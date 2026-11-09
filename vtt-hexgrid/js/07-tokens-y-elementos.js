@@ -394,6 +394,7 @@ function escucharElementos(){
         if(ms === null ? ch.doc.metadata.hasPendingWrites : Date.now() - ms < 60000){ zonasInmediatasVistas.add(ch.doc.id); setTimeout(() => zonaInmediataRevisar(ch.doc.id), 400); }
         else if(ms !== null) zonasInmediatasVistas.add(ch.doc.id);
       }
+      if(d.zona === true && typeof zonaDueloVista === 'function') zonaDueloVista(ch.doc.id, d, ch.doc.metadata.hasPendingWrites);   // 💨 la nube que se expande (js/112)
       // Portal usado por un aliado: los mismos pulsos (violeta donde entró, azul donde salió) en todas las pantallas.
       if(ch.type === 'modified' && previoElem && d.portal === true && Number.isFinite(d.usoEn) && d.usoEn !== previoElem.usoEn && destinoParsear(d.portalDestino)){
         teleportEfecto(elementos.get(ch.doc.id), d.portalDestino);

@@ -1225,6 +1225,7 @@ function dibujarLienzo(){
   // TODOS los conectados (no solo el GM) mientras dura la cascada — ver escucharAreas().
   areasActivas.forEach(a => {
     if(typeof areaDeOtroMapa === 'function' && areaDeOtroMapa(a)) return;   // 🗺 un área de otro mapa no se dibuja acá
+    if(a.hab && a.hab.zonaId) return;   // 💨 la tanda de duelos de una zona (js/112): ya se ve la nube
     if(!(a.centro && (a.centro.cono || Array.isArray(a.centro.linea)))){ dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z); return; }
     // El cono de una habilidad (Sonic Boom) o su línea recta (Varita láser): sus casillas, en el mismo violeta.
     const celdas = Array.isArray(a.centro.linea) ? a.centro.linea.map(k => nbUnpack(k)) : zonasSigilo({col: a.centro.col, fila: a.centro.fila, rotacion: num(a.centro.rot)}).cono;

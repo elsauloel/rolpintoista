@@ -80,6 +80,7 @@ function superficieDibujar(el, celdas, z){
   // neblina»): una zona que es un gas (tóxica, o por su nombre: gas, nube, humo, miasma, pedos, esporas, vapor) se dibuja como una mancha con el
   // borde desparejo y borroso, en vez de hexágonos.
   const nube = nubeColor(el);
+  if(nube && typeof zonaDueloExpandiendo === 'function'){ const k = zonaDueloExpandiendo(el); if(k !== null){ zonaDueloExpansionDibujar(el, celdas, nube, z, k); return {anima: true, sinBorde: true}; } }   // 💨 recién tirada, se expande (js/112)
   if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
   if(esLava(el)){ lavaDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }   // 🌋 la lava (2026-11-09)
   if(esFuego(el)){ fuegoDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }

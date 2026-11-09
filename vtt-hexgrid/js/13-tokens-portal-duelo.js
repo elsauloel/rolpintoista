@@ -455,7 +455,7 @@ async function crearElementoZona(centro, cfg){
   };
   if(cfg.amiga) datos.zonaAmiga = true;
   if(cfg.dano){ datos.zonaDano = String(cfg.dano).slice(0, 12); if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
-  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada || cfg.estado.cura)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22)
+  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada || cfg.estado.cura || cfg.estado.duelo)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22)
   if(cfg.resistStat && Number.isFinite(cfg.resistValor)){ datos.zonaResistStat = String(cfg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(cfg.resistValor)); }
   // La tirada de la zona (2026-10-02, P143): el stat de quien la creó y su valor al crearla; se tira cada vez que afecta a alguien.
   else if(cfg.resistStat && cfg.tiraStat && Number.isFinite(cfg.tiraValor)){
@@ -474,15 +474,17 @@ async function crearElementoZona(centro, cfg){
   if(cfg.inmediata) datos.zonaInmediata = true;
   if(cfg.luz) datos.zonaLuz = true;
   try{
-    try{ await coleccionElementos().add(datos); }
+    let nueva = null;
+    try{ nueva = await coleccionElementos().add(datos); }
     catch(e){
       if(e.code !== 'permission-denied' || !(datos.zonaAltura || datos.zonaDirecto || datos.zonaInmediata || datos.zonaLuz)) throw e;
       const sinReglas = [datos.zonaAltura ? 'zonaAltura: quedó «del aire»' : '', datos.zonaDirecto ? 'zonaDirecto: la frena la Defensa especial' : '',
         datos.zonaInmediata ? 'zonaInmediata: afecta al entrar, no enseguida' : '', datos.zonaLuz ? 'zonaLuz: no ilumina' : ''].filter(Boolean).join(' · ');
-      delete datos.zonaAltura; delete datos.zonaDirecto; delete datos.zonaInmediata; delete datos.zonaLuz; await coleccionElementos().add(datos);
+      delete datos.zonaAltura; delete datos.zonaDirecto; delete datos.zonaInmediata; delete datos.zonaLuz; nueva = await coleccionElementos().add(datos);
       toast(`Ojo: faltan publicar las reglas (${sinReglas})`);
     }
     toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
+    if(nueva && typeof cfg.alCrear === 'function') try{ cfg.alCrear(nueva.id, {...datos}); }catch(err){ console.error('Zona: alCrear', err); }   // 💨 los Pedos Tóxicos (js/112)
     return true;
   }catch(err){
     console.error('No se pudo crear la zona:', err);
@@ -521,6 +523,20 @@ function zonaPersistenteDeHabilidad(msg){
     tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto, color: msg.zonaColor,
     cadaPaso: !!msg.zonaCadaPaso, inmediata: !!msg.zonaInmediata, luz: !!msg.zonaLuz,
   };
+  // 💨 Con duelo por token (los Pedos Tóxicos, 2026-11-09, js/112): la marca va adentro del JSON de zonaEstado (las reglas de Firestore no dejan
+  // sumar campos sueltos a los elementos) y, al crearla, esta pantalla arma la primera tanda de duelos cuando la nube termina de expandirse.
+  if(msg.zonaDuelo){
+    cfg.estado = {duelo: 1, ...(cfg.estado || {})};   // (adelante: el JSON se corta a 300 letras)
+    cfg.alCrear = (id, datos) => { if(typeof zonaDueloAlCrear === 'function') zonaDueloAlCrear(id, datos); };
+  }
+  // 💨 Centrada en quien la usa (los Pedos Tóxicos, dueño, 2026-11-09: «que al ejecutarlo, la nube se coloque automáticamente consigo mismo como
+  // centro del área»): no se marca ningún punto.
+  if(msg.zonaEnMi){
+    const yo = msg.fichaId ? [...tokens.values()].find(x => x.fichaId === msg.fichaId && (x.tipo === 'creep') === (msg.casteadorTipo === 'creep')) : null;
+    if(!yo){ toast(`${msg.nombre || 'La zona'}: no encontré tu token en este mapa`); return; }
+    crearElementoZona({col: yo.col, fila: yo.fila}, cfg);
+    return;
+  }
   // Una línea o un camino (2026-10-08): las casillas se marcan con clics y la zona ocupa justo esas.
   if(msg.zonaForma === 'linea'){ elegirCeldasEnLinea(msg.nombre, msg.zonaLargo, celdas => crearElementoZona(celdas[0], {...cfg, celdas}), '🔥'); return; }
   if(msg.zonaForma === 'camino'){
@@ -1248,6 +1264,8 @@ function escucharAreas(){
     // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
     if(soyGM) areasActivas.forEach((a, id) => {
       if(areaDeOtroMapa(a)) return;   // 🗺 la lleva la pantalla del GM que está en ese mapa
+      // 💨 Las tandas de una misma zona con duelo (js/112), de a una: la más nueva espera a que termine la anterior.
+      if(areaEnCurso(a) && !(a.duelos || [])[num(a.indice)] && typeof zonaDueloEspera === 'function' && zonaDueloEspera(id, a)) return;
       if(areaEnCurso(a) && !(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
       // Seguro contra que se quede pegada para siempre (ej. un dodge roll que nadie llegó a resolver, o
       // un permiso que falló en el último paso): pasados AREA_ATASCADA_MS igual 'en-curso', se cierra sola
@@ -1308,7 +1326,9 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null,
+    // 💨 Una zona con duelo (js/112): la tirada de quien la creó (su Ef.Esp de cuando la creó) se tira acá, de nuevo contra cada uno.
+    const pdgZona = a.hab && a.hab.tiraCadaUno && typeof zonaDueloTirada === 'function' ? zonaDueloTirada(a, t) : null;
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
       carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
@@ -1355,7 +1375,7 @@ function dueloGrupoResuelto(d){
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
     const cambios = siguiente >= total ? (quedan > 0 ? {estado: AREA_ELIGIENDO, indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
-    if(!a.pdgCompartido && d.pdg && !reparte) cambios.pdgCompartido = d.pdg;   // (cada misil, con su propia tirada)
+    if(!a.pdgCompartido && d.pdg && !reparte && !(a.hab && a.hab.tiraCadaUno)) cambios.pdgCompartido = d.pdg;   // (💨 una zona con duelo: tira de nuevo contra cada uno, js/112)   // (cada misil, con su propia tirada)
     return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
 }
@@ -2810,6 +2830,7 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
+  if(spec.caer && typeof zonaDueloCaer === 'function') return zonaDueloCaer(t, d);   // 💨 el 20 de los Pedos Tóxicos: se desmaya (js/112)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks, (d.atacante && d.atacante.nombre) || '');   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
   if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)

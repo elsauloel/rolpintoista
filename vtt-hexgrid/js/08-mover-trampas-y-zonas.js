@@ -381,6 +381,7 @@ let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mos
 // `pasos` (el hielo, 2026-10-17): cuántos pasos dio sobre la zona en este movimiento = cuántas tiradas (se suman si ya esperaba).
 // `pisa` (el hielo): las casillas de esos pasos, en orden, con cuántos pasos dio después (`resto`): si se resbala, queda ahí.
 function zonaEncolar(el, t, pasos, pisa){
+  if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)){ zonaDueloPedir(el, t); return; }   // 💨 con duelo por token (los Pedos Tóxicos, js/112): sin cartel
   const id = zonaIdDe(t), n = Math.max(0, Math.round(num(pasos)));
   const ya = zonaCola.find(x => x.elId === el.id && x.tokenId === id);
   if(ya){ if(n){ ya.pasos = (ya.pasos || 0) + n; ya.pisa = [...(ya.pisa || []), ...(pisa || [])]; } return; }
@@ -588,6 +589,7 @@ function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, tru
 function zonaInmediataRevisar(elId){
   const el = elementos.get(elId);
   if(!el || !el.zona) return;
+  if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)) return;   // 💨 la primera tanda la arma quien la creó, al terminar de expandirse (js/112)
   const cs = celdasDeElemento(el);
   tokens.forEach(t => {
     if(!zonaEsMia(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;

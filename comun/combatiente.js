@@ -2108,7 +2108,15 @@ const Combatiente = (() => {
   function zonaDeHab(h, c, o){
     o = o || {};
     const dif = !!(c.dano && c.danoDiferencia);
+    // 💨 Los Pedos Tóxicos (dueño, 2026-11-09: «que al ejecutarlo, la nube se coloque automáticamente consigo mismo como centro del área… la nube
+    // se expanda como un gas desde el token… y recién ahí se abre el menú de efecto… con el mismo estilo del menú del duelo… afectando de a un token
+    // por vez»): `zonaEnMi` = la nube nace centrada en quien la usa (no se marca el punto); `zonaDuelo` = cada vez que afecta a alguien (al aparecer,
+    // al entrar, al pasar la ronda) va como un duelo por token, uno detrás del otro (vtt-hexgrid/js/112-zona-duelo.js). Las copias de la habilidad
+    // que ya tienen los personajes no traen las marcas: se reconocen por el nombre.
+    const pedos = /^pedos t[oó]xicos$/i.test(String(h.nombre || '').trim());
+    const enMi = !!(c.zonaEnMi || pedos), conDuelo = !!(c.zonaDuelo || pedos);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
+      ...(enMi ? {zonaEnMi: true} : {}), ...(conDuelo ? {zonaDuelo: true} : {}),
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',
       zonaEstado: zonaEstadoConTirada(c, o), zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,

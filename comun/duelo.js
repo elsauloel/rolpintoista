@@ -879,6 +879,14 @@ const Duelo = (() => {
     if(s.provocaDe){ o.provocaDe = txtCorto(s.provocaDe, 80); o.provocaDeNombre = txtCorto(s.provocaDeNombre, 40); }   // 😤 Provocado por quién (Tirar la bronca, 2026-10-26)
     return o;
   }
+  // 💨 La tabla «según la tirada» de un efecto (los Pedos Tóxicos, 2026-11-09, vtt-hexgrid/js/112): desde N → un estado, o «cae» (la vida a 0).
+  const porTiradaDe = e => { const t = e && e.porTirada && typeof Combatiente !== 'undefined' && Combatiente.porTiradaNorm ? Combatiente.porTiradaNorm(e.porTirada) : []; return t.length ? t : null; };
+  // Lo que sale en el dado de un efecto con tabla: funciona si alcanza algún renglón, y el estado es el de ese renglón.
+  function porTiradaResolver(ef, r){
+    const fila = Combatiente.efectoPorTirada(ef.porTirada, r.dado);
+    r.exito = !!fila;
+    if(fila){ ef.spec = fila.caer ? {nombre: 'Desmayo', caer: true} : {...fila.estado}; r.txt = String(Combatiente.porTiradaFilaTxt(fila)).slice(0, 60); }
+  }
   function limpiarEfectos(lista){
     return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => ({
       nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20),
@@ -895,6 +903,7 @@ const Duelo = (() => {
       ...(_num(e.trae) > 0 ? {trae: Math.min(6, Math.round(_num(e.trae)))} : {}),   // 🪝 el gancho de Arrastrar: lo trae hasta pegado (2026-11-04)
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26)
       ...(typeof e.requiereDano === 'boolean' ? {requiereDano: e.requiereDano} : {}),   // 🛡 solo si el golpe hizo daño (el Golpe de escudo, 2026-10-27)
+      ...(porTiradaDe(e) ? {porTirada: porTiradaDe(e)} : {}),   // 💨 el 1d20 de los Pedos Tóxicos (2026-11-09): lo que deja según lo que salga
     })).filter(e => e.nombre);
   }
   // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
@@ -956,6 +965,7 @@ const Duelo = (() => {
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
       ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}),   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
+      ...(h.tiraCadaUno ? {tiraCadaUno: true} : {}), ...(h.zonaId ? {zonaId: txtCorto(h.zonaId, 40)} : {}),   // 💨 una zona con duelo por token (js/112): quien la creó tira de nuevo contra cada uno
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
         ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
@@ -1349,6 +1359,7 @@ const Duelo = (() => {
       if(_num(e.trae) > 0) o.trae = Math.min(6, Math.round(_num(e.trae)));   // 🪝 el gancho de Arrastrar (2026-11-04): entra siempre y lo aplica solo la pantalla del GM, sin botón
       if(e.clava) o.clava = {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))};   // 📌 Clavar a la pared (2026-10-26)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
+      if(porTiradaDe(e)) o.porTirada = porTiradaDe(e);   // 💨 (2026-11-09)
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);
       o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = o.trae ? 'pedido-lados' : '';   // 🪝 (2026-11-05: 'pedido-mapa', que las pantallas viejas no conocen y no toman)
@@ -1381,6 +1392,7 @@ const Duelo = (() => {
       else if(!siempreEf(ef)){
         r.dado = 1 + Math.floor(Math.random() * ef.caras);
         r.exito = r.dado >= ef.caras - ef.exitos + 1;
+        if(ef.porTirada) porTiradaResolver(ef, r);
       }
       if(r.exito && ef.dado && typeof tirarDados === 'function'){
         const x = tirarDados(ef.dado);
@@ -1392,7 +1404,7 @@ const Duelo = (() => {
       tx.update(ref, cambiosDe(m));
       if(aMano){ anuncio = `✍ ${ef.nombre} de ${m.atacante.nombre} sobre ${m.defensor.nombre}, a mano: ${r.exito ? 'funcionó' : 'no funcionó'}`; return; }
       if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {}), ...quienDeLado(m.atacante)}};
-      anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
+      anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}${r.txt ? r.txt : '¡FUNCIONÓ!'}${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
@@ -1427,6 +1439,7 @@ const Duelo = (() => {
         if(!siempreEf(ef)){
           r.dado = 1 + Math.floor(Math.random() * ef.caras);
           r.exito = r.dado >= ef.caras - ef.exitos + 1;
+          if(ef.porTirada) porTiradaResolver(ef, r);
           dados.push({caras: ef.caras, dado: r.dado, exito: r.exito});
         }
         if(r.exito && ef.dado && typeof tirarDados === 'function'){
@@ -1434,7 +1447,7 @@ const Duelo = (() => {
           if(x) r.extra = {formula: x.formula, total: x.total, rolls: (x.rolls || []).slice(0, 10)};
         }
         ef.res = r;
-        partes.push(`${r.exito ? '✔' : '✘'} ${ef.nombre}${siempreEf(ef) ? '' : ` ${pctEf(ef)} % (salió ${r.dado} en d${ef.caras})`}${r.extra ? ` · ${ef.dado} = ${r.extra.total}` : ''}`);
+        partes.push(`${r.exito ? '✔' : '✘'} ${ef.nombre}${siempreEf(ef) ? '' : ` ${pctEf(ef)} % (salió ${r.dado} en d${ef.caras})`}${r.txt ? ' → ' + r.txt : ''}${r.extra ? ` · ${ef.dado} = ${r.extra.total}` : ''}`);
         return ef;
       });
       if(!partes.length) return;
@@ -2722,7 +2735,7 @@ const Duelo = (() => {
       const desde = ef.caras - ef.exitos + 1;
       const dadoTxt = ef.res && ef.res.manual ? '✍' : ef.res ? _fmt(ef.res.dado) : '';   // ✍ elegido a mano
       const res = ef.omitido ? `<span class="no">no entra</span>` : !ef.res ? '<span class="espera">—</span>'
-        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">¡FUNCIONÓ!</span>`
+        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">${ef.res.txt ? '→ ' + _esc(ef.res.txt) : '¡FUNCIONÓ!'}</span>`
         : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="no">✘ no funcionó</span>`;
       return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
     };
@@ -2745,7 +2758,7 @@ const Duelo = (() => {
       else if(ef.aplicado) estado = `<div class="duelo-ef-res ok">✔ Aplicado${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;
       else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span></div>`;
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
-        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
+        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ${ef.res.txt ? '→ ' + _esc(ef.res.txt) : '¡FUNCIONÓ!'} ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
         if(ef.aplicar === 'pedido' || ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa' || ef.aplicar === 'pedido-lados' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;

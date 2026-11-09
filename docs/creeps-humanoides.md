@@ -395,6 +395,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Def.Esp 1, Evasión 10; el arma pasa a Buena: **Puñal de sombra** (Tipo 4, PdG +1, Crítico potente +4, por la espalda en sigilo +2 PdG y +2 de daño)
   en lugar del Punzón de hielo; habilidad nueva **Puñalada por la espalda**; sin pasiva nueva. Combo: Bomba de humo → Puñalada desde el sigilo
   (PdG 19, 2 dados + 9, Crítico frecuente +2 y potente +4). Muy letal contra Evasión baja: medirlo en la ronda de balance.
+  **Nivel 4 aprobado** (dueño, 2026-11-09: «me gusta con Dash»): Des 14 · Agi 10 · Con 8 · Fue 8 · Esp 2 → vida 40, 10 No2, PdG 16, Daño 8,
+  Def 1, Def.Esp 3, Evasión 11, Sigilo +4; **Ropas de sombra finas** (Buena: Def.Esp +2, Sigilo +2, Evasión +1) en lugar del Chaleco de cuero;
+  pasiva **Paso ligero**. Habilidad nueva: **Dash** en lugar del Tajo veloz del plan, que se pisaba con la Finta nueva (+2 PdG, +1 al daño): el Dash
+  atraviesa a un rival y lo deja del otro lado, a su espalda, y también le sirve para escapar.
 
 - **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
   grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1

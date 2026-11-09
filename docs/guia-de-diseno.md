@@ -248,6 +248,11 @@ una vez por ronda… si empieza su turno con este +3 activo… se desactiva… e
   Necesita las reglas de Firestore del campo `pf` (firebase/firestore.rules, `tokenValido`); sin ellas, cada pantalla cuenta por su lado como antes.
   Código: `pasoFantasmaAplicar` y `pasoFantasmaReglas` (js/07), `pasoFantasmaRemoto` (js/09).
 
+## Visión y Percepción en los creeps (dueño, 2026-11-09)
+
+La Visión y el Campo de visión no le sirven a un creep: el GM ve todo el mapa. La **Percepción sí**: «los jugadores en sigilo el GM no los ve», y
+la tirada de Percepción es la que los descubre. Un ítem con Percepción vale para un creep; uno con solo Visión, no.
+
 ## Atacar saca del Sigilo (dueño, 2026-11-09)
 
 «Claro, atacar lo saca del sigilo». Cualquier ataque contra un rival —con el arma, una habilidad de ataque, un disparo, un hechizo o una varita—

@@ -62,6 +62,9 @@
 - **Habilidades que se sientan**: si gasta la acción, además del estado suma algo de daño o algo concreto; ante la duda, un poco para arriba.
 - **Creeps agresivos**: los jugadores tienen muchas herramientas (consumibles, support, re-roll, wildcards); ante la duda, la opción más agresiva.
   La alarma es lo contrario: una acción que no le hace nada a nadie.
+- **Visión y Percepción en un creep** (dueño, 2026-11-09): la Visión y el Campo de visión no le dan ninguna ventaja a un creep (el GM ve todo el
+  mapa), pero la **Percepción sí le sirve**: «los jugadores en sigilo el GM no los ve», y es la Percepción la que los descubre. No decir que un
+  +Percepción «no le sirve» a un creep.
 - **Versión creep, más potente**: al adaptar una skill de clase a creep, proponerla un escalón arriba (tienen menos skills y menos combos).
 - **Vida de un creep = Con × 5 + bonos**, sola. Al editar un creep por script, recalcular con `CreepCalculo.actualizarHpMaxPorCon` (y el No2 con
   `actualizarNo2PorAgl`).

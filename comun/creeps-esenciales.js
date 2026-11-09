@@ -349,6 +349,9 @@
   esencial({...R2, nivel: 4, atrib: [8, 8, 11, 13, 2],   // (aprobado 2026-11-09, dueño: el punto de Constitución a Agilidad; la pasiva, Escurridizo en lugar de Prisa)
     equipo: ['Arco de la sombra', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
     habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla', 'Disparo señalador'], pasivas: ['Pies ligeros', 'Escurridizo']});
+  esencial({...R2, nivel: 5, atrib: [9, 8, 12, 14, 2],   // (aprobado 2026-11-09, dueño: «me cierra el nivel cinco»; los Guantes de cetrero: PdG a distancia +2)
+    equipo: ['Arco de la sombra', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Guantes de cetrero', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla', 'Disparo señalador', 'Ráfaga encadenada'], pasivas: ['Pies ligeros', 'Escurridizo']});
   esencial({linea: 'S2', nombre: 'Abanderado', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 7, 6, 7, 3],
     equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero'],
     habilidades: ['Potencia', '¡A la carga!'], consumibles: ['Pergamino grupal de Furia de Combate'],

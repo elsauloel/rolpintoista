@@ -554,6 +554,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   (Buena: Def +3, +2 contra armas a distancia, Res. crít. T4 +1, Vida +5, Res. fuego +1); habilidad nueva **Disparo señalador** (Presa y
   Marcado 2 turnos); pasiva **Escurridizo**. Vida 45, No2 11, PdG 14, Daño 8, Def 4 (6 contra armas a distancia), Def.Esp 1, Eva 13, Ini 11,
   Mov 11. Programado (R24 en la prueba de niveles).
+  **Nivel 5 aprobado** (dueño, 2026-11-09: «me cierra el nivel cinco»): Des 14 · Agi 12 · Con 9 · Fue 8 · Esp 2 (otra vez Agilidad antes que
+  Constitución); los guantes pasan a **Guantes de cetrero** (Buena: PdG a distancia +2, Percepción +1); habilidad nueva **Ráfaga encadenada**.
+  Vida 50, No2 12, PdG 14 (16 con el arco), Daño 8, Def 4 (6 contra armas a distancia), Eva 14, Ini 12, Mov 12. Programado (R25 en la prueba de
+  niveles). **Línea R2 completa.**
 
 - **M4 · Arcano · Mago, con SP** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: control y movilidad: decide dónde
   está cada uno (aparece, empuja, atrae, manda por un portal, atraviesa en línea); en nv5, la Tormenta arcana. Atributos (Esp/Con/Agi/Des/Fue →
@@ -931,7 +935,7 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 
 ### M1 Piromante · nivel 5 (aprobado 2026-11-06, cargado en el pool) — ✅ línea M1 completa
 - Atributos Con 11 · Fue 2 · Agi 7 · Des 7 · Esp 18 → vida 65 (55 + kevlar 5 + casco 5), No2 7, SP 54 (regen 9). Equipo: Varita del chorro de lava (B) ·
-  Chaleco de kevlar (B) · **Casco de bandas remachadas** (B; dueño: el Turbante no, «la visión al creep no le da ninguna ventaja», el GM ve todo el mapa)
+  Chaleco de kevlar (B) · **Casco de bandas remachadas** (B; dueño: el Turbante no, «la visión al creep no le da ninguna ventaja», el GM ve todo el mapa; la Percepción sí le sirve: descubre a los jugadores en sigilo, dueño 2026-11-09)
   · Botella con un diablito · Escarpines de fieltro · **Mitones del primer conjuro** (−1 SP al primer uso de la varita en el turno). Habilidades: +
   **Meteoro**. Pasivas: Potencia especial · Puntería arcana.
 - Números (nv4 → nv5): Def 3 → 5 (7 a distancia) · crít. T4 1 → 2 · PdG.Esp 18 → 19 · Ef.Esp 18 → 19 · SP 51 → 54 · Res. fuego 2 → 1.

@@ -650,14 +650,15 @@ function bnPreguntarTipoAtaque(arma, otro){
    Dos botones y un desplegable (dueño, 2026-10-11: «cuando tenés flechas especiales, que aparezca flecha común / flecha especial, y al apretar
    especial un desplegable con las especiales más ordenaditas; si no, con mucha variedad se despelota el menú»): «Flecha especial ▾» abre abajo
    la lista, un renglón por flecha, ordenada por nombre. */
-function bnElegirFlecha(arma, flechas, alElegir, abierto){
+function bnElegirFlecha(arma, flechas, alElegir, abierto, alCancelar){   // ↩ alCancelar: se cerró sin elegir (2026-11-09)
   const vir = Combatiente.municionDe(arma) === 'virote', cosa = vir ? 'virote' : 'flecha', Cosa = vir ? 'Virote' : 'Flecha';   // la ballesta dispara virotes (2026-10-10)
   const total = flechas.reduce((t, f) => t + (num(f.unidades) || 1), 0);
   const lista = [...flechas].sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
-  AvisoCombate.mostrar({clave: 'elegir-flecha', icono: '🏹', titulo: `¿Qué ${cosa}? · ${arma ? arma.nombre : 'arco'}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}, pegue o no, y su efecto entra siempre que pegue.`,
-    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
-      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${fmt(total)} en el carcaj · ${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`}`, alClic: () => bnElegirFlecha(arma, flechas, alElegir, !abierto)},
-      ...(abierto ? lista.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
+  let elegida = false;
+  AvisoCombate.mostrar({clave: 'elegir-flecha', alCerrar: () => { if(!elegida && alCancelar) alCancelar(); }, icono: '🏹', titulo: `¿Qué ${cosa}? · ${arma ? arma.nombre : 'arco'}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}, pegue o no, y su efecto entra siempre que pegue.`,
+    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { elegida = true; AvisoCombate.cerrar(); alElegir(''); }},
+      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${fmt(total)} en el carcaj · ${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`}`, alClic: () => bnElegirFlecha(arma, flechas, alElegir, !abierto, alCancelar)},
+      ...(abierto ? lista.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { elegida = true; AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
 }
 function bnDispararFlecha(flechaId, arma){
   const S = bn.S, c = FichaEquipo.carcajDe(S), f = c && (c.flechas || []).find(x => x.id === flechaId);
@@ -781,7 +782,7 @@ function bnElegirObjetivo(cfg, flechaId){
   if(cfg.emergio) bnEmergido = null;
   const arma = atq && atq.tipo === 'habilidad-arma' && atq.armaId ? (S.inventario || []).find(x => x.id === atq.armaId) || null : null;
   const flechas = arma && Combatiente.municionDe(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S).filter(f => Combatiente.sirveLaMunicion(arma, f)) : [];
-  if(flechaId === undefined && flechas.length){ bnElegirFlecha(arma, flechas, id => bnElegirObjetivo(cfg, id)); return; }
+  if(flechaId === undefined && flechas.length){ bnElegirFlecha(arma, flechas, id => bnElegirObjetivo(cfg, id), false, () => { bnDevolverSiCancelo(cfg); if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } }); return; }
   const fl = flechaId ? flechas.find(f => f.id === flechaId) || null : null;
   const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
   bn.host.hidden = true;

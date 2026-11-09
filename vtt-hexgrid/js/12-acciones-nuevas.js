@@ -348,13 +348,18 @@ function acFlechas(sc){
   const m = acMunicion(sc);
   return m ? (sc.cinturon || []).filter(i => i && i.flecha && num(i.unidades) > 0 && (m === 'virote') === !!i.flecha.virote) : [];
 }
-function acElegirFlecha(sc, flechas, alElegir, abierto){
+// ↩ `alCancelar` (2026-11-09, cola de pruebas 9: cerrar el «¿Qué flecha?» con la ✕ de una habilidad de disparo ya cobrada no devolvía el cooldown
+// ni los No2): se llama si la ventana se cierra sin elegir flecha.
+function acElegirFlecha(sc, flechas, alElegir, abierto, alCancelar){
   const vir = acMunicion(sc) === 'virote', cosa = vir ? 'virote' : 'flecha', Cosa = vir ? 'Virote' : 'Flecha';
   const txt = f => typeof FichaEquipo !== 'undefined' && FichaEquipo.flechaTxt ? FichaEquipo.flechaTxt(f) : String(f.detalle || '').slice(0, 90);
+  let elegida = false;
+  const elegir = id => { elegida = true; AvisoCombate.cerrar(); alElegir(id); };
   AvisoCombate.mostrar({clave: 'elegir-flecha', icono: '🏹', titulo: `¿Qué ${cosa}? · ${sc.nombre}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}.`,
-    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
-      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`} en el cinturón`, alClic: () => acElegirFlecha(sc, flechas, alElegir, !abierto)},
-      ...(abierto ? flechas.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: txt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
+    alCerrar: () => { if(!elegida && alCancelar) alCancelar(); },
+    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => elegir('')},
+      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`} en el cinturón`, alClic: () => acElegirFlecha(sc, flechas, alElegir, !abierto, alCancelar)},
+      ...(abierto ? flechas.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: txt(f), alClic: () => elegir(f.id)})) : [])]});
 }
 function acDispararFlecha(flechaId){
   let item = null;   // (una copia, por si el duelo se cancela: CreepDuelo.devolverFlecha)
@@ -508,7 +513,13 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
     // como Atacar (acAtacar): se elige antes del objetivo y se gasta al disparar.
     const lanzar = fl => acElegirObjetivo(sc, fl ? {...atq, flecha: fl} : atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)), fl ? () => acDispararFlecha(fl.id) : null);
     const flechas = atq.tipo === 'habilidad-arma' && !atq.escudoGolpe && !(emergio && armaSalida) ? acFlechas(sc) : [];   // (saliendo de abajo, con un arma de mano: sin flechas)
-    if(flechas.length) acElegirFlecha(sc, flechas, fid => lanzar(fid ? flechas.find(f => f.id === fid) || null : null));
+    if(flechas.length){
+      // ↩ Cerrar el «¿Qué flecha?» sin elegir: se devuelve lo cobrado por la habilidad, como al cancelar la elección del objetivo.
+      const nomHab = atq.habNombre || (atq.hab && atq.hab.nombre), base = x => String(x || '').split(':')[0].trim().toLowerCase();
+      const cancelar = () => { const dev = ac && ac.devolucion && ac.devolucion.creepId === sc.id && base(ac.devolucion.habNombre) === base(nomHab) ? ac.devolucion : null;
+        if(ac && dev) ac.devolucion = null; if(ac && ac.creepId === sc.id){ ac.host.hidden = false; acUbicar(); acDibujar(); } acDevolver(dev); };
+      acElegirFlecha(sc, flechas, fid => lanzar(fid ? flechas.find(f => f.id === fid) || null : null), false, cancelar);
+    }
     else lanzar(null);
   }
   else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));

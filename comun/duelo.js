@@ -1638,8 +1638,12 @@ const Duelo = (() => {
         }
       }
       if((d.efectos || []).some(ef => ef && _num(ef.trae) > 0 && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('Lo enganchó y lo arrastró hasta dejarlo pegado.');   // 🪝 Arrastrar (2026-11-04)
-      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !(_num(ef.trae) > 0)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
+      // (2026-11-09, cola de pruebas 9: el efecto que frenó el Invulnerable —nota «no entró: …»— no cuenta como que «quedó con»: se dice aparte)
+      const noEntro = ef => /^no entró/i.test(String(ef.nota || ''));
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !noEntro(ef) && !(_num(ef.trae) > 0)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);
+      const frenados = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && noEntro(ef)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);
+      if(frenados.length) partes.push(`No le entró ${frenados.join(', ')} (${String((d.efectos.find(ef => ef && noEntro(ef)) || {}).nota).replace(/^no entró:\s*/i, '').replace(/\s*\(.*$/, '')}).`);
       if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
       fin = partes.join(' ');
     }

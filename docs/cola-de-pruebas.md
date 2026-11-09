@@ -13,6 +13,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 ## En cola
 
 27. [ ] **Línea L3 · Asesino de las sombras, niveles 1 a 5** (Ojo de asesino, Bomba de humo y Sigilo, Finta nueva, Puñalada por la espalda, Dash a la espalda, Degollar con Expuesto, Paso ligero, Puñal de sombra en sigilo, Bombacha de cuatrero).
+28. [ ] **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

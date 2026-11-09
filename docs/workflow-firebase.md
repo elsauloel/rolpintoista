@@ -242,7 +242,8 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`
   (+ `ruta`) al soltar. Un PJ vinculado a su ficha gasta Nitros: el mapa pide
   confirmar y descuenta `nitros` en `partes/general` + `resumen.nitros` en
-  una transacción.
+  una transacción. `pf` (2026-11-09) = el Paso fantasma del anillo, `{v, c, l, d}`: lo escribe el
+  mapa (los pasos, quien mueve; el gasto, quien tira la Evasión) — ver `docs/guia-de-diseno.md`.
 - `campanas/{id}/mapa/usos` — `{ids: {mapaId: fecha}}` (2026-10-31): cuándo se usó por última vez cada mapa (se anota al publicar: el que
   entra y el que sale). Lo escribe el GM; ordena la lista de 🗺 Mapas.
 - `campanas/{id}/mapa/activo` — `{mapaId, actualizado}`: cuál de los mapas

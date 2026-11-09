@@ -1118,7 +1118,16 @@ const rondaAnterior = r => r[0] + (Number(r.slice(1)) - 1);
    - El bono sirve para su próxima tirada de Evasión; si no lo usó y empieza su turno, se vence. No se acumula (moverse 6 da lo mismo).
    La ventana se deduce del orden de turnos, que ven todas las pantallas: su turno ya empezó en esta ronda si está en `actuaron` o `empezados`, o si es
    el turno de ahora o uno anterior. */
-const pasoFantasmaEstado = new Map();   // tokenId → {v: ventana, listo, disparado}
+/* 🗄 Guardado en la partida (dueño, 2026-11-09: «guardamos la cuenta del paso fantasma»): el estado vive en el token (`pf` = {v: ventana, c: pasos
+   seguidos, l: listo, d: ya se activó en esta ventana}), así todas las pantallas ven lo mismo, se gasta una sola vez y sobrevive a recargar la página.
+   - Escribe solo quien tiene que hacerlo: los pasos, la pantalla que mueve al token (no las que ven la ruta llegar); el gasto, la que tira la Evasión
+     (en una transacción: si otra pantalla ya lo gastó, no se gasta dos veces y avisa); el corte de la cadena, la pantalla del dueño del token (el GM
+     para sus creeps y los personajes que maneja), solo si la cadena no estaba en 0.
+   - El vencimiento no se escribe: la ventana (`v`) se deduce del orden de turnos, y un `pf` de otra ventana cuenta como vacío.
+   - Sin las reglas nuevas de Firestore (el campo `pf`), la escritura falla y queda como antes: la cuenta de esta pantalla (aviso una vez en la consola).
+   `pasoFantasmaEstado` es la copia local (lo que llegó del token, o lo que esta pantalla acaba de escribir). */
+const pasoFantasmaEstado = new Map();   // tokenId → {v: ventana, c: cadena, l: listo, d: disparado}
+let pasoFantasmaSinReglas = false;
 function pasoFantasmaVentana(id){
   const orden = iniciativa.orden || [], i = orden.findIndex(o => o && o.id === id);
   if(!orden.length || i < 0) return 'm' + Math.round(num(mantenimientoNumero));
@@ -1126,26 +1135,72 @@ function pasoFantasmaVentana(id){
   const empezo = (iniciativa.actuaron || []).includes(id) || (iniciativa.empezados || []).includes(id) || i <= num(iniciativa.turno);
   return 'i' + (empezo ? r : r - 1);
 }
+// Un `pf` (del token o local) llevado a la ventana de ahora: si es de otra ventana, empezó su turno y lo que no usó se vence.
+function pasoFantasmaNormal(pf, v){
+  return pf && typeof pf === 'object' && pf.v === v ? {v, c: Math.max(0, Math.round(num(pf.c))), l: pf.l === true, d: pf.d === true} : {v, c: 0, l: false, d: false};
+}
 function pasoFantasmaDe(id){
-  const v = pasoFantasmaVentana(id);
-  let e = pasoFantasmaEstado.get(id);
-  if(!e || e.v !== v){ e = {v, listo: false, disparado: false, cadena: 0}; pasoFantasmaEstado.set(id, e); }   // empezó su turno: lo que no usó se vence
+  const v = pasoFantasmaVentana(id), e = pasoFantasmaNormal(pasoFantasmaEstado.get(id), v);
+  pasoFantasmaEstado.set(id, e);
   return e;
 }
-function pasoFantasmaMovio(id, pasos){
-  const e = pasoFantasmaDe(id);
-  e.cadena = num(e.cadena) + pasos;   // los pasos seguidos, aunque vengan de varios movimientos
-  if(e.disparado || !(e.cadena >= 3)) return;
-  e.listo = true; e.disparado = true;
+// Lo que llega del token (js/09): pasa a ser la copia local.
+function pasoFantasmaRemoto(id, pf){ if(pf && typeof pf === 'object') pasoFantasmaEstado.set(id, {v: String(pf.v || ''), c: num(pf.c), l: pf.l === true, d: pf.d === true}); }
+// Las reglas, como funciones puras (también las usa la prueba automática): → el estado nuevo, o null si no cambia.
+const pasoFantasmaReglas = {
+  movio: (e, pasos) => { const c = e.c + Math.max(0, Math.round(num(pasos))); return !e.d && c >= 3 ? {...e, c, l: true, d: true} : {...e, c}; },
+  cortar: e => e.c > 0 ? {...e, c: 0} : null,
+  gastar: e => e.l ? {...e, l: false} : null,
+};
+window.pasoFantasmaReglas = pasoFantasmaReglas;
+// Aplica una regla: ya en esta pantalla, y en el token con una transacción (lee lo último guardado, aplica, escribe). → lo que devolvió la transacción
+// (true si la regla cambió algo en lo guardado), o lo local si no se pudo guardar.
+async function pasoFantasmaAplicar(id, regla, ...args){
+  const v = pasoFantasmaVentana(id), local = pasoFantasmaReglas[regla](pasoFantasmaDe(id), ...args);
+  if(local) pasoFantasmaEstado.set(id, local);
+  if(pasoFantasmaSinReglas || typeof fbDb === 'undefined' || !tokens.has(id)) return !!local;
+  const ref = coleccionTokens().doc(id);
+  try{
+    return await fbDb.runTransaction(async tx => {
+      const s = await tx.get(ref);
+      if(!s.exists) return false;
+      const nuevo = pasoFantasmaReglas[regla](pasoFantasmaNormal(s.data().pf, v), ...args);
+      if(!nuevo) return false;
+      tx.update(ref, {pf: nuevo});
+      return true;
+    });
+  }catch(err){
+    if(err && err.code === 'permission-denied'){ pasoFantasmaSinReglas = true; console.warn('👻 Paso fantasma: faltan las reglas de Firestore del campo «pf» (se cuenta solo en esta pantalla).'); }
+    else console.error('👻 Paso fantasma: no se pudo guardar', err);
+    return !!local;
+  }
 }
-// Otra acción del token (o un desplazamiento sin camino): se corta la cadena de pasos seguidos (lo ya ganado, `listo`, no se toca).
-function pasoFantasmaCortar(id){ const e = pasoFantasmaEstado.get(id); if(e) e.cadena = 0; }
+function pasoFantasmaMovio(id, pasos){ pasoFantasmaAplicar(id, 'movio', pasos); }
+// Otra acción del token (o un desplazamiento sin camino): se corta la cadena de pasos seguidos (lo ya ganado, `l`, no se toca).
+// El corte lo guarda solo la pantalla del dueño del token (el GM para sus creeps y los personajes que maneja): así no llega tarde desde otra pantalla
+// y le borra pasos nuevos. Las demás lo cortan en su copia y esperan lo guardado.
+function pasoFantasmaCortar(id){
+  const e = pasoFantasmaDe(id);
+  if(!(e.c > 0)) return;
+  const t = tokens.get(id);
+  if(t && typeof fbUsuario !== 'undefined' && fbUsuario && t.duenoUid === fbUsuario.uid) pasoFantasmaAplicar(id, 'cortar');
+  else pasoFantasmaEstado.set(id, {...e, c: 0});
+}
 window.mapaPasoFantasmaCortar = pasoFantasmaCortar;
-window.mapaPasoFantasma = id => pasoFantasmaDe(id).listo;
-window.mapaPasoFantasmaGastar = id => { pasoFantasmaDe(id).listo = false; };
-function contarCasilleros(id, pasos){
+window.mapaPasoFantasma = id => pasoFantasmaDe(id).l;
+// Se tiró la Evasión con el +3: se gasta. Si otra pantalla ya lo había gastado (lo guardado ya no estaba listo), avisa: esta tirada lo sumó de más.
+window.mapaPasoFantasmaGastar = async id => {
+  const ok = await pasoFantasmaAplicar(id, 'gastar');
+  if(!ok && !pasoFantasmaSinReglas){
+    const t = tokens.get(id), nom = t ? nombreDe(t) : 'Alguien';
+    if(typeof mesaLinea === 'function') mesaLinea(`👻 ${nom}: el +3 del Paso fantasma ya se había gastado en otra pantalla; esta Evasión lo sumó de más (restale 3).`, 'alerta');
+  }
+  return ok;
+};
+// `ajeno`: la ruta la trajo otra pantalla (js/09): suma a «Contra el que corre», pero el Paso fantasma ya lo guardó la pantalla que movió.
+function contarCasilleros(id, pasos, ajeno){
   if(!(pasos > 0)) return;
-  pasoFantasmaMovio(id, pasos);
+  if(!ajeno) pasoFantasmaMovio(id, pasos);
   const r = rondaDeCasilleros(), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
   if(m[rondaAnterior(r)]) nuevo[rondaAnterior(r)] = m[rondaAnterior(r)];
   casillerosRonda.set(id, nuevo);

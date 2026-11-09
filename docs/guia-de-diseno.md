@@ -238,6 +238,13 @@ una vez por ronda… si empieza su turno con este +3 activo… se desactiva… e
   Evasión (una varita, un hechizo dirigido): suma el fijo y se gasta igual (`Combatiente.fantasmaEvaHab`). Antes solo valía contra un ataque con arma.
 - Código: `pasoFantasmaVentana` / `pasoFantasmaDe` / `pasoFantasmaMovio` en vtt-hexgrid/js/07 (la ventana sale del orden de turnos que ven todas las
   pantallas: `actuaron`, `empezados` y el turno actual).
+- **Guardado en la partida (dueño, 2026-11-09: «guardamos la cuenta del paso fantasma»):** el estado vive en el token, campo `pf` = `{v: ventana,
+  c: pasos seguidos, l: listo, d: ya se activó en esta ventana}`. Todas las pantallas ven lo mismo y sobrevive a recargar la página. Los pasos los
+  guarda la pantalla que mueve al token (las demás, al ver la ruta, ya no los suman); el corte lo guarda la pantalla del dueño del token (el GM para
+  sus creeps y los personajes que maneja); el gasto, la pantalla que tira la Evasión, en una transacción: si otra pantalla ya lo había gastado, no
+  se gasta dos veces y la Mesa avisa que esa Evasión lo sumó de más. El vencimiento no se escribe: un `pf` de otra ventana cuenta como vacío.
+  Necesita las reglas de Firestore del campo `pf` (firebase/firestore.rules, `tokenValido`); sin ellas, cada pantalla cuenta por su lado como antes.
+  Código: `pasoFantasmaAplicar` y `pasoFantasmaReglas` (js/07), `pasoFantasmaRemoto` (js/09).
 
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).

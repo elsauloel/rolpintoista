@@ -145,7 +145,7 @@ function escucharTokens(){
         const celdas = [];
         for(let i = 0; i + 1 < ruta.length; i += 2) celdas.push({col: ruta[i], fila: ruta[i + 1]});
         estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
-        if(typeof contarCasilleros === 'function') contarCasilleros(ch.doc.id, celdas.length - 1);   // lo que se movió (Contra el que corre, js/35)
+        if(typeof contarCasilleros === 'function') contarCasilleros(ch.doc.id, celdas.length - 1, true);   // lo que se movió (Contra el que corre, js/35; el Paso fantasma lo guarda quien movió)
       }
       // 👻 Cambió de casilla sin camino nuevo (el Salto, el Dash, un empujón, el Mover libre): corta la cadena de pasos seguidos del Paso fantasma (js/07).
       else if(ch.type === 'modified' && previo && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila))) && typeof pasoFantasmaCortar === 'function') pasoFantasmaCortar(ch.doc.id);
@@ -175,6 +175,7 @@ function escucharTokens(){
         bajoTierra: d.bajoTierra === true,   // 🕳 bajo tierra (js/46)
         tunel: Array.isArray(d.tunel) ? d.tunel.map(Number) : null,   // 🕳 la estela del túnel (js/46)
       });
+      if(d.pf && typeof pasoFantasmaRemoto === 'function') pasoFantasmaRemoto(ch.doc.id, d.pf);   // 👻 el Paso fantasma guardado en el token (js/07)
     });
     renderIniciativa();
     nuevosInv.forEach(id => { if(typeof invocacionAlOrden === 'function') invocacionAlOrden(id); });

@@ -100,6 +100,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
+  if(d.tipo === 'escudo-dado' && typeof escudoDadoMomento === 'function') escudoDadoMomento(id, d);   // 🎲 el dado del Escudo elemental: lo tira quien lo tiró (js/106, 2026-11-09)
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
   if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'onda' && typeof ondaFxRecibido === 'function') ondaFxRecibido(id, d);   // 💥 la onda del Shockwave (js/94, 2026-11-03)
@@ -164,7 +165,7 @@ function momentoRecibido(id, d){
   const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid))
     || (d.datos.soloGM && d.datos.aviso && soyGM));   // 🙈 el aviso solo para el GM: al centro, en cada pantalla de GM (2026-11-05)
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
-  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && d.tipo !== 'pergamino-grupal' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'escudo-dado' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && d.tipo !== 'pergamino-grupal' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
@@ -175,7 +176,7 @@ function momentoRecibido(id, d){
   const ya = momentosFeed.get(id);
   // ▶ El inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»); 🎲 la tirada extra de una zona, mientras espere algo (el GM tiene
   // «Tirar por él», «Que se aplique» y «Aplicar»: a los 14 s se borraba y el GM se quedaba sin el botón; 2026-10-22).
-  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'malviaje' && d.estado !== 'listo') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
+  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'malviaje' && d.estado !== 'listo') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'escudo-dado' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
   momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
   renderMomentosFeed();
 }

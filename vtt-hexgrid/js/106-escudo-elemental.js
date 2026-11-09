@@ -341,8 +341,157 @@ function escudoResuelvoYo(v){
   const r = ((fichasPub.get(String(v.fichaId || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {};
   return fbUsuario.uid === (r.control || v.duenoUid || '');
 }
-// Quema a `vid` con el escudo de `pid` (si esta pantalla resuelve a la víctima y no la quemó en esta ronda).
-async function escudoQuemar(pid, vid, motivo){
+/* ---------- 🎲 La tirada del dado del escudo (dueño, 2026-11-09: «quiero que esté la instancia de tirar el dado; ahora está todo automático») ----------
+   El 1d6 ya no se tira solo. Lo tira quien maneja a QUIEN TIRÓ el escudo (`escudoDe` del estado): un creep → el GM; un personaje → su dueño, o
+   quien tiene 🎮 el control. Esa pantalla ve el cartel «🎲 Tirar 1d6» (o «✋ Resolver a mano»: la mesa escribe lo que entra a la vida). Lo que sigue
+   (la resistencia, el efecto, el salto, los números flotantes y el reporte) se resuelve solo, en la pantalla de la víctima, como antes.
+   - Si quien tira es la misma pantalla que resuelve a la víctima: el cartel sale acá, directo.
+   - Si no: la pantalla de la víctima abre un momento `escudo-dado` (esperando) y espera; la Crónica muestra «⏳ Esperando que X tire…». Si a los
+     20 s nadie tiró, el GM ve el mismo cartel («tirar por él»). Lo toma una transacción, así no se tira dos veces.
+   - Varios a la vez (el portador se mueve sobre dos): uno por uno, en fila (un cartel por cada víctima), en el orden en que entraron. */
+const ESCUDO_DADO_ESPERA_GM = 20000, ESCUDO_DADO_MAX = 180000;
+const escudoDadoEsperan = new Map();   // momentoId → resolve (la pantalla de la víctima esperando la tirada)
+const escudoDadoCola = [], escudoDadoVistos = new Set(), escudoDadoTomados = new Set();
+let escudoDadoAbierto = null, escudoQuemarFila = Promise.resolve();
+// Quién tira: {gm: true} (un creep o nadie) o {uid, nombre} (el que maneja al personaje que lo tiró).
+function escudoTirador(e, p){
+  const cid = e && e.estado && e.estado.escudoDe ? String(e.estado.escudoDe) : '';
+  const c = cid ? tokens.get(cid) : null;
+  if(!c || c.tipo === 'creep') return {gm: true, nombre: 'el GM'};
+  const f = fichasPub.get(String(c.fichaId || '').split(SEP_INVOCACION)[0]);
+  const uid = (f && f.resumen && f.resumen.control) || c.duenoUid || (f && f.duenoUid) || '';
+  return uid ? {uid, nombre: c.oculto ? 'Alguien' : nombreDe(c), creep: false} : {gm: true, nombre: 'el GM'};
+}
+const escudoTiroMio = tz => tz.gm ? !!soyGM : !!(fbUsuario && fbUsuario.uid === tz.uid);
+// La tirada en esta pantalla: los dados en la Mesa (con la animación) → {total, rolls, formula}.
+async function escudoDadoTirarAca(info){
+  const r = tirarDados(info.dado || '1d6');
+  if(!r) return null;
+  try{ await mesaPublicar(`${info.icono} ${info.escudo} de ${info.quienP} → ${info.quienV}${info.porGM ? ' (lo tiró el GM)' : ''}`,
+    {formula: r.formula || info.dado, rolls: r.rolls, mod: r.mod || 0, total: r.total, quien: `${info.escudo} de ${info.quienP}`, ...(info.gm ? {desde: 'gm'} : {})}); }catch(err){}
+  await new Promise(res => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(res) : res());
+  return {total: num(r.total), rolls: r.rolls || [], formula: r.formula || info.dado};
+}
+// ✋ A mano: lo que entra a la vida (sin resistencia ni multiplicador). → número o null.
+async function escudoDadoAMano(info){
+  const t = await Confirmar.texto(`${info.escudo} de ${info.quienP} → ${info.quienV}: ¿cuánto le entra a la vida? (lo que decidió la mesa; va directo, sin resistencia)`,
+    {titulo: 'Resolver a mano', icono: '✋', valor: '', si: 'Aplicar', max: 6});
+  if(t === null || t === undefined) return null;
+  const n = Math.round(Number(String(t).trim()));
+  if(!Number.isFinite(n) || n < 0){ toast('Escribí un número (0 o más)'); return escudoDadoAMano(info); }
+  return n;
+}
+// El cartel → Promise<{total, rolls} | {mano: n} | null (cerró sin tirar)>.
+// (Uno por vez y sin perderse: si otro cartel está abierto, espera; si otro lo tapa, vuelve a aparecer cuando se cierra. Solo se cierra con sus botones.)
+function escudoDadoCartel(info, alTomar){
+  return new Promise(fin => {
+    let listo = false, fase = 'inicio', vigia = null;
+    const clave = 'escudo-dado:' + (info.mid || 'local') + ':' + Math.random().toString(36).slice(2, 7);
+    const cerrar = v => { if(listo) return; listo = true; if(vigia) clearInterval(vigia); try{ if(AvisoCombate.abiertoClave() === clave) AvisoCombate.cerrar(); }catch(e){} fin(v); };
+    const que = `${info.quienV} ${info.motivo === 'turno' ? 'empieza su turno pegado al' : 'entra al'} ${info.escudo.toLowerCase()} de ${info.quienP}.`;
+    const mostrarInicio = () => AvisoCombate.mostrar({clave, soloBoton: true, icono: info.icono, titulo: `${info.escudo} de ${info.quienP}${info.porGM ? ' · tirá por él' : ''}`,
+      pasos: [{titulo: que, texto: info.que ? `${info.que.charAt(0).toUpperCase()}${info.que.slice(1)}. Directo a la vida.` : `Le hace ${info.dado} de ${info.nombreEl}, directo a la vida.`},
+        {titulo: 'Tirada', texto: `🎲 ${info.dado}: el daño del escudo.`, espera: true}],
+      botones: [{texto: `🎲 Tirar ${info.dado}`, id: 'escudo-dado-tirar', alClic: async () => {
+          if(listo) return;
+          const b = document.getElementById('escudo-dado-tirar'); if(b) b.disabled = true;
+          fase = 'tirando';
+          if(alTomar && !(await alTomar())){ cerrar(null); return; }
+          AvisoCombate.mostrar({clave, soloBoton: true, icono: info.icono, titulo: `${info.escudo} de ${info.quienP}`,
+            pasos: [{titulo: que, texto: `Rodando ${info.dado}…`, espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
+          const r = await escudoDadoTirarAca(info);
+          if(!r){ toast(`No se pudo tirar ${info.dado}`); cerrar(null); return; }
+          fase = 'listo';
+          AvisoCombate.mostrar({clave, icono: info.icono, titulo: `${info.escudo} de ${info.quienP}`,
+            pasos: [{titulo: que, texto: `Salió ${fmt(r.total)} en ${info.dado}. Ahora se resuelve el resto (resistencia, efecto${info.clave === 'rayo' ? ', salto' : ''}).`}],
+            veredicto: {tono: 'malo', grande: `🎲 ${fmt(r.total)}`, chico: `${info.dado} del ${info.escudo.toLowerCase()}`},
+            botones: [{texto: 'Entendido', alClic: () => cerrar(r)}], alCerrar: () => cerrar(r)});
+          setTimeout(() => cerrar(r), 2500);
+        }},
+        {texto: '✋ Resolver a mano', sec: true, alClic: async () => {
+          if(listo) return;
+          const n = await escudoDadoAMano(info);
+          if(n === null) return;   // canceló: sigue el cartel
+          fase = 'tirando';
+          if(alTomar && !(await alTomar())){ cerrar(null); return; }
+          cerrar({mano: n});
+        }}],
+      alCerrar: () => cerrar(null)});
+    vigia = setInterval(() => { if(!listo && fase === 'inicio' && !AvisoCombate.abierto()) mostrarInicio(); }, 1000);
+    if(!AvisoCombate.abierto()) mostrarInicio();
+  });
+}
+// La pantalla de la víctima pide la tirada. → {total, rolls} | {mano: n} | null, y el id del momento (para cerrarlo después).
+async function escudoPedirDado(info, tz){
+  if(escudoTiroMio(tz)){
+    const mid = await momentoAbrir({tipo: 'escudo-dado', icono: info.icono, titulo: `🎲 ${tz.gm ? 'El GM' : tz.nombre} tira el ${info.dado} del ${info.escudo.toLowerCase()} (${info.quienV})`, estado: 'tirando',
+      datos: {chico: true, local: true}}).catch(() => null);
+    return {r: await escudoDadoCartel(info, null), mid};
+  }
+  const mid = await momentoAbrir({tipo: 'escudo-dado', icono: '⏳', titulo: `⏳ Esperando que ${tz.gm ? 'el GM' : tz.nombre} tire el dado del ${info.escudo.toLowerCase()} de ${info.quienP} (${info.quienV})`,
+    estado: 'esperando', datos: {...info, paraUid: tz.gm ? '' : tz.uid, paraGM: !!tz.gm}});
+  if(!mid){   // sin momentos (reglas viejas): lo tira esta pantalla, para no trabar
+    return {r: await escudoDadoCartel({...info, porGM: !tz.gm}, null), mid: null};
+  }
+  const r = await new Promise(res => {
+    escudoDadoEsperan.set(mid, res);
+    setTimeout(() => { if(escudoDadoEsperan.get(mid) === res){ escudoDadoEsperan.delete(mid); momentoActualizar(mid, {estado: 'listo', resultado: 'Nadie tiró a tiempo: a mano.'}); res(null); } }, ESCUDO_DADO_MAX);
+  });
+  return {r, mid};
+}
+// Llega un momento `escudo-dado` (js/16).
+function escudoDadoMomento(id, d){
+  const dt = d.datos || {};
+  if(dt.local) return;
+  const espera = escudoDadoEsperan.get(id);
+  if(espera && (d.estado === 'tirado' || d.estado === 'mano')){
+    escudoDadoEsperan.delete(id);
+    espera(d.estado === 'mano' ? {mano: num(dt.valor)} : {total: num(dt.total), rolls: dt.rolls || []});
+    return;
+  }
+  if(d.estado !== 'esperando'){
+    if(escudoDadoAbierto === id && !escudoDadoTomados.has(id) && AvisoCombate.abiertoClave && String(AvisoCombate.abiertoClave() || '').startsWith('escudo-dado:' + id + ':')) AvisoCombate.cerrar();
+    return;
+  }
+  const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(!fbUsuario || escudoDadoVistos.has(id) || Date.now() - ms > ESCUDO_DADO_MAX) return;
+  const mio = dt.paraGM ? !!soyGM : dt.paraUid === fbUsuario.uid;
+  if(mio){ escudoDadoVistos.add(id); escudoDadoCola.push({id, d}); escudoDadoMostrar(); return; }
+  // 🧯 Si quien tiene que tirar no aparece, el GM tira por él (a los 20 s).
+  if(soyGM && !dt.paraGM){
+    escudoDadoVistos.add(id);
+    setTimeout(async () => {
+      try{ const x = await coleccionMomentos().doc(id).get(); if(x.exists && x.data().estado === 'esperando'){ escudoDadoCola.push({id, d, porGM: true}); escudoDadoMostrar(); } }catch(err){}
+    }, Math.max(0, ESCUDO_DADO_ESPERA_GM - (Date.now() - ms)));
+  }
+}
+function escudoDadoMostrar(){
+  if(escudoDadoAbierto || !escudoDadoCola.length) return;
+  const {id, d, porGM} = escudoDadoCola.shift(), dt = d.datos || {};
+  escudoDadoAbierto = id;
+  const tomar = async (estado, extra) => {
+    const ref = coleccionMomentos().doc(id);
+    let tomo = false;
+    try{ await fbDb.runTransaction(async tx => { const x = await tx.get(ref); if(x.exists && x.data().estado === 'esperando'){ tx.update(ref, {estado: 'tirando'}); tomo = true; } }); }
+    catch(err){ console.error('Escudo: no se pudo tomar la tirada', err); }
+    if(!tomo) toast('Esa tirada ya se hizo');
+    else escudoDadoTomados.add(id);
+    return tomo;
+  };
+  escudoDadoCartel({...dt, mid: id, porGM: !!porGM}, () => tomar()).then(async r => {
+    if(r && r.mano !== undefined) await momentoActualizar(id, {estado: 'mano', 'datos.valor': r.mano, titulo: `✋ ${dt.escudo} de ${dt.quienP} → ${dt.quienV}: a mano, ${r.mano}`});
+    else if(r) await momentoActualizar(id, {estado: 'tirado', 'datos.total': r.total, 'datos.rolls': r.rolls || [], titulo: `🎲 ${dt.escudo} de ${dt.quienP} → ${dt.quienV}: ${dt.dado} = ${fmt(r.total)}${porGM ? ' (lo tiró el GM)' : ''}`});
+  }).catch(err => console.error('Escudo: la tirada', err)).finally(() => { escudoDadoAbierto = null; setTimeout(escudoDadoMostrar, 300); });
+}
+
+// Quema a `vid` con el escudo de `pid` (si esta pantalla resuelve a la víctima). Uno por vez (la tirada espera al que la tira).
+function escudoQuemar(pid, vid, motivo){
+  const v = tokens.get(vid);
+  if(!v || pid === vid || !escudoResuelvoYo(v)) return Promise.resolve();
+  escudoQuemarFila = escudoQuemarFila.then(() => escudoQuemarYa(pid, vid, motivo)).catch(err => console.error('Escudo elemental:', err));
+  return escudoQuemarFila;
+}
+async function escudoQuemarYa(pid, vid, motivo){
   const p = tokens.get(pid), v = tokens.get(vid);
   if(!p || !v || pid === vid) return;
   if(!escudoResuelvoYo(v)) return;   // lo resuelve UNA pantalla: la de quien maneja a la víctima (el GM sus creeps)
@@ -360,20 +509,34 @@ async function escudoQuemar(pid, vid, motivo){
     atacante: {nombre: nombreDe(p), tokenId: pid, tipo: p.tipo, ref: String(p.fichaId || ''), uid: p.duenoUid || ''},
     defensor: {nombre: nombreDe(v), tokenId: vid, tipo: v.tipo, ref: String(v.fichaId || ''), uid: v.duenoUid || ''}};
   const partes = [], estadosV = [], notasV = [], extraFx = [];
-  let saltosFx = [], antesV = null, despuesV = null, recibidoV = 0;
+  let saltosFx = [], antesV = null, despuesV = null, recibidoV = 0, dadoMid = null;
   try{
-    const tir = tirarDados(ef.dado || '1d6');
-    const dado = tir ? tir.total : 0;
+    // 🎲 La tirada: la hace quien maneja a quien tiró el escudo (ver arriba). Cerrar el cartel sin tirar = a mano.
+    const dadoF = ef.dado || '1d6';
+    const info = {dado: dadoF, icono: def.icono, escudo: def.estado, nombreEl: def.nombre.toLowerCase(), que: def.que || '', clave: el, quienP, quienV, motivo, gm: false};
+    const tz = escudoTirador(e, p);
+    info.gm = !!tz.gm;
+    const pedido = await escudoPedirDado(info, tz);
+    dadoMid = pedido.mid;
+    const tir = pedido.r;
+    if(!tir){
+      partes.push(`nadie tiró el ${dadoF}: resolvelo a mano`);
+      try{ mesaLinea(`${def.icono} ${quienV} ${motivo === 'turno' ? 'empieza su turno pegado al' : 'entra al'} ${def.estado.toLowerCase()} de ${quienP}: no se tiró el ${dadoF} — resolvelo a mano`, 'recordatorio'); }catch(e2){}
+      if(dadoMid) momentoActualizar(dadoMid, {estado: 'listo', resultado: 'No se tiró: a mano.'});
+      return;
+    }
+    const aMano = tir.mano !== undefined;
+    const dado = aMano ? Math.max(0, Math.round(num(tir.mano))) : num(tir.total);
     const esInv = v.tipo === 'pj' && String(v.fichaId || '').includes(SEP_INVOCACION);
-    const resEl = (await resistenciasDe(v, el)).res;
+    const resEl = aMano ? 0 : (await resistenciasDe(v, el)).res;
     const id0 = Combatiente.identidadElemento(el, ((vinculo(v) || {}).tipoCriatura));
     const idE = id0 && id0.estado && num(ef.identidadTurnos) > 0 ? {...id0, estado: {...id0.estado, turnos: num(ef.identidadTurnos)}} : id0;
-    const mult = (num(ef.mult) > 1 ? num(ef.mult) : 1) * (idE ? idE.mult : 1);
+    const mult = aMano ? 1 : (num(ef.mult) > 1 ? num(ef.mult) : 1) * (idE ? idE.mult : 1);
     let monto = Math.ceil(dado * mult);
-    const ag = typeof aguaRayo === 'function' ? aguaRayo(v, el, monto) : null;
+    const ag = !aMano && typeof aguaRayo === 'function' ? aguaRayo(v, el, monto) : null;
     if(ag && ag.txt){ monto = ag.monto; partes.push(ag.txt); notasV.push(`${ag.txt} (está parado en el agua).`); }
-    partes.push(`${ef.dado || '1d6'}: ${dado}${mult !== 1 ? ` × ${String(mult).replace('.', ',')} = ${monto}` : ''}`);
-    try{ mesaPublicar(`${def.icono} ${def.estado} de ${quienP} → ${quienV}`, {formula: ef.dado || '1d6', rolls: tir ? tir.rolls : [], mod: 0, total: dado, quien: `${def.estado} de ${quienP}`}); }catch(err){}
+    partes.push(aMano ? `✋ a mano: ${dado}` : `${dadoF}: ${dado}${mult !== 1 ? ` × ${String(mult).replace('.', ',')} = ${monto}` : ''}`);
+    if(aMano) notasV.push(`Resuelto a mano: la mesa decidió ${dado}.`);
     let recibido = 0, perdio = 0;
     if(monto > 0){
       const o = {magico: true};
@@ -432,6 +595,7 @@ async function escudoQuemar(pid, vid, motivo){
   }catch(err){ console.error('Escudo elemental: no se pudo aplicar', err); partes.push('aplicalo a mano: 1d6 del elemento'); }
   // 🔢 Lo que se ve (dueño, 2026-11-09): el «−X» rojo sobre cada uno, «¡Parálisis!», el reporte al terminar y una línea clara en la Mesa (js/110).
   const txt = `${def.icono} ${quienV} ${motivo === 'turno' ? 'empieza su turno pegado al' : 'entra al'} ${def.estado.toLowerCase()} de ${quienP}: ${partes.join(' · ')}`;
+  if(dadoMid) momentoActualizar(dadoMid, {estado: 'listo', resultado: partes.join(' · ')});
   if(typeof rayoFxPublicar === 'function' && recibidoV > 0){
     try{ rayoFxPublicar({titulo: `${def.estado} de ${quienP}`, icono: def.icono, fuente: `${def.estado} de ${quienP}`, resultado: partes.join(' · '),
       golpe: {id: vid, entro: recibidoV, antes: antesV, despues: despuesV, estados: estadosV, notas: notasV, etiqueta: motivo === 'turno' ? 'empieza su turno en el anillo' : 'entra al anillo'}, saltos: saltosFx, extra: extraFx}); }

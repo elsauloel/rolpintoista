@@ -740,6 +740,14 @@
 > pruebas»; ~~pegar las reglas de Firestore (la estela de un jugador bajo tierra, `tunel`; desde el 2026-10-29, también el 🌀 Town portal, `townPortal`)~~ ✅ pegadas por el dueño el 2026-10-29; una revisión automática de nombres repetidos entre archivos (hoy,
 > a mano: `scratchpad/choques.py`).
 
+
+## 🖥 Para recordarle al dueño cuando esté en la compu
+
+- [ ] **Probar el Escudo elemental de rayo (eléctrico)** (dueño, 2026-11-09, desde el celular: «cuando esté en la compu, recordame que pruebe el escudo
+  de rayo»). Su duda: si dos personajes están pegados al que lleva el escudo, los dos reciben el golpe inicial **y además** el salto del rayo, y
+  quizás sea mucho. **Regla propuesta (sin decidir):** quien recibe el golpe inicial del escudo no puede ser objetivo del salto; el salto va solo a
+  los de afuera del escudo. Decidir después de probarlo.
+
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
 
 - [x] El Escudo humano de los creeps se llama así en todos lados (2026-10-27): la marca del creep, el Anuncio («le aplicó Escudo humano») y el cuadro del

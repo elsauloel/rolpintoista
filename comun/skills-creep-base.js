@@ -1026,8 +1026,8 @@
   // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +1 → +3.
   // 🤺 Sin los bonos de crítico desde el 2026-11-09 (dueño: se pisaba con el Ojo de asesino): la Finta es el golpe contra el que ataja bien; el Ojo de
   // asesino, el que busca el crítico.
-  H('Finta', 'D', 'hd', 'e', 2, aA('Amaga para un lado y pega por el otro: un ataque con su arma con +2 al daño que no se puede parar: el rival no puede usar Parry (ni, por eso, Bloqueo) contra este golpe; solo le queda esquivarlo. Es el golpe contra el que ataja bien.',
-    {fijo: 2, sinParry: true}, 'va al duelo como un ataque con +2 al daño, que no se puede parar', 2, []));
+  H('Finta', 'D', 'hd', 'e', 2, aA('Amaga para un lado y pega por el otro: un ataque con su arma con +2 a la Probabilidad de Golpe y +1 al daño que no se puede parar: el rival no puede usar Parry (ni, por eso, Bloqueo) contra este golpe; solo le queda esquivarlo. Es el golpe contra el que ataja bien.',
+    {pdg: 2, fijo: 1, sinParry: true}, 'va al duelo como un ataque con +2 PdG y +1 al daño, que no se puede parar', 2, []));   // (dueño, 2026-11-09: «+2 a la pdg, +1 al daño»)
   // 👁 Auditada (dueño, 2026-10-26; Choque liviano, «buscar el crítico», el Ojo de asesino del Asalto: «al del creep le sumaría lo mismo que al del asalto»;
   // «no es un estado… es algo que se le suma a un ataque»): un ataque con su arma con +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1. Costo el de la
   // clase: el ataque y 2 SP, o cooldown 2.

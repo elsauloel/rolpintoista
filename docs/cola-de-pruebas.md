@@ -12,7 +12,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-(vacía: las 23 pruebas están hechas)
+24. [ ] **Finta: +2 PdG y +1 al daño, sin Parry** (2026-11-09): en el duelo, +2 a la tirada de PdG y +1 al daño; el rival solo puede esquivar;
+    sin bonos de crítico.
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

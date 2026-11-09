@@ -293,6 +293,11 @@ function calcularDisposicion(){
     const p = ganchoFxPosToken(d.id);
     if(p){ d.x = p.x; d.y = p.y; d.radio = HEX * 0.68; d.solo = true; d.gancho = true; }
   });
+  // 📺 El Parpadeo (js/111): mientras se apaga y se prende, el token se dibuja en la casilla que toca, aplastado como un televisor viejo.
+  if(typeof blinkTvPosToken === 'function') res.forEach(d => {
+    const p = blinkTvPosToken(d.id);
+    if(p){ d.x = p.x; d.y = p.y; d.radio = HEX * 0.68; d.solo = true; d.gancho = true; d.tv = {sx: p.sx, sy: p.sy}; }
+  });
   return res;
 }
 
@@ -845,6 +850,7 @@ function dibujarLienzo(){
       else{ v.x = d.x; v.y = d.y; }
     }
     const x = v.x, y = v.y, rad = d.radio;
+    if(d.tv){ ctx.save(); ctx.translate(x, y); ctx.scale(d.tv.sx, d.tv.sy); ctx.translate(-x, -y); animando = true; }   // 📺 el Parpadeo (js/111)
     // Hexágono del token: mismo tamaño y orientación que la casilla de la
     // grilla (fijo — no rota con el frente), para que calce con el mapa.
     const puntos = verticesHex(x, y, rad);
@@ -1019,6 +1025,7 @@ function dibujarLienzo(){
       ctx.fillText(texto, x, ty);
     }
     ctx.globalAlpha = 1;
+    if(d.tv) ctx.restore();
   });
   if(dibujarNieblaVarita(z)) animando = true;   // la niebla de una varita, encima de los tokens (2026-10-05)
   if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, true)) animando = true;   // ☁ la niebla que se va disipando (js/91)
@@ -1236,6 +1243,7 @@ function dibujarLienzo(){
   if(typeof dibujarEfectosEscudoHumano === 'function' && dibujarEfectosEscudoHumano(z)) animando = true;   // 🛡 el lazo y el golpe repartido del Escudo humano (js/95)
   if(typeof dibujarEfectosTransfusion === 'function' && dibujarEfectosTransfusion(z)) animando = true;   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosGancho === 'function' && dibujarEfectosGancho(z)) animando = true;
+  if(typeof dibujarEfectosBlinkTv === 'function' && dibujarEfectosBlinkTv(z)) animando = true;   // 📺 el Parpadeo como un televisor viejo (js/111)
   if(typeof dibujarEfectosCambio === 'function' && dibujarEfectosCambio(z)) animando = true;   // 🔄 Cambiar de lugar (js/107)   // 🪝 la cadena y el gancho de Arrastrar (js/96)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;
   if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;

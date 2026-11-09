@@ -105,6 +105,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'onda' && typeof ondaFxRecibido === 'function') ondaFxRecibido(id, d);   // 💥 la onda del Shockwave (js/94, 2026-11-03)
   if(d.tipo === 'cambio-fx'){ if(typeof cambioFxRecibido === 'function') cambioFxRecibido(id, d); return; }   // 🔄 Cambiar de lugar (js/107): sin tarjeta
+  if(d.tipo === 'blink-tv'){ if(typeof blinkTvRecibido === 'function') blinkTvRecibido(id, d); return; }   // 📺 el Parpadeo (js/111): sin tarjeta
   if(d.tipo === 'gancho-fx'){ if(typeof ganchoFxRecibido === 'function') ganchoFxRecibido(id, d); return; }
   if(d.tipo === 'gancho-eva'){ if(typeof ganchoEvaRecibido === 'function') ganchoEvaRecibido(id, d); return; }   // 🫨 el «−2 EVA» del arrastrado (js/96): sin tarjeta   // 🪝 la cadena de Arrastrar (js/96): sin tarjeta
   if(d.tipo === 'escudo-golpe'){ if(typeof escudoHumanoGolpeRecibido === 'function') escudoHumanoGolpeRecibido(id, d); return; }   // 🛡 el golpe que se reparte (js/95): sin tarjeta

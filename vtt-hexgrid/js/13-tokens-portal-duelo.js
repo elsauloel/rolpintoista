@@ -217,6 +217,8 @@ function blinkDeHabilidad(msg){
     if(msg.alFrente && !pegadaARival(h, t)){ toast('Tiene que ser una casilla pegada a un rival'); adonde(id, t); return; }
     const desde = {col: t.col, fila: t.fila};
     try{
+      // 📺 Primero la animación (js/111), así nadie ve el token en la casilla nueva antes de que se apague en la vieja.
+      if(typeof blinkTvPublicar === 'function') await blinkTvPublicar(id, desde, h);
       await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
       if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, id, [desde, {col: h.col, fila: h.fila}], msg.nombre || 'Parpadeo');   // 💨 sin oportunidad: el aviso (js/17)
       fin();

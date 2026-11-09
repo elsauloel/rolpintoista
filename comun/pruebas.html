@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261109muere"></script>
+<script src="combatiente.js?v=20261109inconsc"></script>
 <script src="creep-calculo.js?v=20261109pa"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -120,7 +120,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261109muere"></script>
+<script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
 <script src="skills-creep-base.js?v=20261109nube"></script>
@@ -619,14 +619,14 @@ prueba('💨 duelo por token: la habilidad de la zona conserva «tira contra cad
   const fila = Combatiente.efectoPorTirada(h.efectos[0].porTirada, 20), baja = Combatiente.efectoPorTirada(h.efectos[0].porTirada, 6);
   igual([h.tiraCadaUno, h.zonaId, h.sinDodge, h.dano.diferencia, h.efectos[0].porTirada.length, !!fila.caer, baja], [true, 'z1', true, true, 2, true, null]);
 });
-prueba('💀 Pedos (2026-11-09): el 20 es natural y mata; con bonos 18+2 no; la tabla y el texto de la habilidad', () => {
+prueba('💀 Pedos (2026-11-09): el 20 es natural y deja inconsciente (con Revivir); con bonos 18+2 no; la tabla y el texto de la habilidad', () => {
   const pedos = SKILLS_CUSTOM.find(x => x.id === 'custom-pedos-toxicos'), t = pedos.duelo.danoExtraEfectos;
   const nat20 = Combatiente.efectoPorTirada(t, 20, 20), con2 = Combatiente.efectoPorTirada(t, 20, 18), sin = Combatiente.efectoPorTirada(t, 20);
-  igual([!!nat20.muere, con2.estado && con2.estado.nombre, !!sin.muere, Combatiente.porTiradaTxt(t), /Un jefe no muere ni queda con Stun/.test(pedos.detalle), /o la muerte\)/.test(pedos.detalle), /a rivales y aliados/.test(pedos.detalle)],
-    [true, 'Stun', true, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20 natural muere', true, true, true]);
+  igual([!!nat20.caer, !!nat20.muere, con2.estado && con2.estado.nombre, !!sin.caer, Combatiente.porTiradaTxt(t), /Un jefe no queda inconsciente ni con Stun/.test(pedos.detalle), /o el inconsciente\)/.test(pedos.detalle), /20 queda inconsciente/.test(pedos.detalle), /a rivales y aliados/.test(pedos.detalle)],
+    [true, false, 'Stun', true, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20 natural cae (la vida a 0)', true, true, true, true]);
   const vieja = Combatiente.zonaDeHab({nombre: 'Pedos Tóxicos'}, {objetivo: 'zona', radio: 2, dano: true, danoDiferencia: true, danoExtra: '1d20', danoExtraEfectos: [{desde: 7, estado: {nombre: 'Pajaritos', turnos: 1}}, {desde: 20, caer: true}]}, {fichaId: 'f1', tipo: 'pj', tiraValor: 9});
   const f20 = vieja.zonaEstado.porTirada.find(f => f.desde === 20);
-  igual([!!f20.muere, !!f20.natural], [true, true]);   // una copia guardada con «20 cae» se lee como el pool
+  igual([!!f20.muere, !!f20.natural, !!f20.caer], [false, true, true]);   // una copia guardada con «20 cae» se lee como el pool (sin muerte definitiva)
 });
 prueba('trampa de una habilidad: sin nombre propio lleva el de la habilidad', () => igual(
   [Combatiente.trampaDeHab({nombre: 'Raíces', trampaColocar: {nombre: '  ', dano: '1d6', radio: 1}}), Combatiente.trampaDeHab({nombre: 'X', trampaColocar: {nombre: 'Cepo'}}).nombre, Combatiente.trampaDeHab({nombre: 'Y'})],

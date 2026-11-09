@@ -2117,8 +2117,9 @@ const Combatiente = (() => {
     // ☠ La Nube tóxica de los creeps (dueño, 2026-11-09: «sí», que resuelva un duelo por cada uno como los Pedos): con duelo por token y la
     // expansión desde el punto marcado (no nace en el creep). Las copias guardadas sin la marca se reconocen por el nombre (solo la del creep).
     const nubeCreep = o.tipo === 'creep' && /^nube t[oó]xica$/i.test(String(h.nombre || '').trim());
-    // 💀 El 20 de los Pedos (dueño, 2026-11-09): muere, y solo con el 20 natural. Las copias guardadas antes traen «20 cae»: se leen como el pool.
-    if(pedos && Array.isArray(c.danoExtraEfectos)) c = {...c, danoExtraEfectos: c.danoExtraEfectos.map(f => f && f.caer && nf(f.desde) >= 20 ? {...f, muere: true, natural: true} : f)};
+    // 💀 El 20 de los Pedos (dueño, 2026-11-09): queda inconsciente (la vida a 0, con ✚ Revivir; «sí aplica el botón de revivir»), y solo con
+    // el 20 natural. Las copias guardadas antes (con «cae» o con el «muere» de un rato) se leen como el pool: sin muerte definitiva.
+    if(pedos && Array.isArray(c.danoExtraEfectos)) c = {...c, danoExtraEfectos: c.danoExtraEfectos.map(f => { if(!(f && f.caer && nf(f.desde) >= 20)) return f; const g = {...f, natural: true}; delete g.muere; return g; })};
     const enMi = !!(c.zonaEnMi || pedos), conDuelo = !!(c.zonaDuelo || pedos || nubeCreep);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       ...(enMi ? {zonaEnMi: true} : {}), ...(conDuelo ? {zonaDuelo: true} : {}),

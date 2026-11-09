@@ -2114,7 +2114,10 @@ const Combatiente = (() => {
     // al entrar, al pasar la ronda) va como un duelo por token, uno detrás del otro (vtt-hexgrid/js/112-zona-duelo.js). Las copias de la habilidad
     // que ya tienen los personajes no traen las marcas: se reconocen por el nombre.
     const pedos = /^pedos t[oó]xicos$/i.test(String(h.nombre || '').trim());
-    const enMi = !!(c.zonaEnMi || pedos), conDuelo = !!(c.zonaDuelo || pedos);
+    // ☠ La Nube tóxica de los creeps (dueño, 2026-11-09: «sí», que resuelva un duelo por cada uno como los Pedos): con duelo por token y la
+    // expansión desde el punto marcado (no nace en el creep). Las copias guardadas sin la marca se reconocen por el nombre (solo la del creep).
+    const nubeCreep = o.tipo === 'creep' && /^nube t[oó]xica$/i.test(String(h.nombre || '').trim());
+    const enMi = !!(c.zonaEnMi || pedos), conDuelo = !!(c.zonaDuelo || pedos || nubeCreep);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       ...(enMi ? {zonaEnMi: true} : {}), ...(conDuelo ? {zonaDuelo: true} : {}),
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',

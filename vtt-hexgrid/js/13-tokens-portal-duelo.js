@@ -1327,7 +1327,10 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
     // 💨 Una zona con duelo (js/112): la tirada de quien la creó (su Ef.Esp de cuando la creó) se tira acá, de nuevo contra cada uno.
-    const pdgZona = a.hab && a.hab.tiraCadaUno && typeof zonaDueloTirada === 'function' ? zonaDueloTirada(a, t) : null;
+    // (dueño, 2026-11-09: «la tirada que sacó 9 apareció sola, yo controlando a Larry nunca apreté el botón»): ya no se tira sola — en cada
+    // sub-duelo de la zona, quien la creó (su jugador, o el GM por un creep) tira con su botón, con los dados y la Mesa como cualquier duelo;
+    // `tiraCadaUno` sigue impidiendo que se comparta la primera tirada. Si no está conectado, el GM la tira a mano (el «🎲 Tirar a mano» del duelo).
+    const pdgZona = null;
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
       carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
@@ -2830,7 +2833,8 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
-  if(spec.caer && typeof zonaDueloCaer === 'function') return zonaDueloCaer(t, d);   // 💨 el 20 de los Pedos Tóxicos: se desmaya (js/112)
+  if(spec.caer && typeof zonaDueloCaer === 'function') return zonaDueloCaer(t, d);
+  if(d.hab && d.hab.zonaId && typeof zonaDueloAnotar === 'function') zonaDueloAnotar(d.hab.zonaId, d.defensor.tokenId, spec.nombre);   // ☠ la Nube tóxica (js/112): anota que ya lo envenenó   // 💨 el 20 de los Pedos Tóxicos: se desmaya (js/112)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks, (d.atacante && d.atacante.nombre) || '');   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
   if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)

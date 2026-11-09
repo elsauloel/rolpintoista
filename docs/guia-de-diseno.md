@@ -315,3 +315,10 @@ Commit `90398810` (`vtt-hexgrid/js/50-superficies.js`): borde negro nítido de l
 juntas rojas que laten, grandes pegadas al borde y cada vez más chicas y separadas hacia el centro, que queda rojo y liso con llamitas y chispas.
 
 - **👁 Percepción aumentada sin punto ciego para el sigilo** (dueño, 2026-11-09: «con percepción aumentada, aún el casillero de la espalda le otorga la chance de tirar para detectar»): la casilla de atrás de quien tiene la pasiva cuenta como zona de alerta del sigilo (`sinPuntoCiego`, vtt-hexgrid/js/02). No toca a Paso ligero: un rival que se acerca por la espalda **sin** sigilo sigue sin que lo oigan hasta quedar pegado y con su +1 PdG por la espalda.
+
+**Zonas con duelo por token (dueño, 2026-11-09)**: los Pedos Tóxicos y la **Nube tóxica de los creeps** resuelven de a un afectado por vez con el
+cuadro del duelo (late el token, se despliega, las tiradas, se pliega y sigue el próximo, en sentido horario desde el más cercano), al aparecer, al
+entrar y al pasar la ronda adentro; la nube se expande antes (los Pedos desde quien los tira, la Nube tóxica desde el punto marcado). **La tirada de
+quien creó la zona no se tira sola** (dueño: «la tirada que sacó 9 apareció sola, yo controlando a Larry nunca apreté el botón»): en cada duelo la
+tira con su botón quien lo maneja (el jugador; el GM por un creep), con los dados y la Mesa; si no está, el GM la tira a mano. En la Nube tóxica,
+el envenenado sigue igual: la nube no le vuelve a tirar, le suma 1 stack (vtt-hexgrid/js/112-zona-duelo.js).

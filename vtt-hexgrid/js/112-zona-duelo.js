@@ -8,8 +8,12 @@
    (#zona-banner, js/08): cada vez que le toca a alguien (la primera tanda, alguien que entra, la ronda que pasa con alguien adentro) se arma una
    tanda de la cascada de las áreas (`coleccionAreas`, js/13) con esos tokens, y el mapa del GM abre un duelo por token, de a uno, con el mismo
    cuadro que todas las habilidades (late el token, se despliega el cuadro, las tiradas adentro, se pliega y sigue el próximo):
-   - la tirada de quien la creó (su Ef.Esp de cuando la tiró, `zonaTiraValor`) se tira de nuevo contra cada uno (`hab.tiraCadaUno`,
-     `zonaDueloTirada`): cada uno solo tira su resistencia, desde la pantalla de quien lo maneja;
+   - la tirada de quien la creó (su Ef.Esp de cuando la tiró, `zonaTiraValor` → la fórmula de `hab.tira`) se tira de nuevo en cada duelo
+     (`hab.tiraCadaUno`: no se comparte la primera). Desde el 2026-11-09 (dueño: «la tirada apareció sola… nunca apreté el botón») la tira con su
+     botón quien maneja a quien la creó (el jugador, o el GM por un creep), con los dados y la Mesa como cualquier duelo; si no está, el GM la tira
+     a mano. Cada afectado tira su resistencia desde la pantalla de quien lo maneja. (`zonaDueloTirada` quedó sin usar.)
+   - ☠ La Nube tóxica de los creeps (2026-11-09) usa lo mismo, con la expansión desde el punto marcado; el estado que entra se anota en
+     zonaResueltos (`zonaDueloAnotar`) para que su «envenenado: +1 stack» siga igual;
    - si no resiste, el daño es la diferencia, del tipo de la zona (tóxico), menos la Defensa especial (`ignoraDef`), como siempre;
    - y si el daño entra, el dado extra (1d20) con su tabla (`porTirada`: 7+ Pajaritos · 17+ Stun · 20 se desmaya) es un efecto más del cuadro
      (comun/duelo.js `porTiradaResolver`); el «cae» lo aplica `zonaDueloCaer`.
@@ -208,4 +212,16 @@ async function zonaDueloCaer(t, d){
     }
     return {nota: `💀 ${nom} se desmaya (la vida a 0)`};
   }catch(err){ console.error('Zona con duelo: no se pudo desmayar', err); return {manual: true, nota: `${nom} cae: ponele la vida en 0 a mano`}; }
+}
+
+// ☠ La Nube tóxica de los creeps (2026-11-09): el estado de la zona entró por el duelo → se anota en zonaResueltos, como lo hacía el cartel (js/08),
+// así su `unaVez` / `sumaUno` siguen igual (envenenado, la nube no le vuelve a tirar: al entrar o al pasar la ronda adentro le suma 1 stack).
+async function zonaDueloAnotar(zonaId, tokenId, nombreEstado){
+  const el = elementos.get(zonaId);
+  if(!el || !el.zonaEstado || !tokenId) return;
+  const e = zonaSpecDe(el);
+  if(!e.nombre || (nombreEstado && nombreEstado !== e.nombre)) return;
+  if((el.zonaResueltos || []).includes(tokenId)) return;
+  try{ await coleccionElementos().doc(zonaId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(tokenId)}); }
+  catch(err){ console.error('Zona con duelo: no se pudo anotar zonaResueltos', err); }
 }

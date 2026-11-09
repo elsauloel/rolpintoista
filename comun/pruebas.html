@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261109pedos"></script>
+<script src="combatiente.js?v=20261109nube"></script>
 <script src="creep-calculo.js?v=20261109pa"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -120,10 +120,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261109pedos"></script>
+<script src="skills-clase.js?v=20261109nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261109trampas"></script>
+<script src="skills-creep-base.js?v=20261109nube"></script>
 <script src="creeps-esenciales.js?v=20261109m25"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -604,12 +604,13 @@ prueba('zona persistente: el mismo mensaje al mapa para personaje y creep (daño
   igual([pj.tipo, pj.casteadorTipo, pj.radio, pj.zonaTurnos, pj.zonaDano, pj.zonaIgnoraDef, pj.resistStat, pj.resistValor, pj.zonaEstado.nombre, cr.zonaDano, cr.resistValor, cr.casteadorTipo],
     ['zona-persistente-habilidad', 'pj', 2, 3, '1d4+2', false, 'eva', 7, 'Rengo', '1d4', null, 'creep']);
 });
-prueba('💨 Pedos Tóxicos (2026-11-09): centrada en quien la tira y con duelo por token; la Nube tóxica de los creeps no', () => {
+prueba('💨 Pedos Tóxicos (2026-11-09): centrada en quien la tira y con duelo por token; la Nube tóxica de los creeps también con duelo (dueño, 2026-11-09), sin nacer en el creep; la del personaje no', () => {
   const pedos = SKILLS_CUSTOM.find(x => x.id === 'custom-pedos-toxicos'), c = pedos.duelo;
   const m = Combatiente.zonaDeHab(pedos, c, {fichaId: 'f1', tipo: 'pj', tiraValor: 9});
   const copia = Combatiente.zonaDeHab({nombre: 'Pedos tóxicos'}, {...c, zonaEnMi: false, zonaDuelo: false}, {fichaId: 'f1', tipo: 'pj', tiraValor: 9});   // una copia vieja: por el nombre
   const nube = Combatiente.zonaDeHab({nombre: 'Nube tóxica'}, {objetivo: 'zona', radio: 1, tira: 'esp', contra: ['resmg']}, {fichaId: 'c1', tipo: 'creep', tiraValor: 5});
-  igual([m.zonaEnMi, m.zonaDuelo, (m.zonaEstado.porTirada || []).map(f => f.desde).join(','), copia.zonaEnMi, copia.zonaDuelo, !!nube.zonaEnMi, !!nube.zonaDuelo], [true, true, '7,17,20', true, true, false, false]);
+  const nubePj = Combatiente.zonaDeHab({nombre: 'Nube tóxica'}, {objetivo: 'zona', radio: 1, tira: 'esp', contra: ['resmg']}, {fichaId: 'f1', tipo: 'pj', tiraValor: 5});
+  igual([m.zonaEnMi, m.zonaDuelo, (m.zonaEstado.porTirada || []).map(f => f.desde).join(','), copia.zonaEnMi, copia.zonaDuelo, !!nube.zonaEnMi, !!nube.zonaDuelo, !!nubePj.zonaDuelo], [true, true, '7,17,20', true, true, false, true, false]);
 });
 prueba('💨 duelo por token: la habilidad de la zona conserva «tira contra cada uno» y la tabla del 1d20', () => {
   const h = Duelo.limpiarHab({nombre: 'Pedos Tóxicos', objetivo: 'area', tira: {formula: '1d8+1', etq: 'Ef.Esp'}, contra: [{modo: 'resmg', stat: 'resmg', etq: 'Res.Esp'}],

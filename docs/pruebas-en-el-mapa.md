@@ -2360,3 +2360,30 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - Sin probar en juego: Piel curtida, Robustez, Rodela, Casco, Polainas (solo en los números).
 - En la prueba, al apretar botones de la defensa de Larry se gastó por error su 🃏 Wildcard; la restauración lo devolvió.
 - Sin errores. Capturas `cola-15-*` en el scratchpad.
+
+
+## ✨🐝 Cola de pruebas · 16 y 17: el Milagro con 3d8 y el Barrido armado por un jugador para su invocación (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+**16 · Milagro con 3d8.** A Larry (copia), del J1, se le sumó el Milagro del Support (desde su ficha). Heridos: Larry 15/35 con Debilitado, Bizzante
+(copia) 12/35 con Sangrado, Rockardo (copia) 20/40 con Debilitado; el Goblin rompehuesos (rival) dentro de la flor.
+- Botonera de J1: «Milagro · 2 No2 · 10 SP» → Ejecutar → centro en 10,25 → un duelo por aliado, Larry → Bizzante → Rockardo. Los tres cuadros dicen
+  **«Cura 3d8: [6, 1, 7] = 14»**: una sola tirada para todos. Resultado: Larry 15 → 29, Bizzante 12 → 26, Rockardo 20 → 34; a cada uno le sacó su
+  estado malo (Debilitado, Sangrado, Debilitado). El Goblin, nada. Costo: No2 5 → 3 y 10 SP; queda usada (una vez por combate).
+- El texto: «…cura 3d8 a cada uno de tus aliados adentro (vos incluido) —una sola tirada para todos: todos se curan lo mismo—…». Sin errores.
+
+**17 · Barrido armado por un jugador para su invocación.** Todo desde la pantalla del J2 (Bizzante (copia) estaba en manos del GM: el GM le devolvió
+el control con «↩ Devolver el control»; mientras el GM lo tiene, la ficha del jugador queda de solo lectura y lo que arma no se guarda).
+- **El armado**, en la ficha: Abeja Gorda → ✎ Editar → 5. Habilidades → «+ Habilidad» → ✨ Automático → «Giro de aguijón» → No2 «Lo mismo que un ataque»,
+  cooldown 3 → Ejecución → «✨ Armar la ejecución paso a paso» → Tipo: «Ataque con mi arma, con arreglos» → la tarjeta «Pagar y tirar PdG · tu arma»
+  → tilde **«🌀 Giro (como el Barrido)»** → Listo → Guardar → ✔ Crear → Guardar. Queda `duelo: {modo: 'arma', barrido: true}` en la ficha.
+  (El resumen del paso «Listo» dice «Paso a paso: ataque con tu arma», sin mencionar el giro: detalle menor, no se cambió.)
+- La abeja estaba dormida («Abeja Gorda está dormida — tocá «Invocar» en la ficha»): se la invocó desde la ficha y se recargó el mapa del J2.
+- **En el mapa**: la abeja en 8,18 con el Capataz (izquierda), la Rata (arriba), el Goblin (derecha) y Rockardo (aliado, abajo). Botonera de la abeja
+  (⚡ del token): «Giro de aguijón · 2 No2 (como un ataque) · CD 3» → Ejecutar → «Mareo de invocación» → «Hacerlo igual» → **se cobró una vez** (4 → 2
+  No2) y «🌀 Giro de aguijón: elegí el primer rival · brillan los que tenés al lado (3)»; Rockardo no brilló. Elegido el Capataz: **Capataz → Rata →
+  Goblin** (la Mesa: «Giro de aguijón — Capataz del culto → Rata de la grieta → Goblin rompehuesos»), con el cuadro desplegado desde cada uno y su
+  propia tirada y defensa (el GM eligió por los creeps):
+  - **Capataz** (Evasión): esquivó.
+  - **Rata** (Parry de los Dientes infecciosos 11 contra PdG 1): atajó, pero perdió el Bloqueo (5 contra 5, desempate con par) → pasa la mitad: 30 → 27.
+  - **Goblin** (Evasión 3 contra PdG 12, a mano): **crítico ×2**, 85 → 71.
+  Cooldown del Giro quedó en 3. Sin errores. Capturas `cola-16-*` y `cola-17-*` en el scratchpad.

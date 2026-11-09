@@ -12,8 +12,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-16. [ ] **Milagro con 3d8** (2026-11-08): la cura pasó de 2d8 a 3d8, una sola tirada para todos los aliados del área; ver que la tirada y el texto digan 3d8.
-17. [ ] **Barrido armado por un jugador para su invocación** (2026-11-08): en el armado de la habilidad de la invocación (✨ Ejecución → «Ataque con mi arma» → la tarjeta de la PdG) tildar «🌀 Giro (como el Barrido)»; usarlo en el mapa: elegir el primero, el orden, el pulso y el duelo de cada rival.
 19. [ ] **Inamovible (Botas de estibador)**: que un empujón tire su 33 % (no se pudo probar en las líneas W1 y T1: no hubo empujones).
 20. [ ] **Salto sin atacar cobra 1 No2** (2026-11-08): al caer, «No, solo saltar» (o caer sin rival pegado) devuelve los No2 del ataque menos 1; el cooldown o el SP quedan cobrados. También el Salto aplastante (mismo código). Y el Saltador H2 con el orden nuevo (nv2 Pisotón, nv3 Aguante, nv4 Dash, nv5 Barrido) en la línea 15.
 21. [ ] **Finta sin crítico** (2026-11-09): un ataque con +2 al daño que no se puede parar (solo esquivar), sin Crítico frecuente ni potente de más; probarla con el Asesino de las sombras nivel 2.
@@ -23,6 +21,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 Cada línea nueva que se termine de diseñar se suma al final.
 
 ## Hechas
+
+- [x] **Milagro con 3d8** (2026-11-09): Larry (copia), del J1, con el Milagro del Support, sobre él, Bizzante y Rockardo (heridos, con
+  Debilitado / Sangrado / Debilitado): **una sola tirada «Cura 3d8: [6, 1, 7] = 14» para los tres** (15 → 29, 12 → 26, 20 → 34) y a cada uno le sacó
+  su estado malo; el Goblin (rival) adentro del área, nada; el texto dice «cura 3d8… una sola tirada para todos». Costó 2 No2 y 10 SP. Sin errores.
+- [x] **Barrido armado por un jugador para su invocación** (2026-11-09): el J2, en la ficha de Bizzante (copia), ✎ Editar la Abeja Gorda →
+  Habilidades → «+ Habilidad» → ✨ Automático → «Giro de aguijón», No2 como un ataque, cooldown 3 → Ejecución: «Ataque con mi arma» → la
+  tarjeta de la PdG → tildó **«🌀 Giro (como el Barrido)»** → Crear y Guardar (queda `barrido: true`). En el mapa, la Botonera de la abeja la
+  muestra («2 No2 (como un ataque) · CD 3»); al Ejecutar se cobró una vez (4 → 2 No2), brillaron los tres creeps de al lado y no Rockardo (aliado);
+  elegido el Capataz, el orden fue **Capataz → Rata → Goblin** (agujas del reloj), con el cuadro desplegado desde cada uno: el Capataz esquivó, la
+  Rata atajó con Parry pero perdió el Bloqueo (pasa la mitad: 30 → 27) y al Goblin le pegó con crítico ×2 (85 → 71). Sin errores.
 
 - [x] **Línea H2 · Saltador, niveles 1 a 5** (2026-11-09): agregados desde el Pool esencial; los números en el mapa coinciden con la prueba de
   niveles (vida 45/50/55/75/80, No2 6/7/7/8/8, PdG 7/8/9/9/10, Daño 9/9/10/11/12, Def 4/7/7/9/9). Salto (elige casilla; atacando, +1 PdG y Crítico

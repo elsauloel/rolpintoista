@@ -81,6 +81,7 @@ function superficieDibujar(el, celdas, z){
   // borde desparejo y borroso, en vez de hexágonos.
   const nube = nubeColor(el);
   if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
+  if(esLava(el)){ lavaDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }   // 🌋 la lava (2026-11-09)
   if(esFuego(el)){ fuegoDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }
   return null;
 }
@@ -380,6 +381,146 @@ function fuegoDibujar(celdas, z){
   });
   ctx.restore();
   bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
+}
+/* 🌋 La lava (2026-11-09, dueño: «con bordes no difuminados, sino como si fuera una mancha de lava con detalles de fuego, pero que los bordes sean
+   como si fuera un líquido aplastado, espeso»). Las zonas de fuego que se llaman «lava» (la Varita del chorro de lava) ya no son el manchón borroso
+   del fuego: son una mancha espesa con la misma forma de lóbulos redondos del charco (aguaForma), borde NÍTIDO. Por capas: una costra oscura afuera,
+   la lava derretida adentro (naranja, con centros amarillos), placas que se enfrían (más oscuras, con grietas que brillan) y un brillo de borde.
+   Esa parte es fija: se pinta UNA vez por forma y zoom en un lienzo aparte (como el manchón del fuego). En cada cuadro solo se suma lo que se
+   mueve: un pulso lento del brillo, burbujas que se inflan y revientan, llamitas que titilan y chispas que suben. */
+function esLava(el){ return !!(el && el.zona && /lava/i.test(String(el.zonaNombre || '')) && esFuego(el)); }
+// La orilla de la forma (o una línea corrida `adentro` hacia la lava), en el contexto `g`, sin onda (la lava es espesa: no ondula).
+function lavaTrazar(g, forma, adentro){
+  g.beginPath();
+  forma.lazos.forEach(L => {
+    const N = L.pts.length;
+    for(let k = 0; k <= N; k++){
+      const i = k % N, p = L.pts[i], n = L.nor[i], x = p[0] - n[0] * adentro, y = p[1] - n[1] * adentro;
+      if(!k) g.moveTo(x, y); else g.lineTo(x, y);
+    }
+    g.closePath();
+  });
+}
+const lavaCapas = new Map();
+function lavaCapa(celdas, forma, z){
+  const esc = z * (typeof dpr === 'number' ? dpr : 1), zq = Math.round(esc * 8) / 8;
+  const clave = celdas.map(c => c.col + ',' + c.fila).sort().join(';') + '|' + zq;
+  let m = lavaCapas.get(clave);
+  if(m) return m;
+  const todos = forma.lazos.flatMap(L => L.pts), mx = HEX * 0.3;
+  const x0 = Math.min(...todos.map(p => p[0])) - mx, y0 = Math.min(...todos.map(p => p[1])) - mx;
+  const x1 = Math.max(...todos.map(p => p[0])) + mx, y1 = Math.max(...todos.map(p => p[1])) + mx;
+  const w = Math.max(1, Math.ceil((x1 - x0) * zq)), h = Math.max(1, Math.ceil((y1 - y0) * zq));
+  if(w * h > 6e6) return null;
+  const lz = document.createElement('canvas'); lz.width = w; lz.height = h;
+  const g = lz.getContext('2d');
+  g.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  g.lineJoin = 'round'; g.lineCap = 'round';
+  // 1. La costra de afuera: oscura, con un filo negro nítido.
+  lavaTrazar(g, forma, 0);
+  g.fillStyle = '#2b0c04'; g.fill();
+  g.lineWidth = HEX * 0.035; g.strokeStyle = '#120402'; g.stroke();
+  // 2. La lava derretida, un poco más adentro.
+  const adentro = HEX * 0.09;
+  lavaTrazar(g, forma, adentro);
+  g.fillStyle = '#c4380b'; g.fill();
+  g.save(); lavaTrazar(g, forma, adentro); g.clip();
+  // Centros calientes (amarillo) por casilla.
+  celdas.forEach(c => {
+    const p = hexCentro(c.col, c.fila), a = superficieAzar(c.col, c.fila, 91), b = superficieAzar(c.col, c.fila, 92);
+    const x = p.x + (a - 0.5) * HEX * 0.5, y = p.y + (b - 0.5) * HEX * 0.5, r = HEX * (0.7 + 0.3 * a);
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, 'rgba(255,214,92,.95)'); gr.addColorStop(0.45, 'rgba(255,140,36,.75)'); gr.addColorStop(1, 'rgba(196,56,11,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  });
+  // Placas que se enfrían: manchas oscuras de borde redondeado, con grietas que brillan.
+  celdas.forEach(c => {
+    const p = hexCentro(c.col, c.fila);
+    const n = 1 + Math.floor(superficieAzar(c.col, c.fila, 93) * 2);
+    for(let k = 0; k < n; k++){
+      const a = superficieAzar(c.col, c.fila, 100 + k), b = superficieAzar(c.col, c.fila, 110 + k), q = superficieAzar(c.col, c.fila, 120 + k);
+      const x = p.x + (a - 0.5) * HEX * 1.1, y = p.y + (b - 0.5) * HEX * 1.0, rx = HEX * (0.16 + 0.16 * q), ry = rx * (0.55 + 0.3 * a), rot = q * Math.PI;
+      // la placa: un contorno blando e irregular (7 puntas al azar, unidas con curvas), no un óvalo
+      const pts = [];
+      for(let q2 = 0; q2 < 7; q2++){
+        const ang = rot + q2 / 7 * Math.PI * 2, rr = 0.65 + 0.5 * superficieAzar(c.col, c.fila, 200 + k * 10 + q2);
+        pts.push([x + Math.cos(ang) * rx * rr, y + Math.sin(ang) * ry * rr]);
+      }
+      g.beginPath();
+      pts.forEach((pt, q2) => { const nx = pts[(q2 + 1) % 7], mx2 = (pt[0] + nx[0]) / 2, my2 = (pt[1] + nx[1]) / 2; if(!q2) g.moveTo((pts[6][0] + pt[0]) / 2, (pts[6][1] + pt[1]) / 2); g.quadraticCurveTo(pt[0], pt[1], mx2, my2); });
+      g.closePath();
+      g.fillStyle = 'rgba(52,14,5,.86)'; g.fill();
+      g.lineWidth = HEX * 0.022; g.strokeStyle = 'rgba(255,140,40,.6)'; g.stroke();
+      // grietas que brillan: del centro de la placa hacia dos o tres puntas
+      g.beginPath();
+      for(let q2 = 0; q2 < 3; q2++){
+        if(superficieAzar(c.col, c.fila, 230 + k * 10 + q2) < 0.3) continue;
+        const pt = pts[(q2 * 2 + k) % 7], mxq = x + (pt[0] - x) * 0.45 + (a - 0.5) * rx * 0.3, myq = y + (pt[1] - y) * 0.45 + (b - 0.5) * ry * 0.3;
+        g.moveTo(x, y); g.lineTo(mxq, myq); g.lineTo(x + (pt[0] - x) * 0.85, y + (pt[1] - y) * 0.85);
+      }
+      g.lineWidth = HEX * 0.014; g.strokeStyle = 'rgba(255,200,95,.9)'; g.stroke();
+    }
+  });
+  g.restore();
+  // 3. El brillo del borde de la lava (donde toca la costra) y un reflejo claro arriba.
+  lavaTrazar(g, forma, adentro);
+  g.lineWidth = HEX * 0.03; g.strokeStyle = 'rgba(255,170,60,.9)'; g.stroke();
+  lavaTrazar(g, forma, adentro + HEX * 0.05);
+  g.lineWidth = HEX * 0.012; g.strokeStyle = 'rgba(255,230,150,.45)'; g.stroke();
+  m = {lz, x0, y0, w: x1 - x0, h: y1 - y0};
+  if(lavaCapas.size > 40) lavaCapas.clear();
+  lavaCapas.set(clave, m);
+  return m;
+}
+function lavaDibujar(celdas, z){
+  const forma = aguaForma(celdas), s = performance.now() / 1000, lista = celdas.slice(0, 120);
+  const capa = celdas.length <= 400 ? lavaCapa(celdas, forma, z) : null;
+  ctx.save();
+  if(capa) ctx.drawImage(capa.lz, capa.x0, capa.y0, capa.w, capa.h);
+  else{ lavaTrazar(ctx, forma, 0); ctx.fillStyle = '#c4380b'; ctx.fill(); }
+  // Lo que se mueve, adentro de la lava.
+  ctx.save();
+  lavaTrazar(ctx, forma, HEX * 0.09); ctx.clip();
+  ctx.globalCompositeOperation = 'lighter';
+  const pulso = 0.07 + 0.06 * Math.sin(s * 1.4);   // el brillo que late, lento
+  ctx.fillStyle = `rgba(255,150,40,${pulso.toFixed(3)})`; ctx.fill();
+  lista.forEach(c => {
+    const p = hexCentro(c.col, c.fila);
+    // Una burbuja por casilla: se infla y revienta, cada una a su ritmo.
+    const a = superficieAzar(c.col, c.fila, 130), b = superficieAzar(c.col, c.fila, 131), per = 2.2 + 1.6 * a;
+    const v = ((s + b * per) % per) / per;
+    if(v < 0.75){
+      const x = p.x + (a - 0.5) * HEX * 0.8, y = p.y + (b - 0.5) * HEX * 0.7, r = HEX * 0.11 * (v / 0.75);
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,215,110,.35)'; ctx.fill();
+      ctx.lineWidth = Math.max(1 / z, HEX * 0.012); ctx.strokeStyle = 'rgba(255,240,170,.55)'; ctx.stroke();
+    }
+  });
+  ctx.restore();
+  // Llamitas que titilan y chispas que suben (por encima del borde, sin desenfoque).
+  ctx.globalCompositeOperation = 'lighter';
+  lista.forEach(c => {
+    const p = hexCentro(c.col, c.fila);
+    for(let k = 0; k < 2; k++){
+      const a = superficieAzar(c.col, c.fila, 140 + k), b = superficieAzar(c.col, c.fila, 150 + k);
+      const f = 0.55 + 0.45 * Math.sin(s * (6 + 3 * a) + b * 9) * Math.sin(s * (3.7 + a) + a * 5);
+      const x = p.x + (a - 0.5) * HEX * 0.9, y = p.y + (b - 0.5) * HEX * 0.7, alto = HEX * (0.22 + 0.16 * f), ancho = HEX * 0.07;
+      ctx.beginPath();
+      ctx.moveTo(x - ancho, y);
+      ctx.quadraticCurveTo(x - ancho * 0.9, y - alto * 0.55, x + Math.sin(s * 5 + a * 7) * ancho * 0.6, y - alto);
+      ctx.quadraticCurveTo(x + ancho * 0.9, y - alto * 0.55, x + ancho, y);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(255,${Math.round(150 + 70 * f)},60,${(0.45 + 0.3 * f).toFixed(2)})`; ctx.fill();
+    }
+    for(let k = 0; k < 2; k++){
+      const a = superficieAzar(c.col, c.fila, 160 + k), b = superficieAzar(c.col, c.fila, 170 + k), v = ((s * (0.3 + 0.25 * a)) + b) % 1;
+      const x = p.x + (a - 0.5) * HEX * 0.9 + Math.sin(s * 2 + a * 10) * HEX * 0.08, y = p.y + HEX * 0.2 - v * HEX * 1.1;
+      ctx.fillStyle = `rgba(255,${Math.round(170 + 60 * (1 - v))},80,${(0.9 * (1 - v)).toFixed(2)})`;
+      ctx.beginPath(); ctx.arc(x, y, Math.max(1.2 / z, HEX * 0.035 * (1 - v * 0.5)), 0, Math.PI * 2); ctx.fill();
+    }
+  });
+  ctx.restore();
+  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
 function trazarManchon(celdas, o){

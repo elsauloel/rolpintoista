@@ -746,6 +746,13 @@ const Duelo = (() => {
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
     // "medio hecho" — nada más pide la Evasión de este objetivo (mismo camino que cuando un lado tira antes que el otro).
     if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(sinCarancho(cfg.pdgCompartido));   // (sin el Ojo de carancho del primero: cada objetivo suma el suyo, más abajo)
+    // 🎯 Con la misma tirada viaja el crítico de quien ataca (2026-11-09, cola de pruebas 9: la Flecha que atraviesa perdía el Ojo crítico en el
+    // segundo objetivo, porque el Crítico frecuente/potente lo anota el atacante al tirar el PdG y acá no se vuelve a tirar). La Resistencia a crítico
+    // es del nuevo defensor: esa no se copia.
+    if(cfg.pdgCompartido && cfg.critCompartido && typeof cfg.critCompartido === 'object'){
+      const cc = {}; for(const [k, v] of Object.entries(cfg.critCompartido)) if(k !== 'resistencia' && Number.isFinite(Number(v))) cc[k] = Math.max(-20, Math.min(20, Math.round(Number(v))));
+      if(Object.keys(cc).length) inicial.critDatos = cc;
+    }
     // Embestida (piernas, 2026-10-06): el mapa la calcula (`cfg.embestida`, PdG) y se suma al PdG al guardarlo, como por la espalda.
     if(_num(cfg.embestida) > 0 && !hab) inicial.ataque.embestida = Math.min(10, Math.round(_num(cfg.embestida)));
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).

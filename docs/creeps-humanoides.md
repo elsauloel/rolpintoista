@@ -332,6 +332,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     (Def.Esp +1, Res.Esp +1, Res. hielo +1, Vida +5) · **Anillo de escarcha** (+2 al daño de hielo): Defensa 2, Def.Esp 1. Skills: **Dardo helado**
     (lenta, cd 4: 2d6 + ¼ Ef.Esp de hielo +2, Escarcha 1 y una más cada 5) · **Hálito polar** (lenta, cd 3: cono de 16, 2d4 + ¼ Ef.Esp +2 y
     Escarcha). Consumible: Poción de SP menor. Sin cargar hasta que el dueño diga.
+  - **Nivel 2 aprobado y cargado** (dueño, 2026-11-09: «el mago de escarcha está bien»): Esp 13 · Con 9 · Agi 5 · Des 6 · Fue 2, vida 50 (con la capa),
+    5 No2, **SP 39** (modo SP: «los magos van a usar SP, no cooldown»), PdG.Esp 13, Ef.Esp 14, Def 3, Def.Esp 1, Eva 6. Suma **Parpadeo** (Flash, 4 SP: se
+    teletransporta hasta 3 casillas, sin oportunidad) y la pasiva **Potencia especial** (+1 Ef.Esp, igual que el Piromante nv2: el dueño la dejó así).
+    Equipo + Polainas de cuero remendado (Def +1, Res.CC +1) y Escarpines de fieltro (Eva +1). Costos con SP: Dardo helado y Hálito polar, tanto SP como su
+    Especial (13). El Parpadeo, desde el mismo día, se ve como un televisor viejo que se apaga en la salida y se prende en la llegada (vtt-hexgrid/js/111).
   - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
     nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
   - **Boceto nivel por nivel** (dueño, 2026-11-03: «me cierra»): nv2 Parpadeo + pasiva Potencia especial; + Polainas de cuero remendado y Botas de

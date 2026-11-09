@@ -2080,3 +2080,35 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - Capturas: `cola-07-0-en-el-mapa`, `cola-07-1-golpe-que-sangra`, `cola-07-2-sal-en-la-herida`, `cola-07-3-tendon-cortado`, `cola-07-4-rafaga-efectos`,
   `cola-07-5-arteria-carancho` (la declaración), `cola-07-6-arteria-critico`, `cola-07-7-paso-atras` (el «¿Querés dar un paso?»),
   `cola-07-8-escurridizo`, `cola-07-9-botas-oportunidad`.
+
+## 🧪 Cola de pruebas · 8: la línea L2 · Envenenador, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Envenenador Lv 1 a Lv 5 → «Crear token»; renombrados
+  Envenenador 1 a 5 al lado de Bizzante y Rockardo (copias). Larry no se usó (es inmune a lo tóxico).
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Parry/Eva/Ini/Res.CC): nv1 35/9/2/0/11/5/10/9/9/7 ·
+  nv2 40/9/3/0/12/6/11/9/9/8 · nv3 40/10/3/0/13/7/12/10/10/8 · nv4 45/11/2/2/14/7/13/14/11/9 · nv5 50/12/2/2/15/7/14/15/12/10. Res. tóxico y ácido
+  +1 (Zuecos) del 2 al 5; Evasión contra oportunidad +2 (Calzas en el 2 y el 3, Chaqueta del corredor en el 4 y el 5).
+- **Estocada** (nv1 → Bizzante): «Daga ritual · +1 de daño fijo · perfora 3», «1d4 + 5 + 1», y «Aplicar Veneno ×2» (la daga, siempre).
+- **Hoja envenenada** (nv2 → Rockardo, Defensa 15): crítico; dos botones, Veneno ×2 (daga) y ×3 (habilidad) → Rockardo con **Veneno 5**.
+- **Tajo veloz** (nv3 → Bizzante, que tenía Veneno 2): «+2 PdG · +2 de daño fijo · Crítico frecuente +1» (el rango lo muestra: «Tajo veloz suma +1
+  a tu Crítico frecuente»); Veneno ×3 de la Daga de la viuda verde → **Veneno 5**.
+- **Golpe a la rodilla** (nv3 → Bizzante): «Aplicar Veneno ×3» y «Aplicar Rengo (2 turnos)» → Veneno 8, Rengo 2.
+- **Hit and run** (nv4 → Rockardo): 1d4 + 7 contra Defensa 15: «lo frenó entero» y el veneno de la viuda verde no entró (no perfora, el veneno pide
+  daño). Al resolverse: el cartel «💨 Envenenador 4 se aleja · Arrastrá el token hasta 2 casilleros: gratis y sin ataque de oportunidad» y la Mesa
+  «se alejó de Rockardo… con Hit and run: no permite ataque de oportunidad»; el paso no gastó No2 (9 → 9).
+- **Escurridizo** (nv2, Bizzante le erró por la espalda): «🦶 Envenenador: sos escurridizo. ¿Querés dar un paso? …».
+- **Chaqueta del corredor** (nv4 se aleja de Bizzante): «Sí, atacar» con el Machete y la defensa ofrece «🏃 Evasión 🎲 2d8 (con +2 contra
+  oportunidad)»; esquivó (9 contra 2) y salió también el Escurridizo.
+- **Ráfaga de cortes + Anillo del pantano** (nv5 → Bizzante): «🗡 3 cortes: los efectos del arma se tiran 3 veces», crítico ×2, y **tres «✔ Aplicar
+  Veneno ×4 (3 + 1 del envenenador)»**. El golpe dejó a Bizzante en 0 y su ítem de emergencia lo levantó **Invulnerable**: los tres venenos no
+  entraron (quedó Veneno 8).
+- **🐞 Arreglado: el aviso del Invulnerable en el duelo del GM** (lo que se vio en la prueba 7): el duelo decía «✔ Aplicado · le llegó a su ficha:
+  Veneno ×4» aunque la ficha no lo sumaba. Ahora `dueloAplicarEfectoBase` (js/13) mira los estados que publica la ficha (`Combatiente.inmunidad`) y,
+  si algo lo frena, dice «no entró: está Invulnerable (Veneno ×2 no le hizo efecto)» (también Inmunidad a CC, Sangre pura…); el aviso igual viaja a la
+  ficha, que decide con lo suyo. Comprobado sobre el duelo de la Estocada contra Bizzante Invulnerable. Si el golpe mismo pega contra un Invulnerable,
+  el duelo ya decía «✘ No entra: era Invulnerable» (sin cambios).
+- **Óleo venenoso** (nv2, desde sus Acciones): estado «Óleo venenoso» con 1 carga, cinturón vacío, −1 No2. La Estocada siguiente contra Rockardo:
+  daño 1d4 + 9 (6 + 1 de la Estocada + 2 del óleo), botones Veneno ×2 (daga) y ×3 (óleo), la carga se gastó → Rockardo de **Veneno 5 a 10**.
+- **El veneno se suma entero:** Bizzante 2 → 5 → 8; Rockardo 5 → 10.
+- Capturas: `cola-08-0-en-el-mapa`, `cola-08-1-estocada`, `cola-08-2-tajo-veloz-viuda`, `cola-08-3-hit-and-run-cartel`, `cola-08-4-escurridizo`,
+  `cola-08-5-rafaga-veneno-x4`, `cola-08-6-invulnerable-no-entro`, `cola-08-7-chaqueta-oportunidad`, `cola-08-8-oleo-venenoso`.

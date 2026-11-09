@@ -12,15 +12,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-24. [ ] **Finta: +2 PdG y +1 al daño, sin Parry** (2026-11-09): en el duelo, +2 a la tirada de PdG y +1 al daño; el rival solo puede esquivar;
-    sin bonos de crítico.
+(vacía)
 
 Cada línea nueva que se termine de diseñar se suma al final.
-25. [ ] **Paso Fantasma: pasos seguidos aunque sean en varios movimientos (1 + 2), se corta con otra acción** (2026-11-09): 1 paso, después 2 sin hacer nada en el medio → +3; 1 paso, atacar o una habilidad, 2 pasos → nada; un Salto o un Dash en el medio también corta.
-26. [ ] **Escudos gastados desaparecen al llegar a 0** (dueño, 2026-11-09): un Shield, el Blindaje, una poción de Cuero Duro o el escudo de 5 del Escudo humano se van de la lista apenas se vacían (personaje, creep e invocación, y del resumen público); la Armadura arcana sigue explotando.
 
 ## Hechas
 
+- [x] **Finta: +2 PdG y +1 al daño, sin Parry** (2026-11-09): el Goblin con la Finta contra Rockardo (copia): la declaración dice «+2 PdG · +1 de
+  daño fijo · no se puede parrear»; los dos Parry de Rockardo (escudo y mazo) apagados («Finta no se deja parrear (sí esquivar)»); el daño
+  «1d10 + 11 + 1»; el rango del crítico, 11 (Tipo 10 + 1 de resistencia), sin bonos de la Finta. Sin errores.
+- [x] **Paso Fantasma: pasos seguidos aunque sean en varios movimientos** (2026-11-09): 1 casilla y después 2 → +3 listo (Capataz, en las tres
+  pantallas); 1, una tirada suya (Fuerza del golpe) y 2 → nada (la tirada corta). **Había un error y está arreglado:** la tirada de Evasión de las
+  Acciones y la Botonera se llama «Esquivar (Eva)» y cortaba la cadena (solo se excluía «Evasión»); ahora no corta: 1, «Esquivar» y 2 → +3 listo.
+- [x] **Escudos gastados desaparecen al llegar a 0** (2026-11-09): Blindaje (Barrera 12), el Escudo especial de 5 del Escudo humano y la Poción de
+  Cuero Duro (15): al vaciarse cada uno, se va de la lista en la pantalla del GM y en la del jugador, y el aviso dice «el escudo absorbió … · se
+  gastó …». Sin errores.
 - [x] **Paso Fantasma con Carga y Takle (y no con Salto ni Dash)** (2026-11-09): en «Encuentro 2», el Goblin con el anillo: la **Carga**
   corrió 3 → +3 listo en las tres pantallas (GM, J1, J2); el **Takle** corre 2 (su receta): no llega a 3 y no lo carga (las 2 casillas sí se cuentan
   como movidas); con la carrera llevada a 3 en la copia de prueba, sí lo carga. **Salto** de 3 y **Dash** de 3: no lo cargan. Caminar 6 da **+3**,

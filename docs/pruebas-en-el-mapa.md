@@ -2419,3 +2419,21 @@ activo, los usos y el documento de Mantenimiento que creó la prueba).
   tirara la Evasión de un personaje que ya la tiró el jugador en la misma ronda, se la sumaría de nuevo. Recargar la página borra el estado.
 - **Invocación:** no se probó (no había una con el anillo a mano).
 
+
+### Cola 24, 25 y 26 · Finta nueva, Paso Fantasma en varios movimientos, escudos gastados (2026-11-09)
+«Claude · pruebas», «Encuentro 2», GM + jugador 1 + jugador 2. Respaldo antes; restaurado y comparado después (idéntico); se borraron el mapa activo,
+los usos y el documento de Mantenimiento.
+- **Finta (+2 PdG, +1 al daño, sin Parry):** el Goblin rompehuesos con la Finta contra Rockardo (copia). Declaración «+2 PdG · +1 de daño fijo · no se
+  puede parrear»; los dos Parry (escudo y mazo) apagados; con PdG 10 contra Evasión 4, «Tirar el daño · 1d10 + 11 + 1»; rango del crítico 11 (Tipo
+  10 + 1), sin bonos de la Finta. Capturas `cola-24-1-finta-declaracion`, `cola-24-2-finta-dano`.
+- **Paso Fantasma, pasos seguidos en varios movimientos:** con el anillo en tres creeps.
+  - Capataz: 1 casilla → cadena 1; 2 casillas más → **listo** (también en J1 y J2).
+  - Rata: 1 casilla, una tirada suya (Fuerza del golpe, desde las Acciones) y 2 casillas → **nada** (la tirada corta).
+  - **Error encontrado y arreglado:** la tirada de Evasión de las Acciones (y de la Botonera) se llama «Esquivar (Eva)» y cortaba la cadena: el corte
+    solo excluía «Evasión» (`mesaAlAccionNueva`, vtt-hexgrid/js/07-tokens-y-elementos.js). Ahora excluye también «Esquivar». Probado: Goblin
+    Alquimista 1 casilla, «Esquivar» y 2 → **listo**. Capturas `cola-25-2-evasion-no-corta`, `cola-25-3-alquimista-listo`.
+- **Escudos gastados:** Capataz con Blindaje (Barrera 12) → golpe crítico de 42 → «− Barrera (escudo) 12 = 30» y la Barrera se fue de la lista; Escudo
+  humano (Escudo especial 5) → golpe → «el escudo absorbió 5 · se gastó Escudo especial», fuera de la lista en GM y J1; la Rata con la Poción de Cuero
+  Duro (15) → golpe de 32 → «el escudo absorbió 15 · se gastó Cuero duro (poción)», fuera de la lista en GM y J1. Capturas `cola-26-1-barrera-se-gasto`,
+  `cola-26-2-escudo-especial-se-gasto`, `cola-26-3-cuero-duro-se-gasto`.
+- De la prueba: al usar Blindaje, un clic de más usó el Town portal del Capataz (sin colocar portal); la restauración lo devolvió.

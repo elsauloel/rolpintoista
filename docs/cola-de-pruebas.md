@@ -21,6 +21,7 @@ Cada línea nueva que se termine de diseñar se suma al final.
 33. [ ] **Atacar saca del Sigilo (después de aplicar el bono de atacar desde el sigilo)** (2026-11-09, dueño: «claro, atacar lo saca del sigilo»): un personaje y un creep en sigilo atacan (arma, habilidad de ataque, disparo, hechizo o varita a un rival): el duelo tiene el bono de atacar desde el sigilo y, apenas se declara, el atacante sale del sigilo (aviso en la Mesa, sin Marcado). El robo en sigilo no lo saca. Un giro: solo el primer rival lleva el bono.
 34. [ ] **Percepción aumentada: sin punto ciego en la espalda para el sigilo** (2026-11-09): un token en sigilo pegado a la espalda de alguien con la pasiva le da la tirada de detección (la casilla de atrás cuenta como zona de alerta); sin la pasiva, sigue siendo punto ciego. Probar con un personaje, un creep y una invocación.
 35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
+36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
 
 ## Hechas
 

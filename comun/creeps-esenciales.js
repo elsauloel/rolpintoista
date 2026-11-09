@@ -222,6 +222,9 @@
   esencial({...M2, nivel: 2, atrib: [9, 2, 5, 6, 13],   // (aprobado 2026-11-09: Parpadeo, Potencia especial; + Polainas de cuero remendado y Escarpines de fieltro. Con SP: «los magos van a usar SP, no cooldown»)
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
     habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M2, nivel: 3, atrib: [9, 2, 6, 6, 15],   // (aprobado 2026-11-09: Prisión de hielo; la mano del escudo pasa a un talismán Bueno, el Orbe de resguardo mayor; la varita sigue siendo la de la ventisca)
+    equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Capa de viajero', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo'], pasivas: ['Potencia especial']});
   esencial({linea: 'M3', nombre: 'Mago del rayo', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa'],
     habilidades: ['Centella', 'Zap'], consumibles: ['Poción de SP menor'],

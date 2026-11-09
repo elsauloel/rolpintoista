@@ -337,6 +337,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     teletransporta hasta 3 casillas, sin oportunidad) y la pasiva **Potencia especial** (+1 Ef.Esp, igual que el Piromante nv2: el dueño la dejó así).
     Equipo + Polainas de cuero remendado (Def +1, Res.CC +1) y Escarpines de fieltro (Eva +1). Costos con SP: Dardo helado y Hálito polar, tanto SP como su
     Especial (13). El Parpadeo, desde el mismo día, se ve como un televisor viejo que se apaga en la salida y se prende en la llegada (vtt-hexgrid/js/111).
+  - **Nivel 3 aprobado y cargado** (dueño, 2026-11-09: «va con esto»): Esp 15 · Con 9 · Agi 6 · Des 6 · Fue 2, vida 50 (con la capa), 6 No2,
+    **SP 45** (+7 por turno), PdG.Esp 15, Ef.Esp 16, Def 1, Def.Esp 2, Eva 7. Suma **Prisión de hielo** (2 No2, 3 SP: su PdG.Esp contra la Evasión;
+    2d4 de hielo e Inmovilizado hasta 2 turnos; se rompe con Fuerza contra su Ef.Esp). **La mano del escudo pasa a un talismán Bueno, el Orbe de
+    resguardo mayor** (Def.Esp +1, Luz +1; una vez por turno, al ganar una tirada de PdG.Esp, un Escudo especial de 3 hasta su próximo turno), en lugar
+    del Escudo de cuero mojado y del Escudo de bronce con runas del boceto (dueño, 2026-11-09: «quizás en el nivel 3 podemos pensar en algún talismán
+    que le sea útil»). **La varita sigue siendo la de la ventisca**: la de la ráfaga helada se descartó porque repite la Ráfaga de viento del nivel 4.
+    Pierde Defensa (de 3 a 1) al soltar el escudo; lo compensa el escudo de 3 del orbe en cada hechizo que pega.
   - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
     nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
   - **Boceto nivel por nivel** (dueño, 2026-11-03: «me cierra»): nv2 Parpadeo + pasiva Potencia especial; + Polainas de cuero remendado y Botas de

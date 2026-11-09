@@ -2152,3 +2152,46 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - Capturas: `cola-09-0-en-el-mapa`, `cola-09-1-tiro-certero`, `cola-09-2-tiro-a-la-cabeza`, `cola-09-3-vigilancia`, `cola-09-4-tiro-al-arma`,
   `cola-09-4b-arma-en-el-piso`, `cola-09-5-disparo-senalador`, `cola-09-5c-presa-marcado`, `cola-09-6-atraviesa-primero`,
   `cola-09-7-atraviesa-segundo-sin-espinas`, `cola-09-8-botas-oportunidad`, `cola-09-9-flecha-especial`.
+
+## 🔥 Cola de pruebas · 10: la línea M1 · Piromante, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Piromante Lv 1 a Lv 5 → «Crear token»; renombrados
+  Piromante 1 a 5 (en el creep público y en el token: si no, el mapa vuelve a mostrar «Piromante»), a 5 casillas de Rockardo.
+- **Números en el mapa = la prueba de niveles** (vida/No2/SP máx/recarga/Def/Def.Esp/PdG.Esp/Ef.Esp/Eva/Ini): nv1 40/5/42/7/1/2/14/14/5/5 ·
+  nv2 45/6/45/7/1/3/15/16/6/6 · nv3 50/6/48/8/1/3/16/17/6/6 · nv4 55/7/51/8/3/1/18/18/8/7 · nv5 65/7/54/9/5/0/19/19/8/7. Todos en modo SP. Potencia
+  especial (+1 Ef.Esp) y Puntería arcana (+1 PdG.Esp) están en esos números; el Meteoro arranca con el cooldown activo (3).
+- **Lengua de fuego** (nv1 → Rockardo): PdG.Esp contra Evasión; con 14: «2d6+3» (¼ de Ef.Esp 14) + la Botella 2 = 15, «no se resta la Defensa; se
+  resta la Defensa especial», y Quemadura 3 turnos. Cobró 14 SP (su Especial) y 2 No2.
+- **Muro de fuego** (nv1): «¿De qué largo?» (4 casillas: 1 No2 y 3 SP … 8 casillas: 5 No2 y 7 SP) → «¿Lo levanta?» → «marcá dónde empieza» →
+  «hacia dónde sigue»: 4 casillas en línea, 3 turnos. Bizzante lo cruzó (arrastrado por el GM): el cartel «Muro de fuego: le toca a Bizzante» →
+  Aplicar → 11 de fuego directo + Quemadura (35 → 22).
+- **Parpadeo** (nv2): «¿adónde salta?» → 3 casillas, sin oportunidad; 4 SP. (Los Piromantes no estaban en el orden de turnos: no cuenta como turno
+  ajeno, así que no se cobró el doble — está bien.)
+- **Bola de fuego** (nv3, centro al lado de Larry y Rockardo): **una sola tirada de PdG.Esp** (16) para los dos. Larry (J1) se defendió desde su
+  pantalla (le salió el cartel del Sobrepeso: «Pagar 1 No2 y tirar sin penalidad»): 10 − Defensa especial 2 = 8. Rockardo, con **Espejo** puesto a
+  propósito: 12 a la vida y **el Espejo no devolvió nada** (es un área). Quemadura a los dos.
+- **Botella con un diablito:** en cada daño especial con un 1 en los dados, el anuncio «El diablito se ríe» → «Aplicar 2 de fuego» → «¡TE QUEMÓ! 2 de
+  fuego (48 → 46)».
+- **Varita del chorro de lava** (nv5): «marcá dónde empieza» (a 3 o menos) → 4 casillas pegadas una a otra; nadie encima. Rockardo entró después
+  (con el aviso de ataque de oportunidad del goblin, «No, dejarlo pasar»): el cartel → Aplicar → 4 de fuego.
+- **Mitones del primer conjuro:** la varita cuesta 3 SP y cobró 2 (54 → 52).
+- **Escudo elemental** (nv4): «¿Al azar · 4 SP / Elegir · 5 SP?» → el rodillo (salió ⚡ Eléctrico, J1 lo vio girar) → el objetivo. Sobre sí mismo:
+  Bizzante (5) y la Rata aliada (4) se electrocutaron al quedar en el anillo (Res.CC contra Ef.Esp para la Parálisis, no salió) y el rayo saltó (Larry
+  2 → Rockardo 1; Piromante 5 2 → Piromante 3 1).
+- **🐞 Arreglado: el Escudo elemental no se podía poner sobre sí mismo.** El texto dice «a un aliado (o a sí mismo) o a un rival», pero el clic en
+  el propio token decía «Ahí no hay otro token»: el «conmigo» solo se conservaba con objetivo «aliado» y el Escudo es «cualquiera». Ahora vale también
+  para «cualquiera» (`comun/combatiente.js` habEjecucion, `comun/duelo.js`, `vtt-hexgrid/js/13` alElegir; prueba automática nueva). Probado: el clic en
+  el propio Piromante 4 le puso el Escudo eléctrico (2 turnos). Esc antes de elegir devolvió los 4 SP y los 2 No2.
+- **Meteoro** (nv5, cooldown puesto en 0 para la prueba): «marcá dónde cae» (Rango 7, diámetro 5) → la sombra; 5 SP y 2 No2. Para que cayera sin
+  armar el orden de turnos se adelantó la ronda en el creep (`meteoro.mant`): «¡Cae el meteoro!», un duelo por cada uno de adentro (el goblin
+  rompehuesos aliado, Larry y Rockardo), el dodge roll (✘ Sigue adentro), 4d6 físico (Rockardo: 13 − Defensa 15 = 0) + 2d6 de fuego directo (11).
+- **Chaleco de kevlar** (nv4, el Arquero del culto le disparó): «10 − Defensa 3 − Defensa contra armas a distancia 2 = 5».
+- **Poción de SP menor** (nv5): 49 → 54 (el máximo), 1 No2, salió del cinturón.
+- **Sin probar en juego:** el segundo uso de una varita en el mismo turno (los Mitones descuentan solo el primero; sin orden de turnos no hay «turno»);
+  las Babuchas, los Escarpines y el Casco solo por los números.
+- **De la prueba, no del juego:** al principio quedaron dos servidores de pasos corriendo a la vez y el Muro de fuego se levantó dos veces (dos
+  carteles al cruzarlo); se borró el duplicado y se recargó la pantalla del GM. Una vez, en la pantalla de J1 se vieron sueltos (sin estilo) varios
+  carteles de la ficha (Tienda, Vender, Tenés sobrepeso…) detrás del duelo; después de recargar no volvió a pasar.
+- Capturas: `cola-10-0-en-el-mapa`, `cola-10-1-lengua-de-fuego`, `cola-10-2-muro-de-fuego`, `cola-10-2-muro-cruza`, `cola-10-3-parpadeo`,
+  `cola-10-4-bola-espejo`, `cola-10-4b-diablito`, `cola-10-5a-lava`, `cola-10-6a-rodillo`, `cola-10-6-escudo-elemental`, `cola-10-7a-meteoro-sombra`,
+  `cola-10-7b-meteoro-cae`, `cola-10-7-meteoro`, `cola-10-8-kevlar`, `cola-10-9-pocion-sp`.

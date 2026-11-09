@@ -2387,3 +2387,15 @@ el control con «↩ Devolver el control»; mientras el GM lo tiene, la ficha de
   - **Rata** (Parry de los Dientes infecciosos 11 contra PdG 1): atajó, pero perdió el Bloqueo (5 contra 5, desempate con par) → pasa la mitad: 30 → 27.
   - **Goblin** (Evasión 3 contra PdG 12, a mano): **crítico ×2**, 85 → 71.
   Cooldown del Giro quedó en 3. Sin errores. Capturas `cola-16-*` y `cola-17-*` en el scratchpad.
+
+### 2026-11-09 · Cola 19–21: 🦶 Inamovible, 🦘 Salto aplastante sin atacar, 🤺 Finta sin crítico (con clics, GM y J1 en «Encuentro 2»; restaurado e idéntico al respaldo)
+- **Inamovible**: al Capataz del culto le puse las Botas de estibador (33 %) y al Goblin rompehuesos la Cornada (Empujón 1, pegado al Capataz).
+  El Empujón tiraba la chance con `Math.random` sin mostrar nada (`dueloEmpujar`; igual en `dueloAtraer`, `arrastrarTraer` y Cambiar de lugar).
+  Arreglado con `inamovibleSale` (js/21, el `chanceCartel` de siempre). Con 6 en el d6: «¡NO SE MUEVE!»; con 1: «LO MUEVEN» y pasó de 14,21 a 14,20.
+  Capturas `cola-19-2a/2b` (sale) y `cola-19-3a/3b` (no sale).
+- **Salto aplastante**: armado al nivel 3, `cd 4`, `cdActual 0`, sin `cdArranca` (arranca disponible). Cayó en 12,24, al lado de Rockardo:
+  «cae aplastando (Fuerza 8): Rockardo 1 contra 8 → queda Sentado». «No, solo saltar»: No2 7 → 2 → 6 (pagó 1; el aviso: «el salto le costó 1 No2
+  (se le devolvieron 4 del ataque)»). Capturas `cola-20-1/2/3`.
+- **Finta**: declaración «+2 de daño fijo · no se puede parrear»; Parry con escudo y con mazo apagados; con PdG 14 contra Evasión 3, rango del
+  crítico 11 = Tipo 10 + 1, sin bonos de la Finta. Capturas `cola-21-1/2/3`.
+

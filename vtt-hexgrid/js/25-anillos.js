@@ -187,12 +187,28 @@ async function pergaminoGrupalRepartir({quien, propio, it, spec, aliados}){
   if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${quien} usó ${it.nombre}: ${efecto} — también a ${nombres.join(', ')} (cada uno lo aplica o lo resuelve a mano)${fueraTxt}`, 'recordatorio', aliados === 'creep' ? quien : undefined);
 }
 const pergGrupalVistos = new Set();
+// 🐞 (Cola de pruebas 11, 2026-11-09: el Pergamino de Regeneración menor de un Sanador a seis creeps aliados) Los avisos llegan todos juntos a la
+// pantalla del GM y AvisoCombate muestra uno solo: cada uno nuevo sacaba al anterior sin cerrarlo, y de los seis se veía solo el último (los otros
+// cinco quedaban «esperando» en la Crónica, sin cartel). Ahora van en fila: se muestra uno, y al cerrarlo (Aplicar, a mano o la ✕) sale el siguiente.
+const pergGrupalCola = [];
+let pergGrupalAbierto = null;
 function pergaminoGrupalMomento(id, d){
   const dt = d.datos || {};
   if(d.estado !== 'esperando' || pergGrupalVistos.has(id)) return;
   if(dt.paraGM ? !soyGM : (!fbUsuario || dt.paraUid !== fbUsuario.uid)) return;
   pergGrupalVistos.add(id);
-  const cerrar = (resultado, linea) => { AvisoCombate.cerrar(); momentoActualizar(id, {estado: 'listo', resultado}); if(linea && typeof mesaLinea === 'function') mesaLinea(linea, 'recordatorio'); };
+  pergGrupalCola.push([id, d]);
+  pergGrupalSiguiente();
+}
+function pergGrupalSiguiente(){
+  // Si otro cartel tapó el nuestro sin cerrarlo, el nuestro vuelve a la fila (adelante).
+  if(pergGrupalAbierto && AvisoCombate.abiertoClave() !== 'perg-grupal:' + pergGrupalAbierto[0]){ pergGrupalCola.unshift(pergGrupalAbierto); pergGrupalAbierto = null; }
+  if(pergGrupalAbierto || !pergGrupalCola.length){ if(pergGrupalAbierto) setTimeout(pergGrupalSiguiente, 2000); return; }
+  if(AvisoCombate.abierto()){ setTimeout(pergGrupalSiguiente, 1200); return; }   // otro cartel abierto: espera a que se cierre
+  const par = pergGrupalCola.shift(), [id, d] = par, dt = d.datos || {};
+  pergGrupalAbierto = par;
+  let decidido = false;
+  const cerrar = (resultado, linea) => { decidido = true; AvisoCombate.cerrar(); momentoActualizar(id, {estado: 'listo', resultado}); if(linea && typeof mesaLinea === 'function') mesaLinea(linea, 'recordatorio'); };
   AvisoCombate.mostrar({clave: 'perg-grupal:' + id, icono: '📜', titulo: d.titulo || 'Pergamino grupal',
     texto: `${dt.quien || 'Un aliado'} usó ${dt.origen || 'un pergamino'}. Para ${dt.nombre || 'vos'}: ${dt.efecto || ''}`,
     botones: [{texto: '✔ Aplicar', alClic: async () => {
@@ -204,7 +220,10 @@ function pergaminoGrupalMomento(id, d){
         cerrar(ok ? `✔ ${dt.nombre}: ${dt.efecto} (aplicado)` : `✖ ${dt.nombre}: no se pudo aplicar (${dt.efecto})`);
       }},
       {texto: '✋ Resolver a mano', sec: true, alClic: () => cerrar(`✋ ${dt.nombre}: lo resuelve a mano (${dt.efecto})`, `📜 ${dt.origen}: ${dt.nombre} lo resuelve a mano (${dt.efecto})`)}],
-    alCerrar: () => { pergGrupalVistos.delete(id); }});   // cerrado sin decidir: queda esperando en la Crónica
+    alCerrar: () => {   // cerrado sin decidir: queda esperando en la Crónica (y vuelve a salir si el momento cambia)
+      if(!decidido) pergGrupalVistos.delete(id);
+      pergGrupalAbierto = null; setTimeout(pergGrupalSiguiente, 300);
+    }});
 }
 // 📜 «Hasta el fin del combate» (dueño, 2026-10-19): los pergaminos de todo el combate se van al «Finalizar combate» (también los viejos, por el nombre).
 const finDelCombate = e => !!e && (e.finCombate || (e.permanente && /\(pergamino\)\s*$|^Sangre de drag[oó]n/i.test(String(e.nombre || ''))));   // (+ la Sangre de dragón, 2026-10-20)

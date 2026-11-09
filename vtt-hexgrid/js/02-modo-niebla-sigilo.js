@@ -621,6 +621,9 @@ function portalFijoDe(el){
 let elegirDestinoLibre = false;   // true: vale cualquier casilla (elegir un token, no un destino a pie)
 let elegirDestinoCancel = null;   // qué hacer si se cancela con Esc o clic derecho
 function elegirDestino(cb, texto, libre, alCancelar){
+  // ↩ (2026-11-09, cola de pruebas 14) Si ya había otra elección pendiente (por ejemplo, una habilidad de un creep esperando su objetivo, y el GM
+  // aprieta Atacar con un personaje), la de antes se cancela como con Esc —se le devuelve lo cobrado— en vez de pisarla sin devolver nada.
+  if(elegirDestinoCb){ const antes = elegirDestinoCancel; elegirDestinoTerminar(); if(antes) try{ antes(); }catch(err){ console.error('No se pudo cancelar la elección anterior', err); } }
   elegirDestinoCb = cb;
   elegirDestinoLibre = !!libre;
   elegirDestinoCancel = alCancelar || null;

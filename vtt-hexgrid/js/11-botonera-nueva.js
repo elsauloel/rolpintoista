@@ -1010,8 +1010,27 @@ let bnSinNitrosSeguir = null;
 // Un cartel de la Botonera que pide algo (sin No2, sobrepeso, ¿con qué arma?) se tiene que ver aunque la Botonera esté escondida (2026-10-03:
 // el duelo le pide el PdG mientras se eligió el objetivo y el cartel quedaba invisible, esperando).
 function bnAbrirCartel(id){
-  if(bn.host.hidden){ bn.host.hidden = false; bnUbicar(); }
+  // 🪟 (2026-11-09, cola de pruebas 14): el duelo le pide algo a un personaje (el sobrepeso de la Evasión, con qué arma…) sin que su Botonera esté
+  // abierta: se muestra SOLO ese cartel, con el estilo de la ficha (antes el recuadro se abría sin su CSS y se veían todos los carteles sueltos,
+  // sin formato: Tienda, Vender, «Tenés sobrepeso»…). Al cerrarse el último cartel, el recuadro se vuelve a esconder.
+  if(bn.host.hidden){ bnSoloCartel(true); bn.host.hidden = false; bnUbicar(); }
+  bnPonerCss();
   bn.raiz.querySelector('#' + id).classList.add('open');
+}
+// El estilo del recuadro (la ficha.css con :root → :host, los 🔍, las piezas): lo pone quien lo muestra (abrirBotoneraNueva o un cartel suelto).
+function bnPonerCss(){
+  const css = bn && bn.raiz.querySelector('#bn-css');
+  if(!css || (css.textContent && bnCss && css.dataset.ok)) return;
+  const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
+  css.textContent = bnCss + lupaCss + (typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : '') + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  if(bnCss) css.dataset.ok = '1';
+}
+// Un cartel suelto (sin la Botonera a la vista): se esconde lo de adentro del recuadro y, al cerrarse el último cartel, el recuadro entero.
+function bnSoloCartel(si){
+  if(!bn) return;
+  bn.soloCartel = !!si;
+  const c = bn.raiz.querySelector('#bn-contenido');
+  if(c) c.hidden = !!si;
 }
 function bnSinNitros(costo, accion, continuar){
   // 💸 Ya en No2 negativos, ninguna acción que cueste No2, tampoco «Realizar de cualquier modo» (dueño, 2026-11-01)
@@ -1331,6 +1350,10 @@ function bnCrear(){
   // Clic en el fondo: se cierra. Ojo: para un clic adentro del recuadro, e.target acá es SIEMPRE el recuadro (el navegador lo
   // "retarguetea"): se mira el primer elemento real del recorrido (antes, cualquier clic con el mouse la cerraba).
   host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && t.id === 'bn-contenido')) cerrarBotoneraNueva(); });
+  // 🪟 Un cartel suelto del duelo (bnAbrirCartel): cuando se cierra el último, el recuadro vuelve a esconderse (cualquiera sea la forma de cerrarlo).
+  new MutationObserver(() => {
+    if(bn && bn.raiz === raiz && bn.soloCartel && !raiz.querySelector('.scrim.open')){ bnSoloCartel(false); host.hidden = true; }
+  }).observe(raiz, {subtree: true, attributes: true, attributeFilter: ['class']});
   return {host, raiz};
 }
 async function abrirBotoneraNueva(fichaId, invId){
@@ -1338,8 +1361,8 @@ async function abrirBotoneraNueva(fichaId, invId){
   if(bn && bn.fichaId === fichaId && (bn.invId || '') === invId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, invId, true); return; }
   bnAbrirSesion(fichaId);
-  const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
-  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + (typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : '') + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  bnPonerCss();
+  bnSoloCartel(false);
   bn.invId = invId;   // la Botonera de una de sus invocaciones (4e), o '' para la del personaje
   if(ac && !ac.host.hidden) cerrarAccionesNuevas();
   bn.host.hidden = false;

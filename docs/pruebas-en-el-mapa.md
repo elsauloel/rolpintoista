@@ -2005,3 +2005,44 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   (sin el número); el Interponerse se eligió por orden.
 - Capturas: `cola-05-*` (Provocar que funcionó, el Parry por pieza, el cartel del Aguante con Golpe de escudo, Devolver gentileza, el botón del
   Interponerse, Interponerse con Espinas, Escudo humano sin Espinas).
+
+## 🐂 Cola de pruebas · 6: la línea H1 · Embestidor, niveles 1 a 4 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Embestidor Lv 1 a Lv 4 → «Crear token»; renombrados
+  Embestidor 1 a 4 y puestos cerca de Rockardo, Larry y Bizzante (copias). El nivel 5 está en pausa.
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Bloqueo/Parry/Eva/Ini/Res.CC): nv1 50/6/2/0/7/8/8/7/6/6/10 ·
+  nv2 55/8/4/1/7/9/9/7/7/7/11 · nv3 60/8/4/1/8/10/10/8/7/7/12 · nv4 80/9/4/3/8/11/11/8/8/8/13 (Impulso +1 No2 desde el nv2; Jubón +10 y Robustez +5
+  en el nv4). Salto aplastante arranca con cooldown 4 (lenta).
+- **Carga que derriba** (nv1 → Larry, J1 se defendió con Evasión): corrió 3 en línea recta (+3 PdG, +3 de daño), crítico ×2 (24); como corrió 3,
+  «Fuerza + 3» (1d10+1 → 2) contra la Res.CC de Larry (4): se mantuvo en pie (Mesa y Crónica). El Derribar 50 % del Hacha de verdugo de pueblo sí
+  salió y lo dejó Sentado. ⚠ **El nivel 1 no llega a la carga de 3 con sus No2**: atacar con el hacha cuesta 4 y correr 3, 3 → 7 contra 6; el mapa
+  avisa «Sin No2 para la carrera… ¿Correr igual? (queda en 0)». Con 6 No2 solo puede correr 2 (sin el derribo de la carga).
+- **Takle** (nv2 → Bizzante, Flash, 2 No2): corrió hasta quedar pegado; Con contra Con. Una vez resistido (3 contra 6) y otra ganado (14 manual
+  contra 7): −3 No2 (8 → 5), empujado 2 (chocó contra Larry: 6 − Defensa 6 → 0 a cada uno) y al final del orden de turnos.
+- **Salto aplastante** (nv3, cooldown puesto en 0 para la prueba): pintó 33 casillas (3 marcadas pegadas a rivales); cayó en 9,26 «en medio de sus
+  rivales»; el aplastamiento tiró su Fuerza contra la Res.CC de Larry y de Bizzante (3 contra 3, empates: no caen); «¿Atacar?» → Sí → elegir objetivo
+  → Bizzante: crítico ×2 (35 → 8; su ítem de emergencia lo dejó Invulnerable) y el Derribar 50 % del Hacha del verdugo de la capital.
+- **Aguante** (nv4, 1 No2): Defensa 4 → 6 y Def.Esp 3 → 5. Rockardo le pegó dos veces → `golpes` 2. Al empezar su turno (`CreepAcciones.inicioTurno`)
+  `aguanteListo` 2; con **Pegar fuerte** salió el cartel «recibió 2 golpes, así que Pegar fuerte suma +2d8. Cuesta +2 turnos de cooldown de Aguante» →
+  el duelo «+3 dados de daño» (2d8 + 3d8 + 11), crítico ×3 (114); cooldown de Aguante 2 → 4.
+- **Pergamino grupal de Paso Fantasma** (nv3): Paso Fantasma 3 turnos (+1 Eva: 7 → 8); salió del cinturón. A los otros Embestidores no les llegó
+  (no estaban en el orden de turnos).
+- ⚠ **El Anillo de Paso Fantasma no se carga con la carrera**: después de la Carga (3 casillas) `mapaPasoFantasma` seguía en falso y la Evasión del
+  nv1 contra Rockardo salió 1d6, sin el +3. El contador (`contarCasilleros`, js/07) solo suma los movimientos con ruta (caminar); la carrera, el Takle,
+  el Salto y el Dash mueven el token sin ruta. Para el dueño: ¿la carrera de la Carga tiene que cargarlo? (las Grebas del carnero ya tienen la regla
+  «Salto y Dash no cuentan»).
+- Capturas: `cola-06-0-en-el-mapa`, `cola-06-x-carga3` (la Carga), `cola-06-x-takle3` (el Takle ganado), `cola-06-x-salto2` (dónde caer),
+  `cola-06-3-aguante-pegar-fuerte` (el cartel), `cola-06-4-aguante-dados` (el golpe con los dados del Aguante).
+
+## 🐞 «Podés usar» adentro del cuadro del duelo (2026-11-09, la captura `cola-05-8-escudo-humano-sin-espinas` de la prueba 5)
+
+- **Qué pasaba:** la columna de Flash (🛡 ✨, «Podés usar») se ubica a la derecha del cuadro con `getBoundingClientRect` de `.duelo-caja`. Mientras
+  el cuadro se despliega desde su token (o vuelve después de `Duelo.apartar`: la Demora animada, Cambiar de lugar, el gancho), el fondo está achicado
+  con `transform` y ese rectángulo es chico: la columna quedaba en el medio del cuadro (~1 s, encima de «14 contra 3» y del Crítico) hasta el final de
+  la animación. Medido con `Duelo.apartar(id, 1500)`: a los 1900 ms la columna en x 861 con el cuadro en 711–1046; a los 2300, el cuadro ya en
+  527–1387 y la columna todavía adentro. El aro tenue al lado era el pulso del token (va encima del cuadro a propósito) y el del dado del crítico es su
+  animación de siempre.
+- **Arreglo** (`comun/flotantes.js`, `columnaDuelo`): el lugar se toma con `offsetLeft/offsetTop` (sin la animación: el lugar final) y, si el fondo
+  tiene una animación en curso, la columna queda escondida y se vuelve a acomodar cuando termina. Probado: durante todo el apartar/volver la columna
+  queda en x 1410 (afuera, a la derecha), escondida mientras el cuadro crece y visible al terminar. Capturas `cola-06b-2-despues-durante` y
+  `cola-06b-3-despues`.

@@ -156,6 +156,22 @@ function lineaLibre(desde, hasta, solidos, sinParedes){
   for(let i = 0; i < l.length - 1; i++) if(solidos.has(nbPack(l[i].col, l[i].fila))) return false;
   return true;
 }
+// 👁 Percepción aumentada (dueño, 2026-11-09: «con percepción aumentada, aún el casillero de la espalda le otorga la chance de tirar para detectar»):
+// quien la tiene no tiene punto ciego para el sigilo: su casilla de atrás también es zona de alerta. Personajes (resumen), creeps (tarjeta pública;
+// el GM, la privada) e invocaciones (el resumen de su dueño).
+function sinPuntoCiego(t){
+  if(!t || !t.fichaId) return false;
+  try{
+    if(t.tipo === 'creep'){
+      const v = vinculo(t); if(v && v.percepcionAumentada) return true;
+      const sc = soyGM && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null;
+      return !!(sc && (sc.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada')));
+    }
+    if(typeof resumenDeInv === 'function'){ const ri = resumenDeInv(t); if(ri) return !!ri.percepcionAumentada; }
+    const v = vinculo(t), r = v && v.resumen;
+    return !!(r && r.percepcionAumentada);
+  }catch(e){ return false; }
+}
 // {cono:[{col,fila}], alerta:[{col,fila}]} de un token, según hacia dónde mira.
 function zonasSigilo(t){
   const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
@@ -182,7 +198,7 @@ function zonasSigilo(t){
     });
   };
   cono.forEach(c => { const cu = hexACubo(c); sumarVecinos(cu.q, cu.r, false); });
-  sumarVecinos(c0.q, c0.r, true);
+  sumarVecinos(c0.q, c0.r, !sinPuntoCiego(t));   // la de atrás no, salvo con Percepción aumentada
   const libre = c => !solidos.has(nbPack(c.col, c.fila)) && lineaLibre(origen, c, solidos);
   return {cono: [...cono.values()].filter(libre), alerta: [...alerta.values()].filter(libre)};
 }

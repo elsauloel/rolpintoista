@@ -290,3 +290,5 @@ ninguna trampa con `efecto.area: 'flor'` (una prueba automática lo vigila). Las
 ## La lava (Varita del chorro de lava): aprobada la tercera versión (dueño, 2026-11-09: «así me gusta, la lava»)
 Commit `90398810` (`vtt-hexgrid/js/50-superficies.js`): borde negro nítido de líquido espeso; la costra del borde partida en placas negras con
 juntas rojas que laten, grandes pegadas al borde y cada vez más chicas y separadas hacia el centro, que queda rojo y liso con llamitas y chispas.
+
+- **👁 Percepción aumentada sin punto ciego para el sigilo** (dueño, 2026-11-09: «con percepción aumentada, aún el casillero de la espalda le otorga la chance de tirar para detectar»): la casilla de atrás de quien tiene la pasiva cuenta como zona de alerta del sigilo (`sinPuntoCiego`, vtt-hexgrid/js/02). No toca a Paso ligero: un rival que se acerca por la espalda **sin** sigilo sigue sin que lo oigan hasta quedar pegado y con su +1 PdG por la espalda.

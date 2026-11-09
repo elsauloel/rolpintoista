@@ -49,7 +49,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261109rayosal"></script>
-<script src="creep-calculo.js?v=20261109pfs"></script>
+<script src="creep-calculo.js?v=20261109pa"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261106manos2"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261107dosarmas"></script>
+<script src="ficha-resumen.js?v=20261109pa"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -2151,6 +2151,12 @@ prueba('👣 Pasos silenciosos (2026-10-15): la pasiva sube el stat del personaj
   igual([!!pas, FichaCalculo.calcular(S).final.pasossilenciosos, CreepCalculo.tarjetaPublica(sc).pasosSilenciosos, CreepCalculo.tarjetaPublica({hp: 5, equipo: []}).pasosSilenciosos],
     [true, 1, true, false]);
 });
+prueba('👁 Percepción aumentada (2026-11-09): sin punto ciego para el sigilo; la tarjeta pública del creep lo dice y el texto lo explica', () => {
+  const pas = PASIVAS_BASE.find(p => p.poolId === 'percepcion-aumentada');
+  const sc = {hp: 5, equipo: [], estados: [], pasivas: [{id: 'p1', ...pas, compras: 1}]};
+  igual([!!pas, CreepCalculo.tarjetaPublica(sc).percepcionAumentada, CreepCalculo.tarjetaPublica({hp: 5, equipo: []}).percepcionAumentada, /punto ciego/.test(pas.detalle)],
+    [true, true, false, true]);
+});
 prueba('Ataque con arreglos: un efecto con probabilidad la conserva (Veneno ×4, 4 en d4); sin probabilidad, entra siempre', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Mordisco'}, {modo: 'arma', arma: {perfora: 1}, efectos: [{nombre: 'Veneno', stacks: 4, caras: 4, exitos: 1}, {nombre: 'Sangrado'}]}, {arma: {}});
   igual([a.perfora, a.efectos.map(e => [e.nombre, e.caras, e.exitos, e.spec.stacks])], [1, [['Veneno', 4, 1, 4], ['Sangrado', 1, 1, undefined]]]);
@@ -3467,7 +3473,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
+    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});

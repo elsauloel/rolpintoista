@@ -259,7 +259,8 @@ const FichaResumen = (() => {
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
           costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), tormenta: Combatiente.tormenta(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
-          venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
+          venenista: num(invModTotal(inv, 'venenista')),
+          percepcionAumentada: (inv.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada')),   // 👁 sin punto ciego para el sigilo (2026-11-09)   // Guantes del envenenador (2026-10-05)
           ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), etereo: true, sinMareo: true, temporal: true} : {}),   // 👁 el Ojo de Kicillof: ve en flor, revela, invisible, sin mareo (2026-10-20)
           guardian: num(invModTotal(inv, 'guardian')),
           conEscudo: Combatiente.equipoPuesto(inv).some(i => Combatiente.esEscudo(i)), muroescudos: num(invModTotal(inv, 'muroescudos')), empujon: num(invModTotal(inv, 'empujon')),   // escudos (2026-10-06)

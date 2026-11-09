@@ -42,7 +42,7 @@ const PASIVAS_BASE = [
   {poolId: 'voluntad-de-hierro', nombre: 'Voluntad de hierro', jobCosto: 1, etiquetas: ['resistencia', 'stat'],
    detalle: '+2 a la resistencia al crowd control.', mods: [{stat: 'rescc', val: 2}]},
   {poolId: 'percepcion-aumentada', nombre: 'Percepción aumentada', jobCosto: 1, etiquetas: ['utilidad', 'percepción'],
-   detalle: 'Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón). Además, las trampas ocultas cercanas te avisan: si en tu camino quedás justo al lado de una, el movimiento se interrumpe y corresponde una tirada de percepción.',
+   detalle: 'Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón). Además, las trampas ocultas cercanas te avisan: si en tu camino quedás justo al lado de una, el movimiento se interrumpe y corresponde una tirada de percepción. Y no tenés punto ciego para el sigilo: un personaje en sigilo pegado a tu espalda también te da la tirada para descubrirlo (la casilla de atrás cuenta como zona de alerta). ⚙ Automatizado en el mapa.',
    mods: [], percepcionAumentada: true},
   {poolId: 'ojo-avizor', nombre: 'Ojo avizor', jobCosto: 1, etiquetas: ['visión', 'utilidad'],
    detalle: '+1 al campo de visión (radio en hexágonos).', mods: [{stat: 'vision', val: 1}]},

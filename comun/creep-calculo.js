@@ -618,7 +618,8 @@ const CreepCalculo = (() => {
       equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it) && !it.natural).map(it => ver(it.nombre)).filter(Boolean).slice(0, 30),
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
-      pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
+      pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,
+      percepcionAumentada: (sc.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada' || String(p.nombre || '').trim() === 'Percepción aumentada')),   // 👁 sin punto ciego para el sigilo (js/02, 2026-11-09)   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
       // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
       // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).
       auraMiedo: auraMiedo(sc), auraEfEsp: auraMiedo(sc) > 0 ? (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp')) : 0,

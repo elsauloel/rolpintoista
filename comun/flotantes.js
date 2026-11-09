@@ -155,19 +155,30 @@ const Flotantes = (() => {
       soloIcono(b); ponerTitulo(b);
       b.style.width = LADO + 'px'; b.style.height = LADO + 'px';
     });
-    const rc = caja.getBoundingClientRect(), ancho = LADO;
+    /* 🎬 (2026-11-09, dueño: la captura del Escudo humano, «PODÉS USAR» adentro del cuadro): mientras el cuadro se despliega desde su token (o vuelve
+       después de apartarse, Duelo.volverApartado), está achicado con `transform` y getBoundingClientRect daba ese rectángulo chico: la columna quedaba
+       en el medio del cuadro hasta que terminaba la animación (~1 s, sobre «14 contra 3» y el Crítico). Ahora se toma su lugar final, sin la
+       animación (offsetLeft/offsetTop desde el fondo, que es fijo y ocupa toda la pantalla), y la columna espera escondida a que el cuadro termine
+       de desplegarse. */
+    const fondoDuelo = caja.closest('#duelo-fondo');
+    const animando = fondoDuelo && typeof fondoDuelo.getAnimations === 'function' ? fondoDuelo.getAnimations().filter(a => a.playState !== 'finished') : [];
+    let x0 = 0, y0 = 0;
+    for(let el = caja; el; el = el.offsetParent){ x0 += el.offsetLeft; y0 += el.offsetTop; }
+    const rc = {left: x0, top: y0, right: x0 + caja.offsetWidth}, ancho = LADO;
+    const visib = animando.length ? 'hidden' : '';
+    if(animando.length) Promise.all(animando.map(a => a.finished.catch(() => null))).then(() => apilar());
     const derecha = rc.right + 10 + ancho <= window.innerWidth - 6;
     const x = derecha ? rc.right + 10 : Math.max(6, rc.left - 10 - ancho);
     if(!tit){ tit = document.createElement('div'); tit.id = 'flot-duelo-tit'; tit.textContent = 'Podés usar'; document.body.appendChild(tit); }
-    tit.style.left = Math.round(x) + 'px'; tit.style.top = Math.round(rc.top + 4) + 'px';
+    tit.style.left = Math.round(x) + 'px'; tit.style.top = Math.round(rc.top + 4) + 'px'; tit.style.visibility = visib;
     let y = rc.top + 22;
-    lista.forEach(b => { b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px'; y += (b.offsetHeight || 42) + 8; });
+    lista.forEach(b => { b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px'; b.style.visibility = visib; y += (b.offsetHeight || 42) + 8; });
   }
   function apilar(){
     const caja = cajaDuelo();
     if(caja){ columnaDuelo(caja); return; }
     const titD = document.getElementById('flot-duelo-tit'); if(titD) titD.remove();
-    ORDEN.forEach(id => { const b = document.getElementById(id); if(b) b.classList.remove('flot-duelo'); });
+    ORDEN.forEach(id => { const b = document.getElementById(id); if(b){ b.classList.remove('flot-duelo'); b.style.visibility = ''; } });
     const barra = document.getElementById('flotantes-mapa');
     const rb = barra && barra.offsetWidth ? barra.getBoundingClientRect() : null;
     if(rb){

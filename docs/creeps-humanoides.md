@@ -383,6 +383,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Degollar** (+4 PdG, +7 de daño, +1/+1 a los críticos; termina su turno) | — | + una tercera pieza Buena |
   Consumible: Pergamino grupal de Paso Fantasma. Ojo: puede ser muy letal (críticos contra Evasión baja, como las ratas de la simulación del
   Encuentro 2): medirlo al definir cada nivel. **Nivel 1 en detalle** (2026-11-03): Punzón de hielo 1d4 + 6, ataque 2 No2; Ojo de asesino (rápida, cd 2, lo de un ataque) y Bomba de humo (lenta, cd 3, 3 No2); vida 30, 9 No2; Def 2, Def.Esp 1, Sigilo +1.
+  **Nivel 2 aprobado** (dueño, 2026-11-09): Des 12 · Agi 9 · Con 7 · Fue 6 · Esp 2 → vida 35, 9 No2, PdG 13, Daño 6, Def 3, Def.Esp 1, Evasión 9; + Guantes
+  de agarre y Capucha de emboscada (Sigilo +1); Finta y la pasiva Ojo crítico. **La Finta pierde los bonos de crítico** (dueño, 2026-11-09: se pisaba con el
+  Ojo de asesino): queda +2 al daño y no se puede parar; es el golpe contra el que ataja bien, y el Ojo de asesino el que busca el crítico (también la
+  usan L5 Duelista y L6 Patotero en su nivel 1). Ojo: el **Punzón de hielo** tiene en el catálogo **Crítico frecuente +1** (el plan decía Crítico potente +2).
 
 - **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
   grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1
@@ -1076,7 +1080,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | |
 | H2 | ✅ (2026-11-03) | | | | |
-| L3 | ✅ (2026-11-03) | | | | |
+| L3 | ✅ (2026-11-03) | ✅ (2026-11-09) | | | |
 | L4 | ✅ (2026-11-03) | | | | |
 | R2 | ✅ (2026-11-03) | | | | |
 | M2 | ✅ (2026-11-03) | | | | |

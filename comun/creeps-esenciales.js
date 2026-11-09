@@ -301,6 +301,12 @@
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],
     estrategia: 'Choque liviano. Desaparece, aparece por la espalda y busca el crítico: va al golpe único.'});
+  // L3 Asesino de las sombras (niveles 2 en adelante, de a uno desde el 2026-11-09).
+  const L3 = {linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Choque liviano. Desaparece, aparece por la espalda y busca el crítico: va al golpe único.'};
+  esencial({...L3, nivel: 2, atrib: [7, 6, 9, 12, 2],   // (aprobado 2026-11-09: Finta, sin crítico desde ese día; pasiva Ojo crítico; + Guantes de agarre y Capucha de emboscada)
+    equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta'], pasivas: ['Ojo crítico']});
   esencial({linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 6, 8, 10, 2],   // (2026-11-03, dueño: «ya terminamos el L4»)
     equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
     habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],

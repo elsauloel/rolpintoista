@@ -123,8 +123,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261108milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261108salto"></script>
-<script src="creeps-esenciales.js?v=20261108h25"></script>
+<script src="skills-creep-base.js?v=20261109finta"></script>
+<script src="creeps-esenciales.js?v=20261109l32"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -1307,11 +1307,11 @@ prueba('🦶 Pisotón (Choque pesado, 2026-10-26): Flash, onda de Fuerza contra 
   igual([!!h.flash, h.duelo.objetivo, h.duelo.tira, h.duelo.contra.join(','), !!h.duelo.dodgeConEva, !!h.duelo.danoDiferencia, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.spCosto, h.cd, e.etiquetas.includes('choque pesado')],
     [true, 'onda', 'fue', 'rescc,eva', true, true, 'fisico', 'Pajaritos', 2, 3, 3, true]);
 });
-prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos críticos y no se puede parar', () => {
+prueba('🤺 Finta (Choque liviano, 2026-10-26; sin crítico desde el 2026-11-09): +2 al daño y no se puede parar', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Finta'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
-  igual([h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, !!a.sinParry, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
-    [2, 1, 3, true, 'ATAQUE', 2, 2, true]);
+  igual([h.duelo.arma.fijo, num(h.duelo.arma.critBono), num(h.duelo.arma.critpotBono), !!a.sinParry, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
+    [2, 0, 0, true, 'ATAQUE', 2, 2, true]);
 });
 prueba('🏹 Abanico (Rango, 2026-10-26): cono al frente, su PdG contra la Evasión de cada uno, el daño de su arma; lo de un ataque y 3 SP, o cooldown 3', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Abanico'), h = armarHabilidadDeCreep(e.datos, 2);
@@ -6902,7 +6902,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],

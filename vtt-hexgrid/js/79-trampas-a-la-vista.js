@@ -152,3 +152,64 @@ function trampaConosDibujar(z){
     pintar(zn.cono, 'rgba(60,120,210,.45)', 'rgba(110,170,255,.95)');
   });
 }
+/* 🪤👁 Arrastrar una trampa propia (2026-11-09, dueño: «si alguien va a colocar una trampa en el campo de visión directo de un rival, el mapa le
+   debe avisar… que puede, pero va a quedar a la vista»; «al colocar una trampa, que aparezcan visibles los campos de visión de los rivales»). Las
+   que no se eligen con un clic (la ficha suelta, GM Tools, una habilidad a mano: quedan al lado del token y se arrastran) se ubican arrastrándolas:
+   mientras se arrastra una trampa sin disparar de mi bando, se ven los conos de los rivales de quien la puso (los que esta pantalla ve); al
+   soltarla dentro del cono de alguno, la misma pregunta: Avanzar (queda descubierta, a la vista) o Rechazar (vuelve a donde estaba). */
+function trampaArrastrable(el){
+  return !!(el && el.trampa && !el.disparada && !el.descubierta && typeof trampaDeMiBando === 'function' && trampaDeMiBando(el));
+}
+function trampaColocadorToken(el){
+  const c = typeof colocadorDe === 'function' ? colocadorDe(el) : null;
+  return c ? [...tokens.values()].find(x => x.fichaId === c.ref && x.tipo === c.tipo) || null : null;
+}
+// Al empezar a arrastrarla: prende los conos. → true si hay rivales a la vista (y hay que mirar al soltar).
+function trampaArrastreInicio(el){
+  if(!trampaArrastrable(el)) return false;
+  const rivales = trampaRivalesALaVista(trampaColocadorToken(el));
+  trampaConosRivales = rivales.length ? [...tokens.entries()].filter(([, x]) => rivales.includes(x)).map(([id]) => id) : null;
+  pedirDibujo();
+  return !!rivales.length;
+}
+// Al soltarla: apaga los conos y, si quedó en el cono de un rival, pregunta. → Promise<{origen?, descubierta?} | null> (null: volver a donde estaba).
+async function trampaArrastreFin(el, origen0){
+  trampaConosRivales = null; pedirDibujo();
+  const mio = trampaColocadorToken(el);
+  const claves = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
+  const vistos = trampaRivalesALaVista(mio).filter(r => [...zonasClaves(r).cono].some(k => claves.has(k))).map(r => nombreDe(r));
+  if(!vistos.length) return {};
+  const lista = vistos.length === 1 ? vistos[0] : vistos.slice(0, -1).join(', ') + ' y ' + vistos[vistos.length - 1];
+  const texto = `⚠ Estás poniendo la trampa dentro del cono de visión de ${lista}: la ${vistos.length === 1 ? 'va' : 'van'} a ver.\n\n¿Avanzar (queda a la vista) o Rechazar (vuelve a donde estaba)?`;
+  const si = typeof Confirmar !== 'undefined' ? await Confirmar.preguntar(texto, {titulo: 'Trampa a la vista de un rival', icono: '👁', si: 'Avanzar', no: 'Rechazar'}) : confirm(texto);
+  if(!si) return null;
+  trampaAnunciarVista(mio ? {fichaId: mio.fichaId, tipoToken: mio.tipo, nombre: el.nombre} : {nombre: el.nombre}, vistos, el.nombre);
+  return {descubierta: true};
+}
+/* 👁 En sigilo: el botón «Ver campo de visión de los rivales (Ctrl + L)» (2026-11-09, dueño: «cuando alguien entra en sigilo aparezca algún
+   botón disponible ahí arriba… visible con algún tipo de efecto de latir… que uno lo pueda prender y apagar fácilmente, y que ponga entre
+   paréntesis el hotkey»). Aparece mientras un token propio (o que maneja) está en sigilo: el jugador, su personaje; el GM, un creep suyo. Prende
+   los lentes con «ver todas las zonas de riesgo» (los conos de los rivales que esta pantalla ve: los que no se ven no se delatan, las mismas
+   reglas de los 👓); apagarlo apaga los lentes. Ctrl + L hace lo mismo mientras el botón está. Al salir del sigilo el botón se va y, si lo había
+   prendido él, apaga los lentes. */
+let visionSigiloPrendida = false;
+function visionSigiloDisponible(){ return typeof huboAlguienEnSigilo === 'function' && huboAlguienEnSigilo(); }
+function renderBotonVisionSigilo(){
+  const b = $('#btn-vision-sigilo');
+  if(!b) return;
+  const hay = visionSigiloDisponible();
+  if(!hay && visionSigiloPrendida){ visionSigiloPrendida = false; verZonas = false; try{ localStorage.setItem('mapa-ver-zonas', '0'); }catch(e){} renderBotonZonas(); pedirDibujo(); }
+  b.hidden = !hay;
+  const on = hay && verZonas && lentesTodos;
+  b.classList.toggle('activo', on);
+  b.textContent = on ? '👁 Ocultar campo de visión de los rivales (Ctrl + L)' : '👁 Ver campo de visión de los rivales (Ctrl + L)';
+}
+function alternarVisionSigilo(){
+  const on = verZonas && lentesTodos;
+  if(on){ verZonas = false; visionSigiloPrendida = false; }
+  else{ verZonas = true; lentesTodos = true; visionSigiloPrendida = true; try{ localStorage.setItem('mapa-lentes-todos', '1'); }catch(e){} }
+  try{ localStorage.setItem('mapa-ver-zonas', verZonas ? '1' : '0'); }catch(e){}
+  renderBotonZonas(); if(typeof actualizarAvisoLentes === 'function') actualizarAvisoLentes(); renderBotonVisionSigilo(); pedirDibujo();
+  toast(verZonas ? '👁 Campos de visión de los rivales a la vista' : '👁 Campos de visión de los rivales ocultos');
+}
+if($('#btn-vision-sigilo')) $('#btn-vision-sigilo').onclick = alternarVisionSigilo;

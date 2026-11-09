@@ -320,6 +320,11 @@
     equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
     habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],
     estrategia: 'Choque liviano. Pica, se va y te hace pisar algo: tiende un cordón, pega y se aleja por arriba; el que lo persigue tropieza.'});
+  const L4 = {linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Red de caza'],
+    estrategia: 'Choque liviano. Pica, se va y te hace pisar algo: tiende un cordón, pega y se aleja por arriba; el que lo persigue tropieza.'};
+  esencial({...L4, nivel: 2, atrib: [8, 7, 8, 11, 2],   // (aprobado 2026-11-09: Tajo veloz, Pies ligeros; + Escarpines de fieltro y Capucha de emboscada)
+    equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz'], pasivas: ['Pies ligeros']});
   esencial({linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Tiro certero', 'Disparo y repliegue'], consumibles: ['Flecha silbadora'],

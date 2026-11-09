@@ -202,7 +202,9 @@ lienzo.addEventListener('pointerdown', e => {
         return;
       }
       if(puedeManipularElemento(elHit)){
-        arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false};
+        arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false,
+          origen0: elHit.origen ? {col: elHit.origen.col, fila: elHit.origen.fila} : null,
+          trampaVista: typeof trampaArrastreInicio === 'function' && trampaArrastreInicio(elHit)};   // 🪤👁 los conos de los rivales (js/79)
         lienzo.style.cursor = 'grabbing';
       }
       return;
@@ -526,7 +528,17 @@ function soltar(){
     const a = arrastreElemento;
     arrastreElemento = null;
     const els = elementos.get(a.id);
-    if(a.movio && els) moverElemento(a.id, {origen: {col: els.origen.col, fila: els.origen.fila}});
+    if(a.trampaVista && a.movio && els && typeof trampaArrastreFin === 'function'){   // 🪤👁 soltó una trampa propia: ¿a la vista de un rival? (js/79)
+      trampaArrastreFin(els, a.origen0).then(r => {
+        if(r === null){ if(a.origen0){ els.origen = {...a.origen0}; pedirDibujo(); } toast('👁 La trampa volvió a donde estaba'); return; }
+        moverElemento(a.id, {origen: {col: els.origen.col, fila: els.origen.fila}})
+          .then(() => { if(r.descubierta) moverElemento(a.id, {descubierta: true}); });   // (las reglas: el «descubierta» va solo, como al descubrirla)
+      });
+    }
+    else{
+      if(a.trampaVista && typeof trampaConosRivales !== 'undefined'){ trampaConosRivales = null; }
+      if(a.movio && els) moverElemento(a.id, {origen: {col: els.origen.col, fila: els.origen.fila}});
+    }
     pedirDibujo();
   }
   if(rotandoElemento){
@@ -783,6 +795,7 @@ document.addEventListener('keydown', e => {
   // Ctrl+L: prende o apaga el modo lentes (conos de detección). La L sola es del Lápiz.
   if((e.key === 'l' || e.key === 'L') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey){
     e.preventDefault();
+    if(typeof visionSigiloDisponible === 'function' && visionSigiloDisponible()){ alternarVisionSigilo(); return; }   // 👁 en sigilo (js/79)
     alternarLentes();
     return;
   }

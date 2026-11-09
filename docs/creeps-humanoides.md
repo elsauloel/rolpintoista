@@ -629,6 +629,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Cortaplumas (Tipo 4, 1d4 + 7, Ini +2) · Chaleco de cuero · Calzas de cuero flexible: Def 2, Def.Esp 0, Eva +1. Cordón oculto (rápida, con la
   regla nueva: tropieza, avanza 1 y tira Agilidad contra su Destreza; si pierde, Sentado y Tropezado: no se mueve más ese turno) y Hit and run
   (lenta). Consumible: Red de caza. **Programado** en el pool esencial el 2026-11-03.
+  **Nivel 2 aprobado** (dueño, 2026-11-09: «el hostigador con trampas me cierra»): Des 11 · Agi 8 · Con 8 · Fue 7 · Esp 2 → vida 40, 8 No2,
+  PdG 11, Daño 7, Def 3, Eva 11; + Escarpines de fieltro (Eva +1) y Capucha de emboscada (Def +1, Sigilo +1); Tajo veloz (acá no se pisa con nada:
+  el L4 no tiene la Finta); pasiva Pies ligeros. Cargado (`const L4`).
 
 - **D4 · Control mental y ceguera · Debuffer, con SP** (boceto y nivel 1 aprobados 2026-11-03, dueño: «lo confirmo como ruta»; «va»). Estrategia:
   te saca el control: te ciega o te encandila (Destello, Cegar), te abre la mente (Punzada mental, −2 Res.Mt) y ahí te confunde, te asusta o te

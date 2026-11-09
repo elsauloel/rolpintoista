@@ -410,6 +410,7 @@ function revisarAutoLentes(){
     renderBotonZonas(); actualizarAvisoLentes();
   }
   sigiloPropioPrevio = ahora;
+  if(typeof renderBotonVisionSigilo === 'function') renderBotonVisionSigilo();   // 👁 el botón de los campos de visión (js/79)
 }
 
 // ¿Puedo ver la estela (el rastro de movimiento) de este token? (2026-09-24, pedido del dueño): un token oculto por el GM

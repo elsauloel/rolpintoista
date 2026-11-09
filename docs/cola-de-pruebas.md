@@ -16,6 +16,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
+29. [ ] **Trampas: aviso al colocarla a la vista de un rival (todas las formas de colocar) y campos de visión de los rivales mientras se coloca** (2026-11-09): al elegir la casilla con un clic (habilidad, consumible, glifo) ya estaba; nuevo: al **arrastrar** una trampa propia sin disparar (las que quedan al lado del token: ficha suelta, GM Tools, habilidad a mano) se ven los conos de los rivales y, al soltarla en el cono de uno, Avanzar (queda descubierta) o Rechazar (vuelve a donde estaba). Y el botón **«👁 Ver campo de visión de los rivales (Ctrl + L)»**, que late arriba mientras un token propio está en sigilo: prende y apaga los conos de los rivales; al salir del sigilo se va.
 
 ## Hechas
 

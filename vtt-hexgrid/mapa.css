@@ -219,6 +219,10 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 .btn-cuadrado{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1}
 .btn-cuadrado.activo{border-color:var(--copper);box-shadow:inset 0 0 0 1px var(--copper)}
 #btn-zonas-todas{position:absolute;top:calc(100% + 6px);left:0;z-index:39}
+/* 👁 En sigilo (2026-11-09, dueño): el botón para ver los campos de visión de los rivales, al lado de los lentes, latiendo. */
+#btn-vision-sigilo{position:absolute;top:calc(100% + 6px);left:44px;z-index:39;white-space:nowrap;font-size:12px;border-color:#7c5cff;animation:vision-sigilo-latido 1.6s ease-in-out infinite}
+#btn-vision-sigilo.activo{background:#3b2f73;border-color:#a991ff}
+@keyframes vision-sigilo-latido{50%{box-shadow:0 0 0 4px rgba(124,92,255,.25),0 0 14px rgba(150,120,255,.7)}}
 .btn-cuadrado.revelando{background:#8E2323;border-color:#D8524B;color:#fff}
 #ojo-menu{left:auto;right:0;min-width:220px;display:flex;flex-direction:column;gap:5px}
 #ojo-menu[hidden]{display:none}

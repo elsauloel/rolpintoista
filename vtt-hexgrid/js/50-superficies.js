@@ -403,6 +403,53 @@ function lavaTrazar(g, forma, adentro){
     g.closePath();
   });
 }
+// Las placas de la costra de la lava (2026-11-09): semillas en una grilla triangular con azar (fijo por posición); cada placa es la celda de
+// Voronoi de su semilla (recortando un polígono con la mediatriz de cada vecina), achicada hacia su semilla según cuán lejos del borde está.
+function lavaPlacas(celdas, forma, x0, y0, x1, y1){
+  const B = HEX * 0.8;   // el ancho de la franja de costra
+  const area = (x1 - x0) * (y1 - y0);
+  let sp = HEX * 0.3; if(area / (sp * sp) > 3000) sp = Math.sqrt(area / 3000);
+  const camino = new Path2D();
+  forma.lazos.forEach(L => { L.pts.forEach((p, i) => i ? camino.lineTo(p[0], p[1]) : camino.moveTo(p[0], p[1])); camino.closePath(); });
+  const prueba = (lavaPlacas.cx = lavaPlacas.cx || document.createElement('canvas').getContext('2d'));
+  const orilla = forma.lazos.flatMap(L => L.pts), paso = Math.max(1, Math.floor(orilla.length / 400));
+  const distOrilla = (x, y) => { let d = Infinity; for(let i = 0; i < orilla.length; i += paso){ const q = orilla[i]; const e = (q[0] - x) ** 2 + (q[1] - y) ** 2; if(e < d) d = e; } return Math.sqrt(d); };
+  const semillas = [], grilla = new Map(), dy = sp * 0.866;
+  const ci = Math.floor(x0 / sp), cj = Math.floor(y0 / dy);
+  for(let j = cj - 1; j * dy < y1 + sp; j++) for(let i = ci - 1; i * sp < x1 + sp; i++){
+    const x = i * sp + (j & 1 ? sp / 2 : 0) + (superficieAzar(i, j, 500) - 0.5) * sp * 0.7;
+    const y = j * dy + (superficieAzar(i, j, 501) - 0.5) * sp * 0.7;
+    const S = {x, y, i, j}; semillas.push(S);
+    const k = Math.floor(x / sp) + ',' + Math.floor(y / sp); (grilla.get(k) || grilla.set(k, []).get(k)).push(S);
+  }
+  const placas = [];
+  semillas.forEach(S => {
+    if(!prueba.isPointInPath(camino, S.x, S.y)) return;
+    const t = distOrilla(S.x, S.y) / B;
+    if(t > 1.05) return;
+    const az = superficieAzar(S.i, S.j, 502);
+    if(az < 0.75 * Math.pow(t, 2.4)) return;   // hacia adentro faltan cada vez más
+    let pol = []; for(let a = 0; a < 6; a++) pol.push([S.x + Math.cos(a * Math.PI / 3) * sp * 1.6, S.y + Math.sin(a * Math.PI / 3) * sp * 1.6]);
+    const gx = Math.floor(S.x / sp), gy = Math.floor(S.y / sp);
+    for(let a = -2; a <= 2; a++) for(let b = -2; b <= 2; b++) (grilla.get((gx + a) + ',' + (gy + b)) || []).forEach(Q => {
+      if(Q === S || !pol.length) return;
+      const nx = Q.x - S.x, ny = Q.y - S.y, mx = (Q.x + S.x) / 2, my = (Q.y + S.y) / 2;
+      const lado = p => (p[0] - mx) * nx + (p[1] - my) * ny;
+      const nuevo = [];
+      for(let k = 0; k < pol.length; k++){
+        const p = pol[k], q = pol[(k + 1) % pol.length], lp = lado(p), lq = lado(q);
+        if(lp <= 0) nuevo.push(p);
+        if((lp <= 0) !== (lq <= 0)){ const u = lp / (lp - lq); nuevo.push([p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u]); }
+      }
+      pol = nuevo;
+    });
+    if(pol.length < 3) return;
+    const tt = Math.max(0, Math.min(1, t));
+    const f = Math.max(0.28, 0.97 - 0.65 * Math.pow(tt, 1.7) + (superficieAzar(S.i, S.j, 503) - 0.5) * 0.08);
+    placas.push({t: tt, pts: pol.map(p => [S.x + (p[0] - S.x) * f, S.y + (p[1] - S.y) * f])});
+  });
+  return placas;
+}
 const lavaCapas = new Map();
 function lavaCapa(celdas, forma, z){
   const esc = z * (typeof dpr === 'number' ? dpr : 1), zq = Math.round(esc * 8) / 8;
@@ -424,58 +471,26 @@ function lavaCapa(celdas, forma, z){
   lavaTrazar(g, forma, 0);
   g.fillStyle = '#140705'; g.fill();
   g.lineWidth = HEX * 0.035; g.strokeStyle = '#050101'; g.stroke();
-  // 2. Las grietas: líneas finas que se ramifican por toda la mancha, con el rojo que se ve detrás (un halo y un hilo).
-  //    Van en una capa aparte (`gr`), que además se vuelve a pintar latiendo en cada cuadro.
-  const gc = document.createElement('canvas'); gc.width = w; gc.height = h;
-  const gg = gc.getContext('2d');
-  gg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
-  gg.lineJoin = 'round'; gg.lineCap = 'round';
-  gg.save(); lavaTrazar(gg, forma, HEX * 0.04); gg.clip();
-  const rama = (x, y, ang, largo, prof, sem) => {
-    const tramos = 3 + Math.floor(superficieAzar(sem, prof, 1) * 3), pasoL = largo / tramos;
-    gg.moveTo(x, y);
-    for(let t = 0; t < tramos; t++){
-      ang += (superficieAzar(sem, t, 2 + prof) - 0.5) * 1.1;
-      x += Math.cos(ang) * pasoL; y += Math.sin(ang) * pasoL;
-      gg.lineTo(x, y);
-      if(prof < 2 && superficieAzar(sem, t, 7 + prof) < 0.45){
-        const sub = (superficieAzar(sem, t, 9 + prof) < 0.5 ? -1 : 1) * (0.6 + 0.6 * superficieAzar(sem, t, 11));
-        rama(x, y, ang + sub, largo * 0.55, prof + 1, sem * 7 + t + 3);
-        gg.moveTo(x, y);
-      }
-    }
-  };
-  gg.beginPath();
-  celdas.forEach(c => {
-    const p = hexCentro(c.col, c.fila);
-    for(let k = 0; k < 3; k++){
-      const a = superficieAzar(c.col, c.fila, 300 + k), b = superficieAzar(c.col, c.fila, 310 + k);
-      rama(p.x + (a - 0.5) * HEX * 1.2, p.y + (b - 0.5) * HEX * 1.1, a * Math.PI * 2, HEX * (0.55 + 0.35 * b), 0, c.col * 31 + c.fila * 17 + k);
-    }
-  });
-  // y más grietas en la costra negra, cerca del borde, corriendo más o menos a lo largo de la orilla
-  forma.lazos.forEach((L, li) => {
-    const N = L.pts.length, cada = Math.max(4, Math.round(N / Math.max(6, celdas.length * 4)));
-    for(let i = 0; i < N; i += cada){
-      const pt = L.pts[i], n = L.nor[i], az = superficieAzar(li, i, 400), hacia = az < 0.5 ? 1 : -1;
-      const x = pt[0] - n[0] * HEX * (0.1 + 0.12 * az), y = pt[1] - n[1] * HEX * (0.1 + 0.12 * az);
-      const ang = Math.atan2(n[0], -n[1]) * hacia + (superficieAzar(li, i, 401) - 0.5) * 0.9;
-      rama(x, y, ang, HEX * (0.3 + 0.25 * superficieAzar(li, i, 402)), 1, li * 97 + i);
-    }
-  });
-  gg.lineWidth = HEX * 0.06; gg.strokeStyle = 'rgba(190,28,8,.35)'; gg.stroke();
-  gg.lineWidth = HEX * 0.022; gg.strokeStyle = 'rgba(255,70,24,.95)'; gg.stroke();
-  gg.lineWidth = HEX * 0.008; gg.strokeStyle = 'rgba(255,170,90,.8)'; gg.stroke();
-  gg.restore();
-  g.drawImage(gc, 0, 0, w, h, x0, y0, w / zq, h / zq);
-  // 3. El rojo derretido: lejos de los bordes. Una capa roja con su forma, recortada con la misma forma desenfocada dos veces
-  //    (así queda casi nada pegado al borde y lleno en el medio); el borde de la mancha sigue nítido porque va adentro de ella.
+  // (2026-11-09, tercera vuelta del dueño: «las líneas rojas quiero que estén solamente en la parte donde está negro… que las grietas formen
+  // como islas geométricas… cuando se resquebraja una costra y quedan pedazos que se van disolviendo en la parte más roja del centro»)
+  // 2. La máscara del centro: la forma corrida hacia adentro y desenfocada. Lo que tapa es el rojo derretido; lo que queda afuera, la costra.
+  const mc = document.createElement('canvas'); mc.width = w; mc.height = h;
+  const mg = mc.getContext('2d');
+  mg.filter = `blur(${Math.max(2, HEX * 0.28 * zq).toFixed(1)}px)`;
+  const sc = document.createElement('canvas'); sc.width = w; sc.height = h;
+  const sg = sc.getContext('2d'); sg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  lavaTrazar(sg, forma, HEX * 0.3); sg.fillStyle = '#fff'; sg.fill();
+  mg.drawImage(sc, 0, 0);
+  // 3. Abajo de todo, el rojo de las juntas (lo que se ve entre las placas de la costra).
+  lavaTrazar(g, forma, 0);
+  g.fillStyle = '#560b05'; g.fill();
+  // 4. El rojo derretido del centro, lejos de los bordes (recortado con la máscara), con algún punto caliente chico.
   const rc = document.createElement('canvas'); rc.width = w; rc.height = h;
   const rg = rc.getContext('2d');
   rg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
   lavaTrazar(rg, forma, 0);
   rg.fillStyle = '#8e1408'; rg.fill();
-  celdas.forEach(c => {   // un poco más vivo y algún punto caliente chico, por casilla
+  celdas.forEach(c => {
     const p = hexCentro(c.col, c.fila), a = superficieAzar(c.col, c.fila, 91), b = superficieAzar(c.col, c.fila, 92);
     const x = p.x + (a - 0.5) * HEX * 0.4, y = p.y + (b - 0.5) * HEX * 0.4, r = HEX * (0.55 + 0.25 * a);
     const gr = rg.createRadialGradient(x, y, 0, x, y, r);
@@ -488,18 +503,44 @@ function lavaCapa(celdas, forma, z){
       rg.fillStyle = gh; rg.beginPath(); rg.arc(hx, hy, rr, 0, Math.PI * 2); rg.fill();
     }
   });
-  const mc = document.createElement('canvas'); mc.width = w; mc.height = h;
-  const mg = mc.getContext('2d');
-  mg.filter = `blur(${Math.max(2, HEX * 0.28 * zq).toFixed(1)}px)`;
-  const sc = document.createElement('canvas'); sc.width = w; sc.height = h;
-  const sg = sc.getContext('2d'); sg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
-  lavaTrazar(sg, forma, HEX * 0.3); sg.fillStyle = '#fff'; sg.fill();
-  mg.drawImage(sc, 0, 0);
   rg.setTransform(1, 0, 0, 1, 0, 0);
   rg.globalCompositeOperation = 'destination-in'; rg.drawImage(mc, 0, 0); rg.drawImage(mc, 0, 0); rg.drawImage(mc, 0, 0);
   g.drawImage(rc, 0, 0, w, h, x0, y0, w / zq, h / zq);
-  // las grietas también se ven sobre el rojo, más suaves
-  g.save(); g.globalAlpha = 0.3; g.drawImage(gc, 0, 0, w, h, x0, y0, w / zq, h / zq); g.restore();
+  // 5. La costra: placas negras (celdas de Voronoi sobre una grilla con azar), solo en la franja del borde. Pegadas al borde son grandes y
+  //    apretadas (juntas finas); hacia adentro se achican, se separan, se redondean y faltan cada vez más: pedazos que se disuelven en el rojo.
+  const placas = lavaPlacas(celdas, forma, x0, y0, x1, y1);
+  const pc = document.createElement('canvas'); pc.width = w; pc.height = h;
+  const pg = pc.getContext('2d');
+  pg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  pg.lineJoin = 'round';
+  pg.save(); lavaTrazar(pg, forma, 0); pg.clip();
+  placas.forEach(P => {
+    const v = P.pts, n = v.length;
+    pg.beginPath();
+    if(P.t < 0.45){ v.forEach((q, i) => i ? pg.lineTo(q[0], q[1]) : pg.moveTo(q[0], q[1])); pg.closePath(); }
+    else{   // gastada: las esquinas redondeadas (curvas por los puntos medios)
+      const m = i => [(v[i][0] + v[(i + 1) % n][0]) / 2, (v[i][1] + v[(i + 1) % n][1]) / 2];
+      const m0 = m(n - 1); pg.moveTo(m0[0], m0[1]);
+      for(let i = 0; i < n; i++){ const mi = m(i); pg.quadraticCurveTo(v[i][0], v[i][1], mi[0], mi[1]); }
+      pg.closePath();
+    }
+    const k = P.t, rr = Math.round(18 + 30 * k), gg2 = Math.round(7 + 6 * k), bb = Math.round(5 + 3 * k);
+    pg.fillStyle = `rgb(${rr},${gg2},${bb})`; pg.fill();
+    pg.lineWidth = HEX * 0.009; pg.strokeStyle = `rgba(${Math.round(120 + 60 * k)},22,8,${(0.25 + 0.4 * k).toFixed(2)})`; pg.stroke();
+  });
+  pg.restore();
+  g.drawImage(pc, 0, 0, w, h, x0, y0, w / zq, h / zq);
+  // 6. El brillo de las juntas, en su propia capa (late en cada cuadro): solo en la franja de la costra, sin las placas y sin el centro.
+  const gc = document.createElement('canvas'); gc.width = w; gc.height = h;
+  const gg = gc.getContext('2d');
+  gg.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  lavaTrazar(gg, forma, HEX * 0.03); gg.fillStyle = 'rgba(255,60,18,.9)'; gg.fill();
+  gg.setTransform(1, 0, 0, 1, 0, 0);
+  gg.globalCompositeOperation = 'destination-out';
+  gg.drawImage(pc, 0, 0); gg.drawImage(mc, 0, 0); gg.drawImage(mc, 0, 0);
+  // 7. El filo negro nítido de afuera, otra vez arriba de todo.
+  lavaTrazar(g, forma, 0);
+  g.lineWidth = HEX * 0.035; g.strokeStyle = '#050101'; g.stroke();
   // 4. Un filo rojo oscuro, finito, apenas adentro del borde negro.
   lavaTrazar(g, forma, HEX * 0.05);
   g.lineWidth = HEX * 0.012; g.strokeStyle = 'rgba(120,20,8,.55)'; g.stroke();

@@ -2474,3 +2474,26 @@ activo ni usos; zonas y trampas de la prueba borradas).
   alineado a su derecha, dentro del mapa (`vtt-hexgrid/mapa.css`).
 - Nota de la prueba: un personaje que entra en Sigilo a la vista de un rival queda descubierto al instante (Marcado); para probar el botón con J1
   hubo que llevar a Rockardo fuera de los conos.
+
+## ✅ Cola 30 y 31 · Trampas de área que se disparan en cualquier casilla (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Las puso el Goblin rompehuesos (sus Acciones: Ejecutar para las habilidades, Usar para las del cinturón); en cada una, dos personajes parados
+adentro y Rockardo arrastrado desde afuera hasta una casilla del **borde** (no el centro). Restaurado al terminar; trampas borradas.
+
+- **Red tendida** (habilidad): se dispara en el borde; Bizzante (el que la pisó) Fuerza 4 contra 8 → Inmovilizado 2 turnos; Rockardo, parado en
+  otra casilla del área, Fuerza 9 contra 8 → la resistió (`cola-30-1-red-tendida-borde`).
+- **Red de caza** (consumible): pisada en el borde por Rockardo; la red cayó sobre los tres: Larry 2 y Bizzante 1 contra 7 → Inmovilizado 1
+  turno; Rockardo 8 → se escurrió (`cola-30-2-red-de-caza-borde`).
+- **Polvo cegador**: los tres tiraron Res.CC contra 8; Ceguera 1 turno a los que fallaron (`cola-31-1-polvo-cegador-borde`).
+- **Mina del cazador**: cada uno tira su 2d6+2 de fuego (lo frena la Defensa especial) y Res.CC para los Pajaritos: Larry 34 → 24, Bizzante
+  34 → 31, los dos con Pajaritos 2 turnos (`cola-31-2-mina-borde`).
+- **Gas somnífero**: 7 casillas; Exhausto 2 turnos a los tres (Res.CC contra 9) y la nube quedó en las 7 casillas, 3 turnos
+  (`cola-31-3-gas-borde`). **Arreglado:** la nube, en el Mantenimiento, renovaba el Exhausto con **Res.Mt** (copiado del Gas adormecedor);
+  ahora con **Res.CC**, igual que la trampa (`comun/catalogo.js`).
+- **Petardo trampa**: cada uno tira su 2d6, directo a la vida: Larry 24 → 19, Bizzante 31 → 24.
+- Notas (no se tocaron):
+  - Rockardo estaba **Invulnerable**: el daño dice «no le hizo nada», pero el paso «Lo que le deja» de un personaje anuncia el estado
+    (Ceguera, Exhausto) aunque después rebota por la Invulnerabilidad; en un creep sí avisa «no le hace nada». Es solo el texto del cartel.
+  - Un Inmovilizado nuevo **reemplaza** al que ya tenía (Bizzante pasó de 2 turnos a 1 con la segunda red): es la regla de renovar el mismo estado.
+  - Los jugadores (J1, J2) estaban mirando otro mapa (el publicado), así que las tiradas de sus personajes las hizo el GM con «🎲 Tirar por él».
+  - Había dos nubes (sin trampa) en 9,23 de antes; no son de esta prueba y quedaron.

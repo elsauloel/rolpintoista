@@ -15,8 +15,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-30. [ ] **Red: se dispara al pisar cualquiera de las 7 casillas** (2026-11-09, dueño: «que el trigger y el efecto sean igual»): la Red de caza (consumible) y la Red tendida (habilidad de creep) ahora son una trampa en flor de 7 casillas que se dispara al pisar cualquiera; ver que se dibuje en las 7, que la Percepción la descubra y que la red caiga sobre todos los que estén encima.
-31. [ ] **Trampas de área: se disparan al pisar cualquier casilla de su área** (2026-11-09): Mina del cazador, Polvo cegador, Gas adormecedor, Gas somnífero, Nube de veneno, Petardo trampa, Mina explosiva, Cartucho enterrado, Barril de pólvora, Lluvia de cascotes, Géiser de fuego, Niebla de confusión y Espejo de discordia (flor de 7; disparo y efecto en las mismas casillas; el dibujo y la Percepción en las 7).
 32. [ ] **Línea L4 · Hostigador con trampas, niveles 1 a 5.**
 33. [ ] **Atacar saca del Sigilo (después de aplicar el bono de atacar desde el sigilo)** (2026-11-09, dueño: «claro, atacar lo saca del sigilo»): un personaje y un creep en sigilo atacan (arma, habilidad de ataque, disparo, hechizo o varita a un rival): el duelo tiene el bono de atacar desde el sigilo y, apenas se declara, el atacante sale del sigilo (aviso en la Mesa, sin Marcado). El robo en sigilo no lo saca. Un giro: solo el primer rival lleva el bono.
 34. [ ] **Percepción aumentada: sin punto ciego en la espalda para el sigilo** (2026-11-09): un token en sigilo pegado a la espalda de alguien con la pasiva le da la tirada de detección (la casilla de atrás cuenta como zona de alerta); sin la pasiva, sigue siendo punto ciego. Probar con un personaje, un creep y una invocación.
@@ -28,6 +26,12 @@ Cada línea nueva que se termine de diseñar se suma al final.
 40. [ ] **Línea D2 · Tóxico, niveles 1 a 5.**
 
 ## Hechas
+
+- [x] **30 · Red de caza y Red tendida: se disparan en cualquiera de las 7 casillas** (2026-11-10): las dos, pisando un borde (no el centro);
+  la red cayó sobre los tres personajes del área, cada uno con su Fuerza (contra 8 la Red tendida, contra 7 la de caza). Bien. Detalle en `pruebas-en-el-mapa.md`.
+- [x] **31 · Trampas de área: se disparan en cualquier casilla** (2026-11-10): Polvo cegador, Mina del cazador, Gas somnífero (7 casillas, deja la
+  nube 3 turnos) y Petardo trampa, pisando un borde: alcanzaron a los tres del área, cada uno con su tirada. **Arreglado:** la nube del Gas
+  somnífero renovaba el Exhausto con Res.Mt; ahora con Res.CC, como la trampa (`comun/catalogo.js`).
 
 - [x] **Línea L3 · Asesino de las sombras, niveles 1 a 5** (2026-11-09): números iguales a la prueba de niveles (vida 30/35/35/40/45, PdG 11/13/15/16/17);
   Ojo de asesino (crítico ×3), Bomba de humo (Sigilo con rivales mirando, 3 casillas gratis arrastrando, sin No2), Puñalada por la espalda desde el

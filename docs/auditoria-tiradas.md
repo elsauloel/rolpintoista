@@ -36,14 +36,27 @@ habilidades sin Ejecución (los tira quien los usa, con su botón).
 
 | # | Qué | De quién | Dónde | Hoy | Rec. | Esfuerzo |
 |---|---|---|---|---|---|---|
-| 1 | **Zona persistente** (la que se pisa: brasas, nube de una trampa, zona del GM) | estado / zona | `js/08` `zonaResolverBanner` l. ~681 y ~691 | la víctima tira su resistencia con un botón en un cartel propio; **la tirada de quien creó la zona sale sola** | **A**: el mismo duelo de zona que ya usa la Nube tóxica (`js/112`) | media |
-| 2 | **Zona por duelo** (Nube tóxica, Pedos tóxicos): la tirada de quien la creó contra cada uno | habilidad | `js/112` `zonaDueloTirada` l. ~237 | con la zona ya puesta, la tirada de quien la creó **sale sola** en cada duelo nuevo (su valor guardado, con dados nuevos) | **A**: que la tire quien la creó con su botón (o una sola vez para todos, como en el área) | chica |
-| 3 | **Escudo elemental**: el efecto del elemento (quemadura, congelado…) | habilidad (creep y clase) | `js/106` `escudoQuemarYa` l. ~578 | **las dos salen solas**: la Res.Esp de quien se quema y el Ef.Esp del escudo | **A** | media |
-| 4 | **Anulación** («Dispel»): sobre zonas e invocaciones | habilidad | `js/13` `anulaZona` / `anularEn` l. ~2372, 2379, 2477 | **las dos salen solas**: el Ef.Esp de quien anula y la Res.Mt de quien creó la zona o invocó | **A** | media |
-| 5 | **Aura espeluznante / de miedo**: al entrar | habilidad / estado | `js/52` `auraResolver` l. ~148 | un cartel propio; **un solo botón tira los dos lados** (Ef.Esp del dueño del aura y Res.Mt del que entra) | **A** | chica |
-| 6 | **Mala sombra** (mufa): al empezar la ronda | habilidad | `js/102` `ordenTirarValor` l. ~150 | **sale sola**: la Res.Mt contra el Ef.Esp | **A** | media |
-| 7 | **Cebo** (Hunter): la Res.Mt de cada rival que lo ve | habilidad (creep) | `js/80` `ceboAtraer` l. ~46 | **sale sola**: la Res.Mt contra una dificultad fija | **B** (la tira quien lo ve, contra el número fijo) | chica |
+| 1 | ✅ hecho (tanda 1) · **Zona persistente** (la que se pisa: brasas, nube de una trampa, zona del GM) | estado / zona | `js/08` `zonaResolverBanner` l. ~681 y ~691 | la víctima tira su resistencia con un botón en un cartel propio; **la tirada de quien creó la zona sale sola** | **A**: el mismo duelo de zona que ya usa la Nube tóxica (`js/112`) | media |
+| 2 | ✅ hecho (ya estaba: tanda 1 lo confirmó) · **Zona por duelo** (Nube tóxica, Pedos tóxicos): la tirada de quien la creó contra cada uno | habilidad | `js/112` `zonaDueloTirada` l. ~237 | con la zona ya puesta, la tirada de quien la creó **sale sola** en cada duelo nuevo (su valor guardado, con dados nuevos) | **A**: que la tire quien la creó con su botón (o una sola vez para todos, como en el área) | chica |
+| 3 | ✅ hecho (tanda 1) · **Escudo elemental**: el efecto del elemento (quemadura, congelado…) | habilidad (creep y clase) | `js/106` `escudoQuemarYa` l. ~578 | **las dos salen solas**: la Res.Esp de quien se quema y el Ef.Esp del escudo | **A** | media |
+| 4 | ✅ hecho (tanda 1) · **Anulación** («Dispel»): sobre zonas e invocaciones | habilidad | `js/13` `anulaZona` / `anularEn` l. ~2372, 2379, 2477 | **las dos salen solas**: el Ef.Esp de quien anula y la Res.Mt de quien creó la zona o invocó | **A** | media |
+| 5 | ✅ hecho (tanda 1) · **Aura espeluznante / de miedo**: al entrar | habilidad / estado | `js/52` `auraResolver` l. ~148 | un cartel propio; **un solo botón tira los dos lados** (Ef.Esp del dueño del aura y Res.Mt del que entra) | **A** | chica |
+| 6 | ✅ hecho (tanda 1, sin probar en el mapa) · **Mala sombra** (mufa): al empezar la ronda | habilidad | `js/102` `ordenTirarValor` l. ~150 | **sale sola**: la Res.Mt contra el Ef.Esp | **A** | media |
+| 7 | ✅ hecho (tanda 1) · **Cebo** (Hunter): la Res.Mt de cada rival que lo ve | habilidad (creep) | `js/80` `ceboAtraer` l. ~46 | **sale sola**: la Res.Mt contra una dificultad fija | **B** (la tira quien lo ve, contra el número fijo) | chica |
 | 8 | **Choque por empujón**: el daño de colisión (una Constitución por cada casilla que faltó) | regla general | `js/13` `colisionTirar` l. ~2227 | **sale sola** | **D**: ¿quién la tira? ¿el que empujó o el empujado? | media |
+
+**Tanda 1 (2026-11-10), cómo quedó:** todas en el cuadro del duelo de siempre (`contiendaDuelo`, js/78), cada uno con su botón; el GM puede tirar
+por el ausente o elegir el valor a mano, y «✋ Terminar a mano» deja el efecto para la mesa (no se aplica solo).
+- **1 · Zona persistente:** toda zona con «tirada de la zona» (el stat de quien la creó) va como las de duelo (`zonaDueloCompatible`, js/112): quien la
+  creó tira una vez por tanda y cada afectado su resistencia; el daño lo tira quien la creó con su botón (eso cubre también el n.º 9 para estas zonas).
+  Siguen en el cartel de la zona las que el duelo todavía no hace: el hielo (una tirada por paso), la cura, la luz, un estado con chance (Varita de
+  miasma), el «soltarse», la tirada extra sin tabla, las de trampas y las de número fijo (sin tirada de quien la creó).
+- **3 · Escudo elemental:** después del 1d6, el duelo «Ef.Esp del escudo contra Res.Esp/Res.CC» (empate: gana el escudo).
+- **4 · Anulación:** contra una zona, el duelo con el token de quien la creó; contra una invocación, con el token de su invocador (empate: lo
+  sostiene). Si ese token no está en el mapa, a mano.
+- **5 · Aura espeluznante:** el duelo «Ef.Esp de quien lleva el aura contra Res.Mt de quien entra» (empate: el aura); el Miedo entra con «Aplicar».
+- **6 · Mala sombra:** al empezar la ronda, un duelo por cada rival pegado (la pantalla del GM espera que terminen antes de cerrar la ronda).
+- **7 · Cebo:** quien lo ve tira su Res.Mt en el duelo contra el número fijo del cebo (ya puesto; empate: no se tienta).
 
 ## 2 · Daños que salen solos
 

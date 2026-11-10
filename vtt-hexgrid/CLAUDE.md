@@ -858,6 +858,9 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   tras `contiendaPausa`, sobre el mismo golpeado: Stun 1 turno / Sentado por el «Aplicar» de siempre), Salto aplastante (js/55: un rival por vez y la
   Fuerza del primero como `pdgCompartido` para los demás), `dueloAtraer` (Ef.Esp contra Fuerza; empate: no lo mueve) y `dueloTolera` (js/13: el Ef.Esp
   fijo de quien la usó como `pdgCompartido`, el golpeado tiene que superarlo). El cartel propio `js/115-tirada-involucrado.js` se retiró.
+  **Tanda 1 de `docs/auditoria-tiradas.md` (2026-11-10)**, también con `contiendaDuelo`: el efecto del Escudo elemental (js/106), la Anulación contra una
+  zona o una invocación (js/13 `anulaContienda`), el aura espeluznante (js/52 `auraResolver`), la Mala sombra al empezar la ronda (js/102
+  `ordenMalaSombraDuelo`) y el Cebo (js/80). Las zonas con «tirada de la zona» van como las de duelo (`zonaDueloCompatible`, js/112).
 
 ## Pendiente (más adelante)
 

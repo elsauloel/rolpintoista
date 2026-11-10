@@ -8,8 +8,9 @@
    ese otro, igual cuesta el doble). Los dos duran hasta que empieza su próximo turno.
    La Calavera con vela: quien la lleva (`auraMiedo` = el radio, en lo que publica su ficha o su tarjeta de creep) tiene un aura espeluznante.
    Cada vez que un rival entra (estaba afuera y ahora está a `radio` o menos), tira su Res.Mt contra el Ef.Esp de quien la lleva (dos tiradas
-   nuevas; el empate lo gana la calavera) y, si no llega, queda con Miedo. Lo resuelve la pantalla que maneja al que entró (sus personajes; el
-   GM, los creeps), en modo combate: el Anuncio para él y la Crónica para la mesa. Lo que ya estaba adentro al abrir el mapa no cuenta. */
+   nuevas; el empate lo gana la calavera) y, si no llega, queda con Miedo. Desde el 2026-11-10, en el cuadro del duelo de siempre (auraResolver):
+   cada uno tira con su botón. Lo abre la pantalla que maneja al que entró (sus personajes; el GM, los creeps), en modo combate. Lo que ya estaba
+   adentro al abrir el mapa no cuenta. */
 const MIEDO_PENA = 2, MIEDO_RADIO = 3;
 function miedoEstados(t){
   return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
@@ -124,56 +125,21 @@ async function auraSiguiente(){
   auraOcupado = false;
   auraSiguiente();
 }
+/* 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario involucrado»;
+   antes un solo botón tiraba los dos lados): quien lleva el aura tira su Ef.Esp con su botón (el GM por un creep) y quien entra su Res.Mt con el suyo
+   (el GM por el ausente, o a mano). El empate lo gana el aura (`empateGana`). Si no la resiste, el Miedo (de quien lleva el aura) entra por el
+   «Aplicar» de siempre. Lo abre la pantalla que maneja al que entró; los demás duelos del aura esperan su turno (auraCola). */
 async function auraResolver(id, pid){
   const t = tokens.get(id), p = tokens.get(pid);
   if(!t || !p) return;
   const quien = nombreDe(t), de = p.oculto ? 'Alguien' : nombreDe(p);
-  const res = auraResMtDe(t), ef = auraEfEspDe(p);
-  const titulo = `${quien} entra en el aura espeluznante de ${de}`;
-  const paso1 = {titulo: '💀 El aura espeluznante', texto: `Tira Res.Mt contra el Ef.Esp de ${de}: si no llega, queda con Miedo (cada paso que termina a ${MIEDO_RADIO} casilleros o menos de ${de} sin alejarse le cuesta el doble de No2, y contra ${de} tiene −${MIEDO_PENA} a la probabilidad de golpe y −${MIEDO_PENA} al daño, común o especial) hasta que empieza su próximo turno.`};
-  if(res === null || ef === null){
-    try{ momentoAbrir({tipo: 'zona-renueva', icono: '💀', titulo, estado: 'listo', resultado: `Res.Mt contra el Ef.Esp de ${de}: tiralo a mano (faltan los datos para tirarlo solo).`, datos: {}}); }catch(err){}
-    try{ mesaLinea(`💀 ${quien} entró en el aura espeluznante de ${de}: Res.Mt contra su Ef.Esp, a mano`, 'recordatorio'); }catch(err){}
-    return;
-  }
-  const momentoId = await momentoAbrir({tipo: 'chance', icono: '💀', titulo, estado: 'tirando', datos: {centro: true}}).catch(() => null);
-  const base = {clave: 'aura-' + id + '-' + pid, icono: '💀', titulo};
-  await new Promise(fin => {
-    let listo = false, tirando = false;
-    const terminar = () => { if(listo) return; listo = true; AvisoCombate.cerrar(); fin(); };
-    const tirar = async () => {
-      if(tirando || listo) return;
-      tirando = true;
-      AvisoCombate.mostrar({...base, pasos: [paso1, {titulo: 'Tiradas', texto: 'Rodando…', espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
-      const rf = Combatiente.tirarStat(ef, [], 'dmgesp');
-      const rr = Combatiente.tirarStat(res, confusionEstadosDe(t), 'resm');
-      if(!rf || !rr){ tirando = false; AvisoCombate.mostrar({...base, pasos: [paso1], aMano: 'No se pudo tirar solo: tiralo a mano.', botones: [{texto: 'Entendido', alClic: terminar}], alCerrar: terminar}); return; }
-      const gm = x => x.tipo === 'creep' ? {desde: 'gm'} : {};
-      try{ await mesaPublicar(`${de} · Ef.Esp (aura espeluznante)`, {formula: rf.formula, rolls: rf.rolls, mod: rf.mod, total: rf.total, quien: de, ...gm(p)}); }catch(err){}
-      try{ await mesaPublicar(`${quien} · Res.Mt`, {formula: rr.formula, rolls: rr.rolls, mod: rr.mod, total: rr.total, quien, ...gm(t)}); }catch(err){}
-      await new Promise(r => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(r) : r());
-      const resiste = rr.total > rf.total;   // el empate lo gana la calavera
-      const tiradas = `Res.Mt ${rr.total} contra Ef.Esp ${rf.total}`;
-      let nota = '';
-      if(!resiste){
-        const spec = {nombre: 'Miedo', miedoDe: pid, miedoDeNombre: de};
-        try{
-          if(t.tipo === 'creep'){
-            const r = await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
-            if(r && !r.ok) nota = `no le entró (${r.motivo || 'está protegido'})`;
-          }else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: `${de} · aura espeluznante`});
-        }catch(err){ console.error('No se pudo poner el Miedo:', err); nota = 'ponelo a mano'; }
-      }
-      const cronica = resiste ? `${tiradas}: no se asustó.` : `${tiradas}: ¡queda con Miedo de ${de}!${nota ? ' (' + nota + ')' : ''}`;
-      try{ if(momentoId) momentoActualizar(momentoId, {estado: 'listo', resultado: cronica}); }catch(err){}
-      try{ mesaLinea(`💀 ${quien} entró en el aura de ${de}: ${cronica}`, 'recordatorio'); }catch(err){}
-      AvisoCombate.mostrar({...base, pasos: [paso1, {titulo: 'Tiradas', texto: tiradas + ' (el empate lo gana el aura).'}],
-        veredicto: resiste ? {tono: 'bueno', grande: 'NO SE ASUSTÓ', chico: ''} : {tono: 'malo', grande: '¡QUEDA CON MIEDO!', chico: nota || `hasta que empieza su próximo turno`},
-        botones: [{texto: 'Entendido', alClic: terminar}], alCerrar: terminar});
-    };
-    // Entrar al aura obliga a tirar: cerrar el cartel también tira.
-    AvisoCombate.mostrar({...base, pasos: [paso1], botones: [{texto: '🎲 Tirar Res.Mt', alClic: tirar}], alCerrar: tirar});
-  });
+  if(typeof contiendaDuelo !== 'function'){ try{ mesaLinea(`💀 ${quien} entró en el aura espeluznante de ${de}: Res.Mt contra su Ef.Esp, a mano`, 'recordatorio'); }catch(err){} return; }
+  const c = await contiendaDuelo({yo: {ref: String(p.fichaId || ''), tipo: p.tipo, nombre: nombreDe(p), uid: p.duenoUid || ''}, deTokenId: pid, aTokenId: id, esperar: true, hab: {
+    nombre: 'Aura espeluznante', objetivo: 'enemigo',
+    detalle: `${quien} entra en el aura espeluznante de ${de}: el Ef.Esp de ${de} contra la Res.Mt de ${quien} (el empate lo gana el aura). Si no llega, queda con Miedo de ${de}: −${MIEDO_PENA} a la PdG y al daño contra ${de}, y cada paso que termina a ${MIEDO_RADIO} casilleros o menos de ${de} sin alejarse le cuesta el doble de No2, hasta que empieza su próximo turno.`.slice(0, 600),
+    tira: {stat: 'dmgesp', etq: 'Ef.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, empateGana: true,
+    efectos: [{nombre: 'Miedo', caras: 1, exitos: 1, spec: {nombre: 'Miedo', miedoDe: pid, miedoDeNombre: de}, detalle: `Miedo de ${de} hasta su próximo turno`}]}});
+  if(c.falla || c.tiempo || c.aMano){ try{ mesaLinea(`💀 ${quien} entró en el aura espeluznante de ${de}: Res.Mt contra su Ef.Esp, a mano`, 'recordatorio'); }catch(err){} }
 }
 
 /* 🌺 Malviaje al empezar el turno (dueño, 2026-11-03: «al principio de cada turno… alguna tirada para que elija escapar o atacar al más cercano»;

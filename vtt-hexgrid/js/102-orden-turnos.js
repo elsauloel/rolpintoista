@@ -213,13 +213,15 @@ async function ordenInicioRonda(ordenIds){
     if(pegados.length === 1) anotar(pegados[0], k, `Marcar el ritmo de ${ordenNombre(id)}`);
     else if(pegados.length > 1) setTimeout(() => ritmoPedir(id, pegados, k).catch(err => console.error('Marcar el ritmo:', err)), 2500);   // con la ronda ya guardada
   }
+  // 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario
+  // involucrado»): por cada rival pegado, un duelo de a uno (la pantalla del GM espera que termine antes de cerrar la ronda): el Ef.Esp de quien la
+  // echó (el guardado, `m.esp`) con el botón de quien lo maneja, contra la Res.Mt del rival con el suyo (el GM por el ausente). Empate: aguanta.
   for(const [port, m] of Object.entries(mufas)){
     const t = tokens.get(port);
     for(const r of ordenPegados(t, x => dueloEsRival(t, x) && ordenIds.includes(idDeToken(x)))){
-      const tr = tokens.get(r), res = ordenTirarValor(trampaValorStat(tr, 'resm')), ef = ordenTirarValor(m.esp);
-      const pierde = res.total < ef.total;
-      mesaLinea(`🌑 Mala sombra de ${ordenNombre(port)}: ${ordenNombre(r)} tira Res.Mt ${res.total} (${res.formula}) contra el Efecto especial ${ef.total} (${ef.formula})${m.por ? ` de ${m.por}` : ''} → ${pierde ? 'pierde: baja 1 lugar' : 'aguanta'}.`, 'recordatorio');
-      if(pierde) anotar(r, -1, `la Mala sombra de ${ordenNombre(port)}`);
+      const pierde = await ordenMalaSombraDuelo(port, m, r);
+      if(pierde === null) mesaLinea(`🌑 Mala sombra de ${ordenNombre(port)}: ${ordenNombre(r)} tira Res.Mt contra el Efecto especial${m.por ? ` de ${m.por}` : ''} — a mano (si pierde, baja 1 lugar).`, 'recordatorio');
+      else if(pierde) anotar(r, -1, `la Mala sombra de ${ordenNombre(port)}`);
     }
   }
   const r = OrdenTurnos.aplicar(st, movs, usados);
@@ -231,6 +233,20 @@ async function ordenInicioRonda(ordenIds){
   }
   for(const s of r.saltados){ if(porQue.has(s.id)) lineas.push(`${ordenNombre(s.id)} no se mueve (${s.motivo}).`); }
   return {ordenIds: st.orden, lineas, cambios, usados, mufas};
+}
+// 🌑 La contienda de la Mala sombra en el cuadro del duelo. → true (pierde: baja 1) · false (aguanta) · null (no se resolvió: a mano).
+async function ordenMalaSombraDuelo(port, m, rivalId){
+  if(typeof contiendaDuelo !== 'function') return null;
+  const deId = m.de && tokens.has(m.de) ? m.de : port, tDe = tokens.get(deId);
+  if(!tDe) return null;
+  const v = Math.max(0, Math.round(num(m.esp))), fp = formulaParaValor(v), f = typeof fp === 'string' ? fp : String((fp && fp.formula) || v);
+  const quien = ordenNombre(rivalId), dueno = ordenNombre(port);
+  const c = await contiendaDuelo({yo: {ref: String(tDe.fichaId || ''), tipo: tDe.tipo, nombre: m.por || nombreDe(tDe), uid: tDe.duenoUid || ''}, deTokenId: deId, aTokenId: rivalId, esperar: true, hab: {
+    nombre: `Mala sombra de ${dueno}`.slice(0, 60), objetivo: 'enemigo',
+    detalle: `Empieza la ronda y ${quien} está pegado a ${dueno}, que lleva la Mala sombra: su Res.Mt contra el Efecto especial de ${m.por || 'quien la echó'} (empate: aguanta). Si pierde, baja 1 lugar en el orden de turnos.`,
+    tira: {formula: f, etq: 'Ef.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, empatePierde: true, efectos: []}});
+  if(!c.gana) return null;
+  return c.gana === 'atacante';
 }
 // ---------- 🥁 Marcar el ritmo con varios aliados pegados: elige quien la tiene ----------
 // Lo abre la pantalla del GM al empezar la ronda; contesta el dueño del personaje (o el GM si es un creep, o por él si en 30 s nadie eligió).

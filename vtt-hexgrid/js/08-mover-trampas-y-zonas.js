@@ -615,7 +615,7 @@ function zonaRevisarMantenimiento(){ tokens.forEach(t => { if(zonaResuelvoYo(t))
 function zonaInmediataRevisar(elId){
   const el = elementos.get(elId);
   if(!el || !el.zona) return;
-  if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)) return;   // 💨 la primera tanda la arma quien la creó, al terminar de expandirse (js/112)
+  if(zonaSpecDe(el).duelo) return;   // 💨 la primera tanda la arma quien la creó, al terminar de expandirse (js/112); las demás zonas con duelo (tanda 1, 2026-11-10) piden por cada uno (zonaEncolar → zonaDueloPedir)
   const cs = celdasDeElemento(el);
   tokens.forEach(t => {
     if(!zonaResuelvoYo(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;

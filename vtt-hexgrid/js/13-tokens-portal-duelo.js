@@ -2364,11 +2364,36 @@ function anulaCreador(el){
   const f = fichasPub.get(String(c.ref).split(SEP_INVOCACION)[0]);
   return {tipo: 'pj', ref: c.ref, nombre: (f && f.nombre) || 'un personaje', resEsp: num(((f || {}).resumen || {}).resm)};
 }
-// La tirada contra quien creó la zona y el recorte. `ta` (opcional): la tirada de Ef.Esp ya hecha (cuando la termina la pantalla del GM).
-async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera){
+/* 🎲 La Anulación en el cuadro del duelo de siempre (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario
+   involucrado»): el Ef.Esp de quien la usa (su botón) contra la Res.Mt de quien sostiene lo mágico (su botón; el GM por un creep o por el ausente).
+   Empate: gana quien la sostiene (`empatePierde`). `aTokenId`: el token de quien la sostiene. → {gana, ta, tr} · {aMano} si no se resolvió. */
+async function anulaContienda(yo, aTokenId, efEsp, nombre, que, quien){
+  if(typeof contiendaDuelo !== 'function' || !yo || !aTokenId) return {aMano: true};
+  const mio = [...tokens.entries()].find(([, t]) => String(t.fichaId) === String(yo.ref || '') && (t.tipo === 'creep') === (yo.tipo === 'creep'));
+  const vE = Math.max(0, Math.round(num(efEsp))), fp = formulaParaValor(vE), f = typeof fp === 'string' ? fp : String((fp && fp.formula) || vE);
+  const c = await contiendaDuelo({yo: {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || nombre).slice(0, 40), uid: (mio && mio[1].duenoUid) || yo.uid || fbUsuario.uid},
+    deTokenId: mio ? mio[0] : '', aTokenId, esperar: true, hab: {
+      nombre: `${nombre}: ${que}`.slice(0, 60), objetivo: 'enemigo',
+      detalle: `${nombre} contra ${que}: el Ef.Esp de quien la usa contra la Res.Mt de ${quien} (empate: lo sostiene). Si no lo sostiene, se anula.`,
+      tira: {formula: f, etq: 'Ef.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, empatePierde: true, efectos: []}});
+  if(!c.gana) return {aMano: true};
+  return {gana: c.gana, ta: c.d && c.d.pdg ? num(c.d.pdg.total) : null, tr: c.d && c.d.eva ? num(c.d.eva.total) : null};
+}
+const anulaTokenDe = (ref, tipo) => { for(const [id, t] of tokens) if(String(t.fichaId) === String(ref) && (t.tipo === 'creep') === (tipo === 'creep')) return id; return ''; };
+// La tirada contra quien creó la zona y el recorte. `ta` (opcional): la tirada de Ef.Esp ya hecha (cuando la termina la pantalla del GM; los momentos
+// `anula-zona` de antes). `yo` (2026-11-10): quien la usa, para la contienda en el cuadro del duelo.
+async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera, yo){
   const nomZ = el.zonaNombre || el.nombre || 'una zona', c = anulaCreador(el);
   let tirada = '';
-  if(c){
+  if(c && ta0 === undefined){
+    const tc = anulaTokenDe(c.ref, c.tipo);
+    if(!tc || !yo) return {aMano: `${nomZ} (tirá el Ef.Esp contra la Res.Mt de ${c.nombre}: no está en el mapa)`};
+    const k = await anulaContienda(yo, tc, efEsp, nombre, nomZ, c.nombre);
+    if(k.aMano) return {aMano: `${nomZ} (el Ef.Esp contra la Res.Mt de ${c.nombre}: resolvelo a mano)`};
+    const cuenta = k.ta !== null && k.tr !== null ? ` (Ef.Esp ${k.ta} contra la Res.Mt ${k.tr} de ${c.nombre})` : '';
+    if(k.gana !== 'atacante'){ mesaLinea(`🚫 ${nombre}: ${c.nombre} sostiene ${nomZ}${cuenta}`, 'recordatorio'); return {}; }
+    tirada = cuenta;
+  }else if(c){
     const ta = ta0 !== undefined ? num(ta0) : ((Combatiente.tirarStat(efEsp, [], 'dmgesp') || {}).total || 0);
     if(c.resEsp === null){
       const mid = await momentoAbrir({tipo: 'anula-zona', icono: '🚫', titulo: `${nombre} contra ${nomZ}`, estado: 'esperando',
@@ -2462,7 +2487,7 @@ async function anularEn(celdas, yo, hab, rivales){
       elegida = id ? zonasCand.find(z => z.id === id) : null;
     }
     if(elegida){
-      const r = await anulaZona(elegida.id, elegida.el, celdas, efEsp, nombre, undefined, dirigida);
+      const r = await anulaZona(elegida.id, elegida.el, celdas, efEsp, nombre, undefined, dirigida, yo);
       if(r.parte) partes.push(r.parte);
       if(r.aMano) aMano.push(r.aMano);
     }
@@ -2473,13 +2498,17 @@ async function anularEn(celdas, yo, hab, rivales){
   // contra la Res.Mt del invocador (2026-11-02; antes Res.Esp) (su ficha); si no la resiste (empate: resiste), la invocación se va del mapa. Quedan fuera del duelo del área (js/13 lanzar).
   for(const t of (rivales || [])){
     if(etereoDe(t) || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)) || !celdas.has(nbPack(t.col, t.fila))) continue;
-    const nom = nombreDe(t), duenoF = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), resEsp = num(((duenoF || {}).resumen || {}).resm);   // (2026-11-02: la Res.Mt del invocador)
-    const a = Combatiente.tirarStat(efEsp, [], 'dmgesp'), r = Combatiente.tirarStat(resEsp, [], 'resm');
-    const ta = a ? a.total : 0, tr = r ? r.total : 0, quien = (duenoF && duenoF.nombre) || 'su invocador';
-    if(ta > tr){
-      try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (Ef.Esp ${ta} contra la Res.Mt ${tr} de ${quien}: se desvanece)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
+    const nom = nombreDe(t), fichaDueno = String(t.fichaId).split(SEP_INVOCACION)[0], duenoF = fichasPub.get(fichaDueno);
+    const quien = (duenoF && duenoF.nombre) || 'su invocador';
+    // 🎲 En el cuadro del duelo (tanda 1, 2026-11-10): contra el token de su invocador (su Res.Mt). Si el invocador no está en el mapa, a mano.
+    const tInv = anulaTokenDe(fichaDueno, 'pj');
+    const k = tInv ? await anulaContienda(yo, tInv, efEsp, nombre, nom, quien) : {aMano: true};
+    if(k.aMano){ aMano.push(`${nom} (el Ef.Esp contra la Res.Mt de ${quien}: a mano)`); continue; }
+    const cuenta = k.ta !== null && k.tr !== null ? `Ef.Esp ${k.ta} contra la Res.Mt ${k.tr} de ${quien}` : `contra la Res.Mt de ${quien}`;
+    if(k.gana === 'atacante'){
+      try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (${cuenta}: se desvanece)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
       catch(err){ console.error('Anulación: no se pudo sacar la invocación', err); aMano.push(`${nom} (se desvanece)`); }
-    }else mesaLinea(`🚫 ${nombre}: ${quien} sostiene a ${nom} (Res.Mt ${tr} contra Ef.Esp ${ta})`, 'recordatorio');
+    }else mesaLinea(`🚫 ${nombre}: ${quien} sostiene a ${nom} (${cuenta})`, 'recordatorio');
   }
   // 👁 El Ojo de Kicillof: etéreo (no entra en el área de siempre), pero la anulación lo cierra.
   for(const t of (rivales || [])){

@@ -878,6 +878,7 @@ const Duelo = (() => {
     // 🔓 Cómo se suelta (2026-10-20, la Red Nerubian: Fuerza contra el Ef.Esp de quien la tiró, al empezar cada turno).
     if(s.soltar && typeof Combatiente !== 'undefined' && Combatiente.soltarNorm(s.soltar)) o.soltar = Combatiente.soltarNorm(s.soltar);
     if(s.provocaDe){ o.provocaDe = txtCorto(s.provocaDe, 80); o.provocaDeNombre = txtCorto(s.provocaDeNombre, 40); }   // 😤 Provocado por quién (Tirar la bronca, 2026-10-26)
+    if(s.miedoDe){ o.miedoDe = txtCorto(s.miedoDe, 80); o.miedoDeNombre = txtCorto(s.miedoDeNombre, 40); }   // 😱 Miedo de quién (el aura espeluznante en el cuadro del duelo, 2026-11-10)
     return o;
   }
   // 💨 La tabla «según la tirada» de un efecto (los Pedos Tóxicos, 2026-11-09, vtt-hexgrid/js/112): desde N → un estado, o «cae» (la vida a 0).

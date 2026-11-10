@@ -575,13 +575,29 @@ async function escudoQuemarYa(pid, vid, motivo, respaldo){
       let resistio = false;
       const hayEfecto = !!(idE && idE.estado) || !!ef.porDano || efs.some(x => x && !x.danoMagico && num(x.caras) > 0);   // (el fuego solo quema: no hay nada que resistir)
       if(recibido > 0 && def.resiste && hayEfecto){
-        const tirar = v0 => { const fp = formulaParaValor(Math.max(0, Math.round(num(v0)))), f = typeof fp === 'string' ? fp : String((fp && fp.formula) || Math.max(0, Math.round(num(v0)))); const r = tirarDados(f); return {total: r ? num(r.total) : Math.max(0, Math.round(num(v0))), formula: f, r}; };
-        const tE = tirar(num(e.estado.escudoEsp)), tV = tirar(typeof trampaValorStat === 'function' ? trampaValorStat(v, def.resisteStat || 'resmg') : 0);
-        try{ mesaPublicar(`${def.estado} de ${quienP} · Ef.Esp`, {formula: tE.formula, rolls: tE.r ? tE.r.rolls : [], mod: tE.r ? tE.r.mod : 0, total: tE.total, quien: `${def.estado} de ${quienP}`}); }catch(err){}
-        try{ mesaPublicar(`${quienV} · ${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'}`, {formula: tV.formula, rolls: tV.r ? tV.r.rolls : [], mod: tV.r ? tV.r.mod : 0, total: tV.total}); }catch(err){}
-        resistio = tV.total > tE.total;
-        partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto (${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total})`);
-        notasV.push(`${resistio ? 'Resistió' : 'No resistió'} el efecto: ${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total}.`);
+        // 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario
+        // involucrado»): quien maneja a quien tiró el escudo tira su Ef.Esp (el guardado al ponerlo) y quien se quema su resistencia, cada uno con su
+        // botón (el GM puede tirar por el que no está, o elegir el valor a mano). Empate: gana el escudo (`empateGana`). Si nadie resuelve el
+        // duelo (se cancela, «a mano», o pasa el tiempo), el efecto no se aplica solo: queda a mano.
+        const stR = def.resisteStat === 'rescc' ? 'rescc' : 'resmg', etqR = stR === 'rescc' ? 'Res.CC' : 'Res.Esp';
+        const vE = Math.max(0, Math.round(num(e.estado.escudoEsp))), fpE = formulaParaValor(vE);
+        const fE = typeof fpE === 'string' ? fpE : String((fpE && fpE.formula) || vE);
+        const c = typeof contiendaDuelo === 'function' ? await contiendaDuelo({yo: {ref: String(p.fichaId || ''), tipo: p.tipo, nombre: nombreDe(p), uid: p.duenoUid || ''},
+          deTokenId: pid, aTokenId: vid, esperar: true, hab: {
+            nombre: `${def.estado}: ${def.nombre.toLowerCase()}`.slice(0, 60), objetivo: 'enemigo',
+            detalle: `${quienV} se quemó con el ${def.estado.toLowerCase()} de ${quienP}: su ${etqR} contra el Ef.Esp del escudo (empate: gana el escudo). Si no lo resiste, le queda el efecto del elemento.`,
+            tira: {formula: fE, etq: 'Ef.Esp'}, contra: [{modo: stR, stat: stR, etq: etqR}], dano: null, empateGana: true, efectos: []}}) : {falla: true};
+        if(c.gana){
+          resistio = c.gana === 'defensor';
+          const tV = c.d && c.d.eva ? num(c.d.eva.total) : null, tE = c.d && c.d.pdg ? num(c.d.pdg.total) : null;
+          const cuenta = tV !== null && tE !== null ? ` (${etqR} ${tV} contra Ef.Esp ${tE})` : '';
+          partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto${cuenta}`);
+          notasV.push(`${resistio ? 'Resistió' : 'No resistió'} el efecto${cuenta}.`);
+        }else{
+          resistio = true;   // no se aplica solo: lo decide la mesa
+          partes.push(`el efecto (${etqR} contra Ef.Esp) queda a mano`);
+          notasV.push(`El efecto del elemento queda a mano (${etqR} contra el Ef.Esp del escudo).`);
+        }
       }
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0){
         // ⚡ El salto del escudo (dueño, 2026-11-09): nunca a los que ya reciben el golpe del anillo; solo a los de afuera del escudo.

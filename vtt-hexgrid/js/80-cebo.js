@@ -5,7 +5,7 @@
    No es una trampa: se ve. Es un elemento chico (una casilla, dorado) con `trampaNombre: 'Cebo'` y `trampaEstado` = {cebo: {de, dif, radio, mueve, quien}}
    (sin campos nuevos en Firestore), que dura `turnos` (se va solo, como las formas con turnos). Lo resuelve la pantalla del GM:
    · al colocarlo y al empezar el turno de cada rival (turnoDeToken, js/04): los rivales que lo ven, a `radio` casillas o menos, tiran Res.Mt contra la
-     Destreza de quien lo puso (`dif`); el que pierde camina ya hasta `mueve` casillas hacia el cebo (gratis, sin oportunidad), y lo que pise en el camino
+     Destreza de quien lo puso (`dif`) — desde el 2026-11-10 en el cuadro del duelo, cada uno con su botón; el que pierde camina ya hasta `mueve` casillas hacia el cebo (gratis, sin oportunidad), y lo que pise en el camino
      lo toca (la primera trampa lo frena ahí; las zonas, el momento del arrastre: js/78);
    · el primer rival que queda pegado al cebo lo da vuelta: el Anuncio para todos y el cebo desaparece. */
 const CEBO_COLOR = '#E8C547';
@@ -43,11 +43,20 @@ async function ceboAtraer(elId, c, soloId){
   for(const [id, x] of lista){
     const quien = nombreDe(x), estados = x.tipo === 'creep' ? ((creepPrivadoDe(x.fichaId) || {}).estados || []) : (((fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]) || {}).resumen || {}).estados || []);
     if(estados.some(e => e && e.activo !== false && (e.inmunidadMental || e.inmuneCC))){ mesaLinea(`💎 ${quien} ni mira el brillo (inmune a lo mental)`, 'recordatorio'); continue; }
-    const rd = Combatiente.tirarStat(trampaValorStat(x, 'resm'), estados, 'resm');
-    if(!rd){ mesaLinea(`💎 ${quien}: ✋ tirá a mano Res.Mt contra ${c.dif} (si pierde, camina hasta ${c.mueve} casillas hacia el brillo)`, 'alerta-roja'); continue; }
-    try{ await mesaPublicar(`${quien} · Res.Mt (el brillo del cebo)`, {...rd, quien, ...(x.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(x.fichaId).split(SEP_INVOCACION)[0]})}); }catch(err){}
-    if(rd.total >= c.dif){ mesaLinea(`💎 ${quien}: Res.Mt ${rd.total} contra ${c.dif} → no se tienta`, 'recordatorio'); continue; }
-    await ceboCaminar(id, x, centro, c, rd.total);
+    // 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario involucrado»):
+    // quien lo ve tira su Res.Mt con su botón (el GM por un creep o por el ausente) contra el número fijo del cebo (la Destreza de quien lo puso, ya
+    // puesta: no se tira). Empate: no se tienta (`empatePierde`).
+    const [deRef] = String(c.de || '').split('|');
+    const tDe = [...tokens.entries()].find(([, y]) => String(y.fichaId) === deRef && y.tipo === 'creep');
+    const k = typeof contiendaDuelo === 'function' ? await contiendaDuelo({yo: {ref: deRef, tipo: 'creep', nombre: c.quien || (tDe ? nombreDe(tDe[1]) : 'El cazador'), uid: tDe ? (tDe[1].duenoUid || '') : ''},
+      deTokenId: tDe ? tDe[0] : '', aTokenId: id, esperar: true, pdgCompartido: {total: c.dif, formula: String(c.dif), rolls: [], mod: 0}, hab: {
+        nombre: 'El brillo del cebo', objetivo: 'enemigo',
+        detalle: `${quien} ve algo que brilla, semienterrado: su Res.Mt contra ${c.dif} (fijo; empate: no se tienta). Si no llega, camina hasta ${c.mueve} casillas hacia el brillo (gratis, sin ataques de oportunidad).`,
+        tira: {formula: String(c.dif), etq: 'El brillo'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, empatePierde: true, efectos: []}}) : {falla: true};
+    if(!k.gana){ mesaLinea(`💎 ${quien}: ✋ a mano: Res.Mt contra ${c.dif} (si pierde, camina hasta ${c.mueve} casillas hacia el brillo)`, 'alerta-roja'); continue; }
+    const tiro = k.d && k.d.eva ? num(k.d.eva.total) : '?';
+    if(k.gana !== 'atacante'){ mesaLinea(`💎 ${quien}: Res.Mt ${tiro} contra ${c.dif} → no se tienta`, 'recordatorio'); continue; }
+    await ceboCaminar(id, x, centro, c, tiro);
   }
 }
 async function ceboCaminar(id, x, centro, c, tiro){

@@ -25,7 +25,23 @@ const ZONA_DUELO_EXPANDE_MS = 2200;
 const zonaDueloInicio = new Map();   // elId → performance.now() de cuando empezó a expandirse en esta pantalla (0 = ya está quieta)
 const zonaDueloPedidos = new Map();  // elId → {ids, timer}: los que entraron hace un momento (se juntan en una sola tanda)
 
-const zonaEsDuelo = el => !!(el && el.zona && zonaSpecDe(el).duelo);
+/* 🎲 Toda zona con «tirada de la zona» (el stat de quien la creó contra la resistencia de quien la pisa) también va en el cuadro del duelo
+   (dueño, 2026-11-10, tanda 1 de docs/auditoria-tiradas.md: «las tiradas las hace el usuario involucrado»; antes, en el cartel de la zona, la tirada
+   de quien la creó salía sola). Quien la creó tira con su botón una sola vez por tanda (`pdgCompartido`) y cada afectado su resistencia. Quedan en
+   el cartel de siempre las que tienen algo que el duelo no hace: el hielo (una tirada por paso), la cura, la luz, un estado con chance (la Varita de
+   miasma), el «soltarse» de un estado, la tirada extra sin tabla, las de una trampa y las de un número fijo (sin tirada de quien la creó). */
+function zonaDueloCompatible(el){
+  if(!el || !el.zona || el.trampa || el.zonaLuz) return false;
+  if(!el.zonaTiraStat || !Number.isFinite(el.zonaTiraValor) || !el.zonaResistStat) return false;
+  if(typeof zonaCuraDe === 'function' && zonaCuraDe(el)) return false;
+  const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+  if(sup && (sup.superficie || sup.tiraPaso)) return false;
+  const e = zonaSpecDe(el);
+  if(num(e.pct) > 0 || e.soltar || e.revela || e.cura) return false;
+  if(el.zonaTiraExtra && !Combatiente.porTiradaNorm(e.porTirada).length) return false;
+  return true;
+}
+const zonaEsDuelo = el => !!(el && el.zona && (zonaSpecDe(el).duelo || zonaDueloCompatible(el)));
 
 /* ---------- la nube que se expande ---------- */
 // La ve aparecer esta pantalla (js/07): si es recién puesta (la escritura propia, o creada hace unos segundos), arranca la expansión.
@@ -208,7 +224,7 @@ function zonaDueloPedir(el, t){
   const tokId = zonaIdDe(t);
   if(!tokId || !zonaDueloResuelvoYo(t) || zonaDueloPendiente(el.id, tokId)) return;
   const t0 = zonaDueloInicio.get(el.id);
-  if(t0 && performance.now() - t0 < ZONA_DUELO_EXPANDE_MS + 2000) return;   // recién tirada: la primera tanda ya lo incluye
+  if(t0 && zonaSpecDe(el).duelo && performance.now() - t0 < ZONA_DUELO_EXPANDE_MS + 2000) return;   // recién tirada: la primera tanda ya lo incluye (solo las de `duelo`, que la arma quien la creó)
   const p = zonaDueloPedidos.get(el.id) || {ids: new Set(), timer: null};
   p.ids.add(tokId);
   clearTimeout(p.timer);

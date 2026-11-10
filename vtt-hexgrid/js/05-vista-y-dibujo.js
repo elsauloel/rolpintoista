@@ -510,6 +510,10 @@ function dibujarLienzo(){
       // Su ficha redonda con un cepo (dueño, 2026-10-08), como el arma en el piso: la ve quien ve la trampa.
       const cT = typeof trampaCentro === 'function' ? trampaCentro(el) : celdas[0];
       trampaFichaDibujar(hexCentro(cT.col, cT.fila), z, disp);
+      // 🎯 Se dispara solo en el centro (2026-11-10): esa casilla con un borde dorado punteado, para quien ve la trampa sin disparar.
+      if(!disp && celdas.length > 1 && typeof trampaDisparoCentro === 'function' && trampaDisparoCentro(el)){
+        trazarCeldas([cT]); ctx.setLineDash([7 / z, 5 / z]); ctx.strokeStyle = 'rgba(255,210,90,.95)'; ctx.lineWidth = 3 / z; ctx.stroke(); ctx.setLineDash([]);
+      }
       if(typeof atrapaDibujarSuelo === 'function' && atrapaDibujarSuelo(el, celdas, z)) superficiesAnimando = true;   // 🕸 la telaraña o la red, encima de la ficha: se lee qué trampa es (js/68)
       if(typeof cordonDibujarSuelo === 'function' && cordonDibujarSuelo(el, celdas, z, bordeCeldas)) superficiesAnimando = true;   // 🪢 el Cordón oculto (js/79)
       const dst = destinoParsear(el.trampaDestino) || portalFijoDe(el);   // también el portal de la Varita del portal

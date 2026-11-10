@@ -100,6 +100,7 @@ const AsistenteTrampa = (() => {
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
       explota: !!ini.explota,   // 💥 (2026-10-17)
+      disparo: ini.disparo === 'centro' ? 'centro' : 'area',   // 🎯 qué la dispara (2026-11-10, prueba del dueño): 'centro' = solo la casilla del medio; 'area' = cualquiera
       // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
       // como una zona con el mismo daño/estado — ver comun/CLAUDE.md "Trampas persistentes". Desde P123 (2026-09-29)
       // también para las que coloca una habilidad.
@@ -125,6 +126,7 @@ const AsistenteTrampa = (() => {
       const f = [];
       if(danoTxt()) f.push(`Hace ${danoTxt()} de daño ${est.contemplaArmadura ? '(contempla la armadura: se le resta la Defensa)' : '(directo a la vida: ignora la armadura)'}`);
       if(est.explota) f.push('💥 Explota: al pisarla, una explosión en el mapa antes del anuncio');
+      if(est.disparo === 'centro') f.push('🎯 Se dispara al pisar el centro (las demás casillas no la activan, pero el efecto alcanza a todas)');
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
       if(est.dejaZona) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
@@ -226,6 +228,11 @@ const AsistenteTrampa = (() => {
             <option value="aire"${est.altura === 'aire' ? ' selected' : ''}>☁️ Del aire: ocupa el espacio (gas, nube, humo, explosión) — alcanza aunque levites</option>
             <option value="piso"${est.altura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — levitando se cruza sin tocarla</option>
             <option value="ambos"${est.altura === 'ambos' ? ' selected' : ''}>🔥 Ambos (fuego, escarcha): alcanza aunque levites; las Suelas le restan</option></select>
+          <div class="at-preg">¿Qué la dispara?</div>
+          <p class="at-ayuda">Solo cuenta si ocupa más de una casilla. Disparada, el efecto alcanza igual a todos los que estén en su área.</p>
+          <select id="at-disparo" style="max-width:100%">
+            <option value="area"${est.disparo !== 'centro' ? ' selected' : ''}>🟩 Cualquier casilla: pisar cualquiera de sus casillas la dispara</option>
+            <option value="centro"${est.disparo === 'centro' ? ' selected' : ''}>🎯 El centro: solo pisar la casilla del medio la dispara</option></select>
           <div class="at-preg">¿Al dispararse, queda además como una zona?</div>
           <p class="at-ayuda">Una trampa normal actúa una sola vez, sobre quien la pisó. Marcada esto, además queda puesta un tiempo, con el mismo daño y/o estado de los pasos anteriores, para cualquiera que entre o se quede adentro — como una nube de gas que sigue ahí después del disparo.</p>
           <label class="at-sin"><input type="checkbox" id="at-dejaZona"${est.dejaZona ? ' checked' : ''}> Sí, queda como zona</label>
@@ -294,7 +301,7 @@ const AsistenteTrampa = (() => {
       estadoStacks: est.aplicaEstado && est.estado === est.estadoDeStacks && est.estadoStacks ? est.estadoStacks : 0,
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif, que: est.salQue, ...(est.salLogra ? {logra: est.salLogra} : {})} : null,
-      ...(est.explota ? {explota: true} : {}), ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}), ...(est.renuevaPaso ? {renuevaPaso: true} : {}),
+      ...(est.explota ? {explota: true} : {}), ...(est.disparo === 'centro' ? {disparo: 'centro'} : {}), ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}), ...(est.renuevaPaso ? {renuevaPaso: true} : {}),
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
       dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso, altura: est.altura,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
@@ -358,6 +365,7 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-zonaSeResiste'){ est.zonaSeResiste = t.checked; dibujar(); }
       else if(t.id === 'at-zonaResistStat') est.zonaResistStat = t.value;
       else if(t.id === 'at-altura') est.altura = t.value;
+      else if(t.id === 'at-disparo') est.disparo = t.value === 'centro' ? 'centro' : 'area';
       else if(t.name === 'at-detectarStat') est.detectarStat = t.value === 'dmgesp' ? 'dmgesp' : 'des';
     };
     const inicial = JSON.stringify(est);
@@ -397,7 +405,7 @@ const AsistenteTrampa = (() => {
       ...(r.estado && num(r.estadoStacks) > 0 ? {estadoStacks: Math.min(20, Math.round(num(r.estadoStacks)))} : {}),
       ...(r.salvacion && r.salvacion.stat ? {salvacion: {stat: r.salvacion.stat, dif: num(r.salvacion.dif), que: r.salvacion.que || 'todo', ...(r.salvacion.logra ? {logra: r.salvacion.logra} : {})}} : {}),
       ...(r.elemento ? {elemento: r.elemento} : {}), ...(r.lento ? {lento: r.lento} : {}), ...(r.pierdeSp ? {pierdeSp: r.pierdeSp} : {}), ...(r.danoZona ? {danoZona: r.danoZona} : {}), ...(r.cadena ? {cadena: r.cadena} : {}), ...(r.portal ? {portal: r.portal} : {}), ...(r.requiereDano ? {requiereDano: true} : {}), ...(r.renuevaPaso ? {renuevaPaso: true} : {}),
-      ...(['piso', 'aire', 'ambos'].includes(r.altura) ? {altura: r.altura} : {}),
+      ...(['piso', 'aire', 'ambos'].includes(r.altura) ? {altura: r.altura} : {}), ...(r.disparo === 'centro' ? {disparo: 'centro'} : {}),
       tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))),
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
@@ -412,7 +420,7 @@ const AsistenteTrampa = (() => {
       cant: t.cant || 1, color: t.color, alfa: t.alfa, amiga: !!t.amiga, dano: t.dano || '', contemplaArmadura: !t.ignoraDef,
       estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, estadoStacks: t.estadoStacks || 0, teleport: !!t.teleport, salvacion: t.salvacion || null,
       dejaZona: !!t.dejaZona, zonaTurnos: t.zonaTurnos, zonaEnMant: t.zonaEnMantenimiento !== false, zonaCadaPaso: !!t.zonaCadaPaso,
-      zonaResistStat: t.zonaResistStat || '', zonaResistValor: t.zonaResistValor, turnos: t.turnos || 0, detectar: t.detectar, detectarStat: t.detectarStat, altura: t.altura || 'piso'};
+      zonaResistStat: t.zonaResistStat || '', zonaResistValor: t.zonaResistValor, turnos: t.turnos || 0, detectar: t.detectar, detectarStat: t.detectarStat, altura: t.altura || 'piso', disparo: t.disparo === 'centro' ? 'centro' : 'area'};
   }
   // "2d6 de daño (contempla la armadura) · deja Rengo · radio 1 × 2 · deja zona 3 turnos · efecto solo a rivales"
   function resumenTexto(t0){

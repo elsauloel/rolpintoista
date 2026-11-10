@@ -325,12 +325,25 @@ tirar los dados del daño.» Vale para **todas** las trampas (del catálogo, de 
   Cuando el paso que sigue ya no es de esa pantalla (p. ej. el GM tiró el daño y ahora lo aplica el jugador), pasa sola a la víctima siguiente.
 
 ## Trampas de área: se disparan en toda su área (dueño, 2026-11-09)
+> Desde el 2026-11-10, experimento: la mitad más fuerte de las trampas en flor se dispara solo en el centro (ver «Trampas en flor: centro o toda el área»).
 «Aplicale a todas las trampas la misma regla de la red»: si una trampa hace efecto en un área, **el disparo y el efecto ocupan las mismas casillas**:
 pisar cualquiera de ellas la dispara y alcanza a todos los que estén encima. Primero la Red (Red de caza y Red tendida, `b4e3b4c2`); después el
 resto (2026-11-09): Mina del cazador y Polvo cegador (creeps) y, del catálogo, Gas adormecedor, Gas somnífero, Nube de veneno, Petardo trampa,
 Mina explosiva, Cartucho enterrado, Barril de pólvora, Lluvia de cascotes, Géiser de fuego, Niebla de confusión y Espejo de discordia. Todas
 pasan a flor de 7 casillas (`tipo: 'flor', tamano: 1, efecto: {area: 'trampa'}`); los gases que quedan como nube siguen en esas 7. No queda
 ninguna trampa con `efecto.area: 'flor'` (una prueba automática lo vigila). Las de una sola casilla (`pisador`: cepos, agujas, portales) siguen igual.
+
+## Trampas en flor: centro o toda el área — EXPERIMENTO (dueño, 2026-11-10)
+«Tengo una duda si es mejor que el trigger sea la superficie completa o, como antes, solamente el hexágono del centro. Vamos a probar mitad y
+mitad.» Cada trampa lleva **qué la dispara** (`disparo: 'centro'` en la trampa; en el mapa, `dc` dentro de `trampaEstado`, sin regla nueva de
+Firestore): **🎯 el centro** = solo pisar la casilla del medio la dispara (pasar por las otras 6 no la activa ni la delata); **🟩 toda el área** =
+cualquiera de sus casillas (lo de siempre, y lo que vale si no dice nada). Disparada, el efecto alcanza igual a todos los de la flor. El paso a paso
+de trampas (paso «¿Dónde está su efecto?») pregunta «¿Qué la dispara?». Quien ve la trampa sin disparar ve el centro con un borde dorado punteado.
+- **🎯 Centro (las más fuertes, 12):** Barril de pólvora, Géiser de fuego, Bomba de esporas, Resina de árbol negro, Espejo de discordia (Raras);
+  Mina explosiva, Cartucho enterrado, Lluvia de cascotes, Piso de púas, Gas somnífero; y de los creeps, Mina del cazador y Polvo cegador.
+- **🟩 Toda el área (13):** Red de caza y Red tendida (la red fue el pedido original del 2026-11-09), Petardo trampa, Gas adormecedor, Aceite
+  resbaladizo, Brea pegajosa, Arena movediza, Cola de carpintero, Nube de veneno, Mina napalm, Llamarada, Niebla de confusión; y Abrojos (creeps).
+- Se decide después de probarlas en partida (`pendientes.md` §4). Las trampas ya colocadas o guardadas antes en un creep siguen con toda el área.
 
 ## La lava (Varita del chorro de lava): aprobada la tercera versión (dueño, 2026-11-09: «así me gusta, la lava»)
 Commit `90398810` (`vtt-hexgrid/js/50-superficies.js`): borde negro nítido de líquido espeso; la costra del borde partida en placas negras con

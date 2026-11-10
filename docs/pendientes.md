@@ -1014,6 +1014,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+- [ ] **🎯 Trampas en flor: ¿se disparan en el centro o en toda el área?** (dueño, 2026-11-10: «vamos a probar mitad y mitad») — **decidir después
+  de probar en partida.** Hoy, de las 25 trampas en flor de 7 casillas, 12 se disparan solo al pisar el centro (las más fuertes) y 13 con
+  cualquier casilla; el detalle y la lista, en `guia-de-diseno.md` («Trampas en flor: centro o toda el área»).
 - [x] (2026-11-03, hecho: la **Aguja siniestra** pasó a rápida y entraron al pool **Escalofrío** y **Espina tóxica**, rápidas y auditadas; falta probarlas en el mapa) **⚡ Una habilidad RÁPIDA de Debuffer (cooldown 2), auditada (dueño, 2026-11-02, con el Maldito D1):** hoy las del Debuffer auditadas son
   todas lentas (Maldición de la coraza, Aguja siniestra, Maldición debilitante…); las rápidas que hay (Intimidar, Hacer tropezar) son viejas y a mano.
 - [ ] **🔥❄⚡ Talismanes elementales (propuesta de Claude, 2026-11-02; el dueño: «definitivamente hay que crear talismanes potenciadores de daños

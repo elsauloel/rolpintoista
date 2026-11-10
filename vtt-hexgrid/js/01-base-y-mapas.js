@@ -266,6 +266,7 @@ let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport:
 // siendo a mano); acá sí es automática, con una dificultad fija (no hay quien tire, como en el asistente de zonas).
 let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant = true, elemTrampaZonaCadaPaso = false;
 let elemTrampaExplota = false;   // 💥 (2026-10-17)
+let elemTrampaDisparo = 'area';   // 🎯 qué la dispara (2026-11-10): 'centro' = solo la casilla del medio
 let elemTrampaAltura = 'piso';   // dónde está el efecto de la trampa que se arma (2026-10-07: Levitar y las Suelas)
 let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
 let elemTrampaDetectar = 6;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 6)

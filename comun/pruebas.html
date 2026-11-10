@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110sigue"></script>
+<script src="skills-creep-base.js?v=20261110disparo"></script>
 <script src="creeps-esenciales.js?v=20261110w3"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7406,6 +7406,20 @@ prueba('🪤 Todas las trampas de área se disparan en toda su área (dueño, 20
   const mina = Combatiente.trampaDeHab(trp('Mina del cazador', 3), () => 11), polvo = Combatiente.trampaDeHab(trp('Polvo cegador', 3), () => 11);
   const gas = CATALOGO_BASE.find(x => x && x.nombre === 'Gas somnífero').trampaDatos;
   igual([malas, mina.tamano, mina.efecto.area, polvo.tamano, polvo.efecto.area, gas.tipo, gas.tamano, gas.efecto.area], [[], 1, 'trampa', 1, 'trampa', 'flor', 1, 'trampa']);
+});
+prueba('🎯 Trampas en flor: mitad se disparan en el centro y mitad en toda el área (dueño, 2026-11-10: «vamos a probar mitad y mitad»)', () => {
+  const flor7 = CATALOGO_BASE.filter(x => x && x.trampaDatos && x.trampaDatos.tipo === 'flor' && x.trampaDatos.tamano === 1 && !x.archivo);
+  const centro = flor7.filter(x => x.trampaDatos.disparo === 'centro').map(x => x.nombre).sort();
+  const textosOk = flor7.every(x => x.trampaDatos.disparo === 'centro' ? /🎯/.test(x.detalle) && !/al pisar cualquiera/.test(x.detalle) : /🟩/.test(x.detalle));
+  const mina = Combatiente.trampaDeHab(trp('Mina del cazador', 3), () => 11), polvo = Combatiente.trampaDeHab(trp('Polvo cegador', 3), () => 11), red = Combatiente.trampaDeHab(trp('Red tendida', 3), () => 11);
+  const j = x => JSON.parse(TokensAuto.estadoJson(x.estado ? {nombre: x.estado} : null, x.salvacion, null, x.efecto, x.elemento || '', 0, {explota: x.explota, disparo: x.disparo, de: 'abcdefghijklmnopqrst|creep'}) || '{}');
+  const barril = CATALOGO_BASE.find(x => x && x.nombre === 'Barril de pólvora').trampaDatos;
+  const largo = TokensAuto.estadoJson({nombre: barril.estado, turnos: barril.estadoTurnos}, barril.salvacion, null, barril.efecto, barril.elemento || '', 0, {explota: barril.explota, disparo: barril.disparo, altura: barril.altura, de: 'qiWXQ1daWBhfTbwD1E98|creep'});
+  const ida = AsistenteTrampa.aTrampa({nombre: 'X', forma: 'flor', radio: 1, disparo: 'centro'}), vuelta = AsistenteTrampa.inicialDe(ida), sin = AsistenteTrampa.aTrampa({nombre: 'X', forma: 'flor', radio: 1});
+  igual([flor7.length, centro.length, centro.join(), textosOk, mina.disparo, polvo.disparo, red.disparo, !!j(mina).dc, !!j(red).dc, largo.length > 0 && !!JSON.parse(largo).dc,
+    Plantillas.trampa(mina).disparo, ida.disparo, vuelta.disparo, 'disparo' in sin, AsistenteTrampa.inicialDe({tipo: 'flor', tamano: 1}).disparo],
+    [21, 10, 'Barril de pólvora,Bomba de esporas,Cartucho enterrado,Espejo de discordia,Gas somnífero,Géiser de fuego,Lluvia de cascotes,Mina explosiva,Piso de púas,Resina de árbol negro', true,
+      'centro', 'centro', undefined, true, false, true, 'centro', 'centro', 'centro', false, 'area']);
 });
 prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado, −2 a la Evasión, 1 turno de respaldo; ya no hay +2 PdG; el texto lo dice', () => {
   const p = ESTADOS_PRESET.find(x => x.nombre === 'Desequilibrado');

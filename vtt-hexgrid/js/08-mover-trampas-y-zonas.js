@@ -238,11 +238,21 @@ function vecinosDeCasilla(c){
   const c0 = hexACubo(c);
   return VECINO_LADO.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
 }
+/* 🎯 Qué la dispara (2026-11-10, prueba del dueño: «vamos a probar mitad y mitad»): una trampa de área con `dc` en su trampaEstado solo se
+   dispara al pisar su casilla del centro (pasar por las otras no la activa ni la delata); ya disparada, el efecto alcanza a toda el área
+   igual. Sin `dc` (o de una sola casilla): cualquiera de sus casillas, como siempre (regla del 2026-11-09). */
+function trampaDisparoCentro(el){
+  try{ return !!(el && (JSON.parse(el.trampaEstado || '{}') || {}).dc); }catch(e){ return false; }
+}
+function trampaCeldasDisparo(el){
+  const cs = celdasDeElemento(el);
+  return cs.length > 1 && trampaDisparoCentro(el) ? [trampaCentro(el)] : cs;
+}
 function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros casilleros no tocan el piso (Levitar)
   if(etereoDe(t)) return null;   // 👁 etéreo: no pisa nada
   const trampas = [];
   elementos.forEach((el, id) => {
-    if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
+    if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(trampaCeldasDisparo(el).map(c => nbPack(c.col, c.fila)))});   // 🎯 el centro o todas
     // Portal (Invocar portal): lo usan solo los ALIADOS de quien lo invocó (los rivales pasan de largo); no se "dispara", queda hasta que venza.
     else if(el.portal && destinoParsear(el.portalDestino) && !trampaEsRival(t, el)) trampas.push({id, el, portal: true, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
   });

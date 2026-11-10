@@ -3277,10 +3277,13 @@ prueba('🐞 Vaquita de San Antonio (2026-11-10): espanta el primer estado malo 
   // El catálogo: el consumible (clásico y esencial) y el anillo (Vaquita +1 para el mapa, js/25).
   const it = CATALOGO_BASE.find(i => i.nombre === 'Vaquita de San Antonio'), an = CATALOGO_BASE.find(i => i.nombre === 'Anillo de la vaquita de San Antonio');
   const Sr = fichaBotonera({inventario: [{...structuredClone(an), id: 'av', equipado: true}]});
+  // En la góndola de toda tienda (es un clásico, como la Polilla) y entre los esenciales de la tienda de inicio.
+  const catT = CATALOGO_BASE.filter(GeneradorTiendas.publicable), amb = GeneradorTiendas.generar({tamano: 'ambulante', nivel: 1, catalogo: catT});
+  const enGondola = amb.garantizados.includes(it.id) && GeneradorTiendas.seccionDe(it) === 'gondola', enInicio = GeneradorTiendas.inicio({catalogo: CATALOGO_BASE.filter(i => !i.archivo)}).esenciales.includes(it.id);
   igual([sinVeneno1, seFue, veneno2, propioEntra, bufInmune, armadura, creep, creepPropio, anillo, !!a1, a2, invOk,
     !!it && it.consumible && it.legacy && it.efectoNombre, GeneradorTiendas.CONSUMIBLES_ESENCIALES.includes('Vaquita de San Antonio'),
-    !!an && an.tier, num(FichaCalculo.calcular(Sr).final.vaquita), FichaResumen.resumen(Sr, {}).vaquita],
-    [true, true, true, true, true, true, true, true, true, true, null, true, 'Vaquita de San Antonio', true, 'Buena Calidad', 1, 1]);
+    !!an && an.tier, num(FichaCalculo.calcular(Sr).final.vaquita), FichaResumen.resumen(Sr, {}).vaquita, enGondola, enInicio],
+    [true, true, true, true, true, true, true, true, true, true, null, true, 'Vaquita de San Antonio', true, 'Buena Calidad', 1, 1, true, true]);
 });
 prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE escudo, no una pieza al azar', () => {
   const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};

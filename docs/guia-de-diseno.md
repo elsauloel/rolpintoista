@@ -398,3 +398,15 @@ entrar y al pasar la ronda adentro; la nube se expande antes (los Pedos desde qu
 quien creó la zona no se tira sola** (dueño: «la tirada que sacó 9 apareció sola, yo controlando a Larry nunca apreté el botón»): en cada duelo la
 tira con su botón quien lo maneja (el jugador; el GM por un creep), con los dados y la Mesa; si no está, el GM la tira a mano. En la Nube tóxica,
 el envenenado sigue igual: la nube no le vuelve a tirar, le suma 1 stack (vtt-hexgrid/js/112-zona-duelo.js).
+
+**🐞 Vaquita de San Antonio: el primer estado malo que te pone otro no entra** (dueño, 2026-11-10: «parecido a la polilla… algún ítem que
+revolotee alrededor del token… mientras lo tengas activo, el primer debuff que te entre se cancela automáticamente»). Dos formas: el **consumible**
+(Raro, 60; clásico de la góndola —`legacy`, como la Polilla— y esencial de la tienda de inicio), que queda hasta que espanta algo; y el **Anillo de
+la vaquita de San Antonio** (Buena, 160), que pone una vaquita al empezar cada combate (se va al terminarlo). Reglas: cuenta solo un estado **malo**
+(polaridad debuff: Veneno, Sangrado, Stun, Sentado, Armadura rota —en un personaje, antes de tocar las piezas—…), nunca el daño; **solo lo que
+viene de otro** (un golpe, una habilidad, una zona, una trampa, un aura): lo que uno se pone a sí mismo (la Guardia baja de una habilidad propia,
+un consumible, la Ejecución propia sobre uno), el editor y el «+ Estado» a mano no la gastan; **las inmunidades van primero** (si ya era inmune, la
+vaquita sigue); si llegan dos en el mismo golpe, solo cancela el primero; con anillo y consumible, **se gasta primero la del anillo**. Se avisa en la
+Mesa («🐞 … la vaquita de San Antonio espantó X») y en la Crónica; en el mapa revolotea alrededor del token (más sinuosa y pausada que la Polilla,
+con pausitas) y se va volando cuando espanta algo. Ícono 🐞 alrededor del token. Código: `Combatiente.vaquitaEspanta` (comun/combatiente.js),
+`vtt-hexgrid/js/05` (el dibujo) y `js/25` (el anillo y el aviso).

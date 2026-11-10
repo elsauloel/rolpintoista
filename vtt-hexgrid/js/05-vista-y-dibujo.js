@@ -185,7 +185,7 @@ const semillaDe = id => [...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0)
 function vaquitaRevolotea(est){
   return !!(est && Array.isArray(est.estados) && est.estados.some(e => Combatiente.esVaquita(e)));
 }
-const vaquitaVista = new Map(), vaquitaVuelos = new Map(), VAQUITA_VUELO_MS = 1600;
+const vaquitaVista = new Map(), vaquitaVuelos = new Map(), VAQUITA_VUELO_MS = 2200;
 function dibujarVaquita(x, y, rad, z, semilla, vuelo){
   const s = performance.now() / 1000 + semilla + 0.5;
   let px, py, qx, qy, alfa = 1;

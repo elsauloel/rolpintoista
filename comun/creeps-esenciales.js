@@ -377,6 +377,9 @@
   esencial({...S2, nivel: 3, atrib: [12, 8, 7, 8, 4],   // (aprobado 2026-11-10: Redoble de tambores; el estandarte, de Buena: el Estandarte de la vanguardia, creado ese día)
     equipo: ['Lanza corta', 'Estandarte de la vanguardia', 'Chaleco de cuero', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
     habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores'], pasivas: ['Marcar el ritmo']});
+  esencial({...S2, nivel: 4, atrib: [13, 8, 8, 9, 4],   // (aprobado 2026-11-10: Arenga, Voluntad de hierro; el chaleco, de Buena: el Peto de cuero de oficial)
+    equipo: ['Lanza corta', 'Estandarte de la vanguardia', 'Peto de cuero de oficial', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores', 'Arenga'], pasivas: ['Marcar el ritmo', 'Voluntad de hierro']});
   esencial({linea: 'S3', nombre: 'Armero', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 8, 6, 6, 3],
     equipo: ['Hacha del herrero de pueblo', 'Chaleco de cuero', 'Cofia de anillas sueltas'],
     habilidades: ['Bendecir el arma', 'Arma elemental'], consumibles: ['Pergamino grupal de Furia de Combate'],

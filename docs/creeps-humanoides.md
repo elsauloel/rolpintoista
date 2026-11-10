@@ -402,6 +402,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 4 aprobado y cargado** (dueño, 2026-11-10: «va con el peto»): Con 13 · Fue 8 · Des 9 · Agi 8 · Esp 4; Arenga y la pasiva Voluntad
     de hierro; el chaleco pasa a **Peto de cuero de oficial** (Buena: Def +3, Vida +15, Res. ácido +1, Percepción +1), elegido sobre la Coraza de
     primera línea (ya la lleva el Saltador). Vida 80, No2 8, PdG 10, Daño 8, Def 5, Def.Esp 2, Eva 8, Res.CC 15, Res.Esp 13.
+  - **Nivel 5 aprobado y cargado — línea S2 completa** (dueño, 2026-11-10): Con 14 · Fue 9 · Des 9 · Agi 8 · Esp 5; Estandarte de guerra. El
+    plan pedía la lanza de Buena y no había ninguna lanza Buena de una mano (las Buenas son todas a dos manos, y soltaría el estandarte): el dueño
+    creó la **Lanza del abanderado** (Buena, una mano, 130: Tipo 4, 1 dado, +1 de daño, Alcance +1, PdG +1; la Lanza corta mejorada), que la
+    reemplaza. Vida 85, No2 8, PdG 11, Daño 9, Def 5, Def.Esp 2, Eva 8, Res.CC 16, Res.Esp 14.
 
 - **L3 · Asesino de las sombras · Choque liviano** (boceto aprobado 2026-11-03, dueño: «reemplazá la trapera por el tajo, resto ok»). Acento en
   **Destreza y críticos** (la idea del dueño). Estrategia: desaparece, aparece por la espalda y busca el crítico; va al golpe único (el Sangrador gana

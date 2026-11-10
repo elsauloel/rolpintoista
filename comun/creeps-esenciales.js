@@ -439,6 +439,9 @@
   esencial({...W3, nivel: 3, atrib: [10, 12, 7, 8, 2],   // (aprobado 2026-11-10: Salto aplastante; el Martillo de bola a dos manos suelta el escudo; + Guanteletes de cuero tachonado, pedido del dueño, para no perder tanta Defensa)
     equipo: ['Martillo de bola', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
     habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante'], pasivas: ['Robustez']});
+  esencial({...W3, nivel: 4, atrib: [11, 13, 7, 9, 2],   // (aprobado 2026-11-10: Golpe en la sien en lugar de Golpe brutal —«apostar al crítico con el martillo es una mala inversión»—; Capellina de hierro; Voluntad de hierro)
+    equipo: ['Martillo de bola', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Capellina de hierro', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante', 'Golpe en la sien'], pasivas: ['Robustez', 'Voluntad de hierro']});
 
   esencial({linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 6, 11, 2],   // (2026-11-03, dueño: «vamos a probarlo con la ballesta»)
     equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca'],

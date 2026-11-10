@@ -2295,6 +2295,7 @@ const Combatiente = (() => {
       // ⚔🛡 La tanda del Choque pesado (2026-10-27; vtt-hexgrid/js/78): `sigue` (Dos al hilo: si lo deja en 0, ataca a otro pegado), `arrastra` (Arrastrar:
       // si pega, lo trae hasta quedar pegado), `cargaDerriba` (Carga que derriba: la carrera de hasta N; desde 3, Fuerza + X contra la Res.CC) y `escudoGolpe`
       // (Golpe de escudo: pega con el escudo como un arma de Tipo 10, tantos d10 como su peso + el Dmg).
+      ...(c.sien ? {sien: true} : {}),   // 🔨 Golpe en la sien (2026-11-10): si pega, Fuerza contra Res.CC → Stun 1 turno (vtt-hexgrid/js/78)
       ...(c.sigue ? {sigue: true} : {}), ...(nf(c.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(nf(c.arrastra)))} : {}),
       ...(nf(c.cargaDerriba) > 0 ? {cargaDerriba: Math.min(6, Math.round(nf(c.cargaDerriba)))} : {}), ...(c.escudoGolpe ? {escudoGolpe: true} : {}),
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden

@@ -76,6 +76,7 @@ function choquePesadoResuelto(d){
   const pego = d.resultado === 'pego' || d.resultado === 'mitad';
   if(!pego) return;
   if(num(d.ataque.derriba) > 0) cargaDerribaResuelto(d).catch(err => console.error('Carga que derriba:', err));
+  if(d.ataque.sien) golpeSienResuelto(d).catch(err => console.error('Golpe en la sien:', err));
   if(d.ataque.sigue) golpeQueSigueResuelto(d).catch(err => console.error('Dos al hilo:', err));
 }
 const choquePesadoHechos = new Set();
@@ -376,6 +377,41 @@ function arrastreZonasMomento(id, d){
   const cuando = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
   if(Date.now() - cuando > 20000 || typeof zonaRevisarEntrada !== 'function') return;
   setTimeout(() => { try{ zonaRevisarEntrada(a.tokenId, a.celdas, 0); }catch(err){ console.error('Arrastrar: las zonas del camino', err); } }, 800);   // (que llegue antes la casilla nueva)
+}
+
+// 🔨 Golpe en la sien (dueño, 2026-11-10; el Martillero nv4): si pegó, su Fuerza contra la Res.CC del golpeado; si no le llega, Stun 1 turno (empate: no).
+// Las inmunidades (Inmunidad a CC, Invulnerable, Protección de jefe) las aplica la regla común (EstadosAplicar / la ficha del dueño). Mismo camino que la
+// Carga que derriba: las dos tiradas a la vista en la Mesa (con los dados) y el aviso en la Crónica; si no se puede tirar, ✋ a mano.
+async function golpeSienResuelto(d){
+  if(!choquePesadoUnaVez(d, 'sien')) return;
+  const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId);
+  const sc = ta ? creepPrivadoDe(ta.fichaId) : null;
+  if(!t || !sc) return;
+  const nom = nombreDe(ta), obj = nombreDe(t);
+  const rf = Combatiente.tirarStat(CreepCalculo.statValor(sc, 'fue'), sc.estados, 'fue');
+  const rr = Combatiente.tirarStat(trampaValorStat(t, 'rescc'), confusionEstadosDe(t), 'rescc');
+  if(!rf || !rr){ mesaLinea(`🔨 ${nom} le dio en la sien a ${obj}: ✋ tirá a mano su Fuerza contra la Res.CC de ${obj} (si no le llega, Stun 1 turno)`, 'alerta-roja'); return; }
+  mesaPublicar(`🔨 ${nom} · Golpe en la sien · Fuerza`, {...rf, quien: nom, desde: 'gm'});
+  mesaPublicar(`${obj} · Res.CC (para no quedar aturdido)`, {...rr, quien: obj, ...(t.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(t.fichaId).split(SEP_INVOCACION)[0]})});
+  const pierde = rr.total < rf.total;
+  let frena = '';
+  if(pierde){
+    try{
+      if(t.tipo === 'creep'){
+        let r = null;
+        await modificarCreep(String(t.fichaId), c => { r = EstadosAplicar.aplicarACreep(c, {nombre: 'Stun', turnos: 1}); return {}; });
+        if(r && !r.ok) frena = r.motivo || 'no le hace nada';
+      }else{
+        try{ frena = Combatiente.inmunidad(structuredClone(((vinculo(t) || {}).resumen || {}).estados || []), EstadosAplicar.componer({nombre: 'Stun', turnos: 1}), null) || ''; }catch(e){ frena = ''; }
+        if(!frena){ const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: (f && f.duenoUid) || t.duenoUid, spec: {nombre: 'Stun', turnos: 1}, origen: `${nom} · Golpe en la sien`}); }
+      }
+    }catch(err){ console.error('Golpe en la sien: no se pudo aturdir', err); mesaLinea(`🔨 ${obj} queda con Stun 1 turno (✋ ponéselo a mano: no se pudo solo)`, 'alerta-roja'); }
+  }
+  if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
+  const fin = !pierde ? `${obj} aguanta el golpe y sigue entero` : frena ? `${obj} no llegó, pero no le hace nada (${frena})` : `${obj} queda con Stun 1 turno (sin No2 ese turno)`;
+  const txt = `${nom} le da en la sien a ${obj}: Fuerza ${rf.total} contra su Res.CC ${rr.total} → ${fin}.`;
+  mesaLinea(`🔨 ${txt}`, 'recordatorio');
+  momentoAbrir({tipo: 'sien', icono: '🔨', titulo: `${nom}: Golpe en la sien`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...(t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {})}});
 }
 
 // ⚖ Carga que derriba (dueño, 2026-10-27): si corrió 3 o más y pegó, Fuerza + X contra la Res.CC; si gana, Sentado (empate: no cae).

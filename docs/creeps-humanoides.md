@@ -775,6 +775,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Martillo de bola** (Buena, dos manos, 2 dados, Derribar 25 %) en lugar del martillo y el escudo; + **Guanteletes de cuero tachonado** (Def +1,
   Def. especial +1): Def 6, Def. especial 1, Bloqueo 12, Parry 8. Habilidad nueva: **Salto aplastante**. **Cargado** (2026-11-10).
   (**Golpe que sigue pasa a llamarse «Dos al hilo»**, dueño 2026-11-10.)
+  Martillo de bola: Parry +1 y Bloqueo +1 (dueño, 2026-11-10): el nv3 queda con Parry 9 y Bloqueo 13.
+  **Nivel 4 aprobado** (dueño, 2026-11-10: «golpe en la sien me gusta»): **Golpe en la sien** en lugar de Golpe brutal («apostar al crítico con el
+  martillo es una mala inversión… con destreza 9 es prácticamente imposible hacer crítico»). Fue 13 · Con 11 · Des 9 · Agi 7 · Esp 2, vida 60, 7 No2;
+  **Capellina de hierro** (Buena) en lugar del Casco de cuero endurecido; pasiva **Voluntad de hierro** (+2 Res.CC): Def 7, Def. especial 1, PdG 9,
+  Dmg 13, Bloqueo 14, Parry 10, Res.CC 14. Golpe en la sien (cooldown 4, lenta): un ataque con su arma; si pega, su Fuerza contra la Res.CC del
+  golpeado → Stun 1 turno (el jefe es inmune). **Cargado** (2026-11-10).
 
 - **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
   busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):

@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261110dah"></script>
+<script src="combatiente.js?v=20261110sien"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261109triste"></script>
+<script src="duelo.js?v=20261110sien"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,8 +123,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110dah"></script>
-<script src="creeps-esenciales.js?v=20261110hilo"></script>
+<script src="skills-creep-base.js?v=20261110sien"></script>
+<script src="creeps-esenciales.js?v=20261110sien"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6742,6 +6742,14 @@ prueba('⚖ Carga que derriba, Arrastrar y Dos al hilo (2026-10-27): lo que llev
   const c = CreepAcciones.ataqueDeHab(sc, chp('Carga que derriba')), a = CreepAcciones.ataqueDeHab(sc, chp('Arrastrar')), g = CreepAcciones.ataqueDeHab(sc, chp('Dos al hilo'));
   igual([c.embestidaHab, c.cargaDerriba, c.mods.pdg, a.arrastra, a.alcance, a.mods.pdg, g.sigue, g.mods.fijo], [true, 4, 0, 3, 3, 0, true, 2]);   // 🪝 Arrastrar ya no pega (2026-11-04): sin +2 en el arma
 });
+prueba('🔨 Golpe en la sien (2026-11-10): un ataque que lleva `sien` al duelo (si pega, Fuerza contra Res.CC → Stun 1 turno); el jefe es inmune al Stun', () => {
+  const sc = creepPrueba(), g = CreepAcciones.ataqueDeHab(sc, chp('Golpe en la sien'));
+  const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Golpe en la sien');
+  const jefe = {...creepPrueba(), jefe: true, estados: []};
+  igual([g.sien, h.datos.cd, /Stun 1 turno/.test(h.detalle), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Aturdir'),
+    EstadosAplicar.aplicarACreep(jefe, {nombre: 'Stun', turnos: 1}).ok, EstadosAplicar.aplicarACreep(creepPrueba(), {nombre: 'Stun', turnos: 1}).ok],
+    [true, 4, true, true, false, true]);
+});
 prueba('🪝 Una habilidad que pega con el arma elige el arma aunque cueste No2 fijos; Arrastrar ya no pega y no la pide (2026-11-04)', () => {
   const pool = CLASES_SKILLS.flatMap(c => c.habilidades || []);
   const base = pool.find(x => x.id === 'tanque-arrastrar');
@@ -6985,7 +6993,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,D22,D23,D24,D25,W32,W33,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,D22,D23,D24,D25,W32,W33,W34,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -7001,6 +7009,9 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
   const w33 = d('Martillero', 3);   // (W3 nv3, 2026-11-10: Martillo de bola, Salto aplastante, Guanteletes de cuero tachonado)
   igual([w33.hpMax, C.nitrosMax(w33), C.defensaEfectiva(w33), C.armadmgEfectiva(w33), C.statValor(w33, 'dmg'), C.statValor(w33, 'parry'), w33.habilidades.length],
     [55, 7, 6, 1, 12, 9, 4]);   // (Parry 9: el Martillo de bola suma Parry +1 y Bloqueo +1, dueño 2026-11-10)
+  const w34 = d('Martillero', 4);   // (W3 nv4, 2026-11-10: Golpe en la sien en lugar de Golpe brutal; Capellina de hierro; Voluntad de hierro)
+  igual([w34.hpMax, C.nitrosMax(w34), C.defensaEfectiva(w34), C.armadmgEfectiva(w34), C.statValor(w34, 'pdg'), C.statValor(w34, 'dmg'), C.statValor(w34, 'bloqueo'), C.statValor(w34, 'parry'), C.statValor(w34, 'rescc'), w34.habilidades.map(h => h.nombre).join()],
+    [60, 7, 7, 1, 9, 13, 14, 10, 14, 'Puño de roca,Pisotón,Dos al hilo,Salto aplastante,Golpe en la sien']);
   const l25 = d('Envenenador', 5);   // (L2 nv5, 2026-11-07: fuerte a propósito)
   igual([l25.hpMax, C.nitrosMax(l25), C.statValor(l25, 'pdg'), C.statValor(l25, 'dmg'), C.statValor(l25, 'eva'), C.statValor(l25, 'ini'), C.statValor(l25, 'mov'), l25.habilidades.length, l25.equipo.length],
     [50, 12, 15, 7, 15, 12, 12, 6, 6]);

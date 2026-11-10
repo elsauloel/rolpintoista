@@ -2524,3 +2524,28 @@ Los cinco niveles agregados como el GM; respaldo antes y restaurado después; la
 - Notas (no se tocaron):
   - El paso «Lo que le deja», antes del ▶ Seguir, anuncia el estado también a un Invulnerable (en un creep igual); recién al seguir dice que no le hace nada.
   - Res.CC de los personajes de prueba (1d6+1) contra 12 o 13: casi imposible de resistir el Abrojos y el Polvo; es el diseño, a mirar en mesa.
+
+## ✅ Cola 33 y 34 · Atacar saca del Sigilo · Percepción aumentada sin punto ciego (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Respaldo antes y restaurado después. GM, J1 y J2 con clics. Para que nadie lo viera, el Capataz se dio vuelta y después se alejó.
+- **33, un personaje (pantalla de J2):** Bizzante, con Sigilo, detrás del Goblin rompehuesos, atacó con el Machete. Al declararlo, el duelo
+  dijo «🗡 por la espalda: desde el sigilo, la defensa vale 1». En ese momento Bizzante ya no estaba en Sigilo, sin Marcado, y la Mesa dijo
+  «🕶 Bizzante (copia) atacó y salió del sigilo». La Evasión del goblin salió 2 y contó 1: «Evasión (lo sorprendieron por la espalda: vale 1)»,
+  PdG 6 contra 1. Captura `cola-33-1-pj-ataca-desde-sigilo`.
+- **33, un creep (pantalla del GM):** la Rata de la grieta, en Sigilo, detrás de Bizzante, atacó con sus Dientes. Pasó lo mismo: «la defensa
+  vale 1» en el duelo, la Rata salió del sigilo al declarar y la Mesa dijo «🕶 Rata de la grieta atacó y salió del sigilo». La Evasión de
+  Bizzante salió 8 y contó 1: PdG 13 contra 1, doble crítico. Captura `cola-33-3-creep-ataca-desde-sigilo`.
+- **33, no probado:** el robo en sigilo (no tiene que sacarlo) y el giro (solo el primer rival lleva el bono).
+- **34, sin la pasiva:** Rockardo (J1), en Sigilo, caminó con un arrastre hasta la casilla de atrás del Goblin rompehuesos y no hubo aviso:
+  la espalda sigue siendo punto ciego. Captura `cola-34-1-sin-pasiva-espalda-ciega`.
+- **34, con la pasiva:** se le sumó «Percepción aumentada» al goblin. La pantalla de J1 la ve en la tarjeta pública, así que la casilla de atrás
+  pasó a ser zona de alerta. El mismo paseo dio «⚠ Hace falta una tirada de percepción» en la Mesa, y la casilla de atrás se vio pintada de
+  alerta. Captura `cola-34-2-con-pasiva-pide-tirada`.
+- **34, Paso ligero** (sin sigilo, contra el goblin con Percepción aumentada): sin Paso ligero, al quedar a 3 casillas por la espalda, el GM
+  recibe «oye pasos… ¿Se da vuelta?», y el bono por la espalda es +1. Con Paso ligero no hay oferta, ni a 3 casillas ni pegado, y el bono (la cuenta del mapa) es
+  +2. La pasiva no cambia nada de esto.
+- **34, no probado:** un personaje o una invocación con la pasiva. Se probó solo con un creep.
+- Notas:
+  - Las copias de personajes de «Claude · pruebas» las controla el GM («🎮»): las tiradas del duelo de Bizzante las hizo la pantalla del GM.
+    Sacar del sigilo lo hace la pantalla que crea el ataque, y fue la de J2.
+  - Al moverlos para la prueba, Larry quedó en el aura del Capataz y le dio Miedo. Volvió todo con el respaldo.

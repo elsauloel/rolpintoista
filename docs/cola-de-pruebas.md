@@ -15,8 +15,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-33. [ ] **Atacar saca del Sigilo (después de aplicar el bono de atacar desde el sigilo)** (2026-11-09, dueño: «claro, atacar lo saca del sigilo»): un personaje y un creep en sigilo atacan (arma, habilidad de ataque, disparo, hechizo o varita a un rival): el duelo tiene el bono de atacar desde el sigilo y, apenas se declara, el atacante sale del sigilo (aviso en la Mesa, sin Marcado). El robo en sigilo no lo saca. Un giro: solo el primer rival lleva el bono.
-34. [ ] **Percepción aumentada: sin punto ciego en la espalda para el sigilo** (2026-11-09): un token en sigilo pegado a la espalda de alguien con la pasiva le da la tirada de detección (la casilla de atrás cuenta como zona de alerta); sin la pasiva, sigue siendo punto ciego. Probar con un personaje, un creep y una invocación.
 35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
 36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
 37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
@@ -25,6 +23,13 @@ Cada línea nueva que se termine de diseñar se suma al final.
 40. [ ] **Línea D2 · Tóxico, niveles 1 a 5.**
 
 ## Hechas
+
+- [x] **33 · Atacar saca del Sigilo** (2026-11-10): Bizzante (jugador) y una Rata (GM) atacaron desde el sigilo por la espalda: el duelo dijo
+  «desde el sigilo, la defensa vale 1» (Evasión 2 → contó 1; 8 → 1), apenas se declaró salieron del sigilo, sin Marcado, y la Mesa dijo
+  «🕶 … atacó y salió del sigilo». Bien. No probado: el robo y el giro. Detalle en `pruebas-en-el-mapa.md`.
+- [x] **34 · Percepción aumentada: sin punto ciego en la espalda** (2026-11-10): con un creep. Sin la pasiva, Rockardo en sigilo llegó a su
+  espalda sin aviso; con ella, «⚠ Hace falta una tirada de percepción» y la casilla de atrás pintada de alerta (también en la pantalla del jugador).
+  Paso ligero sigue igual (no le ofrece darse vuelta, +2 por la espalda). No probado: un personaje o una invocación con la pasiva. Detalle en `pruebas-en-el-mapa.md`.
 
 - [x] **32 · Línea L4 · Hostigador con trampas, niveles 1 a 5** (2026-11-10): números iguales a la prueba de niveles; cada habilidad, la Red de caza
   y las Botas del desertor usadas una vez en el mapa, sin errores. **Arreglado:** con un personaje Invulnerable, el cartel de la trampa ahora dice

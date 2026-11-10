@@ -2584,3 +2584,38 @@ Respaldo antes y restaurado después. Los cinco niveles agregados como lo hace e
 - Notas (no se tocaron):
   - Un ataque cuesta más No2 si ya atacó en el turno (2, después 4): es la regla de siempre.
   - Como en las pruebas anteriores, las copias de los personajes las controla el GM (🎮): la defensa de Bizzante la tiró la pantalla del GM.
+
+## ✅ Cola 36 y 37 · Orbe de resguardo mayor · Línea M2 · Mago de escarcha, niveles 1 a 5 (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Respaldo antes y restaurado después. Los cinco niveles agregados como lo hace el GM (GM Tools), renombrados «Mago 1» a «Mago 5»; todos en modo SP.
+- **Números:** nv1 vida 45, No2 5, SP 36, PdG.Esp 12, Ef.Esp 12, Def 2, Def esp 1, Eva 5 · nv2 50, 5, 39, 13, 14 (Potencia especial), 3, 1, 6 ·
+  nv3 50, 6, 45, 15, 16, 1, 2, 7 · nv4 55, 6, 51, 17, 18, 4, 1, 7, Res.Esp 11 (Temple mágico), Res.Mt 17 · nv5 55, 7, 57, 19, 20, 5, 3, 8, Res.Esp 12,
+  Res.Mt 19, Res.CC 11. Habilidades, pasivas, equipo y la Poción de SP menor de cada nivel, los aprobados.
+- **Orbe de resguardo mayor (cola 36):** Mago 3 ganó el PdG.Esp del Dardo helado: Mesa «🔮 Orbe de resguardo mayor: Mago 3 recibe un escudo de 3 hasta
+  su próximo turno» y el estado «Escudo especial 🛡3/3, 1 turno». Con 5 de daño: −1 de Defensa, el escudo se comió 3, 1 a la vida (50 → 49) y el
+  escudo desapareció. También salió en Mago 4 y Mago 5 al ganar sus tiradas. Captura `cola-36-1-orbe-escudo`.
+  **Arreglado:** la marca «una vez por turno» vivía solo en la memoria de la pantalla del GM: al recargarla, otro PdG.Esp ganado en el mismo turno
+  daba un segundo escudo. Ahora queda también en el creep (`resguardoTurno`, js/53): con dos pantallas del GM a la vez, salió un solo escudo.
+- **Dardo helado:** 2d6 + ¼ Ef.Esp de hielo + Escarcha (1, y una más cada 5 de daño: a Bizzante, 11 de daño → Escarcha ×3).
+  **Arreglado:** el +2 del **Anillo de escarcha** solo lo sumaba la pantalla del GM; la del jugador golpeado mostraba y aplicaba 2 menos (10 en vez de
+  12). Ahora el anillo va a lo público del creep (`CreepCalculo.tarjetaPublica`, `masDanoElem`) y lo lee cualquier pantalla (js/53). La vista previa
+  ya no repite la línea del anillo en la Mesa. Captura `cola-37-1-anillo-jugador` (la pantalla de Larry: «+ el anillo de hielo 2»).
+- **Hálito polar** (Mago 1): cono al frente, una sola tirada para todos; 2d4 + 3 (¼ de 12) + el anillo, y Escarcha. Rockardo, Invulnerable, sin nada.
+- **Varita de la ventisca** (Mago 2): flor de diámetro 3, 4 SP; 2d4 directo + el anillo; el suelo congelado apareció bajo los pies (Agilidad contra el
+  Ef.Esp o Sentado). **Arreglado:** con el GM con 🎮 el control de Bizzante, la Agilidad se pedía dos veces (en la pantalla del dueño y en la del
+  GM); ahora la zona que aparece y el Mantenimiento los resuelve una sola pantalla (`zonaResuelvoYo`, js/08). Probado con la Lluvia: una sola tirada.
+- **Parpadeo** (Mago 2): 4 SP, salto de 3 casillas a la elegida; el televisor que se apaga (el punto blanco) en la casilla de salida. Cancelar al
+  elegir la casilla devolvió los 4 SP. Fuera del orden de turnos cobra lo normal (el doble es solo en turno ajeno). Captura `cola-37-2-parpadeo-tv`.
+- **Prisión de hielo** (Mago 3 a Larry): 2d4 + el anillo e Inmovilizado 2 turnos. Al empezar el turno de Larry: «intenta zafarse… Fuerza contra 16;
+  Bizzante puede sumar su Fuerza (1 No2)»; tiró 1 contra 16 y siguió atrapado. Capturas `cola-37-3-prision-romper`, `cola-37-3-prision-resultado`.
+  (Para el diseño: la Fuerza de un personaje común contra el Ef.Esp 16 del nv3 casi nunca alcanza.)
+- **Ráfaga de viento** (Mago 4): cono, 1d6 arcano (sin el anillo, no es hielo), empujón de 3 y Sentado; Larry chocó contra la Rata y no avanzó
+  todo; despejó la niebla del cono.
+- **Lluvia de escarcha** (Mago 5): diámetro 5, 19 SP (= su Especial), una sola tirada, 2d4 + 5 + el anillo; suelo congelado 2 turnos y después
+  charco de agua. **Arreglado:** el daño solo les llegaba a los rivales; ahora también a sus aliados, como dice el texto (le pegó a la Rata de la
+  grieta 2); las guardadas reciben la marca al normalizarse. **Arreglado:** al derretirse, el aviso «El hielo se derrite» se cortaba con un error
+  (una constante que ya no existe); el charco se creaba igual. Capturas `cola-37-4-lluvia-apuntar`, `cola-37-4-lluvia-cae`, `cola-37-5-charco`.
+- Sin probar en el mapa: la **Poción de SP menor** y el **Chaleco de kevlar** contra un disparo (sí sus números; el Kevlar ya se probó en la línea R2).
+  El Yelmo de bronce con runas, la Potencia especial y el Temple mágico, en los números.
+- Notas: el Escudo especial del Orbe se va al empezar el turno del creep; si el creep no está en el orden de turnos queda hasta que entra.
+  Las copias de los personajes las controla el GM (🎮), como en las pruebas anteriores. Pruebas nuevas en `comun/pruebas.html` (840 en verde).

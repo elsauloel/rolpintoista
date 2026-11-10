@@ -115,6 +115,12 @@ obstáculo entre medio, alcanza. Es como un swing, pero en vez de dar toda la vu
 pero más leve»). Como mucho, dos candidatos. Salida a mano: «✋ Elegir a mano» (cualquier rival pegado, con el aviso de
 que es fuera de la regla) y «No, se queda». Código: `Combatiente.dosAlHiloSiguientes` (la cuenta, con pruebas) y `dosAlHiloCandidatos` /
 `dosAlHiloElegirEnMapa` (js/78).
+**Se ve como el Barrido** (dueño, 2026-11-10: «que siga la misma lógica que el barrido: late un token, se despliega el menú, se resuelve, se repliega;
+late el siguiente token, se despliega, se resuelve, se repliega»): el primer duelo late en su token y se despliega; al resolverse (tras la pausa del
+Barrido, 1,4 s) se repliega a su token; se elige el segundo en el mapa y su duelo late en ese token y se despliega desde ahí, igual que un golpe del
+giro (`barridoUnGolpe`, js/108: sin pasar por las Acciones del creep); al cerrarlo se repliega. **Costo, decidido** (dueño, 2026-11-10, «la opción 1
+es la correcta»): queda como está — los No2 de un solo ataque, cooldown 2 (2 SP) y +2 al daño en los dos golpes; el Barrido, cooldown 3. Es más
+barata porque alcanza a dos como mucho.
 
 **🌀 Barrido, Coletazo y Remolino: un ataque común por cada rival** (dueño, 2026-11-08: «a fines prácticos es como si fueran múltiples ataques
 continuados uno de otro y van a aplicar las mismas reglas de un ataque. Si esquiva, esquiva, si pega, pega… solo que el contexto del ataque, el inicio,

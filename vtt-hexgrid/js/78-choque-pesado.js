@@ -188,11 +188,13 @@ async function golpeQueSigueResuelto(d){
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
   const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
   if(atq && atq.sigue) delete atq.sigue;
-  abrirAcciones(sc.id);
-  for(let i = 0; i < 40 && !(ac && ac.creepId === sc.id); i++) await new Promise(r => setTimeout(r, 150));
-  if(!(ac && ac.creepId === sc.id)){ toast('Dos al hilo: no se pudieron abrir las Acciones del creep — atacalo a mano'); return; }
-  ac.objetivoFijo = elegido;
-  acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
+  // 🌀 Como un golpe del Barrido (dueño, 2026-11-10: «que siga la misma lógica que el barrido: late un token, se despliega el menú, se resuelve, se
+  // repliega; late el siguiente token, se despliega, se resuelve, se repliega»): el duelo del segundo se arma directo sobre el elegido, sin abrir las
+  // Acciones del creep (barridoUnGolpe, js/108); el cuadro late en su token y se despliega desde ahí (comun/duelo.js animarEntrada). El primero
+  // ya se replegó a su token antes de elegir (Duelo.apartar, arriba).
+  const r = await barridoUnGolpe({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}}, atq, elegido);
+  if(r === 'cancelado') mesaLinea(`✖ Se canceló el segundo golpe de Dos al hilo`, 'recordatorio');
+  // El último, como el del Barrido: queda a la vista con su resultado y se repliega a su token al cerrarlo («Terminar duelo»).
 }
 
 // 🪝 El gancho va como un proyectil (dueño, 2026-10-30: «tiene que haber un camino libre. Si hay cualquier obstáculo entre medio, no se puede tirar

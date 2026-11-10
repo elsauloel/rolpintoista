@@ -302,6 +302,22 @@ Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resisten
   explota al terminar) y los que además dan otra cosa (mods, Invulnerable, el Escudo elemental). Los de los anillos de descanso vuelven en el
   próximo descanso.
 
+## Trampas: las tiradas no son automáticas — cada uno tira lo suyo (dueño, 2026-11-10)
+
+«Larry activa la trampa, y al usuario que lo controla le debe aparecer la notificación "pisaste la trampa X, tirá tal cosa para resistir tal
+efecto". Las tiradas no deben estar automatizadas. Lo mismo para el daño de las trampas explosivas: al activarse, el controlador de la trampa debe
+tirar los dados del daño.» Vale para **todas** las trampas (del catálogo, de habilidades de creep, de jugador y de invocaciones), en
+`vtt-hexgrid/js/19-trampa-paso-a-paso.js`:
+- **Lo de la víctima** (resistir o esquivar, Inamovible, adónde sale despedido, aplicar el daño, lo que le deja) lo resuelve **quien la maneja**
+  (su dueño, quien tiene 🎮 el control, el GM para un creep): le sale «<personaje>: pisaste la trampa «X»» con «🎲 Tirar <stat> para resistir <efecto>».
+- **Lo de la trampa** (los dados del daño, cuánto SP chupa) lo tira **quien la puso** (el jugador; el GM con las de los creeps): «Tu trampa «X»
+  agarró a <víctima>: tirá el daño». Mientras tanto, la víctima ve «⏳ <quien la puso> tira el daño de la trampa…».
+- Cada tirada tiene **«✋ Resolver a mano»** (la mesa escribe lo que salió y la trampa sigue con ese número); aplicar el daño tiene «✋ Lo aplica la mesa».
+- **Si la pantalla que tiene que tirar no está** (no avisó que vio el paso en 6 s), al GM le sale el cartel para tirar por ella («· tirá por …»).
+  Si está pero tarda, no se la apura: queda «🎲 Tirar por él» en la Crónica. Una transacción evita que se tire dos veces.
+- **Varias víctimas** (trampa de área): un cartel por víctima; en la misma pantalla, de a uno, en el orden en que los alcanzó (primero quien la pisó).
+  Cuando el paso que sigue ya no es de esa pantalla (p. ej. el GM tiró el daño y ahora lo aplica el jugador), pasa sola a la víctima siguiente.
+
 ## Trampas de área: se disparan en toda su área (dueño, 2026-11-09)
 «Aplicale a todas las trampas la misma regla de la red»: si una trampa hace efecto en un área, **el disparo y el efecto ocupan las mismas casillas**:
 pisar cualquiera de ellas la dispara y alcanza a todos los que estén encima. Primero la Red (Red de caza y Red tendida, `b4e3b4c2`); después el

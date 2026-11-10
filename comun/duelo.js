@@ -881,6 +881,7 @@ const Duelo = (() => {
     if(s.soltar && typeof Combatiente !== 'undefined' && Combatiente.soltarNorm(s.soltar)) o.soltar = Combatiente.soltarNorm(s.soltar);
     if(s.provocaDe){ o.provocaDe = txtCorto(s.provocaDe, 80); o.provocaDeNombre = txtCorto(s.provocaDeNombre, 40); }   // 😤 Provocado por quién (Tirar la bronca, 2026-10-26)
     if(s.miedoDe){ o.miedoDe = txtCorto(s.miedoDe, 80); o.miedoDeNombre = txtCorto(s.miedoDeNombre, 40); }   // 😱 Miedo de quién (el aura espeluznante en el cuadro del duelo, 2026-11-10)
+    if(s.item) o.item = txtCorto(s.item, 64);   // 🛡 la pieza puntual de una Armadura rota (el escudo que paró el disparo; tanda 3 de docs/auditoria-tiradas.md, 2026-11-10)
     return o;
   }
   // 💨 La tabla «según la tirada» de un efecto (los Pedos Tóxicos, 2026-11-09, vtt-hexgrid/js/112): desde N → un estado, o «cae» (la vida a 0).
@@ -1670,6 +1671,9 @@ const Duelo = (() => {
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);
       const frenados = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && noEntro(ef)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);
       if(frenados.length) partes.push(`No le entró ${frenados.join(', ')} (${String((d.efectos.find(ef => ef && noEntro(ef)) || {}).nota).replace(/^no entró:\s*/i, '').replace(/\s*\(.*$/, '')}).`);
+      // 🎲 Una chance que no salió (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10: el duelo de chances decía «Funcionó» aunque el dado fallara)
+      const noSalio = (d.efectos || []).filter(ef => ef && ef.res && !ef.res.exito && !ef.omitido).map(ef => ef.nombre).filter(Boolean);
+      if(!partes.length && noSalio.length) partes.push(`No le entró ${noSalio.join(', ')}: no salió en el dado.`);
       if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
       fin = partes.join(' ');
     }

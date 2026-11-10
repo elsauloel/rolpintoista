@@ -620,13 +620,26 @@ async function escudoQuemarYa(pid, vid, motivo, respaldo){
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0 && !resistio){
         if(idE && idE.estado){ await dueloIdentidadEstado(d, el, idE).catch(err => console.error('Escudo: la identidad del elemento', err)); if(idE.estado.nombre) estadosV.push(idE.estado.nombre); }
         if(ef.porDano){ const pd = await dueloPorDano(d, recibido, ef.porDano).catch(err => { console.error('Escudo: el estado por daño', err); return null; }); if(pd){ partes.push(`${pd.estado} ×${pd.stacks}`); estadosV.push(pd.estado); } }
-        // ⚡ La Parálisis del eléctrico (la del Arma eléctrica: su chance, a la vista).
-        for(const ch of efs.filter(x => x && !x.danoMagico && num(x.caras) > 0)){
-          const caras = Math.round(num(ch.caras)), exitos = Math.round(num(ch.exitos)) || 1, sale = 1 + Math.floor(Math.random() * caras), entra = sale > caras - exitos;
-          partes.push(`${ch.nombre} ${Math.round(exitos * 100 / caras)} % (1d${caras}: ${sale}) → ${entra ? 'entra' : 'no'}`);
-          notasV.push(`${ch.nombre} ${Math.round(exitos * 100 / caras)} %: salió ${sale} en 1d${caras} → ${entra ? 'entra' : 'no entra'}.`);
-          if(entra){ const ra = await dueloAplicarEfecto(d, {nombre: ch.nombre, spec: {nombre: ch.nombre, ...(num(ch.turnos) > 0 ? {turnos: num(ch.turnos)} : {})}}).catch(err => { console.error('Escudo: la Parálisis', err); return null; });
-            if(!(ra && !ra.manual && /no entró/.test(String(ra.nota || '')))) estadosV.push(ch.nombre); }
+        // ⚡ La Parálisis del eléctrico (la del Arma eléctrica): su chance en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md,
+        // 2026-11-10): la tira con su botón quien maneja al que tiró el escudo (el GM puede tirar por él, o elegir a mano) y entra con el «Aplicar».
+        const chs = efs.filter(x => x && !x.danoMagico && num(x.caras) > 0).map(ch => {
+          const caras = Math.max(1, Math.round(num(ch.caras))), exitos = Math.min(caras, Math.max(1, Math.round(num(ch.exitos)) || 1));
+          return {nombre: ch.nombre, caras, exitos, dado: '', detalle: `${ch.nombre}${num(ch.turnos) > 0 ? ` ${num(ch.turnos)} turno${num(ch.turnos) === 1 ? '' : 's'}` : ''} (el ${def.estado.toLowerCase()}).`,
+            spec: {nombre: ch.nombre, ...(num(ch.turnos) > 0 ? {turnos: num(ch.turnos)} : {})}};
+        });
+        if(chs.length){
+          const pcts = chs.map(ch => `${ch.nombre} ${Math.round(ch.exitos * 100 / ch.caras)} %`).join(', ');
+          const c = typeof chanceDuelo === 'function' ? await chanceDuelo({yo: {ref: String(p.fichaId || ''), tipo: p.tipo, nombre: nombreDe(p), uid: p.duenoUid || ''},
+            deTokenId: pid, aTokenId: vid, esperar: true, nombre: `${def.estado}: ${chs.map(ch => ch.nombre).join(', ')}`.slice(0, 60),
+            detalle: `${quienV} se quemó con el ${def.estado.toLowerCase()} de ${quienP}: ${pcts}. Lo tira quien maneja a ${quienP}.`, efectos: chs}) : {falla: true};
+          if(c && c.d && Array.isArray(c.d.efectos)){
+            for(const e of c.d.efectos){
+              const entra = !!(e && e.res && e.res.exito), sale = e && e.res ? (e.res.manual ? 'a mano' : `salió ${e.res.dado} en 1d${e.caras}`) : 'sin tirar';
+              partes.push(`${e.nombre} ${Math.round(num(e.exitos) * 100 / Math.max(1, num(e.caras)))} % (${sale}) → ${entra ? 'entra' : 'no'}`);
+              notasV.push(`${e.nombre}: ${sale} → ${entra ? 'entra' : 'no entra'}.`);
+              if(entra && !e.omitido && !/no entró/.test(String(e.nota || ''))) estadosV.push(e.nombre);
+            }
+          }else{ partes.push(`${pcts}: queda a mano`); notasV.push(`${pcts}: queda a mano.`); }
         }
       }
     }else partes.push('sin daño');

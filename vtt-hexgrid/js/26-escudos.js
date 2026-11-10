@@ -69,6 +69,18 @@ async function dueloRompeEscudo(d){
   const lista = [...(d.ataque.rompeEscudo || []).map(e => ({...e, de: d.ataque.armaNombre || 'El disparo'})), ...deFlecha];
   if(!lista.length) return;
   const quien = d.defensor.nombre || 'el defensor', escudo = d.defensa.itemNombre || 'el escudo';
+  // 🎲 Con porcentaje, en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10; dueño: «las tiradas las hace el usuario
+  // involucrado»): un duelo de chances que tira con su botón quien disparó (el GM puede tirar por él) y entra con el «Aplicar» (a un personaje, a ese
+  // escudo: `item`, que ahora viaja en el spec del duelo). Los que entran siempre van en el mismo cuadro, sin dado.
+  const tD = tokens.get(d.defensor.tokenId);
+  if(lista.some(e => Math.min(Math.max(1, e.caras), e.exitos) < Math.max(1, e.caras)) && typeof chancesEnSecuencia === 'function'){
+    const alEscudo = !!(tD && tD.tipo === 'pj' && tD.fichaId && !String(tD.fichaId).includes(SEP_INVOCACION));
+    const efectos = lista.map(e => { const caras = Math.max(1, e.caras), exitos = Math.min(caras, e.exitos);
+      return {nombre: `${e.nombre} al escudo`.slice(0, 40), caras, exitos, dado: '', detalle: `${e.de}: ${quien} lo paró con ${escudo}; el escudo se lo come (−${e.stacks} Defensa${alEscudo ? ` y −${e.stacks} durabilidad de ${escudo}` : ''}).`,
+        spec: {nombre: 'Armadura rota', stacks: e.stacks, ...(alEscudo ? {item: d.defensa.itemId || 'escudo'} : {})}}; });
+    chancesEnSecuencia(d, [{tokenId: d.defensor.tokenId, efectos, detalle: `${quien} paró el disparo con ${escudo}: el Romper armadura va al escudo. Lo tira ${d.atacante.nombre}.`}], `${lista[0].de}: al escudo`);
+    return;
+  }
   let stacks = 0;
   for(const e of lista){
     const caras = Math.max(1, e.caras), exitos = Math.min(caras, e.exitos);

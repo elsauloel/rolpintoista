@@ -87,14 +87,23 @@ Espejo, ni la Botella, los anillos, el Orbe salvaje o Sed de sangre de quien lo 
 
 | # | Qué | De quién | Dónde | Hoy | Rec. | Esfuerzo |
 |---|---|---|---|---|---|---|
-| 15 | **Parálisis del Escudo eléctrico** | habilidad | `js/106` l. ~609 | **sale sola** | **B** (la tira el dueño del escudo) | chica |
-| 16 | **Parálisis del rayo en cadena**, en cada salto | habilidad / arma | `js/13` `dueloCadena` l. ~2182, 2196 | **sale sola**, una por salto | **B** (con muchos saltos conviene un botón que tire todas juntas) | media |
-| 17 | **Rayo en el agua**: la chance de cada uno en el charco | superficie | `js/50` `aguaConduceRayo` l. ~812 | **sale sola** | **B** | chica |
-| 18 | **Flecha eléctrica**: la Parálisis del salto | ítem (munición) | `js/33` l. ~99 | **sale sola** | **B** | chica |
-| 19 | **Estado de una zona con chance** (Veneno 50 % de la Varita de miasma) | zona / ítem | `js/08` l. ~777 | **sale sola** | **B** | chica |
-| 20 | **Romper el escudo** (un golpe con Romper armadura parado con el escudo) | regla del arma | `js/26` `dueloRompeEscudo` l. ~76 | **sale sola** (va a la Mesa) | **B** (la tira el atacante, como los otros efectos del arma) | chica |
-| 21 | **Orbe salvaje**: el d6 de qué hace | ítem (talismán) | `js/53` `talSalvajeRodar` l. ~100 | **sale solo** | **B** (lo tira quien lo lleva) | chica |
+| 15 | ✅ hecho (tanda 3) · **Parálisis del Escudo eléctrico** | habilidad | `js/106` l. ~609 | **sale sola** | **B** (la tira el dueño del escudo) | chica |
+| 16 | ✅ hecho (tanda 3) · **Parálisis del rayo en cadena**, en cada salto | habilidad / arma | `js/13` `dueloCadena` l. ~2182, 2196 | **sale sola**, una por salto | **B** (con muchos saltos conviene un botón que tire todas juntas) | media |
+| 17 | ✅ hecho (tanda 3, sin probar en el mapa) · **Rayo en el agua**: la chance de cada uno en el charco | superficie | `js/50` `aguaConduceRayo` l. ~812 | **sale sola** | **B** | chica |
+| 18 | ✅ hecho (tanda 3) · **Flecha eléctrica**: la Parálisis del salto | ítem (munición) | `js/33` l. ~99 | **sale sola** | **B** | chica |
+| 19 | ⏸ espera la revisión del cartel de las zonas (bloque 4): va dentro de ese cartel · **Estado de una zona con chance** (Veneno 50 % de la Varita de miasma) | zona / ítem | `js/08` l. ~777 | **sale sola** | **B** | chica |
+| 20 | ✅ hecho (tanda 3) · **Romper el escudo** (un golpe con Romper armadura parado con el escudo) | regla del arma | `js/26` `dueloRompeEscudo` l. ~76 | **sale sola** (va a la Mesa) | **B** (la tira el atacante, como los otros efectos del arma) | chica |
+| 21 | ✅ ya cumplía (tanda 3 lo confirmó): el d6 sale con el botón del daño de quien ataca, dentro del cuadro del duelo, y se ve ahí y en la Mesa con sus dados; solo queda automático el respaldo raro de un daño tirado fuera del mapa · **Orbe salvaje**: el d6 de qué hace | ítem (talismán) | `js/53` `talSalvajeRodar` l. ~100 | **sale solo** | **B** (lo tira quien lo lleva) | chica |
 | 22 | **Saque rápido**: no pagar No2 al sacar un consumible | ítem / pasiva | `comun/creep-acciones.js` l. ~375 (y la ficha) | **sale sola, sin dados que rueden** | **C**: el dueño lo pidió así el 2026-10-05 («se tira callado y se anuncia en texto») | — |
+
+**Cómo quedó la tanda 3 (2026-11-10):** cada chance es un duelo de habilidad sin oposición que se abre directo en los efectos
+(`chanceDuelo`, `chancesEnSecuencia` en `vtt-hexgrid/js/78-choque-pesado.js`): quien causa el efecto tira «🎲 Tirar el efecto (1dN)» con su
+botón (el GM por un creep o por quien no está; también «✍ Elegir manualmente») y entra con el «Aplicar» de siempre. Varios (los saltos del rayo):
+uno por cada uno, de a uno, sin frenar el daño ni el reporte. A un token oculto no se le abre el cuadro (lo delataría): queda a mano.
+- 15 Escudo eléctrico: después del duelo de resistencia, si no lo resistió, el de la Parálisis (lo tira quien maneja a quien tiró el escudo).
+- 16, 17, 18: un duelo de chances por cada uno al que salta (el agua, con el doble de chance). El reporte del rayo dice «→ en el cuadro del duelo».
+- 20: un duelo «al escudo» que tira quien disparó; a un personaje, a ESE escudo (el `item` ahora viaja en el spec del duelo).
+- De paso: la línea de la Mesa de un duelo de chances que no salió decía «Funcionó»; ahora dice «No le entró …: no salió en el dado».
 
 ## 4 · Carteles propios con botón (no tiran solos, pero no usan el cuadro del duelo)
 

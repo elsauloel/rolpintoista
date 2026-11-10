@@ -866,6 +866,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   (ni Espinas ni Espejo) y `ataque.danoSuelto` (sin la Botella, los anillos, el Orbe salvaje ni Sed de sangre). Lo usan el riesgo de la Varita inestable
   (`dueloRiesgo`, js/13: un duelo sobre sí mismo), el virote que estalla (`virotEstalla`, js/33: uno por afectado, también al errar) y la mordida o el
   agarre que no suelta (`mordidaDano`, js/54: con la Defensa). `yoDeToken(id)` arma el «quien lo causa».
+  **Tanda 3 (2026-11-10), las chances «entra / no entra»:** `chanceDuelo({yo, deTokenId, aTokenId, nombre, detalle, efectos, esperar?})` (js/78) abre un
+  duelo de habilidad sin oposición directo en los efectos (quien causa el efecto tira «🎲 Tirar el efecto (1dN)»; entra con el «Aplicar»), y
+  `chancesEnSecuencia(d, [{tokenId, efectos}], nombre)` hace uno por token, de a uno, sin frenar a quien la llama (un token oculto: a mano). Lo usan la
+  Parálisis del Escudo eléctrico (js/106, después del duelo de resistencia), los saltos del rayo (`dueloCadena` js/13, el agua js/50, la flecha js/33)
+  y Romper armadura contra el escudo (`dueloRompeEscudo` js/26: el `item` del escudo viaja en el spec del duelo, comun/duelo.js `limpiarSpec`).
 
 ## Pendiente (más adelante)
 

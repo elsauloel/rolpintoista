@@ -421,6 +421,38 @@ function danoDuelo({yo, deTokenId, aTokenId, nombre, formula, tipo, fisico, dire
     dano: {formula: String(formula || ''), tipo: tipo || (fisico ? 'físico' : 'arcano'), ignoraDef: !fisico, ...(directo && !fisico ? {directo: true} : {})}};
   return contiendaDuelo({yo, deTokenId, aTokenId, hab, esperar, extra: {secundario: true, danoSuelto: true}});
 }
+/* 🎲 Una chance «entra / no entra» en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10; dueño: «las tiradas las hace
+   el usuario involucrado»): un duelo de habilidad sin oposición que se abre directo en los efectos, con su «🎲 Tirar 1dN» para quien causa el efecto
+   (el GM por un creep, o por quien no está; también «elegir a mano») y el «Aplicar» de siempre. `efectos` en la forma del duelo:
+   [{nombre, caras, exitos, detalle, spec}]. Lo usan la Parálisis del Escudo eléctrico (js/106), los saltos del rayo (js/13 dueloCadena, js/50 el
+   agua, js/33 la flecha) y Romper armadura contra el escudo (js/26). Mismas respuestas que contiendaDuelo. */
+function chanceDuelo({yo, deTokenId, aTokenId, nombre, detalle, efectos, esperar}){
+  const hab = {nombre: String(nombre || 'Efecto').slice(0, 60), objetivo: 'enemigo', tira: null, contra: [], dano: null, efectos: efectos || [],
+    ...(detalle ? {detalle: String(detalle).slice(0, 200)} : {})};
+  return contiendaDuelo({yo, deTokenId, aTokenId, hab, esperar, extra: {secundario: true}});
+}
+/* Varias chances, una por token y de a una (como el Barrido: late, se despliega, se resuelve, se repliega, sigue). `lista`: [{tokenId, efectos,
+   detalle?}]. No frena a quien la llama (el daño ya se aplicó): corre aparte. A un token oculto no se le abre el cuadro (lo delataría): queda a mano. */
+function chancesEnSecuencia(d, lista, nombre){
+  const vivos = (lista || []).filter(x => x && x.tokenId && Array.isArray(x.efectos) && x.efectos.length);
+  if(!vivos.length || !d || !d.atacante) return Promise.resolve([]);
+  const yo = yoDeDuelo(d);
+  return (async () => {
+    const res = [];
+    for(const x of vivos){
+      const t = tokens.get(x.tokenId);
+      if(!t) continue;
+      const pcts = x.efectos.map(e => `${e.nombre} ${Math.round(num(e.exitos) / Math.max(1, num(e.caras)) * 100)} %`).join(', ');
+      if(t.oculto){ try{ mesaLinea(`🎲 ${nombre}: a alguien que no se ve le toca ${pcts} — resolvelo a mano`, 'recordatorio'); }catch(e){} continue; }
+      await contiendaPausa();
+      const c = await chanceDuelo({yo, deTokenId: d.atacante.tokenId, aTokenId: x.tokenId, nombre, detalle: x.detalle || `${pcts}: lo tira ${d.atacante.nombre}.`, efectos: x.efectos, esperar: true});
+      res.push({...x, c});
+    }
+    return res;
+  })().catch(err => { console.error(`${nombre}: las chances`, err); return []; });
+}
+// Lo que entró de un duelo de chances (para el reporte): los nombres de los efectos que funcionaron.
+const chancesEntraron = c => c && c.d && Array.isArray(c.d.efectos) ? c.d.efectos.filter(e => e && e.res && e.res.exito && !e.omitido).map(e => e.nombre) : [];
 // Quien «causa» un daño, desde su token (para danoDuelo).
 const yoDeToken = id => { const t = tokens.get(id); return t ? {ref: String(t.fichaId || ''), tipo: t.tipo === 'creep' ? 'creep' : 'pj', nombre: nombreDe(t), uid: t.duenoUid || ''} : null; };
 // La pausa antes de abrir la contienda que sigue a un ataque: que se alcance a leer el resultado del golpe (como entre los golpes del Barrido).

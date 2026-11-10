@@ -802,19 +802,21 @@ async function aguaConduceRayo(d, t, entro){
   if(cadena.length < 2) return [];
   const hubo = await rayoCadenaAplicar(cadena, {callado: true});
   if(!hubo.length) return [];
-  const lineas = [], estadosDe = {};
+  const lineas = [], estadosDe = {}, lista = [];
+  // 🎲 La Parálisis de cada uno en el charco va en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10): la tira con su
+  // botón quien maneja al atacante (el GM puede tirar por él), de a uno, y entra con el «Aplicar» (chancesEnSecuencia, js/78). En el agua, el doble.
   for(const s of hubo){
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
     let txt = `${nombre}: ${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''}`;
-    for(const ef of (d.efectos || []).filter(e => e && e.nombre === 'Parálisis' && !e.cura)){
+    const efs = (d.efectos || []).filter(e => e && e.nombre === 'Parálisis' && !e.cura).map(ef => {
       const caras = Math.max(1, Math.round(num(ef.caras)) || 1), ex0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
       const exitos = /💧/.test(String(ef.detalle || '')) ? ex0 : Math.min(caras, ex0 * 2);
-      if(Math.floor(Math.random() * caras) >= exitos) continue;
-      try{ const rr = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre}}, ef); txt += ` · Parálisis${rr && rr.manual ? ' (a mano)' : ''}`; if(!(rr && !rr.manual && /no entró/.test(String(rr.nota || '')))) estadosDe[s.id] = ['Parálisis']; }
-      catch(err){ txt += ' · Parálisis (a mano)'; }
-    }
+      return {...ef, caras, exitos, res: null, aplicado: false, aplicar: '', spec: Duelo.specDeEfecto(ef)};
+    });
+    if(efs.length){ lista.push({tokenId: s.id, efectos: efs}); txt += ` · Parálisis ${Math.round(efs[0].exitos * 100 / efs[0].caras)} % (en el cuadro del duelo)`; }
     lineas.push(txt);
   }
+  if(lista.length && typeof chancesEnSecuencia === 'function') chancesEnSecuencia(d, lista, 'El rayo en el agua');
   const resumen = `El golpe eléctrico corre por el agua del charco (cada uno, la mitad del anterior × 1,5): ${lineas.join(' → ')}`;
   const desdes = [tid, ...hubo.map(h => h.id)];
   if(typeof rayoFxPublicar === 'function'){   // 🔢 (2026-11-09) el «−X», «¡Parálisis!» y el reporte (js/110)

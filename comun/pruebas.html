@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261110t1"></script>
+<script src="combatiente.js?v=20261110t3"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261110t2"></script>
+<script src="duelo.js?v=20261110t3b"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261110t1"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110t2"></script>
+<script src="skills-creep-base.js?v=20261110t3"></script>
 <script src="creeps-esenciales.js?v=20261110w35"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7132,6 +7132,13 @@ prueba('⚔ Dos al hilo, el siguiente del círculo (dueño, 2026-11-10: «no pue
   const m = S([A('p'), null, R('b'), null, null, R('c')], 0, [false, false, false, false, false, true]);
   igual([f(a), f(b), f(c), d.length, e.length, f(g), S([], 0).length, S([null], 3).length, f(h), f(k), f(m)],
     ['b:horario,c:antihorario', 'x:antihorario', 'solo:los dos', 0, 0, 'y:horario,x:antihorario', 0, 0, 'c:antihorario', 'c:antihorario', 'b:horario']);
+});
+prueba('🎲 Tanda 3 de la auditoría de tiradas (2026-11-10): una chance en el cuadro del duelo — sin oposición, el % y la pieza (el escudo) viajan en el spec', () => {
+  const h = Duelo.limpiarHab({nombre: 'Al escudo', objetivo: 'enemigo', tira: null, contra: [], dano: null,
+    efectos: [{nombre: 'Rompe armadura al escudo', caras: 4, exitos: 1, spec: {nombre: 'Armadura rota', stacks: 2, item: 'escudo'}}, {nombre: 'Parálisis', caras: 2, exitos: 1, spec: {nombre: 'Parálisis', turnos: 1}}]});
+  const e0 = h.efectos[0], e1 = h.efectos[1];
+  igual([h.sinOposicion, h.dano, e0.caras, e0.exitos, e0.spec.nombre, e0.spec.stacks, e0.spec.item, e1.caras, e1.exitos, e1.spec.turnos, Duelo.specDeEfecto(e0).item],
+    [true, null, 4, 1, 'Armadura rota', 2, 'escudo', 2, 1, 1, 'escudo']);
 });
 prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — toda la habilidad cuesta lo de un solo ataque, como el Barrido', () => {
   const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dos al hilo');

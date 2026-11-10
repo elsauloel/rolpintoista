@@ -89,27 +89,21 @@ async function flechaSalto(d, totalMag){
   const cadena0 = conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0})).slice(0, 1 + n);
   const cadena = conDano && cadena0.length > 1 ? [cadena0[0], ...(await rayoCadenaAplicar(cadena0, {callado: true}))] : cadena0;
   if(cadena.length < 2){ mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
-  const partes = [], estadosDe = {};
+  const partes = [], estadosDe = {}, lista = [];
+  // 🎲 La Parálisis de cada salto va en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10): la tira con su botón quien
+  // disparó (el GM puede tirar por él), de a uno, y entra con el «Aplicar» (chancesEnSecuencia, js/78).
   for(let i = 1; i < cadena.length; i++){
     const c = cadena[i], nom = c.t.oculto ? 'Alguien' : nombreDe(c.t);
     let txt = nom + (c.dano ? ` (${c.dano} de daño eléctrico${c.entro !== undefined && c.entro !== c.dano ? ` → le entraron ${c.entro}` : ''})` : '');
     const pct = num((s.paralisis || [])[i - 1]);
     if(pct > 0){
       const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1};
-      const sale = 1 + Math.floor(Math.random() * dd.caras), entra = sale > dd.caras - dd.exitos;
-      txt += ` · Parálisis ${pct} % (1d${dd.caras}: ${sale}) → ${entra ? 'paralizado 1 turno' : 'no'}`;
-      if(entra){
-        try{
-          const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: c.id, nombre: nombreDe(c.t), tipo: c.t.tipo, ref: c.t.fichaId}},
-            {nombre: 'Parálisis', caras: 1, exitos: 1, dado: '', detalle: 'Parálisis 1 turno (el salto de la flecha).', spec: {nombre: 'Parálisis', turnos: 1}});
-          if(r && r.manual) txt += ' (aplicala a mano)';
-          else if(r && /no entró/.test(String(r.nota || ''))) txt += ` (${r.nota})`;
-          if(!(r && !r.manual && /no entró/.test(String(r.nota || '')))) estadosDe[c.id] = ['Parálisis'];
-        }catch(err){ console.error('No se pudo paralizar en el salto:', err); txt += ' (aplicala a mano)'; }
-      }
+      lista.push({tokenId: c.id, efectos: [{nombre: 'Parálisis', caras: dd.caras, exitos: dd.exitos, dado: '', detalle: `Parálisis 1 turno (el salto de ${flLa(fl)}).`, spec: {nombre: 'Parálisis', turnos: 1}}]});
+      txt += ` · Parálisis ${pct} % (en el cuadro del duelo)`;
     }
     partes.push(txt);
   }
+  if(lista.length && typeof chancesEnSecuencia === 'function') chancesEnSecuencia(d, lista, `${fl.nombre}: el salto`);
   const saltos = cadena.slice(1).map((c, i) => ({desde: cadena[i].id, hacia: c.id}));
   const resultado = partes.join(' → ');
   // 🔢 (2026-11-09) el «−X», «¡Parálisis!» y el reporte, como todo rayo que salta (js/110)

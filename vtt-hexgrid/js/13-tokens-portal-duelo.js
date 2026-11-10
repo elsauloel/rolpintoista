@@ -2172,33 +2172,32 @@ async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el
   const saltos = cadena.slice(1).map((s, i) => ({desde: cadena[i].id, hacia: s.id}));
   // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
   const extra = [], estadosDe = {};   // id → ['Parálisis'…] (para el «¡Parálisis!» flotando y el reporte, js/110)
-  const anotar = (sid, nom, r) => { if(r && !r.manual && /no entró/.test(String(r.nota || ''))) return; (estadosDe[sid] = estadosDe[sid] || []).push(nom); };
   {   // los efectos del golpe a cada uno al que salta (`cadena.efectos`); sin eso, igual la Parálisis a los mojados (el agua, P214)
+    // 🎲 Las chances van en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10; dueño: «las tiradas las hace el
+    // usuario involucrado»): un duelo de chances por cada uno al que salta, de a uno, que tira con su botón quien maneja al atacante (el GM puede
+    // tirar por él); entran con el «Aplicar» de siempre. No frena el daño ni el reporte (corre aparte, chancesEnSecuencia en js/78).
     const pctSalto = Array.isArray(c.paralisis) ? c.paralisis : null;   // ⚡ Zap (2026-10-25): el % de Parálisis de cada salto (el 1.º, el 2.º…)
+    const lista = [];
     for(const [i, s] of cadena.slice(1).entries()){
-      const mojado = typeof enAgua === 'function' && enAgua(s.t);
+      const mojado = typeof enAgua === 'function' && enAgua(s.t), efs = [];
       const pct = pctSalto ? num(pctSalto[i]) : 0;
-      if(pct > 0){   // como la flecha de tormenta (js/33): se tira a la vista; en el agua, el doble de chance
-        const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1}, exitos = mojado ? Math.min(dd.caras, dd.exitos * 2) : dd.exitos;
-        const sale = 1 + Math.floor(Math.random() * dd.caras), entra = sale > dd.caras - exitos, nom = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-        let txt = `${nom}: Parálisis ${pct} %${mojado ? ' (×2, en el agua)' : ''} (1d${dd.caras}: ${sale}) → ${entra ? 'paralizado 1 turno' : 'no'}`;
-        if(entra){
-          try{ const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre: nombreDe(s.t), tipo: s.t.tipo, ref: s.t.fichaId}},
-            {nombre: 'Parálisis', caras: 1, exitos: 1, dado: '', detalle: 'Parálisis 1 turno (el salto del rayo).', spec: {nombre: 'Parálisis', turnos: 1}});
-            if(r && r.manual) txt += ' (aplicala a mano)'; else if(r && /no entró/.test(String(r.nota || ''))) txt += ` (${r.nota})`; anotar(s.id, 'Parálisis', r); }
-          catch(err){ console.error('No se pudo paralizar en el salto:', err); txt += ' (aplicala a mano)'; }
+      if(pct > 0){   // como la flecha de tormenta (js/33); en el agua, el doble de chance
+        const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1};
+        efs.push({nombre: 'Parálisis', caras: dd.caras, exitos: mojado ? Math.min(dd.caras, dd.exitos * 2) : dd.exitos, dado: '',
+          detalle: `Parálisis 1 turno (el salto del rayo)${mojado ? ' · 💧 en el agua: el doble de chance' : ''}.`, spec: {nombre: 'Parálisis', turnos: 1}});
+      }
+      if(c.efectos || mojado){
+        for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis') && !(pctSalto && e.nombre === 'Parálisis'))){
+          const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
+          const exitos = ef.nombre === 'Parálisis' && mojado ? Math.min(caras, exitos0 * 2) : exitos0;   // 💧 el doble de chance (js/50)
+          efs.push({...ef, caras, exitos, res: null, aplicado: false, aplicar: '', spec: Duelo.specDeEfecto(ef)});
         }
-        extra.push(txt);
       }
-      if(!c.efectos && !mojado) continue;
-      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis') && !(pctSalto && e.nombre === 'Parálisis'))){
-        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
-        const exitos = ef.nombre === 'Parálisis' && typeof enAgua === 'function' && enAgua(s.t) ? Math.min(caras, exitos0 * 2) : exitos0;   // 💧 el doble de chance (js/50)
-        if(Math.floor(Math.random() * caras) >= exitos) continue;
-        try{ const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre: nombreDe(s.t)}}, ef); anotar(s.id, ef.nombre, r); extra.push(`${s.t.oculto ? 'Alguien' : nombreDe(s.t)}: ${ef.nombre}${r && r.manual ? ' (a mano)' : ''}`); }
-        catch(err){ console.error('No se pudo aplicar el efecto del salto:', err); extra.push(`${nombreDe(s.t)}: ${ef.nombre} (a mano)`); }
-      }
+      if(!efs.length) continue;
+      lista.push({tokenId: s.id, efectos: efs});
+      extra.push(`${s.t.oculto ? 'Alguien' : nombreDe(s.t)}: ${efs.map(e => `${e.nombre} ${Math.round(e.exitos * 100 / Math.max(1, e.caras))} %`).join(', ')} → en el cuadro del duelo`);
     }
+    if(lista.length && typeof chancesEnSecuencia === 'function') chancesEnSecuencia(d, lista, `${d.hab ? d.hab.nombre : 'El rayo'}: el salto`);
   }
   // 🔢 (2026-11-09, dueño: «quiero que se aplique a cualquier fuente de daño eléctrico con salto») lo que se ve lo arma js/110 (rayoFxPublicar):
   // el «−X» rojo sobre cada uno cuando le llega el rayo, «¡Parálisis!», el reporte al terminar y la línea de la Mesa. o.golpe: el primer golpeado
@@ -3088,7 +3087,7 @@ async function dueloAplicarEfectoBase(d, ef){
     spec.stacks = base + vn;
   }
   const veces = spec.nombre === 'Armadura rota' ? Math.max(1, num(spec.stacks) || 1) : 1;
-  const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota'} : spec;
+  const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota', ...(spec.item && t.tipo !== 'creep' ? {item: spec.item} : {})} : spec;   // (`item`: el escudo que paró el disparo, js/26)
   if(t.tipo === 'creep'){
     const res = await modificarCreep(t.fichaId, sc => {
       let r = {ok: false};

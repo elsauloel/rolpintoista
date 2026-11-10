@@ -361,7 +361,7 @@
   // ⚡ Auditada (dueño, 2026-10-21; el Mago): un rayo dirigido que salta (la regla general del rayo: la mitad de lo que entró, sin repetir, hasta llegar a 1)
   // y 20 % de Parálisis al primero; 2d4 sin el Efecto especial (P216 en pausa). 3 No2 y 3 SP, o cooldown 3.
   H('Cadena de rayos', 'D', 'ega', 'g', 3, {detalle: 'Lanza un rayo a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo. Si pega: 2d4 de daño eléctrico (lo frenan la Defensa especial y la resistencia eléctrica) y 20 % de Parálisis 1 turno. Lo que le entró salta al rival más cercano (4 casillas o menos) con la mitad, sin repetir, hasta llegar a 1; en un charco, corre por el agua.',
-    no2: 3, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; 2d4 eléctrico que salta (la mitad cada vez) y 20 % de Parálisis',
+    no2: 3, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; 2d4 eléctrico que salta (la mitad cada vez) y 20 % de Parálisis (si salta a alguien parado en el agua, su chance va en el cuadro del duelo, con su botón)',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4},
       efectos: [{nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}]}});
   // ⚡ Auditada (dueño, 2026-10-25; el Mago, «rayo paralizante»: «uno que se llame Zap. Un dado de 4 de daño directo eléctrico con salto. El primero
@@ -369,7 +369,7 @@
   // `cadena.paralisis` = el % de cada salto (js/13 dueloCadena). No se esquiva (dueño, el mismo día): el daño entra
   // siempre y su PdG.Esp contra la Res.Esp decide solo la Parálisis (`danoSiempre`, comun/duelo.js). El costo lo propuso Claude.
   H('Zap', 'DK', 'ega', 'g', 3, {detalle: 'Un chispazo a un rival dentro de su Rango que no se esquiva: 1d4 de daño eléctrico directo (no lo frenan la Defensa ni la Defensa especial; sí la resistencia eléctrica) y Parálisis 1 turno, salvo que el objetivo la resista: su Resistencia al control (Res.CC) contra la Probabilidad de Golpe especial del que lo lanza. Lo que le entró salta al rival más cercano (4 casillas o menos) con la mitad, sin repetir, hasta llegar a 1: al primero que alcanza, 50 % de Parálisis; al segundo, 25 %. En el agua, el doble de chance.',
-    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'no se esquiva: 1d4 eléctrico directo; Parálisis si gana su PdG.Esp contra la Res.CC; salta (la mitad) con 50 % y 25 % de Parálisis',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'no se esquiva: 1d4 eléctrico directo; Parálisis si gana su PdG.Esp contra la Res.CC; salta (la mitad) con 50 % y 25 % de Parálisis (la chance de cada salto, con su botón en el cuadro del duelo)',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['rescc'], danoSiempre: true, alcance: 'rango', dano: true, danoFormula: '1d4', danoDirecto: true, tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4, paralisis: [50, 25]},   // la Parálisis, con Res.CC (dueño, 2026-11-03)
       efectos: [{nombre: 'Parálisis', turnos: 1}]}});
   // ❄ Auditada (dueño, 2026-10-23; el Mago, «un cono de frío… hálito polar»): reemplaza al viejo Aliento gélido (a mano). El cono de 16 casillas de

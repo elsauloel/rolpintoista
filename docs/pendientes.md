@@ -748,6 +748,14 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **Auditoría de tiradas (`docs/auditoria-tiradas.md`), las preguntas abiertas** (2026-11-10, dueño: «cuando esté en la compu… las vamos a
+  revisar una por una»). Los bloques 1, 2 y 3 (resistencias, daños y chances) se pasan al cuadro del duelo como ruta de trabajo, por tandas;
+  quedan para revisar juntos:
+  1. **Bloque 4, los carteles propios** (chances de las piezas —Retirada, Inamovible, Recuperarse, Reflejos—, el 1d6 del Escudo elemental, Malviaje,
+     soltarse, Confusión, la tirada extra de una zona): ¿al cuadro del duelo o quedan con su cartel? (Las trampas, en el punto de abajo.)
+  2. **Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?
+  3. **Sigilo:** ¿está bien que el GM tire a escondidas la Destreza de quien está escondido (para no delatarlo)?
+  4. **Saque rápido:** sigue callado (pedido del 2026-10-05) ¿o pasa a tener botón?
 - [ ] **Revisar en el mapa el cartel de las trampas** (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
   excepción: pueden tener su propio menú de trampas, estandarizado para todas»). Hoy cada trampa usa el cartel paso a paso
   (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como
@@ -768,9 +776,10 @@
 
 **Auditoría completa, por bloques y con recomendación (2026-11-10): [`auditoria-tiradas.md`](auditoria-tiradas.md).**
 
-Pieza para convertirlas: `vtt-hexgrid/js/115-tirada-involucrado.js` (`tiradaInvolucrado({token, stat, valor?, extra, etq, titulo, texto})`).
-**Ya convertidas** (2026-11-10): Golpe en la sien y Carga que derriba (js/78), Salto aplastante (js/55), Tolerar un efecto (`dueloTolera`, js/13) y
-Atraer (`dueloAtraer`, js/13); las trampas (js/19) y el 1d6 del Escudo elemental (js/106) ya tenían su botón. Las que **ya piden botón** a quien
+Pieza para convertirlas: **el cuadro del duelo de siempre** (`contiendaDuelo`, vtt-hexgrid/js/78; dueño, 2026-11-10: «¿por qué no usás el menú del
+duelo habitual?» — el cartel propio de js/115 se retiró).
+**Ya convertidas, en el cuadro del duelo** (2026-11-10): Golpe en la sien y Carga que derriba (js/78), Salto aplastante (js/55), Tolerar un efecto
+(`dueloTolera`, js/13) y Atraer (`dueloAtraer`, js/13); las trampas (js/19) y el 1d6 del Escudo elemental (js/106) ya tenían su botón. Las que **ya piden botón** a quien
 corresponde: la iniciativa (js/04), la tirada extra de una zona (js/66), el Malviaje (js/52), ayudar a zafarse (js/54), la Confusión del turno (js/20),
 la cura (js/70), la Varita del caos y la Tormenta arcana (las tira quien las usa al usarlas).
 Pendientes de convertir (cada una tira sola algo de otro):

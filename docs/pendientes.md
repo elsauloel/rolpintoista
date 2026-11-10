@@ -748,6 +748,14 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **Revisar en el mapa el cartel de las trampas** (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
+  excepción: pueden tener su propio menú de trampas, estandarizado para todas»). Hoy cada trampa usa el cartel paso a paso
+  (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como
+  menú propio de las trampas (igual para todas) o pasa al cuadro del duelo. Junto con eso, la prueba de las trampas en flor (mitad «centro»,
+  mitad «toda el área»).
+- [ ] **Revisar el Golpe de escudo** (2026-11-10, dueño: «para eso necesitaría ver cómo está escrito, el coste y todo»): tantos d10 como el
+  peso del escudo + Dmg (con el Escudo de hierro macizo, peso 4, da 4d10 + 6 en el T3 Guardaespaldas nv2), 5 No2, cooldown 2, sin Parry,
+  Sentado y Demora 1 si hace daño. El T3 nv2 espera esta decisión.
 - [x] **Probar el Escudo elemental de rayo (eléctrico)** — ✅ **decidido y programado el 2026-11-09**: el salto va solo a los de afuera del anillo (guía de diseño); el mapa «Prueba · Escudo de rayo» de «Claude · pruebas» quedó armado para que el dueño lo vea. (dueño, 2026-11-09, desde el celular: «cuando esté en la compu, recordame que pruebe el escudo
   de rayo»). Su duda: si dos personajes están pegados al que lleva el escudo, los dos reciben el golpe inicial **y además** el salto del rayo, y
   quizás sea mucho. **Regla (aprobada 2026-11-09):** quien recibe el golpe inicial del escudo no puede ser objetivo del salto; el salto va solo a

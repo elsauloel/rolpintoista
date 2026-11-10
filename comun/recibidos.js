@@ -95,7 +95,7 @@ const Recibidos = (() => {
       ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${t2}`);
       return {inv};
     }
-    const txt = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec(sp, ui.presets));
+    const txt = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec(sp, ui.presets), {deAfuera: true});
     ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${txt}`);
     return {inv};
   }

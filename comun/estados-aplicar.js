@@ -93,13 +93,14 @@ const EstadosAplicar = (() => {
   function bloqueadoCreep(estados, est, sc){ return Combatiente.inmunidad(estados, est, sc); }
 
   // Lo pone en un creep (objeto de gm-tools o de su parte privada). Devuelve {ok, estado?, motivo?}.
-  function aplicarACreep(sc, spec){
+  // `o.propio` (2026-11-10): lo que se pone el creep a sí mismo no gasta la 🐞 Vaquita de San Antonio (lo que viene de otro, sí).
+  function aplicarACreep(sc, spec, o){
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
     const nuevo = componer(spec);
     if(!Combatiente.bezoar(nuevo, Combatiente.equipoPuesto(sc))) return {ok: false, motivo: 'la Piedra bezoar se tragó el Veneno'};   // 🔮 (2026-10-18)
-    const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
-    if(!r.ok) return {ok: false, motivo: r.motivo};
+    const r = Combatiente.agregarEstado(sc.estados, nuevo, o && o.propio ? sc : {...sc, vaquita: true});
+    if(!r.ok) return {ok: false, motivo: r.motivo, ...(r.vaquita ? {vaquita: r.vaquita} : {})};
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
     const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0, hpActual: sc.hp, quien: sc.nombre});
     if(d.hp){ const tope = parseFloat(sc.hpMax) > 0 ? parseFloat(sc.hpMax) : Infinity; sc.hp = Math.max(0, Math.min(tope, (parseFloat(sc.hp) || 0) + d.hp)); }

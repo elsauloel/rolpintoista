@@ -366,7 +366,8 @@ const GeneradorTiendas = (() => {
      Comunes, se completa con la calidad más baja que haya y se avisa (`faltan` / `completado`). Todo va como «garantizado»: no se agota (cada jugador
      compra lo suyo). Los consumibles esenciales, por nombre exacto (para sumar o sacar uno, esta lista). */
   const CONSUMIBLES_ESENCIALES = ['Poción de HP', 'Poción de SP menor', 'Poción de Regeneración menor', 'Poción de Cuero Duro', 'Antídoto', 'Vendas',
-    'Té de tilo', 'Sales aromáticas', 'Ungüento de la Turca', 'Mate cebado', 'Cuerda (por metro)', 'Flecha balanceada', 'Virote perforante'];
+    'Té de tilo', 'Sales aromáticas', 'Ungüento de la Turca', 'Mate cebado', 'Cuerda (por metro)', 'Flecha balanceada', 'Virote perforante',
+    'Vaquita de San Antonio'];   // 🐞 (dueño, 2026-11-10: entre los esenciales; además es un clásico, `legacy`, como la Polilla: va en toda góndola)
   const POR_CATEGORIA_INICIO = 2, TIERS_INICIO = 2;   // Común y, si falta, Buena
   const esHondaIt = it => !!it.honda || /\bhonda\b/i.test(String(it.nombre || ''));
   const esBallestaIt = it => num(it.recarga) > 0;

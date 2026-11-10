@@ -104,6 +104,11 @@ es «una mala inversión»; el golpe de martillo controla. Un ataque con su arma
 1 turno (empate: no). Inmunidad a CC, Invulnerable y Protección de jefe lo frenan. Las dos tiradas van a la vista en la Mesa (como la Carga que
 derriba y el Salto aplastante). Cooldown 4 (lenta). «Aturdir» (a mano) queda para los creeps viejos que la tienen.
 
+**🛡 Golpe de escudo: 1d10 + el peso del escudo + Dmg, sin crítico** (dueño, 2026-11-10, auditoría: «de las opciones, la 2 me parece
+correcta. Y digamos que no puede ser golpe crítico»). Antes tiraba tantos d10 como el peso del escudo: con un escudo de peso 4 eran 4d10 + Dmg
+(~28) y un tanque pegaba más que un warrior. Ahora el peso suma fijo (el de hierro macizo, peso 4: 1d10 + 4 + Dmg, ~15,5): el escudo pesado
+sigue premiado sin dispararse, y lo fuerte de la habilidad es el Sentado + la Demora. Nunca es crítico (el duelo pasa directo al daño).
+
 **⚔ Dos al hilo: dos golpes por lo de un ataque** (dueño, 2026-11-10: «la gracia del golpe que sigue es que vos pagás SP (o el cooldown),
 pero te cuesta los nitros de un solo ataque. Si no, no entiendo cuál sería el beneficio de la skill. Es como el barrido»). El segundo golpe (si el
 primero pegó, contra otro rival pegado) no cobra No2 ni cuenta como otro ataque del turno; la habilidad entera cuesta los No2 de un ataque más su

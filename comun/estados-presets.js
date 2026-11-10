@@ -415,6 +415,10 @@ const ESTADOS_PRESET = [
     detalle:'Lo señalaron para que todos vayan por él: su Evasión baja 2 y todo el que lo ataca le hace +4 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. Con otra Presa encima, vale solo la más fuerte (el daño y la Evasión). ⚙ Automatizado en el mapa.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
+  // 🐞 Vaquita de San Antonio (dueño, 2026-11-10: «mientras lo tengas activo, el primer debuff que te entre se cancela automáticamente»): el consumible y
+  // el anillo (por combate). Lo cancela Combatiente.agregarEstado cuando el estado malo viene de otro (`{vaquita: true}`), comun/combatiente.js.
+  {nombre:'Vaquita de San Antonio', polaridad:'buff', permanente:true, vaquita:true,
+    detalle:'Una vaquita de San Antonio revolotea alrededor: el primer estado malo que le ponga otro no entra, y la vaquita se va volando. No frena el daño ni lo que se pone uno mismo.'},
 ];
 
 // La lista en la forma de la ficha: `hpturno`/`stacksturno`, y Armadura rota con su −1 Defensa como mod.

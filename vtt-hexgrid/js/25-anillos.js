@@ -31,7 +31,7 @@ function anillosDatos(t){
   const rota = (r.estados || []).filter(e => e && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
   return {creep: false, v, dados: !!r.anillosDados, campana: !!r.campanaUsada || !!r.trebolUsado, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
 }
-const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || d.v('madrugador') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
+const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || d.v('madrugador') > 0 || d.v('vaquita') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
 // Cambia los datos del token (personaje o creep) con `fn(lista de estados, objeto)` → bool (hubo cambio).
 async function anillosCambiar(t, fn){
   if(t.tipo === 'creep') return modificarCreep(t.fichaId, sc => { sc.estados = sc.estados || []; fn(sc.estados, sc); });
@@ -68,6 +68,11 @@ async function anillosEmpezar(id, t, d){
         escudoMagico: c, escudoMagicoActual: c, detalle: `Un escudo de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: escudo de ${c}`); }
       if(el){ const e = Combatiente.ELEMENTOS[el]; lista.push({id: anillosId(), nombre: `Cambiante (${e.etq.replace('Res. ', '')})`, polaridad: 'buff', activo: true, permanente: true, anillo: true,
         mods: [{stat: 'res' + el, val: n}], detalle: `${e.etq} +${n} durante este combate.`}); lineas.push(`Cambiante: ${e.etq} +${n}`); }
+      // 🐞 El Anillo de la vaquita de San Antonio (2026-11-10): una vaquita por combate; espanta el primer estado malo que le pone otro
+      // (Combatiente.vaquitaEspanta, que gasta primero esta antes que la del consumible). Al terminar el combate se va con los demás (`anillo`).
+      if(d.v('vaquita') > 0 && !lista.some(e => e && e.vaquitaAnillo)){ lista.push({id: anillosId(), nombre: 'Vaquita de San Antonio (anillo)', polaridad: 'buff', activo: true, permanente: true, anillo: true,
+        vaquita: true, vaquitaAnillo: true, detalle: 'Del anillo: el primer estado malo que te pone otro en este combate no entra, y la vaquita se va volando. Vuelve en el próximo combate.'});
+        lineas.push('Vaquita de San Antonio: espanta el primer estado malo del combate'); }
       Object.entries(ANILLO_ATRIB).forEach(([st, a]) => {
         if(d.v(st) > 0){ lista.push({id: anillosId(), nombre: a.nombre, polaridad: 'buff', activo: true, permanente: true, anillo: true, impulso: a.attr, impulsoVal: d.v(st),
           detalle: `Una vez en este combate: +${d.v(st)} a tu última tirada de ${FichaCalculo.STAT_LABEL[a.attr] || a.attr} (el botón ${a.icono}, como la Polilla).`}); lineas.push(`${a.nombre}: +${d.v(st)} una vez`); }
@@ -523,3 +528,14 @@ async function usarCurandero(){
 }
 setInterval(renderCuranderoBoton, 1500);
 
+
+/* 🐞 Vaquita de San Antonio (2026-11-10): cuando la vaquita (del consumible o del anillo) espanta un estado malo, Combatiente.vaquitaEspanta avisa acá
+   (una vez, fuera de la transacción): la línea en la Mesa y el aviso en la Crónica de esta pantalla (la que aplicó el estado: la del dueño del
+   personaje, o la del GM para un creep). El vuelo de la vaquita lo dibuja cada pantalla sola al ver que el estado se fue (js/05). */
+window.avisoVaquita = function(info){
+  if(!info) return;
+  try{ mesaLinea(info.txt); }catch(e){}
+  try{ momentoAbrir({tipo: 'vaquita', icono: '🐞', titulo: info.txt.replace(/^🐞\s*/, ''), estado: 'listo',
+    resultado: `${info.estado} no entró: la vaquita de San Antonio${info.deAnillo ? ' del anillo' : ''} lo espantó y se fue volando.${info.deAnillo ? ' Vuelve en el próximo combate.' : ''}`}); }
+  catch(e){ try{ toast(info.txt); }catch(e2){} }
+};

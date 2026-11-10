@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261110t3"></script>
+<script src="combatiente.js?v=20261110esc"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261110t3b"></script>
+<script src="duelo.js?v=20261110esc"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261110t1"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110t3"></script>
+<script src="skills-creep-base.js?v=20261110esc"></script>
 <script src="creeps-esenciales.js?v=20261110w35"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -3236,6 +3236,52 @@ prueba('un estado recibido respeta Invulnerable; el Desgaste baja la durabilidad
   FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Desgaste', item: 'esc'}, '', uiAuto(reg, true));
   igual([S.efectos.some(e => e.nombre === 'Stun'), FichaCalculo.durActual(S.inventario[0])], [false, durAntes - 1]);
 });
+prueba('🐞 Vaquita de San Antonio (2026-11-10): espanta el primer estado malo que le pone otro (personaje, creep, invocación), no lo propio; el anillo, primero', () => {
+  const C = Combatiente, vaq = () => ({...estadoDeSpecPrueba('Vaquita de San Antonio'), id: 'vq', activo: true}), tiene = l => (l || []).some(C.esVaquita);
+  function estadoDeSpecPrueba(n){ return FichaAcciones.estadoDeSpec({nombre: n}, estadosPresetFicha()); }
+  // Personaje: el primer Veneno no entra y la vaquita se va; el segundo entra.
+  const S = fichaBotonera({efectos: [vaq()]}), reg = [], msgs = [], ui = {...uiAuto(reg, true), toast: m => msgs.push(m)};
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Veneno', stacks: 4}, 'Un creep', ui);
+  const sinVeneno1 = !S.efectos.some(e => e.esVeneno), seFue = !tiene(S.efectos);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Veneno', stacks: 4}, 'Un creep', ui);
+  const veneno2 = S.efectos.some(e => e.esVeneno);
+  // Lo propio (un efecto de tu Ejecución sobre vos) no la gasta.
+  const P = fichaBotonera({efectos: [vaq()]});
+  FichaAcciones.aplicarEstadoRecibido(P, {nombre: 'Sentado'}, 'Yo', ui, {propio: true});
+  const propioEntra = P.efectos.some(e => e.nombre === 'Sentado') && tiene(P.efectos);
+  // Un buff no la gasta; la inmunidad va primero (Invulnerable + vaquita: la vaquita sigue).
+  const B = fichaBotonera({efectos: [vaq(), {nombre: 'Invulnerable', activo: true, invulnerable: true, turnos: 1, polaridad: 'buff'}]});
+  FichaAcciones.aplicarEstadoRecibido(B, {nombre: 'Afortunado', turnos: 2}, 'Un aliado', ui);
+  FichaAcciones.aplicarEstadoRecibido(B, {nombre: 'Stun', turnos: 1}, 'Un creep', ui);
+  const bufInmune = B.efectos.some(e => e.nombre === 'Afortunado') && tiene(B.efectos) && !B.efectos.some(e => e.stun);
+  // Armadura rota de un personaje (va a las piezas): la vaquita la espanta y la pieza no pierde nada.
+  const A = fichaBotonera({inventario: [structuredClone(escudo)], efectos: [vaq()]}), durA = FichaCalculo.durActual(A.inventario[0]);
+  FichaAcciones.aplicarEstadoRecibido(A, {nombre: 'Armadura rota', stacks: 1, item: 'esc'}, '', ui);
+  const armadura = FichaCalculo.durActual(A.inventario[0]) === durA && !tiene(A.efectos);
+  // Creep: de otro la gasta (y avisa el motivo); lo propio no.
+  const sc = {nombre: 'Rata', estados: [vaq()], equipo: []};
+  const r1 = EstadosAplicar.aplicarACreep(sc, {nombre: 'Stun', turnos: 1}), r2 = EstadosAplicar.aplicarACreep(sc, {nombre: 'Stun', turnos: 1});
+  const creep = !r1.ok && r1.motivo === C.VAQUITA_NOMBRE && r1.vaquita.estado === 'Stun' && r2.ok;
+  const sc2 = {nombre: 'Rata', estados: [vaq()], equipo: []};
+  EstadosAplicar.aplicarACreep(sc2, {nombre: 'Sentado'}, {propio: true});
+  const creepPropio = tiene(sc2.estados) && sc2.estados.some(e => e.nombre === 'Sentado');
+  // El anillo se gasta primero; el consumible queda. Dos estados en el mismo golpe: solo el primero se cancela.
+  const lista = [vaq(), {...vaq(), id: 'an', nombre: 'Vaquita de San Antonio (anillo)', vaquitaAnillo: true, anillo: true}];
+  const v1 = C.vaquitaEspanta(lista, {nombre: 'Rengo', polaridad: 'debuff'}, {});
+  const anillo = v1 && v1.deAnillo && lista.length === 1 && !lista[0].vaquitaAnillo;
+  const dos = [vaq()], a1 = C.vaquitaEspanta(dos, {nombre: 'Veneno', polaridad: 'debuff'}, {}), a2 = C.vaquitaEspanta(dos, {nombre: 'Sangrado', polaridad: 'debuff'}, {});
+  // Invocación: lo recibido (de afuera) la gasta.
+  const inv = {nombre: 'Lobo', estados: [vaq()]};
+  const t = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec({nombre: 'Sentado'}, estadosPresetFicha()), {deAfuera: true});
+  const invOk = /Vaquita/.test(t) && !tiene(inv.estados);
+  // El catálogo: el consumible (clásico y esencial) y el anillo (Vaquita +1 para el mapa, js/25).
+  const it = CATALOGO_BASE.find(i => i.nombre === 'Vaquita de San Antonio'), an = CATALOGO_BASE.find(i => i.nombre === 'Anillo de la vaquita de San Antonio');
+  const Sr = fichaBotonera({inventario: [{...structuredClone(an), id: 'av', equipado: true}]});
+  igual([sinVeneno1, seFue, veneno2, propioEntra, bufInmune, armadura, creep, creepPropio, anillo, !!a1, a2, invOk,
+    !!it && it.consumible && it.legacy && it.efectoNombre, GeneradorTiendas.CONSUMIBLES_ESENCIALES.includes('Vaquita de San Antonio'),
+    !!an && an.tier, num(FichaCalculo.calcular(Sr).final.vaquita), FichaResumen.resumen(Sr, {}).vaquita],
+    [true, true, true, true, true, true, true, true, true, true, null, true, 'Vaquita de San Antonio', true, 'Buena Calidad', 1, 1]);
+});
 prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE escudo, no una pieza al azar', () => {
   const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};
   const S = fichaBotonera({inventario: [{...escudo}, peto]}), reg = [];
@@ -4323,7 +4369,7 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros, fx], [38, 48, [1, 0], 1, 3, 2, ['1d6+1', 0]]);   // 38 Comunes (con la defensa, el madrugador, el escudo de la mañana y el sereno, 2026-10-19); 48 en total
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros, fx], [38, 49, [1, 0], 1, 3, 2, ['1d6+1', 0]]);   // (49: + el Anillo de la vaquita de San Antonio, Buena, 2026-11-10) 38 Comunes (con la defensa, el madrugador, el escudo de la mañana y el sereno, 2026-10-19); 48 en total
 });
 prueba('Paso fantasma también contra una habilidad que se esquiva con Evasión (2026-11-09, cola de pruebas 22/23: una varita o un hechizo dirigido): solo el +3 fijo, con su texto; sin el anillo o sin la carga, nada', () => {
   const antes = window.mapaPasoFantasma;
@@ -6732,15 +6778,16 @@ prueba('🐀 Chillido (2026-10-30, la Rata de galería): 1 refuerzo que también
     p.error || '', x.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(x, x.habilidades[0]))],
     ['auto', {cant: 1, propagan: true}, true, 50, 2, true, false, true, '', true, true]);
 });
-prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parry), tantos d10 como su peso + el Dmg; Sentado y Demora 1 solo si hizo daño', () => {
+prueba('🛡 Golpe de escudo (2026-10-27; daño del 2026-11-10): pega con el escudo (Tipo 10, sin Parry), 1d10 + el peso del escudo + el Dmg, sin crítico; Sentado y Demora 1 solo si hizo daño', () => {
   const h = chp('Golpe de escudo'), sc = creepPrueba({id: 'g1', equipo: [{id: 'e', nombre: 'Rodela de tablas', tipoItem: 'escudo_1m', def: 1, peso: 3, equipado: true}]});
   const atq = CreepAcciones.ataqueDeHab(sc, h);
   const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
   const v = hk.vista({id: 'd', atacante: {ref: 'g1'}, ataque: atq}, 'dano');
   const sinEscudo = CreepAcciones.ataqueDeHab(creepPrueba(), h);
-  igual([atq.escudoGolpe.nombre, atq.escudoGolpe.peso, atq.tipoDado, atq.sinParry, atq.armaNombre, String(v && v.formula).replace(/\s+/g, '').startsWith(`3d10+${CreepCalculo.statValor(sc, 'dmg')}`),
+  igual([atq.escudoGolpe.nombre, atq.escudoGolpe.peso, atq.tipoDado, atq.sinParry, atq.armaNombre, String(v && v.formula).replace(/\s+/g, '').startsWith(`1d10+3+${CreepCalculo.statValor(sc, 'dmg')}`),
+    Combatiente.golpeEscudoFormula(4, 6), Combatiente.golpeEscudoFormula(0, 6),
     atq.efectos.map(e => `${e.nombre}${e.requiereDano ? '*' : ''}`), sinEscudo.escudoGolpe.peso],
-    ['Rodela de tablas', 3, 10, true, 'Rodela de tablas', true, ['Sentado*', 'Demora*'], 0]);
+    ['Rodela de tablas', 3, 10, true, 'Rodela de tablas', true, '1d10 + 4 + 6', '1d10 + 6', ['Sentado*', 'Demora*'], 0]);
 });
 prueba('🕳 Excavar, una sola habilidad (2026-10-27): meterse (1 No2 y 1 SP) y salir apuñalando (un ataque y 2 SP: +1d6, Crítico frecuente +1, Rengo; crítico, Rengo 2 y Lisiado)', () => {
   const h = chp('Excavar', 2), sc = creepPrueba();

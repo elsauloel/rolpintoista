@@ -51,7 +51,7 @@ const FichaHabilidades = (() => {
   const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
     'inmunidadCC', 'inmunidadMental', 'esMental', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'espejo', 'desarmado', 'ceguera', 'mitadPdgEva',
     'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado', 'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado',
-    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno', 'volador', 'sangraSp', 'fenix', 'apila'];   // apila: el contador del Toque de carga (2026-11-05)
+    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno', 'volador', 'sangraSp', 'fenix', 'apila', 'vaquita'];   // apila: el contador del Toque de carga (2026-11-05)
   function flagsDePreset(presets, nombrePreset){
     const p = presetPorNombre(presets, (nombrePreset || '').trim());
     if(!p) return {};

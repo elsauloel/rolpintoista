@@ -149,6 +149,7 @@ const FichaCalculo = (() => {
     {id:'impulsodes', label:'Manos Ligeras', full:'Una vez por combate, +N a tu última tirada de Destreza (como la Polilla)'},
     {id:'impulsoesp', label:'Clarividencia', full:'Una vez por combate, +N a tu última tirada de Especial (como la Polilla)'},
     {id:'impulsocon', label:'Piel de Roble', full:'Una vez por combate, +N a tu última tirada de Constitución (como la Polilla)'},
+    {id:'vaquita', label:'Vaquita de San Antonio', full:'En cada combate, el primer estado malo que te pone otro se cancela solo (el mapa pone la vaquita al empezar el combate)'},   // 🐞 (2026-11-10)
     {id:'pasodoble', label:'Primer paso doble', full:'El primer casillero que te movés en cada turno cuesta el doble (como Lento): la contra de las piernas pesadas'},
     {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},
     {id:'escolta', label:'Escolta (a mano)', full:'Una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). Se resuelve a mano'},

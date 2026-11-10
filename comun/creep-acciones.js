@@ -442,7 +442,7 @@ const CreepAcciones = (() => {
     if(!Combatiente.sobreSiSinTiradas(hab)) return null;
     const hechos = hab.efectos.map(ef => {
       if(!ef.spec){ sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
-      const r = EstadosAplicar.aplicarACreep(sc, ef.spec);
+      const r = EstadosAplicar.aplicarACreep(sc, ef.spec, {propio: true});
       if(!r.ok) return `${ef.nombre}: no le hizo efecto (${r.motivo})`;
       if(C().modsAfectanHp(r.estado.mods)) C().actualizarHpMaxPorCon(sc);
       return r.que === 'renovado' ? `${r.estado.nombre} renovado` : EstadosAplicar.texto(ef.spec);
@@ -684,7 +684,7 @@ const CreepAcciones = (() => {
     const vida = num(it.especial.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(sc.hpMax) * num(it.especial.spVidaPct) / 100)) : 0;
     if(vida) sc.hp = Math.max(0, num(sc.hp) - vida);
     const propio = it.especial.estadoPropio;   // lo que se pone quien la usa (la luz)
-    if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
+    if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio), {propio: true});
     const avisos = [];
     Combatiente.equipoPuesto(sc).filter(o => o && o.orbe).forEach(o => {
       // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño

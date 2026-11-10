@@ -1142,7 +1142,8 @@ const FichaAcciones = (() => {
     if(spec.armaDe){ draft.armaDe = {...spec.armaDe}; draft.nombre = spec.nombre; }   // 🔥 el Arma elemental de un arma (2026-11-04)
     return draft;
   }
-  function aplicarEstadoRecibido(S, spec, origen, ui){
+  // `o.propio` (2026-11-10): un efecto de tu propia Ejecución sobre vos no gasta la 🐞 Vaquita de San Antonio (lo que te pone otro, sí).
+  function aplicarEstadoRecibido(S, spec, origen, ui, o){
     // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
     if(spec.nombre === 'Desgaste'){
       // `item: 'parry'` (2026-10-29): un Parry elegido a mano no dice con qué paró — el escudo puesto o, si no, la única pieza con la que se puede parar.
@@ -1156,6 +1157,10 @@ const FichaAcciones = (() => {
       // (en invocaciones y creeps ya la frena Combatiente.agregarEstado). Ni el escudo ni la armadura pierden durabilidad.
       const inmune = Combatiente.inmunidad(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'});
       if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); return; }
+      // 🐞 La Vaquita de San Antonio la espanta antes de que toque las piezas.
+      if(!(o && o.propio) && Combatiente.vaquitaEspanta(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'}, {nombre: (S.meta && S.meta.nombre) || ''})){
+        ui.toast('🐞 La vaquita de San Antonio espantó la Armadura rota'); ui.cambio(['efectos', 'refresh']); return;
+      }
       let n = Math.max(1, num(spec.stacks) || 1);
       // 💍 Armadura indestructible (anillo, 2026-10-12): la primera Armadura rota del combate se absorbe. En un personaje la rotura va a las piezas,
       // no a un estado, así que se frena acá (el mapa solo la veía en los estados; la marca la libera el mapa al terminar el combate, js/25).
@@ -1306,7 +1311,8 @@ const FichaAcciones = (() => {
     // 🔮 La Piedra bezoar: el Veneno entra con 1 stack menos (si no queda nada, no entra).
     if(!Combatiente.bezoar(draft, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)))){ ui.toast(`🔮 ${quien}la Piedra bezoar se tragó el Veneno`); return; }
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
-    const r = Combatiente.agregarEstado(S.efectos, draft);
+    const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? undefined : {vaquita: true, nombre: (S.meta && S.meta.nombre) || ''});
+    if(!r.ok && r.vaquita){ ui.toast(`🐞 ${quien}la vaquita de San Antonio espantó ${draft.nombre}`); ui.cambio(['efectos', 'refresh']); return; }
     if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
     if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
     // Lo que se dispara (veneno, regeneración…) pega apenas te lo ponen (2026-10-06, P161).
@@ -1327,7 +1333,7 @@ const FichaAcciones = (() => {
       ui.fijarHp(antes + num(spec.cura));
       return {nota: `+${fmt(num(spec.cura))} HP (${fmt(antes)} → ${fmt(num(S.hp))})`};
     }
-    aplicarEstadoRecibido(S, spec, `${d.atacante.nombre} · ${ef.nombre}`, ui);
+    aplicarEstadoRecibido(S, spec, `${d.atacante.nombre} · ${ef.nombre}`, ui, {propio: true});
     return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
   }
   function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : FichaHabilidades.hpVariable(it) ? num(it._xHp) : 0; }

@@ -74,9 +74,10 @@ const InvHabilidades = (() => {
     ui.toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
   }
   // Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación). Devuelve el texto para la Mesa.
-  function ponerEstado(inv, d){
+  // `o.deAfuera` (2026-11-10): un estado que le pone otro (lo recibido) puede gastar la 🐞 Vaquita de San Antonio.
+  function ponerEstado(inv, d, o){
     inv.estados = inv.estados || [];
-    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural});
+    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural, nombre: inv.nombre, ...(o && o.deAfuera ? {vaquita: true} : {})});
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;

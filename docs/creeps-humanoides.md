@@ -927,7 +927,7 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 
 ### T1 Escudero · nivel 3 (aprobado 2026-11-06)
 - Atributos Con 14 · Fue 7 · Agi 6 · Des 8 · Esp 4 → vida 70, No2 6. Equipo: Hacha de piedra · **Escudo de escamas** (B: Def +3, Bloqueo +1,
-  crít. T6 +1, Def. esp. +1, peso 3 → Golpe de escudo 3d10) · Peto de hierro · Cofia de anillas sueltas · Grebas de cuero. Habilidades: Provocar ·
+  crít. T6 +1, Def. esp. +1, peso 3 → Golpe de escudo 3d10; desde el 2026-11-10, 1d10 + 3 + Dmg, sin crítico) · Peto de hierro · Cofia de anillas sueltas · Grebas de cuero. Habilidades: Provocar ·
   Piel de hierro · Golpe de escudo · **Aguante** (en lugar de «Plantarse» 🆕 del boceto, que no existe). Pasiva: Guardia firme.
 - Números (nv2 → nv3): Def 6 → 8 · Bloqueo 9 → 10 · PdG/Parry 7 → 8 · Dmg 6 → 7 · Res.Esp/Res.CC 13 → 14 · Res. crít. T6 0 → 1.
 - ✅ **T1 niveles 2 y 3 cargados en el pool esencial el 2026-11-06** (`comun/creeps-esenciales.js`).

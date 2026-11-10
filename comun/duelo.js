@@ -1093,6 +1093,8 @@ const Duelo = (() => {
 
   // El golpe pegó (por Evasión o por un Parry perdido): se evalúa el crítico con la misma regla, contra la tirada de defensa que se usó.
   function entrarCritico(m){
+    // 🛡 El Golpe de escudo nunca es crítico (dueño, 2026-11-10: «digamos que no puede ser golpe crítico»): pasa directo al daño.
+    if(m.ataque && m.ataque.escudoGolpe){ m.crit = null; entrarDano(m); return; }
     const dd = m.critDatos || {};
     // "Ignora Resistencia a crítico" (2026-09-27, pedido del dueño): una habilidad tipo "ataque con mi arma, con
     // arreglos" (Golpe brutal y similares, duelo.arma.ignoraResistCrit) le resta puntos a la Resistencia del

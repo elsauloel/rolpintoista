@@ -96,9 +96,10 @@ const CreepDuelo = (() => {
     // La fórmula del daño del arma del creep (la del gancho `dano` y la que muestra el botón).
     function formulaDano(sc, d){
       // 🛡 El Golpe de escudo (2026-10-27, dueño: «usa el escudo como si fuera un arma de tipo 10… si es un escudo que pesa 3, tira 3 de 10 y daño»):
-      // el escudo, no el arma: tantos d10 como su peso (mínimo 1) + el Dmg.
+      // el escudo, no el arma. Desde el 2026-11-10 (dueño, «la 2 me parece correcta»): 1d10 + el peso del escudo (fijo) + el Dmg
+      // (antes, tantos d10 como el peso: con escudos pesados pegaba más que un warrior). Nunca es crítico (comun/duelo.js entrarCritico).
       const eg = d.ataque.tipo === 'habilidad-arma' && d.ataque.escudoGolpe ? d.ataque.escudoGolpe : null;
-      let formula = eg ? `${Math.max(1, Math.round(num(eg.peso)))}d10 + ${fmt(Math.max(0, num(C().statValor(sc, 'dmg'))))}` : C().danoTxt(sc, C().statValor(sc, 'dmg'));
+      let formula = eg ? Combatiente.golpeEscudoFormula(eg.peso, C().statValor(sc, 'dmg')) : C().danoTxt(sc, C().statValor(sc, 'dmg'));
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${eg ? 10 : Combatiente.armaEnMano(sc).tipoDado}`;

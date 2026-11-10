@@ -180,6 +180,57 @@ function polillaRevolotea(est){
   return !!(est && est.estados.some(e => e && e.activo !== false && /^Polilla revoloteando/i.test(String(e.nombre || ''))));
 }
 const semillaDe = id => [...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % 13;
+// 🐞 La Vaquita de San Antonio (2026-11-10): el mismo revoloteo que la Polilla, en rojo con pintitas (el consumible o la del anillo). Cuando espanta un
+// estado (o se la sacan) el estado desaparece y se va volando: `vaquitaVuelos` recuerda desde cuándo, ~1,6 s.
+function vaquitaRevolotea(est){
+  return !!(est && Array.isArray(est.estados) && est.estados.some(e => Combatiente.esVaquita(e)));
+}
+const vaquitaVista = new Map(), vaquitaVuelos = new Map(), VAQUITA_VUELO_MS = 1600;
+function dibujarVaquita(x, y, rad, z, semilla, vuelo){
+  const s = performance.now() / 1000 + semilla + 0.5;
+  let px, py, qx, qy, alfa = 1;
+  if(vuelo !== undefined){   // se va: sube en espiral hacia arriba a la derecha y se apaga
+    const k = Math.min(1, vuelo), a0 = s * 1.4;
+    px = x + Math.cos(a0) * rad * 1.1 + k * rad * 2.2; py = y - k * rad * 3.2 + Math.sin(s * 6) * rad * 0.05;
+    qx = px - 1; qy = py + 1; alfa = 1 - k;
+  }else{
+    // Más sinuosa y pausada que la Polilla (dueño, 2026-11-10): da la vuelta despacio, ondulando hacia adentro y hacia afuera, y cada tanto se queda
+    // suspendida (el tiempo se «frena»: `fase` casi no avanza cerca de cada entero).
+    const pos = u => {
+      const w = u * 0.32, fase = w - 0.9 * Math.sin(2 * Math.PI * w) / (2 * Math.PI), a = -fase * 1.9;
+      const r = rad * (1.16 + 0.2 * Math.sin(a * 3 + 0.6) + 0.04 * Math.sin(u * 1.7));
+      return [x + Math.cos(a) * r, y + Math.sin(a) * r * 0.82 + Math.sin(u * 2.2) * rad * 0.05];
+    };
+    [px, py] = pos(s); [qx, qy] = pos(s - 0.06);
+  }
+  const t = rad * 0.13, aleteo = 0.3 + 0.7 * Math.abs(Math.sin(s * 18));
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, alfa);
+  ctx.translate(px, py); ctx.rotate(Math.atan2(py - qy, px - qx));
+  ctx.shadowColor = 'rgba(255,90,70,.9)'; ctx.shadowBlur = 10 / z;
+  ctx.fillStyle = 'rgba(255,235,235,.35)';   // las alitas transparentes
+  [-1, 1].forEach(l => { ctx.beginPath(); ctx.ellipse(-t * 0.2, l * t * 0.9 * aleteo, t * 0.9, t * 0.45 * aleteo + 0.3 / z, l * 0.5, 0, Math.PI * 2); ctx.fill(); });
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#d8231b'; ctx.beginPath(); ctx.ellipse(0, 0, t, t * 0.8, 0, 0, Math.PI * 2); ctx.fill();   // el caparazón
+  ctx.fillStyle = '#151010'; ctx.beginPath(); ctx.arc(t * 0.85, 0, t * 0.42, 0, Math.PI * 2); ctx.fill();   // la cabecita
+  ctx.strokeStyle = '#151010'; ctx.lineWidth = Math.max(0.6 / z, t * 0.1); ctx.beginPath(); ctx.moveTo(-t, 0); ctx.lineTo(t * 0.6, 0); ctx.stroke();
+  [[-0.45, 0.4], [-0.45, -0.4], [0.2, 0.45], [0.2, -0.45]].forEach(([a, b]) => { ctx.beginPath(); ctx.arc(a * t, b * t, t * 0.17, 0, Math.PI * 2); ctx.fill(); });
+  ctx.restore();
+}
+// Dibuja la vaquita de un token (revoloteando o yéndose). → true si hay que seguir animando.
+function vaquitaDibujarToken(id, est, x, y, rad, z){
+  if(!est) return false;
+  const tiene = vaquitaRevolotea(est), antes = vaquitaVista.get(id);
+  if(antes && !tiene) vaquitaVuelos.set(id, performance.now());
+  vaquitaVista.set(id, tiene);
+  if(tiene){ vaquitaVuelos.delete(id); dibujarVaquita(x, y, rad, z, semillaDe(id)); return true; }
+  const v = vaquitaVuelos.get(id);
+  if(v === undefined) return false;
+  const k = (performance.now() - v) / VAQUITA_VUELO_MS;
+  if(k >= 1){ vaquitaVuelos.delete(id); return false; }
+  dibujarVaquita(x, y, rad, z, semillaDe(id), k);
+  return true;
+}
 function dibujarPolillita(x, y, rad, z, semilla){
   const s = performance.now() / 1000 + semilla;
   const pos = k => {
@@ -934,6 +985,7 @@ function dibujarLienzo(){
     { const at = typeof atrapaDeToken === 'function' ? atrapaDeToken(est) : ''; if(at){ dibujarAtrapa(at, x, y, rad, z, semillaDe(d.id)); animando = true; } }   // 🕸 atrapado en una telaraña o una red (js/68)
     if(typeof curaDibujarDestello === 'function' && curaDibujarDestello(d.id, x, y, rad, z)) animando = true;   // ✨ la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
+    if(vaquitaDibujarToken(d.id, est, x, y, rad, z)) animando = true;   // 🐞 la Vaquita de San Antonio (y cuando se va volando)
     if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;
     if(typeof estoicoDibujar === 'function' && estoicoDibujar(d.id, x, y, rad, z)) animando = true;   // 🗿 el ±2 🛡 del Estoicismo (js/85)
     if(typeof provocadoDibujar === 'function' && provocadoDibujar(d.id, x, y, rad, z)) animando = true;   // 😤 contra quién va un provocado (js/77)   // ⬆⬇ recibió un buff o un debuff (js/75)

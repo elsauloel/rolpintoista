@@ -766,6 +766,8 @@
 
 ## 🎲 Tiradas que todavía hace sola el mapa (regla del dueño 2026-11-10: las tira el involucrado)
 
+**Auditoría completa, por bloques y con recomendación (2026-11-10): [`auditoria-tiradas.md`](auditoria-tiradas.md).**
+
 Pieza para convertirlas: `vtt-hexgrid/js/115-tirada-involucrado.js` (`tiradaInvolucrado({token, stat, valor?, extra, etq, titulo, texto})`).
 **Ya convertidas** (2026-11-10): Golpe en la sien y Carga que derriba (js/78), Salto aplastante (js/55), Tolerar un efecto (`dueloTolera`, js/13) y
 Atraer (`dueloAtraer`, js/13); las trampas (js/19) y el 1d6 del Escudo elemental (js/106) ya tenían su botón. Las que **ya piden botón** a quien

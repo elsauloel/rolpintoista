@@ -298,6 +298,7 @@ function escucharVinculables(){
         o.revelado = d.revelado && typeof d.revelado === 'object' ? {...d.revelado} : {};   // 🎯 lo que los jugadores ya descubrieron (js/89, 2026-11-01)
         o.pasosSilenciosos = d.pasosSilenciosos === true;
         o.percepcionAumentada = d.percepcionAumentada === true;   // 👁 sin punto ciego para el sigilo (js/02, 2026-11-09)   // 👣 Pasos silenciosos (js/02, 2026-10-15)
+        o.masDanoElem = d.masDanoElem && typeof d.masDanoElem === 'object' ? {...d.masDanoElem} : {};   // 💍 sus anillos elementales (js/53, 2026-11-10)
         o.auraMiedo = num(d.auraMiedo); o.auraEfEsp = num(d.auraEfEsp);   // 💀 la Calavera con vela (js/52, 2026-10-18)
         o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano); o.estandarteSilencio = num(d.estandarteSilencio);   // 🚩 el Estandarte de guerra y 🤐 el Tótem de silencio (js/73)
         o.meteoroCol = num(d.meteoroCol); o.meteoroFila = num(d.meteoroFila); o.meteoroRadio = num(d.meteoroRadio);   // ☄ la sombra del meteoro (js/74)

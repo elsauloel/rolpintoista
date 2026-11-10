@@ -390,7 +390,8 @@
   // Suma el Ef.Esp → su Especial en SP (P216), 4 No2 como la Bola de fuego, o cooldown 3 (dueño: «sí» a la propuesta completa de Claude).
   H('Lluvia de escarcha', 'DA', 'ega', 'g', 3, {detalle: 'Una lluvia de escarcha en un área de diámetro 5 (19 casillas), con el centro dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión de cada uno (quien gana tiene dodge roll para salir del área; también a sus aliados). Daño: 2d4 más un cuarto de su Efecto especial, de hielo (lo frenan la Defensa especial y la resistencia al hielo). El suelo queda congelado 2 turnos: quien está parado cuando aparece, y después por cada paso que da sobre el hielo, tira Agilidad contra su Efecto especial o resbala y queda Sentado. Al derretirse queda un charco de agua que no se va (el rayo pega más y paraliza más fácil a quien está parado ahí; el fuego lo seca).',
     no2: 4, spCosto: 'esp', auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión de cada uno en un área de diámetro 5; 2d4 + ¼ de su Ef.Esp de hielo; suelo congelado 2 turnos y después charco',
-    duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], radio: 2, centroAlcance: 'rango', dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo',
+    // (2026-11-10, probado en el mapa: el daño solo les llegaba a los rivales; el texto y el diseño dicen «también a sus aliados»)
+    duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], radio: 2, centroAlcance: 'rango', fuegoAmigo: true, dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo',
       zonaQueda: {turnos: 2, nombre: 'suelo congelado', estado: {nombre: 'Sentado', tiraPaso: true, superficie: 'hielo'}, contra: 'agl', tira: 'dmgesp', color: '#9FD3E8', altura: 'piso', enMantenimiento: false, inmediata: true},
       efectos: []}});
   // 🌩 Auditada (dueño, 2026-10-26; Mago, la Tormenta arcana de clase para creeps, el 19 del rol: «el costo en SP y No2 que sea igual que el original, el

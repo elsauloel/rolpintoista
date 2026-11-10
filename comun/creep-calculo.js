@@ -109,6 +109,8 @@ const CreepCalculo = (() => {
         }
         if(!h.pielNivel){ h.pielNivel = true; cambio = true; }
       }
+      // ❄ La Lluvia de escarcha también les pega a sus aliados (2026-11-10, probado en el mapa: la guardada antes solo les llegaba a los rivales).
+      if(h.nombre === 'Lluvia de escarcha' && h.duelo && h.duelo.objetivo === 'area' && h.duelo.fuegoAmigo === undefined){ h.duelo.fuegoAmigo = true; cambio = true; }
       // ⚡ La Aguja siniestra pasa a rápida (dueño, 2026-11-03): de cooldown 3, 2 No2 y 3 SP a cooldown 2, 1 No2 y 2 SP. Una vez (`agujaRapida`).
       if(h.nombre === 'Aguja siniestra' && !h.agujaRapida){
         if(num(h.cd) === 3){ h.cd = 2; if(num(h.cdActual) > 2) h.cdActual = 2; }
@@ -196,6 +198,17 @@ const CreepCalculo = (() => {
     Combatiente.equipoPuesto(sc).forEach(i => sumar(i, 1));
     (sc && sc.pasivas || []).forEach(p => sumar(p, pasivaComprasCreep(p)));
     return {n, fuentes};
+  }
+  /* 💍 Todos sus anillos elementales juntos, {el: {n, de}} (2026-11-10): va a lo público (tarjetaPublica), porque el daño del duelo lo cuenta
+     también la pantalla del jugador que lo recibe, que no ve la ficha privada del creep (antes ahí le faltaba el +2 del Anillo de escarcha). */
+  function masDanoElemTodos(sc){
+    const out = {};
+    const els = new Set();
+    const mirar = x => { if(x && x.masDanoElem && x.masDanoElem.el) els.add(x.masDanoElem.el); };
+    Combatiente.equipoPuesto(sc).forEach(mirar);
+    (sc && sc.pasivas || []).forEach(mirar);
+    els.forEach(el => { const r = masDanoElem(sc, el); if(r.n) out[String(el).slice(0, 20)] = {n: r.n, de: r.fuentes.join(' y ').slice(0, 80)}; });
+    return out;
   }
 
   // Armadura rota activa reduce la Defensa — igual que en ficha.html.
@@ -626,6 +639,7 @@ const CreepCalculo = (() => {
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,
+      masDanoElem: masDanoElemTodos(sc),   // 💍 los anillos elementales (2026-11-10): el +N lo cuenta también la pantalla del jugador golpeado
       percepcionAumentada: (sc.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada' || String(p.nombre || '').trim() === 'Percepción aumentada')),   // 👁 sin punto ciego para el sigilo (js/02, 2026-11-09)   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
       // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
       // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).
@@ -910,7 +924,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {defensas, migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, estandarteMods, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {defensas, migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, estandarteMods, enLasManos, regenPasivas, masDanoElem, masDanoElemTodos, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

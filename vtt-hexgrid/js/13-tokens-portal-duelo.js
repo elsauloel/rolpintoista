@@ -1897,7 +1897,7 @@ async function dueloAplicarDano(d, o){
   const botella = typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
   // 💍 Los anillos elementales (js/53): +N al daño de su elemento (el de la habilidad acá; el elemental del arma, más abajo).
   const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
-  const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab) : 0;
+  const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab, simular) : 0;
   // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
   const idHab00 = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null;
   // 🪱 `sinIdentidad` (la Sanguijuela, dueño 2026-11-03): el daño sigue siendo siniestro (×0 a no-muertos y demonios) pero no deja Herida sombría.
@@ -2040,7 +2040,7 @@ async function dueloAplicarDano(d, o){
       if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
         const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
         const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-        const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;
+        const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag, true) : 0;
         const idMag = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;
         const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);
         const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * multMag);

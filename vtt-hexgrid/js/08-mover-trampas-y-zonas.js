@@ -344,6 +344,16 @@ function zonaEsMia(t){
   // dueño (o de quien tiene 🎮 el control), como un personaje; su stat y sus estados se leen de la invocación (zonaResolverBanner).
   return t.tipo === 'pj' && !!t.fichaId && puedoMover(t);
 }
+/* Lo que ven TODAS las pantallas a la vez (una zona que aparece bajo los pies, el ⟳ Mantenimiento): una sola la resuelve (2026-11-10, probado en el
+   mapa: con el GM con 🎮 el control de un personaje, la Varita de la ventisca le pidió la Agilidad dos veces, en la pantalla del dueño y en la del GM).
+   Un creep → el GM; un personaje o su invocación → quien tiene el control, si no su dueño (lo mismo que el Escudo elemental, js/106). Al moverse
+   sigue resolviendo la pantalla que lo movió (zonaRevisarEntrada, con zonaEsMia). */
+function zonaResuelvoYo(t){
+  if(!t || !zonaEsMia(t)) return false;
+  if(t.tipo === 'creep') return true;
+  const r = ((fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {};
+  return fbUsuario.uid === (r.control || t.duenoUid || '');
+}
 // ¿t es rival de quien creó la zona? (mismo sentido que dueloEsRival, con el casteador guardado en el propio elemento).
 function zonaEsRival(el, t){ return el.zonaCasteadorTipo === 'creep' ? t.tipo === 'pj' : t.tipo === 'creep'; }
 function zonaAplicaA(el, t){
@@ -583,7 +593,7 @@ async function zonaSumarStack(t, spec, el, nombre){
     }catch(err){}
   }catch(err){ console.error('No se pudo sumar el stack de la zona:', err); }
 }
-function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
+function zonaRevisarMantenimiento(){ tokens.forEach(t => { if(zonaResuelvoYo(t)) zonaRevisarToken(t, true); }); }
 // Una zona recién puesta que «aparece bajo los pies» (2026-10-08, campo de estática, arena movediza Buena, luz flotante): cada pantalla revisa sus
 // tokens que ya están adentro, como si acabaran de entrar.
 function zonaInmediataRevisar(elId){
@@ -592,7 +602,7 @@ function zonaInmediataRevisar(elId){
   if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)) return;   // 💨 la primera tanda la arma quien la creó, al terminar de expandirse (js/112)
   const cs = celdasDeElemento(el);
   tokens.forEach(t => {
-    if(!zonaEsMia(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(!zonaResuelvoYo(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
     if(alturaDe(el) === 'piso' && typeof vuelaToken === 'function' && vuelaToken(t)) return;   // 🕊 quien vuela: lo del piso no le aparece bajo los pies
     if(!cs.some(c => c.col === t.col && c.fila === t.fila)) return;
     zonaEncolar(el, t);

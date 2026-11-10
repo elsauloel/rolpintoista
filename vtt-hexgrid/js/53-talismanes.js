@@ -146,9 +146,16 @@ async function talResguardo(d){
   const k = `resguardo|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
   if(talismanUsados.has(k)) return;
   talismanUsados.add(k);
+  // (2026-11-10, probado en el mapa: recargar la página del GM a mitad del turno borraba la marca y el Orbe daba un segundo escudo) En un creep la
+  // marca queda también guardada en su ficha (`resguardoTurno`), así vale aunque la pantalla se recargue.
+  if(ta.tipo === 'creep' && eq.creep && eq.creep.resguardoTurno === k) return;
   const spec = {nombre: 'Escudo especial', turnos: 1, escudoMagico: n};   // un escudo (P227, 2026-10-27; antes «Vida extra»)
   try{
-    if(ta.tipo === 'creep') await modificarCreep(ta.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+    if(ta.tipo === 'creep'){
+      let dado = false;
+      await modificarCreep(ta.fichaId, sc => { if(sc.resguardoTurno === k) return; sc.resguardoTurno = k; dado = true; EstadosAplicar.aplicarACreep(sc, spec); });
+      if(!dado) return;
+    }
     else await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec, origen: `${d.atacante.nombre} · ${nombre}`});
     try{ mesaLinea(`🔮 ${nombre}: ${d.atacante.nombre} recibe un escudo de ${n} hasta su próximo turno`, 'recordatorio'); }catch(err){}
   }catch(err){ console.error('El Orbe de resguardo:', err); }
@@ -196,13 +203,17 @@ function diablitoMomento(id, d){
   return true;
 }
 // 💍 Los anillos elementales: cuánto suma quien atacó al daño de ese elemento (y lo cuenta en la Mesa).
-function talMasDanoElem(d, el){
+function talMasDanoElem(d, el, simular){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
-  if(!eq || !el) return 0;
+  if(!el) return 0;
   let n = 0, de = 'El anillo';
-  if(eq.creep){ const r = CreepCalculo.masDanoElem(eq.creep, el); n = r.n; if(r.fuentes.length) de = r.fuentes.join(' y '); }   // anillos y pasivas (comun/creep-calculo.js)
-  else n = num((eq.resumen.masDanoElem || {})[el]);
-  if(n > 0) try{ mesaLinea(`💍 ${de} de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
+  if(eq && eq.creep){ const r = CreepCalculo.masDanoElem(eq.creep, el); n = r.n; if(r.fuentes.length) de = r.fuentes.join(' y '); }   // anillos y pasivas (comun/creep-calculo.js)
+  else if(eq) n = num((eq.resumen.masDanoElem || {})[el]);
+  else if(ta && ta.tipo === 'creep' && !String(ta.fichaId || '').includes(SEP_INVOCACION)){   // 💍 un jugador no ve la ficha del creep: lo público (2026-11-10)
+    const x = ((creepsPub.get(ta.fichaId) || {}).masDanoElem || {})[el];
+    if(x){ n = num(x.n); if(x.de) de = x.de; }
+  }
+  if(n > 0 && !simular) try{ mesaLinea(`💍 ${de} de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
   return n;
 }
 /* 🔔 La Campana de bronce y 🧉 el Matelisto Taragüí (2026-10-18): el botón de la Botonera (data-talisman). La Campana: una vez por combate (la

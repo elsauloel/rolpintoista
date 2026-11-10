@@ -15,8 +15,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
-37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
+36. [~] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
+37. [~] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
 38. [ ] **Estandarte de la vanguardia: +1 Defensa y +1 PdG a los aliados a 2 casillas o menos; el estado aparece y se va al entrar y salir del rango** (2026-11-10).
 39. [ ] **Línea S2 · Abanderado, niveles 1 a 5.**
 40. [ ] **Línea D2 · Tóxico, niveles 1 a 5.**

@@ -49,7 +49,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261110arcohab"></script>
-<script src="creep-calculo.js?v=20261109pa"></script>
+<script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261109nube"></script>
+<script src="skills-creep-base.js?v=20261110lluvia"></script>
 <script src="creeps-esenciales.js?v=20261110d25"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -3506,7 +3506,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
+    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, masDanoElem: {}, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
@@ -7058,6 +7058,18 @@ prueba('🧪 L2 Envenenador nivel 2 (2026-11-07): Tajo veloz, Escurridizo y las 
   igual([l2.equipo.length, l2.habilidades.map(h => h.nombre).join(), l2.pasivas.map(p => p.nombre).join(), (l2.cinturon || []).map(c => c.nombre).join(),
     ee('oportunidad').val, ee('normal').val, ee('contra').val],
     [5, 'Estocada,Hoja envenenada,Tajo veloz', 'Escurridizo', 'Óleo venenoso', 2, 0, 0]);
+});
+prueba('❄ Lluvia de escarcha (2026-11-10): también les pega a sus aliados; la guardada sin la marca la recibe al normalizar', () => {
+  const m = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Mago de escarcha' && c.nivel === 5).datos;
+  const ll = m.habilidades.find(h => h.nombre === 'Lluvia de escarcha');
+  const vieja = JSON.parse(JSON.stringify(m)); delete vieja.habilidades.find(h => h.nombre === 'Lluvia de escarcha').duelo.fuegoAmigo;
+  const n = CreepCalculo.normalizar(vieja);
+  igual([!!ll.duelo.fuegoAmigo, !!n.habilidades.find(h => h.nombre === 'Lluvia de escarcha').duelo.fuegoAmigo], [true, true]);
+});
+prueba('💍 El anillo elemental de un creep va a lo público (2026-11-10): la pantalla del jugador golpeado también suma el +2 del Anillo de escarcha', () => {
+  const C = CreepCalculo, m = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Mago de escarcha' && c.nivel === 3).datos;
+  const tp = C.tarjetaPublica(m), sin = C.tarjetaPublica({...m, equipo: (m.equipo || []).filter(i => !/Anillo de escarcha/.test(i.nombre || ''))});
+  igual([tp.masDanoElem.hielo && tp.masDanoElem.hielo.n, tp.masDanoElem.hielo && tp.masDanoElem.hielo.de, Object.keys(sin.masDanoElem).length], [2, 'Anillo de escarcha', 0]);
 });
 prueba('⭐ Pool esencial, R2 Hostigador a distancia nivel 2 (2026-11-09): Mantener a raya, Pies ligeros, Guantes de agarre y Cofia', () => {
   const C = CreepCalculo, r = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Hostigador a distancia' && c.nivel === 2).datos;

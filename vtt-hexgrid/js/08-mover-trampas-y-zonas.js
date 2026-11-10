@@ -517,12 +517,18 @@ let zonaVenenoCola = Promise.resolve();
 let zonaVenenoN = 0;
 // Lo que se acaba de aplicar, para que el cartel siguiente de la fila no muestre el número viejo mientras llega el cambio (15 s).
 const zonaVenenoRecien = new Map();   // tokenId|nombre → {stacks, t}
+// Los stacks que suma un Veneno sin `stacks` propios: los de su preset (Veneno = 4, como lo aplica EstadosAplicar). Antes el cartel decía +1 y se
+// aplicaban 4 (cola 40, Varita de miasma: «Veneno 10 → 11» y quedó en 14).
+function zonaVenenoStacksPreset(nombre){
+  const p = typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET.find(x => x && x.nombre === nombre) : null;
+  return Math.max(1, num(p && p.stacks) || 1);
+}
 // → Promise<{aplicar, antes, despues}>
 function zonaVenenoPreguntar(t, el, spec, primera){
   const p = zonaVenenoCola.then(() => new Promise(ok => {
     const nombreZ = el.zonaNombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t);
     const k = zonaIdDe(t) + '|' + spec.nombre, rec = zonaVenenoRecien.get(k);
-    const antes = Math.max(zonaStacksDe(t, spec.nombre), rec && Date.now() - rec.t < 15000 ? rec.stacks : 0), suma = Math.max(1, num(spec.stacks) || 1);
+    const antes = Math.max(zonaStacksDe(t, spec.nombre), rec && Date.now() - rec.t < 15000 ? rec.stacks : 0), suma = Math.max(1, num(spec.stacks) || zonaVenenoStacksPreset(spec.nombre));
     const despues = antes && spec.nombre === 'Veneno severo' ? antes : antes + suma;   // el severo no se acumula (Combatiente.acumularVeneno)
     const clave = 'zona-veneno-' + (++zonaVenenoN);
     const fin = v => { AvisoCombate.cartel(clave, null); if(v) zonaVenenoRecien.set(k, {stacks: despues, t: Date.now()}); ok({aplicar: v, antes, despues}); };

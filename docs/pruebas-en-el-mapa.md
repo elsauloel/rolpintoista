@@ -2648,3 +2648,43 @@ renombrados «Abanderado 1» a «Abanderado 5».
 - Nota del arnés: con dos cuadros de duelo abiertos (el aviso «Entendido» del primer objetivo y el duelo del segundo), el segundo objetivo de las ondas
   de apoyo sale en el otro cuadro; no es un error.
 
+## ✅ Cola 40 · Línea D2 · Tóxico, niveles 1 a 5 (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Con clics: GM, J1 (Larry copia y Rockardo copia) y J2 (Bizzante copia). Respaldo antes, todo restaurado después (tokens, creeps, fichas, mapa
+activo) y las dos nubes borradas.
+
+- **Alta**: los cinco niveles desde GM Tools → Encuentro 2 → «+ Creep» → Pool esencial → «Crear token».
+- **Números** (iguales a la prueba de niveles y al diseño):
+
+  | Nivel | Vida | No2 | SP | PdG.Esp | Ef.Esp | Defensa | Evasión | Res.Mt |
+  |---|---|---|---|---|---|---|---|---|
+  | 1 | 40 | 6 | 36 | 12 | 12 | 2 | 6 | 12 |
+  | 2 | 45 | 6 | 42 | 15 | 14 | 4 | 6 | 14 |
+  | 3 | 45 | 7 | 45 | 16 | 15 | 4 | 7 | 15 |
+  | 4 | 55 | 7 | 51 | 18 | 18 | 5 (7 a distancia) | 7 | 17 |
+  | 5 | 55 | 8 | 56 | 19 | 21 | 5 (7 a distancia) | 8 | 18 |
+
+  En la ficha lite del nv5: Def. especial 2, Res. tóxico 2 (escarpines +1 y Orbe de eco +1, como el catálogo; el diseño viejo decía +3).
+- **Espina tóxica** (nv1 → Bizzante): PdG.Esp contra Evasión; pegó, 1 de daño directo, Bizzante tiró Res.Esp para tolerar y quedó con Veneno ×2.
+- **Nube tóxica** (nv2, centro en Bizzante): la nube se expande y los duelos van de a uno (Bizzante y después Larry) con **una sola tirada de Ef.Esp
+  para todos** (6, con el botón del GM): Bizzante no resistió (3 de daño, Veneno); Larry resistió. Bizzante salió y volvió a entrar: cartel «Veneno 5 → 6
+  (ya estaba envenenado: la nube le suma 1 stack, sin tirada)» con Aplicar / Resolver a mano. 📷 `cola-40-2-nube-toxica`.
+- **Corroer** (nv3 → Larry): pegó, 2 de daño ácido (resta la Def. especial) y Armadura rota; a Larry le llegó el aviso «Tóxico te rompió Yelmo de hierro».
+- **Maldición de la sequía** (nv3 → Larry): ganó contra Res.Esp, Sequía 3 turnos.
+- **Maldición tormentosa** (nv4 → Bizzante): ganó contra Res.Esp, 1d6 (lo frenó la Def. especial) y Atormentado 3 turnos.
+- **Polen somnífero** (nv5, centro al lado de Larry): Ef.Esp contra Res.Mt, Sueño 2 turnos a Larry. 📷 `cola-40-3-polen-somnifero`. Después, Corroer al
+  dormido: su defensa salió sola «Evasión 1 (Stun: Evasión 1, sin tirar)», le entraron 8 y la Mesa dijo «💤 Larry (copia) se despertó: recibió daño».
+- **Varita de la ponzoña** (nv5 → Bizzante): no se esquiva, PdG.Esp contra Res.Esp; 1 de daño directo y Veneno.
+- **Varita de miasma** (nv1): deja la nube de 1 turno; a quien ya está adentro le toca en el Mantenimiento (no es inmediata, a propósito); Bizzante
+  entró, no resistió, salió el 50 % y le entró el Veneno. 📷 `cola-40-4-miasma-veneno`.
+- **Polvo de adormidera** (nv1, desde el cinturón): Larry y Bizzante dormidos; a Rockardo no le entró (está Invulnerable).
+- **Arreglado**: el cartel del Veneno de una zona sin stacks propios (la Varita de miasma) decía «Veneno 10 → 11» y se aplicaba el Veneno
+  estándar (4 stacks): quedó en 14. Ahora el cartel usa los stacks del estado estándar («Veneno 14 → 18»), igual que lo que se aplica
+  (`zonaVenenoStacksPreset`, vtt-hexgrid/js/08). Visto otra vez en el mapa después del arreglo.
+- **Para ver con el dueño** (no se cambió): (1) un personaje que ya tiene Veneno de otra cosa y está adentro de la Nube tóxica cuando aparece, tira
+  y suma 3 (2 + 3 = 5); el +1 sin tirada es solo para el que la nube ya envenenó. (2) La Varita de la ponzoña y la de miasma ponen el Veneno estándar
+  (4 stacks), que se suma a lo que ya tenga (6 → 10).
+- **Sin probar**: las pasivas Puntería arcana y Potencia especial por separado (sí están en los números); el Chaleco de kevlar frenando un arma a
+  distancia (sí su Defensa 7 a distancia en los números).
+- 📷 `cola-40-1-ficha-nv5` (ficha lite del nivel 5).
+

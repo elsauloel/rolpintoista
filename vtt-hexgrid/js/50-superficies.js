@@ -681,7 +681,7 @@ async function superficieAlIrse(el){
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
     momentoAbrir({tipo: 'zona-renueva', icono: '💧', titulo: 'El hielo se derrite', estado: 'listo',
-      resultado: `Queda un charco de agua: quien esté parado en el agua es vulnerable al rayo (Res. eléctrica −${AGUA_VULN_RAYO}).`, datos: {}});
+      resultado: 'Queda un charco de agua: a quien esté parado en el agua, el rayo le pega ×1,5.', datos: {}});   // (2026-11-10: nombraba una constante que ya no existe y el aviso no salía)
   }catch(err){ console.error('No se pudo dejar el charco de agua:', err); }
 }
 // El daño de rayo a quien está en el agua: ×1,5, para arriba. → {monto, txt}

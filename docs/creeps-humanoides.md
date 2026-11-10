@@ -452,6 +452,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-03): Esp 12 · Con 8 · Agi 6 · Des 5 · Fue 2, vida 40, 6 No2; Varita de miasma + Piedra bezoar · Chaleco de
   cuero · Escarpines de piel de cururú (Def 2, Def.Esp 1, Res. tóxico +3); Espina tóxica (rápida, cd 2, 1 No2) y Nube tóxica (lenta, cd 3, 1 No2).
   Consumible: **Polvo de adormidera** (en vez del Óleo venenoso, que no usaba: casi no ataca con arma). Sin cargar hasta que el dueño diga.
+  **Nivel 2 aprobado y cargado** (dueño, 2026-11-10: «me cierra»): Esp 14 · Con 9 · Agi 6 · Des 5 · Fue 2; + Corroer y la pasiva Puntería arcana;
+  + Polainas de cuero remendado y Casco de cuero endurecido (las 2 Comunes; protegerse de los golpes, como los magos). Con SP: vida 45, SP 42 (+7),
+  PdG.Esp 15, Ef.Esp 14, Defensa 4, Def.Esp 1, Evasión 6, Res.CC 10, Res.Mt 14.
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
   Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 

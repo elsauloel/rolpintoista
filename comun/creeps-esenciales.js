@@ -391,10 +391,14 @@
     equipo: ['Varita de los pilares', 'Escudo de madera forrado en lienzo', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
     habilidades: ['Potencia', 'Arrojo'], consumibles: ['Poción de HP'],
     estrategia: 'Support. Juega en el turno de los demás: escudo y +3 a la defensa en el momento justo; con los pilares tapa al que dispara.'});
-  esencial({linea: 'D2', nombre: 'Tóxico', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 6, 5, 12],
+  const D2 = {linea: 'D2', nombre: 'Tóxico', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Polvo de adormidera'],
+    estrategia: 'Debuffer. Envenena el aire: el grupo se tiene que mover o se pudre adentro.'};
+  esencial({...D2, nivel: 1, atrib: [8, 2, 6, 5, 12],
     equipo: ['Varita de miasma', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
-    habilidades: ['Espina tóxica', 'Nube tóxica'], consumibles: ['Polvo de adormidera'],
-    estrategia: 'Debuffer. Envenena el aire: el grupo se tiene que mover o se pudre adentro.'});
+    habilidades: ['Espina tóxica', 'Nube tóxica']});
+  esencial({...D2, nivel: 2, atrib: [9, 2, 6, 5, 14],   // (aprobado 2026-11-10: Corroer, Puntería arcana; + Polainas de cuero remendado y Casco de cuero endurecido. Con SP)
+    equipo: ['Varita de miasma', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer'], pasivas: ['Puntería arcana']});
   esencial({linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 7, 4, 12],
     equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima'],
     habilidades: ['Escalofrío', 'Robar el aliento'], consumibles: ['Gas adormecedor'],

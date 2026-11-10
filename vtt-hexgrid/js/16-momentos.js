@@ -103,7 +103,8 @@ function momentoRecibido(id, d){
   if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
-  if(d.tipo === 'escudo-dado' && typeof escudoDadoMomento === 'function') escudoDadoMomento(id, d);   // 🎲 el dado del Escudo elemental: lo tira quien lo tiró (js/106, 2026-11-09)
+  if(d.tipo === 'escudo-dado' && typeof escudoDadoMomento === 'function') escudoDadoMomento(id, d);
+  if(d.tipo === 'tirada-pedida' && typeof tiradaMomento === 'function') tiradaMomento(id, d);   // 🎲 la tirada la hace el involucrado (js/115, 2026-11-10)   // 🎲 el dado del Escudo elemental: lo tira quien lo tiró (js/106, 2026-11-09)
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
   if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'onda' && typeof ondaFxRecibido === 'function') ondaFxRecibido(id, d);   // 💥 la onda del Shockwave (js/94, 2026-11-03)
@@ -222,6 +223,7 @@ function renderMomentosFeed(){
     feed.addEventListener('click', ev => {
       const bx = ev.target.closest('[data-momento-cerrar]'); if(bx){ momentosCerrados.add(bx.dataset.momentoCerrar); renderMomentosFeed(); return; }
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
+      const btp = ev.target.closest('[data-tirada-por-el]'); if(btp && typeof tiradaPorEl === 'function'){ btp.disabled = true; tiradaPorEl(btp.dataset.tiradaPorEl); }   // 🎲 (js/115)
       const bm = ev.target.closest('[data-mal-de-ojo]'); if(bm){ const v = momentosFeed.get(bm.dataset.malDeOjo); if(v && typeof malDeOjoTirar === 'function'){ bm.disabled = true; malDeOjoTirar(bm.dataset.malDeOjo, v.d, true); } }   // 🧿 (js/60)
       const bz = ev.target.closest('[data-zona-extra]'); if(bz){ const v = momentosFeed.get(bz.dataset.zonaExtra); if(v && typeof zonaExtraTirar === 'function'){ bz.disabled = true; zonaExtraTirar(bz.dataset.zonaExtra, v.d, true); } }   // 🎲 (js/66)
       const bzo = ev.target.closest('[data-zona-extra-ok]'); if(bzo){ bzo.disabled = true; momentoActualizar(bzo.dataset.zonaExtraOk, {estado: 'aplicar'}); }   // 🎲→◎ el GM acepta por quien tiró (js/66)
@@ -247,6 +249,7 @@ function renderMomentosFeed(){
       ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
+      ${d.tipo === 'tirada-pedida' && typeof tiradaBotonFeed === 'function' ? tiradaBotonFeed(k, d) : ''}
       ${d.tipo === 'mal-de-ojo' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-mal-de-ojo="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #8a6fd0;background:#2a1f3a;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'tirado' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-ok="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">✔ Que se aplique (por él)</button></div>` : ''}

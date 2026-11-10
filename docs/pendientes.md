@@ -756,6 +756,35 @@
   del Anillo de Paso Fantasma guardado en la partida). Hasta pegarlas, cada pantalla cuenta por su lado como antes. Después, correr la prueba 28 de
   la cola.
 
+## 🎲 Tiradas que todavía hace sola el mapa (regla del dueño 2026-11-10: las tira el involucrado)
+
+Pieza para convertirlas: `vtt-hexgrid/js/115-tirada-involucrado.js` (`tiradaInvolucrado({token, stat, valor?, extra, etq, titulo, texto})`).
+**Ya convertidas** (2026-11-10): Golpe en la sien y Carga que derriba (js/78), Salto aplastante (js/55), Tolerar un efecto (`dueloTolera`, js/13) y
+Atraer (`dueloAtraer`, js/13); las trampas (js/19) y el 1d6 del Escudo elemental (js/106) ya tenían su botón. Las que **ya piden botón** a quien
+corresponde: la iniciativa (js/04), la tirada extra de una zona (js/66), el Malviaje (js/52), ayudar a zafarse (js/54), la Confusión del turno (js/20),
+la cura (js/70), la Varita del caos y la Tormenta arcana (las tira quien las usa al usarlas).
+Pendientes de convertir (cada una tira sola algo de otro):
+- [ ] `js/08` `zonaResolverBanner` (l. ~681, 722, 764, 777): la víctima tira su resistencia con su botón, pero **la tirada de quien creó la zona**
+  (`zonaTiraValor`), **el daño de la zona** (`zonaDano`), la tirada extra y la chance del estado (50 % de Veneno de la Varita de miasma) salen solas.
+- [ ] `js/106` `escudoQuemarYa` (l. ~578, 609): la **Res.Esp de quien se quema** contra el Ef.Esp del escudo y la **chance de Parálisis** del eléctrico.
+- [ ] `js/13` `dueloCadena` (l. ~2181, 2196): la **chance de Parálisis** de cada salto del rayo en cadena.
+- [ ] `js/13` `colisionTirar` (l. ~2227): las **Constituciones** de un choque por empujón.
+- [ ] `js/13` `anulaZona` / `anularEn` (l. ~2372, 2477): el **Ef.Esp de la Anulación** contra la Res.Mt de quien creó la zona o invocó.
+- [ ] `js/13` `dueloRiesgo` (l. ~2535): el **daño del arma que explota en la mano**.
+- [ ] `js/16` `deteccionGMResolver` (l. ~412): la **Destreza del oculto** en el pedido de detección (la tira el GM a escondidas: ¿a propósito?).
+- [ ] `js/21` `chanceCartel` y `js/23` Reflejos de mangosta (l. ~43, 60): las chances (Retirada limpia, Inamovible, Recuperarse, Reflejos) y la
+  **Evasión contra la trampa** de Reflejos.
+- [ ] `js/26` `dueloRompeEscudo` (l. ~76): la chance de romper el escudo.
+- [ ] `js/28` desarmar una trampa (l. ~64): el **1d10 de qué pasa al fallar** (el intento lo tira quien desarma, con su botón).
+- [ ] `js/33` flechas (l. ~58, 99, 160): la moneda de la flecha errada, la chance de Parálisis del salto y el **daño del virote que estalla**.
+- [ ] `js/50` `aguaConduceRayo` (l. ~812): la chance del rayo en el agua.
+- [ ] `js/52` `auraResolver` (l. ~148): el **Ef.Esp del aura de miedo contra la Res.Mt** de cada uno.
+- [ ] `js/53` `talSalvajeRodar` (l. ~100): el d6 del Orbe salvaje.
+- [ ] `js/54` `mordidaDano` (l. ~233): el **daño que se repite** al no soltarse.
+- [ ] `js/80` `ceboAtraer` (l. ~46): la **Res.Mt contra el cebo**.
+- [ ] `js/102` `ordenTirarValor` (l. ~150): la **Res.Mt contra la Mala sombra** al empezar la ronda.
+- (A propósito, no se tocan: el robo en sigilo, `js/47` l. ~179, que no va a la Mesa para no delatarlo.)
+
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
 
 - [x] El Escudo humano de los creeps se llama así en todos lados (2026-10-27): la marca del creep, el Anuncio («le aplicó Escudo humano») y el cuadro del

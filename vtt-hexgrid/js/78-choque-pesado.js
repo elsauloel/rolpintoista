@@ -381,18 +381,21 @@ function arrastreZonasMomento(id, d){
 
 // 🔨 Golpe en la sien (dueño, 2026-11-10; el Martillero nv4): si pegó, su Fuerza contra la Res.CC del golpeado; si no le llega, Stun 1 turno (empate: no).
 // Las inmunidades (Inmunidad a CC, Invulnerable, Protección de jefe) las aplica la regla común (EstadosAplicar / la ficha del dueño). Mismo camino que la
-// Carga que derriba: las dos tiradas a la vista en la Mesa (con los dados) y el aviso en la Crónica; si no se puede tirar, ✋ a mano.
+// Carga que derriba: cada tirada la hace el involucrado con su botón (js/115), a la vista en la Mesa, y el aviso en la Crónica; ✋ a mano.
 async function golpeSienResuelto(d){
   if(!choquePesadoUnaVez(d, 'sien')) return;
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId);
   const sc = ta ? creepPrivadoDe(ta.fichaId) : null;
   if(!t || !sc) return;
   const nom = nombreDe(ta), obj = nombreDe(t);
-  const rf = Combatiente.tirarStat(CreepCalculo.statValor(sc, 'fue'), sc.estados, 'fue');
-  const rr = Combatiente.tirarStat(trampaValorStat(t, 'rescc'), confusionEstadosDe(t), 'rescc');
+  // 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza, quien maneja al creep (el GM); la Res.CC, quien maneja al golpeado.
+  await esperarDueloCerrado(20000);
+  const rf = await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'fue', etq: 'Fuerza', icono: '🔨', para: 'Golpe en la sien',
+    titulo: `${nom}: Golpe en la sien a ${obj}`, texto: `Le dio en la sien a ${obj}: su Fuerza contra la Res.CC de ${obj}. Si no le llega, Stun 1 turno.`});
+  const rr = rf ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: 'rescc', etq: 'Res.CC', icono: '🔨', para: 'para no quedar aturdido',
+    titulo: t.tipo === 'creep' ? `${obj}: ${nom} le pegó con Golpe en la sien` : `${obj}: ${nom} te pegó con Golpe en la sien`,
+    texto: `Tirá Res.CC para resistir Stun (sacó ${rf.total} de Fuerza: tenés que llegar a ${rf.total} o más).`}) : null;
   if(!rf || !rr){ mesaLinea(`🔨 ${nom} le dio en la sien a ${obj}: ✋ tirá a mano su Fuerza contra la Res.CC de ${obj} (si no le llega, Stun 1 turno)`, 'alerta-roja'); return; }
-  mesaPublicar(`🔨 ${nom} · Golpe en la sien · Fuerza`, {...rf, quien: nom, desde: 'gm'});
-  mesaPublicar(`${obj} · Res.CC (para no quedar aturdido)`, {...rr, quien: obj, ...(t.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(t.fichaId).split(SEP_INVOCACION)[0]})});
   const pierde = rr.total < rf.total;
   let frena = '';
   if(pierde){
@@ -421,11 +424,14 @@ async function cargaDerribaResuelto(d){
   const sc = ta ? creepPrivadoDe(ta.fichaId) : null;
   if(!t || !sc) return;
   const x = Math.round(num(d.ataque.derriba)), nom = nombreDe(ta), obj = nombreDe(t);
-  const rf = Combatiente.tirarStat(CreepCalculo.statValor(sc, 'fue') + x, sc.estados, 'fue');
-  const rr = Combatiente.tirarStat(trampaValorStat(t, 'rescc'), confusionEstadosDe(t), 'rescc');
+  // 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza + X, quien maneja al creep (el GM); la Res.CC, quien maneja al golpeado.
+  await esperarDueloCerrado(20000);
+  const rf = await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'fue', extra: x, etq: `Fuerza + ${x}`, icono: '🏃', para: 'Carga que derriba',
+    titulo: `${nom}: Carga que derriba contra ${obj}`, texto: `Llegó a toda carrera (${x} casillas): su Fuerza + ${x} contra la Res.CC de ${obj}. Si le gana, queda Sentado.`});
+  const rr = rf ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: 'rescc', etq: 'Res.CC', icono: '🏃', para: 'para no caer',
+    titulo: t.tipo === 'creep' ? `${obj}: ${nom} lo embistió con la Carga que derriba` : `${obj}: ${nom} te embistió con la Carga que derriba`,
+    texto: `Tirá Res.CC para no caer Sentado (sacó ${rf.total}: tenés que llegar a ${rf.total} o más).`}) : null;
   if(!rf || !rr){ mesaLinea(`🏃 ${nom} carga contra ${obj}: ✋ tirá a mano Fuerza + ${x} contra su Res.CC (si gana, Sentado)`, 'alerta-roja'); return; }
-  mesaPublicar(`🏃 ${nom} · Carga que derriba · Fuerza + ${x}`, {...rf, quien: nom, desde: 'gm'});
-  mesaPublicar(`${obj} · Res.CC (para no caer)`, {...rr, quien: obj, ...(t.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(t.fichaId).split(SEP_INVOCACION)[0]})});
   const cae = rr.total < rf.total;
   if(cae){
     try{

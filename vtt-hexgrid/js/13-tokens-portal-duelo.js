@@ -2548,7 +2548,11 @@ async function dueloAtraer(d){
   if(!t || !ta) return;
   const nom = nombreDe(t), titulo = `${d.hab.nombre}: ¿${nom} se resiste?`;
   const fue = trampaValorStat(t, a.contra || 'fue'), fF = formulaParaValor(fue), fE = formulaParaValor(num(a.tiraValor));
-  const rF = fF ? tirarDados(fF.formula) : {total: 0}, rE = fE ? tirarDados(fE.formula) : {total: 0};
+  // 🎲 Cada tirada la hace el involucrado, con su botón (dueño, 2026-11-10; js/115): el Ef.Esp, quien usó la habilidad; la Fuerza, quien maneja al atraído.
+  const rE = (await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'dmgesp', valor: num(a.tiraValor), sinEstados: true, etq: 'Ef.Esp', icono: '🪝', para: d.hab.nombre,
+    titulo: `${d.hab.nombre}: ${d.atacante.nombre || 'quien la usó'} tira de ${nom}`, texto: `Su Ef.Esp contra la Fuerza de ${nom}: si le gana, lo trae ${a.casillas} casillero${a.casillas === 1 ? '' : 's'}.`})) || {total: 0};
+  const rF = (await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: a.contra || 'fue', valor: fue, sinEstados: true, etq: 'Fuerza', icono: '🪝', para: 'para no ser atraído',
+    titulo: `${nom}: ${d.hab.nombre} tira de vos`, texto: `Tirá Fuerza para plantarte (sacó ${rE.total}: empate o más, no te mueve).`})) || {total: 0};
   const cuenta = `Fuerza ${fF ? fF.formula : '0'} → ${rF.total} contra Ef.Esp ${fE ? fE.formula : '0'} → ${rE.total}`;
   if(rF.total >= rE.total){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: se planta y no lo mueve.`, estado: 'listo'}); return; }
   const im = chanceDe(t, 'inamovible');
@@ -2777,11 +2781,13 @@ async function dueloTolera(d, ef){
   if(!t) return null;
   const valor = typeof trampaValorStat === 'function' ? num(trampaValorStat(t, tl.stat)) : 0;
   const etq = (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[tl.stat]) || (tl.stat === 'resmg' ? 'Res.Esp' : tl.stat);
-  const r = Combatiente.tirarStat(valor, [], tl.stat);
-  if(!r) return null;
   const quien = nombreDe(t), contra = Math.round(num(tl.valor));
-  const aNombre = typeof Duelo !== 'undefined' && Duelo.quienDeLado ? Duelo.quienDeLado(d.defensor) : {};   // a nombre del golpeado y su dueño (no la cuenta de quien publica; 2026-11-03)
-  try{ mesaPublicar(`${quien} · ${etq} (tolerar ${ef.nombre})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien, ...aNombre}); }catch(err){}
+  // 🎲 La tira el golpeado, con su botón (dueño, 2026-11-10: «las tiradas las hace el usuario involucrado»; js/115). ✋ a mano y el respaldo del GM, ahí.
+  const r = typeof tiradaInvolucrado === 'function'
+    ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: tl.stat, valor, sinEstados: true, etq, icono: '🧪', para: `tolerar ${ef.nombre}`,
+        titulo: `${quien}: ¿tolerás ${ef.nombre}?`, texto: `Tirá ${etq} para tolerar ${ef.nombre}: tenés que superar ${contra}.`})
+    : Combatiente.tirarStat(valor, [], tl.stat);
+  if(!r) return null;
   return r.total > contra ? {nota: `${quien} lo toleró: ${etq} ${r.total} contra ${contra} — no le queda ${ef.nombre}`, sinEfecto: true}
     : {tirada: r.total, contra};
 }

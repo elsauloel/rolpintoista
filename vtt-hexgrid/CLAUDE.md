@@ -851,6 +851,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   dos copias. Duración: un charco no vence, así que el junto tampoco (si todos tuvieran turnos, el que dura más). El hielo y la lava no se juntan.
   Probado en «Claude · pruebas» / «Prueba · Escudo de rayo» (dos que se pisan, un tercero pegado, uno suelto que queda aparte).
 
+- **🎲 Las tiradas las hace el involucrado** (2026-11-10, dueño: «no quiero que las tiradas las haga sola el mapa»): `js/115-tirada-involucrado.js`,
+  `tiradaInvolucrado({token, tokenId, stat, valor?, extra, sinEstados?, etq, icono, titulo, texto, para})` → `{total, formula, rolls, aMano?}` o null.
+  La tira quien maneja al token (creep → el GM; personaje o invocación → 🎮 control o dueño): si es esta pantalla, el cartel ahí (`tiradaCartel`, uno
+  por vez, `tiradaEnFila`); si no, un momento `tirada-pedida` (`datos.tiraUid`/`tiraGM` — **no** `paraUid`, que js/16 abre como Aviso genérico y tapa el
+  cartel) que esa pantalla contesta (`tiradaMomento`: avisa `datos.visto`, toma con transacción esperando → tirando, escribe 'tirado' o 'mano'). Respaldo:
+  si a los 6 s no hay `visto`, el GM tira por él; en la Crónica, «🎲 Tirar por …» (`tiradaBotonFeed`, js/16). La usan Golpe en la sien y Carga que
+  derriba (js/78, después de `esperarDueloCerrado`), Salto aplastante (js/55, un cartel por rival), `dueloTolera` y `dueloAtraer` (js/13).
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

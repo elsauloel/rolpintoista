@@ -69,20 +69,22 @@ async function saltoHab(mio, t, ataque, yo){
   return true;
 }
 // 💥 El Salto aplastante: los rivales pegados a donde cayó tiran Res.CC contra su Fuerza (una tirada para todos); quien no llega queda Sentado.
+// 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza, quien maneja al que salta; la Res.CC de cada rival, quien lo maneja
+// (un cartel por rival, en orden).
 async function saltoAplastar(mio, yo){
-  const sc = mio.tipo === 'creep' ? creepPrivadoDe(mio.fichaId) : null;
-  const vFue = sc ? CreepCalculo.statValor(sc, 'fue') : trampaValorStat(mio, 'fue');
   const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== mio.id && distanciaHex(x, mio) === 1 && !x.oculto && !x.bajoTierra && !etereoDe(x) && dueloEsRival(yo, x));
   if(!rivales.length) return;
-  const nom = nombreDe(mio), rf = Combatiente.tirarStat(vFue, sc ? sc.estados : confusionEstadosDe(mio), 'fue');
-  if(!rf) return;
-  mesaPublicar(`💥 ${nom} cae aplastando · Fuerza`, {...rf, quien: nom, ...(mio.tipo === 'creep' ? {desde: 'gm'} : {})});
+  const nom = nombreDe(mio);
+  const rf = await tiradaInvolucrado({token: tokens.get(mio.id) || mio, tokenId: mio.id, stat: 'fue', etq: 'Fuerza', icono: '💥', para: 'Salto aplastante',
+    titulo: `${nom} cae aplastando`, texto: `Su Fuerza contra la Res.CC de ${rivales.map(nombreDe).join(', ')}: quien no llegue queda Sentado.`});
+  if(!rf){ mesaLinea(`💥 ${nom} cae aplastando: ✋ tirá a mano su Fuerza contra la Res.CC de los pegados (quien no llega, Sentado)`, 'alerta-roja'); return; }
   const lineas = [];
   for(const x of rivales){
-    const rr = Combatiente.tirarStat(trampaValorStat(x, 'rescc'), confusionEstadosDe(x), 'rescc');
     const n2 = nombreDe(x);
+    const rr = await tiradaInvolucrado({token: tokens.get(x.id) || x, tokenId: x.id, stat: 'rescc', etq: 'Res.CC', icono: '💥', para: 'para no caer',
+      titulo: x.tipo === 'creep' ? `${n2}: ${nom} le cayó al lado aplastando` : `${n2}: ${nom} te cayó al lado aplastando`,
+      texto: `Tirá Res.CC para no caer Sentado (sacó ${rf.total} de Fuerza: tenés que llegar a ${rf.total} o más).`});
     if(!rr){ lineas.push(`${n2}: ✋ tirá Res.CC a mano`); continue; }
-    mesaPublicar(`${n2} · Res.CC (para no caer)`, {...rr, quien: n2, ...(x.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(x.fichaId).split(SEP_INVOCACION)[0]})});
     const cae = rr.total < rf.total;   // empate: no cae (llega)
     lineas.push(`${n2}: ${rr.total} contra ${rf.total} → ${cae ? 'queda Sentado' : 'se mantiene en pie'}`);
     if(!cae) continue;

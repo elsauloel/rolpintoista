@@ -37,6 +37,10 @@
 - **Automatizar o aclarar**: si se puede automatizar, se automatiza; si no, se aclara (⚙ Automatizado / ✋ A mano, en «Detalles técnicos»).
   **Sin silencio**: lo automático tiene su Anuncio para quien lo dispara y para quien lo recibe (patrón de `vtt-hexgrid/js/66-zona-extra.js`).
   **Salida a mano**: en cada automatización nueva, preguntar en una línea si vale «Aplicar automático» / «Resolver a mano» (decide él).
+- **Las tiradas las hace el involucrado** (dueño, 2026-11-10: «no quiero que las tiradas las haga sola el mapa… le quitan la sensación de que el
+  jugador está involucrado»): las tiradas las hace el usuario involucrado, con su botón; el mapa no tira solo. Salida: el GM tira por el ausente, y
+  ✋ Resolver a mano. Pieza común: `vtt-hexgrid/js/115-tirada-involucrado.js` (`tiradaInvolucrado`); las trampas, en `js/19`. Al automatizar algo
+  nuevo que tire dados de alguien, usarla. Lo que falta convertir: `docs/pendientes.md`, «Tiradas que todavía hace sola el mapa».
 - **Excepción a propósito**: los efectos de arma sobre el golpeado (`efectosGolpe`) se recuerdan y se tiran, no se aplican solos, salvo pedido.
   Las «inmunidades a X» de ítems nuevos son un estado recordatorio «Inmune a X (origen)», sin mecánica (6 anillos/pergaminos viejos sí la tienen).
 - **Texto de una skill o ítem**: el efecto práctico en números primero, la tirada después, las notas al final. El texto visible dice solo qué pasa:

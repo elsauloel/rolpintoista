@@ -405,6 +405,9 @@
   esencial({...D2, nivel: 4, atrib: [10, 2, 7, 6, 17],   // (aprobado 2026-11-10: Maldición tormentosa, Potencia especial; Chaleco de kevlar (Buena) por la regla del dueño para los magos: protegerlos del rango. Con SP)
     equipo: ['Varita de la ponzoña', 'Piedra bezoar', 'Chaleco de kevlar', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
     habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía', 'Maldición tormentosa'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({...D2, nivel: 5, atrib: [10, 2, 8, 7, 18],   // (aprobado 2026-11-10: Polen somnífero; Orbe de eco (Buena) en lugar de la Piedra bezoar. Con SP. Línea D2 completa)
+    equipo: ['Varita de la ponzoña', 'Orbe de eco', 'Chaleco de kevlar', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía', 'Maldición tormentosa', 'Polen somnífero'], pasivas: ['Puntería arcana', 'Potencia especial']});
   esencial({linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 7, 4, 12],
     equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima'],
     habilidades: ['Escalofrío', 'Robar el aliento'], consumibles: ['Gas adormecedor'],

@@ -461,6 +461,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 4 aprobado y cargado** (dueño, 2026-11-10: «sí»): Esp 17 · Con 10 · Agi 7 · Des 6 · Fue 2; + Maldición tormentosa y la pasiva Potencia
     especial; **el Chaleco de kevlar (Buena) reemplaza al Chaleco de cuero**, por la regla del dueño para los magos: protegerlos del rango. Con SP:
     vida 55 (5 del chaleco), SP 51 (+8), PdG.Esp 18, Ef.Esp 18, Defensa 5 (7 contra armas a distancia), Evasión 7.
+  **Nivel 5 aprobado y cargado** (dueño, 2026-11-10: «ok»): Esp 18 · Con 10 · Agi 8 · Des 7 · Fue 2; + Polen somnífero; **el Orbe de eco (Buena)
+    reemplaza a la Piedra bezoar** (Ef.Esp +2: todo lo suyo se resiste contra su Ef.Esp). Con SP: vida 55, SP 56, PdG.Esp 19, Ef.Esp 21, Defensa 5
+    (7 contra armas a distancia), Def.Esp 2, 8 No2, Evasión 8. **Línea D2 completa** (2026-11-10).
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
   Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 

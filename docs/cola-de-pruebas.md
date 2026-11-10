@@ -25,6 +25,7 @@ Cada línea nueva que se termine de diseñar se suma al final.
 37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
 38. [ ] **Estandarte de la vanguardia: +1 Defensa y +1 PdG a los aliados a 2 casillas o menos; el estado aparece y se va al entrar y salir del rango** (2026-11-10).
 39. [ ] **Línea S2 · Abanderado, niveles 1 a 5.**
+40. [ ] **Línea D2 · Tóxico, niveles 1 a 5.**
 
 ## Hechas
 

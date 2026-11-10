@@ -781,6 +781,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Capellina de hierro** (Buena) en lugar del Casco de cuero endurecido; pasiva **Voluntad de hierro** (+2 Res.CC): Def 7, Def. especial 1, PdG 9,
   Dmg 13, Bloqueo 14, Parry 10, Res.CC 14. Golpe en la sien (cooldown 4, lenta): un ataque con su arma; si pega, su Fuerza contra la Res.CC del
   golpeado → Stun 1 turno (el jefe es inmune). **Cargado** (2026-11-10).
+  **Nivel 5 aprobado** (dueño, 2026-11-10: «el personaje nivel 5 me parece bien»): Fue 14 · Con 12 · Des 9 · Agi 8 · Esp 2, vida 75, 8 No2;
+  **Coraza de bronce con runas** (Buena) en lugar del Chaleco: Def 8, Def. especial 4, Bloqueo 15, Parry 10, Res.CC 15. Habilidad nueva:
+  **Golpe demoledor**. **Cargado** (2026-11-10). La línea W3 queda completa.
 
 - **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
   busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):

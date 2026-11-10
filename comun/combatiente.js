@@ -2269,7 +2269,12 @@ const Combatiente = (() => {
     const ESP = {pdg: 'espaldaPdg', fijo: 'espaldaFijo', critpot: 'espaldaCritpot'};
     const esp = Object.keys(ESP).reduce((acc, k) => { const v = nf(arma.espalda && arma.espalda[k]) + nf(a[ESP[k]]); if(v > 0) acc[k] = v; return acc; }, {});
     const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
-    return {tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
+    // 🏹 Un disparo con una habilidad sigue siendo un disparo con ese arma (2026-11-10, cola de pruebas 35: el Hostigador con el Arco de la sombra perdía la
+    // Emboscada y la Espalda a distancia en Tiro certero, Tiro a la rodilla…): lo que el mapa usa al apuntar —la distancia mínima del arco, el tiro alto, la
+    // distancia ideal y las mecánicas de arco (RASGOS_ARCO)— viaja también acá. La espalda, el sin Parry y la Perfora ya se suman arriba con los de la habilidad.
+    // `o.armaItem`: el ítem entero, cuando `o.arma` viene recortado (la ficha).
+    const delArma = (() => { const it = o.armaItem || arma; if(!it || !it.armaDeRango) return {}; const r = ataqueDeArma(it); ['espalda', 'sinParry', 'armaDetalle', 'perfora'].forEach(k => delete r[k]); return r; })();
+    return {...delArma, tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
       alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}), ...(perfora > 0 ? {perfora} : {}),
       mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, fuerza: nf(a.fuerza), dados: nf(a.dados) + nf(a.dadosPorX) * X,   // `dados`: fijos, del Tipo del arma (2026-10-20, Golpe fuerte de creep)
         fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono),

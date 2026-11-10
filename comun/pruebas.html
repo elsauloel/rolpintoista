@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261109inconsc"></script>
+<script src="combatiente.js?v=20261110arcohab"></script>
 <script src="creep-calculo.js?v=20261109pa"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261108dur"></script>
+<script src="ficha-acciones.js?v=20261110arcohab"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261107dosarmas"></script>
 <script src="estado-preguntas.js"></script>
@@ -987,6 +987,15 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   const a = Combatiente.ataqueConArreglos(hab, hab.duelo, {arma: arco, alcance: 10, X: 0});
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
+});
+prueba('🏹 Un disparo con habilidad lleva las mecánicas del arco (2026-11-10, cola 35: Emboscada y Espalda a distancia del Arco de la sombra)', () => {
+  const sombra = CATALOGO_BASE.find(i => i.id === 'cat-arco-de-la-sombra');
+  const hab = {nombre: 'Tiro certero'}, c = {modo: 'arma', arma: {pdg: 1, perfora: 3}};
+  const cr = Combatiente.ataqueConArreglos(hab, c, {arma: {...sombra, id: '', rango: true}, alcance: 14});
+  const pj = Combatiente.ataqueConArreglos(hab, c, {arma: {id: 'x', nombre: sombra.nombre, tipoDado: 4, rango: true}, armaItem: sombra, alcance: 14});
+  const cuerpo = Combatiente.ataqueConArreglos(hab, c, {arma: {nombre: 'Espada', tipoDado: 8, rango: false, armaDeRango: false}, alcance: 1});
+  igual([cr.tipo, cr.arco, cr.emboscada, JSON.stringify(cr.espaldaDistancia), cr.perfora, cr.mods.pdg, !!cr.armaDetalle, pj.arco, pj.emboscada, JSON.stringify(pj.espaldaDistancia), !!cuerpo.arco, cuerpo.emboscada],
+    ['habilidad-arma', true, 1, '{"pdg":2,"fijo":1}', 3, 1, false, true, 1, '{"pdg":2,"fijo":1}', false, undefined]);
 });
 prueba('🪨 Inmunidad tóxica (2026-10-28): la pasiva racial deja «Inmune a lo tóxico» (frena el Veneno) y Res. tóxico 99; Pedos Tóxicos afecta a los aliados', () => {
   const pas = PASIVAS_BASE.find(p => p.poolId === 'inmunidad-toxica');

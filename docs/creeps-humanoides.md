@@ -464,6 +464,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 5 aprobado y cargado** (dueño, 2026-11-10: «ok»): Esp 18 · Con 10 · Agi 8 · Des 7 · Fue 2; + Polen somnífero; **el Orbe de eco (Buena)
     reemplaza a la Piedra bezoar** (Ef.Esp +2: todo lo suyo se resiste contra su Ef.Esp). Con SP: vida 55, SP 56, PdG.Esp 19, Ef.Esp 21, Defensa 5
     (7 contra armas a distancia), Def.Esp 2, 8 No2, Evasión 8. **Línea D2 completa** (2026-11-10).
+  **Dos reglas confirmadas por el dueño al probar la línea en el mapa** (cola 40, 2026-11-10, las dos con «SÍ»):
+  - **Nube tóxica y el que ya está envenenado por otra cosa**: igual tira la resistencia cuando aparece la nube y, si pierde, recibe +3 stacks.
+    El «+1 stack sin tirar» es solo para quien envenenó la misma nube.
+  - **Las varitas** aplican el Veneno común de 4 stacks, **sumado** a los que el objetivo ya tiene (por ejemplo, 6 → 10).
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
   Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 

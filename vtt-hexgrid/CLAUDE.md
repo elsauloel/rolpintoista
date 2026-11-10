@@ -845,6 +845,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   si se salen un poco»): `aguaForma(celdas)` (guardada por charco) toma ese contorno, lo remuestrea, lo suaviza fuerte (promedio con los vecinos, 36 veces),
   le devuelve la superficie que tenía y lo corre un poco afuera; `aguaTrazar(forma, amp, adentro, fase)` le pasa la onda a lo largo de la orilla. La
   línea punteada sigue marcando las casillas exactas.
+  **Dos charcos que se tocan son uno** (2026-11-10, dueño: «cuando dos charcos se superponen, se deberían fusionar»): `aguaRevisarFusion` (js/50,
+  el GM, cada 1,5 s junto al secado) junta los charcos que comparten casilla o están pegados en uno nuevo con todas las casillas (las reglas no dejan
+  cambiar `celdas` de un elemento ya creado) y borra los de antes. Su id sale de los ids juntados (`aguaHash`), así dos pantallas del GM no hacen
+  dos copias. Duración: un charco no vence, así que el junto tampoco (si todos tuvieran turnos, el que dura más). El hielo y la lava no se juntan.
+  Probado en «Claude · pruebas» / «Prueba · Escudo de rayo» (dos que se pisan, un tercero pegado, uno suelto que queda aparte).
 
 ## Pendiente (más adelante)
 

@@ -109,6 +109,7 @@ const iconosNorm = s => String(s || '').trim().toLowerCase().normalize('NFD').re
 // palabra conocida (dueño, 2026-11-01: «Cuero duro» → 🪨 de las defensas; «veneno» → 🤢…), con la polaridad de la familia si el estado no trae la suya.
 // Solo cae en la inicial si no matchea nada. Orden: lo más específico primero.
 const ICONOS_FAMILIAS = [
+  [/^🚩|estandarte/, {ic: '🚩', pol: 'buff'}],   // (2026-11-10, dueño: «¿estos estados se muestran en los iconos?») «🚩 Estandarte de la vanguardia», «🚩 Estandarte del muro»… salían con la inicial
   [/cuero|piel|coraza|armadura|escudo|blindad|endurec/, {ic: '🪨', pol: 'buff'}],
   [/venen|toxic/, {ic: '🤢', pol: 'debuff', anim: 'burbujas', n: 3}],
   [/sangr/, {ic: '🩸', pol: 'debuff', anim: 'gota'}],

@@ -730,7 +730,52 @@ function elementoComoDatos(el){
     zonaCasteadorRef: String(el.zonaCasteadorRef || '').slice(0, 64), zonaCasteadorTipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj',
     zonaResueltos: [], zonaEnMantenimiento: false, zonaCadaPaso: false, zonaAltura: 'piso', zonaEstado: el.zonaEstado, duenoUid: fbUsuario.uid};
 }
-setInterval(() => { aguaRevisarFuego().catch(err => console.error(err)); }, 1500);
+/* 💧💧 Dos charcos que se tocan son uno (2026-11-10, dueño: «cuando dos charcos se superponen, se deberían fusionar»). Lo hace el GM, como el
+   secado: los charcos que comparten una casilla o están pegados (casillas vecinas) se juntan en uno solo —un charco nuevo con todas las casillas
+   (y el color del más grande) reemplaza a los de antes—, así se dibuja una sola orilla y el rayo corre por todo el agua junta (charcoCeldas). La duración: un charco
+   no vence (queda hasta que lo borre el GM o lo seque el fuego), así que el junto tampoco; si alguno tuviera turnos puestos a mano, queda el
+   que dura más, y si uno no vence, el junto no vence. */
+const aguaFusionando = new Set();
+const aguaHash = txt => { let h1 = 0x811c9dc5, h2 = 0x1b873593; for(let i = 0; i < txt.length; i++){ const c = txt.charCodeAt(i); h1 = Math.imul(h1 ^ c, 16777619) >>> 0; h2 = Math.imul(h2 ^ c, 2246822519) >>> 0; } return h1.toString(36) + h2.toString(36); };
+let aguaFusionCorriendo = false;
+async function aguaRevisarFusion(){
+  if(!soyGM || !elementos || elementos.size < 2 || aguaFusionCorriendo) return;
+  aguaFusionCorriendo = true;
+  try{ await aguaFusionar(); }finally{ aguaFusionCorriendo = false; }
+}
+async function aguaFusionar(){
+  const ch = [...elementos.entries()].filter(([id, el]) => esAgua(el) && !aguaSecando.has(id) && !aguaFusionando.has(id))
+    .map(([id, el]) => ({id, el, cs: celdasDeElemento(el)})).filter(x => x.cs.length);
+  if(ch.length < 2) return;
+  ch.forEach(x => { x.set = new Set(x.cs.map(c => c.col + ',' + c.fila)); x.borde = new Set(x.set); x.cs.forEach(c => vecinosDeCasilla(c).forEach(v => x.borde.add(v.col + ',' + v.fila))); });
+  const padre = ch.map((_, i) => i), raiz = i => padre[i] === i ? i : (padre[i] = raiz(padre[i]));
+  for(let i = 0; i < ch.length; i++) for(let j = i + 1; j < ch.length; j++){
+    if([...ch[j].set].some(k => ch[i].borde.has(k))) padre[raiz(j)] = raiz(i);
+  }
+  const grupos = new Map();
+  ch.forEach((x, i) => { const r = raiz(i); if(!grupos.has(r)) grupos.set(r, []); grupos.get(r).push(x); });
+  for(const g of grupos.values()){
+    if(g.length < 2) continue;
+    g.sort((a, b) => b.cs.length - a.cs.length);
+    const base = g[0], todas = [], vistas = new Set();
+    g.forEach(x => x.cs.forEach(c => { const k = c.col + ',' + c.fila; if(!vistas.has(k)){ vistas.add(k); todas.push(c); } }));
+    g.forEach(x => aguaFusionando.add(x.id));
+    try{
+      const c0 = todas[0], k0 = hexACubo(c0);
+      const dur = g.some(x => !(num(x.el.turnos) > 0)) ? null : g.reduce((m, x) => (num(x.el.venceMant) > num(m.el.venceMant) ? x : m), g[0]);
+      // El id del junto sale de los ids de los que se juntan (2026-11-10, prueba en el mapa: con dos pantallas del GM abiertas salían dos copias):
+      // si otra pantalla del GM hace lo mismo a la vez, escribe el mismo documento.
+      const idJunto = 'charco-' + aguaHash(g.map(x => x.id).sort().join('|'));
+      const refJunto = coleccionElementos().doc(idJunto);
+      if(!(await refJunto.get()).exists) await refJunto.set({...elementoComoDatos(base.el), origen: {col: c0.col, fila: c0.fila}, rotacion: 0,
+        celdas: todas.flatMap(c => { const k = hexACubo(c); return [k.q - k0.q, k.r - k0.r]; }),
+        ...(dur ? {turnos: num(dur.el.turnos), venceMant: num(dur.el.venceMant)} : {}), creado: firebase.firestore.FieldValue.serverTimestamp()});
+      for(const x of g) if(x.id !== idJunto) await borrarElemento(x.id);
+    }catch(err){ console.error('No se pudieron juntar los charcos:', err); }
+    finally{ setTimeout(() => g.forEach(x => aguaFusionando.delete(x.id)), 4000); }
+  }
+}
+setInterval(() => { aguaRevisarFuego().then(() => aguaRevisarFusion()).catch(err => console.error(err)); }, 1500);
 /* ⚡💧 El rayo corre por el agua (dueño, 2026-10-17: «si hay dos personajes parados en el mismo charco y a uno le pega un efecto eléctrico, el
    mismo golpe se transmite por el agua al otro personaje, independientemente de si salta o no el Relámpago»). Lo llama el duelo (js/13) en la
    pantalla que aplica el daño (el GM): a cada uno de los otros que están en ese charco (sin levitar ni volar) le llega el mismo golpe —×1,5

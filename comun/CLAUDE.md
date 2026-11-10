@@ -1971,3 +1971,15 @@ versión parecida en más de una, es candidato a juntar.
   no, solo recorta). La primera vez: si el máximo es exactamente Con × 5 + lo del equipo, lo traía; si no, se lo suma. La llaman `normalizar` (o sea
   GM Tools en cada dibujo y el mapa al leer un creep), `modificarCreep` del mapa después de cada cambio, y `actualizarHpMaxPorCon` deja `hpEquipo` al
   día. Los esenciales arrancan con Con × 5 y `vidaAlDia` les suma el equipo en todos los niveles.
+
+- **🐞 Vaquita de San Antonio** (2026-11-10, dueño: «mientras lo tengas activo, el primer debuff que te entre se cancela automáticamente»): el
+  consumible (Raro, 60, `legacy` —va en toda góndola, como la Polilla— y en `GeneradorTiendas.CONSUMIBLES_ESENCIALES`) pone el estado permanente
+  «Vaquita de San Antonio» (preset con `vaquita`); el **Anillo de la vaquita de San Antonio** (Buena, 160, mod `vaquita`) pone al empezar cada combate
+  «Vaquita de San Antonio (anillo)» (`vaquitaAnillo`, `anillo`: se va al terminar el combate; `vtt-hexgrid/js/25-anillos.js`). La regla:
+  `Combatiente.vaquitaEspanta(estados, est, o)` — un estado malo (`polaridad: 'debuff'`) que llega con `agregarEstado(…, {vaquita: true})` no entra y
+  la vaquita se saca (primero la del anillo); va después de las inmunidades (si ya era inmune, la vaquita sigue). **Solo lo que viene de otro** la
+  gasta: piden `{vaquita: true}` `EstadosAplicar.aplicarACreep` (salvo `{propio: true}`: lo que se pone el creep a sí mismo), `FichaAcciones.
+  aplicarEstadoRecibido` (salvo `{propio: true}`: la Ejecución propia sobre uno; también frena la Armadura rota antes de tocar las piezas) e
+  `InvHabilidades.ponerEstado(inv, d, {deAfuera: true})` (lo recibido, `recibidos.js`). El editor, el «+ Estado» a mano y lo que se pone uno mismo
+  (habilidades, consumibles, Guardia baja) no la gastan. Avisa con `window.avisoVaquita(info)` si la pantalla lo define (el mapa: Mesa + Crónica,
+  js/25) o con una línea en la Mesa; el mapa la dibuja revoloteando (más sinuosa y pausada que la Polilla) y volándose cuando el estado se va (js/05).

@@ -433,9 +433,12 @@
   // W3 Martillero (niveles 2 en adelante, de a uno desde el 2026-11-10).
   const W3 = {linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', consumibles: ['Pergamino grupal de Furia de Combate'],
     estrategia: 'Warrior. Golpes que atontan y derriban: te deja sin turno con Demora y Pajaritos; si lo rodean, Pisotón.'};
-  esencial({...W3, nivel: 2, atrib: [9, 11, 6, 8, 2],   // (aprobado 2026-11-10: Golpe que sigue en lugar de Pegar fuerte, para no repetir; pasiva Robustez; + Casco de cuero endurecido y Pantalón acolchado de aprendiz)
+  esencial({...W3, nivel: 2, atrib: [9, 11, 6, 8, 2],   // (aprobado 2026-11-10: Dos al hilo en lugar de Pegar fuerte, para no repetir; pasiva Robustez; + Casco de cuero endurecido y Pantalón acolchado de aprendiz)
     equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Pantalón acolchado de aprendiz'],
-    habilidades: ['Puño de roca', 'Pisotón', 'Golpe que sigue'], pasivas: ['Robustez']});
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo'], pasivas: ['Robustez']});
+  esencial({...W3, nivel: 3, atrib: [10, 12, 7, 8, 2],   // (aprobado 2026-11-10: Salto aplastante; el Martillo de bola a dos manos suelta el escudo; + Guanteletes de cuero tachonado, pedido del dueño, para no perder tanta Defensa)
+    equipo: ['Martillo de bola', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante'], pasivas: ['Robustez']});
 
   esencial({linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 6, 11, 2],   // (2026-11-03, dueño: «vamos a probarlo con la ballesta»)
     equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca'],

@@ -637,7 +637,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Pisotón** | — | el hacha: **Hacha del aserrador** (Buena) |
   | 4 | **Aguante** | **Robustez** | + una Buena |
   | 5 | **Salto aplastante** | — | + otra Buena |
-  Consumible: Poción de Cuero Duro. Golpe que sigue no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2. (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
+  Consumible: Poción de Cuero Duro. Dos al hilo no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2. (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va»): Fue 9 · Con 9 · Des 7 · Agi 6 · Esp 2, vida 45, 6 No2, con turnos de espera; Hacha de vikingo
   (Tipo 8, 1d8 + 9; desde el 2026-11-03: +1 de daño y Rompe armadura 50 %, sin Derribar) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
   crít. T4 +2. Salto (lenta, cd 3) y Golpe fuerte (rápida, cd 2). Consumible: Poción de Cuero Duro. Sin cargar hasta que el dueño diga.
@@ -767,10 +767,14 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-03: «sí»): Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2, vida 40, 6 No2, turnos de espera; Martillo del herrero de
   pueblo (Tipo 10, 1d10 + 10, Parry +1, Pajaritos 33 %) + Escudo de cuero endurecido · Chaleco de cuero · Botas de cuero de vaca: Def 5, Res. crít.
   T4 +2. Puño de roca (rápida) y Pisotón (Flash, lenta). **Cargado** en el pool esencial (2026-11-03).
-  **Nivel 2 aprobado** (dueño, 2026-11-10: «para el martillero vamos con golpe que sigue»): **Golpe que sigue** en lugar de Pegar fuerte (que ya
+  **Nivel 2 aprobado** (dueño, 2026-11-10: «para el martillero vamos con golpe que sigue»): **Dos al hilo** en lugar de Pegar fuerte (que ya
   tenían el Saltador, el Berserker y el Embestidor). Fue 11 · Con 9 · Des 8 · Agi 6 · Esp 2, vida 50 (con Robustez), 6 No2; + Casco de cuero
   endurecido y Pantalón acolchado de aprendiz: Def 7, Res. crít. T4 +4. El segundo golpe no cobra No2 (dueño, 2026-11-10: toda la habilidad
   cuesta lo de un solo ataque, como el Barrido): con el martillo de Tipo 10, 5 No2 por los dos golpes. **Cargado** en el pool esencial (2026-11-10).
+  **Nivel 3 aprobado** (dueño, 2026-11-10: «al nivel 3 cargarlos con el guantelete»): Fue 12 · Con 10 · Des 8 · Agi 7 · Esp 2, vida 55, 7 No2;
+  **Martillo de bola** (Buena, dos manos, 2 dados, Derribar 25 %) en lugar del martillo y el escudo; + **Guanteletes de cuero tachonado** (Def +1,
+  Def. especial +1): Def 6, Def. especial 1, Bloqueo 12, Parry 8. Habilidad nueva: **Salto aplastante**. **Cargado** (2026-11-10).
+  (**Golpe que sigue pasa a llamarse «Dos al hilo»**, dueño 2026-11-10.)
 
 - **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
   busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):
@@ -795,12 +799,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   |---|---|---|---|
   | 1 | **Romper armadura** (lenta) · **Desarmar** (Flash) | — | **Facón largo** (Tipo 6, Parry +1; ex «Caronero», renombrado por el dueño) + escudo Común · 2 Comunes |
   | 2 | **Remate** | **Guardia firme** | + 2 Comunes |
-  | 3 | **Golpe que sigue** | — | **Espada del herrero** (Buena, Tipo 6) |
+  | 3 | **Dos al hilo** | — | **Espada del herrero** (Buena, Tipo 6) |
   | 4 | **Arte de la guerra** (Flash) | **Desvío hábil** | + una Buena |
   | 5 | **Golpe demoledor** | — | + otra Buena |
-  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza). (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
+  Arma de Tipo 6, no hacha: el Dos al hilo son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza). (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va así»), con la ruta ajustada (Romper armadura y Desarmar eran las dos lentas): **nv1 Estocada
-  (rápida) · Desarmar (Flash)**; nv2 Romper armadura + Guardia firme; nv3 Golpe que sigue; nv4 Remate + Desvío hábil; nv5 Golpe demoledor (sale el
+  (rápida) · Desarmar (Flash)**; nv2 Romper armadura + Guardia firme; nv3 Dos al hilo; nv4 Remate + Desvío hábil; nv5 Golpe demoledor (sale el
   Arte de la guerra). Fue 9 · Con 9 · Des 8 · Agi 5 · Esp 2, vida 45, 5 No2; Facón largo (Tipo 6, 1d6 + 9, Parry +1) + Escudo de asalto (Def 2,
   Parry +1) · Coraza de cuero hervido · Botas de cuero de vaca: Def 6, Parry +2. Consumible: **Pergamino grupal de Reflejo de Acero** (+1 Parry 3
   turnos, para desarmar más). **Cargado** en el pool esencial (2026-11-03).

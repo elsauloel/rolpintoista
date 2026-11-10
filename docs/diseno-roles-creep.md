@@ -145,7 +145,7 @@ Las propuestas concretas que se ofrecieron en el camino a 20 y no se eligieron (
 - **Golpe brutal** (Warrior, versión creep): un ataque con su arma con Crítico potente +2 y +2 al daño; queda Guardia baja (−2 Evasión) hasta su próximo
   turno. Un ataque y 2 SP, o cooldown 2.
 - **Hendidura**: un ataque con su arma que, pegue o no, sigue al que está justo detrás del objetivo, contra la misma tirada.
-- **Golpe que sigue** ✦, **Lanzar**, **Muralla**, **Interponerse**, **Segundo aliento**, **Estoicismo** (de clase: «Estoicismo [2] — NO2: (0). Flash. +2
+- **Dos al hilo** ✦, **Lanzar**, **Muralla**, **Interponerse**, **Segundo aliento**, **Estoicismo** (de clase: «Estoicismo [2] — NO2: (0). Flash. +2
   Def por cada enemigo adyacente. +1 Res.Crit.»).
 
 ## Los roles
@@ -172,7 +172,7 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 3. ✅ **Remate** ✦ (2026-10-23): **Remate** / **Ir por el herido** — un ataque con su arma: +2 dados si el objetivo tiene la mitad de la vida o menos,
    +3 con un cuarto o menos (escalonado, dueño). Golpe de gracia queda aparte (es del concepto 1, a revisar).
 4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
-5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
+5. **Dos al hilo** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
 6. ✅ **Partir la armadura**: **Romper armadura** / **Arrancar la coraza** y **Golpe demoledor** / **Mandíbula trituradora** (2026-10-21). Queda: perforar.
 7. ✅ **Furia** ✦ (2026-10-26: Enfurecido, +3 PdG y +4 al daño, −2 Evasión y −2 Defensa): pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
 8. **Frenesí que crece** ✦: cada golpe que da en el combate le suma daño al siguiente.
@@ -258,7 +258,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 > warrior, 6 tanque y 4 ambiguas** (14). Se definen sin programar, rotando W → T → A para que avancen parejas. Propuesta (cada una un escalón
 > arriba de la de clase; las de repuesto, por si alguna no convence):
 
-- ⚔ **Warrior (+4)**: **Golpe brutal** (clase), **Arte de la guerra** (clase), **Contraataque** (clase), **Golpe que sigue** ✦ (A5).
+- ⚔ **Warrior (+4)**: **Golpe brutal** (clase), **Arte de la guerra** (clase), **Contraataque** (clase), **Dos al hilo** ✦ (A5).
   Repuesto: Todo o nada, Hendidura, Frenesí que crece, Sangre por sangre.
 - 🛡 **Tanque (+6)**: **Provocar** (Taunt), **Piel de hierro** (Piel resistente + Temple), **Blindaje**, **Segundo aliento** (Recuperación),
   **Escudo humano** (Miti-Miti), **Interponerse**. Repuesto: Inamovible, Estoicismo, Grito de desafío, Muralla, Represalia, Cubrir al de atrás,
@@ -342,7 +342,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      queda Sentado.»; dueño, 2026-10-27: «ok»): **Flash**; el mismo cono al frente (16 casillas); **Fuerza +2 contra la Constitución** de cada rival
      del cono; al que pierde le saca **1 + la diferencia en No2** y le hace **la diferencia como daño físico directo**; sin No2, **Sentado**. 1 No2 y
      3 SP (6 en turno ajeno), o cooldown 3.
-  12. ⚔ **Golpe que sigue** ✦ — **cambiada (dueño, 2026-10-30)**: «me hace ruido que tenga que matar para funcionar… si pega, pasa al siguiente. Es un
+  12. ⚔ **Dos al hilo** ✦ — **cambiada (dueño, 2026-10-30)**: «me hace ruido que tenga que matar para funcionar… si pega, pasa al siguiente. Es un
      golpe doble. Pero tiene que haber al menos dos adyacentes al atacante» → si pega, sigue contra otro rival pegado **sin No2 de más** (dueño,
      2026-11-10: «pagás SP (o el cooldown), pero te cuesta los nitros de un solo ataque… como el barrido»); con menos
      de dos rivales pegados avisa y deja seguir. Lo de abajo es la versión vieja. (A5; dueño, 2026-10-27: «vamos así»): un ataque con su arma con **+2 al daño**; si deja al rival **en 0**, ataca
@@ -354,7 +354,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      o cooldown 2; sin No2. Combina con Interponerse (se mete en el golpe y lo absorbe) y con Escudo humano.
   14. ⚖ **Arrastrar** (C16; dueño, 2026-10-27: «va así»): a un rival a **3 casillas o menos**: **PdG contra la Evasión** (era la Destreza; dueño, 2026-11-04: «no debe tirar Destreza sino PdG»; desde ese día también es de la clase Tanque); si lo engancha, lo
      **arrastra hasta quedar pegado** a él (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino **sí lo tocan**) y le pega
-     con su arma con **+2 PdG**. Un ataque y 2 SP, o cooldown 2. Combina con Provocar, Golpe de escudo y Golpe que sigue.
+     con su arma con **+2 PdG**. Un ataque y 2 SP, o cooldown 2. Combina con Provocar, Golpe de escudo y Dos al hilo.
      **Hoy (dueño, 2026-11-05):** sin golpe; al llegar, el arrastrado queda **Desequilibrado (−2 a la Evasión) hasta el final del turno de quien lo
      arrastró**; 2 No2 fijos.
 - **Cuenta** (2026-10-27): ✅ **⚔ 10 · 🛡 10 · ⚖ 10**, todas definidas. ✅ **Programadas y probadas en el mapa el mismo día** (reporte: `reporte-choque-pesado-2026-10-27.md`; dueño: «tocaría pasar a programar todas

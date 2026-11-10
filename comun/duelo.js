@@ -709,7 +709,7 @@ const Duelo = (() => {
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono))),
             ...(cfg.ataque.mods && /^\d{1,2}d\d{1,3}$/i.test(String(cfg.ataque.mods.dadoExtra || '')) ? {dadoExtra: String(cfg.ataque.mods.dadoExtra).toLowerCase()} : {})}, efectos: limpiarEfectos(cfg.ataque.efectos),
           ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}), ...(cfg.ataque.soloCritico ? {soloCritico: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
-          // ⚔🛡 El Choque pesado (2026-10-27, vtt-hexgrid/js/78): lo que hace el mapa al resolverse (el Golpe que sigue, Arrastrar, el derribo de la Carga) y el escudo con que pega.
+          // ⚔🛡 El Choque pesado (2026-10-27, vtt-hexgrid/js/78): lo que hace el mapa al resolverse (el Dos al hilo, Arrastrar, el derribo de la Carga) y el escudo con que pega.
           ...(cfg.ataque.sigue ? {sigue: true} : {}), ...(_num(cfg.ataque.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(_num(cfg.ataque.arrastra)))} : {}),
           ...(_num(cfg.ataque.derriba) > 0 ? {derriba: Math.min(8, Math.round(_num(cfg.ataque.derriba)))} : {}),
           ...(cfg.ataque.escudoGolpe ? {escudoGolpe: {nombre: txtCorto(cfg.ataque.escudoGolpe.nombre, 60), peso: Math.max(0, Math.min(20, Math.round(_num(cfg.ataque.escudoGolpe.peso))))}} : {}),

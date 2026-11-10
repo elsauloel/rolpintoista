@@ -2,7 +2,7 @@
    Lo que estas habilidades de creep hacen en el mapa (lo demás —la Ejecución, los estados, el cobro— va por el camino de siempre):
    · 🛡 Interponerse (Flash, botón ✨): cuando atacan a un aliado a 2 casillas o menos y el aliado todavía no eligió cómo defenderse, salta a su lado (gratis,
      sin oportunidad), el golpe va contra él (el duelo cambia de defensor) y queda Interpuesto (+2 a la Defensa contra ese golpe).
-   · ⚔ Golpe que sigue (`ataque.sigue`): si el golpe pega, ataca enseguida a otro rival pegado, pagando lo de un primer ataque (el segundo no sigue; 2026-10-30, antes pedía dejarlo en 0).
+   · ⚔ Dos al hilo (`ataque.sigue`): si el golpe pega, ataca enseguida a otro rival pegado, pagando lo de un primer ataque (el segundo no sigue; 2026-10-30, antes pedía dejarlo en 0).
    · ⚖ Arrastrar (`ataque.arrastra`): antes del golpe, Destreza contra la Evasión para engancharlo; si lo engancha, lo trae hasta quedar pegado (no camina:
      sin No2 ni oportunidad; las trampas y zonas del camino sí lo tocan) y sigue el golpe; si no, no hay golpe (P224, 2026-10-29).
    · ⚖ Carga que derriba (`ataque.derriba` = las casillas que corrió, desde 3; la carrera la hace js/55): si pega, Fuerza + X contra la Res.CC; si gana, Sentado.
@@ -76,7 +76,7 @@ function choquePesadoResuelto(d){
   const pego = d.resultado === 'pego' || d.resultado === 'mitad';
   if(!pego) return;
   if(num(d.ataque.derriba) > 0) cargaDerribaResuelto(d).catch(err => console.error('Carga que derriba:', err));
-  if(d.ataque.sigue) golpeQueSigueResuelto(d).catch(err => console.error('Golpe que sigue:', err));
+  if(d.ataque.sigue) golpeQueSigueResuelto(d).catch(err => console.error('Dos al hilo:', err));
 }
 const choquePesadoHechos = new Set();
 // Lo que pregunta algo espera a que el cuadro del duelo se cierre o se minimice (hasta 2 minutos), para no salirle encima.
@@ -90,7 +90,7 @@ async function esperarDueloCerrado(maxMs){
 }
 function choquePesadoUnaVez(d, que){ const k = `${d.id}:${que}`; if(choquePesadoHechos.has(k)) return false; choquePesadoHechos.add(k); return true; }
 
-// ⚔ Golpe que sigue (dueño, 2026-10-27, «vamos así»; cambiado el 2026-10-30: «me hace ruido que tenga que matar para funcionar… si pega, pasa al
+// ⚔ Dos al hilo (dueño, 2026-10-27, «vamos así»; cambiado el 2026-10-30: «me hace ruido que tenga que matar para funcionar… si pega, pasa al
 // siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante»): si pegó, otro rival pegado; el segundo no sigue. Los dos
 // rivales pegados se avisan al usarla (acEjecutarHab, js/12). El segundo golpe NO cobra No2 ni cuenta como otro ataque del turno (dueño, 2026-11-10:
 // «pagás SP (o el cooldown), pero te cuesta los nitros de un solo ataque… como el barrido»).
@@ -109,19 +109,19 @@ async function golpeQueSigueResuelto(d){
   if(!ta || !sc || num(sc.hp) <= 0) return;
   const rivales = golpeQueSigueRivales(sc, d.defensor.tokenId) || [];
   const nom = nombreDe(ta), caido = d.defensor.nombre;
-  if(!rivales.length){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Golpe que sigue)`, 'recordatorio'); return; }
+  if(!rivales.length){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Dos al hilo)`, 'recordatorio'); return; }
   await esperarDueloCerrado();   // (probado en el mapa, 2026-10-27: la pregunta salía encima del «Fin del duelo» y el clic en «Terminar duelo» la contestaba)
   const elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}: ¿sigue contra otro rival pegado? (sin No2 de más: la habilidad cuesta lo de un solo ataque)`,
-    {titulo: 'Golpe que sigue', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
+    {titulo: 'Dos al hilo', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
   if(!elegido) return;
   const h = (sc.habilidades || []).find(x => x && x.duelo && x.duelo.sigue);
-  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Golpe que sigue: sin No2 de más)`, 'recordatorio');
+  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Dos al hilo: sin No2 de más)`, 'recordatorio');
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
   const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
   if(atq && atq.sigue) delete atq.sigue;
   abrirAcciones(sc.id);
   for(let i = 0; i < 40 && !(ac && ac.creepId === sc.id); i++) await new Promise(r => setTimeout(r, 150));
-  if(!(ac && ac.creepId === sc.id)){ toast('Golpe que sigue: no se pudieron abrir las Acciones del creep — atacalo a mano'); return; }
+  if(!(ac && ac.creepId === sc.id)){ toast('Dos al hilo: no se pudieron abrir las Acciones del creep — atacalo a mano'); return; }
   ac.objetivoFijo = elegido;
   acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
 }

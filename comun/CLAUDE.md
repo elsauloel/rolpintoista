@@ -1789,7 +1789,7 @@ versión parecida en más de una, es candidato a juntar.
   `bomba-humo-habilidad`, registrado en `mensajes-mapa.js`). Efectos que aplica el mapa por nombre: «Al final del orden», «Sube en el orden» y la Demora
   con `stacks` = cuántos lugares.
 - **⚔🛡 La tanda del Choque pesado** (2026-10-27, dueño: 10 warrior · 10 tanque · 10 ambiguas; `docs/diseno-roles-creep.md`): 14 de creep nuevas en
-  `skills-creep-base.js` (Golpe brutal, Arte de la guerra, Contraataque, Golpe que sigue, Provocar, Piel de hierro, Blindaje, Segundo aliento, Escudo humano,
+  `skills-creep-base.js` (Golpe brutal, Arte de la guerra, Contraataque, Dos al hilo, Provocar, Piel de hierro, Blindaje, Segundo aliento, Escudo humano,
   Interponerse, Golpe de escudo, Carga que derriba, Sonic Boom, Arrastrar; reemplazan a las viejas del mismo nombre) y tres de clase cambiadas (Taunt:
   PdG.Esp + nivel; Golpe brutal: +1/+1 críticos y +2 al daño; Contraataque: Flash, 1 SP). Piezas nuevas: `tiraBonoNivel` en una Ejecución (`habEjecucion`
   suma `o.nivel`: lo pasan la ficha, el creep y la invocación); `requiereDano` en los efectos de un ataque con arreglos (`ataqueConArreglos` y

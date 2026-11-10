@@ -2012,7 +2012,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `provocadoBrilloPedir`), el momento `provocado-brillo` (js/16 → `provocadoBrilloRecibido`) hace brillar al que provoca en todas las pantallas hasta que pasa el turno (`provocadoDibujar`, js/05).
 - **⚔🛡 La tanda del Choque pesado** (2026-10-27, dueño; `js/78-choque-pesado.js`): **🛡 Interponerse** (el botón ✨ de los Flash de creep, js/71: aparece
   solo cuando un aliado creep es atacado a 2 o menos y todavía no eligió cómo defenderse; `interponerObjetivos` escucha los duelos abiertos;
-  `interponerseUsar` cobra, le pone Interpuesto, lo mueve al lado del aliado y cambia el `defensor` del duelo) · **⚔ Golpe que sigue**, **⚖ Arrastrar** y el
+  `interponerseUsar` cobra, le pone Interpuesto, lo mueve al lado del aliado y cambia el `defensor` del duelo) · **⚔ Dos al hilo**, **⚖ Arrastrar** y el
   derribo de la **Carga que derriba** (`choquePesadoResuelto`, desde el gancho `disparoResuelto` de js/14). La carrera de la Carga (hasta 4, +X, sin
   empuje) es una variante de `cargaEmbestida` (js/55, `ataque.cargaDerriba`). El **Escudo humano** de los creeps es el Miti-Miti entre creeps
   (`mitiMitiDe` y `danioCreep` en js/10; la marca la pone `dueloAplicarEfectoBase`, js/13, a 3 casillas o menos); **Desafiante** (el del Provocar) va a quien

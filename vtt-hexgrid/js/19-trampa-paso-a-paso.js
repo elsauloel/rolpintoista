@@ -684,8 +684,11 @@ async function trampaPasoEstado(id, dt){
       await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
       que = inmune ? ` — no le hace nada (${inmune})` : '';
     }else if(spec && x && x.tipo === 'pj' && x.fichaId && x.duenoUid){
+      // 🛡 (2026-11-10, cola de pruebas 31: el cartel le anunciaba Ceguera o cansancio a un personaje Invulnerable que no lo recibía): con lo
+      // que publica su ficha, si algo lo frena se dice «no le hace nada», como con un creep. El aviso igual viaja (decide la ficha).
+      try{ inmune = Combatiente.inmunidad(structuredClone(((vinculo(x) || {}).resumen || {}).estados || []), EstadosAplicar.componer(spec), null) || ''; }catch(e){ inmune = ''; }
       await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: dt.nombreT});
-      que = '';
+      que = inmune ? ` — no le hace nada (${inmune})` : '';
     }
   }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
   // 🪢 Tropezado (dueño, 2026-11-03): el que perdió la Agilidad del Cordón no se mueve más en este turno (puede levantarse y usar el resto de sus

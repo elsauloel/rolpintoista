@@ -111,6 +111,10 @@
 
 ## Sesiones en la nube (desde el 2026-10-31)
 
+- **De a una tarea de programación por vez** (2026-11-10, dueño: «las tareas no las hagas en simultáneo: andá poniéndolas en cola y cuando
+  terminás una avanzás a la siguiente»). Con varios pedidos, primero se definen las ideas con el dueño; después van a una **cola de
+  programación** (`docs/cola-de-pruebas.md`, sección de programación) y se hacen **una por vez**: un solo ayudante programando a la vez, y al
+  terminar (probado y subido) arranca la siguiente. (Antes se lanzaban ayudantes en paralelo y se pisaban los archivos.)
 - **Videos de las animaciones, no capturas** (2026-11-10, dueño: «si pudieras mandarme videítos de las animaciones en lugar de capturas, sería
   genial»). Para todo lo que se mueve (pulsos, duelos que se despliegan, vaquita, lava, rayos…), grabar con Playwright
   (`newContext({recordVideo: {dir, size: {width: 1280, height: 720}}, viewport: {width: 1280, height: 720}})`, cerrar el contexto para que se

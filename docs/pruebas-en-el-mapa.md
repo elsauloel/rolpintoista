@@ -2619,3 +2619,32 @@ Respaldo antes y restaurado después. Los cinco niveles agregados como lo hace e
   El Yelmo de bronce con runas, la Potencia especial y el Temple mágico, en los números.
 - Notas: el Escudo especial del Orbe se va al empezar el turno del creep; si el creep no está en el orden de turnos queda hasta que entra.
   Las copias de los personajes las controla el GM (🎮), como en las pruebas anteriores. Pruebas nuevas en `comun/pruebas.html` (840 en verde).
+
+## ✅ Cola 38 y 39 · Estandarte de la vanguardia · Línea S2 · Abanderado, niveles 1 a 5 (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Respaldo antes y restaurado después (el token del Estandarte de guerra, borrado con el resto). Los cinco niveles agregados como lo hace el GM (GM Tools),
+renombrados «Abanderado 1» a «Abanderado 5».
+- **Números** (sin el bono del estandarte de al lado): nv1 vida 50, No2 6, PdG 7, Daño 7, Def 3, Def esp 1, Eva 6 · nv2 55, 7, 9, 7, 4, 2, 7 ·
+  nv3 60, 7, 9, 8, 4, 2, 7 · nv4 80, 8, 10, 8, 5, 2, 8, Res.CC 15 (Voluntad de hierro), Res.Esp 13 · nv5 85, 8, 11, 9, 5, 2, 8, Res.CC 16, Res.Esp 14.
+  Habilidades, pasivas, equipo y el Pergamino grupal de cada nivel, los aprobados. (El daño que se tira suma además el +1 de la lanza: nv1 «1d4 + 8».)
+- **Estandarte de la vanguardia (cola 38):** el aliado a 2 casillas recibe «🚩 Estandarte de la vanguardia» (+1 Defensa y +1 PdG: Def 4 → 5, PdG 9 → 10);
+  a 3 casillas se le va, y al volver a 2 vuelve a aparecer. Captura `cola-38-1-estandarte-cerca`.
+  **Arreglado:** con dos bonos, el texto del estado usaba una herramienta de la ficha que el mapa no carga: cortaba con un error y el estado no aparecía
+  (ahora usa las etiquetas de los creeps). **Arreglado:** si el aliado salía y volvía a entrar antes de 2 minutos, no se lo volvía a poner (el freno
+  contra avisos repetidos no se limpiaba). **Arreglado (sin volver a probarlo en el mapa):** el token del Estandarte de guerra también lo recibía; ahora,
+  como en las ondas de apoyo, a los inertes (estandarte, tótem) no les llega.
+- **Potencia** (nv1 a nv2): Flash, sin No2, cooldown 2: Empower +3 a la próxima tirada.
+- **¡A la carga!** (nv1): 2 No2, a los aliados a 4 casillas (no a él): +2 PdG, PdG.Esp, daño y Ef.Esp 2 turnos (nv3: PdG 10 → 12, daño 8 → 10).
+- **Bendecir el arma** (nv2 a nv3): Arma bendecida; en el ataque siguiente el daño fue «1d4 + 1d4 + 12» (el dado de más) y se gastó.
+- **Redoble de tambores** (nv3): 2 No2, a seis aliados a 4 casillas: Redoble (+2 No2 en su próximo turno) y −1 a cada cooldown activo (2 → 1, 3 → 2).
+- **Arenga** (nv4): 1 No2, Bendecido 3 turnos (+1 a todo) a los aliados a 4 casillas.
+- **Estandarte de guerra** (nv5): 2 No2, se clava con un clic dentro de su Rango; 50 de vida (10 por nivel). El ataque del nv3 (a 2 casillas, con la
+  Lanza corta: Alcance +1) mostró «🚩 bajo el estandarte: +3 PdG y +5 de daño»: 19 de daño − Defensa 6 = 13 a Larry. Capturas
+  `cola-39-1-estandarte-de-guerra`, `cola-39-2-ataque-bajo-estandarte`.
+- **Marcar el ritmo** (nv2): con un aliado pegado, la cuenta del orden al empezar la ronda lo sube 1 lugar (3.º → 2.º); no se pasó una ronda entera.
+- **Pergamino grupal de Furia de Combate** (nv1): −1 No2, +1 Daño 3 turnos a él y un aviso «Aplicar / Resolver a mano» por cada creep aliado del orden
+  de turnos (los Abanderados que no estaban en el orden no lo recibieron: así está pensado).
+- Sin probar en el mapa: la **Lanza del abanderado** atacando (sí sus números: PdG 11 del nv5).
+- Nota del arnés: con dos cuadros de duelo abiertos (el aviso «Entendido» del primer objetivo y el duelo del segundo), el segundo objetivo de las ondas
+  de apoyo sale en el otro cuadro; no es un error.
+

@@ -304,7 +304,7 @@ async function estandartesRevisar(){
   tokens.forEach((t, id) => {
     const lista = estandartesDe(t);
     if(!lista.length || (typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id))) return;
-    lista.forEach(e => aliadosAlLado(t, Math.max(1, Math.round(num(e.rango)) || 1)).forEach(a => {   // `rango`: hasta dónde llega (sin él, al lado)
+    lista.forEach(e => aliadosAlLado(t, Math.max(1, Math.round(num(e.rango)) || 1)).filter(a => typeof esInerte !== 'function' || !esInerte(a.t)).forEach(a => {   // (al estandarte clavado o al tótem, no: 2026-11-10)   // `rango`: hasta dónde llega (sin él, al lado)
       if(!quiere.has(a.id)) quiere.set(a.id, new Map());
       quiere.get(a.id).set(ESTANDARTE_PREFIJO + e.nombre, e);
     }));
@@ -316,9 +316,9 @@ async function estandartesRevisar(){
     const q = quiere.get(id) || new Map();
     const poner = [...q.keys()].filter(n => !tiene.includes(n)), sacar = tiene.filter(n => !q.has(n));
     for(const n of poner){
-      const k = `${id}|+${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
+      const k = `${id}|+${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora); estandarteEnviados.delete(`${id}|-${n}`);   // (2026-11-10) si sale y vuelve a entrar enseguida, se lo vuelve a poner
       const e = q.get(n), mods = Array.isArray(e.mods) && e.mods.length ? e.mods : [{stat: e.stat, val: e.val}];   // varios bonos (2026-11-10)
-      const lbl = m => `+${m.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[m.stat] || m.stat : m.stat}`;
+      const ETQ = Object.assign({def: 'Defensa'}, (typeof CreepCalculo !== 'undefined' && CreepCalculo.STAT_LABEL) || {}), lbl = m => `+${m.val} ${ETQ[m.stat] || m.stat}`;   // (2026-11-10: FichaCalculo no existe en el mapa: cortaba el estandarte de varios bonos)
       const spec = {nombre: n, polaridad: 'buff', permanente: true, mods: mods.map(m => ({stat: m.stat, val: m.val})), detalle: `${num(e.rango) > 1 ? `A ${Math.round(num(e.rango))} casillas o menos` : 'Al lado'} de un aliado con ${e.nombre}: ${mods.map(lbl).join(' y ')}. Se va cuando se aleja.`};
       try{
         if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
@@ -326,7 +326,7 @@ async function estandartesRevisar(){
       }catch(err){ console.error('El estandarte:', err); }
     }
     for(const n of sacar){
-      const k = `${id}|-${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
+      const k = `${id}|-${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora); estandarteEnviados.delete(`${id}|+${n}`);
       try{
         if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => { sc.estados = (sc.estados || []).filter(e => !(e && e.nombre === n)); return true; });
         else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec: {nombre: 'Quitar estado', estado: n}, origen: n.slice(ESTANDARTE_PREFIJO.length)}); }

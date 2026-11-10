@@ -582,11 +582,18 @@ const CreepCalculo = (() => {
   const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
   // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
   // 💀 El aura espeluznante (el radio): de la Calavera con vela del equipo o de una pasiva propia con su efecto (dueño 2026-10-18: El ocultista).
+  // 🚩 Un estandarte puede dar varios bonos (2026-11-10, el Estandarte de la vanguardia: +1 Defensa y +1 PdG): `mods` [{stat, val}]; sin `mods`,
+  // el `stat`/`val` de siempre. → {stat, val, mods} (stat/val = el primero, para lo viejo que lee uno solo).
+  const estandarteMods = e => {
+    const mods = (Array.isArray(e && e.mods) && e.mods.length ? e.mods : [{stat: e && e.stat, val: e && e.val}])
+      .filter(m => m && m.stat).map(m => ({stat: String(m.stat), val: num(m.val)}));
+    return {stat: mods[0] ? mods[0].stat : '', val: mods[0] ? mods[0].val : 0, mods};
+  };
   // 🚩 Los estandartes de un creep (los aliados cerca, con el bono): de su equipo y de sus pasivas (dueño 2026-10-18: el Kobold hongero, rango 2).
   // `rango`: hasta cuántas casillas llega (sin él, 1: al lado). → [{stat, val, rango, nombre}].
   const estandartes = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
-    .filter(x => x && x.estandarte && x.estandarte.stat)
-    .map(x => ({stat: String(x.estandarte.stat), val: num(x.estandarte.val), rango: Math.max(1, Math.round(num(x.estandarte.rango)) || 1), nombre: String(x.nombre || '').slice(0, 40)}));
+    .filter(x => x && x.estandarte && (x.estandarte.stat || Array.isArray(x.estandarte.mods)))
+    .map(x => ({...estandarteMods(x.estandarte), rango: Math.max(1, Math.round(num(x.estandarte.rango)) || 1), nombre: String(x.nombre || '').slice(0, 40)}));
   const auraMiedo = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
     .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
@@ -903,7 +910,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {defensas, migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {defensas, migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, estandarteMods, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

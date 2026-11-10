@@ -107,6 +107,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Relicario de sangre (antes «De sangre») | Cada vez que matás con daño especial, Vida extra 10 |
 | Matelisto Taragüí (antes «Mate con termo») | La ronda de mate: una vez por ronda, en tu turno, le pasás el mate a un aliado al lado tuyo y recupera 2 No2 · Buena, 130 |
 | Estandartes (4 versiones) | Los aliados al lado tuyo: Firmeza +2 Res.CC · Templanza +3 Res.Mt · Muro +1 Defensa · Amparo +1 Defensa especial |
+| Estandarte de la vanguardia (Buena, 150; 2026-11-10) | Los aliados a 2 casillas o menos: +1 Defensa y +1 PdG (`estandarte.mods` y `rango: 2`) |
 
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
 | Talismán | Lo que dijo el dueño |

@@ -396,6 +396,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Consumible: Pergamino grupal de Furia de Combate. Piezas Buenas a elegir al definir cada nivel. Sin cargar hasta que el dueño diga.
   - **Nivel 2 aprobado y cargado** (dueño, 2026-11-09: «me cierra»): Con 11 · Des 8 · Agi 7 · Fue 7 · Esp 3; + Cofia de anillas sueltas y Guantes de
     agarre; Bendecir el arma (Flash) y la pasiva Marcar el ritmo. Vida 55, No2 7, PdG 9, Daño 7, Def 4, Def.Esp 2, Eva 7 (con cooldown, no SP).
+  - **Nivel 3 aprobado y cargado** (dueño, 2026-11-10): Con 12 · Fue 8 · Des 8 · Agi 7 · Esp 4; Redoble de tambores. El plan pedía el estandarte de
+    Buena y no había ninguno (los cuatro estandartes son Comunes): el dueño creó el **Estandarte de la vanguardia** (Buena, 150: a los aliados a 2
+    casillas o menos, +1 Defensa y +1 PdG, mientras sigan cerca), que reemplaza al del muro. Vida 60, No2 7, PdG 9, Daño 8, Def 4.
 
 - **L3 · Asesino de las sombras · Choque liviano** (boceto aprobado 2026-11-03, dueño: «reemplazá la trapera por el tajo, resto ok»). Acento en
   **Destreza y críticos** (la idea del dueño). Estrategia: desaparece, aparece por la espalda y busca el crítico; va al golpe único (el Sangrador gana

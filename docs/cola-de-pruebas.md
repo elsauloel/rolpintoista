@@ -23,6 +23,7 @@ Cada línea nueva que se termine de diseñar se suma al final.
 35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
 36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
 37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
+38. [ ] **Estandarte de la vanguardia: +1 Defensa y +1 PdG a los aliados a 2 casillas o menos; el estado aparece y se va al entrar y salir del rango** (2026-11-10).
 
 ## Hechas
 

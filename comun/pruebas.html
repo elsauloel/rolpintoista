@@ -6543,6 +6543,17 @@ prueba('Talismanes (2026-10-18): el aura de la Calavera sale del equipo o de una
     CreepCalculo.auraMiedo({equipo: [], pasivas: []})], [3, 3, 0]);
 });
 
+prueba('Estandarte de la vanguardia (2026-11-10): Buena, rango 2, +1 Defensa y +1 PdG a los aliados', () => {
+  const it = CATALOGO_BASE.find(x => x && x.nombre === 'Estandarte de la vanguardia');
+  cierto(it && it.tier === 'Buena Calidad' && it.talisman && it.tipoItem === 'escudo_1m', 'el ítem existe, Buena, talismán de una mano');
+  const l = CreepCalculo.estandartes({equipo: [it]});
+  igual(l.length, 1, 'un estandarte');
+  igual(l[0].rango, 2, 'llega a 2 casillas');
+  igual(JSON.stringify(l[0].mods), JSON.stringify([{stat: 'def', val: 1}, {stat: 'pdg', val: 1}]), 'dos bonos: +1 Defensa y +1 PdG');
+  const viejo = CreepCalculo.estandartes({equipo: [{nombre: 'Estandarte del muro', estandarte: {stat: 'def', val: 1}}]});
+  igual(viejo[0].rango, 1, 'los de siempre siguen al lado');
+  igual(JSON.stringify(viejo[0].mods), JSON.stringify([{stat: 'def', val: 1}]), 'un solo bono, como antes');
+});
 prueba('Talismanes (2026-10-18): los estandartes de un creep salen del equipo o de una pasiva, con su rango', () => {
   const l = CreepCalculo.estandartes({equipo: [{nombre: 'Estandarte del muro', estandarte: {stat: 'def', val: 1}}], pasivas: [{nombre: 'Esporas de corteza', estandarte: {stat: 'def', val: 1, rango: 2}}, {nombre: 'Otra'}]});
   igual(l.map(e => `${e.nombre}:${e.stat}+${e.val}@${e.rango}`), ['Estandarte del muro:def+1@1', 'Esporas de corteza:def+1@2']);
@@ -6965,7 +6976,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],

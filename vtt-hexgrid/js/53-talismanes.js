@@ -306,7 +306,9 @@ async function estandartesRevisar(){
     const poner = [...q.keys()].filter(n => !tiene.includes(n)), sacar = tiene.filter(n => !q.has(n));
     for(const n of poner){
       const k = `${id}|+${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
-      const e = q.get(n), spec = {nombre: n, polaridad: 'buff', permanente: true, mods: [{stat: e.stat, val: e.val}], detalle: `${num(e.rango) > 1 ? `A ${Math.round(num(e.rango))} casillas o menos` : 'Al lado'} de un aliado con ${e.nombre}: +${e.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[e.stat] || e.stat : e.stat}. Se va cuando se aleja.`};
+      const e = q.get(n), mods = Array.isArray(e.mods) && e.mods.length ? e.mods : [{stat: e.stat, val: e.val}];   // varios bonos (2026-11-10)
+      const lbl = m => `+${m.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[m.stat] || m.stat : m.stat}`;
+      const spec = {nombre: n, polaridad: 'buff', permanente: true, mods: mods.map(m => ({stat: m.stat, val: m.val})), detalle: `${num(e.rango) > 1 ? `A ${Math.round(num(e.rango))} casillas o menos` : 'Al lado'} de un aliado con ${e.nombre}: ${mods.map(lbl).join(' y ')}. Se va cuando se aleja.`};
       try{
         if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
         else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec, origen: e.nombre}); }

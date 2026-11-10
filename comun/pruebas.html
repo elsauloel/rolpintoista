@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261110arcohab"></script>
+<script src="combatiente.js?v=20261110dah"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110hilo"></script>
+<script src="skills-creep-base.js?v=20261110dah"></script>
 <script src="creeps-esenciales.js?v=20261110hilo"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7098,6 +7098,26 @@ prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal
   const p = es.find(c => c.nombre === 'Piromante').datos;
   igual([sp, CreepCalculo.spMax(p) >= 42, CreepCalculo.modoSP(es.find(c => c.nombre === 'Escudero').datos)],
     [['Arcano', 'Control mental y ceguera', 'Ladrón de fuerzas', 'Mago de escarcha', 'Mago del rayo', 'Maldito', 'Piromante', 'Protector', 'Sanador', 'Tóxico'].sort().join(), true, false]);
+});
+prueba('⚔ Dos al hilo, el siguiente del círculo (dueño, 2026-11-10: «no puede ser cualquiera adyacente si hay alguno interpuesto»)', () => {
+  const S = Combatiente.dosAlHiloSiguientes, R = id => ({id, rival: true}), A = id => ({id, rival: false});
+  const f = l => l.map(x => x.id + ':' + x.sentido).join();
+  // primero en 0; un rival a cada lado
+  const a = S([A('p'), R('b'), null, null, null, R('c')], 0);
+  // un aliado en el medio tapa ese lado; el rival de más allá no vale; del otro lado, saltea vacías
+  const b = S([A('p'), A('ali'), R('lejos'), null, R('x'), null], 0);
+  // los dos lados llegan al mismo
+  const c = S([A('p'), null, null, R('solo'), null, null], 0);
+  // nadie más, o los dos lados tapados
+  const d = S([A('p'), null, null, null, null, null], 0), e = S([A('p'), A('a1'), R('r'), null, null, A('a2')], 0);
+  // arranca en el medio del anillo
+  const g = S([R('x'), null, A('p'), null, R('y'), A('z')], 2);
+  // un Sólido / pared en una casilla tapa; una pared entre dos casillas seguidas corta el giro (cortes[k]: entre k y k + 1)
+  const O = {obstaculo: true};
+  const h = S([A('p'), O, R('tras'), null, null, R('c')], 0), k = S([A('p'), null, R('b'), null, null, R('c')], 0, [false, true, false, false, false, false]);
+  const m = S([A('p'), null, R('b'), null, null, R('c')], 0, [false, false, false, false, false, true]);
+  igual([f(a), f(b), f(c), d.length, e.length, f(g), S([], 0).length, S([null], 3).length, f(h), f(k), f(m)],
+    ['b:horario,c:antihorario', 'x:antihorario', 'solo:los dos', 0, 0, 'y:horario,x:antihorario', 0, 0, 'c:antihorario', 'c:antihorario', 'b:horario']);
 });
 prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — toda la habilidad cuesta lo de un solo ataque, como el Barrido', () => {
   const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dos al hilo');

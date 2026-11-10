@@ -103,19 +103,88 @@ function golpeQueSigueRivales(sc, fuera){
     && !etereoDe(x) && dueloEsRival(yo, x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id)));
 }
 function golpeQueSigueRivalesPegados(sc){ const l = golpeQueSigueRivales(sc, null); return l ? l.length : null; }
+// ⚔ Dos al hilo, el segundo (dueño, 2026-11-10: «al terminar se minimiza y te tiene que dar a elegir el segundo objetivo, que tiene que ser el
+// siguiente dentro del círculo en una dirección o en la otra, como si estuviera girando el ataque. No puede ser cualquiera adyacente si hay alguno
+// interpuesto»; «no es necesario que los dos enemigos estén adyacentes entre sí… es como un swing, pero en vez de dar toda la vuelta, pega uno,
+// avanza hasta el siguiente, pega dos»): las 6 casillas pegadas al atacante, en el sentido de las agujas del reloj (el ángulo de barridoAngulo,
+// js/108), y desde la del primer golpeado, hacia cada lado, lo primero que aparece (Combatiente.dosAlHiloSiguientes): rival = candidato; cualquier
+// otro token (un aliado, alguien neutral), un Sólido / colisión (elementoSolidoEn) o una pared (paredCorta, js/34: entre el atacante y la casilla, o
+// entre dos casillas seguidas del giro) tapan ese lado. No cuentan (casilla vacía): los ocultos, bajo tierra, etéreos y caídos. → [{id, sentido}].
+function dosAlHiloCandidatos(sc, ta, primeroId){
+  const p = tokens.get(primeroId);
+  if(!p || typeof vecinosDeCelda !== 'function') return null;
+  const yo = {ref: sc.id, tipo: 'creep', nombre: sc.nombre};
+  const anillo = vecinosDeCelda(ta).map(c => ({...c, ang: barridoAngulo(ta, c)})).sort((x, y) => x.ang - y.ang);
+  const i = anillo.findIndex(c => c.col === p.col && c.fila === p.fila);
+  if(i < 0) return null;   // (el primero ya no está pegado: se elige a mano)
+  const cuenta = x => !x.oculto && !x.bajoTierra && !etereoDe(x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id));
+  const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
+  const ocup = anillo.map((c, k) => {
+    if(k === i) return {id: primeroId, rival: false};
+    const x = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(t => t.id !== ta.id && t.col === c.col && t.fila === c.fila && cuenta(t));
+    if(x) return pared(ta, c) ? {obstaculo: true} : {id: x.id, rival: dueloEsRival(yo, x)};
+    if((typeof elementoSolidoEn === 'function' && elementoSolidoEn(c.col, c.fila)) || pared(ta, c)) return {obstaculo: true};
+    return null;
+  });
+  const cortes = anillo.map((c, k) => pared(c, anillo[(k + 1) % anillo.length]));
+  return Combatiente.dosAlHiloSiguientes(ocup, i, cortes);
+}
+// Elegir el segundo en el mapa: brillan los candidatos; clic en uno. En el cartel: «No, se queda» y «✋ Elegir a mano» (cualquier rival pegado, fuera
+// de la regla). → el id elegido, o null.
+function dosAlHiloElegirEnMapa(nom, caido, cands, todos){
+  return new Promise(resolve => {
+    let listo = false;
+    const fin = v => { if(listo) return; listo = true; objetivosResaltados = null; pedirDibujo(); resolve(v); };
+    const aMano = async () => {
+      if(typeof elegirDestinoTerminar === 'function') elegirDestinoTerminar();
+      objetivosResaltados = null; pedirDibujo();
+      if(!todos.length){ toast('Dos al hilo: no hay ningún rival pegado'); fin(null); return; }
+      const v = await Confirmar.elegir(`⚠ Fuera de la regla: el segundo golpe va al siguiente rival del círculo, sin saltear a nadie. A mano, ${nom} puede seguir contra cualquier rival pegado (lo decide la mesa).`,
+        {titulo: 'Dos al hilo · a mano', icono: '✋', no: 'No, se queda', opciones: todos.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
+      fin(v || null);
+    };
+    const pedir = () => {
+      objetivosResaltados = new Set(cands.map(c => c.id)); pedirDibujo();
+      const quienes = cands.map(c => `${esc(nombreDe(tokens.get(c.id)))}${c.sentido === 'horario' ? ' ↻' : c.sentido === 'antihorario' ? ' ↺' : ''}`).join(' · ');
+      elegirDestino(h => {
+        const c = cands.find(x => { const t = tokens.get(x.id); return t && t.col === h.col && t.fila === h.fila; });
+        if(!c){ toast('Dos al hilo: elegí a uno de los que brillan (el siguiente del círculo, para un lado o el otro)'); pedir(); return; }
+        fin(c.id);
+      }, `<b>⚔ Dos al hilo: ${esc(nom)} le pegó a ${esc(caido)} — ¿contra quién sigue?</b> <span>brilla el siguiente rival del círculo hacia cada lado (${quienes}) · no puede saltear a nadie · sin No2 de más</span><button type="button" class="btn" data-dah-no>No, se queda</button><button type="button" class="btn" data-dah-mano title="Cualquier rival pegado, fuera de la regla">✋ Elegir a mano</button>`,
+      true, () => fin(null));
+      const av = $('#colocando-aviso');
+      const bNo = av && av.querySelector('[data-dah-no]'), bMano = av && av.querySelector('[data-dah-mano]');
+      if(bNo) bNo.onclick = e => { e.stopPropagation(); if(typeof elegirDestinoTerminar === 'function') elegirDestinoTerminar(); fin(null); };
+      if(bMano) bMano.onclick = e => { e.stopPropagation(); aMano(); };
+    };
+    pedir();
+  });
+}
 async function golpeQueSigueResuelto(d){
   if(!choquePesadoUnaVez(d, 'sigue')) return;
-  const ta = tokens.get(d.atacante.tokenId), sc = ta ? creepPrivadoDe(ta.fichaId) : null;
-  if(!ta || !sc || num(sc.hp) <= 0) return;
-  const rivales = golpeQueSigueRivales(sc, d.defensor.tokenId) || [];
+  const ta0 = tokens.get(d.atacante.tokenId), sc = ta0 ? creepPrivadoDe(ta0.fichaId) : null;
+  if(!ta0 || !sc || num(sc.hp) <= 0) return;
+  const ta = {...ta0, id: d.atacante.tokenId};
+  const todos = golpeQueSigueRivales(sc, d.defensor.tokenId) || [];
   const nom = nombreDe(ta), caido = d.defensor.nombre;
-  if(!rivales.length){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Dos al hilo)`, 'recordatorio'); return; }
-  await esperarDueloCerrado();   // (probado en el mapa, 2026-10-27: la pregunta salía encima del «Fin del duelo» y el clic en «Terminar duelo» la contestaba)
-  const elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}: ¿sigue contra otro rival pegado? (sin No2 de más: la habilidad cuesta lo de un solo ataque)`,
-    {titulo: 'Dos al hilo', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
-  if(!elegido) return;
+  const cands = dosAlHiloCandidatos(sc, ta, d.defensor.tokenId);
+  if(!todos.length && !(cands && cands.length)){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Dos al hilo)`, 'recordatorio'); return; }
+  // Que se alcance a leer el resultado; después el cuadro se repliega a su token (como entre los golpes del Barrido) y se elige en el mapa.
+  await new Promise(r => setTimeout(r, typeof BARRIDO_PAUSA_MS === 'number' ? BARRIDO_PAUSA_MS : 1400));
+  try{ if(typeof Duelo !== 'undefined' && Duelo.apartar && !Duelo.apartar(d.id) && Duelo.abiertoId && Duelo.abiertoId() === d.id) Duelo.minimizar(); }catch(e){}
+  let elegido = null;
+  if(cands && cands.length) elegido = await dosAlHiloElegirEnMapa(nom, caido, cands, todos);
+  else{
+    // Nadie en el círculo que valga (los dos lados tapados, o el primero ya no está pegado): solo a mano.
+    const tapado = cands ? 'los dos lados del círculo están tapados' : `${caido} ya no está pegado`;
+    elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}, pero ${tapado}: no hay un siguiente rival para el segundo golpe. ⚠ A mano (fuera de la regla), la mesa puede elegir a cualquier rival pegado.`,
+      {titulo: 'Dos al hilo', icono: '⚔', no: 'No, se queda', opciones: todos.map(x => ({valor: x.id, texto: `✋ ${nombreDe(x)}`, detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
+  }
+  if(!elegido){ mesaLinea(`⚔ ${nom} le pegó a ${caido} y no siguió (Dos al hilo)`, 'recordatorio'); return; }
+  const c = (cands || []).find(x => x.id === elegido);
+  const giro = !c ? ' — elegido a mano' : c.sentido === 'horario' ? ' — girando ↻' : c.sentido === 'antihorario' ? ' — girando ↺' : '';
   const h = (sc.habilidades || []).find(x => x && x.duelo && x.duelo.sigue);
-  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Dos al hilo: sin No2 de más)`, 'recordatorio');
+  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))}${giro} (Dos al hilo: sin No2 de más)`, 'recordatorio');
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
   const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
   if(atq && atq.sigue) delete atq.sigue;

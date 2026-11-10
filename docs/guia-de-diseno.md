@@ -104,6 +104,17 @@ pero te cuesta los nitros de un solo ataque. Si no, no entiendo cuál sería el 
 primero pegó, contra otro rival pegado) no cobra No2 ni cuenta como otro ataque del turno; la habilidad entera cuesta los No2 de un ataque más su
 cooldown o SP. Mismo criterio que el Barrido: lo que la habilidad paga es el giro o la cadena, no cada golpe. Código: `golpeQueSigueResuelto`
 (vtt-hexgrid/js/78-choque-pesado.js).
+**El segundo es el siguiente del círculo** (dueño, 2026-11-10: «al terminar se minimiza y te tiene que dar a elegir el segundo objetivo, que tiene que
+ser el siguiente dentro del círculo en una dirección o en la otra, como si estuviera girando el ataque. No puede ser cualquiera adyacente si hay alguno
+interpuesto»): el primer golpe es un duelo común; si pega, el cuadro se repliega a su token y en el mapa brillan los candidatos. Desde la casilla del
+primer golpeado se recorren las 6 casillas pegadas al atacante hacia cada lado (↻ y ↺): **el primero que ocupa una casilla es el único que vale para ese
+lado** — si es rival, es candidato; si es cualquier otro (un aliado, alguien neutral), un Sólido / colisión o una pared (entre el atacante y esa casilla,
+o cortando el giro entre dos casillas seguidas), **tapa** ese lado. Las casillas vacías se saltean (y los ocultos, bajo tierra, etéreos y caídos cuentan
+como vacías). **No hace falta que los dos rivales estén pegados entre sí** (dueño: «con que ambos estén adyacentes del que golpea y no tengan ningún
+obstáculo entre medio, alcanza. Es como un swing, pero en vez de dar toda la vuelta, pega uno, avanza hasta el siguiente, pega dos. Es como un barrido,
+pero más leve»). Como mucho, dos candidatos. Salida a mano: «✋ Elegir a mano» (cualquier rival pegado, con el aviso de
+que es fuera de la regla) y «No, se queda». Código: `Combatiente.dosAlHiloSiguientes` (la cuenta, con pruebas) y `dosAlHiloCandidatos` /
+`dosAlHiloElegirEnMapa` (js/78).
 
 **🌀 Barrido, Coletazo y Remolino: un ataque común por cada rival** (dueño, 2026-11-08: «a fines prácticos es como si fueran múltiples ataques
 continuados uno de otro y van a aplicar las mismas reglas de un ataque. Si esquiva, esquiva, si pega, pega… solo que el contexto del ataque, el inicio,

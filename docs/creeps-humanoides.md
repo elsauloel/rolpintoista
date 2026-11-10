@@ -763,6 +763,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-03: «sí»): Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2, vida 40, 6 No2, turnos de espera; Martillo del herrero de
   pueblo (Tipo 10, 1d10 + 10, Parry +1, Pajaritos 33 %) + Escudo de cuero endurecido · Chaleco de cuero · Botas de cuero de vaca: Def 5, Res. crít.
   T4 +2. Puño de roca (rápida) y Pisotón (Flash, lenta). **Cargado** en el pool esencial (2026-11-03).
+  **Nivel 2 aprobado** (dueño, 2026-11-10: «para el martillero vamos con golpe que sigue»): **Golpe que sigue** en lugar de Pegar fuerte (que ya
+  tenían el Saltador, el Berserker y el Embestidor). Fue 11 · Con 9 · Des 8 · Agi 6 · Esp 2, vida 50 (con Robustez), 6 No2; + Casco de cuero
+  endurecido y Pantalón acolchado de aprendiz: Def 7, Res. crít. T4 +4. Ojo: con el martillo de Tipo 10, el golpe que sigue cuesta otros 5 No2
+  (5 + 5 = 10 de 6): el segundo golpe casi siempre sale forzado. **Cargado** en el pool esencial (2026-11-10).
 
 - **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
   busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):

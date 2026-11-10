@@ -111,6 +111,13 @@
 
 ## Sesiones en la nube (desde el 2026-10-31)
 
+- **La publicación del sitio a veces falla** (2026-11-10: al dueño le llegan mails «pages build and deployment: Some jobs were not successful»,
+  y los ignora). Es un tropiezo de GitHub: el código queda subido, pero el sitio sigue con la versión anterior hasta que una publicación salga
+  bien. **Al terminar cada tanda de trabajo, revisar que la ÚLTIMA publicación de `nueva-version` haya salido bien** (herramienta de GitHub:
+  `actions_list` / `list_workflow_runs`) y, si falló, volver a lanzarla (`actions_run_trigger` / `rerun_failed_jobs`).
+- **«Cuando esté en la compu»**: lo que el dueño deja para revisar en la compu va a `docs/pendientes.md`, sección «🖥 Para recordarle al dueño
+  cuando esté en la compu». Cuando escriba que está en la compu (o pida «la lista de pendientes de la compu»), pasarle esa lista entera y
+  revisarla una por una.
 - **Subir directo a `nueva-version`** (`git push origin HEAD:nueva-version`), no a una rama `claude/…`: lo que no llega a `nueva-version` no se
   publica. Antes de empezar, partir de la última `nueva-version`. Para ver que se publicó: `curl` al archivo en `https://elsauloel.github.io/rolpintoista/`.
 - **Tres cuentas de prueba en la nube (desde el 2026-10-31)**: el entorno tiene `ROL_GM_EMAIL`/`ROL_GM_CLAVE`, `ROL_J1_…` y `ROL_J2_…` (nunca

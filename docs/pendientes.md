@@ -761,9 +761,13 @@
   (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como
   menú propio de las trampas (igual para todas) o pasa al cuadro del duelo. Junto con eso, la prueba de las trampas en flor (mitad «centro»,
   mitad «toda el área»).
-- [ ] **Revisar el Golpe de escudo** (2026-11-10, dueño: «para eso necesitaría ver cómo está escrito, el coste y todo»): tantos d10 como el
-  peso del escudo + Dmg (con el Escudo de hierro macizo, peso 4, da 4d10 + 6 en el T3 Guardaespaldas nv2), 5 No2, cooldown 2, sin Parry,
-  Sentado y Demora 1 si hace daño. El T3 nv2 espera esta decisión.
+- [x] **Revisar el Golpe de escudo** — ✅ decidido desde el celular el 2026-11-10 (dueño: «la 2 me parece correcto… y no puede ser golpe
+  crítico»): **1d10 + el peso del escudo + Dmg**, nunca crítico (antes: tantos d10 como el peso).
+- [ ] **Zonas que todavía usan su propio cartel** (2026-11-10, dueño: «ponelo en la lista de pendientes para ver en la compu»). En la auditoría
+  de tiradas (`docs/auditoria-tiradas.md`, tandas 1 y 2) las zonas con «tirada de la zona» pasaron al cuadro del duelo; estas siguen con el
+  cartel de la zona (y sus dados salen solos o con un «Aplicar»), porque el duelo todavía no las maneja: el **hielo** (una tirada por paso), las
+  zonas de **cura** y de **luz**, un **estado con chance** (la Varita de miasma), las que dejan **«soltarse»**, la **tirada extra sin tabla**, las de
+  **trampas** y las de **número fijo** (también su daño). Ver juntos: ¿pasan al cuadro del duelo o queda un cartel de zonas estandarizado?
 - [x] **Probar el Escudo elemental de rayo (eléctrico)** — ✅ **decidido y programado el 2026-11-09**: el salto va solo a los de afuera del anillo (guía de diseño); el mapa «Prueba · Escudo de rayo» de «Claude · pruebas» quedó armado para que el dueño lo vea. (dueño, 2026-11-09, desde el celular: «cuando esté en la compu, recordame que pruebe el escudo
   de rayo»). Su duda: si dos personajes están pegados al que lleva el escudo, los dos reciben el golpe inicial **y además** el salto del rayo, y
   quizás sea mucho. **Regla (aprobada 2026-11-09):** quien recibe el golpe inicial del escudo no puede ser objetivo del salto; el salto va solo a

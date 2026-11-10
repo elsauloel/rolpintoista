@@ -2497,3 +2497,30 @@ adentro y Rockardo arrastrado desde afuera hasta una casilla del **borde** (no e
   - Un Inmovilizado nuevo **reemplaza** al que ya tenía (Bizzante pasó de 2 turnos a 1 con la segunda red): es la regla de renovar el mismo estado.
   - Los jugadores (J1, J2) estaban mirando otro mapa (el publicado), así que las tiradas de sus personajes las hizo el GM con «🎲 Tirar por él».
   - Había dos nubes (sin trampa) en 9,23 de antes; no son de esta prueba y quedaron.
+
+## ✅ Cola 32 · Línea L4 · Hostigador con trampas, niveles 1 a 5 (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Los cinco niveles agregados como el GM; respaldo antes y restaurado después; las trampas de la prueba, borradas. GM, J1 y J2 con clics.
+- **Números** = prueba de niveles: vida 35/40/40/45/50, No2 8/8/9/9/10, PdG 10/11/13/15/16, Daño 6/7/8/9/9 (Cortaplumas 1d4 en nv1–2, Aguja
+  2d4 desde nv3), Evasión 9/11/12/12/12 (Pies ligeros +1 desde nv2), Ini 10/10/9/9/10. Al atacar con la Aguja, los **Guantes del estoque** suman
+  +1: el Tajo veloz del nv4 tiró el PdG de 18 (15 + 1 + 2 del Tajo) y el Dash del nv5 el de 19 (16 + 1 + 2).
+- **Abrojos** (nv3, centro al lado de Rockardo): Bizzante entró por una casilla del **borde** y alcanzó a los tres del área: 2d6+2 menos la
+  Defensa y Res.CC contra 12 para el Rengo (Larry y Bizzante, Rengo 2 turnos); el piso queda 3 turnos. Captura `cola-32-1-abrojos-invulnerable`.
+- **Polvo cegador** (nv4): Larry pisó un borde; Res.CC contra 13, Ceguera 1 turno a Larry y Bizzante.
+- **Arreglado (lo que había quedado de la prueba 31):** Rockardo estaba **Invulnerable**; el paso «Lo que le deja» ahora dice «Rengo (2 turnos) —
+  no le hace nada (Invulnerable)» y «Ceguera (1 turno) — no le hace nada (Invulnerable)», igual que en un creep, y no le queda el estado.
+  También con la Red de caza sobre Bizzante Invulnerable.
+- **Cordón oculto** (nv1): Larry lo pisó, tropezó y avanzó una casilla; Agilidad 3 contra 10 (la Destreza del nv1) → Sentado (fuera de su turno:
+  solo Sentado). Captura `cola-32-2-cordon-oculto-j1`.
+- **Hit and run** (nv1 contra Larry): +1 por la espalda, le pegó; al cerrar el duelo, «💨 se aleja: arrastrá hasta 2 casilleros» → lo arrastré 2
+  casillas, gratis (no gastó No2).
+- **Tajo veloz** (nv4 contra Bizzante): +2 PdG, +2 de daño fijo, Crítico frecuente +1 (salió crítico ×2; daño 2d4 + 9 + 2). Captura
+  `cola-32-3-tajo-veloz`.
+- **Dash** (nv5, tres casillas hacia Larry): lo atravesó, le pegó con +2 PdG (crítico ×2) y terminó detrás de él. Captura `cola-32-4-dash`.
+- **Botas del desertor** (nv5 alejándose de Bizzante): cartel «Retirada limpia 50 % · Tirar 1d2» → 1, no alcanzó; el GM eligió «No, dejarlo
+  pasar» y siguió su camino. Captura `cola-32-5-retirada-limpia`.
+- **Red de caza** (cinturón del nv2, centro en una casilla vecina): Bizzante entró por un borde; la red cayó sobre los del área, también sobre dos
+  Hostigadores (es física, con fuego amigo): uno quedó Inmovilizado (con «🔓 Soltarse» en sus Acciones), el otro se escurrió.
+- Notas (no se tocaron):
+  - El paso «Lo que le deja», antes del ▶ Seguir, anuncia el estado también a un Invulnerable (en un creep igual); recién al seguir dice que no le hace nada.
+  - Res.CC de los personajes de prueba (1d6+1) contra 12 o 13: casi imposible de resistir el Abrojos y el Polvo; es el diseño, a mirar en mesa.

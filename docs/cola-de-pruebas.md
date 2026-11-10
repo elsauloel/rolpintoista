@@ -15,7 +15,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-32. [ ] **Línea L4 · Hostigador con trampas, niveles 1 a 5.**
 33. [ ] **Atacar saca del Sigilo (después de aplicar el bono de atacar desde el sigilo)** (2026-11-09, dueño: «claro, atacar lo saca del sigilo»): un personaje y un creep en sigilo atacan (arma, habilidad de ataque, disparo, hechizo o varita a un rival): el duelo tiene el bono de atacar desde el sigilo y, apenas se declara, el atacante sale del sigilo (aviso en la Mesa, sin Marcado). El robo en sigilo no lo saca. Un giro: solo el primer rival lleva el bono.
 34. [ ] **Percepción aumentada: sin punto ciego en la espalda para el sigilo** (2026-11-09): un token en sigilo pegado a la espalda de alguien con la pasiva le da la tirada de detección (la casilla de atrás cuenta como zona de alerta); sin la pasiva, sigue siendo punto ciego. Probar con un personaje, un creep y una invocación.
 35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
@@ -27,6 +26,9 @@ Cada línea nueva que se termine de diseñar se suma al final.
 
 ## Hechas
 
+- [x] **32 · Línea L4 · Hostigador con trampas, niveles 1 a 5** (2026-11-10): números iguales a la prueba de niveles; cada habilidad, la Red de caza
+  y las Botas del desertor usadas una vez en el mapa, sin errores. **Arreglado:** con un personaje Invulnerable, el cartel de la trampa ahora dice
+  «no le hace nada (Invulnerable)», como con un creep (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`). Detalle en `pruebas-en-el-mapa.md`.
 - [x] **30 · Red de caza y Red tendida: se disparan en cualquiera de las 7 casillas** (2026-11-10): las dos, pisando un borde (no el centro);
   la red cayó sobre los tres personajes del área, cada uno con su Fuerza (contra 8 la Red tendida, contra 7 la de caza). Bien. Detalle en `pruebas-en-el-mapa.md`.
 - [x] **31 · Trampas de área: se disparan en cualquier casilla** (2026-11-10): Polvo cegador, Mina del cazador, Gas somnífero (7 casillas, deja la

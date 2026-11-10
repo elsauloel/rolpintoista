@@ -399,6 +399,9 @@
   esencial({...D2, nivel: 2, atrib: [9, 2, 6, 5, 14],   // (aprobado 2026-11-10: Corroer, Puntería arcana; + Polainas de cuero remendado y Casco de cuero endurecido. Con SP)
     equipo: ['Varita de miasma', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
     habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer'], pasivas: ['Puntería arcana']});
+  esencial({...D2, nivel: 3, atrib: [9, 2, 7, 6, 15],   // (aprobado 2026-11-10: Maldición de la sequía; la Varita de la ponzoña, Buena, en lugar de la de miasma. Con SP)
+    equipo: ['Varita de la ponzoña', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía'], pasivas: ['Puntería arcana']});
   esencial({linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 7, 4, 12],
     equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima'],
     habilidades: ['Escalofrío', 'Robar el aliento'], consumibles: ['Gas adormecedor'],

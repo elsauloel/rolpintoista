@@ -111,6 +111,11 @@
 
 ## Sesiones en la nube (desde el 2026-10-31)
 
+- **Videos de las animaciones, no capturas** (2026-11-10, dueño: «si pudieras mandarme videítos de las animaciones en lugar de capturas, sería
+  genial»). Para todo lo que se mueve (pulsos, duelos que se despliegan, vaquita, lava, rayos…), grabar con Playwright
+  (`newContext({recordVideo: {dir, size: {width: 1280, height: 720}}, viewport: {width: 1280, height: 720}})`, cerrar el contexto para que se
+  guarde el .webm) y pasarlo a mp4 para el celular con ffmpeg (`ffmpeg -y -i in.webm -vf "scale=1280:-2" -c:v libx264 -pix_fmt yuv420p
+  -movflags +faststart out.mp4`, recortado con `-ss`/`-t`): cortos (5–15 s) y livianos (< 5 MB). Lo quieto, con capturas.
 - **La publicación del sitio a veces falla** (2026-11-10: al dueño le llegan mails «pages build and deployment: Some jobs were not successful»,
   y los ignora). Es un tropiezo de GitHub: el código queda subido, pero el sitio sigue con la versión anterior hasta que una publicación salga
   bien. **Al terminar cada tanda de trabajo, revisar que la ÚLTIMA publicación de `nueva-version` haya salido bien** (herramienta de GitHub:

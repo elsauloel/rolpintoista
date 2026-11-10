@@ -458,6 +458,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 3 aprobado y cargado** (dueño, 2026-11-10: «me cierra»): Esp 15 · Con 9 · Agi 7 · Des 6 · Fue 2 → vida 45, 7 No2, SP 45;
     + Maldición de la sequía; **la Varita de la ponzoña (Buena) reemplaza a la Varita de miasma** (un solo objetivo, no se esquiva y no alcanza a
     sus aliados; el área ya la da la Nube tóxica). PdG.Esp 16, Ef.Esp 15, Def 4, Evasión 7.
+  **Nivel 4 aprobado y cargado** (dueño, 2026-11-10: «sí»): Esp 17 · Con 10 · Agi 7 · Des 6 · Fue 2; + Maldición tormentosa y la pasiva Potencia
+    especial; **el Chaleco de kevlar (Buena) reemplaza al Chaleco de cuero**, por la regla del dueño para los magos: protegerlos del rango. Con SP:
+    vida 55 (5 del chaleco), SP 51 (+8), PdG.Esp 18, Ef.Esp 18, Defensa 5 (7 contra armas a distancia), Evasión 7.
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
   Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 

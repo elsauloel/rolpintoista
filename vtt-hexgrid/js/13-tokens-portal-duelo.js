@@ -2547,14 +2547,19 @@ async function dueloAtraer(d){
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId), a = d.hab.atrae;
   if(!t || !ta) return;
   const nom = nombreDe(t), titulo = `${d.hab.nombre}: ¿${nom} se resiste?`;
-  const fue = trampaValorStat(t, a.contra || 'fue'), fF = formulaParaValor(fue), fE = formulaParaValor(num(a.tiraValor));
-  // 🎲 Cada tirada la hace el involucrado, con su botón (dueño, 2026-11-10; js/115): el Ef.Esp, quien usó la habilidad; la Fuerza, quien maneja al atraído.
-  const rE = (await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'dmgesp', valor: num(a.tiraValor), sinEstados: true, etq: 'Ef.Esp', icono: '🪝', para: d.hab.nombre,
-    titulo: `${d.hab.nombre}: ${d.atacante.nombre || 'quien la usó'} tira de ${nom}`, texto: `Su Ef.Esp contra la Fuerza de ${nom}: si le gana, lo trae ${a.casillas} casillero${a.casillas === 1 ? '' : 's'}.`})) || {total: 0};
-  const rF = (await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: a.contra || 'fue', valor: fue, sinEstados: true, etq: 'Fuerza', icono: '🪝', para: 'para no ser atraído',
-    titulo: `${nom}: ${d.hab.nombre} tira de vos`, texto: `Tirá Fuerza para plantarte (sacó ${rE.total}: empate o más, no te mueve).`})) || {total: 0};
-  const cuenta = `Fuerza ${fF ? fF.formula : '0'} → ${rF.total} contra Ef.Esp ${fE ? fE.formula : '0'} → ${rE.total}`;
-  if(rF.total >= rE.total){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: se planta y no lo mueve.`, estado: 'listo'}); return; }
+  // 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10; contiendaDuelo, js/78): quien la usó tira su Ef.Esp y el atraído su Fuerza, cada uno con su
+  // botón (o el GM por quien no está). Empate: no lo mueve.
+  const etqC = a.contra && a.contra !== 'fue' ? ((typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[a.contra]) || a.contra) : 'Fuerza';
+  const cd = typeof contiendaDuelo === 'function' ? await contiendaDuelo({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre, uid: d.atacante.uid},
+    deTokenId: d.atacante.tokenId, aTokenId: d.defensor.tokenId, esperar: true, hab: {
+      nombre: `${d.hab.nombre}: lo atrae`.slice(0, 60), objetivo: 'enemigo',
+      detalle: `${d.atacante.nombre || 'Quien la usó'} tira de ${nom}: su Ef.Esp contra la ${etqC} de ${nom} (empate: no lo mueve). Si le gana, lo trae ${a.casillas} casillero${a.casillas === 1 ? '' : 's'} hacia ${d.atacante.nombre || 'él'}.`,
+      tira: {stat: 'dmgesp', etq: 'Ef.Esp'}, contra: [{modo: a.contra || 'fue', stat: a.contra || 'fue', etq: etqC}], dano: null, empatePierde: true, efectos: []}}) : {falla: true};
+  if(cd.falla || cd.tiempo || cd.aMano){ mesaLinea(`🪝 ${d.hab.nombre}: ✋ resolvé a mano si ${nom} se planta (su ${etqC} contra el Ef.Esp de ${d.atacante.nombre || 'quien la usó'})`, 'alerta-roja'); return; }
+  if(cd.cancelado) return;
+  const tE = cd.d && cd.d.pdg ? cd.d.pdg.total : '?', tF = cd.d && cd.d.eva ? cd.d.eva.total : '?';
+  const cuenta = `${etqC} ${tF} contra Ef.Esp ${tE}`;
+  if(cd.gana !== 'atacante'){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: se planta y no lo mueve.`, estado: 'listo'}); return; }
   const im = chanceDe(t, 'inamovible');
   if(im && await inamovibleSale(t, im, `${titulo} ${cuenta}: pierde`)) return;   // el cartel con el d6 (js/21)
   let c = {col: t.col, fila: t.fila}, pasos = 0;
@@ -2782,14 +2787,19 @@ async function dueloTolera(d, ef){
   const valor = typeof trampaValorStat === 'function' ? num(trampaValorStat(t, tl.stat)) : 0;
   const etq = (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[tl.stat]) || (tl.stat === 'resmg' ? 'Res.Esp' : tl.stat);
   const quien = nombreDe(t), contra = Math.round(num(tl.valor));
-  // 🎲 La tira el golpeado, con su botón (dueño, 2026-11-10: «las tiradas las hace el usuario involucrado»; js/115). ✋ a mano y el respaldo del GM, ahí.
-  const r = typeof tiradaInvolucrado === 'function'
-    ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: tl.stat, valor, sinEstados: true, etq, icono: '🧪', para: `tolerar ${ef.nombre}`,
-        titulo: `${quien}: ¿tolerás ${ef.nombre}?`, texto: `Tirá ${etq} para tolerar ${ef.nombre}: tenés que superar ${contra}.`})
-    : Combatiente.tirarStat(valor, [], tl.stat);
-  if(!r) return null;
-  return r.total > contra ? {nota: `${quien} lo toleró: ${etq} ${r.total} contra ${contra} — no le queda ${ef.nombre}`, sinEfecto: true}
-    : {tirada: r.total, contra};
+  // 🎲 En el cuadro del duelo de siempre (dueño, 2026-11-10; contiendaDuelo, js/78): el valor de quien lo usó ya está puesto (no se tira: es su Ef.Esp
+  // fijo) y el golpeado tira su stat con su botón (o el GM por él). Tiene que superarlo: el empate es de quien lo usó (`empateGana`).
+  if(typeof contiendaDuelo !== 'function') return null;
+  const c = await contiendaDuelo({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre, uid: d.atacante.uid},
+    deTokenId: d.atacante.tokenId, aTokenId: d.defensor.tokenId, esperar: true, pdgCompartido: {total: contra, formula: String(contra), rolls: [], mod: 0}, hab: {
+      nombre: `Tolerar ${ef.nombre}`.slice(0, 60), objetivo: 'enemigo',
+      detalle: `${quien} puede tolerar ${ef.nombre}: su ${etq} contra el Ef.Esp de ${d.atacante.nombre || 'quien lo usó'} (${contra}, fijo). Tiene que superarlo (el empate no alcanza); si lo supera, no le queda ${ef.nombre}.`,
+      tira: {formula: String(contra), etq: 'Ef.Esp'}, contra: [{modo: tl.stat, stat: tl.stat, etq}], dano: null, empateGana: true, efectos: []}});
+  if(c.falla || c.tiempo || c.aMano) return {manual: true, sinEfecto: true, nota: `✋ a mano: si ${quien} supera ${contra} con su ${etq}, tolera ${ef.nombre}`};
+  if(c.cancelado) return null;
+  const tirada = c.d && c.d.eva ? c.d.eva.total : null;
+  return c.gana === 'defensor' ? {nota: `${quien} lo toleró: ${etq} ${tirada} contra ${contra} — no le queda ${ef.nombre}`, sinEfecto: true}
+    : {tirada, contra};
 }
 async function dueloAplicarEfecto(d, ef){
   if(num(ef && ef.trae) > 0 && typeof dueloGanchoTraer === 'function') return dueloGanchoTraer(d);   // 🪝 el gancho de Arrastrar (js/78, 2026-11-04)

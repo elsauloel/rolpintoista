@@ -330,16 +330,18 @@ Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resisten
   explota al terminar) y los que además dan otra cosa (mods, Invulnerable, el Escudo elemental). Los de los anillos de descanso vuelven en el
   próximo descanso.
 
-## Regla general: las tiradas las hace el usuario involucrado, con su botón (dueño, 2026-11-10)
+## Regla general: las tiradas las hace el usuario involucrado, con su botón, en el cuadro del duelo de siempre (dueño, 2026-11-10)
 
 «No quiero que las tiradas las haga sola el mapa. Quiero que las tiradas las haga el usuario involucrado… porque le quitan la sensación de que el
-jugador está involucrado en la partida.» **Las tiradas las hace el usuario involucrado, con su botón; el mapa no tira solo. Salida: el GM tira por el
-ausente, y ✋ Resolver a mano.** Quien tira: lo de un personaje o su invocación, quien lo maneja (su dueño, o quien tiene 🎮 el control); lo de un
-creep, el GM. La pieza común es `vtt-hexgrid/js/115-tirada-involucrado.js` (`tiradaInvolucrado`): el cartel «🎲 Tirar <stat> (fórmula)» + «✋ Resolver
-a mano» en la pantalla de quien tira; si es otra pantalla, un momento `tirada-pedida` que esa pantalla contesta; si no avisó que lo vio en 6 s, al GM
-le sale el cartel «· tirá por …» (y en la Crónica, «🎲 Tirar por …»); una transacción evita tirar dos veces. La tirada va a la Mesa con los dados 3D.
-Ya la usan **Golpe en la sien, Carga que derriba, Salto aplastante** (un cartel por rival, en orden), **Tolerar un efecto** (la Espina tóxica) y
-**Atraer**. Las trampas (abajo) y el dado del Escudo elemental tienen su propio flujo, con la misma regla. Lo que todavía tira solo el mapa está
+jugador está involucrado en la partida.» **Las tiradas las hace el usuario involucrado, con su botón; el mapa no tira solo.** Y, el mismo día: «¿Por
+qué no usás el menú del duelo habitual? El mismo de siempre, el que se usa para los ataques y para las skills.» → **Una contienda (un stat contra otro)
+va en el cuadro del duelo de siempre** (`comun/duelo.js`), no en un cartel aparte: cada lado tira con su botón, el GM tira por el ausente como en
+cualquier duelo, está «✋ Terminar a mano», y el estado entra por el camino de siempre («Aplicar», con las inmunidades). La pieza es
+`contiendaDuelo` (vtt-hexgrid/js/78): abre un duelo de habilidad desde el token del objetivo (el cuadro anterior se repliega solo). Ya la usan
+**Golpe en la sien** y **Carga que derriba** (después del golpe, sobre el mismo golpeado), **Salto aplastante** (un rival por vez, como las zonas:
+late, se despliega, se resuelve, se repliega; la Fuerza del que salta se tira una vez y vale para todos), **Atraer** y **Tolerar un efecto** (la Espina
+tóxica: el Ef.Esp de quien la usó ya viene puesto y el golpeado tiene que superarlo). El cartel propio que se probó primero (js/115) se retiró. Las
+trampas tienen su propio cartel paso a paso (js/19) y el dado del Escudo elemental el suyo, con la misma regla. Lo que todavía tira solo el mapa está
 listado en `docs/pendientes.md` («Tiradas que todavía hace sola el mapa»).
 
 ## Trampas: las tiradas no son automáticas — cada uno tira lo suyo (dueño, 2026-11-10)

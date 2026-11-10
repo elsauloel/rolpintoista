@@ -68,35 +68,28 @@ async function saltoHab(mio, t, ataque, yo){
   if(ataque.saltoAplasta) await saltoAplastar(mio, yo);
   return true;
 }
-// 💥 El Salto aplastante: los rivales pegados a donde cayó tiran Res.CC contra su Fuerza (una tirada para todos); quien no llega queda Sentado.
-// 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza, quien maneja al que salta; la Res.CC de cada rival, quien lo maneja
-// (un cartel por rival, en orden).
+// 💥 El Salto aplastante: los rivales pegados a donde cayó tiran Res.CC contra su Fuerza (una tirada para todos); quien no llega queda Sentado
+// (empate: no cae). En el cuadro del duelo de siempre (dueño, 2026-11-10; contiendaDuelo, js/78), uno por uno como las zonas y el Barrido: late el
+// rival, se despliega el cuadro, se resuelve, se repliega y sigue el próximo. La Fuerza la tira quien saltó en el primero y vale para todos
+// (`pdgCompartido`, como un hechizo de área); cada rival tira su Res.CC con su botón.
 async function saltoAplastar(mio, yo){
   const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== mio.id && distanciaHex(x, mio) === 1 && !x.oculto && !x.bajoTierra && !etereoDe(x) && dueloEsRival(yo, x));
-  if(!rivales.length) return;
-  const nom = nombreDe(mio);
-  const rf = await tiradaInvolucrado({token: tokens.get(mio.id) || mio, tokenId: mio.id, stat: 'fue', etq: 'Fuerza', icono: '💥', para: 'Salto aplastante',
-    titulo: `${nom} cae aplastando`, texto: `Su Fuerza contra la Res.CC de ${rivales.map(nombreDe).join(', ')}: quien no llegue queda Sentado.`});
-  if(!rf){ mesaLinea(`💥 ${nom} cae aplastando: ✋ tirá a mano su Fuerza contra la Res.CC de los pegados (quien no llega, Sentado)`, 'alerta-roja'); return; }
-  const lineas = [];
-  for(const x of rivales){
-    const n2 = nombreDe(x);
-    const rr = await tiradaInvolucrado({token: tokens.get(x.id) || x, tokenId: x.id, stat: 'rescc', etq: 'Res.CC', icono: '💥', para: 'para no caer',
-      titulo: x.tipo === 'creep' ? `${n2}: ${nom} le cayó al lado aplastando` : `${n2}: ${nom} te cayó al lado aplastando`,
-      texto: `Tirá Res.CC para no caer Sentado (sacó ${rf.total} de Fuerza: tenés que llegar a ${rf.total} o más).`});
-    if(!rr){ lineas.push(`${n2}: ✋ tirá Res.CC a mano`); continue; }
-    const cae = rr.total < rf.total;   // empate: no cae (llega)
-    lineas.push(`${n2}: ${rr.total} contra ${rf.total} → ${cae ? 'queda Sentado' : 'se mantiene en pie'}`);
-    if(!cae) continue;
-    try{
-      if(x.tipo === 'creep') await modificarCreep(String(x.fichaId), c => { EstadosAplicar.aplicarACreep(c, {nombre: 'Sentado'}); return {}; });
-      else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec: {nombre: 'Sentado'}, origen: `${nom} · Salto aplastante`}); }
-    }catch(err){ console.error('Salto aplastante: no se pudo sentar', err); lineas[lineas.length - 1] += ' (✋ ponéselo a mano)'; }
+  if(!rivales.length || typeof contiendaDuelo !== 'function') return;
+  const nom = nombreDe(mio), quien = {ref: yo.ref, tipo: yo.tipo, nombre: yo.nombre || nom, ...(yo.uid ? {uid: yo.uid} : {})};
+  mesaLinea(`💥 ${nom} cae aplastando: su Fuerza contra la Res.CC de ${rivales.map(nombreDe).join(', ')} (quien no llega, Sentado)`, 'recordatorio');
+  let fuerza = null;
+  for(let i = 0; i < rivales.length; i++){
+    const x = rivales[i];
+    if(!tokens.get(x.id)) continue;
+    if(i > 0) await new Promise(r => setTimeout(r, typeof BARRIDO_PAUSA_MS !== 'undefined' ? BARRIDO_PAUSA_MS : 1400));
+    const r = await contiendaDuelo({yo: quien, deTokenId: mio.id, aTokenId: x.id, esperar: true, ...(fuerza ? {pdgCompartido: fuerza} : {}), hab: {
+      nombre: 'Salto aplastante: al piso', objetivo: 'enemigo',
+      detalle: `${nom} le cayó al lado a ${nombreDe(x)} aplastando: su Fuerza contra la Res.CC de ${nombreDe(x)} (empate: no cae). Si no le llega, queda Sentado.${rivales.length > 1 ? ` Una sola Fuerza para los ${rivales.length} rivales pegados.` : ''}`,
+      tira: {stat: 'fue', etq: 'Fuerza'}, contra: [{modo: 'rescc', stat: 'rescc', etq: 'Res.CC'}], dano: null, empatePierde: true,
+      efectos: [{nombre: 'Sentado', caras: 1, exitos: 1, spec: {nombre: 'Sentado'}, detalle: 'Cae al piso: Sentado'}]}});
+    if(r.cancelado){ mesaLinea(`✖ Se cortó el Salto aplastante de ${nom}${i < rivales.length - 1 ? ' (los que faltaban, a mano)' : ''}`, 'recordatorio'); return; }
+    if(!fuerza && r.d && r.d.pdg) fuerza = r.d.pdg;   // la Fuerza del primero vale para los demás
   }
-  if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
-  const txt = `${nom} cae aplastando (Fuerza ${rf.total}): ${lineas.join(' · ')}.`;
-  mesaLinea(`💥 ${txt}`, 'recordatorio');
-  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '💥', titulo: `${nom} cae aplastando`, resultado: txt, estado: 'listo', datos: {chico: true}});
 }
 /* 🏃 La Carga que derriba (2026-10-27, dueño; la Carga del Warrior un escalón arriba): `ataque.cargaDerriba` = hasta cuántas casillas corre (4). La misma
    carrera, pero suma +X a la Probabilidad de Golpe y +X al daño (X = las casillas que corrió; al lado, nada) y no empuja; si corrió 3 o más, `derriba` = X:

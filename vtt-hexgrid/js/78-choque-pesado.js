@@ -379,68 +379,67 @@ function arrastreZonasMomento(id, d){
   setTimeout(() => { try{ zonaRevisarEntrada(a.tokenId, a.celdas, 0); }catch(err){ console.error('Arrastrar: las zonas del camino', err); } }, 800);   // (que llegue antes la casilla nueva)
 }
 
+/* 🎲 La contienda en el cuadro del duelo de siempre (dueño, 2026-11-10: «¿por qué no usás el menú del duelo habitual? El mismo de siempre, el que se
+   usa para los ataques y para las skills»; reemplaza al cartel propio de js/115, que se retiró). Golpe en la sien, la Carga que derriba, el Salto
+   aplastante (js/55), Atraer y Tolerar un efecto (js/13) abren un duelo de habilidad común (comun/duelo.js): cada lado tira con su botón —el GM por un
+   creep, el jugador por su personaje, y el GM por quien no está, como en cualquier duelo—, el cuadro se despliega desde el token del objetivo (el
+   anterior se repliega solo) y el estado entra por el camino de siempre («Aplicar», con Inmunidad a CC, Invulnerable y Protección de jefe).
+   `yo` = quien la usa ({ref, tipo, nombre, uid}); `hab` = la habilidad del cuadro (tira, contra, efectos, empatePierde/empateGana); `pdgCompartido` =
+   la tirada de quien la usa, ya hecha (la Fuerza del Salto para todos; el valor fijo de Tolerar). Con `esperar`, → {gana: 'atacante'|'defensor', d} |
+   {cancelado} | {aMano} | {tiempo} | {falla}; sin `esperar`, → {id} apenas se abre (o {falla}). */
+const CONTIENDA_TOPE_MS = 15 * 60000;
+async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, esperar}){
+  const t = tokens.get(aTokenId);
+  if(!t || !hab) return {falla: true};
+  let id = null;
+  try{
+    id = await Duelo.crear({yo, ataque: {hab, habNombre: hab.nombre}, ...(pdgCompartido ? {pdgCompartido} : {})},
+      {id: aTokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, deTokenId || '');
+  }catch(err){ console.error(`${hab.nombre}: no se pudo abrir el duelo`, err); }
+  if(!id){ toast(`${hab.nombre}: no se pudo abrir el duelo — resolvelo a mano con la mesa`); return {falla: true}; }
+  if(!esperar) return {id};
+  return new Promise(resolve => {
+    let listo = false, quitar = null;
+    const fin = v => { if(listo) return; listo = true; try{ quitar && quitar(); }catch(e){} clearTimeout(reloj); resolve({...v, id}); };
+    const reloj = setTimeout(() => fin({tiempo: true}), CONTIENDA_TOPE_MS);
+    quitar = fbDb.collection(fbRutaCampana('duelos')).doc(id).onSnapshot(doc => {
+      const d = doc.exists ? doc.data() : null;
+      if(!d){ fin({cancelado: true}); return; }
+      if(d.estado === 'cancelado'){ fin(d.resultado === 'a-mano' ? {aMano: true} : {cancelado: true}); return; }
+      if(d.estado === 'resuelto') fin({gana: d.resultado === 'pego' || d.resultado === 'mitad' ? 'atacante' : 'defensor', d});
+    }, () => fin({tiempo: true}));
+  });
+}
+// La pausa antes de abrir la contienda que sigue a un ataque: que se alcance a leer el resultado del golpe (como entre los golpes del Barrido).
+const contiendaPausa = () => new Promise(r => setTimeout(r, typeof BARRIDO_PAUSA_MS !== 'undefined' ? BARRIDO_PAUSA_MS : 1400));
+const yoDeDuelo = d => ({ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre, uid: d.atacante.uid});
+
 // 🔨 Golpe en la sien (dueño, 2026-11-10; el Martillero nv4): si pegó, su Fuerza contra la Res.CC del golpeado; si no le llega, Stun 1 turno (empate: no).
-// Las inmunidades (Inmunidad a CC, Invulnerable, Protección de jefe) las aplica la regla común (EstadosAplicar / la ficha del dueño). Mismo camino que la
-// Carga que derriba: cada tirada la hace el involucrado con su botón (js/115), a la vista en la Mesa, y el aviso en la Crónica; ✋ a mano.
+// En el cuadro del duelo de siempre (contiendaDuelo): el golpe se repliega y se despliega, sobre el mismo golpeado, la contienda.
 async function golpeSienResuelto(d){
   if(!choquePesadoUnaVez(d, 'sien')) return;
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId);
-  const sc = ta ? creepPrivadoDe(ta.fichaId) : null;
-  if(!t || !sc) return;
+  if(!t || !ta) return;
   const nom = nombreDe(ta), obj = nombreDe(t);
-  // 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza, quien maneja al creep (el GM); la Res.CC, quien maneja al golpeado.
-  await esperarDueloCerrado(20000);
-  const rf = await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'fue', etq: 'Fuerza', icono: '🔨', para: 'Golpe en la sien',
-    titulo: `${nom}: Golpe en la sien a ${obj}`, texto: `Le dio en la sien a ${obj}: su Fuerza contra la Res.CC de ${obj}. Si no le llega, Stun 1 turno.`});
-  const rr = rf ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: 'rescc', etq: 'Res.CC', icono: '🔨', para: 'para no quedar aturdido',
-    titulo: t.tipo === 'creep' ? `${obj}: ${nom} le pegó con Golpe en la sien` : `${obj}: ${nom} te pegó con Golpe en la sien`,
-    texto: `Tirá Res.CC para resistir Stun (sacó ${rf.total} de Fuerza: tenés que llegar a ${rf.total} o más).`}) : null;
-  if(!rf || !rr){ mesaLinea(`🔨 ${nom} le dio en la sien a ${obj}: ✋ tirá a mano su Fuerza contra la Res.CC de ${obj} (si no le llega, Stun 1 turno)`, 'alerta-roja'); return; }
-  const pierde = rr.total < rf.total;
-  let frena = '';
-  if(pierde){
-    try{
-      if(t.tipo === 'creep'){
-        let r = null;
-        await modificarCreep(String(t.fichaId), c => { r = EstadosAplicar.aplicarACreep(c, {nombre: 'Stun', turnos: 1}); return {}; });
-        if(r && !r.ok) frena = r.motivo || 'no le hace nada';
-      }else{
-        try{ frena = Combatiente.inmunidad(structuredClone(((vinculo(t) || {}).resumen || {}).estados || []), EstadosAplicar.componer({nombre: 'Stun', turnos: 1}), null) || ''; }catch(e){ frena = ''; }
-        if(!frena){ const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: (f && f.duenoUid) || t.duenoUid, spec: {nombre: 'Stun', turnos: 1}, origen: `${nom} · Golpe en la sien`}); }
-      }
-    }catch(err){ console.error('Golpe en la sien: no se pudo aturdir', err); mesaLinea(`🔨 ${obj} queda con Stun 1 turno (✋ ponéselo a mano: no se pudo solo)`, 'alerta-roja'); }
-  }
-  if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
-  const fin = !pierde ? `${obj} aguanta el golpe y sigue entero` : frena ? `${obj} no llegó, pero no le hace nada (${frena})` : `${obj} queda con Stun 1 turno (sin No2 ese turno)`;
-  const txt = `${nom} le da en la sien a ${obj}: Fuerza ${rf.total} contra su Res.CC ${rr.total} → ${fin}.`;
-  mesaLinea(`🔨 ${txt}`, 'recordatorio');
-  momentoAbrir({tipo: 'sien', icono: '🔨', titulo: `${nom}: Golpe en la sien`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...(t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {})}});
+  await contiendaPausa();
+  await contiendaDuelo({yo: yoDeDuelo(d), deTokenId: d.atacante.tokenId, aTokenId: d.defensor.tokenId, hab: {
+    nombre: 'Golpe en la sien: aturdido', objetivo: 'enemigo',
+    detalle: `${nom} le dio en la sien a ${obj}: su Fuerza contra la Res.CC de ${obj} (empate: no lo aturde). Si no le llega, Stun 1 turno: se queda sin No2 ese turno.`,
+    tira: {stat: 'fue', etq: 'Fuerza'}, contra: [{modo: 'rescc', stat: 'rescc', etq: 'Res.CC'}], dano: null, empatePierde: true,
+    efectos: [{nombre: 'Stun', caras: 1, exitos: 1, spec: {nombre: 'Stun', turnos: 1}, detalle: 'Stun 1 turno: sin No2 ese turno'}]}});
 }
 
 // ⚖ Carga que derriba (dueño, 2026-10-27): si corrió 3 o más y pegó, Fuerza + X contra la Res.CC; si gana, Sentado (empate: no cae).
+// En el cuadro del duelo de siempre (contiendaDuelo), con el +X como bono de la tirada.
 async function cargaDerribaResuelto(d){
   if(!choquePesadoUnaVez(d, 'derriba')) return;
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId);
-  const sc = ta ? creepPrivadoDe(ta.fichaId) : null;
-  if(!t || !sc) return;
+  if(!t || !ta) return;
   const x = Math.round(num(d.ataque.derriba)), nom = nombreDe(ta), obj = nombreDe(t);
-  // 🎲 Las tiradas las hace el involucrado (dueño, 2026-11-10; js/115): la Fuerza + X, quien maneja al creep (el GM); la Res.CC, quien maneja al golpeado.
-  await esperarDueloCerrado(20000);
-  const rf = await tiradaInvolucrado({token: ta, tokenId: d.atacante.tokenId, stat: 'fue', extra: x, etq: `Fuerza + ${x}`, icono: '🏃', para: 'Carga que derriba',
-    titulo: `${nom}: Carga que derriba contra ${obj}`, texto: `Llegó a toda carrera (${x} casillas): su Fuerza + ${x} contra la Res.CC de ${obj}. Si le gana, queda Sentado.`});
-  const rr = rf ? await tiradaInvolucrado({token: t, tokenId: d.defensor.tokenId, stat: 'rescc', etq: 'Res.CC', icono: '🏃', para: 'para no caer',
-    titulo: t.tipo === 'creep' ? `${obj}: ${nom} lo embistió con la Carga que derriba` : `${obj}: ${nom} te embistió con la Carga que derriba`,
-    texto: `Tirá Res.CC para no caer Sentado (sacó ${rf.total}: tenés que llegar a ${rf.total} o más).`}) : null;
-  if(!rf || !rr){ mesaLinea(`🏃 ${nom} carga contra ${obj}: ✋ tirá a mano Fuerza + ${x} contra su Res.CC (si gana, Sentado)`, 'alerta-roja'); return; }
-  const cae = rr.total < rf.total;
-  if(cae){
-    try{
-      if(t.tipo === 'creep') await modificarCreep(String(t.fichaId), c => { EstadosAplicar.aplicarACreep(c, {nombre: 'Sentado'}); return {}; });
-      else{ const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: (f && f.duenoUid) || t.duenoUid, spec: {nombre: 'Sentado'}, origen: `${nom} · Carga que derriba`}); }
-    }catch(err){ console.error('Carga que derriba: no se pudo sentar', err); mesaLinea(`🏃 ${obj} cae Sentado (✋ ponéselo a mano: no se pudo solo)`, 'alerta-roja'); }
-  }
-  if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
-  const txt = `${nom} llega a toda carrera (Fuerza + ${x}: ${rf.total}) contra la Res.CC de ${obj} (${rr.total}): ${cae ? `${obj} cae Sentado` : `${obj} se mantiene en pie`}.`;
-  mesaLinea(`🏃 ${txt}`, 'recordatorio');
-  momentoAbrir({tipo: 'carga', icono: '🏃', titulo: `${nom}: Carga que derriba`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...(t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {})}});
+  await contiendaPausa();
+  await contiendaDuelo({yo: yoDeDuelo(d), deTokenId: d.atacante.tokenId, aTokenId: d.defensor.tokenId, hab: {
+    nombre: 'Carga que derriba: al piso', objetivo: 'enemigo',
+    detalle: `${nom} llegó a toda carrera (${x} casillas): su Fuerza + ${x} contra la Res.CC de ${obj} (empate: no cae). Si le gana, ${obj} queda Sentado.`,
+    tira: {stat: 'fue', etq: `Fuerza + ${x}`, bono: x}, contra: [{modo: 'rescc', stat: 'rescc', etq: 'Res.CC'}], dano: null, empatePierde: true,
+    efectos: [{nombre: 'Sentado', caras: 1, exitos: 1, spec: {nombre: 'Sentado'}, detalle: 'Cae al piso: Sentado'}]}});
 }

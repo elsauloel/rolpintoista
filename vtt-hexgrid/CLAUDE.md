@@ -851,13 +851,13 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   dos copias. Duración: un charco no vence, así que el junto tampoco (si todos tuvieran turnos, el que dura más). El hielo y la lava no se juntan.
   Probado en «Claude · pruebas» / «Prueba · Escudo de rayo» (dos que se pisan, un tercero pegado, uno suelto que queda aparte).
 
-- **🎲 Las tiradas las hace el involucrado** (2026-11-10, dueño: «no quiero que las tiradas las haga sola el mapa»): `js/115-tirada-involucrado.js`,
-  `tiradaInvolucrado({token, tokenId, stat, valor?, extra, sinEstados?, etq, icono, titulo, texto, para})` → `{total, formula, rolls, aMano?}` o null.
-  La tira quien maneja al token (creep → el GM; personaje o invocación → 🎮 control o dueño): si es esta pantalla, el cartel ahí (`tiradaCartel`, uno
-  por vez, `tiradaEnFila`); si no, un momento `tirada-pedida` (`datos.tiraUid`/`tiraGM` — **no** `paraUid`, que js/16 abre como Aviso genérico y tapa el
-  cartel) que esa pantalla contesta (`tiradaMomento`: avisa `datos.visto`, toma con transacción esperando → tirando, escribe 'tirado' o 'mano'). Respaldo:
-  si a los 6 s no hay `visto`, el GM tira por él; en la Crónica, «🎲 Tirar por …» (`tiradaBotonFeed`, js/16). La usan Golpe en la sien y Carga que
-  derriba (js/78, después de `esperarDueloCerrado`), Salto aplastante (js/55, un cartel por rival), `dueloTolera` y `dueloAtraer` (js/13).
+- **🎲 Las tiradas las hace el involucrado, en el cuadro del duelo de siempre** (2026-11-10, dueño: «no quiero que las tiradas las haga sola el
+  mapa»; «¿por qué no usás el menú del duelo habitual?»): `contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido?, esperar?})` (js/78) abre un
+  duelo de habilidad común (`Duelo.crear` con `ataque.hab`: tira, contra, efectos, `empatePierde` / `empateGana` —nuevo en comun/duelo.js: el empate lo
+  gana quien la usa—). Con `esperar`, → {gana, d} | {cancelado} | {aMano} | {tiempo} | {falla}. Lo usan Golpe en la sien y Carga que derriba (js/78,
+  tras `contiendaPausa`, sobre el mismo golpeado: Stun 1 turno / Sentado por el «Aplicar» de siempre), Salto aplastante (js/55: un rival por vez y la
+  Fuerza del primero como `pdgCompartido` para los demás), `dueloAtraer` (Ef.Esp contra Fuerza; empate: no lo mueve) y `dueloTolera` (js/13: el Ef.Esp
+  fijo de quien la usó como `pdgCompartido`, el golpeado tiene que superarlo). El cartel propio `js/115-tirada-involucrado.js` se retiró.
 
 ## Pendiente (más adelante)
 

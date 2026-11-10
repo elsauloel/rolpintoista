@@ -966,7 +966,7 @@ const Duelo = (() => {
         ...(h.zonaQueda.soloRivales ? {soloRivales: true} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
-      ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}),   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
+      ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}), ...(h.empateGana ? {empateGana: true} : {}),   // empate: gana quien la usa (Tolerar un efecto: hay que superarlo, 2026-11-10)   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
       ...(h.tiraCadaUno ? {tiraCadaUno: true} : {}), ...(h.zonaId ? {zonaId: txtCorto(h.zonaId, 40)} : {}),   // 💨 una zona con duelo por token (js/112): quien la creó tira de nuevo contra cada uno
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
@@ -1161,6 +1161,7 @@ const Duelo = (() => {
     let r = resolverPar(a, b);
     // 🪝 Una habilidad con `empatePierde` (el gancho de Arrastrar, dueño 2026-11-04: «empate: no engancha»): en el contacto, empate = gana el objetivo.
     if(par === 'contacto' && m.hab && m.hab.empatePierde && a.total === b.total) r = {gana: 'defensor', dif: 0, desempate: 'empatePierde'};
+    else if(par === 'contacto' && m.hab && m.hab.empateGana && a.total === b.total) r = {gana: 'atacante', dif: 0, desempate: 'empatePierde'};   // (mismo texto: «el empate lo gana…»)
     if(r.empate){ m.estado = 'empate'; m.empate = {par}; return null; }
     cerrarPar(m, par, r);
     return r.desempate === 'mas1' || r.desempate === 'empatePierde' ? textoDesempate(m, par, r) : null;

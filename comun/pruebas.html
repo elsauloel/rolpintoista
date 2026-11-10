@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261110sien"></script>
+<script src="duelo.js?v=20261110duelocc"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110inv"></script>
+<script src="skills-creep-base.js?v=20261110duelocc"></script>
 <script src="creeps-esenciales.js?v=20261110w35"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7372,6 +7372,16 @@ prueba('🏹 El Tirador de precisión al pool esencial y el Hachero con sus atri
   igual([t.des, t.agl, t.con, t.fue, t.esp, t.hp, t.equipo.map(i => i.nombre).join(), t.habilidades.map(x => x.nombre + ':' + x.cd).join(), t.cinturon.map(i => i.nombre).join(),
     [h.fue, h.con, h.agl, h.des, h.esp, h.hp].join()],
     [11, 7, 7, 5, 3, 35, 'Arco de la espera,Chaleco de cuero,Botas de cuero de vaca', 'Tiro certero:2,Tiro a la cabeza:3', 'Flecha perforante', '9,7,6,7,4,35']);
+});
+prueba('🎲 Contiendas en el cuadro del duelo (dueño, 2026-11-10: «¿por qué no usás el menú del duelo habitual?»): Golpe en la sien / Carga / Salto con empatePierde y el bono; Tolerar con empateGana', () => {
+  const sien = Duelo.limpiarHab({nombre: 'Golpe en la sien: aturdido', objetivo: 'enemigo', tira: {stat: 'fue', etq: 'Fuerza'}, contra: [{modo: 'rescc', stat: 'rescc', etq: 'Res.CC'}], dano: null, empatePierde: true,
+    efectos: [{nombre: 'Stun', caras: 1, exitos: 1, spec: {nombre: 'Stun', turnos: 1}}]});
+  const carga = Duelo.limpiarHab({nombre: 'Carga que derriba: al piso', tira: {stat: 'fue', etq: 'Fuerza + 3', bono: 3}, contra: [{modo: 'rescc', stat: 'rescc', etq: 'Res.CC'}], empatePierde: true,
+    efectos: [{nombre: 'Sentado', spec: {nombre: 'Sentado'}}]});
+  const tol = Duelo.limpiarHab({nombre: 'Tolerar Veneno', tira: {formula: '7', etq: 'Ef.Esp'}, contra: [{modo: 'resmg', stat: 'resmg', etq: 'Res.Esp'}], empateGana: true, efectos: []});
+  igual([sien.empatePierde, !!sien.empateGana, sien.sinOposicion, sien.efectos[0].spec.nombre, sien.efectos[0].spec.turnos, carga.tira.bono, carga.efectos[0].spec.nombre,
+    tol.empateGana, !!tol.empatePierde, tol.tira.formula, tol.efectos.length, typeof window.tiradaInvolucrado],
+    [true, false, false, 'Stun', 1, 3, 'Sentado', true, false, '7', 0, 'undefined']);
 });
 prueba('⚡🥶🧪 Debuffer (2026-11-03): la Aguja siniestra rápida (y los guardados al día), Escalofrío y Espina tóxica; tolerar el Veneno con Res.Esp', () => {
   const H = nm => HABILIDADES_CREEP_BASE.find(x => x.nombre === nm);

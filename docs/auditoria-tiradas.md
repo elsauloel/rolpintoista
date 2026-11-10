@@ -62,12 +62,26 @@ por el ausente o elegir el valor a mano, y «✋ Terminar a mano» deja el efect
 
 | # | Qué | De quién | Dónde | Hoy | Rec. | Esfuerzo |
 |---|---|---|---|---|---|---|
-| 9 | **El daño de una zona** al que no la resiste | zona | `js/08` l. ~722, 723 | **sale solo** | **B**: lo tira quien creó la zona (el GM si es del GM) | media |
-| 10 | **Varita inestable**: el daño que le explota en la mano a quien la usó | ítem | `js/13` `dueloRiesgo` l. ~2535 | **sale solo** | **B** (lo tira quien la usó) | chica |
-| 11 | **Virote que estalla** | ítem (munición) | `js/33` l. ~160 | **sale solo** | **B** (lo tira quien disparó) | chica |
-| 12 | **Mordida que no suelta**: el daño que se repite al no soltarse | habilidad (creep) | `js/54` `mordidaDano` l. ~233 | **sale solo** | **B** (lo tira el dueño de la mordida, el GM) | chica |
-| 13 | **Cepo del cazador**: el daño al fallar el intento de soltarse | trampa / estado | `comun/creep-acciones.js` l. ~104 y `comun/ficha-acciones.js` l. ~100 | **sale solo** | **B** | chica |
-| 14 | **Desarmar una trampa**: el 1d10 de qué pasa al fallar | regla general | `js/28` l. ~64 | el intento lo tira quien desarma con su botón; **el 1d10 de la falla sale solo** | **B** (lo tira quien desarma) | chica |
+| 9 | ✅ en parte (tanda 1: las zonas con «tirada de la zona», por duelo) · **El daño de una zona** al que no la resiste | zona | `js/08` l. ~722, 723 | **sale solo** | **B**: lo tira quien creó la zona (el GM si es del GM) | media |
+| 10 | ✅ hecho (tanda 2) · **Varita inestable**: el daño que le explota en la mano a quien la usó | ítem | `js/13` `dueloRiesgo` l. ~2535 | **sale solo** | **B** (lo tira quien la usó) | chica |
+| 11 | ✅ hecho (tanda 2) · **Virote que estalla** | ítem (munición) | `js/33` l. ~160 | **sale solo** | **B** (lo tira quien disparó) | chica |
+| 12 | ✅ hecho (tanda 2) · **Mordida que no suelta**: el daño que se repite al no soltarse | habilidad (creep) | `js/54` `mordidaDano` l. ~233 | **sale solo** | **B** (lo tira el dueño de la mordida, el GM) | chica |
+| 13 | ⏸ espera la revisión de las trampas (y del cartel de soltarse, bloque 4) · **Cepo del cazador**: el daño al fallar el intento de soltarse | trampa / estado | `comun/creep-acciones.js` l. ~104 y `comun/ficha-acciones.js` l. ~100 | **sale solo** | **B** | chica |
+| 14 | ⏸ espera la revisión de las trampas · **Desarmar una trampa**: el 1d10 de qué pasa al fallar | regla general | `js/28` l. ~64 | el intento lo tira quien desarma con su botón; **el 1d10 de la falla sale solo** | **B** (lo tira quien desarma) | chica |
+
+**Cómo quedó la tanda 2 (2026-11-10).** Un daño suelto se abre en el cuadro del duelo de siempre como una habilidad sin oposición que va directo al
+daño (`danoDuelo`, `vtt-hexgrid/js/78`): lo tira quien lo causa, con su botón (el GM por un creep, o por quien no está; «✍ Otro valor» como en
+cualquier duelo), y lo aplica el camino de siempre (`dueloAplicarDano`: Defensa, resistencias, escudos, Invulnerable). No es un golpe: ni Espinas ni
+Espejo, ni la Botella, los anillos, el Orbe salvaje o Sed de sangre de quien lo causa (`ataque.secundario` y `ataque.danoSuelto`).
+- **10 · Varita inestable:** quien la usó tira su propio daño (un duelo sobre sí mismo), directo, sin resistencia elemental (como antes).
+- **11 · Virote que estalla:** quien disparó tira el fuego de cada uno, de a uno (late, se despliega, se resuelve, se repliega); sin Defensa ni Defensa
+  especial, con la Res. fuego. **Cambio:** al errar ya no queda a mano para el GM: también se abre por duelo. Un token oculto adentro queda a mano.
+- **12 · Mordida / agarre:** quien muerde (o aprieta) tira el daño; lo frena la Defensa del mordido. Si la bestia ya no está en el mapa, a mano.
+- **9 · Daño de una zona:** las zonas con «tirada de la zona» ya van por duelo (tanda 1), daño incluido. **Queda** el daño de las zonas que siguen con
+  su cartel (sin tirada de quien la creó: las del GM o de trampas con número fijo, el hielo por pasos, la que solo se «Aplica»): ahí el botón lo toca
+  el afectado y el dado del daño sale solo. Va con el cartel de las zonas (bloque 4) y la revisión de las trampas.
+- **13 · Cepo** y **14 · Desarmar una trampa:** quedan como están: son de trampas, que el dueño va a revisar (¿menú propio de trampas?), y el Cepo
+  además va dentro del cartel de soltarse (bloque 4).
 
 ## 3 · Chances «entra / no entra» que salen solas
 

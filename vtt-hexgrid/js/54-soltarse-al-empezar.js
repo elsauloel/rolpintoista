@@ -213,7 +213,7 @@ async function soltarAlEmpezarPj(clave, fichaId, invId, t, ayuda){
 /* ---------- 🦷 Mordisco feroz (2026-10-21, dueño: «mientras la bestia me está mordiendo, debería repetir el daño… y si tira para soltarse y no se
    suelta, debería hacerle daño»; «también queda trabada, y al principio del siguiente turno la bestia se suelta») ----------
    El estado «Mordido» lleva en su `soltar` quién lo tiene agarrado (`de`, el token) y el daño que se repite (`danoFalla`). Al pegar, la bestia queda
-   «Mordiendo» (`muerdeA`). Si el mordido no se suelta al empezar su turno, `mordidaDano` le aplica ese daño otra vez (con su Defensa). Al empezar el
+   «Mordiendo» (`muerdeA`). Si el mordido no se suelta al empezar su turno, `mordidaDano` le abre ese daño otra vez en el cuadro del duelo (lo tira quien muerde; con su Defensa). Al empezar el
    turno de la bestia, `mordidaSoltar` (el GM) les saca los dos estados; y si el mordido se zafa antes, el revisado de abajo le saca el «Mordiendo» a
    la bestia. */
 // 🤼 El agarre (2026-10-21) va por el mismo camino: «Agarrado» en quien recibe, «Agarrando» en quien agarra.
@@ -229,21 +229,24 @@ async function mordidaEmpezar(d, spec){
   }catch(err){ console.error('Agarre: no se pudo trabar a quien agarra', err); }
 }
 // El daño que se repite al no soltarse. → el texto para el cartel.
+// 🎲 Tanda 2 de docs/auditoria-tiradas.md (2026-11-10): ese daño lo tira quien muerde (o aprieta), con su botón, en el cuadro del duelo de siempre
+// (danoDuelo, js/78: el GM por una bestia, o por quien no está); lo frena la Defensa del mordido, por el camino de siempre. Si quien muerde ya no
+// está en el mapa, a mano.
 async function mordidaDano(t, nombre, s, estNombre){
-  const r = typeof tirarDados === 'function' ? tirarDados(s.danoFalla) : null;
-  if(!t || !r) return `✋ El mordisco le vuelve a hacer daño (${s.danoFalla}): aplicalo a mano.`;
   const quien = s.deNombre || 'La bestia', sigue = estNombre === 'Agarrado' ? 'sigue apretando' : 'sigue mordiendo', ico = estNombre === 'Agarrado' ? '🤼' : '🦷';
-  mesaPublicar(`${ico} ${quien} ${sigue} a ${nombre} · Daño`, {...r, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})});
-  await esperarDadosMapa();
-  let res = null;
-  try{
-    if(t.tipo === 'creep'){ if(soyGM) res = await danioCreep(t, String(r.total), false, 0, 0); }
-    else res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(r.total), false, 0, 0);
-  }catch(err){ console.error('Mordisco: no se pudo aplicar el daño', err); }
-  const txt = res && res.r ? `${quien} ${sigue}: ${s.danoFalla} = ${r.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}.`
-    : `${quien} ${sigue}: ${s.danoFalla} = ${r.total} de daño, menos su Defensa — aplicalo a mano.`;
+  const idV = t ? ([...tokens.entries()].find(([, x]) => x === t) || [...tokens.entries()].find(([, x]) => x && x.fichaId === t.fichaId && x.tipo === t.tipo) || [])[0] : null;   // (el token pudo cambiar de objeto con un snapshot)
+  const yo = s.de && tokens.get(s.de) && typeof yoDeToken === 'function' ? yoDeToken(s.de) : null;
+  if(!t || !idV || !yo || typeof danoDuelo !== 'function'){
+    const txt = `${quien} ${sigue}: ${s.danoFalla} de daño, menos su Defensa — aplicalo a mano.`;
+    mesaLinea(`${ico} ${txt}`, 'recordatorio');
+    return `✋ ${txt}`;
+  }
+  const txt = `${quien} ${sigue} a ${nombre}: tira ${s.danoFalla} de daño en el cuadro del duelo (lo frena su Defensa).`;
   mesaLinea(`${ico} ${txt}`, 'recordatorio');
-  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'mordisco', icono: ico, titulo: `${quien} ${sigue} a ${nombre}`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  (async () => {
+    await contiendaPausa();   // que se alcance a leer el cartel de soltarse
+    await danoDuelo({yo: {...yo, nombre: quien}, deTokenId: s.de, aTokenId: idV, nombre: `${ico} ${quien} ${sigue}`, formula: s.danoFalla, fisico: true});
+  })().catch(err => console.error('Mordisco: no se pudo abrir el daño', err));
   return txt;
 }
 // Le saca un estado a un token (el GM): un creep directo; un personaje o una invocación, por aviso a su pantalla.

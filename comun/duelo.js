@@ -703,7 +703,9 @@ const Duelo = (() => {
       estado: 'esperando', fase: 'contacto',
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
-      ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true}
+      ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true,
+          ...(cfg.ataque.secundario ? {secundario: true} : {}),   // 🌵🪞 ni Espinas ni Espejo (un daño que no es un golpe: tanda 2 de docs/auditoria-tiradas.md)
+          ...(cfg.ataque.danoSuelto ? {danoSuelto: true} : {})}   // 🎲 un daño suelto (la Varita inestable, el virote que estalla, la mordida; 2026-11-10): sin los bonos de quien lo «causa» (Botella, anillos, Orbe salvaje, Sed de sangre)
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), fuerza: _num(cfg.ataque.mods && cfg.ataque.mods.fuerza), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono))),

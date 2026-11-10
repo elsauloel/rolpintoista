@@ -1883,6 +1883,7 @@ async function dueloAplicarDano(d, o){
   const trueDmg = !!(magico && d.hab.dano.trueDamage), directo = !!(magico && d.hab.dano.directo);
   const crit = critReal || magico;
   const habMagica = magico;   // (adentro del try, «magico» es otra cosa: el daño mágico del arma)
+  const suelto = !!(d.ataque && d.ataque.danoSuelto);   // 🎲 un daño suelto (danoDuelo, js/78): sin la Botella, los anillos, el Orbe salvaje ni Sed de sangre de quien lo causa
   // La pelea cercana (2026-10-05): pierde 1 por cada casillero de distancia después del primero (al lado, entero).
   const ta0 = d.atacante && tokens.get(d.atacante.tokenId);
   const menosDist = (d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0)
@@ -1891,13 +1892,13 @@ async function dueloAplicarDano(d, o){
   const multCarga = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
   let multHab = multCarga;
   // 🔮 El Orbe salvaje (js/53): con daño especial, una tirada de 1d6 (6: ×2 o ×3; 1: el mismo daño a quien atacó, después).
-  const salvaje = dn.salvaje ? {...dn.salvaje} : !simular && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
+  const salvaje = dn.salvaje ? {...dn.salvaje} : !simular && !suelto && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
   if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   // 🔮 La Botella con un diablito (js/53): +N a todo tu daño especial (si hay el de la habilidad, ahí; si no, al del arma).
-  const botella = typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
+  const botella = !suelto && typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
   // 💍 Los anillos elementales (js/53): +N al daño de su elemento (el de la habilidad acá; el elemental del arma, más abajo).
   const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
-  const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab, simular) : 0;
+  const anilloHab = elHab && !suelto && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab, simular) : 0;
   // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
   const idHab00 = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null;
   // 🪱 `sinIdentidad` (la Sanguijuela, dueño 2026-11-03): el daño sigue siendo siniestro (×0 a no-muertos y demonios) pero no deja Herida sombría.
@@ -1934,7 +1935,7 @@ async function dueloAplicarDano(d, o){
         : !d.hab && dn.magico && dn.magico.porDano ? await dueloPorDano(d, entro, dn.magico.porDano).catch(() => null) : null;
       if(idHab && idHab.estado && entro > 0 && !(d.contacto && d.contacto.resistioEstado)) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));
       if(entro > 1 && ((d.hab && d.hab.cadena) || (!d.hab && dn.magico && dn.magico.cadena))) await dueloCadena(d, entro, {golpe: {id: d.defensor.tokenId, entro: entro, antes: num(res.previo), despues: num(res.nuevo)}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
-      if(num(res.previo) > 0 && num(res.nuevo) <= 0 && typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
+      if(!suelto && num(res.previo) > 0 && num(res.nuevo) <= 0 && typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
       const cuenta = [{s: '', txt: 'El duelo sugería', v: sug}, inv ? {s: '', txt: 'Invulnerable: el golpe no hace nada'} : {s: '=', txt: '✍ se aplicó a mano: entra a la vida', v: entro, f: 1}];
       return {...base, cuenta, aMano: {valor: N, sugerido: sug}, defensa: 0, recibido: entro, absorbido: 0, invulnerable: inv, hpAntes: num(res.previo), hpDespues: num(res.nuevo),
         ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(porDano ? {porDano} : {})};
@@ -2128,7 +2129,7 @@ async function dueloAplicarDano(d, o){
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // 🩸 Sed de sangre (2026-11-05, js/102): si el golpe dejó al rival en 0, quien pegó sube en el orden de turnos.
-    if((num(res.previo) > 0 && num(res.nuevo) <= 0) || (magico && num(magico.hpAntes) > 0 && num(magico.hpDespues) <= 0))
+    if(!suelto && ((num(res.previo) > 0 && num(res.nuevo) <= 0) || (magico && num(magico.hpAntes) > 0 && num(magico.hpDespues) <= 0)))
       if(typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
     const cuenta = armarCuenta(res);
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
@@ -2556,21 +2557,26 @@ async function destelloEn(h, radio, yo, hab, rivales){
   if(typeof explosionEmpezar === 'function') explosionEmpezar(explota);
 }
 // El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
+// 🎲 Tanda 2 de docs/auditoria-tiradas.md (2026-11-10): ese daño lo tira quien la usó, con su botón, en el cuadro del duelo de siempre
+// (danoDuelo, js/78: un duelo sobre sí mismo que se abre directo en el daño). Sin su token en el mapa, a mano.
 async function dueloRiesgo(d){
-  const ta = d.atacante && tokens.get(d.atacante.tokenId), rg = d.hab.riesgo;
+  const rg = d.hab.riesgo, quien = d.atacante.nombre || 'Quien la usó';
   // `porCada` (2026-10-08, dueño): el daño por cada dado que salió en ese número (1d4 por cada 1).
   const veces = rg.porCada ? ((d.dano && d.dano.rolls) || []).map(num).filter(x => x === num(rg.si)).length : 1;
   const formula = veces > 1 ? String(rg.dano || '1d4').replace(/^(\d*)d/, (m, k) => `${(num(k) || 1) * veces}d`) : (rg.dano || '2d4');
-  const r = tirarDados(formula);
-  if(!r) return;
-  try{ mesaPublicar(`${d.atacante.nombre || 'Quien la usó'} · ${d.hab.nombre}: se le va de las manos`, {formula: r.formula || formula, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
-  let txt = `Salió ${veces > 1 ? `${veces} veces el ${rg.si}` : `un ${rg.si}`} en los dados: ${formula} → ${r.total} de daño a quien la usó.`;
-  if(ta){
-    const esInv = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION);
-    const res = esInv ? await danioInv(ta, String(r.total), true, 0, 0) : ta.tipo === 'creep' ? await danioCreep(ta, String(r.total), true, 0, 0) : await danioPj(ta, String(r.total), true, 0, 0);
-    txt += ` Vida ${fmt(num(res.previo))} → ${fmt(num(res.nuevo))}.`;
-  }else txt += ' ✋ A mano (su token no está en el mapa).';
-  momentoAbrir({tipo: 'riesgo', icono: '💥', titulo: `${d.hab.nombre}: le explota en la mano a ${d.atacante.nombre || 'quien la usó'}`, resultado: txt, estado: 'listo'});
+  const salio = `Salió ${veces > 1 ? `${veces} veces el ${rg.si}` : `un ${rg.si}`} en los dados`;
+  const idA = d.atacante.tokenId, yo = idA && typeof yoDeToken === 'function' ? yoDeToken(idA) : null;
+  if(!yo || typeof danoDuelo !== 'function'){
+    const txt = `${salio}: ${formula} de daño directo a quien la usó. ✋ A mano (su token no está en el mapa).`;
+    mesaLinea(`💥 ${d.hab.nombre}: le explota en la mano a ${quien} — ${txt}`, 'recordatorio');
+    momentoAbrir({tipo: 'riesgo', icono: '💥', titulo: `${d.hab.nombre}: le explota en la mano a ${quien}`, resultado: txt, estado: 'listo'});
+    return;
+  }
+  mesaLinea(`💥 ${d.hab.nombre}: le explota en la mano a ${quien} — ${salio}: tira ${formula} de daño directo a sí mismo en el cuadro del duelo`, 'recordatorio');
+  (async () => {
+    await contiendaPausa();   // que se alcance a leer el golpe de la varita
+    await danoDuelo({yo: {...yo, nombre: quien}, deTokenId: idA, aTokenId: idA, nombre: `💥 ${d.hab.nombre}: se le va de las manos`, formula, tipo: 'arcano', directo: true});   // (arcano: sin resistencia elemental, como antes)
+  })().catch(err => console.error('No se pudo abrir el daño del riesgo:', err));
 }
 async function dueloAtraer(d){
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId), a = d.hab.atrae;

@@ -150,23 +150,25 @@ async function virotEstalla(d, celda, pego){
     mesaLinea(`✨ El ${fl.nombre} de ${quien} prendió una bengala ${donde} (diámetro 3, 3 turnos)`, 'recordatorio');
   }
   if(fl.explota){
-    const afectados = [...tokens.values()].filter(t => t && distanciaHex(t, celda) <= 1);
-    if(!pego){   // al fallar lo ve la pantalla de quien disparó, que no puede tocar la vida de los demás: queda para el GM
-      mesaLinea(`💥 El ${fl.nombre} de ${quien} explotó ${donde}: ${fl.explota} de fuego a ${afectados.length ? afectados.map(t => t.oculto ? 'alguien' : nombreDe(t)).join(', ') : 'nadie'} (el GM lo aplica a mano)`, 'alerta-roja');
-      return;
-    }
-    const partes = [];
-    for(const t of afectados){
-      const v = Math.max(0, num((tirarDados(fl.explota) || {}).total));
-      try{
-        const rz = await resistenciasDe(t, 'fuego');
-        if(t.tipo === 'creep') await danioCreep(t, String(v), true, 0, rz.res, {magico: true});
-        else if(puedoMover(t)) await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(v), true, 0, rz.res, {magico: true});
-        partes.push(`${t.oculto ? 'alguien' : nombreDe(t)} ${v}${rz.res ? ` (− Res. fuego ${rz.res})` : ''}`);
-      }catch(err){ console.error('No se pudo aplicar la explosión:', err); partes.push(`${nombreDe(t)} ${v} (a mano)`); }
-    }
-    momentoAbrir({tipo: 'golpe', icono: '💥', titulo: `${fl.nombre}: explota`, estado: 'listo', resultado: partes.join(' · ') || 'no alcanzó a nadie', datos: {chico: true}});
-    mesaLinea(`💥 El ${fl.nombre} de ${quien} explotó ${donde}: fuego ${fl.explota} (diámetro 3) — ${partes.join(' · ') || 'no alcanzó a nadie'}`, 'recordatorio');
+    // 🎲 Tanda 2 de docs/auditoria-tiradas.md (2026-11-10): el fuego de la explosión lo tira quien disparó, con su botón, en el cuadro del duelo de
+    // siempre (danoDuelo, js/78), uno por uno, para cada token a 1 casilla o menos (él también, si quedó cerca). Lo aplica el camino de siempre: sin
+    // Defensa ni Defensa especial, con la Res. fuego. Peguen o no (antes, al errar, quedaba a mano para el GM: ahora cada daño lo aplica quien lo recibe).
+    const afectados = [...tokens.entries()].filter(([, t]) => t && distanciaHex(t, celda) <= 1);
+    const ocultos = afectados.filter(([, t]) => t.oculto), aVista = afectados.filter(([, t]) => !t.oculto);
+    const idA = d.atacante && d.atacante.tokenId, yo = idA && typeof yoDeToken === 'function' ? yoDeToken(idA) : null;
+    const nombres = aVista.map(([, t]) => nombreDe(t));
+    const resultado = `${fl.explota} de fuego (diámetro 3) a ${nombres.length ? nombres.join(', ') : 'nadie'}${ocultos.length ? ` (y a alguien más: a mano)` : ''}`;
+    momentoAbrir({tipo: 'golpe', icono: '💥', titulo: `${fl.nombre}: explota`, estado: 'listo', resultado: `${resultado}. ${yo && aVista.length ? `${quien} tira el daño de cada uno en el cuadro del duelo.` : ''}`.trim(), datos: {chico: true}});
+    mesaLinea(`💥 El ${fl.nombre} de ${quien} explotó ${donde}: ${resultado}${aVista.length && !yo ? ' — aplicalo a mano (su token no está en el mapa)' : ''}`, 'recordatorio');
+    if(!yo || !aVista.length || typeof danoDuelo !== 'function') return;
+    (async () => {
+      await contiendaPausa();
+      for(const [id] of aVista){
+        if(!tokens.get(id)) continue;
+        const r = await danoDuelo({yo: {...yo, nombre: quien}, deTokenId: idA, aTokenId: id, nombre: `💥 ${fl.nombre}: explota`, formula: fl.explota, tipo: 'fuego', directo: true, esperar: true});
+        if(r && (r.cancelado || r.falla)) break;
+      }
+    })().catch(err => console.error('No se pudo abrir el daño de la explosión:', err));
   }
 }
 async function viroteRebota(d){

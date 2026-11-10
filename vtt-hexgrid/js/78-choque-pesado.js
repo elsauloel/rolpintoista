@@ -388,12 +388,12 @@ function arrastreZonasMomento(id, d){
    la tirada de quien la usa, ya hecha (la Fuerza del Salto para todos; el valor fijo de Tolerar). Con `esperar`, → {gana: 'atacante'|'defensor', d} |
    {cancelado} | {aMano} | {tiempo} | {falla}; sin `esperar`, → {id} apenas se abre (o {falla}). */
 const CONTIENDA_TOPE_MS = 15 * 60000;
-async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, esperar}){
+async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, esperar, extra}){
   const t = tokens.get(aTokenId);
   if(!t || !hab) return {falla: true};
   let id = null;
   try{
-    id = await Duelo.crear({yo, ataque: {hab, habNombre: hab.nombre}, ...(pdgCompartido ? {pdgCompartido} : {})},
+    id = await Duelo.crear({yo, ataque: {hab, habNombre: hab.nombre, ...(extra || {})}, ...(pdgCompartido ? {pdgCompartido} : {})},
       {id: aTokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, deTokenId || '');
   }catch(err){ console.error(`${hab.nombre}: no se pudo abrir el duelo`, err); }
   if(!id){ toast(`${hab.nombre}: no se pudo abrir el duelo — resolvelo a mano con la mesa`); return {falla: true}; }
@@ -410,6 +410,19 @@ async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, espe
     }, () => fin({tiempo: true}));
   });
 }
+/* 🎲 Un daño en el cuadro del duelo de siempre (tanda 2 de docs/auditoria-tiradas.md, 2026-11-10; dueño: «las tiradas las hace el usuario
+   involucrado»): un duelo de habilidad sin oposición que se abre directo en el daño. Lo tira quien lo causa con su botón (el GM por un creep, o por
+   quien no está), y lo aplica el camino de siempre (`dueloAplicarDano`: Defensa, resistencias, escudos, Invulnerable). `secundario` y `danoSuelto`:
+   no es un golpe, así que ni Espinas ni Espejo, ni los bonos de daño de quien lo causa. `fisico`: lo frena la Defensa (la mordida); si no, ignora la
+   Defensa y, con `directo`, también la Defensa especial (el fuego del virote, la explosión de la Varita inestable). Lo usan dueloRiesgo (js/13),
+   virotEstalla (js/33) y mordidaDano (js/54). Mismas respuestas que contiendaDuelo. */
+function danoDuelo({yo, deTokenId, aTokenId, nombre, formula, tipo, fisico, directo, esperar}){
+  const hab = {nombre: String(nombre || 'Daño').slice(0, 60), objetivo: deTokenId && deTokenId === aTokenId ? 'uno mismo' : 'enemigo', tira: null, contra: [], efectos: [],
+    dano: {formula: String(formula || ''), tipo: tipo || (fisico ? 'físico' : 'arcano'), ignoraDef: !fisico, ...(directo && !fisico ? {directo: true} : {})}};
+  return contiendaDuelo({yo, deTokenId, aTokenId, hab, esperar, extra: {secundario: true, danoSuelto: true}});
+}
+// Quien «causa» un daño, desde su token (para danoDuelo).
+const yoDeToken = id => { const t = tokens.get(id); return t ? {ref: String(t.fichaId || ''), tipo: t.tipo === 'creep' ? 'creep' : 'pj', nombre: nombreDe(t), uid: t.duenoUid || ''} : null; };
 // La pausa antes de abrir la contienda que sigue a un ataque: que se alcance a leer el resultado del golpe (como entre los golpes del Barrido).
 const contiendaPausa = () => new Promise(r => setTimeout(r, typeof BARRIDO_PAUSA_MS !== 'undefined' ? BARRIDO_PAUSA_MS : 1400));
 const yoDeDuelo = d => ({ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre, uid: d.atacante.uid});

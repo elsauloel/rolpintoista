@@ -861,6 +861,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   **Tanda 1 de `docs/auditoria-tiradas.md` (2026-11-10)**, también con `contiendaDuelo`: el efecto del Escudo elemental (js/106), la Anulación contra una
   zona o una invocación (js/13 `anulaContienda`), el aura espeluznante (js/52 `auraResolver`), la Mala sombra al empezar la ronda (js/102
   `ordenMalaSombraDuelo`) y el Cebo (js/80). Las zonas con «tirada de la zona» van como las de duelo (`zonaDueloCompatible`, js/112).
+  **Tanda 2 (2026-11-10), los daños sueltos:** `danoDuelo({yo, deTokenId, aTokenId, nombre, formula, tipo, fisico?, directo?, esperar?})` (js/78) abre un
+  duelo de habilidad sin oposición que va directo al daño (lo tira quien lo causa con su botón; lo aplica `dueloAplicarDano`). Lleva `ataque.secundario`
+  (ni Espinas ni Espejo) y `ataque.danoSuelto` (sin la Botella, los anillos, el Orbe salvaje ni Sed de sangre). Lo usan el riesgo de la Varita inestable
+  (`dueloRiesgo`, js/13: un duelo sobre sí mismo), el virote que estalla (`virotEstalla`, js/33: uno por afectado, también al errar) y la mordida o el
+  agarre que no suelta (`mordidaDano`, js/54: con la Defensa). `yoDeToken(id)` arma el «quien lo causa».
 
 ## Pendiente (más adelante)
 

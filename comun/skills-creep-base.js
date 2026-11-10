@@ -128,7 +128,7 @@
   // Auditada (dueño, 2026-10-21): la que no suelta — si pega, el mordido y la bestia quedan trabados; al empezar su turno el mordido tira Fuerza contra
   // la Fuerza de la bestia (gratis) y, si no se suelta, el mordisco le vuelve a hacer daño; la bestia lo suelta al empezar su siguiente turno (js/54).
   H('Mordisco feroz', 'D', 'b', 'me', 3, aA('Una mordida profunda que no suelta: un ataque con su arma con +1 dado del Tipo de su arma. Si pega, el objetivo queda Mordido (no se mueve, y la bestia tampoco): al empezar su turno tira Fuerza contra la Fuerza de la bestia, gratis; si no se suelta, el mordisco le vuelve a hacer el mismo daño. La bestia lo suelta al empezar su siguiente turno.',
-    {dados: 1}, 'va al duelo como un ataque con +1 dado del Tipo de su arma; si pega, deja Mordido (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
+    {dados: 1}, 'va al duelo como un ataque con +1 dado del Tipo de su arma; si pega, deja Mordido (se suelta con Fuerza contra su Fuerza; si no, la bestia le vuelve a tirar el daño en el cuadro del duelo)', 3,
     [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Mordisco venenoso', 'DX', 'b', 'ex', 3, zO('Muerde y, si golpea, tirá 1d4: con 1 el objetivo queda Envenenado (a mano).', 2, 'L'));
   // Auditada (dueño, 2026-10-21): la que empuja y toma carrera — al lado, +1 PdG, +1 al daño y empuja 1; si se ejecuta de lejos, corre en línea recta
@@ -1077,7 +1077,7 @@
   // 🤼 Los agarres de las bestias (dueño, 2026-10-21: «con y sin daño»): como el Mordisco feroz (vtt-hexgrid/js/54), con «Agarrado».
   H('Agarrón', 'K', 'bpc', 'mt', 3, {detalle: 'Agarra al objetivo sin lastimarlo: tira su Probabilidad de Golpe contra la Evasión; si gana, el objetivo queda Agarrado (no se mueve, y quien lo agarra tampoco). Al empezar su turno tira Fuerza contra la Fuerza de quien lo agarra, gratis; lo suelta al empezar el siguiente turno de quien lo agarró.', no2: 2, auditada: true, spCosto: 2, ataqueTxt: 'su Probabilidad de Golpe contra la Evasión; si gana, Agarrado (se suelta con Fuerza contra su Fuerza)', duelo: {objetivo: 'enemigo', tira: 'pdg', contra: ['eva'], alcance: 1, dano: false, efectos: [{nombre: 'Agarrado', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true}}]}});
   H('Abrazo aplastante', 'DK', 'b', 'mt', 3, aA('Lo atrapa entre los brazos y aprieta: un ataque con su arma; si pega, el objetivo queda Agarrado (no se mueve, y la bestia tampoco). Al empezar su turno tira Fuerza contra la Fuerza de la bestia, gratis; si no se suelta, el apretón le vuelve a hacer el mismo daño. La bestia lo suelta al empezar su siguiente turno.',
-    {}, 'va al duelo como un ataque; si pega, deja Agarrado (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
+    {}, 'va al duelo como un ataque; si pega, deja Agarrado (se suelta con Fuerza contra su Fuerza; si no, la bestia le vuelve a tirar el daño en el cuadro del duelo)', 3,
     [{nombre: 'Agarrado', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Empujón', 'K', '*', 'mt', 2, tA('Empuja al objetivo un casillero (a mano).', 1));
   // (Arrastrar, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)

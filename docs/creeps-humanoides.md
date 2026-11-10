@@ -637,7 +637,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Pisotón** | — | el hacha: **Hacha del aserrador** (Buena) |
   | 4 | **Aguante** | **Robustez** | + una Buena |
   | 5 | **Salto aplastante** | — | + otra Buena |
-  Consumible: Poción de Cuero Duro. Golpe que sigue no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2.
+  Consumible: Poción de Cuero Duro. Golpe que sigue no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2. (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va»): Fue 9 · Con 9 · Des 7 · Agi 6 · Esp 2, vida 45, 6 No2, con turnos de espera; Hacha de vikingo
   (Tipo 8, 1d8 + 9; desde el 2026-11-03: +1 de daño y Rompe armadura 50 %, sin Derribar) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
   crít. T4 +2. Salto (lenta, cd 3) y Golpe fuerte (rápida, cd 2). Consumible: Poción de Cuero Duro. Sin cargar hasta que el dueño diga.
@@ -769,8 +769,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   T4 +2. Puño de roca (rápida) y Pisotón (Flash, lenta). **Cargado** en el pool esencial (2026-11-03).
   **Nivel 2 aprobado** (dueño, 2026-11-10: «para el martillero vamos con golpe que sigue»): **Golpe que sigue** en lugar de Pegar fuerte (que ya
   tenían el Saltador, el Berserker y el Embestidor). Fue 11 · Con 9 · Des 8 · Agi 6 · Esp 2, vida 50 (con Robustez), 6 No2; + Casco de cuero
-  endurecido y Pantalón acolchado de aprendiz: Def 7, Res. crít. T4 +4. Ojo: con el martillo de Tipo 10, el golpe que sigue cuesta otros 5 No2
-  (5 + 5 = 10 de 6): el segundo golpe casi siempre sale forzado. **Cargado** en el pool esencial (2026-11-10).
+  endurecido y Pantalón acolchado de aprendiz: Def 7, Res. crít. T4 +4. El segundo golpe no cobra No2 (dueño, 2026-11-10: toda la habilidad
+  cuesta lo de un solo ataque, como el Barrido): con el martillo de Tipo 10, 5 No2 por los dos golpes. **Cargado** en el pool esencial (2026-11-10).
 
 - **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
   busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):
@@ -798,7 +798,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Golpe que sigue** | — | **Espada del herrero** (Buena, Tipo 6) |
   | 4 | **Arte de la guerra** (Flash) | **Desvío hábil** | + una Buena |
   | 5 | **Golpe demoledor** | — | + otra Buena |
-  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza).
+  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza). (Ya no vale desde el 2026-11-10: el segundo golpe no cobra No2.)
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va así»), con la ruta ajustada (Romper armadura y Desarmar eran las dos lentas): **nv1 Estocada
   (rápida) · Desarmar (Flash)**; nv2 Romper armadura + Guardia firme; nv3 Golpe que sigue; nv4 Remate + Desvío hábil; nv5 Golpe demoledor (sale el
   Arte de la guerra). Fue 9 · Con 9 · Des 8 · Agi 5 · Esp 2, vida 45, 5 No2; Facón largo (Tipo 6, 1d6 + 9, Parry +1) + Escudo de asalto (Def 2,

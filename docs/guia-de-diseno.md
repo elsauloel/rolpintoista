@@ -99,6 +99,12 @@ Stun, Cansado, Exhausto, Escarcha, Sentado.
 
 **🔢 Lo que se ve de un rayo que salta** (dueño, 2026-11-09: «no queda claro cuánto daño le hace a cada uno… que aparezca en el token un número en rojo con "-x", que ascienda, se mantenga algún tiempo, y luego de terminar se abra un pop up con un reporte»; «si se aplica la parálisis… "¡Parálisis!" flotando»; «quiero que se aplique a cualquier fuente de daño eléctrico con salto»): **toda** fuente de rayo que salta (el salto general del duelo —varitas, Cadena de rayos, Centella / Zap, la Carga eléctrica, el daño eléctrico de un arma—, la flecha que salta, el rayo que corre por el agua) y el Escudo elemental de cualquier elemento usan un solo ayudante, `rayoFxPublicar` (vtt-hexgrid/js/110-rayo-fx.js): sobre cada token, cuando le llega el rayo, el «−X» rojo que le entró (sube, se queda ~1,5 s y se apaga) y, si le entró un estado, «¡Parálisis!» (o el que sea) arriba del número; al terminar, el reporte (cartel del juego) con el golpe y cada salto (cuánto, la vida antes → después, la tirada de la resistencia y de la Parálisis, a quién saltó). Lo ven todas las pantallas (un solo momento «rayo»); el reporte, el GM y el jugador que tenga un token adentro. En la Mesa, una línea: «⚡ Escudo eléctrico de X: Larry −5 (entra al anillo), Rockardo −2 (salto) · Rockardo: Parálisis». Una fuente nueva de rayo que salte pasa por `dueloCadena` y lo recibe sola.
 Afortunado, Sangre pura, Coagulación extrema, Blindado, Sigilo.
+**⚔ Golpe que sigue: dos golpes por lo de un ataque** (dueño, 2026-11-10: «la gracia del golpe que sigue es que vos pagás SP (o el cooldown),
+pero te cuesta los nitros de un solo ataque. Si no, no entiendo cuál sería el beneficio de la skill. Es como el barrido»). El segundo golpe (si el
+primero pegó, contra otro rival pegado) no cobra No2 ni cuenta como otro ataque del turno; la habilidad entera cuesta los No2 de un ataque más su
+cooldown o SP. Mismo criterio que el Barrido: lo que la habilidad paga es el giro o la cadena, no cada golpe. Código: `golpeQueSigueResuelto`
+(vtt-hexgrid/js/78-choque-pesado.js).
+
 **🌀 Barrido, Coletazo y Remolino: un ataque común por cada rival** (dueño, 2026-11-08: «a fines prácticos es como si fueran múltiples ataques
 continuados uno de otro y van a aplicar las mismas reglas de un ataque. Si esquiva, esquiva, si pega, pega… solo que el contexto del ataque, el inicio,
 es el barrido»). Cada rival al lado recibe un duelo entero: **su propia tirada de PdG** (dueño: una por rival), su defensa (Evasión, Parry o Bloqueo),

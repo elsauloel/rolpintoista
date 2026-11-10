@@ -343,7 +343,8 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      del cono; al que pierde le saca **1 + la diferencia en No2** y le hace **la diferencia como daño físico directo**; sin No2, **Sentado**. 1 No2 y
      3 SP (6 en turno ajeno), o cooldown 3.
   12. ⚔ **Golpe que sigue** ✦ — **cambiada (dueño, 2026-10-30)**: «me hace ruido que tenga que matar para funcionar… si pega, pasa al siguiente. Es un
-     golpe doble. Pero tiene que haber al menos dos adyacentes al atacante» → si pega, sigue contra otro rival pegado (lo de un primer ataque); con menos
+     golpe doble. Pero tiene que haber al menos dos adyacentes al atacante» → si pega, sigue contra otro rival pegado **sin No2 de más** (dueño,
+     2026-11-10: «pagás SP (o el cooldown), pero te cuesta los nitros de un solo ataque… como el barrido»); con menos
      de dos rivales pegados avisa y deja seguir. Lo de abajo es la versión vieja. (A5; dueño, 2026-10-27: «vamos así»): un ataque con su arma con **+2 al daño**; si deja al rival **en 0**, ataca
      enseguida a **otro rival pegado** a él pagando **los No2 de un primer ataque**; la cadena se corta ahí (el segundo no sigue). Un ataque y 2 SP,
      o cooldown 2. Combina con Remate, Barrido y Furia.

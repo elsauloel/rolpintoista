@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261109inconsc"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110lluvia"></script>
+<script src="skills-creep-base.js?v=20261110sigue"></script>
 <script src="creeps-esenciales.js?v=20261110w3"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7095,6 +7095,11 @@ prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal
   const p = es.find(c => c.nombre === 'Piromante').datos;
   igual([sp, CreepCalculo.spMax(p) >= 42, CreepCalculo.modoSP(es.find(c => c.nombre === 'Escudero').datos)],
     [['Arcano', 'Control mental y ceguera', 'Ladrón de fuerzas', 'Mago de escarcha', 'Mago del rayo', 'Maldito', 'Piromante', 'Protector', 'Sanador', 'Tóxico'].sort().join(), true, false]);
+});
+prueba('⚔ Golpe que sigue (dueño, 2026-11-10): el segundo golpe no cobra No2 — toda la habilidad cuesta lo de un solo ataque, como el Barrido', () => {
+  const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Golpe que sigue');
+  const txt = JSON.stringify(h);
+  igual([/sin pagar No2 de más/.test(txt), /pagando lo de un primer ataque/.test(txt), /sin No2 de más/.test(txt)], [true, false, true]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidades y consumibles de los nuevos', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);

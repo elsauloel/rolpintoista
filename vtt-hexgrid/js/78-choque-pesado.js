@@ -91,8 +91,9 @@ async function esperarDueloCerrado(maxMs){
 function choquePesadoUnaVez(d, que){ const k = `${d.id}:${que}`; if(choquePesadoHechos.has(k)) return false; choquePesadoHechos.add(k); return true; }
 
 // ⚔ Golpe que sigue (dueño, 2026-10-27, «vamos así»; cambiado el 2026-10-30: «me hace ruido que tenga que matar para funcionar… si pega, pasa al
-// siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante»): si pegó, otro rival pegado; lo de un primer ataque; el
-// segundo no sigue. Los dos rivales pegados se avisan al usarla (acEjecutarHab, js/12).
+// siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante»): si pegó, otro rival pegado; el segundo no sigue. Los dos
+// rivales pegados se avisan al usarla (acEjecutarHab, js/12). El segundo golpe NO cobra No2 ni cuenta como otro ataque del turno (dueño, 2026-11-10:
+// «pagás SP (o el cooldown), pero te cuesta los nitros de un solo ataque… como el barrido»).
 // Los rivales pegados al creep (a la vista, en juego), menos `fuera`. → la lista, o null si el creep no tiene token.
 function golpeQueSigueRivales(sc, fuera){
   const e = [...tokens.entries()].find(([, x]) => x.tipo === 'creep' && x.fichaId === sc.id);
@@ -109,15 +110,12 @@ async function golpeQueSigueResuelto(d){
   const rivales = golpeQueSigueRivales(sc, d.defensor.tokenId) || [];
   const nom = nombreDe(ta), caido = d.defensor.nombre;
   if(!rivales.length){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Golpe que sigue)`, 'recordatorio'); return; }
-  const costo = CreepCalculo.costoContraataque(sc);   // lo de un primer ataque
   await esperarDueloCerrado();   // (probado en el mapa, 2026-10-27: la pregunta salía encima del «Fin del duelo» y el clic en «Terminar duelo» la contestaba)
-  const elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}: ¿sigue contra otro rival pegado? (lo de un primer ataque: ${fmt(costo)} No2; tiene ${fmt(num(sc.nitros))})`,
+  const elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}: ¿sigue contra otro rival pegado? (sin No2 de más: la habilidad cuesta lo de un solo ataque)`,
     {titulo: 'Golpe que sigue', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
   if(!elegido) return;
-  if(num(sc.nitros) < costo && !(await AvisoCombate.preguntar(`Le faltan No2 (cuesta ${fmt(costo)}, tiene ${fmt(num(sc.nitros))}). ¿Seguir igual? (queda en 0)`, {icono: '⚔', titulo: 'Sin No2', si: 'Seguir igual', no: 'No'}))) return;
   const h = (sc.habilidades || []).find(x => x && x.duelo && x.duelo.sigue);
-  await modificarCreep(sc.id, c => { c.nitros = Math.max(0, num(c.nitros) - costo); return {}; });
-  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Golpe que sigue: −${fmt(costo)} No2)`, 'recordatorio');
+  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Golpe que sigue: sin No2 de más)`, 'recordatorio');
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
   const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
   if(atq && atq.sigue) delete atq.sigue;

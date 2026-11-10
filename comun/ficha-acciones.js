@@ -1152,6 +1152,10 @@ const FichaAcciones = (() => {
       return;
     }
     if(spec.nombre === 'Armadura rota'){
+      // 🛡 Invulnerable (2026-11-10, bug de la tanda 3): la rotura va a las piezas, no a un estado, así que la inmunidad se mira acá
+      // (en invocaciones y creeps ya la frena Combatiente.agregarEstado). Ni el escudo ni la armadura pierden durabilidad.
+      const inmune = Combatiente.inmunidad(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'});
+      if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); return; }
       let n = Math.max(1, num(spec.stacks) || 1);
       // 💍 Armadura indestructible (anillo, 2026-10-12): la primera Armadura rota del combate se absorbe. En un personaje la rotura va a las piezas,
       // no a un estado, así que se frena acá (el mapa solo la veía en los estados; la marca la libera el mapa al terminar el combate, js/25).

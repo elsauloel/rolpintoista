@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261110arcohab"></script>
+<script src="ficha-acciones.js?v=20261110invul"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261107dosarmas"></script>
 <script src="estado-preguntas.js"></script>
@@ -3243,6 +3243,19 @@ prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE e
   FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 1, item: 'esc'}, '', uiAuto(reg, true));
   igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1])],
     [1, durEsc - 1, 0, durPeto]);
+});
+prueba('🛡 Invulnerable (2026-11-10, bug de la tanda 3): la Armadura rota recibida no le gasta ni el escudo ni la armadura', () => {
+  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};
+  const S = fichaBotonera({inventario: [{...escudo}, peto], efectos: [{nombre: 'Invulnerable', activo: true, turnos: 2, polaridad: 'buff', invulnerable: true}]}), reg = [];
+  const durEsc = FichaCalculo.durActual(S.inventario[0]), durPeto = FichaCalculo.durActual(S.inventario[1]);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 2, item: 'esc'}, '', uiAuto(reg, true));
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 1}, '', uiAuto(reg, true));
+  const S2 = fichaBotonera({inventario: [{...escudo}]});
+  FichaAcciones.aplicarEstadoRecibido(S2, {nombre: 'Armadura rota', stacks: 1, item: 'esc'}, '', uiAuto([], true));
+  const inv = {estados: [{nombre: 'Invulnerable', activo: true, turnos: 2, polaridad: 'buff', invulnerable: true}], hp: 10, hpMax: 10};
+  const r = Combatiente.agregarEstado(inv.estados, {nombre: 'Armadura rota', polaridad: 'debuff', stacks: 1});
+  igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]) === durEsc, FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1]) === durPeto,
+    FichaCalculo.armRotaDe(S2.inventario[0]), r.ok], [0, true, 0, true, 1, false]);
 });
 prueba('⏳ Pasar de día (2026-10-12): descansar llena vida, SP y No2 (no levanta a un caído), terminan los estados con turnos y el tope del talento vuelve a 0', () => {
   const S = fichaBotonera({efectos: [{nombre: 'Veneno', activo: true, turnos: 2, polaridad: 'debuff'}, {nombre: 'Sigilo', activo: true, permanente: true, polaridad: 'buff'}]});

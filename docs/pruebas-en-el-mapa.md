@@ -2549,3 +2549,38 @@ Respaldo antes y restaurado después. GM, J1 y J2 con clics. Para que nadie lo v
   - Las copias de personajes de «Claude · pruebas» las controla el GM («🎮»): las tiradas del duelo de Bizzante las hizo la pantalla del GM.
     Sacar del sigilo lo hace la pantalla que crea el ataque, y fue la de J2.
   - Al moverlos para la prueba, Larry quedó en el aura del Capataz y le dio Miedo. Volvió todo con el respaldo.
+
+## ✅ Cola 35 · Línea R2 · Hostigador a distancia, niveles 1 a 5 (2026-11-10, «Claude · pruebas» / «Encuentro 2»)
+
+Respaldo antes y restaurado después. Los cinco niveles agregados como lo hace el GM (GM Tools), renombrados «Hostigador 1» a «Hostigador 5».
+- **Números:** iguales a la prueba de niveles. nv1 vida 35, No2 9, PdG 10, Daño 5, Def 2, Eva 10, Ini 9 · nv2 40, 9, 12, 6, 3, 11, 9 · nv3 40,
+  10, 13, 7, 3, 12, 10 · nv4 45 (con el Kevlar), 11, 14, 8, Def 4 (+2 contra disparos), 13, 11 · nv5 50, 12, PdG 14 (16 con el arco, por los
+  Guantes de cetrero), 8, 4, 14, 12. Habilidades, pasivas y equipo de cada nivel, los aprobados. Los cinco con la Flecha silbadora.
+- **Tiro certero** (H1 a Larry): +1 PdG, Crítico frecuente +2 y Perfora 3 en el duelo. Larry esquivó.
+- **Disparo y repliegue** (H1): primero el cartel «se reacomoda antes de disparar»; se arrastró 2 casillas (gratis, sin oportunidad) y
+  después eligió el blanco. El daño, con el +2: «Daño 1d4+6». Captura `cola-35-repliegue-antes`.
+- **Mantener a raya** (H2 a Larry): pegó (crítico ×3); Larry fue empujado 2 casillas lejos del tirador (10,26 → 10,28) y quedó Lento. Captura
+  `cola-35-1-mantener-a-raya`.
+- **Tiro a la rodilla** (H3 a Bizzante): pegó; quedó Rengo.
+- **Disparo señalador** (H4 al Goblin rompehuesos): pegó; quedó Presa y Marcado. (El +2 de la Presa no se sumó en el disparo siguiente porque el
+  que tiraba era un aliado del goblin: es lo esperado.)
+- **Ráfaga encadenada** (H5): quedó «Repitiendo»; tres disparos al mismo blanco: el 1.º normal, el 2.º «repetición (+1)»: +1 PdG y +1d4, el
+  3.º «repetición (+2)»: +2 PdG y +2d4; después del 3.º se fue el estado. Captura `cola-35-3-rafaga-segundo-disparo`.
+- **Arco de la sombra** (ataque común de H5): «emboscada y por la espalda: +2 PdG, Crítico frecuente +1, +1 de daño»; la emboscada, solo en
+  el primer disparo. **Guantes de cetrero:** el PdG del nv5 con el arco salió 2d8 (16) en lugar de 14.
+- **Arco de tiro ligero** (H2, dos disparos comunes al Capataz): el primero pegó y el segundo costó 3 No2 en lugar de 4 (Encadenar). La Racha
+  no se vio: no salió ningún crítico.
+- **Chaleco de kevlar** (el Arquero del culto le disparó al H4): «7 − Defensa 4 − Defensa contra armas a distancia 2 = 1». Captura `cola-35-4-kevlar`.
+- **Escurridizo** (la Rata mordió al H4 y esquivó): aviso «🦶 sos escurridizo. ¿Querés dar un paso?»; un paso de 1 casilla, pagó 1 No2, sin
+  oportunidad. Captura `cola-35-5-escurridizo`.
+- **Pies ligeros:** el +1 de Evasión, en los números.
+- **Flecha silbadora** (H1 a la Rata de la grieta 2, «✨ Flecha especial»): pegó, «Demora»; la Rata bajó del 5.º al 6.º lugar del orden de turnos
+  y la flecha se gastó del cinturón. Captura `cola-35-6-flecha-silbadora-orden`.
+- **Arreglado:** un disparo con una habilidad («un ataque con su arma»: Tiro certero, Tiro a la rodilla, Mantener a raya, Disparo señalador…)
+  no llevaba lo propio del arco: con el Arco de la sombra no sumaba la Emboscada ni la Espalda a distancia, no avisaba si el blanco estaba
+  demasiado cerca para el arco y no ofrecía el tiro alto. Ahora sí (`comun/combatiente.js`, `ataqueConArreglos`; también para los personajes,
+  `comun/ficha-acciones.js`). Probado: Tiro certero del H5 con «tiro alto (−2) y emboscada y por la espalda: Crítico frecuente +1, +1 de daño».
+  Captura `cola-35-2-arco-de-la-sombra-con-habilidad`. Prueba nueva en `comun/pruebas.html`.
+- Notas (no se tocaron):
+  - Un ataque cuesta más No2 si ya atacó en el turno (2, después 4): es la regla de siempre.
+  - Como en las pruebas anteriores, las copias de los personajes las controla el GM (🎮): la defensa de Bizzante la tiró la pantalla del GM.

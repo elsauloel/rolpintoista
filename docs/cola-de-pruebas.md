@@ -15,7 +15,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
 36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
 37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
 38. [ ] **Estandarte de la vanguardia: +1 Defensa y +1 PdG a los aliados a 2 casillas o menos; el estado aparece y se va al entrar y salir del rango** (2026-11-10).
@@ -24,6 +23,10 @@ Cada línea nueva que se termine de diseñar se suma al final.
 
 ## Hechas
 
+- [x] **35 · Línea R2 · Hostigador a distancia, niveles 1 a 5** (2026-11-10): números iguales a la prueba de niveles; cada habilidad, pasiva y
+  pieza del equipo usada en el mapa, sin errores salvo uno. **Arreglado:** un disparo hecho con una habilidad (Tiro certero, Tiro a la rodilla…)
+  perdía lo propio del arco (Emboscada, Espalda a distancia, la distancia mínima, el tiro alto); ahora lo lleva (`comun/combatiente.js`).
+  No se vio la Racha (no salió ningún crítico con el Arco de tiro ligero). Detalle en `pruebas-en-el-mapa.md`.
 - [x] **33 · Atacar saca del Sigilo** (2026-11-10): Bizzante (jugador) y una Rata (GM) atacaron desde el sigilo por la espalda: el duelo dijo
   «desde el sigilo, la defensa vale 1» (Evasión 2 → contó 1; 8 → 1), apenas se declaró salieron del sigilo, sin Marcado, y la Mesa dijo
   «🕶 … atacó y salió del sigilo». Bien. No probado: el robo y el giro. Detalle en `pruebas-en-el-mapa.md`.

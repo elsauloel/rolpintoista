@@ -735,6 +735,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Desarmar** (Flash) | — | + otra Buena |
   **Nivel 1:** vida 60, 6 No2, turnos de espera; Def 5, Def.Esp 1, Res. crít. T4 +2, Bloqueo +1. Consumible: Poción de Cuero Duro. **Cargado** en el pool esencial (2026-11-03).
   Pedido del dueño: una animación del Escudo humano que muestre que el daño se reparte entre los dos (en diseño).
+  **Nivel 2 aprobado** (dueño, 2026-11-10: «sí»): Con 13 · Des 7 · Agi 6 · Fue 6 · Esp 4, vida 65, 6 No2; + Botas de cuero de vaca y Guantes de
+  pelea callejera: Def 7, Def. especial 1, Bloqueo 8, Parry 7, Res.CC 13. **Golpe de escudo** (rehecho el mismo día: 1d10 + el peso del escudo
+  + Dmg, nunca crítico, cooldown 3 o 3 SP; con el Escudo de hierro macizo, 1d10 + 4 + 6) y la pasiva **Guardia firme**. **Cargado** (2026-11-10).
 
 - **L5 · Duelista · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me gusta»). Estrategia: el esgrimista del mano a mano: busca a uno, ataja y
   devuelve, amaga y entra por donde no ataja; gana el uno contra uno. Atributos (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 11/8/7/5/2 → 35, 8** · nv2

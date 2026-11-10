@@ -421,6 +421,12 @@
     equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto'],
     habilidades: ['Provocar', 'Escudo humano'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'});
+  // T3 Guardaespaldas (niveles 2 en adelante, de a uno desde el 2026-11-10).
+  const T3 = {linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'};
+  esencial({...T3, nivel: 2, atrib: [13, 6, 6, 7, 4],   // (aprobado 2026-11-10: Golpe de escudo —1d10 + peso del escudo + Dmg, sin crítico, cooldown 3—; pasiva Guardia firme; + Botas de cuero de vaca y Guantes de pelea callejera)
+    equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo'], pasivas: ['Guardia firme']});
   esencial({linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 8, 11, 2],   // (2026-11-03, dueño: «me parece bien»)
     equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],

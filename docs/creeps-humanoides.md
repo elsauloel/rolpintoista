@@ -831,6 +831,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   turnos, para desarmar más). **Cargado** en el pool esencial (2026-11-03).
   **Nivel 2 aprobado** (dueño, 2026-11-11: «sí»): Fue 10 · Con 10 · Des 8 · Agi 6 · Esp 2, vida 50, 6 No2; + Casco de cuero endurecido y Guantes
   de esgrimista (Parry +1): Def 7, Bloqueo 11, Parry 11. **Romper armadura** y la pasiva **Guardia firme**. **Cargado** (2026-11-11).
+  **Nivel 3 aprobado** (dueño, 2026-11-11: «me gusta»): Fue 11 · Con 10 · Des 9 · Agi 7 · Esp 2, vida 50, 7 No2; el arma pasa a Buena: **Espada
+  del herrero** (Tipo 6, 2 dados, +1, Bloqueo +1, Romper armadura 20 %): Bloqueo 13, Parry 11. Habilidad nueva: **Dos al hilo**. **Cargado** (2026-11-11).
 
 - **⏸ EN PAUSA desde el 2026-11-04** (dueño: «vamos a pausar el tema de los creeps esenciales. Cuando te diga que retomemos, me volvés a mandar lo
   del Patotero para continuar»). Quedó presentado, sin respuesta, el boceto del **L6 · Patotero · Choque liviano**: la patota (pelea cuando tiene a

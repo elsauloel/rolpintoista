@@ -476,6 +476,9 @@
   esencial({...H3, nivel: 2, atrib: [10, 10, 6, 8, 2],   // (aprobado 2026-11-11: Romper armadura; pasiva Guardia firme; + Casco de cuero endurecido y Guantes de esgrimista)
     equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
     habilidades: ['Estocada', 'Desarmar', 'Romper armadura'], pasivas: ['Guardia firme']});
+  esencial({...H3, nivel: 3, atrib: [10, 11, 7, 9, 2],   // (aprobado 2026-11-11: Dos al hilo; el arma pasa a Buena: Espada del herrero)
+    equipo: ['Espada del herrero', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura', 'Dos al hilo'], pasivas: ['Guardia firme']});
 
   // ---- La tanda del 2026-11-05 (nivel 1 aprobado por el dueño; detalle en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
   esencial({linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [8, 6, 8, 9, 2],   // (dueño: «vamos a definir el nivel 1»; el Jubón en vez del chaleco)

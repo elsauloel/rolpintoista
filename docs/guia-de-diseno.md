@@ -479,7 +479,8 @@ movimiento. `Combatiente.trabaNarrativo` (vtt-hexgrid/js/06 `soltar`).
   la sensación de que lo observan…» (`Combatiente.percepcionIncierta`). Nunca quién está escondido, cuántos, qué hacen, dónde ni el paso.
 - En la Mesa sale «Fulano · Percepción», sin «aumentada» ni «Pisada atenta».
 - Después de tirar: si encuentra algo, se dice qué (el escondido, la trampa); si no, «Mmm… puede que estés flasheando» / «no nota nada raro».
-- El escondido que es un personaje recibe «Alguien podría haberte notado — tirá tu Sigilo», sin el nombre de quién.
+- El escondido que es un personaje recibe «<Quien percibe> podría haberte notado — tirá tu Sigilo» (dueño, 2026-11-11: «el escondido sí ve a la
+  persona y sabe cuál es su rango»): se nombra a quien lo puede notar; «Alguien podría haberte notado» solo si ese también está escondido.
 - El GM tiene el detalle (quién y por qué) **plegado** en su cartel («ℹ detalle (solo el GM)»): no lo dice el cartel, pero lo puede abrir para
   dirigir. Cuando el GM tira el Sigilo de su propio creep escondido, el cartel sí dice cuál (es suyo).
 - Quién tira: percibe un creep → el GM; percibe un personaje o invocación → quien lo maneja (si no está conectado, el GM tira por él a los 6 s).

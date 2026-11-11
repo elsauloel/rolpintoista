@@ -228,7 +228,10 @@ function sigiloJugCartelSigilo(id, d, porEl){
   sigiloJugCartel.set(id, clave);
   const quien = dt.ocultoNombre || 'tu personaje';
   const tirando = d.estado === 'sigiloTirando';
-  AvisoCombate.cartel(clave, {icono: '🕶', titulo: `Alguien podría haber${porEl ? ` notado a ${quien} · tirá por él` : 'te notado'}`,
+  // 🕶 El escondido ve a quien lo puede notar (dueño, 2026-11-11): se lo nombra, salvo que ese también esté escondido.
+  const det = tokens.get(dt.detectorId), detVisible = !!det && !det.oculto && !(typeof enSigilo === 'function' && enSigilo(det));
+  const titEsc = Combatiente.sigiloAvisoTitulo(dt.detector || (det ? nombreDe(det) : ''), detVisible);
+  AvisoCombate.cartel(clave, {icono: '🕶', titulo: porEl ? `${detVisible && dt.detector ? dt.detector : 'Alguien'} podría haber notado a ${quien} · tirá por él` : titEsc,
     pasos: [{titulo: 'Para seguir escondido', ...(porEl
       ? {html: `${esc(quien)} (en sigilo) tira Sigilo (Destreza + bonos): tiene que sacar ${esc(dt.percepcion)} o más.${sigiloDetalleGM(dt)}`}
       : {texto: `Tirá tu Sigilo (Destreza + bonos): tenés que sacar ${dt.percepcion} o más.`})}],

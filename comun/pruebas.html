@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261110vaq"></script>
+<script src="ficha-acciones.js?v=20261111dsg"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261107dosarmas"></script>
 <script src="estado-preguntas.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261110esc"></script>
+<script src="duelo.js?v=20261111dsg"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -3305,6 +3305,15 @@ prueba('🛡 Invulnerable (2026-11-10, bug de la tanda 3): la Armadura rota reci
   const r = Combatiente.agregarEstado(inv.estados, {nombre: 'Armadura rota', polaridad: 'debuff', stacks: 1});
   igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]) === durEsc, FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1]) === durPeto,
     FichaCalculo.armRotaDe(S2.inventario[0]), r.ok], [0, true, 0, true, 1, false]);
+});
+prueba('🔧 Bloqueo perdido (dueño, 2026-11-11): la pieza pierde 1 de durabilidad, no baja la Defensa, y al jugador le llega «pasó de N a N−1»', () => {
+  const S = fichaBotonera({inventario: [{...escudo}]}), reg = [];
+  const antes = FichaCalculo.durActual(S.inventario[0]), defAntes = FichaCalculo.calcular(S).final.def;
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Desgaste', item: 'parry'}, 'Goblin · Bloqueo perdido', uiAuto(reg, true));
+  const msg = reg.find(t => typeof t === 'string' && t.startsWith('🔧')) || '';
+  igual([FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.calcular(S).final.def === defAntes,
+    msg.includes(`Perdiste el Bloqueo: la durabilidad de tu Escudo pasó de ${antes} a ${antes - 1}`), reg.filter(t => typeof t === 'string' && t.startsWith('🔧')).length],
+    [antes - 1, 0, true, true, 1]);
 });
 prueba('⏳ Pasar de día (2026-10-12): descansar llena vida, SP y No2 (no levanta a un caído), terminan los estados con turnos y el tope del talento vuelve a 0', () => {
   const S = fichaBotonera({efectos: [{nombre: 'Veneno', activo: true, turnos: 2, polaridad: 'debuff'}, {nombre: 'Sigilo', activo: true, permanente: true, polaridad: 'buff'}]});

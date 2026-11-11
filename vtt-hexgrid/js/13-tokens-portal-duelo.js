@@ -1991,10 +1991,12 @@ async function dueloAplicarDano(d, o){
   const golpeRayo = elDano === 'rayo' ? aplicar : 0;
   const aplicarSinAgua = aplicar;   // (la cuenta: lo que pasaba antes del ×1,5 del agua)   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5
   if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
-  let desgaste = '';
+  let desgaste = '', desgasteDur = null;
   // (un Parry elegido a mano no dice con qué paró: `item: 'parry'` = el escudo puesto o la única pieza con la que se puede parar, 2026-10-29)
   if(!simular && base.mitad && t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa && (d.defensa.itemId || d.defensa.modo === 'parry')){
-    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId || 'parry'}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = d.defensa.itemNombre || 'el objeto con el que paró'; }
+    // 🔧 «de N a N−1» (dueño, 2026-11-11): se mira la pieza en la ficha ANTES de pedir el desgaste (la ficha del dueño lo aplica una sola vez).
+    desgasteDur = await pjDurabilidadPieza(t.fichaId, d.defensa.itemId || 'parry');
+    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId || 'parry'}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = (desgasteDur && desgasteDur.nombre) || d.defensa.itemNombre || 'el objeto con el que paró'; }
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
     // 🧮 La cuenta del daño, renglón por renglón (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
@@ -2133,7 +2135,7 @@ async function dueloAplicarDano(d, o){
       if(typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
     const cuenta = armarCuenta(res);
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, ...(desgasteDur ? {desgasteDur} : {}), cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
@@ -3111,6 +3113,24 @@ async function dueloAplicarEfectoBase(d, ef){
   for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
   if(frena) return {nota: `no entró: ${frena === 'Invulnerable' ? 'está Invulnerable' : frena === 'Marcado' ? 'está Marcado' : 'lo frena ' + frena} (${EstadosAplicar.texto(unico)}${veces > 1 ? ` ×${veces}` : ''} no le hizo efecto)`};
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
+}
+// 🔧 La pieza que se gasta al perder el Bloqueo (2026-11-11): {nombre, antes, despues, max} leída de la ficha, o null si no se pudo (el duelo
+// muestra entonces el texto de siempre, sin números). `item: 'parry'` = el escudo puesto o la única pieza con la que se puede parar (como la ficha).
+async function pjDurabilidadPieza(fichaId, itemId){
+  try{
+    await cargarPiezas(BN_PIEZAS);
+    const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${fichaId}`));
+    if(!l || !l.S) return null;
+    const S = l.S, inv = S.inventario || [];
+    let it = null;
+    if(itemId === 'parry'){
+      it = inv.find(x => x && x.equipado && FichaCalculo.esEscudoItem(x) && !FichaCalculo.itemRoto(x));
+      if(!it){ const c = FichaCombate.armasYEscudosParaParry(S); it = c.length === 1 ? c[0].item : null; }
+    }else it = inv.find(x => x && x.id === itemId);
+    if(!it || !FichaCalculo.durableItem(it)) return null;
+    const antes = FichaCalculo.durActual(it);
+    return {nombre: String(it.nombre || '').slice(0, 80), antes, despues: Math.max(0, antes - 1), max: FichaCalculo.durMax(it)};
+  }catch(err){ console.error('No se pudo mirar la durabilidad de la pieza:', err); return null; }
 }
 // ¿Tiene puesta alguna pieza de armadura que se pueda romper? (lee la ficha una vez; ante la duda, sí: la ficha avisa igual)
 async function pjTieneArmadura(fichaId){

@@ -1048,10 +1048,10 @@ const FichaAcciones = (() => {
     const c = FichaCombate.armasYEscudosParaParry(S);
     return c.length === 1 ? c[0].item : null;
   }
-  function desgastarItem(S, i, n, ui){
+  function desgastarItem(S, i, n, ui, sinAviso){
     const antes = FichaCalculo.durActual(i);
     i.dur = Math.max(0, antes - Math.max(1, n || 1));
-    if(FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
+    if(!sinAviso && FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
   }
   // La Defensa que da una pieza ahora (con lo que le baja la armadura rota o la abolladura, sin pasar de la que da; rota, nada).
   function defDePieza(it){
@@ -1078,6 +1078,26 @@ const FichaAcciones = (() => {
     const rotoAlguno = rotas.some(r => FichaCalculo.durActual(r.it) <= 0);
     AvisoCombate.mostrar({icono: '💥', titulo: `${origen ? String(origen).split(' · ')[0] : 'Un golpe'} te rompió ${nombres}`, pasos,
       veredicto: {tono: 'malo', grande: rotoAlguno ? '¡ROTO!' : 'Armadura rota', chico: origen ? String(origen) : ''}});
+  }
+  /* 🔧 El aviso del Bloqueo perdido (dueño, 2026-11-11: «perdiste el bloqueo, la durabilidad de tu escudo pasó de N a N−1», sin que baje la
+     Defensa: eso es solo Romper armadura). Cada desgaste le llega al jugador: el cartel del juego (comun/aviso-combate.js) donde lo haya (el mapa) y,
+     siempre, el toast y la línea de recordatorio. Con 1 punto, la advertencia; en 0, que se rompió. */
+  function avisoDesgaste(S, it, antes, origen, ui){
+    const act = FichaCalculo.durActual(it), max = FichaCalculo.durMax(it), quien = ((S.meta && S.meta.nombre) || '').trim();
+    const perdio = /bloqueo perdido/i.test(String(origen || ''));
+    const frase = `${perdio ? 'Perdiste el Bloqueo: l' : 'L'}a durabilidad de tu ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)})`;
+    ui.toast(`🔧 ${frase}`);
+    try{ ui.recordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${frase}`, detalle: ''}]); }catch(e){}
+    if(typeof AvisoCombate === 'undefined') return;
+    const lin = [`La durabilidad de ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)}).`,
+      'La Defensa que da no baja: eso solo lo hace Romper armadura.'];
+    if(act <= 0) lin.push('💥 La durabilidad llegó a 0: está ROTO. Sigue ocupando su lugar, pero no da ningún efecto (ni Defensa ni bonos) hasta repararlo.');
+    else if(act === 1) lin.push(`⚠ Advertencia: a ${it.nombre} le queda 1 punto de durabilidad. Un punto más de desgaste lo rompe.`);
+    try{
+      AvisoCombate.mostrar({icono: '🔧', titulo: perdio ? 'Perdiste el Bloqueo' : `Se gastó ${it.nombre}`,
+        pasos: [{titulo: `🔧 ${it.nombre}`, texto: lin.join('\n')}],
+        veredicto: {tono: 'malo', grande: act <= 0 ? '¡ROTO!' : `${fmt(antes)} → ${fmt(act)}`, chico: origen ? String(origen) : ''}});
+    }catch(e){}
   }
   // Una pieza puntual: +N de armadura rota (hasta su durabilidad) y −N de durabilidad.
   function romperPieza(S, it, n, ui, origen){
@@ -1148,7 +1168,11 @@ const FichaAcciones = (() => {
     if(spec.nombre === 'Desgaste'){
       // `item: 'parry'` (2026-10-29): un Parry elegido a mano no dice con qué paró — el escudo puesto o, si no, la única pieza con la que se puede parar.
       const it = spec.item === 'parry' ? piezaDelParry(S) : S.inventario.find(x => x.id === spec.item);
-      if(it && FichaCalculo.durableItem(it)){ desgastarItem(S, it, 1, ui); ui.cambio(['equipo', 'mochila', 'refresh']); }
+      if(it && FichaCalculo.durableItem(it)){
+        const antes = FichaCalculo.durActual(it);
+        desgastarItem(S, it, 1, ui, true); ui.cambio(['equipo', 'mochila', 'refresh']);
+        avisoDesgaste(S, it, antes, origen, ui);
+      }
       else ui.toast(`Desgaste: no encuentro ese ítem en tu inventario`);
       return;
     }

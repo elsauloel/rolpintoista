@@ -2664,6 +2664,7 @@ const Duelo = (() => {
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
+    const dgD = d.dano && d.dano.desgasteDur && d.dano.desgasteDur.nombre ? d.dano.desgasteDur : null;   // 🔧 «de N a N−1» (2026-11-11)
     const disparoParado = d.resultado === 'bloqueado' && !d.bloq && !(d.defensa && d.defensa.modo === 'parrydist') && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(d);
     const interceptado = d.resultado === 'bloqueado' && d.defensa && d.defensa.modo === 'parrydist';
     // Efecto que la skill no puede automatizar del todo (2026-09-27, pedido del dueño — "Pasos personalizados"
@@ -2699,7 +2700,7 @@ const Duelo = (() => {
     }else if(d.resultado === 'mitad'){
       const desFallo = d.ataque && d.ataque.desarme && d.ataque.desarme.lado === 'defensor';   // 🤺 quiso desarmar defendiendo y no le salió
       caja = `<div class="duelo-veredicto mitad${nuevo}">${desFallo ? `<div class="chico" style="color:#ffd25a;font-weight:700;margin-bottom:4px">🤺 ${_esc(d.defensor.nombre)} intentó desarmar a ${_esc(d.atacante.nombre)}, pero falló</div>` : ''}<div class="grande">⚠ PASA LA MITAD</div><div class="chico">${desFallo ? 'No bloqueó el golpe: ' : 'Paró el golpe pero no lo frenó del todo: '}pasa la mitad del daño (redondeada para arriba)</div>
-        <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha)</span>' : ''}</div>${mot}</div>`;
+        <div class="duelo-motivo">🔧 ${_esc(dgD ? dgD.nombre : item)} pierde 1 punto de durabilidad${dgD ? `: de ${_fmt(dgD.antes)} a ${_fmt(dgD.despues)} (de ${_fmt(dgD.max)})` : ''}${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha · la Defensa no baja)</span>' : ''}</div>${mot}</div>`;
     }else return '';
     // Contraataque (regla del dueño, 2026-10-01, P139): solo después de un Parry Y un Bloqueo exitosos — eso es «bloqueado». El paso
     // siguiente es una pregunta, Sí o No: con Sí se abre un duelo nuevo con los papeles al revés (quien defendía ataca). `contra`:

@@ -118,6 +118,10 @@
 
 ## Sesiones en la nube (desde el 2026-10-31)
 
+- **Armar las condiciones para probar, no darlo por «sin probar»** (2026-11-11, dueño, sobre «no hay invocaciones vivas» y «ningún creep la tiene»:
+  «para probar estas cosas vos deberías poder crear las condiciones necesarias»). Si falta algo para una prueba en el mapa (una invocación, un creep
+  con cierta habilidad, un personaje con un arma a distancia, una pared, un charco…), se crea en «Claude · pruebas» (foto antes, restaurar después,
+  borrar lo creado). «Sin probar» queda solo para lo que de verdad no se puede (los dados 3D sin internet, una segunda persona real).
 - **De a una tarea de programación por vez** (2026-11-10, dueño: «las tareas no las hagas en simultáneo: andá poniéndolas en cola y cuando
   terminás una avanzás a la siguiente»). Con varios pedidos, primero se definen las ideas con el dueño; después van a una **cola de
   programación** (`docs/cola-de-pruebas.md`, sección de programación) y se hacen **una por vez**: un solo ayudante programando a la vez, y al

@@ -138,6 +138,8 @@ async function sigiloJugTirarPercepcion(id, d, aMano){
   }else{
     const det = tokens.get(dt.detectorId);
     if(!det){ toast('Sigilo: el creep ya no está en el mapa — resolvelo a mano'); return; }
+    // (FichaBotonera se carga recién con la Botonera: la pantalla del GM puede no tenerla todavía — prueba en el mapa del 2026-11-11)
+    try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo tirar Percepción — resolvelo a mano'); return; }
     const r = FichaBotonera.tiradaPercepcionValor(sigiloValorPercepcion(det), tokenPercepcionAumentada(det));
     if(!r){ toast('Percepción: sin valor para tirar'); return; }
     total = r.total;

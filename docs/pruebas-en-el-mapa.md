@@ -983,6 +983,34 @@
 - [x] ✅ caso guardado (2026-11-03e: a un goblin se le guardó una habilidad «Empuje»; al guardarse se renombró sola a «Potencia»). ✅ (2026-11-03d: un goblin usó «Potencia» sobre el Arquero: Empower aplicado, −2 SP, «sin costo de No2»; el caso del creep guardado con «Empuje» no se probó) **💪 Potencia (antes «Empuje»)**: un creep guardado con «Empuje» aparece como «Potencia» al abrirlo (GM Tools / mapa) y funciona igual (Empower +3).
 
 ## Probado
+
+## 🧪 Pruebas en el mapa de lo hecho el 2026-11-11 (Claude, «Claude · pruebas», «Prueba · Trampas en flor»; todo restaurado después)
+
+Pantallas del GM, J1 y J2 con clics de verdad (las situaciones de prueba, armadas por código cuando hacía falta). Evidencia en el scratchpad
+de la sesión (`prueba-*.png`).
+
+- ✅ **Modo narrativo + Inmovilizado** (0b16fbbc): J1 arrastró a Larry Inmovilizado; al soltar, «Larry (copia) está Inmovilizado. ¿Moverlo
+  igual?» → «Sí, mover igual» quedó en la casilla nueva; «No» lo dejó donde estaba. En modo combate no se arrastra (el aviso de siempre).
+- ✅ **Sigilo, una tirada por paso**: Larry en sigilo caminó 3 pasos en la zona de alerta de una rata → al GM «Rata de prueba 1 percibe
+  movimientos cerca» (paso 1 de 3); el GM tiró la Percepción y J1 su Sigilo (a mano 20: sigue escondido) → se abrió el paso 2; ahí perdió (1)
+  → descubierto, Marcado, y el paso 3 no se abrió. J2 no vio nada (privado). **Arreglado en la prueba:** el botón «🎲 Tirar Percepción» del
+  GM fallaba («FichaBotonera is not defined»: esa pieza se carga recién con la Botonera); ahora la carga antes (`js/116`).
+- ✅ **El visible sin Percepción aumentada**: la rata que pasó de largo por la zona (Larry escondido en su alerta a mitad de camino) no pidió
+  nada; la que terminó el movimiento con Larry en su zona de alerta abrió «percibe movimientos cerca» → el GM tiró la Percepción y J1 el Sigilo.
+  ⚪ No llegué a probar el caso de un personaje que termina cerca de un **creep** escondido (la rata quedaba Marcada al detectarla y no
+  podía volver al sigilo para repetir).
+- ✅ **Saque rápido**: con el Cinto de cuatrero (chance forzada al 100 %), al sacar una Poción del cinturón le salió a J1 el cartel
+  «🎒 Saque rápido — Sacaste Poción de HP del cinturón sin gastar No2»; con la chance al 1 %, no salió: sin cartel, solo la línea de la Mesa
+  («⚡ Saque rápido (1 %): 1d20 = 16 → no salió») y cobró el No2.
+- ✅ **Golpe en la sien contra un jefe**: el duelo Fuerza 20 contra Res.CC 4 ganó; «Aplicar Stun» → «no entró: Protección de jefe».
+- ⚪ **Sin probar todavía:** el dodge roll con sobrepeso (+1 No2), Atraer y Tolerar en el cuadro del duelo, la Mala sombra al empezar la
+  ronda, la Anulación contra una invocación y el rayo en el agua.
+- 🔧 **Otro arreglo de paso:** al pasar el mapa a combate, la pantalla del GM tiraba en bucle «Anillos al empezar el combate:
+  FichaCalculo is not defined» (`js/25`, el texto de los anillos de atributo) y cortaba el resto de los anillos de ese combate; ahora no
+  depende de esa pieza.
+- ⚠ **Visto, sin arreglar:** si la pantalla del GM se recarga con un pedido de sigilo abierto («percibe movimientos cerca»), el cartel no
+  vuelve a aparecer y queda colgado (hay que cerrarlo a mano).
+
 - [x] **Tanda 4 (2026-11-03, «Claude · pruebas», con capturas `t4-1103-*`; detalle en `reporte-pruebas-4-2026-11-03.md`)**: 👁 Sólidos «Se ve entero» con las
   reglas pegadas (el ⚙ guarda, desde un jugador el objeto entero y lo de atrás y adentro tapados; uno nuevo desde Formas libres); ⚡ Aguja siniestra rápida
   (espera 2, 1 No2, los viejos al día, baja con el turno del creep); 🥶 Escalofrío (1d4 siniestro directo, Herida sombría, −2 PdG en el ataque siguiente,

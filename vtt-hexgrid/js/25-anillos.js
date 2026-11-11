@@ -75,7 +75,7 @@ async function anillosEmpezar(id, t, d){
         lineas.push('Vaquita de San Antonio: espanta el primer estado malo del combate'); }
       Object.entries(ANILLO_ATRIB).forEach(([st, a]) => {
         if(d.v(st) > 0){ lista.push({id: anillosId(), nombre: a.nombre, polaridad: 'buff', activo: true, permanente: true, anillo: true, impulso: a.attr, impulsoVal: d.v(st),
-          detalle: `Una vez en este combate: +${d.v(st)} a tu última tirada de ${FichaCalculo.STAT_LABEL[a.attr] || a.attr} (el botón ${a.icono}, como la Polilla).`}); lineas.push(`${a.nombre}: +${d.v(st)} una vez`); }
+          detalle: `Una vez en este combate: +${d.v(st)} a tu última tirada de ${(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_LABEL[a.attr]) || a.attr} (el botón ${a.icono}, como la Polilla).`}); lineas.push(`${a.nombre}: +${d.v(st)} una vez`); }
       });
       return true;
     });

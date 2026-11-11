@@ -518,6 +518,9 @@
   esencial({...L6, nivel: 4, atrib: [9, 9, 10, 12, 2],   // (aprobado 2026-11-11: Golpe a la rodilla; pasiva Ojo crítico; Jubón de cuero tachonado en lugar del curtido, por la vida)
     equipo: ['Facón de plata', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre'],
     habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero', 'Golpe a la rodilla'], pasivas: ['Pies ligeros', 'Ojo crítico']});
+  esencial({...L6, nivel: 5, atrib: [10, 10, 10, 13, 2],   // (aprobado 2026-11-11: Ráfaga de cortes; + Capellina de hierro en la cabeza)
+    equipo: ['Facón de plata', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre', 'Capellina de hierro'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero', 'Golpe a la rodilla', 'Ráfaga de cortes'], pasivas: ['Pies ligeros', 'Ojo crítico']});
   esencial({linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
     equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca'],
     habilidades: ['Takle', 'Pisotón'], consumibles: ['Grasa de carpincho'],

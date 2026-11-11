@@ -869,6 +869,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   (+2 de daño, Ini +2, Sangrado 50 %): PdG 12, Eva 12. Habilidad nueva: **Tajo de carnicero**. **Cargado** (2026-11-11).
   **Nivel 4 aprobado** (dueño, 2026-11-11: «ok»): Des 12 · Agi 10 · Con 9 · Fue 9 · Esp 2, vida 55, 10 No2; **Jubón de cuero tachonado** (Buena,
   vida +10) en lugar del curtido: Def 2, Def. especial 2, Eva 13. **Golpe a la rodilla** y la pasiva **Ojo crítico**. **Cargado** (2026-11-11).
+  **Nivel 5 aprobado** (dueño, 2026-11-11: «ok»): Des 13 · Agi 10 · Con 10 · Fue 10 · Esp 2, vida 60, 10 No2; + **Capellina de hierro** (Buena): Def 4,
+  Res.CC 11. Habilidad nueva: **Ráfaga de cortes**. **Cargado** (2026-11-11). La línea L6 queda completa.
 - **T4 · Peleador de control · Tanque** (2026-11-05): empuja, tira y demora; desordena al grupo rival. **Ruta aprobada**: nv1 Takle · Pisotón; nv2
   Desarmar + Guardia firme; nv3 Puño de roca; nv4 Arrastrar + **Marcar el ritmo** (dueño: «le vamos a poner marcar el ritmo a nivel 4»); nv5 Barrido.
   **Nivel 1 (en revisión)**: Con 9 · Fue 7 · Agi 7 · Des 6 · Esp 4 (dueño: «le bajaría un punto de constitución y le subiría uno de agilidad») → vida

@@ -115,6 +115,9 @@
   terminás una avanzás a la siguiente»). Con varios pedidos, primero se definen las ideas con el dueño; después van a una **cola de
   programación** (`docs/cola-de-pruebas.md`, sección de programación) y se hacen **una por vez**: un solo ayudante programando a la vez, y al
   terminar (probado y subido) arranca la siguiente. (Antes se lanzaban ayudantes en paralelo y se pisaban los archivos.)
+  **Un solo ayudante a la vez, para TODO** (2026-11-11, dueño: «por esto pedí que cada pedido nuevo se agregue a una cola… y no que se realicen
+  en simultáneo»): también las pruebas en el mapa, armar mapas o revisar datos, no solo programar — usan las mismas cuentas de prueba y se pisan
+  (un ayudante armando un mapa con J1 le «robó» el aviso al que probaba el escudo).
 - **Videos de las animaciones, no capturas** (2026-11-10, dueño: «si pudieras mandarme videítos de las animaciones en lugar de capturas, sería
   genial»). Para todo lo que se mueve (pulsos, duelos que se despliegan, vaquita, lava, rayos…), grabar con Playwright
   (`newContext({recordVideo: {dir, size: {width: 1280, height: 720}}, viewport: {width: 1280, height: 720}})`, cerrar el contexto para que se

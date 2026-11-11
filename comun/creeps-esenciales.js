@@ -470,6 +470,12 @@
     equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],
     habilidades: ['Estocada', 'Desarmar'], consumibles: ['Pergamino grupal de Reflejo de Acero'],
     estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'});
+  // H3 Duelista pesado (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const H3 = {linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Pergamino grupal de Reflejo de Acero'],
+    estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'};
+  esencial({...H3, nivel: 2, atrib: [10, 10, 6, 8, 2],   // (aprobado 2026-11-11: Romper armadura; pasiva Guardia firme; + Casco de cuero endurecido y Guantes de esgrimista)
+    equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura'], pasivas: ['Guardia firme']});
 
   // ---- La tanda del 2026-11-05 (nivel 1 aprobado por el dueño; detalle en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
   esencial({linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [8, 6, 8, 9, 2],   // (dueño: «vamos a definir el nivel 1»; el Jubón en vez del chaleco)

@@ -128,5 +128,5 @@ function anunciarConsumo(a, oculto, quien){
     mesaLinea(a.texto, '', quien);
     momentoAbrir({tipo: 'consumo', icono: '🧪', titulo: a.titulo, resultado: a.resultado || '', estado: 'listo', datos: {centro: true}});
   }else if(quien) mesaLinea(a.texto, '', quien);
-  if(a.saqueSalio) AvisoCombate.mostrar({icono: '⚡', titulo: 'Saque rápido', texto: `Sacar ${a.item} del cinturón no te costó No2.`});
+  if(a.saqueSalio) AvisoCombate.mostrar(Combatiente.saqueRapidoAviso(a.item));   // 🎒 solo si salió; si no, queda en la Mesa y la Crónica (2026-11-11)
 }

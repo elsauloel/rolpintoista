@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111narr"></script>
+<script src="combatiente.js?v=20261111saque"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261111sob"></script>
+<script src="ficha-acciones.js?v=20261111saque"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261111dur6"></script>
 <script src="estado-preguntas.js"></script>
@@ -7936,6 +7936,15 @@ prueba('📝 Texto vigente: una copia a mano de los Pedos Tóxicos muestra el te
   const deClase = {nombre: 'Pedos Tóxicos', habClaseId: 'custom-pedos-toxicos', detalle: 'copia del pool'};
   igual([FichaBotonera.detalleVigente(vieja) === pool.detalle, /centrada en vos/.test(FichaBotonera.detalleVigente(vieja)),
     FichaBotonera.detalleVigente(otra), FichaBotonera.detalleVigente(deClase)], [true, true, 'lo escribí yo', 'copia del pool']);
+});
+prueba('🎒 Saque rápido (dueño, 2026-11-11): se tira solo; si sale, un aviso a quien lo sacó; si falla, solo la Mesa y la Crónica', () => {
+  const a = Combatiente.saqueRapidoAviso('Poción de vida menor');
+  const sc = creepPrueba({id: 'sr1', cinturon: [{id: 'p1', nombre: 'Poción de vida menor', consumible: true, unidades: 2, curahp: 5}], equipo: [{id: 'c', nombre: 'Cinto', tipoItem: 'cinturon', mods: [{stat: 'saquerapido', val: 100}], equipado: true}], nitros: 6});
+  const r = CreepAcciones.consumir(sc, 'p1', [], false);
+  const sc2 = creepPrueba({id: 'sr2', cinturon: [{id: 'p2', nombre: 'Poción de vida menor', consumible: true, unidades: 2, curahp: 5}], nitros: 6});
+  const r2 = CreepAcciones.consumir(sc2, 'p2', [], false);
+  igual([a.icono, a.texto, Combatiente.saqueRapidoToast('Poción'), !!(r.anuncio && r.anuncio.saqueSalio), /Saque rápido/.test(r.anuncio.texto), !!(r2.anuncio && r2.anuncio.saqueSalio)],
+    ['🎒', 'Sacaste Poción de vida menor del cinturón sin gastar No2.', '🎒 Saque rápido: Sacaste Poción del cinturón sin gastar No2.', true, true, false]);
 });
 prueba('zonaEstado roto no rompe', () => {
   igual(HexInfo.describir({zona: true, zonaEstado: '{roto'})[0].titulo, 'Zona · efecto persistente');

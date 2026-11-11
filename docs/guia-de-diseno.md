@@ -440,3 +440,7 @@ Fuera del combate (modo narrativo) moverse no cobra No2, pero los estados que tr
 Prisión de hielo), Sentado, Stun / Sueño y Congelado — el token no se arrastra y avisa por qué. Rengo no cambia nada (sin costo, el doble de
 nada es nada). Sentado se levanta como siempre desde la Botonera. Salida a mano: el GM mueve a cualquiera con 🦶 Mover libre (tecla M).
 `Combatiente.trabaNarrativo(estados)` (comun/combatiente.js) y el arrastre en `vtt-hexgrid/js/06-mouse.js`.
+
+- **🎒 Saque rápido** (dueño, 2026-11-11): la chance (Cinto de cuatrero 33 %, Cinto de prestidigitador; stat `saquerapido`) **se tira sola**, sin
+  pedir botón (es un ahorro chico y frecuente). Si sale, un **aviso** a quien sacó el consumible («🎒 Saque rápido: sacaste X del cinturón sin
+  gastar No2»; un creep, al GM); si falla, **solo** la línea de la Mesa y la Crónica (con la tirada: «no salió»). `Combatiente.saqueRapidoAviso`.

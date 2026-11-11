@@ -467,7 +467,7 @@ const FichaAcciones = (() => {
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
       if(it.trampaDatos){}   // una trampa: ya la anunció TokensAuto (🎭 acción incierta para el rival, 2026-10-09)
       else if(ui.anunciar) ui.anunciar(anuncio);
-      else{ if(typeof mesaLinea === 'function') mesaLinea(anuncio.texto); if(anuncio.saqueSalio) ui.toast(`⚡ Saque rápido: sacar ${it.nombre} del cinturón no te costó No2`); }
+      else{ if(typeof mesaLinea === 'function') mesaLinea(anuncio.texto); if(anuncio.saqueSalio) ui.toast(Combatiente.saqueRapidoToast(it.nombre)); }
     }
   }
 

@@ -755,7 +755,7 @@
      soltarse, Confusión, la tirada extra de una zona): ¿al cuadro del duelo o quedan con su cartel? (Las trampas, en el punto de abajo.)
   2. ~~**Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?~~ ✅ decidido el 2026-11-11 (cada uno tira su propia Constitución; cola de programación 5).
   3. **Sigilo:** ¿está bien que el GM tire a escondidas la Destreza de quien está escondido (para no delatarlo)?
-  4. **Saque rápido:** sigue callado (pedido del 2026-10-05) ¿o pasa a tener botón?
+  4. ~~**Saque rápido:** sigue callado ¿o pasa a tener botón?~~ ✅ decidido el 2026-11-11: se tira solo; si sale, un aviso; si falla, solo Mesa y Crónica.
 - [ ] **Revisar en el mapa el cartel de las trampas** (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
   excepción: pueden tener su propio menú de trampas, estandarizado para todas»). Hoy cada trampa usa el cartel paso a paso
   (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como

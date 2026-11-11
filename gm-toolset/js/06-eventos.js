@@ -232,6 +232,7 @@ document.addEventListener('click', async e => {
       if(res.error){ toast(res.error); return; }
       (res.tiradas || []).forEach(t => publicarTiradaCreep(t));
       if(res.anuncio) mesaLinea(res.anuncio.texto);   // el anuncio en la Mesa (la Crónica es del mapa)
+      if(res.anuncio && res.anuncio.saqueSalio) toast(Combatiente.saqueRapidoToast(res.anuncio.item));   // 🎒 el aviso al GM (2026-11-11)
       renderAll();
       toast(res.aviso);
     })();

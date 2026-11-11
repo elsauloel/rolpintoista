@@ -94,7 +94,7 @@ Espejo, ni la Botella, los anillos, el Orbe salvaje o Sed de sangre de quien lo 
 | 19 | ⏸ espera la revisión del cartel de las zonas (bloque 4): va dentro de ese cartel · **Estado de una zona con chance** (Veneno 50 % de la Varita de miasma) | zona / ítem | `js/08` l. ~777 | **sale sola** | **B** | chica |
 | 20 | ✅ hecho (tanda 3) · **Romper el escudo** (un golpe con Romper armadura parado con el escudo) | regla del arma | `js/26` `dueloRompeEscudo` l. ~76 | **sale sola** (va a la Mesa) | **B** (la tira el atacante, como los otros efectos del arma) | chica |
 | 21 | ✅ ya cumplía (tanda 3 lo confirmó): el d6 sale con el botón del daño de quien ataca, dentro del cuadro del duelo, y se ve ahí y en la Mesa con sus dados; solo queda automático el respaldo raro de un daño tirado fuera del mapa · **Orbe salvaje**: el d6 de qué hace | ítem (talismán) | `js/53` `talSalvajeRodar` l. ~100 | **sale solo** | **B** (lo tira quien lo lleva) | chica |
-| 22 | **Saque rápido**: no pagar No2 al sacar un consumible | ítem / pasiva | `comun/creep-acciones.js` l. ~375 (y la ficha) | **sale sola, sin dados que rueden** | **C**: el dueño lo pidió así el 2026-10-05 («se tira callado y se anuncia en texto») | — |
+| 22 | **Saque rápido**: no pagar No2 al sacar un consumible | ítem / pasiva | `comun/creep-acciones.js` l. ~375 (y la ficha) | **sale sola, sin dados que rueden** | **C**: el dueño lo pidió así el 2026-10-05 («se tira callado y se anuncia en texto») | — | ✅ **decidido (2026-11-11)**: se tira solo; si sale, un aviso a quien lo sacó («🎒 Saque rápido: sacaste X del cinturón sin gastar No2»); si falla, solo la Mesa y la Crónica.
 
 **Cómo quedó la tanda 3 (2026-11-10):** cada chance es un duelo de habilidad sin oposición que se abre directo en los efectos
 (`chanceDuelo`, `chancesEnSecuencia` en `vtt-hexgrid/js/78-choque-pesado.js`): quien causa el efecto tira «🎲 Tirar el efecto (1dN)» con su
@@ -138,5 +138,5 @@ duelo o se dejan?
    soltarse, la Confusión y la tirada extra de la zona), ¿los pasamos todos al cuadro del duelo, o te sirven así? Las trampas son el más grande.
 2. ~~**Choque por empujón (#8):** el daño de colisión, ¿lo tira quien empujó o el empujado?~~ ✅ decidido y hecho el 2026-11-11: cada uno tira su propia Constitución (contra algo sólido, el empujado se la come; contra otro, se la hace al otro).
 3. **Detección del sigilo (#30):** ¿está bien que el GM la tire a escondidas?
-4. **Saque rápido (#22):** ¿sigue callado, como pediste el 2026-10-05, o ahora también con botón?
+4. **Saque rápido (#22):** ¿sigue callado, como pediste el 2026-10-05, o ahora también con botón? ✅ Decidido el 2026-11-11: sola, con aviso si sale.
 5. **Bloques 1 a 3:** ¿se aprueban en bloque (A y B) para hacerlos de a tandas?

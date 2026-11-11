@@ -836,6 +836,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 4 aprobado** (dueño, 2026-11-11: «sí»): Fue 12 · Con 11 · Des 9 · Agi 8 · Esp 2, vida 65, 8 No2; **Coraza de primera línea** (Buena,
   Def +4, +3 contra el primer golpe del turno, vida +10) en lugar de la de cuero hervido: Def 8, Bloqueo 14, Parry 12, Res.CC 12. **Remate** y la
   pasiva **Desvío hábil**. **Cargado** (2026-11-11).
+  **Nivel 5 aprobado** (dueño, 2026-11-11: «sí»): Fue 13 · Con 12 · Des 10 · Agi 8 · Esp 2, vida 70, 8 No2; **Escudo triangular** (Buena) en
+  lugar del de asalto: Bloqueo 16, Parry 13. Habilidad nueva: **Golpe demoledor**. **Cargado** (2026-11-11). La línea H3 queda completa.
 
 - **⏸ EN PAUSA desde el 2026-11-04** (dueño: «vamos a pausar el tema de los creeps esenciales. Cuando te diga que retomemos, me volvés a mandar lo
   del Patotero para continuar»). Quedó presentado, sin respuesta, el boceto del **L6 · Patotero · Choque liviano**: la patota (pelea cuando tiene a

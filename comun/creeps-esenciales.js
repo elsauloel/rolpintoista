@@ -480,6 +480,12 @@
     equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Tiro certero', 'Tiro a la rodilla'], consumibles: ['Virote de red'],
     estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'});
+  // R3 Trabador (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const R3 = {linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', consumibles: ['Virote de red'],
+    estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'};
+  esencial({...R3, nivel: 2, atrib: [9, 7, 6, 12, 2],   // (aprobado 2026-11-11: Red tendida; pasiva Puntería; + Casco de cuero endurecido y Guantes de agarre)
+    equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida'], pasivas: ['Puntería']});
 
   esencial({linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 5, 8, 2],   // (2026-11-03, dueño: «va así»)
     equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],

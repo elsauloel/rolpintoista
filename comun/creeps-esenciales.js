@@ -440,6 +440,12 @@
     equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],
     estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'});
+  // L5 Duelista (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const L5 = {linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'};
+  esencial({...L5, nivel: 2, atrib: [8, 6, 8, 12, 2],   // (aprobado 2026-11-11: Contraataque; pasiva Guardia firme; + Guantes de esgrimista y Casco de cuero endurecido)
+    equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque'], pasivas: ['Guardia firme']});
 
   esencial({linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (2026-11-03, dueño: «sí»)
     equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca'],

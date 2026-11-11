@@ -236,6 +236,9 @@ El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T1
 **En pausa (2026-09-26):** no se diseñan armas T12 hasta que el resto esté consolidado; el único T12 del catálogo es el Lanzallamas (Excepcional).
 
 ## Durabilidad como elemento de diseño (idea del dueño, 2026-09-26; hecho el 2026-09-30)
+**Cuándo se gasta (2026-11-11, dueño):** cuerpo a cuerpo, un Parry o un Bloqueo **ganados** no gastan; **perder el Bloqueo** gasta 1 del arma
+o escudo con que bloqueó. **Contra un disparo**, «Poner escudo» **ganado** gasta 1 («la flecha queda clavada en el escudo»; el botón lo avisa);
+**perdido**, la flecha pasa de largo y no gasta (contra un disparo no hay Bloqueo). La Defensa nunca baja por desgaste: solo con Romper armadura.
 **Desde el 2026-11-11 (dueño: «que la durabilidad de todo sea de 6 por punto de peso»): 6 puntos de durabilidad por punto de Peso para armas,
 escudos y armaduras, mínimo 6**; Resistente ×N / Frágil ×N suman o restan encima. Las copias ya gastadas se pasaron conservando lo perdido
 (2 de 3 → 5 de 6; una rota sigue rota). (Antes:) Por defecto un ítem tenía **3 puntos de durabilidad por punto de Peso** (mínimo 3). Desde el 2026-09-30 es un **campo propio del

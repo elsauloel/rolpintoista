@@ -328,8 +328,11 @@ const FichaDuelo = (() => {
           ops.push(Combatiente.parryApagado({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `🗡 Parry · ${a.item.nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo')));
         armasYEscudosParaParry().filter(a => Combatiente.sirveParaParry(a.item, disparo)).forEach(a => {
           const costo = gratis ? 0 : Combatiente.costoParry();
-          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, reglaNo2: Combatiente.defensaSinNo2(S.nitros, costo) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Parry'} : null,
-            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
+          // 🛡 Contra un disparo, el escudo que lo para se gasta (2026-11-11, dueño: «la flecha queda clavada en el escudo y se pierde 1 punto de
+          // durabilidad»): se avisa en el botón, antes de elegir, con lo que le queda.
+          const clava = disparo ? Combatiente.disparoClavadoTxt(a.item, FichaCalculo.durableItem(a.item) ? FichaCalculo.durActual(a.item) : null) : '';
+          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}${clava ? ' · −1 durabilidad' : ''}`, costo, reglaNo2: Combatiente.defensaSinNo2(S.nitros, costo) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Parry'} : null,
+            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(clava ? [clava] : []), ...(costo > num(S.nitros) && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
         // 🏹 Parry a distancia (Shooter, 2026-10-12): con la habilidad y un arma a distancia en mano, contra cualquier ataque: Evasión contra el PdG,
         // siempre 2 SP (dueño: se usa en turno ajeno, así que no es un Flash que cuesta el doble) + el No2 de un disparo; si gana, cuenta como un Parry

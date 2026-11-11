@@ -1085,16 +1085,20 @@ const FichaAcciones = (() => {
   function avisoDesgaste(S, it, antes, origen, ui){
     const act = FichaCalculo.durActual(it), max = FichaCalculo.durMax(it), quien = ((S.meta && S.meta.nombre) || '').trim();
     const perdio = /bloqueo perdido/i.test(String(origen || ''));
-    const frase = `${perdio ? 'Perdiste el Bloqueo: l' : 'L'}a durabilidad de tu ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)})`;
-    ui.toast(`🔧 ${frase}`);
-    try{ ui.recordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${frase}`, detalle: ''}]); }catch(e){}
+    // 🛡 Disparo parado con el escudo (2026-11-11, dueño: «si es exitoso, la flecha queda clavada en el escudo y se pierde 1 punto de durabilidad»).
+    const clavada = /disparo parado/i.test(String(origen || ''));
+    const frase = clavada ? `Paraste el disparo con tu ${it.nombre}: la flecha quedó clavada — la durabilidad pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)})`
+      : `${perdio ? 'Perdiste el Bloqueo: l' : 'L'}a durabilidad de tu ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)})`;
+    ui.toast(`${clavada ? '🛡' : '🔧'} ${frase}`);
+    try{ ui.recordatorios([{nombre: `${clavada ? '🛡' : '🔧'} ${quien ? quien + ': ' : ''}${frase}`, detalle: ''}]); }catch(e){}
     if(typeof AvisoCombate === 'undefined') return;
-    const lin = [`La durabilidad de ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)}).`,
+    const lin = [...(clavada ? [`Paraste el disparo con ${it.nombre}: la flecha quedó clavada en el escudo.`] : []),
+      `La durabilidad de ${it.nombre} pasó de ${fmt(antes)} a ${fmt(act)} (de ${fmt(max)}).`,
       'La Defensa que da no baja: eso solo lo hace Romper armadura.'];
     if(act <= 0) lin.push('💥 La durabilidad llegó a 0: está ROTO. Sigue ocupando su lugar, pero no da ningún efecto (ni Defensa ni bonos) hasta repararlo.');
     else if(act === 1) lin.push(`⚠ Advertencia: a ${it.nombre} le queda 1 punto de durabilidad. Un punto más de desgaste lo rompe.`);
     try{
-      AvisoCombate.mostrar({icono: '🔧', titulo: perdio ? 'Perdiste el Bloqueo' : `Se gastó ${it.nombre}`,
+      AvisoCombate.mostrar({icono: clavada ? '🛡' : '🔧', titulo: clavada ? 'Paraste el disparo' : perdio ? 'Perdiste el Bloqueo' : `Se gastó ${it.nombre}`,
         pasos: [{titulo: `🔧 ${it.nombre}`, texto: lin.join('\n')}],
         veredicto: {tono: 'malo', grande: act <= 0 ? '¡ROTO!' : `${fmt(antes)} → ${fmt(act)}`, chico: origen ? String(origen) : ''}});
     }catch(e){}

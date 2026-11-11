@@ -578,6 +578,7 @@ estado: borrador
 **Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 6 puntos por cada punto de Peso** (mínimo 6; hasta el 2026-11-11 eran 3). **Los creeps y las invocaciones no llevan.**
 
 - **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.
+- **Parar un disparo con el escudo** («Poner escudo», contra una flecha, un virote o cualquier disparo): si lo parás, **la flecha queda clavada en el escudo** y pierde **1 punto** de durabilidad (el botón lo avisa antes de elegir). Contra un disparo no hay Bloqueo: si fallás, **la flecha pasa de largo** (te pega normal) y el escudo **no pierde nada**.
 - **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico también la rompe**, como cualquier golpe que pega.
 - **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.
 - **Un escudo abollado** (por ejemplo, un disparo que *atraviesa escudos*) también pierde **1 de Defensa por cada abolladura**, sin pasar de la que da. Un orbe no.

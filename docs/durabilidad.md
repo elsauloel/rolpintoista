@@ -2,6 +2,10 @@
 
 > **2026-11-11 (dueño): 6 puntos por punto de Peso para todo, mínimo 6** (antes 3 y mínimo 3). Lo de abajo que dice «3» es la regla vieja.
 > Las copias gastadas se pasan una vez (`Combatiente.migrarDurItem`, marca `durV: 2`) conservando los puntos perdidos; un `durPorPeso` viejo se escala ×2.
+> **2026-11-11 (dueño): parar un disparo con el escudo gasta 1** («la flecha queda clavada en el escudo»): «Poner escudo» GANADO contra un disparo
+> le saca 1 de durabilidad a ese escudo (aviso «pasó de N a N−1»; el botón lo dice antes de elegir). Contra un disparo no hay Bloqueo: si falla,
+> «la flecha pasa de largo y no le baja la durabilidad» (pega normal). El Parry cuerpo a cuerpo ganado sigue sin gastar. Lo hace el mapa del GM
+> al ver el duelo «bloqueado» (`dueloDisparoClavado`, `vtt-hexgrid/js/26-escudos.js`); Invulnerable no lo frena (la flecha pega en el escudo).
 
 > Mecánica nueva del dueño, 2026-09-26, nacida del duelo paso a paso (Parry → Bloqueo). **Estado: reglas definidas casi todas, sin implementar.** Lo que falta decidir está al final y en `preguntas-abiertas.md` (P-Durabilidad).
 

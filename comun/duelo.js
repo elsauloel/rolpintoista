@@ -2689,7 +2689,10 @@ const Duelo = (() => {
     }else if(interceptado){
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🏹 ¡INTERCEPTADO!</div><div class="chico">${_esc(d.defensor.nombre)} lo paró con un disparo (Parry a distancia): el golpe queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'bloqueado' && disparoParado){
-      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${mot}</div>`;
+      // 🛡 La flecha quedó clavada (2026-11-11): el escudo pierde 1 de durabilidad (lo anota el mapa del GM en `defensa.clavada`).
+      const cl = d.defensa && d.defensa.clavada;
+      const clTxt = cl ? `<div class="duelo-motivo">🛡 La flecha quedó clavada: ${_esc(cl.nombre || 'el escudo')} pierde 1 punto de durabilidad${cl.antes !== undefined ? `: de ${_fmt(cl.antes)} a ${_fmt(cl.despues)} (de ${_fmt(cl.max)})` : ''}</div>` : '';
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${clTxt}${mot}</div>`;
     }else if(d.resultado === 'bloqueado'){
       const desFalloA = d.ataque && d.ataque.desarme && d.ataque.desarme.lado === 'atacante';   // 🤺 quiso desarmar atacando y no le salió (2026-10-22)
       caja = `<div class="duelo-veredicto bloqueado${nuevo}">${desFalloA ? `<div class="chico" style="color:#ffd25a;font-weight:700;margin-bottom:4px">🤺 ${_esc(d.atacante.nombre)} intentó desarmar a ${_esc(d.defensor.nombre)}, pero falló</div>` : ''}<div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;

@@ -104,6 +104,24 @@ async function dueloRompeEscudo(d){
   const r = await dueloAplicarEfecto(d, {nombre: 'Rompe armadura', caras: 1, exitos: 1, dado: '', stacks, detalle: `El escudo se come el ${lista[0].nombre}.`});
   mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}, pero el escudo se comió el ${lista[0].nombre}${r && r.nota ? ` — ${r.nota}` : ''}`);
 }
+/* 🛡 La flecha queda clavada (2026-11-11, dueño: «parar un proyectil con un escudo, tirando Destreza, sería un parry; si es exitoso, la flecha queda
+   clavada en el escudo y se pierde 1 punto de durabilidad»): un disparo PARADO con el escudo (Poner escudo, Parry ganado contra un disparo) le gasta 1
+   de durabilidad a ese escudo, por el mismo camino que el Bloqueo perdido («Desgaste», js/13): la ficha descuenta y avisa «de N a N−1». Solo
+   personajes (sus piezas tienen durabilidad). Invulnerable no lo frena: la flecha pega en el escudo, no en quien lo lleva. Un Parry cuerpo a cuerpo
+   ganado no gasta. Lo hace el GM al ver el duelo «bloqueado». En el cuadro del duelo, `defensa.clavada` = {nombre, antes, despues, max}. */
+async function dueloDisparoClavado(d){
+  if(!d || d.hab || !d.ataque || d.bloq || d.resultado !== 'bloqueado' || !Combatiente.contraDisparo(d) || !d.defensa || d.defensa.modo !== 'parry') return;
+  const t = tokens.get(d.defensor.tokenId);
+  if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return;
+  const quien = d.defensor.nombre || nombreDe(t), item = d.defensa.itemId || 'parry';
+  const dur = typeof pjDurabilidadPieza === 'function' ? await pjDurabilidadPieza(t.fichaId, item) : null;
+  const escudo = (dur && dur.nombre) || d.defensa.itemNombre || 'el escudo';
+  try{
+    await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item}, origen: `${d.ataque.armaNombre || 'El disparo'} · disparo parado`});
+    mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}: la flecha quedó clavada — ${dur ? `durabilidad de ${dur.antes} a ${dur.despues} (de ${dur.max})` : '−1 de durabilidad'}`);
+    if(d.id) try{ await fbDb.collection(fbRutaCampana('duelos')).doc(d.id).update({'defensa.clavada': dur ? {nombre: escudo, antes: dur.antes, despues: dur.despues, max: dur.max} : {nombre: escudo}}); }catch(err){ console.error('No se pudo anotar la flecha clavada en el duelo:', err); }
+  }catch(err){ console.error('No se pudo gastar el escudo:', err); mesaLinea(`🛡 ${quien}: ✋ a mano: −1 de durabilidad en ${escudo} (la flecha quedó clavada)`); }
+}
 // Empujón: el GM, al ver un duelo bloqueado (ver arriba).
 async function dueloEmpujon(d){
   if(!d || d.hab || !d.ataque || d.ataque.rango || !d.defensor || !d.atacante) return;

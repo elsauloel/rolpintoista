@@ -124,7 +124,7 @@ duelo o se dejan?
 
 | # | Qué | Dónde | Por qué dejarla así (**C**) |
 |---|---|---|---|
-| 30 | **Detección del que está en sigilo**: la Destreza del oculto | `js/16` `deteccionGMResolver` l. ~412 | la tira el GM a escondidas: si la tirara el jugador a la vista, se delata. **Confirmar con el dueño.** |
+| 30 | **Detección del que está en sigilo**: la Destreza del oculto | `js/16` `deteccionGMResolver` l. ~412 | ✅ decidido (2026-11-11): escondido = creep, la tira el GM a escondidas; escondido = personaje, la Percepción del creep la tira el GM y el **Sigilo lo tira el jugador** con su botón, privado (él y el GM) — `vtt-hexgrid/js/116`. |
 | 31 | **Robo en sigilo**: la tirada del ladrón | `js/47` l. ~179 | no va a la Mesa para no delatarlo |
 | 32 | **Qué se roba** (ítem al azar, oro) | `js/47` l. ~46, 64, 112 | es solo sortear qué cosa |
 | 33 | **Dónde cae el arma** desarmada o soltada | `js/62` l. ~224, `js/27` l. ~58 | es solo un lugar |
@@ -137,6 +137,6 @@ duelo o se dejan?
 1. **Bloque 4:** los carteles propios que ya tienen botón (las trampas, las chances de las piezas, el 1d6 del Escudo elemental, el Malviaje,
    soltarse, la Confusión y la tirada extra de la zona), ¿los pasamos todos al cuadro del duelo, o te sirven así? Las trampas son el más grande.
 2. ~~**Choque por empujón (#8):** el daño de colisión, ¿lo tira quien empujó o el empujado?~~ ✅ decidido y hecho el 2026-11-11: cada uno tira su propia Constitución (contra algo sólido, el empujado se la come; contra otro, se la hace al otro).
-3. **Detección del sigilo (#30):** ¿está bien que el GM la tire a escondidas?
+3. ~~**Detección del sigilo (#30):** ¿está bien que el GM la tire a escondidas?~~ ✅ decidido y hecho el 2026-11-11: si el escondido es un creep, sí; si es un personaje, su jugador tira el Sigilo (privado, él y el GM).
 4. **Saque rápido (#22):** ¿sigue callado, como pediste el 2026-10-05, o ahora también con botón? ✅ Decidido el 2026-11-11: sola, con aviso si sale.
 5. **Bloques 1 a 3:** ¿se aprueban en bloque (A y B) para hacerlos de a tandas?

@@ -2173,3 +2173,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   quien maneja el token, casilla con un clic pintada como las del Salto, minimiza el duelo; Paso atrás gratis con `moverToken`, Escurridizo por
   `confirmarRuta` con `oportunidad: []`); Cambiar de lugar (`cambiarLugarResuelto`, gancho `disparoResuelto`, solo la pantalla del GM, Inamovible
   primero). Detalle en `../docs/auditoria-skills-creep.md`.
+
+- **🕶 El Sigilo de un personaje lo tira su jugador** (2026-11-11, dueño; `js/116-sigilo-jugador.js`): momento `sigilo-pedido` con estados nuevos.
+  `percepcionGM` (el escondido —un personaje— caminó y quedó en la zona de alerta de un creep: `sigiloPublicarAvisos`, js/03, lo pide en vez del aviso
+  anónimo; al GM, «<creep> percibe movimientos cerca — tirá Percepción») → `sigiloJugador` (quien maneja al escondido tira su Sigilo con su botón; la
+  pantalla avisa que lo vio en `datos.visto` y, si no, a los 6 s el GM tira por él) → `listo`. También lo usa `percepcionResolverBanner` (js/16) cuando
+  el que camina tiene Percepción aumentada y el escondido es un personaje. Privado (`datos.privado`): lo ven solo el GM y quien maneja al escondido
+  (`sigiloMomentoVisible`, js/16). Cada paso lo toma una transacción (`sigiloTomar`). Un creep escondido sigue con el `esperandoGM` de siempre.
+

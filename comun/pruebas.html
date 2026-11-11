@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111saque"></script>
+<script src="combatiente.js?v=20261111sig"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -7275,6 +7275,9 @@ prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — 
   const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dos al hilo');
   const txt = JSON.stringify(h);
   igual([/sin pagar No2 de más/.test(txt), /pagando lo de un primer ataque/.test(txt), /sin No2 de más/.test(txt)], [true, false, true]);
+});
+prueba('🕶 Detección del sigilo (2026-11-11): descubre si la Percepción supera al Sigilo; el empate sigue escondido', () => {
+  igual([Combatiente.sigiloDetecta(8, 7), Combatiente.sigiloDetecta(7, 7), Combatiente.sigiloDetecta(5, 9), Combatiente.sigiloDetecta('10', '3')], [true, false, false, true]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidades y consumibles de los nuevos', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);

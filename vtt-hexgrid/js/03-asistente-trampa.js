@@ -188,7 +188,7 @@ async function sigiloAlertaRoja(t, que, detalle){
 // Mesa. NO se interrumpe el movimiento por la zona de alerta: el oculto ve las zonas y decide
 // cuándo entrar, así que sabe lo que hace (decidido 2026-09-19, escenario 1).
 function sigiloEvaluarRuta(t, a){
-  const rivales = rivalesDe(t).map(zonasClaves);
+  const rivales = rivalesDe(t).map(r => ({...zonasClaves(r), tok: r}));
   if(!rivales.length) return;
   const ruta = a.ruta;
   let corte = -1;
@@ -201,7 +201,7 @@ function sigiloEvaluarRuta(t, a){
   rivales.forEach(z => {
     let pasos = 0;
     for(let i = 1; i <= fin; i++) if(z.alerta.has(nbPack(ruta[i].col, ruta[i].fila))) pasos++;
-    if(pasos > 0) avisos.push({rival: z.nombre, pasos});
+    if(pasos > 0) avisos.push({rival: z.nombre, pasos, tok: z.tok});
   });
   if(corte >= 0) ruta.length = corte + 1;
   if(avisos.length) sigiloAvisosPendientes.set(a.id, avisos);
@@ -212,9 +212,15 @@ function sigiloPublicarAvisos(id){
   const t = tokens.get(id);
   if(!avisos || !t) return;
   // Uno por rival que ve la zona; sin decir quién se mueve ni que está en sigilo.
-  avisos.forEach(av => alertaRojaAnonima(av.pasos === 1
-    ? '⚠ Hace falta una tirada de percepción'
-    : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
+  // 🕶 Un personaje escondido en la zona de un creep (2026-11-11, js/116): en vez del aviso anónimo, al GM le sale el cartel
+  // «<creep> percibe movimientos cerca — tirá Percepción» (privado) y después el jugador tira su Sigilo.
+  avisos.forEach(av => {
+    if(av.tok && av.tok.tipo === 'creep' && typeof sigiloEsDeJugador === 'function' && sigiloEsDeJugador(t) && typeof sigiloPedirPercepcionGM === 'function'){
+      let rid = null; for(const [k, x] of tokens) if(x === av.tok){ rid = k; break; }
+      if(rid){ sigiloPedirPercepcionGM(id, rid, av.pasos); return; }
+    }
+    alertaRojaAnonima(av.pasos === 1 ? '⚠ Hace falta una tirada de percepción' : `⚠ Hacen falta ${av.pasos} tiradas de percepción`);
+  });
 }
 /* Quien pierde el sigilo porque lo DESCUBREN queda Marcado 2 turnos (regla del dueño, 2026-10-14: «aunque le dé el cooldown, tenga que estar sí o
    sí 2 turnos fuera de sigilo»; salir por las suyas, con el botón, no marca: eso no pasa por romperSigilo): brilla, se lo ve a través de la niebla y no puede volver a entrar en sigilo (Combatiente.agregarEstado lo rebota). Los cuenta su turno

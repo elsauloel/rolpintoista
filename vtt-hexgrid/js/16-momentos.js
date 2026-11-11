@@ -129,6 +129,9 @@ function momentoRecibido(id, d){
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }
+  // 🕶 El sigilo de un personaje (2026-11-11, js/116): privado (el GM y quien maneja al escondido); la Percepción la tira el GM y el Sigilo, el jugador.
+  if(d.tipo === 'sigilo-pedido' && typeof sigiloMomentoVisible === 'function' && !sigiloMomentoVisible(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
+  if(d.tipo === 'sigilo-pedido' && typeof sigiloJugadorMomento === 'function' && sigiloJugadorMomento(id, d) && !(percepcionBanner && percepcionBanner.momentoId === id)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   // El pedido de detección al GM (P145): la pantalla del GM tira la Destreza del oculto.
   if(d.tipo === 'sigilo-pedido' && d.estado === 'esperandoGM' && soyGM) deteccionGMAbrir(id, d);
   if(d.tipo === 'turno-fin' && d.estado === 'esperandoGM' && soyGM && typeof finTurnoDelJugador === 'function') finTurnoDelJugador(id, d);   // ✅ un jugador terminó su turno (js/04, 2026-10-22)
@@ -311,7 +314,8 @@ function renderPercepcionBanner(){
   }else if(percepcionBanner.esperando){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
   }else{
-    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: 'Algo está fuera de lugar…', texto: `${quien}, tirá Percepción.`,
+    const percibeCreep = percepcionBanner.ocultoId && t && t.tipo === 'creep';   // (2026-11-11, dueño: «<creep> percibe movimientos cerca, tirá percepción»)
+    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: percibeCreep ? `${quien} percibe movimientos cerca` : 'Algo está fuera de lugar…', texto: percibeCreep ? `Tirá la Percepción de ${quien}.` : `${quien}, tirá Percepción.`,
       botones: [{texto: '🎲 Tirar Percepción', id: 'percepcion-banner-ir', alClic: percepcionResolverBanner}]});
   }
 }
@@ -337,6 +341,13 @@ async function percepcionResolverBanner(){
     pb.esperando = true; pb.total = r.total; pb.momentoId = mid;
     renderPercepcionBanner();
     if(!mid){ pb.esperando = false; pb.resultado = 'no se pudo avisar al GM (¿faltan publicar las reglas?)'; renderPercepcionBanner(); return; }
+    // 🕶 Si el escondido es un personaje (2026-11-11, js/116): tira su Sigilo su jugador, con su botón (privado: él y el GM).
+    const ocu = tokens.get(pb.ocultoId);
+    if(ocu && typeof sigiloEsDeJugador === 'function' && sigiloEsDeJugador(ocu)){
+      momentoActualizar(mid, {titulo: `${nombre} percibe movimientos cerca…`, estado: 'sigiloJugador', resuelve: '', datos: {centro: true, privado: true, ocultoId: pb.ocultoId, ocultoFicha: String(ocu.fichaId || ''),
+        ocultoNombre: nombreDe(ocu), detectorId: pb.tokenId, detector: nombre, percepcion: r.total, desde: Date.now()}});
+      return;
+    }
     momentoActualizar(mid, {estado: 'esperandoGM', resuelve: 'gm', datos: {centro: true, ocultoId: pb.ocultoId, detectorId: pb.tokenId, detector: nombre, percepcion: r.total}});
     return;
   }

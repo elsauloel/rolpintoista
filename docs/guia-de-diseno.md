@@ -435,6 +435,17 @@ Constitución ×N y se la come él (menos su Defensa); **contra otro token**, ca
 **al otro** (menos la Defensa del otro). Primero el empujado, después el otro. El GM tira por un creep o por quien no está; «✋ Terminar a mano»
 como en cualquier duelo. (`avisoColision`, `vtt-hexgrid/js/13`; `Combatiente.colisionFormula`.)
 
+### 🕶 Sigilo: quién tira la detección (dueño, 2026-11-11)
+Los disparadores de siempre no cambian (el escondido que camina y queda en la zona de alerta de alguien → Percepción; el visible que camina: con
+Percepción aumentada se frena a tirar si un escondido queda en su zona de alerta; sin ella, solo lo delata el cono de visión directa). Lo que cambia
+es quién tira:
+- **Escondido = creep:** como siempre, el GM tira su Sigilo a escondidas (los jugadores no se enteran de que hay alguien).
+- **Escondido = personaje** (o invocación de un jugador) y lo puede percibir un creep: al GM le sale «<creep> percibe movimientos cerca — tirá
+  Percepción» y tira la del creep (no va a la Mesa); después **el jugador tira su Sigilo con su botón**. Tiene que sacar la Percepción o más
+  (empate: sigue escondido). Es privado: lo ven solo el GM y quien maneja al escondido. Si su pantalla no aparece en 6 s, el GM tira por él;
+  «✋ Resolver a mano» en las dos tiradas. `vtt-hexgrid/js/116-sigilo-jugador.js`, `Combatiente.sigiloDetecta`.
+- Simplificación: varios pasos en la misma zona de alerta de un creep piden **una** tirada (el cartel dice cuántos pasos dio).
+
 ### 🚷 Modo narrativo y los estados que traban el movimiento (dueño, 2026-11-11)
 Fuera del combate (modo narrativo) moverse no cobra No2, pero los estados que traban el movimiento **frenan igual**: Inmovilizado (también la
 Prisión de hielo), Sentado, Stun / Sueño y Congelado — el token no se arrastra y avisa por qué. Rengo no cambia nada (sin costo, el doble de

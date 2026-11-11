@@ -62,6 +62,10 @@
 
 ## Diseño del juego
 
+- **La Percepción siempre incierta** (2026-11-11, dueño: «que no se sepa bien para qué estás tirando… no importa si es el máster o un jugador»):
+  todo cartel que pide Percepción nombra solo a quien percibe con una frase incierta («Fulano siente un movimiento extraño…»,
+  `Combatiente.percepcionIncierta`) — nunca quién está escondido, cuántos, qué hace (moverse, poner una trampa, robar), dónde ni el paso. El
+  detalle, plegado y solo para el GM. Ver `docs/guia-de-diseno.md`.
 - **Esencia sandbox**: plataforma, no corsé. Avisar en vez de bloquear, salida manual siempre, no imponer balance; la creación es colectiva (del grupo).
 - **Nitros (No2) muy preciados**: un costo bajo en No2 es una ventaja grande; lo barato en No2 es de calidad baja o tiene límites.
 - **Habilidades que se sientan**: si gasta la acción, además del estado suma algo de daño o algo concreto; ante la duda, un poco para arriba.

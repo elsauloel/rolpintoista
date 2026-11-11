@@ -470,3 +470,18 @@ movimiento. `Combatiente.trabaNarrativo` (vtt-hexgrid/js/06 `soltar`).
 - **🎒 Saque rápido** (dueño, 2026-11-11): la chance (Cinto de cuatrero 33 %, Cinto de prestidigitador; stat `saquerapido`) **se tira sola**, sin
   pedir botón (es un ahorro chico y frecuente). Si sale, un **aviso** a quien sacó el consumible («🎒 Saque rápido: sacaste X del cinturón sin
   gastar No2»; un creep, al GM); si falla, **solo** la línea de la Mesa y la Crónica (con la tirada: «no salió»). `Combatiente.saqueRapidoAviso`.
+
+### 🔎 La Percepción siempre incierta (dueño, 2026-11-11)
+
+«Siempre que se tira Percepción, que no se sepa bien para qué estás tirando… no importa si es el máster o un jugador.»
+- Todo pedido de Percepción (sigilo, Percepción aumentada, fin del movimiento, un robo, una trampa recién puesta) dice **solo quién percibe**,
+  con una frase incierta: «Fulano siente un movimiento extraño…», «A Fulano algo le parece inusual…», «Fulano cree escuchar algo…», «Fulano tiene
+  la sensación de que lo observan…» (`Combatiente.percepcionIncierta`). Nunca quién está escondido, cuántos, qué hacen, dónde ni el paso.
+- En la Mesa sale «Fulano · Percepción», sin «aumentada» ni «Pisada atenta».
+- Después de tirar: si encuentra algo, se dice qué (el escondido, la trampa); si no, «Mmm… puede que estés flasheando» / «no nota nada raro».
+- El escondido que es un personaje recibe «Alguien podría haberte notado — tirá tu Sigilo», sin el nombre de quién.
+- El GM tiene el detalle (quién y por qué) **plegado** en su cartel («ℹ detalle (solo el GM)»): no lo dice el cartel, pero lo puede abrir para
+  dirigir. Cuando el GM tira el Sigilo de su propio creep escondido, el cartel sí dice cuál (es suyo).
+- Quién tira: percibe un creep → el GM; percibe un personaje o invocación → quien lo maneja (si no está conectado, el GM tira por él a los 6 s).
+- **Poner una trampa es una acción incierta:** si alguna casilla queda en la zona de alerta de un rival (en el cono ya la ve), ese rival tira
+  Percepción contra la dificultad de la trampa; si llega, la descubre.

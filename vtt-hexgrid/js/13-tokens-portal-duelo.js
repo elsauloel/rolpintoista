@@ -635,6 +635,7 @@ function trampaDeHabilidad(msg){
             ...(vista.vistos.length ? {descubierta: true} : {})});
           if(!r.colocadas){ toast(`🪤 ${msg.nombre}: no se pudo colocar`); return; }
           if(vista.vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vista.vistos, t.nombre || msg.nombre);
+          else if(typeof trampaPedirPercepcion === 'function' && r.ids && r.ids[0]) trampaPedirPercepcion(trampaTokenDe(msg), r.ids[0], trampaCeldasPrevias({...msg, trampa: {...t, cant: 1}}, h)).catch(err => console.error('Percepción de la trampa:', err));   // 🔎 js/116
           if(cant === 1) toast(`🪤 ${msg.nombre}: trampa colocada`);
         }
         puestas++;
@@ -673,6 +674,7 @@ function trampaConsumibleEnMapa(msg){
           ...(msg.item ? {item: msg.item} : {}), mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}, ...(vista.vistos.length ? {descubierta: true} : {})});
         if(!r.colocadas){ toast(`🪤 ${nombre}: no se pudo colocar ahí — no se usó`); res(false); return; }
         if(vista.vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vista.vistos, nombre);
+        else if(typeof trampaPedirPercepcion === 'function' && r.ids && r.ids[0]) trampaPedirPercepcion(trampaTokenDe(msg), r.ids[0], trampaCeldasPrevias(msg, h)).catch(err => console.error('Percepción de la trampa:', err));   // 🔎 js/116
         toast(`🪤 ${nombre}: trampa colocada`);
         res(true);
       }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); res(false); }

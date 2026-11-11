@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111paso"></script>
+<script src="combatiente.js?v=20261111perc"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -7282,6 +7282,14 @@ prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — 
 });
 prueba('🕶 Detección del sigilo (2026-11-11): descubre si la Percepción supera al Sigilo; el empate sigue escondido', () => {
   igual([Combatiente.sigiloDetecta(8, 7), Combatiente.sigiloDetecta(7, 7), Combatiente.sigiloDetecta(5, 9), Combatiente.sigiloDetecta('10', '3')], [true, false, false, true]);
+});
+prueba('🔎 Percepción incierta (dueño, 2026-11-11): el pedido nombra solo a quien percibe, con una frase que no dice por qué; la misma semilla, la misma frase', () => {
+  const P = Combatiente.percepcionIncierta;
+  const frases = new Set(Array.from({length: 40}, (_, i) => P('Rata', 'x' + i)));
+  const todas = [...frases];
+  igual([P('Rata', 'abc') === P('Rata', 'abc'), frases.size, todas.every(f => /Rata/.test(f)), todas.some(f => /escondid|sigilo|trampa|paso \d/i.test(f)),
+    P('', 1).includes('Alguien'), Combatiente.PERCEPCION_FRASES.length],
+    [true, 4, true, false, true, 4]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidades y consumibles de los nuevos', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);

@@ -50,7 +50,7 @@ function momentosEscuchar(){
       const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
       // 🕶 Un pedido de sigilo sin terminar (js/116) vuelve aunque sea de antes de entrar (2026-11-11, prueba en el mapa: al recargar la
       // pantalla del GM quedaba colgado): si sigue esperando una tirada y es de la última media hora, se muestra de nuevo.
-      const sigiloPendiente = d.tipo === 'sigilo-pedido' && ['percepcionGM', 'sigiloJugador', 'sigiloTirando'].includes(d.estado) && Date.now() - ms < 30 * 60 * 1000;
+      const sigiloPendiente = d.tipo === 'sigilo-pedido' && ['percepcionGM', 'percepcionJug', 'sigiloJugador', 'sigiloTirando', 'esperandoGM'].includes(d.estado) && Date.now() - ms < 30 * 60 * 1000;
       // (…y su resultado, en la pantalla que todavía muestra el cartel: si no, quedaba «tirá tu Sigilo» después de recargar.)
       const sigiloConCartel = d.tipo === 'sigilo-pedido' && typeof sigiloJugCartel !== 'undefined' && sigiloJugCartel.has(ch.doc.id);
       if(ms < momentosDesde && !sigiloPendiente && !sigiloConCartel) return;
@@ -293,16 +293,20 @@ function percepcionSiguienteFin(){
   if(percepcionBanner) return;   // ya hay un cartel de Percepción abierto: sigue cuando se cierre
   while(percepcionColaFin.length){
     const p = percepcionColaFin.shift();
-    const t = tokens.get(p.tokenId), o = tokens.get(p.ocultoId);
-    if(t && o && enSigilo(o)){ percepcionAbrir(p); return; }
+    const t = tokens.get(p.tokenId), o = p.ocultoId ? tokens.get(p.ocultoId) : null, el = p.trampaId ? elementos.get(p.trampaId) : null;
+    if(t && ((o && enSigilo(o)) || (el && !el.disparada && !el.descubierta))){ percepcionAbrir(p); return; }
+    // (un pedido de otra pantalla que ya no hace falta: el escondido ya no está escondido o la trampa ya saltó → se cierra sin decir nada)
+    if(p.momentoId) momentoActualizar(p.momentoId, {estado: 'listo', resultado: `${t ? nombreDe(t) : 'Alguien'} no nota nada raro.`});
   }
 }
 function percepcionAbrir(o){
   const t = tokens.get(o.tokenId);
   if(!t) return;
-  percepcionBanner = {...o, resultado: null, esperando: false, momentoId: null};
-  percepcionBanner.momentoP = momentoAbrir({tipo: o.ocultoId ? 'sigilo-pedido' : 'percepcion', icono: '🔎', titulo: `${nombreDe(t)} siente que algo está fuera de lugar…`,
-    estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
+  // 🔎 Siempre incierto (dueño, 2026-11-11): solo quién percibe, con una frase que no dice por qué (Combatiente.percepcionIncierta).
+  const frase = o.frase || Combatiente.percepcionIncierta(nombreDe(t), Date.now() + ':' + o.tokenId);
+  percepcionBanner = {...o, frase, resultado: null, esperando: false, momentoId: o.momentoId || null, externo: !!o.momentoId};
+  percepcionBanner.momentoP = o.momentoId ? Promise.resolve(o.momentoId) : momentoAbrir({tipo: o.ocultoId ? 'sigilo-pedido' : 'percepcion', icono: '🔎', titulo: frase,
+    estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true, frase}});
   const pb = percepcionBanner;
   pb.momentoP.then(id => { pb.momentoId = id; });
   renderPercepcionBanner();
@@ -329,8 +333,10 @@ function renderPercepcionBanner(){
   }else if(percepcionBanner.esperando){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
   }else{
-    const percibeCreep = percepcionBanner.ocultoId && t && t.tipo === 'creep';   // (2026-11-11, dueño: «<creep> percibe movimientos cerca, tirá percepción»)
-    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: percibeCreep ? `${quien} percibe movimientos cerca` : 'Algo está fuera de lugar…', texto: percibeCreep ? `Tirá la Percepción de ${quien}.` : `${quien}, tirá Percepción.`,
+    // 🔎 Incierto (dueño, 2026-11-11): «<quien> siente un movimiento extraño…» — nunca quién, cuántos, qué hacen ni dónde.
+    const deCreep = t && t.tipo === 'creep', porEl = percepcionBanner.porEl;
+    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${percepcionBanner.frase}${porEl ? ` · tirá por ${quien}` : ''}`,
+      texto: deCreep || porEl ? `Tirá la Percepción de ${quien}.` : `${quien}, tirá Percepción.`,
       botones: [{texto: '🎲 Tirar Percepción', id: 'percepcion-banner-ir', alClic: percepcionResolverBanner}]});
   }
 }
@@ -349,7 +355,10 @@ async function percepcionResolverBanner(){
   const r = FichaBotonera.tiradaPercepcionValor(valor, aumentada);
   if(!r){ toast('Percepción: sin valor para tirar (abrí la ficha una vez para que lo publique)'); percepcionBanner = null; renderPercepcionBanner(); return; }
   const nombre = nombreDe(t);
-  try{ mesaPublicar(`${nombre} · Percepción (${aumentada ? 'aumentada' : 'Pisada atenta'})`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
+  // Un pedido de otra pantalla (js/116): una sola pantalla lo tira (la de quien percibe o, si no estaba, el GM por él).
+  if(pb.externo && typeof sigiloTomar === 'function' && !(await sigiloTomar(pb.momentoId, 'percepcionJug', 'percepcionTirando'))){ percepcionBanner = null; renderPercepcionBanner(); percepcionSiguienteFin(); return; }
+  // (En la Mesa, «Percepción» sola: ni «aumentada» ni «Pisada atenta», que dirían por qué se tira.)
+  try{ mesaPublicar(`${nombre} · Percepción`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
   const mid = await pb.momentoP;
   if(pb.ocultoId){
     // Sigilo: la resuelve la pantalla del GM (la Destreza del oculto es privada).
@@ -359,11 +368,14 @@ async function percepcionResolverBanner(){
     // 🕶 Si el escondido es un personaje (2026-11-11, js/116): tira su Sigilo su jugador, con su botón (privado: él y el GM).
     const ocu = tokens.get(pb.ocultoId);
     if(ocu && typeof sigiloEsDeJugador === 'function' && sigiloEsDeJugador(ocu)){
-      momentoActualizar(mid, {titulo: `${nombre} percibe movimientos cerca…`, estado: 'sigiloJugador', resuelve: '', datos: {centro: true, privado: true, ocultoId: pb.ocultoId, ocultoFicha: String(ocu.fichaId || ''),
-        ocultoNombre: nombreDe(ocu), detectorId: pb.tokenId, detector: nombre, percepcion: r.total, desde: Date.now()}});
+      momentoActualizar(mid, {titulo: pb.frase, estado: 'sigiloJugador', resuelve: '', datos: {centro: true, privado: true, ocultoId: pb.ocultoId, ocultoFicha: String(ocu.fichaId || ''),
+        ocultoNombre: nombreDe(ocu), detectorId: pb.tokenId, detector: nombre, detectorTipo: t.tipo, detectorFicha: String(t.fichaId || ''), frase: pb.frase,
+        pasos: num(pb.pasos) || 1, paso: num(pb.paso) || 1, percepcion: r.total, desde: Date.now()}});
       return;
     }
-    momentoActualizar(mid, {estado: 'esperandoGM', resuelve: 'gm', datos: {centro: true, ocultoId: pb.ocultoId, detectorId: pb.tokenId, detector: nombre, percepcion: r.total}});
+    momentoActualizar(mid, {titulo: pb.frase, estado: 'esperandoGM', resuelve: 'gm', datos: {centro: true, privado: true, ocultoId: pb.ocultoId, ocultoFicha: String((ocu && ocu.fichaId) || ''),
+      ocultoNombre: ocu ? nombreDe(ocu) : '', detectorId: pb.tokenId, detector: nombre, detectorTipo: t.tipo, detectorFicha: String(t.fichaId || ''), frase: pb.frase,
+      pasos: num(pb.pasos) || 1, paso: num(pb.paso) || 1, percepcion: r.total}});
     return;
   }
   const el = elementos.get(pb.trampaId);
@@ -411,7 +423,8 @@ function renderDeteccionBanner(){
     AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: 'Detección', texto: deteccionBanner.resultado,
       botones: [{texto: 'Listo', id: 'deteccion-banner-ok', alClic: () => { deteccionBanner = null; renderDeteccionBanner(); }}]});
   }else{
-    AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: `${dt.detector || 'Alguien'} siente que algo está fuera de lugar`,
+    // (El GM tira el Sigilo de SU creep escondido: acá sí dice cuál; el título, incierto como en todos lados.)
+    AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: dt.frase || Combatiente.percepcionIncierta(dt.detector, deteccionBanner.id),
       pasos: [{titulo: 'Percepción', texto: `${dt.detector || 'Alguien'} sacó ${dt.percepcion}.`}, {titulo: 'Para seguir escondido', texto: `${nomOculto} (en sigilo) tira Sigilo (Destreza + bonos): tiene que sacar ${dt.percepcion} o más.`}],
       botones: [{texto: `🎲 Tirar Sigilo de ${nomOculto}`, id: 'deteccion-banner-ir', alClic: deteccionGMResolver}]});
   }
@@ -441,7 +454,10 @@ async function deteccionGMResolver(){
     : `${nomOculto} sigue escondido (Percepción ${dt.percepcion} contra Sigilo ${total}).`;
   renderDeteccionBanner();
   await momentoActualizar(db.id, {estado: 'listo', resultado: detectado ? `…¡y descubre a ${nomOculto}!` : 'Mmm... puede que esté flasheando.',
-    datos: {...dt, detectado, ...(detectado ? {ocultoNombre: nomOculto} : {})}});
+    datos: {...dt, detectado, sigilo: total, ...(detectado ? {ocultoNombre: nomOculto} : {})}});
+  // Una tirada por paso (2026-11-11): si sigue escondido y quedan pasos en la zona de quien percibe, el siguiente (js/116).
+  const sig = !detectado && Combatiente.sigiloPasoSiguiente(dt.paso, dt.pasos, false);
+  if(sig && oculto && enSigilo(oculto) && typeof sigiloPedirPercepcion === 'function') await sigiloPedirPercepcion(dt.ocultoId, dt.detectorId, dt.pasos, sig);
 }
 
 /* ---------- Un aviso al centro para quien le toca (P146) ----------

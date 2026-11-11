@@ -23,10 +23,16 @@ function sigiloSoyDelOculto(dt){
   const base = String(dt.ocultoFicha || '').split(SEP_INVOCACION)[0];
   return !!base && typeof bnManejo === 'function' && bnManejo(base);
 }
-// ¿Esta pantalla puede ver el momento? (privado: el GM y quien maneja al escondido)
+// ¿Esta pantalla maneja a quien percibe? (un creep: el GM; un personaje o invocación: su dueño o quien tiene 🎮 el control)
+function sigiloSoyDelDetector(dt){
+  if(dt.detectorTipo === 'creep') return !!soyGM;
+  const base = String(dt.detectorFicha || '').split(SEP_INVOCACION)[0];
+  return !!base && typeof bnManejo === 'function' && bnManejo(base);
+}
+// ¿Esta pantalla puede ver el momento? (privado: el GM, quien maneja al escondido y quien percibe)
 function sigiloMomentoVisible(d){
   const dt = (d && d.datos) || {};
-  return !dt.privado || soyGM || sigiloSoyDelOculto(dt);
+  return !dt.privado || soyGM || sigiloSoyDelOculto(dt) || sigiloSoyDelDetector(dt);
 }
 // Toma un paso con una transacción: de `desde` a `hacia`, una sola pantalla. → true si lo tomó esta.
 async function sigiloTomar(id, desde, hacia){
@@ -45,12 +51,52 @@ async function sigiloTomar(id, desde, hacia){
 /* Una tirada por paso (dueño, 2026-11-11: «si el personaje escondido da varios pasos dentro de una zona de alerta, sigue siendo una tirada por
    paso»): se abre el paso 1; cuando se resuelve y sigue escondido, la pantalla que lo resolvió abre el siguiente (sigiloJugTirarSigilo). Si en un
    paso lo descubren, los pasos que quedan no se tiran. */
-async function sigiloPedirPercepcionGM(ocultoId, detectorId, pasos, paso){
+/* 🔎 La Percepción siempre incierta (dueño, 2026-11-11): el pedido nombra solo a quien percibe («Rata siente un movimiento extraño…»,
+   Combatiente.percepcionIncierta): ni quién está escondido, ni cuántos, ni qué hace, ni el paso. El detalle (quién y por qué) lo ve solo el GM,
+   plegado («ℹ detalle»), para poder dirigir la partida.
+   - Percibe un creep y el escondido es un personaje → el GM (estado 'percepcionGM', su cartel acá).
+   - Percibe un personaje o invocación (el escondido es un creep o el personaje de otro jugador) → quien lo maneja (estado 'percepcionJug'): el
+     cartel de Percepción de siempre (js/16 percepcionAbrir) en su pantalla; si no está conectado, el GM tira por él. */
+async function sigiloPedirPercepcion(ocultoId, detectorId, pasos, paso){
   const o = tokens.get(ocultoId), det = tokens.get(detectorId);
   if(!o || !det) return null;
   const total = Math.max(1, num(pasos) || 1), n = Math.min(total, Math.max(1, num(paso) || 1));
-  return momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: `${nombreDe(det)} percibe movimientos cerca…${total > 1 ? ` (paso ${n} de ${total})` : ''}`, estado: 'percepcionGM', resuelve: 'gm',
-    datos: {centro: true, privado: true, ocultoId, ocultoFicha: String(o.fichaId || ''), ocultoNombre: nombreDe(o), detectorId, detector: nombreDe(det), pasos: total, paso: n}});
+  const frase = Combatiente.percepcionIncierta(nombreDe(det), Date.now() + ':' + detectorId);
+  const comun = {centro: true, privado: true, ocultoId, ocultoFicha: String(o.fichaId || ''), ocultoNombre: nombreDe(o), detectorId, detector: nombreDe(det),
+    detectorTipo: det.tipo, detectorFicha: String(det.fichaId || ''), frase, pasos: total, paso: n};
+  if(det.tipo === 'creep' && sigiloEsDeJugador(o))
+    return momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: frase, estado: 'percepcionGM', resuelve: 'gm', datos: comun});
+  if(det.tipo === 'creep') return null;   // un creep no busca a otro creep (no son rivales)
+  return momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: frase, estado: 'percepcionJug', resuelve: '', datos: {...comun, desde: Date.now()}});
+}
+// (el nombre de antes: lo llama js/03)
+const sigiloPedirPercepcionGM = sigiloPedirPercepcion;
+/* 🪤 Poner una trampa es una acción incierta (dueño, 2026-11-11: «quizás el jugador está haciendo una acción incierta, como colocar una trampa:
+   tiene que aparecer un cartel notificando que debe tirar Percepción, pero con un mensaje que comunique incertidumbre»). Cada rival con alguna
+   casilla de la trampa en su zona de alerta (el cono ya la deja a la vista, js/79) tira Percepción contra la dificultad de la trampa; si llega, la
+   descubre (js/16 percepcionResolverBanner, el mismo camino que la Pisada atenta). Nada dice qué es. */
+async function trampaPedirPercepcion(mio, trampaId, celdas){
+  if(!mio || !trampaId || typeof rivalesDe !== 'function') return;
+  const claves = new Set((celdas || []).map(c => nbPack(c.col, c.fila)));
+  for(const r of rivalesDe(mio)){
+    const z = zonasClaves(r);
+    if(![...z.alerta, ...z.cono].some(k => claves.has(k))) continue;
+    let rid = null; for(const [k, x] of tokens) if(x === r){ rid = k; break; }
+    if(!rid) continue;
+    const frase = Combatiente.percepcionIncierta(nombreDe(r), trampaId + ':' + rid);
+    await momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: frase, estado: 'percepcionJug', resuelve: '',
+      datos: {centro: true, privado: true, trampaId, ocultoFicha: String(mio.fichaId || ''), detectorId: rid, detector: nombreDe(r), detectorTipo: r.tipo,
+        detectorFicha: String(r.fichaId || ''), frase, pasos: 1, paso: 1, desde: Date.now()}});
+  }
+}
+// El cartel de Percepción que pidió otra pantalla, en la de quien percibe (o en la del GM, por él): a la cola de js/16, de a uno.
+const sigiloPercepcionEncolados = new Set();
+function sigiloEncolarPercepcion(id, dt, porEl){
+  if(sigiloPercepcionEncolados.has(id) || typeof percepcionColaFin === 'undefined') return;
+  sigiloPercepcionEncolados.add(id);
+  percepcionColaFin.push({tokenId: dt.detectorId, ...(dt.ocultoId ? {ocultoId: dt.ocultoId} : {}), ...(dt.trampaId ? {trampaId: dt.trampaId} : {}),
+    momentoId: id, frase: dt.frase || '', paso: dt.paso, pasos: dt.pasos, ...(porEl ? {porEl: true} : {})});
+  percepcionSiguienteFin();
 }
 // El paso siguiente de la misma caminata, o null si ya no hay (pura, para las pruebas).
 const sigiloPasoSiguiente = (paso, pasos, detectado) => Combatiente.sigiloPasoSiguiente(paso, pasos, detectado);
@@ -79,6 +125,24 @@ function sigiloJugadorMomento(id, d){
     sigiloJugCartelPercepcion(id, d);
     return true;
   }
+  if(d.estado === 'percepcionJug'){
+    if(sigiloSoyDelDetector(dt)){
+      if(!dt.visto) momentoActualizarCampo(id, 'datos.visto', fbUsuario.uid);
+      sigiloEncolarPercepcion(id, dt, false);
+      return true;
+    }
+    if(soyGM){
+      if(!dt.visto && !sigiloJugRespaldo.has(id)){
+        sigiloJugRespaldo.set(id, setTimeout(() => {
+          const ult = momentosUltimo(id) || d;
+          if(ult.estado === 'percepcionJug' && !(ult.datos || {}).visto) sigiloEncolarPercepcion(id, ult.datos || dt, true);
+        }, SIGILO_RESPALDO_MS));
+      }
+      return true;
+    }
+    return sigiloSoyDelOculto(dt);
+  }
+  if(d.estado === 'percepcionTirando') return soyGM || sigiloSoyDelDetector(dt) || sigiloSoyDelOculto(dt);
   if(d.estado === 'sigiloJugador' || d.estado === 'sigiloTirando'){
     const mio = sigiloSoyDelOculto(dt);
     if(mio){
@@ -123,8 +187,8 @@ function sigiloJugCartelPercepcion(id, d){
   sigiloUltimos.set(id, d);
   const dt = d.datos || {}, clave = 'sigilo-jug:' + id;
   sigiloJugCartel.set(id, clave);
-  AvisoCombate.cartel(clave, {icono: '🔎', titulo: `${dt.detector || 'Un creep'} percibe movimientos cerca`,
-    pasos: [{titulo: 'Percepción', texto: `Alguien escondido (${dt.ocultoNombre || 'un personaje'}) se movió en la zona de alerta de ${dt.detector || 'tu creep'}${num(dt.pasos) > 1 ? ` (paso ${num(dt.paso) || 1} de ${dt.pasos}: una tirada por paso)` : ''}. Tirá su Percepción: después, el jugador tira su Sigilo.`}],
+  AvisoCombate.cartel(clave, {icono: '🔎', titulo: dt.frase || Combatiente.percepcionIncierta(dt.detector, id),
+    pasos: [{titulo: 'Percepción', html: `Tirá la Percepción de ${esc(dt.detector || 'el creep')}.${sigiloDetalleGM(dt)}`}],
     botones: [{texto: `🎲 Tirar Percepción de ${dt.detector || 'el creep'}`, alClic: () => sigiloJugTirarPercepcion(id, d, false)},
       {texto: '✋ Resolver a mano', sec: true, alClic: () => sigiloJugTirarPercepcion(id, d, true)}]});
 }
@@ -154,7 +218,7 @@ function sigiloJugEspera(id, d){
   if(typeof percepcionBanner !== 'undefined' && percepcionBanner && percepcionBanner.momentoId === id) return;   // ya dice «Esperando qué pasa…» (js/16)
   const dt = d.datos || {}, clave = 'sigilo-jug:' + id;
   sigiloJugCartel.set(id, clave);
-  AvisoCombate.cartel(clave, {icono: '🔎', titulo: `${dt.detector || 'Alguien'}: Percepción ${dt.percepcion}`, texto: `Esperando que ${dt.ocultoNombre || 'el jugador'} tire su Sigilo…`});
+  AvisoCombate.cartel(clave, {icono: '🔎', titulo: `${dt.detector || 'Alguien'}: Percepción ${dt.percepcion}`, pasos: [{titulo: 'Esperando', html: `Esperando qué pasa…${sigiloDetalleGM(dt)}`}]});
 }
 
 // 2) Quien maneja al escondido (o el GM, por él): «tirá tu Sigilo».
@@ -164,9 +228,10 @@ function sigiloJugCartelSigilo(id, d, porEl){
   sigiloJugCartel.set(id, clave);
   const quien = dt.ocultoNombre || 'tu personaje';
   const tirando = d.estado === 'sigiloTirando';
-  AvisoCombate.cartel(clave, {icono: '🔎', titulo: `${dt.detector || 'Alguien'} percibe movimientos cerca${porEl ? ` · tirá por ${quien}` : ''}`,
-    pasos: [{titulo: 'Percepción', texto: `${dt.detector || 'Alguien'} sacó ${dt.percepcion}.`},
-      {titulo: 'Para seguir escondido', texto: `${quien} (en sigilo) tira Sigilo (Destreza + bonos): tiene que sacar ${dt.percepcion} o más.`}],
+  AvisoCombate.cartel(clave, {icono: '🕶', titulo: `Alguien podría haber${porEl ? ` notado a ${quien} · tirá por él` : 'te notado'}`,
+    pasos: [{titulo: 'Para seguir escondido', ...(porEl
+      ? {html: `${esc(quien)} (en sigilo) tira Sigilo (Destreza + bonos): tiene que sacar ${esc(dt.percepcion)} o más.${sigiloDetalleGM(dt)}`}
+      : {texto: `Tirá tu Sigilo (Destreza + bonos): tenés que sacar ${dt.percepcion} o más.`})}],
     botones: [{texto: `🎲 Tirar Sigilo de ${quien}`, deshabilitado: tirando, alClic: () => sigiloJugTirarSigilo(id, d, false)},
       {texto: '✋ Resolver a mano', sec: true, deshabilitado: tirando, alClic: () => sigiloJugTirarSigilo(id, d, true)}]});
 }
@@ -186,11 +251,19 @@ async function sigiloJugTirarSigilo(id, d, aMano){
   const o = tokens.get(dt.ocultoId);
   const detectado = !!o && enSigilo(o) && sigiloDetecta(dt.percepcion, total);
   if(detectado) await romperSigilo(dt.ocultoId, dt.detector || 'alguien', `Lo descubrió ${dt.detector || 'alguien'}`, true);
-  const resultado = detectado
-    ? `${dt.detector || 'Alguien'} descubre a ${quien} (Percepción ${dt.percepcion} contra Sigilo ${total}).`
-    : `${quien} sigue escondido (Percepción ${dt.percepcion} contra Sigilo ${total}).`;
+  // (Lo que se sabe después de tirar: si lo descubre, a quién; si no, nada — los números quedan en los datos, para el «ℹ detalle» del GM.)
+  const resultado = detectado ? `${dt.detector || 'Alguien'} descubre a ${quien}.` : `${dt.detector || 'Alguien'} no nota nada raro.`;
   await momentoActualizar(id, {estado: 'listo', resultado, datos: {...dt, sigilo: total, detectado, ...(aMano ? {aMano: true} : {})}});
   // Una tirada por paso: si sigue escondido y quedan pasos en la zona, el siguiente (lo abre esta pantalla, la que tomó la tirada).
   const sig = sigiloPasoSiguiente(dt.paso, dt.pasos, detectado);
-  if(sig && o && enSigilo(o)) await sigiloPedirPercepcionGM(dt.ocultoId, dt.detectorId, dt.pasos, sig);
+  if(sig && o && enSigilo(o)) await sigiloPedirPercepcion(dt.ocultoId, dt.detectorId, dt.pasos, sig);
+}
+
+// ℹ El detalle para el GM (quién está escondido y por qué se tira), plegado: no lo dice el cartel, pero el GM lo puede abrir para dirigir.
+function sigiloDetalleGM(dt){
+  if(!soyGM || !dt) return '';
+  const pasos = num(dt.pasos) > 1 ? ` · paso ${num(dt.paso) || 1} de ${dt.pasos}` : '';
+  const que = dt.trampaId ? `una trampa recién puesta en su zona de alerta` : `${dt.ocultoNombre || 'alguien'} (en sigilo) en su zona de alerta${pasos}`;
+  const nums = dt.percepcion !== undefined ? ` · Percepción ${esc(dt.percepcion)}${dt.sigilo !== undefined ? ` contra Sigilo ${esc(dt.sigilo)}` : ''}` : '';
+  return `<details style="margin-top:6px;font-size:12px;opacity:.85"><summary style="cursor:pointer">ℹ detalle (solo el GM)</summary>${esc(dt.detector || 'Alguien')}: ${esc(que)}${nums}.</details>`;
 }

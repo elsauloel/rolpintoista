@@ -214,10 +214,13 @@ function sigiloPublicarAvisos(id){
   // Uno por rival que ve la zona; sin decir quién se mueve ni que está en sigilo.
   // 🕶 Un personaje escondido en la zona de un creep (2026-11-11, js/116): en vez del aviso anónimo, al GM le sale el cartel
   // «<creep> percibe movimientos cerca — tirá Percepción» (privado) y después el jugador tira su Sigilo.
+  // 🔎 (2026-11-11, dueño: la Percepción siempre incierta y con cartel a quien tiene que tirarla): también cuando percibe un personaje — el cartel
+  // incierto le sale a quien lo maneja (js/116 sigiloPedirPercepcion); el aviso anónimo de la Mesa queda solo si no se encuentra el token.
   avisos.forEach(av => {
-    if(av.tok && av.tok.tipo === 'creep' && typeof sigiloEsDeJugador === 'function' && sigiloEsDeJugador(t) && typeof sigiloPedirPercepcionGM === 'function'){
+    const puede = av.tok && typeof sigiloPedirPercepcion === 'function' && (av.tok.tipo !== 'creep' || (typeof sigiloEsDeJugador === 'function' && sigiloEsDeJugador(t)));
+    if(puede){
       let rid = null; for(const [k, x] of tokens) if(x === av.tok){ rid = k; break; }
-      if(rid){ sigiloPedirPercepcionGM(id, rid, av.pasos); return; }
+      if(rid){ sigiloPedirPercepcion(id, rid, av.pasos); return; }
     }
     alertaRojaAnonima(av.pasos === 1 ? '⚠ Hace falta una tirada de percepción' : `⚠ Hacen falta ${av.pasos} tiradas de percepción`);
   });

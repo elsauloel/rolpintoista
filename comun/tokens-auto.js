@@ -198,10 +198,12 @@ const TokensAuto = (() => {
     // El texto de la trampa entero (2026-10-04: el cartel del mapa lo muestra al seleccionarla); con las reglas viejas (tope 200) se reintenta
     // cortado en el último punto, así no queda una frase por la mitad.
     const cortar = (txt, n) => { const s = String(txt || ''); if(s.length <= n) return s; const c = s.slice(0, n); const p = c.lastIndexOf('. '); return p > 40 ? c.slice(0, p + 1) : c; };
-    const armar = tope => { const lote = fbDb.batch(); elegidas.forEach(c => {
+    let ids = [];   // los elementos que quedaron (js/116: la Percepción de los rivales cercanos, 2026-11-11)
+    const armar = tope => { const lote = fbDb.batch(); ids = []; elegidas.forEach(c => {
       const linea = o.forma === 'linea';
       const celdasLinea = []; for(let i = 0; i < Math.max(1, Math.min(20, o.largo || 3)); i++) celdasLinea.push(0, i);   // recta hacia afuera: (0,0), (0,1), (0,2)…, rotada según hacia dónde mira
-      lote.set(elCol.doc(), {
+      const ref = elCol.doc(); ids.push(ref.id);
+      lote.set(ref, {
         tipo: linea ? 'linea' : 'flor', origen: {col: c.col, fila: c.fila}, celdas: linea ? celdasLinea : celdasFlor(o.radio || 0), rotacion: linea ? ((c.dir % 6) + 6) % 6 * 60 : 0,
         color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#D9A21B', alfa: Number.isFinite(o.alfa) ? Math.max(10, Math.min(100, Math.round(o.alfa))) : 45, solido: false, invisible: false,
         imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
@@ -222,7 +224,7 @@ const TokensAuto = (() => {
     try{ await armar(600).commit(); }
     catch(err){ if(String(o.detalle || '').length <= 200) throw err; await armar(200).commit(); }
     anunciarIncierta(o, mio, elegidas.length);
-    return {colocadas: elegidas.length, mapaId};
+    return {colocadas: elegidas.length, mapaId, ids, celdas: elegidas.map(c => ({col: c.col, fila: c.fila}))};
   }
   // 🎭 Acción incierta (2026-10-09, idea de Pablo: «colocar trampas se anuncia en el log para el equipo rival»): una línea en la Mesa con el
   // detalle; su bando la ve entera y el rival solo «X está realizando una acción incierta», si lo ve (decide el mapa de cada uno, js/29).

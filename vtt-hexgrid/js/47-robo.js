@@ -268,7 +268,8 @@ function roboVictimaDibujar(){
   }else if(v.total !== null){
     AvisoCombate.cartel('robo-victima', {icono: '🤨', titulo: `${quien}: Percepción ${v.total}`, texto: 'A ver…'});
   }else{
-    AvisoCombate.cartel('robo-victima', {icono: '🤨', titulo: '¿Sentiste un movimiento raro?', texto: `${quien}, tirá Percepción.`,
+    // 🔎 Incierto como toda Percepción (dueño, 2026-11-11): Combatiente.percepcionIncierta.
+    AvisoCombate.cartel('robo-victima', {icono: '🤨', titulo: Combatiente.percepcionIncierta(quien, v.id), texto: `${quien}, tirá Percepción.`,
       botones: [{texto: '🎲 Tirar Percepción', alClic: () => roboTirarPercepcion(v.id, v.victimaId, false)}]});
   }
 }

@@ -772,6 +772,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 4 aprobado** (dueño, 2026-11-11): Des 14 · Agi 9 · Con 9 · Fue 8 · Esp 2, vida 45, 9 No2; **Escudo triangular** en lugar del broquel: Def 5,
   Parry 16, Bloqueo 10. **Arte de la guerra** (Flash) y la pasiva **Ojo crítico**. Regla confirmada: puede atajar y bloquear con el escudo y
   contraatacar con el sable (dueño: «está bien»); el Bloqueo del escudo cuenta solo cuando ataja con el escudo. **Cargado** (2026-11-11).
+  **Nivel 5 aprobado** (dueño, 2026-11-11: «sí»): Des 15 · Agi 10 · Con 10 · Fue 8 · Esp 2, vida 55, 10 No2; **Cota de malla fina** (Buena) en
+  lugar del Chaleco: Def 8, Parry 17, Bloqueo 10. Habilidad nueva: **Ráfaga de cortes**. **Cargado** (2026-11-11). La línea L5 queda completa.
 
 - **W3 · Martillero · Warrior** (boceto aprobado 2026-11-03, dueño: «me gusta», con un punto de Con a Des en cada nivel). Estrategia: golpes que
   atontan y derriban: te deja sin turno (Demora, Pajaritos, Sentado); desordena la pelea. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1

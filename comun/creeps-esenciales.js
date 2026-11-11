@@ -452,6 +452,9 @@
   esencial({...L5, nivel: 4, atrib: [9, 8, 9, 14, 2],   // (aprobado 2026-11-11: Arte de la guerra; pasiva Ojo crítico; Escudo triangular en lugar del broquel —ataja y bloquea con el escudo y contraataca con el sable, dueño: «está bien»—)
     equipo: ['Sable del sargento', 'Escudo triangular', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
     habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada', 'Arte de la guerra'], pasivas: ['Guardia firme', 'Ojo crítico']});
+  esencial({...L5, nivel: 5, atrib: [10, 8, 10, 15, 2],   // (aprobado 2026-11-11: Ráfaga de cortes; Cota de malla fina en lugar del Chaleco, por la Defensa y la vida)
+    equipo: ['Sable del sargento', 'Escudo triangular', 'Cota de malla fina', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada', 'Arte de la guerra', 'Ráfaga de cortes'], pasivas: ['Guardia firme', 'Ojo crítico']});
 
   esencial({linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (2026-11-03, dueño: «sí»)
     equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca'],

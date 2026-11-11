@@ -10,6 +10,16 @@ restauración después; sin servidores ni navegadores viejos conectados; captura
 
 Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una línea).
 
+## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
+
+1. **[en curso] Durabilidad — el aviso del Bloqueo perdido** (dueño, 2026-11-11: «el aviso está ok»): al perder el Bloqueo, al personaje le llega
+   «Perdiste el Bloqueo: la durabilidad de tu <ítem> pasó de N a N−1» (y la advertencia si queda 1 / se rompe); el cuadro del duelo muestra «de N a
+   N−1». **Regla confirmada:** un Parry o un Bloqueo **ganados** no gastan; solo se gasta 1 al **perder el Bloqueo**. La Defensa no baja (eso es
+   solo Romper armadura).
+2. **Durabilidad: 6 por punto de Peso para todo** (armas, escudos y armaduras), mínimo 6 (dueño, 2026-11-11: «la durabilidad está ok»).
+   «Resistente ×N» / «Frágil ×N» siguen sumando/restando encima; las piezas ya gastadas conservan lo gastado y ganan el margen nuevo. Revisar
+   el precio de reparar.
+
 ## En cola
 
 28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

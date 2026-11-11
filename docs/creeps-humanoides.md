@@ -824,6 +824,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Cargado** en el pool esencial (2026-11-03).
   **Nivel 2 aprobado** (dueño, 2026-11-11: «👍»): Des 12 · Con 9 · Agi 6 · Fue 7 · Esp 2, vida 45, 6 No2; + Casco de cuero endurecido y Guantes de
   agarre: PdG 14, Def 4. **Red tendida** y la pasiva **Puntería**. **Cargado** (2026-11-11).
+  **Nivel 3 aprobado** (dueño, 2026-11-11: «creemos alguna ballesta buena y listo»): Des 13 · Con 9 · Agi 7 · Fue 8 · Esp 2, vida 45, 7 No2. No había
+  ballestas Buenas fuera del archivo: se creó la **Ballesta del pialador** (Buena, 150 de oro; Tipo 4, 2 manos, peso 2, 2 dados + 4, Perfora 2, Lisiado
+  33 %, Recarga 2). PdG 15. Habilidad nueva: **Clavar a la pared**. **Cargado** (2026-11-11).
 
 - **H3 · Duelista pesado · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra así»). Estrategia: te desarma (Desarmar, al ganar un Parry),
   te rompe la armadura y te remata. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/8/5/2 → 45, 5** · nv2 10/10/8/6/2 → 50, 6 · nv3

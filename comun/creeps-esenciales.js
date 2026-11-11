@@ -486,6 +486,9 @@
   esencial({...R3, nivel: 2, atrib: [9, 7, 6, 12, 2],   // (aprobado 2026-11-11: Red tendida; pasiva Puntería; + Casco de cuero endurecido y Guantes de agarre)
     equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
     habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida'], pasivas: ['Puntería']});
+  esencial({...R3, nivel: 3, atrib: [9, 8, 7, 13, 2],   // (aprobado 2026-11-11: Clavar a la pared; el arma pasa a Buena: la Ballesta del pialador, creada para él —no había ballestas Buenas fuera del archivo—, dueño: «creemos alguna ballesta buena y listo»)
+    equipo: ['Ballesta del pialador', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared'], pasivas: ['Puntería']});
 
   esencial({linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 5, 8, 2],   // (2026-11-03, dueño: «va así»)
     equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],

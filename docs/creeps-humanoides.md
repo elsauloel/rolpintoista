@@ -863,6 +863,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Pergamino grupal de Puntería Certera**. **Patotear y Jauría cambian** (dueño: «+1 a la Probabilidad de Golpe fijo si hay al menos un aliado pegado,
   y +1 al daño, pero sin tope»): +1 PdG si hay al menos un aliado pegado al rival, y +1 dado de daño por cada aliado pegado, **sin el tope de +3**.
   **Sin programar** (dueño: «vamos dejándolos definidos»): se programa con el resto de los esenciales cuando el dueño lo pida.
+  **Nivel 2 aprobado** (dueño, 2026-11-11: «va bien el patotero»): Des 10 · Agi 8 · Con 9 · Fue 7 · Esp 2, vida 45, 8 No2; + Escarpines de fieltro
+  y Guantes de agarre: PdG 11, Eva 11, Ini 11. **Hit and run** y la pasiva **Pies ligeros**. **Cargado** (2026-11-11).
 - **T4 · Peleador de control · Tanque** (2026-11-05): empuja, tira y demora; desordena al grupo rival. **Ruta aprobada**: nv1 Takle · Pisotón; nv2
   Desarmar + Guardia firme; nv3 Puño de roca; nv4 Arrastrar + **Marcar el ritmo** (dueño: «le vamos a poner marcar el ritmo a nivel 4»); nv5 Barrido.
   **Nivel 1 (en revisión)**: Con 9 · Fue 7 · Agi 7 · Des 6 · Esp 4 (dueño: «le bajaría un punto de constitución y le subiría uno de agilidad») → vida

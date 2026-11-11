@@ -506,6 +506,12 @@
     equipo: ['Navaja del compadrito', 'Jubón de cuero curtido', 'Calzas de cuero flexible'],
     habilidades: ['Finta', 'Patotear'], consumibles: ['Pergamino grupal de Puntería Certera'],
     estrategia: 'Choque liviano. Pelea en patota: cuantos más de los suyos rodean al rival, más le pega.'});
+  // L6 Patotero (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const L6 = {linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Pergamino grupal de Puntería Certera'],
+    estrategia: 'Choque liviano. Pelea en patota: cuantos más de los suyos rodean al rival, más le pega.'};
+  esencial({...L6, nivel: 2, atrib: [9, 7, 8, 10, 2],   // (aprobado 2026-11-11: Hit and run; pasiva Pies ligeros; + Escarpines de fieltro y Guantes de agarre)
+    equipo: ['Navaja del compadrito', 'Jubón de cuero curtido', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run'], pasivas: ['Pies ligeros']});
   esencial({linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
     equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca'],
     habilidades: ['Takle', 'Pisotón'], consumibles: ['Grasa de carpincho'],

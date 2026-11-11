@@ -1043,7 +1043,7 @@ const FichaEditor = (() => {
        Lo que un personaje compró es una copia: si después cambia el ítem del catálogo (las armas especiales rehechas), la copia sigue vieja.
        Se reconoce por `catId` (lo deja la tienda desde hoy) o, si no, por el nombre (y la calidad, si hay más de uno). Se pisa todo menos lo
        propio de esa copia: su id, si está equipado, las unidades, la carga, la mano y si está a mano. → el ítem del catálogo o null. */
-    const PROPIO_DE_LA_COPIA = ['id', 'equipado', 'unidades', 'cargaActual', 'activo', 'manoPreferida', 'aMano', 'dur', 'reservado', 'reservadoPara'];
+    const PROPIO_DE_LA_COPIA = ['id', 'equipado', 'unidades', 'cargaActual', 'activo', 'manoPreferida', 'aMano', 'dur', 'durV', 'reservado', 'reservadoPara'];
     function delCatalogo(it){
       const cat = (S().catalogo || []).filter(c => c && !c.archivo);
       if(it.catId){ const x = cat.find(c => c.id === it.catId); if(x) return x; }

@@ -1,5 +1,8 @@
 # Durabilidad de armas, escudos y armaduras
 
+> **2026-11-11 (dueño): 6 puntos por punto de Peso para todo, mínimo 6** (antes 3 y mínimo 3). Lo de abajo que dice «3» es la regla vieja.
+> Las copias gastadas se pasan una vez (`Combatiente.migrarDurItem`, marca `durV: 2`) conservando los puntos perdidos; un `durPorPeso` viejo se escala ×2.
+
 > Mecánica nueva del dueño, 2026-09-26, nacida del duelo paso a paso (Parry → Bloqueo). **Estado: reglas definidas casi todas, sin implementar.** Lo que falta decidir está al final y en `preguntas-abiertas.md` (P-Durabilidad).
 
 > **2026-09-30 — la durabilidad es una variable de diseño del ítem** (dueño): cada arma, escudo o armadura puede traer su propio

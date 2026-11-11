@@ -281,7 +281,7 @@ async function autoRepararAlTerminar(){
           if(!it || !it.equipado || n <= 0 || !FichaCalculo.durableItem(it)) return;
           const max = FichaCalculo.durMax(it), antes = FichaCalculo.durActual(it);
           if(antes >= max) return;
-          it.dur = Math.min(max, antes + n);
+          it.dur = Math.min(max, antes + n); it.durV = Combatiente.DUR_VERSION;
           lineas.push(`${it.nombre}: se reparó sola, durabilidad ${antes} → ${it.dur}`);
         });
         return lineas.length > 0;
@@ -422,7 +422,7 @@ async function cueroTrollAlTerminar(){
         if(!it) return false;
         const antes = FichaCalculo.durActual(it), max = FichaCalculo.durMax(it);
         if(antes >= max) return false;
-        it.dur = Math.min(max, antes + n);
+        it.dur = Math.min(max, antes + n); it.durV = Combatiente.DUR_VERSION;
         linea = `${it.nombre}: durabilidad ${antes} → ${it.dur}`;
         return true;
       });

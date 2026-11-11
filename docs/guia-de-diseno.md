@@ -236,7 +236,9 @@ El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T1
 **En pausa (2026-09-26):** no se diseñan armas T12 hasta que el resto esté consolidado; el único T12 del catálogo es el Lanzallamas (Excepcional).
 
 ## Durabilidad como elemento de diseño (idea del dueño, 2026-09-26; hecho el 2026-09-30)
-Por defecto un ítem tiene **3 puntos de durabilidad por punto de Peso** (mínimo 3). Desde el 2026-09-30 es un **campo propio del
+**Desde el 2026-11-11 (dueño: «que la durabilidad de todo sea de 6 por punto de peso»): 6 puntos de durabilidad por punto de Peso para armas,
+escudos y armaduras, mínimo 6**; Resistente ×N / Frágil ×N suman o restan encima. Las copias ya gastadas se pasaron conservando lo perdido
+(2 de 3 → 5 de 6; una rota sigue rota). (Antes:) Por defecto un ítem tenía **3 puntos de durabilidad por punto de Peso** (mínimo 3). Desde el 2026-09-30 es un **campo propio del
 ítem**, `durPorPeso` ("puntos por cada punto de Peso"): se elige en el asistente de ítems (paso Peso y daño en las armas, paso
 Peso/Precio en escudos y armaduras) y se ve en el "Ver" de cada ítem (ficha, GM Tools, tienda, editor del catálogo). 4 o 5 =
 más resistente para su peso; 2 = frágil. Regla en `comun/combatiente.js` (`durMax`). Ver `durabilidad.md`. Pendiente: cuánto

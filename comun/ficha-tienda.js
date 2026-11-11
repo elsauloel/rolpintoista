@@ -528,7 +528,7 @@ const FichaTienda = (() => {
       const q = Math.min(n, Math.max(0, C().durMax(it) - C().durActual(it)));
       if(q <= 0) return;
       if(C().itemRoto(it)) it.reparoRoto = true;
-      it.dur = C().durActual(it) + q;
+      it.dur = C().durActual(it) + q; it.durV = Combatiente.DUR_VERSION;
       if(it.dur >= C().durMax(it)) delete it.reparoRoto;
       it.armRota = Math.max(0, C().armRotaDe(it) - q);
     });

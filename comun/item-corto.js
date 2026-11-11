@@ -126,8 +126,8 @@ const ItemCorto = (() => {
     if(c === 5){ c = 10; x *= 2; }  // y un d5 con d10 (9 o 10; dueño, 2026-10-06)
     return `${x > 1 ? (c - x + 1) + '–' : ''}${c} en d${c}`; };
   const pctTxt = e => `${pctEf(e)} % (${dadoEf(e)})`;
-  const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) : 3;
-  const durMax = it => typeof Combatiente !== 'undefined' && Combatiente.durMax ? Combatiente.durMax(it) : Math.max(3, Math.round(durPP(it) * Math.max(0, Math.round(num(it.peso)))));
+  const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) * 2 : 6;   // (2026-11-11: 6 por Peso; un durPorPeso viejo, sobre la base de 3, se escala ×2)
+  const durMax = it => typeof Combatiente !== 'undefined' && Combatiente.durMax ? Combatiente.durMax(it) : Math.max(6, Math.round(durPP(it) * Math.max(0, Math.round(num(it.peso)))));
   // «Sangrado 50 % (2 en d2) · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 % (4 en d4), seguro si es crítico».
   function efectoCorto(e){
     const pct = pctEf(e);
@@ -204,7 +204,7 @@ const ItemCorto = (() => {
     if(efs.length) L.push('⚙ El duelo tira los efectos y los aplica con «Aplicar».');
     const dx = Math.round(num(it.durExtra));
     if(dx) L.push(`Durabilidad ${durMax(it)} (${dx > 0 ? `+${dx}` : `−${-dx}`} sobre lo normal).`);
-    else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3).`);
+    else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 6).`);
     return L;
   }
   // Lo que se ve de un ítem en la tarjeta de una grilla para elegir.

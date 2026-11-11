@@ -1409,20 +1409,39 @@ const Combatiente = (() => {
   const BLOQUEO_SOLO_TRAS_PARRY = 'El Bloqueo se tira solo después de un Parry, con la misma arma o escudo';
 
   /* ---------- Durabilidad de un ítem (2026-09-26, docs/durabilidad.md; variable de diseño desde 2026-09-30) ----------
-     Armas, escudos y piezas de armadura tienen durabilidad: puntos por cada punto de Peso (3 por defecto) y como mínimo 3.
-     Cada ítem puede traer su propio `durPorPeso` (dueño, 2026-09-30: "una variable de diseño, para generar objetos de
-     mejor calidad"): 4 o 5 = más resistente para su peso; 2 = frágil. Sin el campo vale 3. La durabilidad ACTUAL de una
-     copia (`dur`, lo que se gastó) y su Armadura rota (`armRota`) son de esa copia, no del diseño. */
-  const DUR_POR_PESO = 3, DUR_MIN = 3;
+     Armas, escudos y piezas de armadura tienen durabilidad: **6 puntos por cada punto de Peso, como mínimo 6** (dueño, 2026-11-11:
+     «que la durabilidad de todo sea de 6 por punto de peso»; antes, 3 y mínimo 3). Un `durPorPeso` viejo en una copia (dueño,
+     2026-09-30: 4 o 5 = más resistente, 2 = frágil, sobre la base de 3) se escala ×2 para conservar la proporción. La durabilidad ACTUAL
+     de una copia (`dur`, lo que se gastó) y su Armadura rota (`armRota`) son de esa copia, no del diseño; las copias de antes del cambio
+     se pasan una vez con `FichaGuardado.migrarDurabilidad` (conservan los puntos perdidos: 2 de 3 → 5 de 6; marca `durV: 2`). */
+  const DUR_POR_PESO = 6, DUR_MIN = 6, DUR_POR_PESO_VIEJO = 3, DUR_MIN_VIEJO = 3, DUR_VERSION = 2;
   const TIPOS_DURABLES = ['cabeza', 'manos', 'piernas', 'pies'];
   function esDurable(item){ const t = String((item && item.tipoItem) || ''); return !(item && item.consumible) && (/^(arma_|escudo_|armadura_)/.test(t) || TIPOS_DURABLES.includes(t)); }
-  function durPorPeso(item){ const v = n(item && item.durPorPeso); return v > 0 ? v : DUR_POR_PESO; }
+  function durPorPeso(item){ const v = n(item && item.durPorPeso); return v > 0 ? v * (DUR_POR_PESO / DUR_POR_PESO_VIEJO) : DUR_POR_PESO; }
   /* Resistente / Frágil (dueño, 2026-10-04): `durExtra` suma o resta durabilidad TOTAL (Resistente ×N = +N, Frágil ×N = −N), no por Peso: más
-     margen de diseño. Con Frágil (u otro efecto que la baje) puede quedar por debajo de 3, pero nunca menos de 1. `durPorPeso` queda solo para las
+     margen de diseño. Con Frágil (u otro efecto que la baje) puede quedar por debajo de 6, pero nunca menos de 1. `durPorPeso` queda solo para las
      copias viejas que lo traen. */
   function durExtra(item){ return Math.round(n(item && item.durExtra)); }
   function durBase(item){ return Math.max(DUR_MIN, Math.round(durPorPeso(item) * Math.max(0, Math.round(n(item && item.peso))))); }
   function durMax(item){ const b = durBase(item), x = durExtra(item); return x < 0 ? Math.max(1, b + x) : b + x; }
+  // La durabilidad máxima con la regla de antes del 2026-11-11 (3 por punto de Peso, mínimo 3): solo para pasar las copias gastadas.
+  function durMaxViejo(item){
+    const v = n(item && item.durPorPeso), pp = v > 0 ? v : DUR_POR_PESO_VIEJO;
+    const b = Math.max(DUR_MIN_VIEJO, Math.round(pp * Math.max(0, Math.round(n(item && item.peso))))), x = durExtra(item);
+    return x < 0 ? Math.max(1, b + x) : b + x;
+  }
+  /* Pasar una copia a la regla de 6 por Peso (2026-11-11), una sola vez (`durV: 2`): conserva los puntos que había perdido (2 de 3 → 5 de 6);
+     una pieza ROTA (0) sigue rota (repararla es aparte). Devuelve true si tocó algo. Las escrituras nuevas de `dur` marcan `durV` (marcarDur). */
+  function migrarDurItem(item){
+    if(!item || !esDurable(item) || n(item.durV) >= DUR_VERSION) return false;
+    if(item.dur !== undefined && item.dur !== null){
+      const viejo = durMaxViejo(item), nuevo = durMax(item), d = Math.round(n(item.dur));
+      item.dur = d <= 0 ? 0 : Math.min(nuevo, Math.max(1, nuevo - Math.max(0, viejo - d)));
+    }
+    item.durV = DUR_VERSION;
+    return true;
+  }
+  function marcarDur(item){ if(item) item.durV = DUR_VERSION; return item; }
   // Texto para las características del ítem: «12 (Resistente ×3)»; null si el ítem no tiene durabilidad.
   function durTexto(item){
     if(!esDurable(item)) return null;
@@ -3047,7 +3066,7 @@ const Combatiente = (() => {
     return `1d10${p ? ' + ' + p : ''} + ${d}`;
   }
   return {golpeEscudoFormula, dosAlHiloSiguientes, quitarEscudosGastados, esSoloEscudo, ESCUDOS_ELEMENTALES, ESCUDO_ELEMENTAL, escudoElementalDuelo, escudoElementalVariantes, escudoElementalDe, estadoAplicaAlArma, baseNombreEstado, armaElementalDe, nombreArmaElemental, armaElementalDelGolpe, roboOro, oroConRobos, esSanguijuela, sanguijuelaDe, curaRobada, repartoCuraRobada, curaRobadaTxt, curaPerdidaTxt, permiteDefNegativa, pisoDefensa, ESTADOS_MAGICOS, esEstadoMagico, GRITO_ESPELUZNANTE, migrarGritoEspeluznante, JEFE_INMUNE, JEFE_UN_TURNO, ADRENALINA_CREEP, PILA_PILA, migrarAdrenalina, AZAR_ELEGIR, varianteAlAzar, elegirVarianteAzar, migrarArmaElementalAzar, sinNo2Negativo, LUZ_SANADORA_CREEP, migrarLuzSanadora, VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, ponerAlDiaItemsFabrica, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, esVidaExtraComun, juntarVidaExtra, sumarVidaExtra, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, conEstadoMalo, OJO_CARANCHO_TXT, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, unaEvasionDe, gastarUnaEvasion, arteriaAtaque, STATS_DEL_ARMA, STATS_DE_LA_PIEZA, piezaEnMano, fuentesParaStat, armaEnMano, sumarArmaEnMano, sobraEnManos, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, armasDeMano, ataquesConArmaCreep, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, manosQueOcupa, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, fantasmaEvaHab, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, resCritPorVida, repararArmRotaEstados, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, permitirNo2Negativo, permisoNo2, cerrarPermisoNo2, reglaNo2, reglaNo2Texto, REGLA_NO2_SI, REGLA_NO2_NO, errorNo2, errorReglaNo2, alertaReglaNo2, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
-    DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
+    DUR_POR_PESO, DUR_MIN, DUR_VERSION, esDurable, durPorPeso, durExtra, durBase, durMax, durMaxViejo, migrarDurItem, marcarDur, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,

@@ -253,6 +253,7 @@ const FichaGuardado = (() => {
         ...(data.mochila || []).map(i => ({...i, equipado: false, ranuras: i.ranuras ?? 1})),
       ];
     }
+    migrarDurabilidad(next.inventario);
     if(!next.bitacora.some(p => p.id === next.bitacoraActiva)) next.bitacoraActiva = next.bitacora[0].id;
     return {S: next, tiposMigrados};
   }
@@ -345,8 +346,17 @@ const FichaGuardado = (() => {
     });
     return cambiadas;
   }
+  // 🔧 Durabilidad de 6 por punto de Peso (dueño, 2026-11-11): las copias de antes (3 por Peso) se pasan una vez, conservando lo gastado
+  // (Combatiente.migrarDurItem, marca `durV: 2` en cada ítem: viaja con el ítem en la misma parte, así que no se pasa dos veces).
+  function migrarDurabilidad(lista){
+    if(typeof Combatiente === 'undefined' || !Combatiente.migrarDurItem || !Array.isArray(lista)) return false;
+    let toco = false;
+    lista.forEach(it => { if(Combatiente.migrarDurItem(it)) toco = true; });
+    return toco;
+  }
   function completar(S, o){
     o = o || {};
+    migrarDurabilidad(S.inventario);
     migrarEstadoIt2(S, o.spPorBono);
     migrarEstadoEspecial(S);
     migrarTextosFlash(S);
@@ -455,6 +465,7 @@ const FichaGuardado = (() => {
     }
     if(datos.meta){ datos.meta.imagen = S.meta.imagen; datos.meta.miniatura = S.meta.miniatura; }
     Object.keys(datos).forEach(k => { S[k] = datos[k]; });
+    if(parte === 'inventario') migrarDurabilidad(S.inventario);
     if(parte === 'invocaciones' && o.imgInvocaciones !== undefined && o.imgInvocaciones !== null){
       let mapa = {};
       try{ mapa = JSON.parse(o.imgInvocaciones || '{}'); }catch(e){}
@@ -486,7 +497,7 @@ const FichaGuardado = (() => {
   return {ESCALA_TIPOS, DEFAULT, CATALOGO_IDS, PARTES, CLAVES_CON_PARTE,
     migrarModsIt2, migrarObjIt2, migrarEstadoIt2, migrarObjEspecial, migrarEstadoEspecial,
     correrTiposTexto, migrarObjTipos, migrarEstadoTipos, mergeDeep,
-    normalizar, completar, migrarHabsDeClase, huellaHab, baseDeClase,
+    normalizar, completar, migrarDurabilidad, migrarHabsDeClase, huellaHab, baseDeClase,
     serializar, imagenesInvocaciones, ponerImagenesInvocaciones, partes, leerParte, armarDatos, aplicarParte,
     leer, cargar};
 })();

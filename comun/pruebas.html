@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261110vaq"></script>
+<script src="combatiente.js?v=20261111dur6"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -79,9 +79,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261111dsg"></script>
+<script src="ficha-acciones.js?v=20261111dur6"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
-<script src="ficha-mantenimiento.js?v=20261107dosarmas"></script>
+<script src="ficha-mantenimiento.js?v=20261111dur6"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -466,14 +466,32 @@ prueba('Parry y Bloqueo: con arma o escudo; el arma natural también, última y 
     Combatiente.armaParaDefensa({arma: {nombre: 'Colmillos'}, natural: true}),
   ], [espada, escudo, {nombre: 'Garras', peso: 4, natural: true}, escudo, null, null, {nombre: 'Colmillos', peso: 1, natural: true}]);
 });
-prueba('durabilidad: 3 por Peso (mínimo 3); un ítem de diseño puede traer más o menos', () => igual([
+prueba('durabilidad: 6 por Peso (mínimo 6; dueño, 2026-11-11); un durPorPeso viejo (sobre la base de 3) se escala ×2', () => igual([
   Combatiente.durMax({tipoItem: 'escudo_1m', peso: 3}),
   Combatiente.durMax({tipoItem: 'escudo_1m', peso: 3, durPorPeso: 5}),
   Combatiente.durMax({tipoItem: 'arma_1m', peso: 2, durPorPeso: 2}),
   Combatiente.durMax({tipoItem: 'cabeza', peso: 0}),
   Combatiente.esDurable({tipoItem: 'anillos'}), Combatiente.esDurable({tipoItem: 'armadura_rigida'}),
   Combatiente.durTexto({tipoItem: 'escudo_1m', peso: 3, durPorPeso: 5}),
-], [9, 15, 4, 3, false, true, '15 (5 por punto de Peso)']));
+], [18, 30, 8, 6, false, true, '30 (10 por punto de Peso)']));
+prueba('🔧 durabilidad 6 por Peso (2026-11-11): las copias gastadas de antes se pasan una vez conservando lo perdido (2 de 3 → 5 de 6), una rota sigue rota, y no se pasa dos veces', () => {
+  const S = FichaGuardado.normalizar({inventario: [
+    {id: 'a', nombre: 'Espada', tipoItem: 'arma_1m', peso: 1, dur: 2},                 // 2 de 3 → 5 de 6
+    {id: 'b', nombre: 'Escudo', tipoItem: 'escudo_1m', peso: 3, dur: 0},               // rota: sigue rota
+    {id: 'c', nombre: 'Casco', tipoItem: 'cabeza', peso: 1, durExtra: 2, dur: 4},      // 4 de 5 → 7 de 8
+    {id: 'd', nombre: 'Peto', tipoItem: 'armadura_rigida', peso: 2},                    // sin gastar: queda entero
+    {id: 'e', nombre: 'Botas', tipoItem: 'pies', peso: 1, dur: 3, durV: 2},             // ya con la regla nueva: no se toca
+    {id: 'f', nombre: 'Anillo', tipoItem: 'anillos', dur: 1},                           // no tiene durabilidad
+  ]}).S;
+  const it = id => S.inventario.find(i => i.id === id);
+  const antes = S.inventario.map(i => FichaCalculo.durActual(i));
+  FichaGuardado.completar(S);   // (otra vuelta: no se vuelve a pasar)
+  const espada = {id: 'g', tipoItem: 'arma_1m', peso: 1};
+  FichaAcciones.desgastarItem({meta: {}}, espada, 1, {toast: () => {}, recordatorios: () => {}}, true);
+  igual([antes, S.inventario.map(i => FichaCalculo.durActual(i)), it('a').durV, 'durV' in it('f'), espada.dur, espada.durV,
+    Combatiente.durMax({tipoItem: 'arma_1m', peso: 0}), Combatiente.durMaxViejo({tipoItem: 'escudo_1m', peso: 3})],
+    [[5, 0, 7, 12, 3, 1], [5, 0, 7, 12, 3, 1], 2, false, 5, 2, 6, 9]);   // (el anillo no tiene durabilidad: su `dur` no se toca)
+});
 prueba('subir un ítem lleva su durabilidad de diseño pero no el desgaste de la copia', () => {
   const s = Plantillas.limpiar('items', {nombre: 'Escudo', tipoItem: 'escudo_1m', peso: 3, durPorPeso: 4, dur: 2, armRota: 1});
   igual([s.durPorPeso, 'dur' in s, 'armRota' in s], [4, false, false]);
@@ -2728,7 +2746,7 @@ prueba('✊ piedra, papel o tijera (comun/ppt.js): quién gana, el documento nue
 grupo('Tienda (A5)');
 prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito, vender con ajuste y reparar con el herrero', async () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, meta: {nombre: 'Prueba', dde: 500}, loot: {normal: 2},
-    inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3}]}).S);
+    inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3, durV: 2}]}).S);
   const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && num(i.precioCompra) <= 200 && !i.consumible);   // una que se pueda comprar con 500
   const st = FichaTienda.nueva();
   st.tienda = {items: [arma.id], itemsDatos: [], ajustePrecio: 50, ajusteVenta: -50, herrero: true, precioReparacion: 2};
@@ -2959,7 +2977,7 @@ prueba('🩹 Mañas de sobreviviente y Contra las cuerdas (2026-11-05, dueño): 
 });
 prueba('🔨 Ungüento del herrero (2026-11-05): repara 1 punto de Armadura rota de la pieza puesta más dañada (Defensa y durabilidad) y da +1 Res. crítico Tipo 4 por 3 turnos; en un creep saca 1 stack', async () => {
   const U = CATALOGO_BASE.find(i => i.id === 'cons-unguento-del-herrero'), A = CATALOGO_BASE.find(i => i.id === 'cat-armadura-mediana');
-  const pieza = {...structuredClone(A), id: 'a', equipado: true, armRota: 2};
+  const pieza = {...structuredClone(A), id: 'a', equipado: true, armRota: 2, durV: 2};
   pieza.dur = FichaCalculo.durMax(pieza) - 2;
   const S = fichaBotonera({nitros: 5, inventario: [pieza, {...structuredClone(U), id: 'u'}]}), reg = [];
   const durAntes = FichaCalculo.durActual(pieza);
@@ -3358,8 +3376,8 @@ prueba('🃏 Wildcards: repiten una tirada como la moneda (una por tirada), se g
     [true, true, true, false, 1, ['PdG (re-roll)'], false, true, 1, false, '', 'wildcard']);
 });
 prueba('Reparar sin herrero (2026-10-12): el talento (2 despojos por punto, tope 3 por nivel por día, una rota al doble) y el Óleo reparador (3 puntos, no a una rota)', () => {
-  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 2}], dur: 3, armRota: 2};
-  const roto = {id: 'roto', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [], dur: 0};
+  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 2}], dur: 3, armRota: 2, durV: 2};
+  const roto = {id: 'roto', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [], dur: 0, durV: 2};
   const oleo = {...CATALOGO_BASE.find(i => i.id === 'cat-oleo-reparador'), id: 'ol', unidades: 1};
   const S = fichaBotonera({inventario: [peto, roto, oleo], sociales: [{id: 's', nombre: 'Reparar equipo', puntosInt: 1, nivelExtra: 0}]}), reg = [];
   S.loot = {...(S.loot || {}), normal: 10};
@@ -3373,7 +3391,7 @@ prueba('Reparar sin herrero (2026-10-12): el talento (2 despojos por punto, tope
   const oleoRoto = FichaEquipo.usarOleo(S, 'roto', ui);   // el yelmo quedó en 1/3 (ya no está roto: sí se puede)
   const enCombate = FichaEquipo.usarOleo(S, 'peto', {...ui, modoCombate: () => true});
   igual([tope, tras2, sinTope, oleoRoto, FichaCalculo.durActual(S.inventario[1]), S.inventario.some(i => i.id === 'ol'), enCombate],
-    [3, [1, 4, 1, 4, 1], false, true, 3, false, false]);
+    [3, [1, 4, 1, 4, 1], false, true, 4, false, false]);   // (el yelmo: 1 + 3 del Óleo = 4, de 6 desde el 2026-11-11)
 });
 prueba('Un escudo abollado pierde Defensa como la armadura rota (dueño, 2026-10-12); un orbe no', () => {
   const esc = {id: 'esc2', nombre: 'Tapa', tipoItem: 'escudo_1m', equipado: true, peso: 1, mods: [{stat: 'def', val: 2}], armRota: 1};
@@ -5527,12 +5545,12 @@ prueba('catálogo: las piernas Común (30, con las 2 de Defensa especial del 202
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));
   igual([L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), ['evaopor', 'evacontra', 'retirada', 'pasosgratis', 'sigilo', 'armadmg'].every(x => stats.has(x))], [30, true, true]);
 });
-prueba('durabilidad: Resistente ×N suma N y Frágil ×N resta N a la total (no por Peso); con Frágil puede bajar de 3, nunca de 1', () => {
+prueba('durabilidad: Resistente ×N suma N y Frágil ×N resta N a la total (no por Peso); con Frágil puede bajar de 6, nunca de 1', () => {
   const d = (peso, x, extra) => Combatiente.durMax({tipoItem: 'escudo_1m', peso, ...(x ? {durExtra: x} : {}), ...(extra || {})});
   const puerta = CATALOGO_BASE.find(i => i.nombre === 'Coraza de puerta');
   igual([d(3), d(3, 2), d(3, -4), d(1, -2), d(1, -9), d(2, 0, {durPorPeso: 4.5}), Combatiente.durTexto({tipoItem: 'escudo_1m', peso: 3, durExtra: 2}),
     Combatiente.durTexto({tipoItem: 'escudo_1m', peso: 2, durExtra: -3}), puerta.durExtra, puerta.durPorPeso, Combatiente.durMax(puerta)],
-    [9, 11, 5, 1, 1, 9, '11 (Resistente ×2)', '3 (Frágil ×3)', -3, undefined, 6]);
+    [18, 20, 14, 4, 1, 18, '20 (Resistente ×2)', '9 (Frágil ×3)', -3, undefined, 15]);
 });
 prueba('reparar: una pieza rota (durabilidad 0) cuesta el doble hasta quedar entera, aunque se repare de a 1', () => {
   const S = FichaGuardado.normalizar({}).S;
@@ -6145,7 +6163,7 @@ prueba('el catálogo trae las 28 T4 Comunes (24 + 2 con Perfora, 2026-10-10; + l
   const nom = n => t4.find(i => i.nombre === n);
   igual([t4.length, ['Cuchillo del grumete polizón', 'Punzón del ladronzuelo', 'Lanza de guardia de puerta', 'Estileto ritual del acólito'].some(nom), nom('Lanza corta').peso,
     nom('Estileto').mods, nom('Cuchillo de trinchera').durExtra, Combatiente.durMax(nom('Cuchillo de trinchera')), nom('Punzón de matarife').efectosGolpe[0].seguroCritico],
-    [28, false, 1, [{stat: 'crit', val: 1}], 3, 6, true]);   // (2026-11-04) el Estileto pasó de Crítico potente +1 a frecuente +1 (dueño)
+    [28, false, 1, [{stat: 'crit', val: 1}], 3, 9, true]);   // (2026-11-04) el Estileto pasó de Crítico potente +1 a frecuente +1 (dueño)
 });
 prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks); en el duelo, con crítico entra sin tirar', () => { const pp = fbFalsoCola.then(async () => {
   const n = EfectosGolpe.normalizar({nombre: 'Envenenar', caras: 4, exitos: 1, stacks: 2, seguroCritico: true});

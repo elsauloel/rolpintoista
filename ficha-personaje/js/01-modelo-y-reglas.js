@@ -91,12 +91,12 @@ function fileToDataURL(file, maxDim=480, quality=0.85){ return FichaEditor.image
    ========================================================= */
 
 /* ---------- Durabilidad (2026-09-26, reglas del dueño en docs/durabilidad.md) ----------
-   Armas, escudos y piezas de armadura: 3 puntos de durabilidad por punto de Peso (mínimo 3). Cada ítem guarda `dur` (actual; sin él vale el máximo) y, las piezas de
+   Armas, escudos y piezas de armadura: 6 puntos de durabilidad por punto de Peso (mínimo 6; hasta el 2026-11-11 eran 3). Cada ítem guarda `dur` (actual; sin él vale el máximo) y, las piezas de
    armadura, `armRota` (puntos de Armadura rota: cada uno baja 1 la Defensa de ESA pieza y sigue aunque se la saque). Un ítem con 0 de durabilidad está ROTO: ocupa el
    slot pero no aporta ningún efecto (es como si no lo tuvieras equipado). Rompe armadura elige una pieza equipada al azar; un Bloqueo perdido gasta 1 punto del arma o escudo
    con el que se bloqueó. Los creeps y las invocaciones no llevan. */
-// Cuánta durabilidad tiene cada ítem es regla común (comun/combatiente.js): 3 por punto de Peso salvo que el ítem traiga su
-// propio `durPorPeso` (variable de diseño, 2026-09-30), mínimo 3.
+// Cuánta durabilidad tiene cada ítem es regla común (comun/combatiente.js): 6 por punto de Peso (2026-11-11), mínimo 6;
+// Resistente / Frágil suman o restan.
 // Qué ítems tienen durabilidad, cuánta les queda y si están rotos: comun/ficha-calculo.js.
 const {SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe} = FichaCalculo;
 
@@ -111,7 +111,7 @@ function durLineaHtml(i){
   const max = durMax(i), act = durActual(i), ar = armRotaDe(i);
   const cls = act <= 0 ? 'roto' : act <= 1 ? 'aviso' : '';
   const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
-  return `<div class="idur ${cls}" title="Durabilidad: ${Combatiente.durTexto(i) || fmt(max)} (3 por punto de Peso, mínimo ${Combatiente.DUR_MIN}; Resistente suma, Frágil resta). Reparar solo fuera de combate: herrero (1 de oro por punto) o talento con despojos (2 por punto).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)}` : ''}${est}
+  return `<div class="idur ${cls}" title="Durabilidad: ${Combatiente.durTexto(i) || fmt(max)} · mínimo ${Combatiente.DUR_MIN}; Resistente suma, Frágil resta. Reparar solo fuera de combate: herrero (1 de oro por punto) o talento con despojos (2 por punto).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)}` : ''}${est}
     <button class="mini" data-durmod="${i.id}:-1" title="Un punto menos (a mano)">−</button><button class="mini" data-durmod="${i.id}:1" title="Reparar 1 punto (solo fuera de combate)">+</button></div>`;
 }
 

@@ -329,7 +329,7 @@ const FichaMantenimiento = (() => {
       (S.inventario || []).forEach(it => {
         if(!it || !it.equipado || !FichaCalculo.durableItem(it)) return;
         const a = FichaCalculo.durActual(it), m = FichaCalculo.durMax(it);
-        if(a < m){ it.dur = Math.min(m, a + herr); k++; }
+        if(a < m){ it.dur = Math.min(m, a + herr); it.durV = Combatiente.DUR_VERSION; k++; }
       });
       if(k) lineas.push(`💍 Anillo del herrero ambulante: ${k} pieza${k === 1 ? '' : 's'} +${herr} de durabilidad`);
     }

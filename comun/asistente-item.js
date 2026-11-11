@@ -686,7 +686,7 @@ const AsistenteItem = (() => {
         ${fila('Bonos', e(bonos || 'ninguno'))}
         ${cfg.conEstadoEquipar ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
-        ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))}${Math.round(n(d.durExtra)) > 0 ? ` (Resistente ×${Math.round(n(d.durExtra))})` : Math.round(n(d.durExtra)) < 0 ? ` (Frágil ×${-Math.round(n(d.durExtra))})` : ' (lo normal: 3 por punto de Peso)'}`) : ''}
+        ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))}${Math.round(n(d.durExtra)) > 0 ? ` (Resistente ×${Math.round(n(d.durExtra))})` : Math.round(n(d.durExtra)) < 0 ? ` (Frágil ×${-Math.round(n(d.durExtra))})` : ' (lo normal: 6 por punto de Peso)'}`) : ''}
         ${cfg.conPrecio ? fila('Precio', `${f(n(d.precioCompra))} DDE`) : ''}
         ${cfg.conLugar ? fila('Dónde', d.equipado ? 'equipado' : `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conRanuras ? fila('Ranuras', f(n(d.ranuras))) : ''}
       </div>`;
@@ -773,21 +773,21 @@ const AsistenteItem = (() => {
     return t + ' En la mochila no pesa: ocupa ranuras.';
   }
 
-  /* Durabilidad: variable de diseño del ítem (2026-09-30, dueño). Puntos por cada punto de Peso: 3 lo normal, más = mejor
-     calidad, menos = frágil; mínimo 3 en total. La regla es la del motor (comun/combatiente.js). */
+  /* Durabilidad: variable de diseño del ítem (2026-09-30, dueño). Puntos por cada punto de Peso: 6 (desde el 2026-11-11; antes 3), mínimo 6 en total;
+     Resistente / Frágil suman o restan. La regla es la del motor (comun/combatiente.js). */
   const DURABLE = d => /^(arma_|escudo_|armadura_)/.test(String(d.tipoItem || '')) || ['cabeza', 'manos', 'piernas', 'pies'].includes(d.tipoItem);
   // Resistente / Frágil (dueño, 2026-10-04): un número que suma o resta durabilidad total (no por Peso). Con Frágil, nunca menos de 1.
-  const durBase = d => typeof Combatiente !== 'undefined' ? Combatiente.durBase(d) : Math.max(3, 3 * Math.max(0, Math.round(n(d.peso))));
+  const durBase = d => typeof Combatiente !== 'undefined' ? Combatiente.durBase(d) : Math.max(6, 6 * Math.max(0, Math.round(n(d.peso))));
   const durTotal = d => typeof Combatiente !== 'undefined' ? Combatiente.durMax(d) : Math.max(1, durBase(d) + Math.round(n(d.durExtra)));
   function durHtml(){
     const d = st.d, x = Math.round(n(d.durExtra)), base = durBase(d), tot = durTotal(d);
     const calidad = x > 0 ? ` + <b>Resistente ×${x}</b>` : x < 0 ? ` − <b>Frágil ×${-x}</b>` : ' (lo normal)';
-    return `Durabilidad <b>${f(tot)}</b>: ${f(base)} por su Peso (3 por punto, mínimo 3)${calidad}${x < 0 && base + x < 1 ? ' (nunca menos de 1)' : ''}. Cada Bloqueo perdido (o una pieza de armadura dañada) le saca 1 punto; en 0 se rompe y no da efectos hasta repararlo.`;
+    return `Durabilidad <b>${f(tot)}</b>: ${f(base)} por su Peso (6 por punto, mínimo 6)${calidad}${x < 0 && base + x < 1 ? ' (nunca menos de 1)' : ''}. Cada Bloqueo perdido (o una pieza de armadura dañada) le saca 1 punto; en 0 se rompe y no da efectos hasta repararlo.`;
   }
   function durCampo(){
     const d = st.d;
     return campo('Durabilidad: Resistente (+) o Frágil (−)', num('durExtra', Math.round(n(d.durExtra)), 'step="1" style="max-width:120px"'),
-      '0 es lo normal. Resistente ×N suma N a la durabilidad total; Frágil ×N la baja N (puede quedar por debajo de 3, nunca menos de 1).' + (quien().ctx === 'creep' ? ' (Los creeps no gastan durabilidad: vale si se publica en el catálogo o se suelta como botín.)' : ''))
+      '0 es lo normal. Resistente ×N suma N a la durabilidad total; Frágil ×N la baja N (puede quedar por debajo de 6, nunca menos de 1).' + (quien().ctx === 'creep' ? ' (Los creeps no gastan durabilidad: vale si se publica en el catálogo o se suelta como botín.)' : ''))
       + efecto(`<span id="aa-dur">${durHtml()}</span>`);
   }
 
@@ -966,7 +966,7 @@ const AsistenteItem = (() => {
       ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido',
        'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg'].forEach(k => delete d[k]);
     }
-    // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
+    // Durabilidad: solo se guarda si no es la de siempre (6 por Peso) y el ítem la tiene.
     // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
     if(n(d.durPorPeso) > 0 && n(d.durPorPeso) !== 3 && typeof Combatiente !== 'undefined'){ const tot = Combatiente.durMax(d); delete d.durPorPeso; d.durExtra = tot - Combatiente.durBase(d); }
     delete d.durPorPeso;

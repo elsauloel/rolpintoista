@@ -192,7 +192,7 @@ El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Par
 > [!info] El concepto (regla del dueño, 2026-09-30)
 > Cuando te vienen a atacar, el **Parry** (Destreza) es **interceptar el arma del enemigo** con tu propia arma o tu escudo. Si lo lográs, el **Bloqueo** es **aguantar la fuerza del golpe con tu propia fuerza**: tu Fuerza + el peso de tu arma o escudo, contra la Fuerza del atacante + el peso de su arma. Por eso **no hay Bloqueo sin Parry** (salvo que algún día se diseñe para un contexto especial).
 >
-> Si **ganás el Bloqueo**, el golpe queda anulado. Si **lo perdés**, pasa **la mitad del daño** (para arriba) y tu arma o escudo **pierde 1 punto de [[Durabilidad]]** (3 puntos por cada punto de Peso, mínimo 3; en 0 se rompe y no sirve para parar).
+> Si **ganás el Bloqueo**, el golpe queda anulado. Si **lo perdés**, pasa **la mitad del daño** (para arriba) y tu arma o escudo **pierde 1 punto de [[Durabilidad]]** (6 puntos por cada punto de Peso, mínimo 6; en 0 se rompe y no sirve para parar).
 >
 > En la Botonera el botón de Bloqueo **se ve siempre, apagado, con lo que tirarías** con cada arma o escudo: sirve para decidir antes de defenderte si te conviene el Parry o la [[Evasión]] (con un Bloqueo muy bajo quizás convenga esquivar). Recién se puede tirar después de un Parry, y con la misma arma o escudo.
 
@@ -575,7 +575,7 @@ alias: [Durabilidad de armas, Armadura rota por ítem, Reparar]
 tags: [combate, equipo]
 estado: borrador
 +++
-**Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**
+**Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 6 puntos por cada punto de Peso** (mínimo 6; hasta el 2026-11-11 eran 3). **Los creeps y las invocaciones no llevan.**
 
 - **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.
 - **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico también la rompe**, como cualquier golpe que pega.

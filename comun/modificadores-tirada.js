@@ -52,7 +52,7 @@ const ModTirada = (() => {
       'Aguantar la fuerza del golpe con tu propia fuerza, después de ganar el Parry.',
       'Tirás tu Bloqueo (Fuerza) + el peso de tu arma o escudo, contra la Fuerza del atacante + el peso de su arma.',
       'Si ganás, el golpe queda anulado. Si perdés, pasa la mitad del daño y tu arma o escudo pierde 1 punto de durabilidad.',
-      'Durabilidad: 3 puntos por cada punto de Peso (mínimo 3). En 0 se rompe: no da bonos y no sirve para parar hasta repararlo.',
+      'Durabilidad: 6 puntos por cada punto de Peso (mínimo 6). En 0 se rompe: no da bonos y no sirve para parar hasta repararlo.',
       'No hay Bloqueo sin Parry: el botón muestra lo que tirarías, para decidir antes de defenderte.']},
   };
   function ayuda(clave){

@@ -84,7 +84,7 @@ const Glosario = (() => {
     {titulo: 'Atado al antebrazo', re: '[Aa]tado al antebrazo', texto: 'Atado al antebrazo: el escudo va sujeto al brazo y no ocupa la mano, así que se puede llevar con dos armas. Ataja igual que cualquier escudo (Parry, Bloqueo, Golpe de escudo).'},
     {titulo: 'Resistente', re: 'Resistente(?: ×\\d+)?', texto: 'Resistente: aguanta más desgaste antes de romperse (+1 de durabilidad por cada ×).'},
     {titulo: 'Frágil', re: 'Frágil(?: ×\\d+)?', texto: 'Frágil: aguanta menos desgaste antes de romperse (−1 de durabilidad por cada ×).'},
-    {titulo: 'Durabilidad', texto: 'Durabilidad: cuánto desgaste aguanta antes de romperse (3 por punto de Peso). Una pieza rota no da sus bonos y repararla cuesta el doble.'},
+    {titulo: 'Durabilidad', texto: 'Durabilidad: cuánto desgaste aguanta antes de romperse (6 por punto de Peso, mínimo 6). Una pieza rota no da sus bonos y repararla cuesta el doble.'},
     {titulo: 'Daño elemental', re: '\\+\\d*d\\d+ (?:eléctrico|tóxico|de fuego|de hielo|de ácido)', texto: 'Daño elemental: se tira aparte cuando el golpe pega y va directo a la vida: no lo frenan la Defensa ni la Defensa especial, solo la resistencia a su elemento. No se multiplica con el crítico.'},
     {titulo: 'Drena vida', texto: 'Drena vida N %: quien ataca se cura el N % de la vida que el golpe le sacó de verdad (lo que frena la armadura no cuenta).'},
     {titulo: 'Rompe armadura', re: 'Rompe armadura|Armadura rota doble', texto: 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack). «Doble»: 2 stacks por golpe.'},

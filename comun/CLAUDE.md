@@ -909,7 +909,7 @@ versión parecida en más de una, es candidato a juntar.
   está lista; la usan el reenvío del duelo (si no, la Botonera o las Acciones aparecían encima del duelo) y
   `precargarMarco()` del mapa (6 s después de entrar carga la ficha propia o GM Tools para que la primera apertura no espere).
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
-  `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
+  `esDurable` — (desde el 2026-11-11: **6 por punto de Peso, mínimo 6**; `migrarDurItem`/`marcarDur`, `durV: 2`) antes: 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
   3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,
   tienda y editor del catálogo muestran «Durabilidad N (X por punto de Peso)». `Plantillas.limpiar('items')` ya no sube `dur`
   ni `armRota` (desgaste de la copia). El motor ahora también se carga en `vendor-generator.html` y `catalogo-editor.html`.

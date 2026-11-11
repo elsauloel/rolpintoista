@@ -275,7 +275,7 @@ const FichaAcciones = (() => {
     if(it){
       const r = Math.min(Math.max(0, Math.round(num(q))), FichaCalculo.armRotaDe(it));
       it.armRota = FichaCalculo.armRotaDe(it) - r;
-      it.dur = Math.min(FichaCalculo.durMax(it), FichaCalculo.durActual(it) + r);
+      it.dur = Math.min(FichaCalculo.durMax(it), FichaCalculo.durActual(it) + r); it.durV = Combatiente.DUR_VERSION;
       return r ? `🔨 ${it.nombre}: −${fmt(r)} de Armadura rota${it.armRota ? ` (le queda ×${fmt(it.armRota)})` : ''}` : '';
     }
     const e = Combatiente.repararArmRotaEstados(S.efectos, q);
@@ -1050,7 +1050,7 @@ const FichaAcciones = (() => {
   }
   function desgastarItem(S, i, n, ui, sinAviso){
     const antes = FichaCalculo.durActual(i);
-    i.dur = Math.max(0, antes - Math.max(1, n || 1));
+    i.dur = Math.max(0, antes - Math.max(1, n || 1)); i.durV = Combatiente.DUR_VERSION;   // (2026-11-11: ya con la regla de 6 por Peso)
     if(!sinAviso && FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
   }
   // La Defensa que da una pieza ahora (con lo que le baja la armadura rota o la abolladura, sin pasar de la que da; rota, nada).

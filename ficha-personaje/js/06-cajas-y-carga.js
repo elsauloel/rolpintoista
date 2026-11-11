@@ -338,7 +338,7 @@ document.addEventListener('click', async e => {
     if(it && durableItem(it)){
       if(num(d) < 0) desgastarItem(it, 1);
       else{
-        it.dur = Math.min(durMax(it), durActual(it) + 1);
+        it.dur = Math.min(durMax(it), durActual(it) + 1); it.durV = Combatiente.DUR_VERSION;
         if(armRotaDe(it) > 0) it.armRota = armRotaDe(it) - 1;
       }
       renderList('equipo'); renderList('mochila');

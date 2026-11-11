@@ -490,7 +490,7 @@ const FichaEquipo = (() => {
     q = Math.min(q, faltanDe(it));
     if(q <= 0) return 0;
     if(FichaCalculo.itemRoto(it)) it.reparoRoto = true;
-    it.dur = FichaCalculo.durActual(it) + q;
+    it.dur = FichaCalculo.durActual(it) + q; it.durV = Combatiente.DUR_VERSION;
     if(it.dur >= FichaCalculo.durMax(it)) delete it.reparoRoto;
     it.armRota = Math.max(0, FichaCalculo.armRotaDe(it) - q);
     return q;

@@ -444,13 +444,28 @@ es quién tira:
   Percepción» y tira la del creep (no va a la Mesa); después **el jugador tira su Sigilo con su botón**. Tiene que sacar la Percepción o más
   (empate: sigue escondido). Es privado: lo ven solo el GM y quien maneja al escondido. Si su pantalla no aparece en 6 s, el GM tira por él;
   «✋ Resolver a mano» en las dos tiradas. `vtt-hexgrid/js/116-sigilo-jugador.js`, `Combatiente.sigiloDetecta`.
-- Simplificación: varios pasos en la misma zona de alerta de un creep piden **una** tirada (el cartel dice cuántos pasos dio).
+- **Una tirada por paso** (dueño, 2026-11-11: «si el personaje escondido da varios pasos dentro de una zona de alerta, sigue siendo una tirada
+  por paso»): cada paso dentro de la zona de alerta de un creep es su propio cartel (Percepción del GM → Sigilo del jugador), uno detrás del otro;
+  si en uno lo descubren, los que quedan no se tiran (`Combatiente.sigiloPasoSiguiente`).
+
+**🕶 La regla completa de la detección** (dueño, 2026-11-11):
+- **Se mueve el escondido:** cada paso que da dentro de la zona de alerta de un rival pide una tirada (Percepción del que lo puede percibir contra
+  su Sigilo). Entrar en el cono de visión directa lo delata enseguida.
+- **Se mueve el visible, CON Percepción aumentada:** en cada paso, si un escondido queda en su zona de alerta, se frena ahí y tira Percepción.
+- **Se mueve el visible, SIN Percepción aumentada:** de pasada no se frena ni se tira nada («si está en movimiento, no»); si **termina** el
+  movimiento con un escondido en su zona de alerta, ahí sí corresponde la tirada («cuando está quieto, corresponde la tirada»): la misma de la
+  Percepción aumentada (js/08 `percepcionPublicarAvisos` → js/16 `percepcionAbrir`), ya no un aviso anónimo en la Mesa. El cono de visión
+  directa delata siempre, en cualquier paso.
+- **Quién tira:** la Percepción, quien la hace (un creep: el GM, «<creep> percibe movimientos cerca — tirá Percepción»; un personaje: su jugador);
+  el Sigilo, el escondido (un personaje: su jugador, privado; un creep: el GM a escondidas). Varios escondidos: una tirada por cada uno, de a una.
 
 ### 🚷 Modo narrativo y los estados que traban el movimiento (dueño, 2026-11-11)
-Fuera del combate (modo narrativo) moverse no cobra No2, pero los estados que traban el movimiento **frenan igual**: Inmovilizado (también la
-Prisión de hielo), Sentado, Stun / Sueño y Congelado — el token no se arrastra y avisa por qué. Rengo no cambia nada (sin costo, el doble de
-nada es nada). Sentado se levanta como siempre desde la Botonera. Salida a mano: el GM mueve a cualquiera con 🦶 Mover libre (tecla M).
-`Combatiente.trabaNarrativo(estados)` (comun/combatiente.js) y el arrastre en `vtt-hexgrid/js/06-mouse.js`.
+Fuera del combate (modo narrativo) moverse no cobra No2 y **nada frena**. Corrección del dueño el mismo día: «yo quiero que sí pueda mover el
+token; a lo sumo que le aparezca una notificación: está inmovilizado, ¿mover igual? sí». Si el token tiene un estado que traba el movimiento
+(Inmovilizado —también la Prisión de hielo—, Sentado, Congelado), **al soltarlo** el mapa pregunta «<Nombre> está Inmovilizado. ¿Moverlo igual?»:
+«Sí, mover igual» sigue como siempre; «No» lo deja donde estaba (se pregunta al soltar y no al agarrarlo porque el cartel cortaría el arrastre).
+El Stun / Sueño ya lo pregunta el aviso de siempre («Hacerlo igual»). Rengo no cambia nada. En combate no cambia nada: ahí frena el costo del
+movimiento. `Combatiente.trabaNarrativo` (vtt-hexgrid/js/06 `soltar`).
 
 - **🎒 Saque rápido** (dueño, 2026-11-11): la chance (Cinto de cuatrero 33 %, Cinto de prestidigitador; stat `saquerapido`) **se tira sola**, sin
   pedir botón (es un ahorro chico y frecuente). Si sale, un **aviso** a quien sacó el consumible («🎒 Saque rápido: sacaste X del cinturón sin

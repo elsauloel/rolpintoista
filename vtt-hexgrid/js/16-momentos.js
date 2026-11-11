@@ -282,6 +282,16 @@ function dueloPasoCronica(d, nuevos, todos){
 let percepcionBanner = null;            // {tokenId, trampaId?, ocultoId?, momentoP, momentoId, resultado, esperando}
 let percepcionSigiloPendiente = null;   // {tokenId, ocultoId, celda} cortado por la zona de alerta, se resuelve al llegar
 const percepcionChequeados = new Set(); // 'token:oculto:casillero' que ya pidieron la tirada (sigilo)
+// Al terminar un movimiento con varios ocultos en la zona de alerta (js/08 percepcionPublicarAvisos): una tirada por oculto, de a una.
+const percepcionColaFin = [];
+function percepcionSiguienteFin(){
+  if(percepcionBanner) return;   // ya hay un cartel de Percepción abierto: sigue cuando se cierre
+  while(percepcionColaFin.length){
+    const p = percepcionColaFin.shift();
+    const t = tokens.get(p.tokenId), o = tokens.get(p.ocultoId);
+    if(t && o && enSigilo(o)){ percepcionAbrir(p); return; }
+  }
+}
 function percepcionAbrir(o){
   const t = tokens.get(o.tokenId);
   if(!t) return;
@@ -306,7 +316,7 @@ function renderPercepcionBanner(){
   const t = tokens.get(percepcionBanner.tokenId);
   const quien = t ? nombreDe(t) : '';
   if(percepcionBanner.resultado){
-    const cerrar = () => { percepcionBanner = null; renderPercepcionBanner(); };
+    const cerrar = () => { percepcionBanner = null; renderPercepcionBanner(); percepcionSiguienteFin(); };
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción`, texto: percepcionBanner.resultado,
       botones: percepcionBanner.desarmar
         ? [{texto: `${typeof trampaEsMagica === 'function' && trampaEsMagica(elementos.get(percepcionBanner.desarmar)) ? '✨ Disiparla' : '🪤 Desarmarla'}${modoMapa === 'combate' ? ' (1 No2)' : ''}`, id: 'percepcion-banner-desarmar', alClic: desarmarDesdeBanner}, {texto: 'Dejarla', sec: true, alClic: cerrar}]

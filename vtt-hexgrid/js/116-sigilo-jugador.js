@@ -42,12 +42,18 @@ async function sigiloTomar(id, desde, hacia){
 }
 
 /* El escondido caminó y quedó en la zona de alerta de un creep: el pedido al GM (lo llama js/03 sigiloPublicarAvisos). */
-async function sigiloPedirPercepcionGM(ocultoId, detectorId, pasos){
+/* Una tirada por paso (dueño, 2026-11-11: «si el personaje escondido da varios pasos dentro de una zona de alerta, sigue siendo una tirada por
+   paso»): se abre el paso 1; cuando se resuelve y sigue escondido, la pantalla que lo resolvió abre el siguiente (sigiloJugTirarSigilo). Si en un
+   paso lo descubren, los pasos que quedan no se tiran. */
+async function sigiloPedirPercepcionGM(ocultoId, detectorId, pasos, paso){
   const o = tokens.get(ocultoId), det = tokens.get(detectorId);
   if(!o || !det) return null;
-  return momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: `${nombreDe(det)} percibe movimientos cerca…`, estado: 'percepcionGM', resuelve: 'gm',
-    datos: {centro: true, privado: true, ocultoId, ocultoFicha: String(o.fichaId || ''), ocultoNombre: nombreDe(o), detectorId, detector: nombreDe(det), pasos: num(pasos) || 1}});
+  const total = Math.max(1, num(pasos) || 1), n = Math.min(total, Math.max(1, num(paso) || 1));
+  return momentoAbrir({tipo: 'sigilo-pedido', icono: '🔎', titulo: `${nombreDe(det)} percibe movimientos cerca…${total > 1 ? ` (paso ${n} de ${total})` : ''}`, estado: 'percepcionGM', resuelve: 'gm',
+    datos: {centro: true, privado: true, ocultoId, ocultoFicha: String(o.fichaId || ''), ocultoNombre: nombreDe(o), detectorId, detector: nombreDe(det), pasos: total, paso: n}});
 }
+// El paso siguiente de la misma caminata, o null si ya no hay (pura, para las pruebas).
+const sigiloPasoSiguiente = (paso, pasos, detectado) => Combatiente.sigiloPasoSiguiente(paso, pasos, detectado);
 
 // La Percepción de un token (la misma cuenta que js/16 percepcionResolverBanner).
 function sigiloValorPercepcion(t){
@@ -118,7 +124,7 @@ function sigiloJugCartelPercepcion(id, d){
   const dt = d.datos || {}, clave = 'sigilo-jug:' + id;
   sigiloJugCartel.set(id, clave);
   AvisoCombate.cartel(clave, {icono: '🔎', titulo: `${dt.detector || 'Un creep'} percibe movimientos cerca`,
-    pasos: [{titulo: 'Percepción', texto: `Alguien escondido (${dt.ocultoNombre || 'un personaje'}) se movió en la zona de alerta de ${dt.detector || 'tu creep'}${num(dt.pasos) > 1 ? ` (${dt.pasos} pasos)` : ''}. Tirá su Percepción: después, el jugador tira su Sigilo.`}],
+    pasos: [{titulo: 'Percepción', texto: `Alguien escondido (${dt.ocultoNombre || 'un personaje'}) se movió en la zona de alerta de ${dt.detector || 'tu creep'}${num(dt.pasos) > 1 ? ` (paso ${num(dt.paso) || 1} de ${dt.pasos}: una tirada por paso)` : ''}. Tirá su Percepción: después, el jugador tira su Sigilo.`}],
     botones: [{texto: `🎲 Tirar Percepción de ${dt.detector || 'el creep'}`, alClic: () => sigiloJugTirarPercepcion(id, d, false)},
       {texto: '✋ Resolver a mano', sec: true, alClic: () => sigiloJugTirarPercepcion(id, d, true)}]});
 }
@@ -182,4 +188,7 @@ async function sigiloJugTirarSigilo(id, d, aMano){
     ? `${dt.detector || 'Alguien'} descubre a ${quien} (Percepción ${dt.percepcion} contra Sigilo ${total}).`
     : `${quien} sigue escondido (Percepción ${dt.percepcion} contra Sigilo ${total}).`;
   await momentoActualizar(id, {estado: 'listo', resultado, datos: {...dt, sigilo: total, detectado, ...(aMano ? {aMano: true} : {})}});
+  // Una tirada por paso: si sigue escondido y quedan pasos en la zona, el siguiente (lo abre esta pantalla, la que tomó la tirada).
+  const sig = sigiloPasoSiguiente(dt.paso, dt.pasos, detectado);
+  if(sig && o && enSigilo(o)) await sigiloPedirPercepcionGM(dt.ocultoId, dt.detectorId, dt.pasos, sig);
 }

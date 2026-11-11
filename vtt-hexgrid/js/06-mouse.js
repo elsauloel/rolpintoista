@@ -102,9 +102,6 @@ lienzo.addEventListener('pointerdown', e => {
         // Ese clic confirmó el movimiento marcado: no empieza otro arrastre.
       }else if(costo && costo.porCasillero <= 0){
         toast('No te podés mover ahora (Inmovilizado o Tropezado: este turno no se mueve; si hace falta, el GM lo mueve con 🦶 Mover libre, tecla M)');
-      }else if(modoMapa !== 'combate' && Combatiente.trabaNarrativo(confusionEstadosDe(t))){
-        // 🚷 Modo narrativo (dueño, 2026-11-11): no se cobran No2, pero los estados que traban el movimiento frenan igual (comun/combatiente.js).
-        toast(`No te podés mover ahora (${Combatiente.trabaNarrativo(confusionEstadosDe(t))}: aunque el mapa esté en modo narrativo, no se mueve; si hace falta, el GM lo mueve con 🦶 Mover libre, tecla M)`);
       }else{
         const v = visibles.get(id) || hexCentro(t.col, t.fila);
         arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false,
@@ -558,6 +555,17 @@ function soltar(){
     // Confusión (2026-10-04, js/20): antes de moverse, si es su primera acción del turno, tira; con «Seguir» se mueve por esta misma ruta.
     // El dodge roll es una reacción (2026-10-20): el Mareo de invocación lo deja pasar (el Stun no), y no es «moverse fuera de turno» ni la primera acción (Confusión).
     const reaccion = enDodge(a.id);
+    // 🚷 Modo narrativo (dueño, 2026-11-11: «quiero que sí pueda mover el token; a lo sumo una notificación: está inmovilizado, ¿mover igual?»): con un
+    // estado que traba el movimiento, al soltar se pregunta; «Sí» sigue como siempre, «No» lo deja donde estaba. (El Stun / Sueño ya lo pregunta stunAntes.)
+    const estN = a.movio && !a.libre && !reaccion && t && modoMapa !== 'combate' ? confusionEstadosDe(t) : null;
+    const trabaN = estN && !Combatiente.stuneado(estN) ? Combatiente.trabaNarrativo(estN) : '';
+    if(trabaN && !a.trabaOk){
+      pedirDibujo();
+      Confirmar.preguntar(`${nombreDe(t)} está ${trabaN}. ¿Moverlo igual?`, {titulo: '🚷 Está trabado', si: 'Sí, mover igual', no: 'No'})
+        .then(ok => { if(!ok){ pedirDibujo(); return; } arrastre = {...a, trabaOk: true}; soltar(); });
+      lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
+      return;
+    }
     if(a.movio && !a.libre && stunAntes(a.id, () => rutaSoltada(a, tokens.get(a.id)), {reaccion, mover: true})){}   // stuneado: no se mueve, salvo que la mesa lo deje (2026-10-06)
     else{
       // moverse fuera de turno: se avisa, no se frena (2026-10-06) — solo si de verdad se movió (2026-10-28, probando: soltarlo en una casilla a la que no

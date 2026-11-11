@@ -2180,4 +2180,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   pantalla avisa que lo vio en `datos.visto` y, si no, a los 6 s el GM tira por él) → `listo`. También lo usa `percepcionResolverBanner` (js/16) cuando
   el que camina tiene Percepción aumentada y el escondido es un personaje. Privado (`datos.privado`): lo ven solo el GM y quien maneja al escondido
   (`sigiloMomentoVisible`, js/16). Cada paso lo toma una transacción (`sigiloTomar`). Un creep escondido sigue con el `esperandoGM` de siempre.
+  **Una tirada por paso** (corrección del dueño el mismo día): `datos.paso`/`datos.pasos`; al resolverse uno sin descubrirlo, la pantalla que lo
+  resolvió abre el siguiente (`Combatiente.sigiloPasoSiguiente`). **El visible que termina el movimiento sin Percepción aumentada** con un escondido
+  en su zona de alerta (js/08 `percepcionPublicarAvisos`) ya no publica el aviso anónimo: abre la tirada de verdad (`percepcionAbrir`, en cola
+  `percepcionColaFin` si son varios, js/16). **Modo narrativo:** un token con un estado que traba el movimiento se mueve igual, preguntando al
+  soltar «¿Moverlo igual?» (js/06 `soltar`).
 

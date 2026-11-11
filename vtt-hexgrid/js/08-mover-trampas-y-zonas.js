@@ -1066,13 +1066,25 @@ function percepcionEvaluarRuta(t, id, ruta, ignorar){
   if(pasos.size) percepcionAvisosPendientes.set(id, pasos);
   return null;
 }
-// Uno por oculto en cuya zona de alerta se caminó (sin decir quién es ninguno de los dos): la
-// Mesa solo pide la tirada, igual que sigiloPublicarAvisos del otro escenario.
+/* Terminó el movimiento con un oculto en su zona de alerta (sin Percepción aumentada; dueño, 2026-11-11: «si un personaje sin Percepción
+   aumentada hace un movimiento y justo termina con un personaje en sigilo dentro de su zona de alerta, ahí sí corresponde el aviso y la tirada…
+   cuando está quieto, corresponde la tirada; si está en movimiento, no»): ya no es un aviso anónimo en la Mesa, sino la tirada de verdad, con
+   el mismo camino que la Percepción aumentada (js/16 percepcionAbrir): quien se movió tira Percepción en su pantalla (un creep: el GM, «<creep>
+   percibe movimientos cerca»; un personaje: su jugador), y después el Sigilo del oculto (un personaje: su jugador, js/116; un creep: el GM a
+   escondidas). Con varios ocultos, de a uno (percepcionColaFin). */
 function percepcionPublicarAvisos(id){
   const pasos = percepcionAvisosPendientes.get(id);
   percepcionAvisosPendientes.delete(id);
-  if(!pasos) return;
-  pasos.forEach(n => alertaRojaAnonima(n === 1 ? '⚠ Hace falta una tirada de percepción' : `⚠ Hacen falta ${n} tiradas de percepción`));
+  if(!pasos || !pasos.size) return;
+  const t = tokens.get(id);
+  if(!t) return;
+  [...pasos.keys()].forEach(ocultoId => {
+    const o = tokens.get(ocultoId);
+    if(!o || !enSigilo(o)) return;
+    percepcionChequeados.add(id + ':' + ocultoId + ':' + nbPack(t.col, t.fila));
+    percepcionColaFin.push({tokenId: id, ocultoId});
+  });
+  percepcionSiguienteFin();
 }
 
 // ⛈ Maldición tormentosa (2026-10-12): moverse cuesta 1 de vida por stack de Atormentado cada 2 casillas completas, directo a la vida (lo

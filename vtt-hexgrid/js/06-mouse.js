@@ -682,18 +682,22 @@ function rutaSoltada(a, t){
     if(alMoverAntes) setTimeout(alMoverAntes, 450);   // (que el token ya esté en su casilla nueva al elegir el objetivo)
     if(dodgeArco){
       const at = tokens.get(dodgeArco.atacanteId), ini = a.ruta[0], fin = a.ruta[a.ruta.length - 1];
-      const costo0 = a.costo ? costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo) : 0;
+      const costo0 = a.costo ? costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo) + Combatiente.recargoSobrepeso(sobrepesoDeToken(t)) : 0;   // ⚖ +1 con sobrepeso (2026-11-11)
       if(pasos > 2) toast('El dodge roll es de 1 o 2 casilleros: no habilita el contraataque');
       else if(a.costo && costo0 > num(a.costo.disponibles)) toast('No te alcanzan los No2 para el dodge roll: sin contraataque');
       else if(at && distanciaHex(fin, at) <= distanciaHex(ini, at)) toast('El dodge roll tiene que alejarte del atacante: sin contraataque');
       else Duelo.marcarDodgeArco(dodgeArco.id).then(() => toast('🏹 Dodge roll hecho: ya podés contraatacar')).catch(err => console.error('No se pudo marcar el dodge roll:', err));
     }
     if(a.costo){
-      const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, num(a.costo.gratis) + alejarseGratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo);   // con el terreno lento (arena movediza), los pasos gratis y Lento
+      const costoRutaBase = costoRuta(a.ruta, a.costo.porCasillero, pasos, num(a.costo.gratis) + alejarseGratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo);   // con el terreno lento (arena movediza), los pasos gratis y Lento
       // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no. 🐞 (2026-11-03, tanda e: un creep quedó en −37
       // después de la Bomba de humo) un movimiento libre de N casilleros (Hit and run, Bomba de humo, Disparo y repliegue: `alejarse`) NO es un dodge roll:
       // los primeros N son gratis y lo que se pase se paga como cualquier movimiento (si no alcanzan los No2, se pregunta), no se deja ir a negativo.
       const dodge0 = enDodge(a.id) || (libre && !dodgeArco && !(alejarseGratis > 0));
+      // ⚖ Sobrepeso (2026-11-11, dueño: «el sobrepeso también te debe cobrar un nitro más para tirar… dodge roll»): +1 No2 al dodge roll de un personaje.
+      const recargoSob = (dodge0 || dodgeArco) ? Combatiente.recargoSobrepeso(sobrepesoDeToken(t)) : 0;
+      const costoTotal = costoRutaBase + recargoSob;
+      if(recargoSob) toast(`⚖ Sobrepeso: el dodge roll cuesta ${fmt(costoTotal)} No2 (${fmt(costoRutaBase)} del movimiento + ${recargoSob} por sobrepeso)`);
       const dodge = dodge0 && !Combatiente.defensaSinNo2(a.costo.disponibles, costoTotal);   // …salvo si ya estaba en negativo (2026-10-23)
       const dodgeRegla = dodge0 && !dodge;   // ⚖ ya en negativo: la regla dice que no; la mesa puede decir «hacerlo igual» (2026-11-03)
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, miedo: a.costo.miedo, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,

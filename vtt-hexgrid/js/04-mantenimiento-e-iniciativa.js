@@ -937,6 +937,14 @@ window.avisoDeudaNo2 = o => {
 };
 // ¿Ese token está haciendo el dodge roll? (puede quedar en No2 negativos al moverse)
 const enDodge = id => typeof dodgeBanner !== 'undefined' && !!dodgeBanner && dodgeBanner.tokenId === id;
+// ⚖ El sobrepeso de un personaje (2026-11-11, dueño): lo que se pasa de su Carga máxima, del estado derivado «Sobrepeso» de su resumen público
+// (comun/ficha-resumen.js). El dodge roll le cuesta +1 No2 (Combatiente.recargoSobrepeso). Invocaciones y creeps no tienen sobrepeso.
+const sobrepesoDeToken = t => {
+  if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION) || typeof fichasPub === 'undefined') return 0;
+  // (el resumen público no guarda el id ni el monto: alcanza con saber que lo tiene — el recargo es fijo)
+  const f = fichasPub.get(String(t.fichaId)), e = f && f.resumen && (f.resumen.estados || []).find(x => x && x.nombre === 'Sobrepeso' && x.derivado);
+  return e ? 1 : 0;
+};
 
 /* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra al final y con «Mareo de invocación» (su primer turno no hace nada).
    Lo hace la pantalla del GM al ver aparecer el token. */

@@ -49,6 +49,13 @@ estado: confirmado
 ## El sobrepeso lo baja
 Si el peso de tu equipo supera tu [[Carga máxima]], tenés el estado alterado **Sobrepeso**: **por cada punto que te pasás restás 1 a la Evasión** cuando la tirás. Antes de tirar, el juego te pregunta si querés **pagar 1 No2** para evitar esa penalidad en esa tirada. *(Regla en prueba, 2026-09-24; antes se perdía SP máximo.)*
 
+Además, con sobrepeso tus reacciones cuestan **+1 No2** (fijo, te pases lo que te pases; regla del 2026-11-11, «por ahora»):
+- el **[[Parry]]** cuesta **2 No2** en lugar de 1 (también **«Poner escudo»** contra un disparo, que es un Parry);
+- el primer Parry con **Parada fácil** cuesta **1 No2** (el escudo te ahorra el Parry, pero el peso lo seguís cargando);
+- el **dodge roll** cuesta lo de moverse **+ 1 No2**.
+
+Los botones de defensa lo dicen («2 No2 (1 + 1 por sobrepeso)») junto con la cuenta: cuánto pesa tu equipo y cuál es tu Carga máxima.
+
 > [!question] Piso del sobrepeso
 > ¿Se puede llegar a 0 de SP por sobrepeso? ¿La penalidad afecta solo al SP, o también al movimiento?
 

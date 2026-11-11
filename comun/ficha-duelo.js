@@ -315,11 +315,16 @@ const FichaDuelo = (() => {
         const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
         const c = compute();
         const sobre = c.sobrecarga;
+        // 🔎 Cada penalidad dice de dónde sale (2026-11-11, dueño: «si la penalidad de −5 es por sobrepeso, debe ser claro; si es por otra razón,
+        // también»): el sobrepeso con su cuenta (lo que pesa tu equipo y tu Carga máxima) y los estados que tocan la tirada (ModTirada.porQue).
+        const porQue = (est, st) => typeof ModTirada !== 'undefined' && ModTirada.porQue ? ModTirada.porQue(est, st) : '';
+        const sobreCuenta = sobre > 0 ? `sobrepeso: tu equipo pesa ${fmt(c.pesoEquipado)} y tu Carga máxima es ${fmt(num(c.final.crgmax))} (te pasás ${fmt(sobre)})` : '';
+        const modEva = porQue(estEva, 'eva');
         // Con sobrepeso la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
         const ops = sobre > 0
-          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, reglaNo2: Combatiente.defensaSinNo2(S.nitros, 1) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Evasión pagando el sobrepeso'} : null, info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
-             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
-          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`]}];
+          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: `🏃 Evasión · pagando 1 No2 para evitar la penalidad de sobrepeso (−${fmt(sobre)})`, costo: 1, costoTxt: '1 No2 (para evitar el sobrepeso)', reglaNo2: Combatiente.defensaSinNo2(S.nitros, 1) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Evasión pagando el sobrepeso'} : null, info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, sobreCuenta, ...(modEva ? [modEva] : []), ...(num(S.nitros) < 1 && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
+             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con la penalidad de sobrepeso −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)} −${fmt(sobre)} (sobrepeso)${evaInfo}`, sobreCuenta, ...(modEva ? [modEva] : []), 'no gastás No2']}]
+          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, ...(modEva ? [modEva] : [])]}];
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
         const gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));   // Parada fácil (2026-10-06)
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
@@ -327,12 +332,15 @@ const FichaDuelo = (() => {
         if(disparo) armasYEscudosParaParry().filter(a => !Combatiente.sirveParaParry(a.item, true) && Combatiente.sirveParaParry(a.item, false)).forEach(a =>
           ops.push(Combatiente.parryApagado({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `🗡 Parry · ${a.item.nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo')));
         armasYEscudosParaParry().filter(a => Combatiente.sirveParaParry(a.item, disparo)).forEach(a => {
-          const costo = gratis ? 0 : Combatiente.costoParry();
+          // ⚖ Con sobrepeso, +1 No2 (2026-11-11): el Parry y el «Poner escudo» cuestan 2; con Parada fácil, 1. Lo mismo que cobra parryConArma.
+          const exP = num(Combatiente.extenuado(S.efectos));
+          const costo = Combatiente.conExtenuado(S.efectos, Combatiente.costoParrySobrepeso(gratis, sobre));
+          const costoTxt = Combatiente.costoParryTxt(gratis, sobre, costo > 0 ? exP : 0);
           // 🛡 Contra un disparo, el escudo que lo para se gasta (2026-11-11, dueño: «la flecha queda clavada en el escudo y se pierde 1 punto de
           // durabilidad»): se avisa en el botón, antes de elegir, con lo que le queda.
           const clava = disparo ? Combatiente.disparoClavadoTxt(a.item, FichaCalculo.durableItem(a.item) ? FichaCalculo.durActual(a.item) : null) : '';
-          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}${clava ? ' · −1 durabilidad' : ''}`, costo, reglaNo2: Combatiente.defensaSinNo2(S.nitros, costo) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Parry'} : null,
-            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(clava ? [clava] : []), ...(costo > num(S.nitros) && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
+          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${!costo ? ' · gratis (Parada fácil)' : ''}${clava ? ' · −1 durabilidad' : ''}`, costo, costoTxt, reglaNo2: Combatiente.defensaSinNo2(S.nitros, costo) ? {nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: num(S.nitros), accion: 'Parry'} : null,
+            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(clava ? [clava] : []), ...(Combatiente.recargoSobrepeso(sobre) ? [`+1 No2 por sobrepeso (${sobreCuenta.replace(/^sobrepeso: /, '')})`] : []), ...(porQue(S.efectos, 'parry') ? [porQue(S.efectos, 'parry')] : []), ...(costo > num(S.nitros) && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
         // 🏹 Parry a distancia (Shooter, 2026-10-12): con la habilidad y un arma a distancia en mano, contra cualquier ataque: Evasión contra el PdG,
         // siempre 2 SP (dueño: se usa en turno ajeno, así que no es un Flash que cuesta el doble) + el No2 de un disparo; si gana, cuenta como un Parry
@@ -364,7 +372,7 @@ const FichaDuelo = (() => {
       },
       _defender: (d, modo, itemId) => {
         const S = getS();
-        if(modo === 'parry') FichaAcciones.parryConArma(S, itemId ? S.inventario.find(x => x.id === itemId) || null : null, undefined, ui);
+        if(modo === 'parry') FichaAcciones.parryConArma(S, itemId ? S.inventario.find(x => x.id === itemId) || null : null, undefined, ui, {disparo: Combatiente.contraDisparo(d)});
         else if(modo === 'parrydist'){   // 🏹 Parry a distancia: cobra (2 SP siempre, y el No2 del disparo) y tira la Evasión
           const it = S.inventario.find(x => x.id === itemId) || null, ee = evaEsp(d);
           FichaAcciones.gastarSp(S, 2, ui, 'Parry a distancia');   // 🩸 Maldito

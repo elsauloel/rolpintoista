@@ -272,6 +272,17 @@ aplica solo para esa arma… para jugadores, para creeps, para invocaciones, par
 Código: `Combatiente.STATS_DEL_ARMA` / `STATS_DE_LA_PIEZA` / `fuentesParaStat` (creeps e invocaciones) y `FichaCombate.statParaArma`
 (personajes). Las invocaciones atacan con dos armas como los creeps desde el 2026-11-07 (`armaActiva`, `ataquesArma`).
 
+## Sobrepeso: +1 No2 a las reacciones (dueño, 2026-11-11)
+
+«El sobrepeso también te debe cobrar un nitro más para tirar parry, dodge roll, o parar proyectiles con un escudo.» Con Sobrepeso (lo equipado pesa
+más que la Carga máxima), **+1 No2 fijo, te pases lo que te pases** («es correcto, por ahora»): Parry 1 → 2 (también «Poner escudo» contra un
+disparo), el primer Parry con Parada fácil cuesta 1 («el escudo te ahorra el Parry, pero el peso lo seguís cargando»), el dodge roll cuesta lo de
+moverse + 1. La Evasión sigue igual (−1 por punto de más, o 1 No2 para evitarlo). Solo personajes (los creeps y las invocaciones no tienen
+sobrepeso). `Combatiente.recargoSobrepeso`, `costoParrySobrepeso`, `costoParryTxt`; el dodge roll en `vtt-hexgrid/js/06` (`sobrepesoDeToken`, js/04).
+**Toda penalidad dice de dónde sale** (dueño, el mismo día: «si la penalidad de −5 es por sobrepeso, debe ser claro; si es por otra razón,
+también»): los botones de defensa del duelo muestran la cuenta del sobrepeso (lo que pesa el equipo y la Carga máxima) y «Modificado por: …» con
+cada estado que toca la tirada (`ModTirada.porQue`).
+
 ## Paso fantasma: qué movimiento cuenta (dueño, 2026-11-09)
 
 El Paso fantasma (Anillo de Paso Fantasma, stat `pasofantasma`) suma su valor fijo a la **próxima** tirada de Evasión después de moverse 3 casilleros

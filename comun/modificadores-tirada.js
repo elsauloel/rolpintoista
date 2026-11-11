@@ -45,7 +45,7 @@ const ModTirada = (() => {
       'Nunca baja de 1. Pajaritos y Sentado la parten a la mitad.']},
     parry: {t: '🗡 Parry', p: [
       'Interceptar el arma del enemigo con tu propia arma o tu escudo: tirás tu Parry (sale de la Destreza) contra el PdG del que te ataca.',
-      'Cuesta 1 No2 y necesitás un arma o un escudo sano (uno roto no sirve; un arma natural tampoco, por ahora).',
+      'Cuesta 1 No2 (2 con sobrepeso) y necesitás un arma o un escudo sano (uno roto no sirve; un arma natural tampoco, por ahora).',
       'Si lo ganás, todavía falta aguantar el golpe: sigue el Bloqueo. Si lo perdés, te pega.',
       'Para elegir entre Parry y Esquivar, mirá también cuánto tirarías de Bloqueo.']},
     bloqueo: {t: '🛡 Bloqueo', p: [
@@ -106,6 +106,9 @@ const ModTirada = (() => {
     document.head.appendChild(s);
   }
 
+  // 🔎 De dónde sale cada modificador (2026-11-11, dueño: «si la penalidad es por sobrepeso, debe ser claro; si es por otra razón, también»):
+  // «Modificado por: Pajaritos ÷2 · Bendición +2» para poner debajo de un botón de defensa o ataque; '' si no hay ninguno.
+  function porQue(estados, statId){ const l = lista(estados, statId); return l.length ? `Modificado por: ${l.map(x => x.txt).join(' · ')}` : ''; }
   function tile(estados, statId){
     estilos();
     const l = lista(estados, statId);
@@ -115,5 +118,5 @@ const ModTirada = (() => {
     return {clase: b && d ? ' bt-mixto' : d ? ' bt-debuff' : ' bt-buff', html: `<span class="bt-estados">${esc(txt)}</span>`, titulo: ` — Modificado por: ${txt}`};
   }
 
-  return {lista, tile, ayuda, AYUDA};
+  return {lista, tile, porQue, ayuda, AYUDA};
 })();

@@ -541,13 +541,16 @@ const FichaAcciones = (() => {
     return true;
   }
   // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
-  function parryConArma(S, arma, forzar, ui){
+  // `o.disparo` (2026-11-11): un Parry contra un disparo («Poner escudo»): no hay Bloqueo después.
+  function parryConArma(S, arma, forzar, ui, o){
     // Parada fácil (escudos de Buena calidad, 2026-10-06): el primer Parry del turno, gratis. La marca se vacía al empezar su turno.
-    const fin = FichaCalculo.calcular(S).final;
+    const calc = FichaCalculo.calcular(S), fin = calc.final;
     const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
-    const costo = gratis ? 0 : Combatiente.conExtenuado(S.efectos, Combatiente.costoParry());   // + Extenuado
+    // ⚖ Con sobrepeso, +1 No2 (2026-11-11; con Parada fácil, solo ese 1) · + Extenuado
+    const costo = Combatiente.conExtenuado(S.efectos, Combatiente.costoParrySobrepeso(gratis, calc.sobrecarga));
+    const sobreTxt = Combatiente.recargoSobrepeso(calc.sobrecarga) ? ' (+1 por sobrepeso)' : '';
     if(Combatiente.defensaSinNo2(S.nitros, costo)){   // ya en negativo (2026-10-23) · ⚖ la regla se puede saltar con la mesa (2026-11-03)
-      Combatiente.reglaNo2({nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: S.nitros, accion: `Parry${arma ? ' con ' + arma.nombre : ''}`}, () => parryConArma(S, arma, forzar, ui));
+      Combatiente.reglaNo2({nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: S.nitros, accion: `Parry${arma ? ' con ' + arma.nombre : ''}`}, () => parryConArma(S, arma, forzar, ui, o));
       return;
     }
     S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
@@ -559,7 +562,7 @@ const FichaAcciones = (() => {
     Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `Parry${con}`, costo, quedan: num(S.nitros)});
     ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
     tirarValorStat(S, arma ? `Parry · ${arma.nombre}` : 'Parry', FichaCombate.statParaArma(S, 'parry', arma), 'parry', undefined, undefined, undefined, ui);
-    ui.toast(`Parry${con}: ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
+    ui.toast(`Parry${con}: ${!costo ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2${sobreTxt}`} · te quedan ${fmt(num(S.nitros))}${o && o.disparo ? ' · si lo ganás, el disparo queda parado (contra un disparo no hay Bloqueo)' : arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
     ui.cambio(['refresh', 'botonera']);
   }
   // Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma o escudo; esa suma es el dado.

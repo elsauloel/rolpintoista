@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111clava"></script>
+<script src="combatiente.js?v=20261111sob"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261110vaq"></script>
+<script src="ficha-resumen.js?v=20261111sob2"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261111clava"></script>
+<script src="ficha-acciones.js?v=20261111sob"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261111dur6"></script>
 <script src="estado-preguntas.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261111clava"></script>
+<script src="duelo.js?v=20261111sob"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -3169,6 +3169,18 @@ prueba('con sobrepeso la Evasión se ofrece pagando 1 No2 o con la penalidad', (
   const pesado = fichaBotonera({nitros: 3, attrs: {con: 1, fue: 0, agl: 6, des: 5, esp: 4}, inventario: [{id: 'y', nombre: 'Yunque', tipoItem: 'armadura_rigida', equipado: true, peso: 40}]});
   const h = FichaDuelo.hooks(() => pesado, uiDuelo([], {}));
   igual(h.opcionesDefensa(dueloPrueba()).map(o => o.itemId), ['pagado', 'penal']);
+});
+prueba('⚖ sobrepeso (2026-11-11): el Parry cuesta 2 No2 (1 + 1), con Parada fácil 1, y cada penalidad dice de dónde sale', () => {
+  const pesado = fichaBotonera({nitros: 6, attrs: {con: 1, fue: 0, agl: 6, des: 5, esp: 4}, inventario: [espada, escudo, {id: 'y', nombre: 'Yunque', tipoItem: 'armadura_rigida', equipado: true, peso: 40}]});
+  const h = FichaDuelo.hooks(() => pesado, uiDuelo([], {}));
+  const ops = h.opcionesDefensa(dueloPrueba()), par = ops.find(o => o.modo === 'parry'), pag = ops.find(o => o.itemId === 'pagado'), pen = ops.find(o => o.itemId === 'penal');
+  const antes = pesado.nitros;
+  FichaAcciones.parryConArma(pesado, pesado.inventario.find(x => x.id === 'esp'), undefined, uiCombate([], {}));
+  igual([par.costo, par.costoTxt, /para evitar la penalidad de sobrepeso/.test(pag.etiqueta), /penalidad de sobrepeso −/.test(pen.etiqueta),
+    pen.info.some(t => /tu equipo pesa \d+ y tu Carga máxima es/.test(t)), par.info.some(t => /\+1 No2 por sobrepeso/.test(t)), antes - pesado.nitros,
+    Combatiente.costoParrySobrepeso(true, 3), Combatiente.costoParrySobrepeso(false, 0), Combatiente.costoParryTxt(true, 2), Combatiente.costoParryTxt(true, 0),
+    ModTirada.porQue([{nombre: 'Pajaritos', activo: true, mitadPdgEva: true, polaridad: 'debuff'}], 'eva'), ModTirada.porQue([], 'eva')],
+    [2, '2 No2 (1 + 1 por sobrepeso)', true, true, true, true, 2, 1, 1, '1 No2 (Parada fácil + 1 por sobrepeso)', 'gratis (Parada fácil)', 'Modificado por: Pajaritos ÷2', '']);
 });
 prueba('el Bloqueo del duelo usa el arma del Parry y borra el Parry pendiente', () => {
   const S = fichaBotonera({inventario: [espada, escudo]}), reg = [], est = {parry: 'esc'};

@@ -27,7 +27,7 @@ const FichaResumen = (() => {
     const s = FichaCalculo.calcular(S).sobrecarga;
     if(!(s > 0)) return [];
     return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
-      detalle: `Tu equipo pesa ${fmt(s)} de más: al tirar Evasión restás ${fmt(s)}, salvo que pagues 1 No2 para evitarlo.`}];
+      detalle: `Tu equipo pesa ${fmt(s)} de más que tu Carga máxima. Evasión: −${fmt(s)}, o pagás 1 No2 para evitarlo. Además, +1 No2 fijo: Parry y «Poner escudo» 2 No2 (con Parada fácil, 1), y el dodge roll lo de moverse + 1.`}];
   }
   /* 🛡 Armadura rota (dueño, 2026-10-29: «esta armadura rota no es del jugador, sino del ítem, pero lo tiene que ver el jugador para saberlo… si ningún
      ítem tiene, todos tienen la durabilidad full, no aparece el estado»): derivado de las piezas puestas con puntos de rotura (`armRota`, armadura o

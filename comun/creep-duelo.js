@@ -275,6 +275,10 @@ const CreepDuelo = (() => {
         // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
         const ct = contraListo(sc);
         if(ct.h && !d.hab) ops.forEach(o => { o.contraEsquiva = true; o.info = [...(o.info || []), ct.motivo ? `⚔ ${ct.h.nombre}: ahora no (${ct.motivo})` : `⚔ si gana, puede contraatacar (${ct.h.nombre}: ${C().modoSP(sc) ? `${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`} + un primer ataque)`]; });
+        // 🔎 De dónde sale cada modificador (2026-11-11, dueño): «Modificado por: Pajaritos ÷2 · …» debajo de la Evasión y el Parry.
+        if(typeof ModTirada !== 'undefined' && ModTirada.porQue) ops.forEach(o => { if(!o || o.motivoNo || !['evasion', 'parry'].includes(o.modo)) return;
+          const t = ModTirada.porQue(o.modo === 'evasion' ? Combatiente.ciegoContraDistancia(d, sc.estados) : sc.estados, o.modo === 'evasion' ? 'eva' : 'parry');
+          if(t) o.info = [...(o.info || []), t]; });
         return Combatiente.sinReaccionesNo2(ops, sc.estados);   // Expuesto (Degollar): sin Parry
       },
       // ⚔ Cobrar el Contraataque al elegir «Sí» (su SP o su cooldown, al doble: es en turno ajeno). '' = cobrado.

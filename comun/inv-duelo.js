@@ -234,6 +234,10 @@ const InvDuelo = (() => {
         const esArmaInv = x => !x.escudo && Combatiente.armasDeMano(inv).some(a => a.nombre === x.nombre);   // ⚔⚔ la segunda arma también es arma (2026-11-07)
         if(def) I().defensas(inv, {soloEscudo: disparo}).forEach(def => ops.push({modo: 'parry', itemId: def.id || def.nombre, itemNombre: def.nombre, escudo: !esArmaInv(def), natural: !!def.natural || (esArmaInv(def) && !!(Combatiente.armasDeMano(inv).find(a => a.nombre === def.nombre) || {}).natural), etiqueta: `${esArmaInv(def) ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
           info: [`Parry 🎲 ${fx(I().parryValor(inv, def.id || def.nombre), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv, def.nombre))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]}));   // 🛡 una por arma y por escudo (2026-11-03)
+        // 🔎 De dónde sale cada modificador (2026-11-11, dueño): «Modificado por: Pajaritos ÷2 · …» debajo de la Evasión y el Parry.
+        if(typeof ModTirada !== 'undefined' && ModTirada.porQue) ops.forEach(o => { if(!o || o.motivoNo || !['evasion', 'parry'].includes(o.modo)) return;
+          const t = ModTirada.porQue(o.modo === 'evasion' ? Combatiente.ciegoContraDistancia(d, inv.estados) : inv.estados, o.modo === 'evasion' ? 'eva' : 'parry');
+          if(t) o.info = [...(o.info || []), t]; });
         return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo, itemId) => {

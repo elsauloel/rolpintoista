@@ -186,10 +186,10 @@ Tu **[[Fuerza]]** define tu **Carga máxima** (Crg.Max): cuánto peso podés lle
 
 - **Solo cuenta lo equipado.** Lo que está en la mochila no suma.
 - Cada ítem equipado tiene un **peso**. Se suman todos.
-- Si te pasás, **por cada punto de peso que sobra perdés 1 de [[SP]] máximo**.
+- Si te pasás, tenés **Sobrepeso**: **por cada punto de peso que sobra restás 1 a la [[Evasión]]** (o pagás 1 No2 para evitarlo en esa tirada), y el **[[Parry]]**, «Poner escudo» y el **dodge roll** cuestan **+1 No2**. Detalle en [[SP]] → «El sobrepeso lo baja». *(Antes: perdías 1 de SP máximo por punto.)*
 
 > [!example] Sobrecargado
-> Crg.Max 8, llevás 10 de peso → te pasás por 2 → tu SP máximo baja en 2.
+> Crg.Max 8, llevás 10 de peso → te pasás por 2 → tu Evasión tira con −2 (o pagás 1 No2), y cada Parry te cuesta 2 No2.
 
 > [!question] Fórmula y efectos
 > - ¿Cuál es la fórmula exacta FUE → Crg.Max?

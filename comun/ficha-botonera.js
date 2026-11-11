@@ -144,7 +144,9 @@ const FichaBotonera = (() => {
   function costoParryTxt(S){
     const armas = FichaCombate.armasYEscudosParaParry(S);
     if(!armas.length) return 'no podés parriar sin un arma o escudo equipado';
-    return armas.map(a => `${a.item.nombre}: ${fmt(Combatiente.costoParry(a.item))} No2`).join(' · ');
+    // ⚖ Con sobrepeso, +1 No2 (2026-11-11): «2 No2 (1 + 1 por sobrepeso)».
+    const c = FichaCalculo.calcular(S), gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));
+    return armas.map(a => `${a.item.nombre}: ${Combatiente.costoParryTxt(gratis, c.sobrecarga)}`).join(' · ');
   }
 
   /* ---------- Consumibles ---------- */
@@ -411,7 +413,7 @@ const FichaBotonera = (() => {
             ${lupaBotonHtml('stat:eva')}${ModTirada.ayuda('eva')}
             <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">${Combatiente.stuneado(S.efectos) ? '1 (Stun)' : `🎲 ${esc(fCombate.eva)}`}</span>${mtEva.html}
           </button>
-          <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt(S) + ')' + mtParry.titulo)}">
+          <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: cuesta 1 No2, 2 con sobrepeso (' + costoParryTxt(S) + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}${ModTirada.ayuda('parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(parryPrevio)}`}</span>${sinDefArma ? '' : mtParry.html}
           </button>

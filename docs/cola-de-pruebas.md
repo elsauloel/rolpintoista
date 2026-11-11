@@ -12,6 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **[siguiente] 🎮 El GM controla a un personaje** (dueño, 2026-11-11: «el aviso de que el GM está controlando a Rockardo debería estar visible
+  siempre, sí, pero además un jugador no debería poder usar su propio token mientras lo controla el GM… sólo observar»). Mientras el GM tiene el 🎮
+  control de un personaje: (1) en la pantalla del jugador dueño, un aviso fijo y siempre visible «🎮 El GM está manejando a <nombre>: las tiradas le
+  salen a él»; (2) el jugador no puede usar ese token ni su Botonera (moverlo, atacar, habilidades, ítems, duelos de ese personaje): solo mirar.
+  Al soltar el control, todo vuelve. (Surgió probando las trampas: el cartel de Rockardo le salía al GM.)
 - **✅ hecho — Contraataque antes del Bloqueo** (dueño, 2026-11-11): con la habilidad Contraataque, al ganar el Parry se pregunta «¿contraatacás?»
   antes del Bloqueo; Sí → sin Bloqueo y sin daño, y se abre el contraataque; No → el Bloqueo de siempre. Devolver gentileza, sin cambios.
 - ✅ hecho · **La Percepción siempre incierta** (dueño, 2026-11-11: «siempre que se tira Percepción, que no se sepa bien para qué… "Fulano

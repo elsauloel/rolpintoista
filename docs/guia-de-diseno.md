@@ -434,3 +434,9 @@ Constitución, **con botón, en el cuadro del duelo de siempre** (no la tira sol
 Constitución ×N y se la come él (menos su Defensa); **contra otro token**, cada uno tira **su propia** Constitución ×N, que es el daño que le hace
 **al otro** (menos la Defensa del otro). Primero el empujado, después el otro. El GM tira por un creep o por quien no está; «✋ Terminar a mano»
 como en cualquier duelo. (`avisoColision`, `vtt-hexgrid/js/13`; `Combatiente.colisionFormula`.)
+
+### 🚷 Modo narrativo y los estados que traban el movimiento (dueño, 2026-11-11)
+Fuera del combate (modo narrativo) moverse no cobra No2, pero los estados que traban el movimiento **frenan igual**: Inmovilizado (también la
+Prisión de hielo), Sentado, Stun / Sueño y Congelado — el token no se arrastra y avisa por qué. Rengo no cambia nada (sin costo, el doble de
+nada es nada). Sentado se levanta como siempre desde la Botonera. Salida a mano: el GM mueve a cualquiera con 🦶 Mover libre (tecla M).
+`Combatiente.trabaNarrativo(estados)` (comun/combatiente.js) y el arrastre en `vtt-hexgrid/js/06-mouse.js`.

@@ -102,6 +102,9 @@ lienzo.addEventListener('pointerdown', e => {
         // Ese clic confirmó el movimiento marcado: no empieza otro arrastre.
       }else if(costo && costo.porCasillero <= 0){
         toast('No te podés mover ahora (Inmovilizado o Tropezado: este turno no se mueve; si hace falta, el GM lo mueve con 🦶 Mover libre, tecla M)');
+      }else if(modoMapa !== 'combate' && Combatiente.trabaNarrativo(confusionEstadosDe(t))){
+        // 🚷 Modo narrativo (dueño, 2026-11-11): no se cobran No2, pero los estados que traban el movimiento frenan igual (comun/combatiente.js).
+        toast(`No te podés mover ahora (${Combatiente.trabaNarrativo(confusionEstadosDe(t))}: aunque el mapa esté en modo narrativo, no se mueve; si hace falta, el GM lo mueve con 🦶 Mover libre, tecla M)`);
       }else{
         const v = visibles.get(id) || hexCentro(t.col, t.fila);
         arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false,

@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111cho"></script>
+<script src="combatiente.js?v=20261111narr"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -7263,6 +7263,13 @@ prueba('🎲 Tanda 3 de la auditoría de tiradas (2026-11-10): una chance en el 
   const e0 = h.efectos[0], e1 = h.efectos[1];
   igual([h.sinOposicion, h.dano, e0.caras, e0.exitos, e0.spec.nombre, e0.spec.stacks, e0.spec.item, e1.caras, e1.exitos, e1.spec.turnos, Duelo.specDeEfecto(e0).item],
     [true, null, 4, 1, 'Armadura rota', 2, 'escudo', 2, 1, 1, 'escudo']);
+});
+prueba('🚷 Modo narrativo (dueño, 2026-11-11): Inmovilizado, Sentado, Stun/Sueño y Congelado frenan el movimiento; Rengo no; un estado apagado no', () => {
+  const T = e => Combatiente.trabaNarrativo(e);
+  igual([T([{nombre: 'Inmovilizado', inmovilizado: true}]), T([{nombre: 'Sentado', sentado: true}]), T([{nombre: 'Stun', stun: true}]),
+    T([{nombre: 'Sueño', stun: true, sueno: true}]), T([{nombre: 'Congelado'}]), T([{nombre: 'Rengo', rengo: true}]),
+    T([{nombre: 'Inmovilizado', inmovilizado: true, activo: false}]), T([]), T(null)],
+    ['Inmovilizado', 'Sentado', 'Stun', 'Sueño', 'Congelado', '', '', '', '']);
 });
 prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — toda la habilidad cuesta lo de un solo ataque, como el Barrido', () => {
   const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dos al hilo');

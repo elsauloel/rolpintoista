@@ -518,7 +518,9 @@ const Duelo = (() => {
      Con la PASIVA «Devolver gentileza» (`defensa.contraPasiva`): solo si ganó el Parry y el Bloqueo («bloqueado»), lo de un primer ataque, sin bonus.
      Si se dan las dos tras un Parry y un Bloqueo, va por la pasiva (no gasta la habilidad). */
   const contraPorPasiva = d => !!(d && !d.hab && d.resultado === 'bloqueado' && d.defensa && d.defensa.contraPasiva);
-  const contraPorHab = d => !!(d && !d.hab && d.defensa && d.defensa.contraEsquiva && !contraPorPasiva(d)
+  const contraPrePendiente = d => !!(d && !d.hab && d.fase === 'bloqueo' && d.defensa && d.defensa.contraPre === 'pregunta' && !d.fuerza && !d.bloqueo && !d.contra);
+  // (2026-11-11) Tras un Parry ganado, la habilidad se pregunta antes del Bloqueo (`defensa.contraPre`): respondida esa pregunta, no se vuelve a ofrecer.
+  const contraPorHab = d => !!(d && !d.hab && d.defensa && d.defensa.contraEsquiva && !d.defensa.contraPre && !contraPorPasiva(d)
     && (d.resultado === 'fallo' || ((d.resultado === 'mitad' || d.resultado === 'bloqueado') && (d.defensa.modo === 'parry' || d.defensa.modo === 'parrydist'))));
   // ⚔ Contraataque (Warrior, 2026-10-13): ¿el que esquiva alcanza con su arma a quien lo atacó? Se mide al elegir la Evasión (antes de
   // tirar), con los tokens del mapa activo. Sin los dos tokens (la ficha suelta, otro mapa), no se frena: decide la mesa.
@@ -1077,7 +1079,12 @@ const Duelo = (() => {
       // Con un arco, antes del contraataque, el dodge roll: alejarse 1 casillero pagando sus No2 (`dodgeArco`; con ballesta no hace falta).
       if(m.defensa && m.defensa.modo === 'parrydist' && r.gana === 'defensor'){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; if(m.defensa.arco){ m.contacto.dodgeLibre = true; m.contacto.dodgeArco = true; } }
       else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
-      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
+      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){
+        m.fase = 'bloqueo';   // el Parry paró el PdG: sigue el Bloqueo
+        // ⚔ Contraataque ANTES del Bloqueo (dueño, 2026-11-11): con la habilidad, al ganar el Parry se pregunta primero «¿contraatacás?». Sí → no se
+        // tira el Bloqueo y el golpe queda parado del todo (sin daño), y se abre el contraataque; No → el Bloqueo de siempre. Si no lo alcanza, no se pregunta.
+        if(m.defensa.contraEsquiva && m.defensa.contraAlcanza !== false) m.defensa = {...m.defensa, contraPre: 'pregunta'};
+      }
       else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
     }else{
@@ -2615,6 +2622,13 @@ const Duelo = (() => {
     if(actual && actual.id === id && actual.dato) dibujar();
   }
   // 🤺 El desarme en juego, dicho en el paso 3 (2026-10-22, dueño: «¿se vio en algún lado que la tirada es para un desarme?»).
+  // ⚔ Contraataque antes del Bloqueo (dueño, 2026-11-11): la pregunta, en el lugar del paso del Bloqueo, mientras se decide.
+  function contraPreHtml(d){
+    const propio = esMio(d.defensor);
+    if(!(propio || soyGM())) return `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} paró el golpe y está decidiendo si contraataca…</div>`;
+    return `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Paraste el golpe' : _esc(d.defensor.nombre) + ' paró el golpe'}${d.defensa.itemNombre ? ' con ' + _esc(d.defensa.itemNombre) : ''}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b> Con el Contraataque no se tira el Bloqueo: el golpe queda parado del todo y ${propio ? 'contestás' : 'contesta'} con +2 a la Probabilidad de Golpe. Si no, sigue el Bloqueo.</div>`
+      + `<button type="button" data-contrapre>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contrapre-no>No, tirar el Bloqueo</button></div>`;
+  }
   function desarmeAvisoHtml(d){
     const ds = d.ataque && d.ataque.desarme;
     if(!ds) return '';
@@ -2684,6 +2698,8 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
     }else if(d.resultado === 'fallo' && d.crit && d.crit.soloCritico){
       caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🎯 SIN CRÍTICO</div><div class="chico">Pegó, pero no fue crítico: ${_esc(d.ataque.habNombre || 'el disparo')} no hace nada (solo vale si es crítico)</div>${mot}</div>`;
+    }else if(d.resultado === 'fallo' && d.defensa && d.defensa.contraPre === 'si'){
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el golpe${d.defensa.itemNombre ? ' con ' + _esc(d.defensa.itemNombre) : ''} y aprovecha para contestar: no hay Bloqueo y no recibe daño</div>${mot}</div>`;
     }else if(d.resultado === 'fallo'){
       caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${_esc(d.defensor.nombre)} lo esquivó</div>${mot}</div>`;
     }else if(interceptado){
@@ -3178,8 +3194,8 @@ const Duelo = (() => {
           ${miniHtml(d, 'contacto')}
         </div>`}
         ${mostrarBloqueo ? `<div class="duelo-paso"><h4><span class="n">3</span>${d.ataque && d.ataque.desarme ? '🤺 Desarmar: ' : 'Bloqueo: '}Fuerza del golpe contra Bloqueo</h4>${desarmeAvisoHtml(d)}
-          <div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
-          ${miniHtml(d, 'bloqueo')}
+          ${contraPrePendiente(d) ? contraPreHtml(d) : `<div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
+          ${miniHtml(d, 'bloqueo')}`}
         </div>` : ''}
         ${d.fase === 'dodge' ? dodgeHtml(d, nuevaClave('dodge')) : ''}
         ${d.crit ? criticoHtml(d) : ''}
@@ -3373,6 +3389,13 @@ const Duelo = (() => {
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
+    const bcp = f.querySelector('[data-contrapre]');
+    if(bcp) bcp.onclick = () => { bcp.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id, pre: true}); };
+    const bcpNo = f.querySelector('[data-contrapre-no]');
+    if(bcpNo) bcpNo.onclick = () => {
+      bcpNo.disabled = true;
+      col().doc(d.id).update({'defensa.contraPre': 'no'}).catch(err => { console.error('Duelo: no se pudo anotar «no contraatacar»', err); bcpNo.disabled = false; _toast('No se pudo anotar la respuesta: probá de nuevo'); });
+    };
     const bconNo = f.querySelector('[data-contra-no]');
     if(bconNo) bconNo.onclick = () => {
       bconNo.disabled = true;
@@ -3424,6 +3447,17 @@ const Duelo = (() => {
         else recibirFlash(d.id, m.campo, ops);
         return;
       }
+      if(m.tipo === 'duelo-contra' && m.pre){   // ⚔ Contraataque antes del Bloqueo (2026-11-11): Sí → golpe parado sin daño + el contraataque
+        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || !contraPrePendiente(d)) return;
+        const arma = h.armaContra(d) || {};
+        const err = h.contraEsquivaPagar ? await h.contraEsquivaPagar(d, arma) : 'esta página no sabe cobrar el Contraataque';
+        if(err){ _toast('No se pudo contraatacar: ' + err); return; }
+        const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
+        await col().doc(d.id).update({'defensa.contraPre': 'si', resultado: 'fallo', fase: 'fin', estado: 'resuelto'});
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, contraHab: true}}, tok, d.defensor.tokenId, d.id);
+        if(nid) await col().doc(d.id).update({contra: nid});
+        return;
+      }
       if(m.tipo === 'duelo-contra'){
         const porPasiva = contraPorPasiva(d), alEsquivar = contraPorHab(d) && d.defensa.contraAlcanza;   // ⚔ reglas del 2026-11-05   // ⚔ Contraataque (Warrior; el creep, también tras el Parry)
         if(!h.soy || !h.soy(d.defensor) || !h.armaContra || (!porPasiva && !alEsquivar) || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
@@ -3442,6 +3476,7 @@ const Duelo = (() => {
       const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
       const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : campo === 'dano' ? 'dano' : 'bloqueo';
       if(!h.soy || !h.soy(lado) || d[campo] || d.estado !== 'esperando' || d.fase !== fase) return;
+      if((campo === 'fuerza' || campo === 'bloqueo') && contraPrePendiente(d)) return;   // ⚔ primero se responde «¿contraatacás?» (2026-11-11)
       if(!hk) document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
       let defensa = null;
       if(campo === 'eva'){
@@ -4056,5 +4091,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

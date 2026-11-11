@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261111sob"></script>
+<script src="duelo.js?v=20261111cpre"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -120,10 +120,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261110t1"></script>
+<script src="skills-clase.js?v=20261111cpre"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261110esc3"></script>
+<script src="skills-creep-base.js?v=20261111cpre"></script>
 <script src="creeps-esenciales.js?v=20261111h15"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -3149,6 +3149,17 @@ prueba('Sentado no puede atacar (personaje, invocación y creep, cualquier ataqu
   FichaAcciones.atacarConArma(S, espada, false, ui(true));
   igual([Combatiente.preguntaSentado(sentado), Combatiente.preguntaSentado(sentado, 'Orco'), Combatiente.preguntaSentado([]), preguntas.length, sinCobrar, S.nitros < 20],
     ['Estás Sentado: no podés atacar. ¿Atacar igual?', 'Orco está Sentado y no puede atacar. ¿Atacar igual?', '', 3, 20, true]);
+});
+prueba('⚔ Contraataque antes del Bloqueo (dueño, 2026-11-11): con la habilidad, al ganar el Parry se pregunta antes del Bloqueo; Evasión y Devolver gentileza, igual', () => {
+  const base = def => ({ataque: {tipo: 'normal', armaNombre: 'Sable'}, atacante: {nombre: 'A'}, defensor: {nombre: 'D'}, defensa: def});
+  const p1 = base({modo: 'parry', contraEsquiva: true, contraAlcanza: true}); Duelo.cerrarPar(p1, 'contacto', {gana: 'defensor', dif: 3});
+  const p2 = base({modo: 'parry', contraEsquiva: true, contraAlcanza: false}); Duelo.cerrarPar(p2, 'contacto', {gana: 'defensor', dif: 3});
+  const p3 = base({modo: 'parry', contraPasiva: true}); Duelo.cerrarPar(p3, 'contacto', {gana: 'defensor', dif: 3});
+  const e1 = base({modo: 'eva', contraEsquiva: true, contraAlcanza: true}); Duelo.cerrarPar(e1, 'contacto', {gana: 'defensor', dif: 3});
+  const no = {...p1, defensa: {...p1.defensa, contraPre: 'no'}, resultado: 'mitad'};
+  igual([p1.fase, p1.defensa.contraPre, Duelo.contraPrePendiente(p1), Duelo.contraPorHab(p1), p2.defensa.contraPre || '', p3.defensa.contraPre || '', p3.fase,
+    e1.resultado, Duelo.contraPorHab(e1), Duelo.contraPorHab(no), Duelo.contraPrePendiente({...p1, fuerza: {total: 5}})],
+    ['bloqueo', 'pregunta', true, false, '', '', 'bloqueo', 'fallo', true, false, false]);
 });
 prueba('oportunidad y contraataque cuestan siempre lo de un primer ataque y no suman al conteo', () => {
   const S = fichaBotonera({nitros: 20, inventario: [espada], ataquesArma: {[FichaCombate.claveAtaque(espada)]: 3}}), reg = [];

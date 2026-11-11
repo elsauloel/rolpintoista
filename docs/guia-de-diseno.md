@@ -224,6 +224,14 @@ Toda habilidad configurable (propias de la ficha, de invocaciones y de creeps; l
 2. **Tirada de efecto** — la tirada interna de la habilidad (daño, curación, duración…; fórmula de dados, ej. `2d6+3`). Es un botoncito **🎲** al lado de Ejecutar, y **solo aparece cuando esa segunda tirada existe** (hay un stat al ejecutar **y** una fórmula). Sin stat, Ejecutar tira la fórmula directamente y no hay botón aparte.
 **En los editores paso a paso las dos tiradas son dos pasos distintos**: «Tirada al ejecutar» (el stat) y «Tirada de efecto» (la fórmula), antes de «Estado» / «Efecto». Vale para el creador de habilidades de la ficha, el de invocaciones y el de creeps de gm-tools; el resumen final las muestra en dos filas («Al ejecutar» y «Efecto»). Código: `ficha.html` (`PASOS_HAB`, `PASOS_HAB_INV`, `botonSegundaHab`, `botonSegundaHabInv`) y `gm-tools.html` (`PASOS_HAB_CREEP`, `botonSegundaHabCreep`).
 
+## Contraataque antes del Bloqueo (dueño, 2026-11-11)
+Con la **habilidad Contraataque**, al **ganar el Parry** el duelo pregunta «¿contraatacás?» **antes de tirar el Bloqueo**. **Sí**: no se tira el
+Bloqueo, el golpe queda **parado del todo, sin daño** («el Parry lo desvió y aprovecha para contestar»), y se abre el contraataque (+2 PdG, lo de un
+primer ataque + el cooldown/SP; Flash: el doble en turno ajeno). **No**: sigue el Bloqueo de siempre, y la habilidad ya no se vuelve a ofrecer en ese
+duelo. Si no alcanza al atacante, no se pregunta. Al ganar la **Evasión**, igual que antes («Esquivaste, ¿contraatacás?»). La pasiva **Devolver
+gentileza** no cambia: necesita ganar el Parry **y** el Bloqueo. Desarmar (que va en el paso del Bloqueo) se ofrece después de contestar «No».
+Parar un disparo con el escudo sigue sin dar contraataque. (Código: `contraPre` dentro de `defensa`, comun/duelo.js.)
+
 ## PdG en contraataque (`pdgcontra`) — el «mundo del contraataque» es de los Tipo 6 (dueño, 2026-09-26)
 Con la dinámica de [[Contraataque]] algunas armas de **Tipo 6** (cortantes) pueden traer **+1, +2 o +3 al PdG solo cuando contraatacás** (stat nuevo **PdG en contraataque**, `pdgcontra`). **Vale mucho menos que un PdG normal** porque es circunstancial: en la calculadora **0,8 PC por punto** (el PdG normal vale 3,5). Es una **stat de casa de los cortantes** (junto a Parry e Iniciativa: sin recargo). Se suma solo al elegir **Contraataque** en el menú de Atacar (no al ataque normal ni al de oportunidad), tanto en la ficha como en las tarjetas de creeps (`armaMods`). **Armas con `pdgcontra`:** Espada larga de infantería +1 · Cimitarra del desierto +1 · Sable del capitán pirata +2 · Espada vampírica menor +2 · Katana de maestro +3 · Espadón de acero de Toledo +3 · Katana del viento +3 · Filo del Capitán Sin Nombre +3 (todas siguen en su tier). También puede darlo un estado o un ítem.
 

@@ -741,6 +741,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 3 aprobado** (dueño, 2026-11-10: «me cierra así»): Con 14 · Des 8 · Agi 6 · Fue 7 · Esp 4, vida 70, 6 No2; el escudo pasa a Buena:
   **Escudo de la guardia** (Guardián +1, Def +2, Bloqueo +1, peso 3): Def 7, Bloqueo 9, Parry 8, Res.CC 14. Habilidad nueva: **Interponerse**
   (Flash). **Cargado** (2026-11-10).
+  **Nivel 4 aprobado** (dueño, 2026-11-11: «la consagrada va ok»): Con 15 · Des 8 · Agi 7 · Fue 8 · Esp 4, vida 80 (Robustez), 7 No2;
+  **Coraza consagrada** (Buena) en lugar de la de cuero hervido: Def 6, Def. especial 3, Res.Esp 19, Res.Mt 8, Bloqueo 10. Habilidad nueva:
+  **Tirar la bronca**. **Cargado** (2026-11-11).
 
 - **L5 · Duelista · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me gusta»). Estrategia: el esgrimista del mano a mano: busca a uno, ataja y
   devuelve, amaga y entra por donde no ataja; gana el uno contra uno. Atributos (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 11/8/7/5/2 → 35, 8** · nv2

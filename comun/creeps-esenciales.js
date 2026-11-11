@@ -430,6 +430,9 @@
   esencial({...T3, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-10: Interponerse; el escudo pasa a Buena: Escudo de la guardia, Guardián +1)
     equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
     habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse'], pasivas: ['Guardia firme']});
+  esencial({...T3, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-11: Tirar la bronca; pasiva Robustez; Coraza consagrada en lugar de la de cuero hervido, para bancarse la magia)
+    equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza consagrada', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca'], pasivas: ['Guardia firme', 'Robustez']});
   esencial({linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 8, 11, 2],   // (2026-11-03, dueño: «me parece bien»)
     equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],

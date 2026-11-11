@@ -48,7 +48,12 @@ function momentosEscuchar(){
       if(ch.type === 'removed') return;
       const d = ch.doc.data();
       const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
-      if(ms < momentosDesde) return;
+      // 🕶 Un pedido de sigilo sin terminar (js/116) vuelve aunque sea de antes de entrar (2026-11-11, prueba en el mapa: al recargar la
+      // pantalla del GM quedaba colgado): si sigue esperando una tirada y es de la última media hora, se muestra de nuevo.
+      const sigiloPendiente = d.tipo === 'sigilo-pedido' && ['percepcionGM', 'sigiloJugador', 'sigiloTirando'].includes(d.estado) && Date.now() - ms < 30 * 60 * 1000;
+      // (…y su resultado, en la pantalla que todavía muestra el cartel: si no, quedaba «tirá tu Sigilo» después de recargar.)
+      const sigiloConCartel = d.tipo === 'sigilo-pedido' && typeof sigiloJugCartel !== 'undefined' && sigiloJugCartel.has(ch.doc.id);
+      if(ms < momentosDesde && !sigiloPendiente && !sigiloConCartel) return;
       momentoRecibido(ch.doc.id, d);
     });
   }, err => console.error('Error escuchando los momentos:', err));

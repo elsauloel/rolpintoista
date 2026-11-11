@@ -1003,8 +1003,25 @@ de la sesión (`prueba-*.png`).
   «🎒 Saque rápido — Sacaste Poción de HP del cinturón sin gastar No2»; con la chance al 1 %, no salió: sin cartel, solo la línea de la Mesa
   («⚡ Saque rápido (1 %): 1d20 = 16 → no salió») y cobró el No2.
 - ✅ **Golpe en la sien contra un jefe**: el duelo Fuerza 20 contra Res.CC 4 ganó; «Aplicar Stun» → «no entró: Protección de jefe».
-- ⚪ **Sin probar todavía:** el dodge roll con sobrepeso (+1 No2), Atraer y Tolerar en el cuadro del duelo, la Mala sombra al empezar la
-  ronda, la Anulación contra una invocación y el rayo en el agua.
+- ✅ **Segunda tanda (2026-11-11, la misma partida, todo restaurado; las 9 marcas del lápiz intactas)**:
+  - 🔧 **Arreglado: el pedido de sigilo al recargar.** Si la pantalla del GM (o la del jugador) se recargaba con un «percibe movimientos cerca»
+    abierto, el cartel no volvía (los momentos de antes de entrar se ignoran) y quedaba colgado; tampoco llegaba el resultado a la pantalla
+    que lo seguía mostrando. Ahora vuelve (`js/16`: un pedido de sigilo sin terminar de la última media hora, y el resultado del que tiene el
+    cartel abierto). Probado: GM y J1 recargados con el pedido abierto → el GM vio «percibe movimientos cerca» y J1 «🎲 Tirar Sigilo».
+  - ✅ **Personaje que termina cerca de un creep escondido** (3b): la Rata 3 en sigilo; J1 movió a Larry un paso y terminó con la rata en su
+    zona de alerta (sin cono) → J1: «Algo está fuera de lugar… tirá Percepción» (sacó 5, a la Mesa); el GM tiró a escondidas el Sigilo de la
+    rata (5: sigue escondida) y J1 solo vio «Puede que estés flasheando».
+  - ✅ **Dodge roll con sobrepeso**: Bizzante (con Sobrepeso) en dodge roll, 1 casillero → «−2 No2» (1 del movimiento + 1 por sobrepeso).
+  - ✅ **Atraer** (Varita del gancho, la Rata contra Larry): el duelo Ef.Esp (GM) contra Fuerza (J1, con su botón): 3 contra 2 → lo trajo 2
+    casilleros.
+  - ✅ **Tolerar un efecto** (Veneno, Ef.Esp 5 fijo): el cuadro se abrió con el 5 puesto y J1 tiró su Res.Esp (3): no lo toleró.
+  - ✅ **Mala sombra al empezar la ronda**: con Larry pegado a la portadora, el duelo Ef.Esp (GM) contra Res.Mt (J1): perdió (5 contra 3) y el
+    orden lo anotó («ya es el último: no baja más»).
+  - ✅ **Anulación contra una invocación** (una invocación de prueba de Larry, armada en memoria): el duelo contra la Res.Mt de su invocador
+    (J1, con su botón): 1 contra 12 → «Larry (copia) sostiene a Lobo invocado (prueba)».
+  - ✅ **Rayo en el agua**: un charco con la Rata 1 y Larry; el golpe eléctrico a la rata corrió por el agua a Larry (−5) y su Parálisis
+    (25 %) se tiró en el cuadro del duelo al **50 %** (3–4 en d4), con el botón del GM.
+  - Nota: para mover a Larry (Inmovilizado de una prueba anterior del dueño) se usó el modo narrativo y «Sí, mover igual».
 - 🔧 **Otro arreglo de paso:** al pasar el mapa a combate, la pantalla del GM tiraba en bucle «Anillos al empezar el combate:
   FichaCalculo is not defined» (`js/25`, el texto de los anillos de atributo) y cortaba el resto de los anillos de ese combate; ahora no
   depende de esa pieza.

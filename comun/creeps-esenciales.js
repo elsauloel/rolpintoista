@@ -492,6 +492,9 @@
   esencial({...R3, nivel: 4, atrib: [10, 9, 7, 14, 2],   // (aprobado 2026-11-11: Mantener a raya; pasiva Escurridizo en lugar de Vista de halcón —«con la destreza que tiene, el rango me parece suficiente»—; Guantes de cetrero)
     equipo: ['Ballesta del pialador', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de cetrero'],
     habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared', 'Mantener a raya'], pasivas: ['Puntería', 'Escurridizo']});
+  esencial({...R3, nivel: 5, atrib: [11, 9, 8, 15, 2],   // (aprobado 2026-11-11: Vigilancia; Chaleco de kevlar en lugar del de cuero)
+    equipo: ['Ballesta del pialador', 'Chaleco de kevlar', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de cetrero'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared', 'Mantener a raya', 'Vigilancia'], pasivas: ['Puntería', 'Escurridizo']});
 
   esencial({linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 5, 8, 2],   // (2026-11-03, dueño: «va así»)
     equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],

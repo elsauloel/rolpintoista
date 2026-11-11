@@ -830,6 +830,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 4 aprobado** (dueño, 2026-11-11: «vamos con el escurridizo; con la destreza que tiene, el rango me parece suficiente»): Des 14 · Con 10 ·
   Agi 7 · Fue 9 · Esp 2, vida 50, 7 No2; **Guantes de cetrero** (Buena, PdG a distancia +2) en lugar de los de agarre: PdG con la ballesta 17.
   **Mantener a raya** y la pasiva **Escurridizo** (en lugar de Vista de halcón). **Cargado** (2026-11-11).
+  **Nivel 5 aprobado** (dueño, 2026-11-11: «el trabador me parece bien»): Des 15 · Con 11 · Agi 8 · Fue 9 · Esp 2, vida 60, 8 No2; **Chaleco de kevlar**
+  (Buena) en lugar del de cuero: Def 5 (7 contra disparos). Habilidad nueva: **Vigilancia**. **Cargado** (2026-11-11). La línea R3 queda completa.
 
 - **H3 · Duelista pesado · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra así»). Estrategia: te desarma (Desarmar, al ganar un Parry),
   te rompe la armadura y te remata. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/8/5/2 → 45, 5** · nv2 10/10/8/6/2 → 50, 6 · nv3

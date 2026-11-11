@@ -753,6 +753,8 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
+- [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.
 - [ ] **Auditoría de tiradas (`docs/auditoria-tiradas.md`), las preguntas abiertas** (2026-11-10, dueño: «cuando esté en la compu… las vamos a
   revisar una por una»). Los bloques 1, 2 y 3 (resistencias, daños y chances) se pasan al cuadro del duelo como ruta de trabajo, por tandas;
   quedan para revisar juntos:

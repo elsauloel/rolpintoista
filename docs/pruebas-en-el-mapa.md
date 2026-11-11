@@ -984,6 +984,29 @@
 
 ## Probado
 
+## 🧪 Tanda del 2026-11-11 (tarde): pendientes viejos (Claude, «Claude · pruebas», «Prueba · Trampas en flor»; todo restaurado después)
+Informe con capturas y video para el dueño (página aparte). Con clics en las pantallas del GM, J1 y J2; creeps de prueba sumados del pool
+esencial y borrados al final.
+- ✅ **Lanza del abanderado** (Abanderado nv5): ataca desde 2 casillas sin el aviso de fuera de alcance; crítico ×1 contra Larry (34 → 23).
+- ✅ **Poción de SP menor** (Mago de escarcha nv4): 10 → 27 SP (un tercio de 51, para arriba), −1 No2.
+- ✅ **Devolver gentileza** (Escudero nv4): Parry y Bloqueo ganados → «¿Contraatacás? (Devolver gentileza)»; **sin** la pasiva ni la habilidad
+  (Martillero) → «¡BLOQUEADO!» y no ofrece contraatacar.
+- ✅ **Contraataque** (Duelista nv2): Parry ganado y Bloqueo perdido → pasa la mitad y ofrece contraatacar. **Arreglado** (`54b49dec`): el cuadro
+  decía que el escudo de un creep perdía durabilidad; ahora esa línea es solo para personajes.
+- ✅ **📏 Fuera de alcance / ✨ Invulnerable** al elegir el objetivo: los dos carteles con «Proceder / Atacarlo igual» y «Elegir otro».
+- ✅ **❤ +N y Vida extra** (creep): +10 con la vida llena → «¿Cargar el sobrante como Vida extra?» → Vida extra 10. Falta con personaje e invocación.
+- ✅ **Percepción aumentada en un personaje**: Larry se frena al primer paso con una rata en sigilo cerca; cartel incierto; «Puede que estés flasheando».
+- ✅ **Robo en sigilo**: a la víctima solo le llega el cartel incierto; si la rata gana se lleva oro y **sigue en sigilo** (huida para el GM); si pierde,
+  la pescan y queda Marcada. El +2 sigilo y el +2 espalda se suman (+4).
+- ✅ **⏬ Demora animada** en un duelo real (Puño de roca): la lista se despliega y el demorado baja; aviso «ahora estás 6.º».
+- ✅ **✕ de la tira del duelo minimizado, en curso**: «¿Cancelarlo?» → «¿Cuenta como usada?» → cancelado para todos, la línea en la Mesa y el
+  cuadro de J1 se cierra solo. Falta: otro jugador que no puede cancelarlo.
+- ✅ **🧮 La cuenta del daño antes de aplicar**: «11 de daño te va a entrar a la vida» y al aplicar entró 11.
+- ◐ **🎲 d20 del crítico**: el cuadro «Tirando…» y el resultado bien; los dados 3D no cargan en la máquina de pruebas (la librería viene de internet).
+- ⬜ **Kevlar contra un disparo con M2/D2**: no se pudo (un creep no ataca a otro creep desde sus Acciones —no pasa nada, sin aviso— y los personajes
+  de prueba no tienen arma a distancia física). Pregunta al dueño: ¿avisar al elegir a un aliado?
+- ⬜ Percepción aumentada en una invocación (no hay invocaciones vivas) · Mala sombra desde la Botonera (ningún esencial la tiene).
+
 ## 🧪 Pruebas en el mapa de lo hecho el 2026-11-11 (Claude, «Claude · pruebas», «Prueba · Trampas en flor»; todo restaurado después)
 
 Pantallas del GM, J1 y J2 con clics de verdad (las situaciones de prueba, armadas por código cuando hacía falta). Evidencia en el scratchpad

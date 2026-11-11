@@ -753,7 +753,7 @@
   quedan para revisar juntos:
   1. **Bloque 4, los carteles propios** (chances de las piezas —Retirada, Inamovible, Recuperarse, Reflejos—, el 1d6 del Escudo elemental, Malviaje,
      soltarse, Confusión, la tirada extra de una zona): ¿al cuadro del duelo o quedan con su cartel? (Las trampas, en el punto de abajo.)
-  2. **Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?
+  2. ~~**Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?~~ ✅ decidido el 2026-11-11 (cada uno tira su propia Constitución; cola de programación 5).
   3. **Sigilo:** ¿está bien que el GM tire a escondidas la Destreza de quien está escondido (para no delatarlo)?
   4. **Saque rápido:** sigue callado (pedido del 2026-10-05) ¿o pasa a tener botón?
 - [ ] **Revisar en el mapa el cartel de las trampas** (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una

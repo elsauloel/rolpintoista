@@ -426,3 +426,11 @@ vaquita sigue); si llegan dos en el mismo golpe, solo cancela el primero; con an
 Mesa («🐞 … la vaquita de San Antonio espantó X») y en la Crónica; en el mapa revolotea alrededor del token (más sinuosa y pausada que la Polilla,
 con pausitas) y se va volando cuando espanta algo. Ícono 🐞 alrededor del token. Código: `Combatiente.vaquitaEspanta` (comun/combatiente.js),
 `vtt-hexgrid/js/05` (el dibujo) y `js/25` (el anillo y el aviso).
+
+### 💥 Choque por empujón: cada uno tira su Constitución (dueño, 2026-11-11)
+
+Si un empujón se frena antes de recorrer todo (choca contra algo sólido o contra otro token), por cada casillero que le faltó se tira una
+Constitución, **con botón, en el cuadro del duelo de siempre** (no la tira sola el mapa): **contra algo sólido**, el empujado tira su propia
+Constitución ×N y se la come él (menos su Defensa); **contra otro token**, cada uno tira **su propia** Constitución ×N, que es el daño que le hace
+**al otro** (menos la Defensa del otro). Primero el empujado, después el otro. El GM tira por un creep o por quien no está; «✋ Terminar a mano»
+como en cualquier duelo. (`avisoColision`, `vtt-hexgrid/js/13`; `Combatiente.colisionFormula`.)

@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111sob"></script>
+<script src="combatiente.js?v=20261111cho"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -6831,6 +6831,10 @@ prueba('🐀 Chillido (2026-10-30, la Rata de galería): 1 refuerzo que también
   igual([h.modo, h.refuerzos, h.unaVez, h.soloVidaHasta, num(h.nitrosCosto), tag.includes('auditada'), !!CreepAcciones.preguntaVida(sc(15), h), !!CreepAcciones.preguntaVida(sc(16), h),
     p.error || '', x.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(x, x.habilidades[0]))],
     ['auto', {cant: 1, propagan: true}, true, 50, 2, true, false, true, '', true, true]);
+});
+prueba('💥 Choque por empujón con botón (cola de programación 5, 2026-11-11): la Constitución ×N como fórmula de dados para el cuadro del duelo', () => {
+  const f = Combatiente.colisionFormula;
+  igual([f(9, 2), f(12, 1), f(6, 3), f(1, 3), f(0, 1), f(9, 0)], ['2d8+2', '1d12', '3d6', '3', null, '1d8+1']);
 });
 prueba('🛡 Golpe de escudo (2026-10-27; daño del 2026-11-10): pega con el escudo (Tipo 10, sin Parry), 1d10 + el peso del escudo + el Dmg, sin crítico; Sentado y Demora 1 solo si hizo daño', () => {
   const h = chp('Golpe de escudo'), sc = creepPrueba({id: 'g1', equipo: [{id: 'e', nombre: 'Rodela de tablas', tipoItem: 'escudo_1m', def: 1, peso: 3, equipado: true}]});

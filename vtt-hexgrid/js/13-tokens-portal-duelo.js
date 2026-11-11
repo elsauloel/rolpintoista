@@ -2220,40 +2220,41 @@ async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el
 /* El empujón (2026-10-08, ráfaga helada y vendaval): lejos de quien lo tira, hasta `n` casillas libres (lo frena un Sólido o un token). Inamovible
    (su %) no se mueve. Va a la Crónica. */
 /* 💥 El daño de colisión (P178, dueño 2026-10-21: «Tira Constitución por cada casillero que le faltó recorrer, menos armadura. Y si es contra otro
-   pj, cada uno usa la Constitución del otro»). Si el empujón se frena antes de recorrer todo: por cada casillero que le faltó se tira una Constitución
-   (contra algo sólido, la suya; contra otro token, la de ese otro) y se le resta la Defensa; el otro token recibe lo mismo con la Constitución del
-   empujado. Las tiradas van a la Mesa; el resultado, al centro de quien maneja a cada uno (un creep: el GM) y a la Crónica. Lo aplica la pantalla
-   que resuelve el efecto (el GM). */
-function colisionTirar(de, veces){
-  const v = trampaValorStat(de, 'con'), est = confusionEstadosDe(de), rs = [];
-  for(let i = 0; i < veces; i++){ const r = Combatiente.tirarStat(v, est, 'con'); if(r) rs.push(r); }
-  if(!rs.length) return null;
-  return {total: rs.reduce((a, r) => a + num(r.total), 0), rolls: rs.flatMap(r => r.rolls || []), mod: rs.reduce((a, r) => a + num(r.mod), 0), formula: rs.map(r => r.formula).join(' + ').slice(0, 60)};
-}
-async function colisionAplicar(x, tir, deNombre, veces){
-  mesaPublicar(`💥 Choque: ${nombreDe(x)} · Constitución de ${deNombre} ×${veces}`, {...tir, quien: nombreDe(x), ...(x.tipo === 'creep' ? {desde: 'gm'} : {})});
-  let res = null;
-  try{
-    if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(tir.total), false, 0, 0); }
-    else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(tir.total), false, 0, 0);
-  }catch(err){ console.error('No se pudo aplicar el daño de colisión:', err); }
-  return res && res.r ? `${nombreDe(x)}: ${tir.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}`
-    : `${nombreDe(x)}: ${tir.total} de daño menos su Defensa — aplicalo a mano`;
-}
+   pj, cada uno usa la Constitución del otro»). Si el empujón se frena antes de recorrer todo, por cada casillero que le faltó:
+   🎲 Con botón, en el cuadro del duelo de siempre (cola de programación 5, dueño 2026-11-11: «claro, es así»; tanda de docs/auditoria-tiradas.md #8):
+   - contra algo sólido, el empujado tira SU Constitución ×N y se la come él, menos su Defensa;
+   - contra otro token, cada uno tira SU Constitución ×N, que es el daño que le hace AL OTRO (menos la Defensa del otro): primero el empujado
+     (le pega al que estaba), después el otro (le pega al empujado), uno detrás del otro (late, se despliega, se resuelve, se repliega).
+   Cada tirada la hace quien maneja a ese token (el jugador; el GM por un creep o por quien no está), con «elegir a mano» y «✋ Terminar a mano»
+   como en cualquier duelo; lo aplica el camino de siempre (danoDuelo, js/78: Defensa, escudos, Invulnerable). No frena el empujón: corre aparte.
+   Un token oculto no abre el cuadro (lo delataría): queda a mano. Sin danoDuelo (no debería pasar), a mano. */
+function colisionPares(t, contra){ return contra ? [[t, contra], [contra, t]] : [[t, t]]; }   // [quien tira su Constitución, a quién le pega]
 async function avisoColision(t, contra, faltan){
   const veces = Math.max(1, Math.round(num(faltan)) || 1);
   const uidDe = x => x.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || '') : (x.duenoUid || '');
   const uids = [...new Set([t, ...(contra ? [contra] : [])].map(uidDe).filter(Boolean))];
-  const lineas = [];
-  const t1 = colisionTirar(contra || t, veces);
-  if(t1) lineas.push(await colisionAplicar(t, t1, contra ? nombreDe(contra) : nombreDe(t), veces));
-  if(contra){ const t2 = colisionTirar(t, veces); if(t2) lineas.push(await colisionAplicar(contra, t2, nombreDe(t), veces)); }
-  const cuenta = `Le falt${veces === 1 ? 'ó' : 'aron'} ${veces} casillero${veces === 1 ? '' : 's'}: ${veces} ${veces === 1 ? 'Constitución' : 'Constituciones'}${contra ? ' (cada uno, la del otro)' : ''}, menos la Defensa.`;
-  const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ${cuenta} ${lineas.join(' · ') || '✋ Daño de colisión a mano.'}`;
+  const conX = `Constitución ×${veces}`;
+  const cuenta = contra
+    ? `Le falt${veces === 1 ? 'ó' : 'aron'} ${veces} casillero${veces === 1 ? '' : 's'}: cada uno tira su propia ${conX} con su botón, en el cuadro del duelo, y es el daño que le hace al otro (menos la Defensa del otro).`
+    : `Le falt${veces === 1 ? 'ó' : 'aron'} ${veces} casillero${veces === 1 ? '' : 's'}: ${nombreDe(t)} tira su ${conX} con su botón, en el cuadro del duelo, y se lo come él (menos su Defensa).`;
+  const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ${cuenta}`;
   mesaLinea(`💥 ${texto}`, 'recordatorio');
   momentoAbrir({tipo: 'colision', icono: '💥', titulo: `Choque: ${nombreDe(t)}${contra ? ' contra ' + nombreDe(contra) : ''}`, resultado: texto, estado: 'listo',
     datos: {paraUids: uids, aviso: true, boton: 'Entendido', pasos: [{titulo: 'Daño de colisión', texto}]}});
-  return lineas.join(' · ');
+  const pares = colisionPares(t, contra).map(([de, a]) => ({de, a, idDe: idDeToken(de), idA: idDeToken(a)}));
+  (async () => {
+    for(const p of pares){
+      const formula = Combatiente.colisionFormula(trampaValorStat(p.de, 'con'), veces);
+      const yo = p.idDe && typeof yoDeToken === 'function' ? yoDeToken(p.idDe) : null;
+      if(!formula || !yo || !p.idA || p.de.oculto || p.a.oculto || typeof danoDuelo !== 'function'){
+        mesaLinea(`💥 Choque: ${nombreDe(p.a)} recibe la ${conX} de ${nombreDe(p.de)} menos su Defensa — ✋ resolvelo a mano`, 'recordatorio');
+        continue;
+      }
+      await contiendaPausa();
+      await danoDuelo({yo, deTokenId: p.idDe, aTokenId: p.idA, nombre: `💥 Choque: ${conX} de ${nombreDe(p.de)}`, formula, fisico: true, esperar: true});
+    }
+  })().catch(err => console.error('No se pudo abrir el daño de colisión:', err));
+  return `daño de colisión en el cuadro del duelo (${conX}${contra ? ', cada uno la suya contra el otro' : ''})`;
 }
 /* 📌 Clavar a la pared (2026-10-26, dueño, el Rango: «si en alguno de esos casilleros hay un objeto sólido, se choca contra el mismo y queda inmovilizado
    por tres turnos. Puede tirar fuerza contra; la dificultad va a ser la tirada de probabilidad de golpe»): si el empujón se frena contra algo sólido (un

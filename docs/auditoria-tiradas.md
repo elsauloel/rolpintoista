@@ -43,7 +43,7 @@ habilidades sin Ejecución (los tira quien los usa, con su botón).
 | 5 | ✅ hecho (tanda 1) · **Aura espeluznante / de miedo**: al entrar | habilidad / estado | `js/52` `auraResolver` l. ~148 | un cartel propio; **un solo botón tira los dos lados** (Ef.Esp del dueño del aura y Res.Mt del que entra) | **A** | chica |
 | 6 | ✅ hecho (tanda 1, sin probar en el mapa) · **Mala sombra** (mufa): al empezar la ronda | habilidad | `js/102` `ordenTirarValor` l. ~150 | **sale sola**: la Res.Mt contra el Ef.Esp | **A** | media |
 | 7 | ✅ hecho (tanda 1) · **Cebo** (Hunter): la Res.Mt de cada rival que lo ve | habilidad (creep) | `js/80` `ceboAtraer` l. ~46 | **sale sola**: la Res.Mt contra una dificultad fija | **B** (la tira quien lo ve, contra el número fijo) | chica |
-| 8 | **Choque por empujón**: el daño de colisión (una Constitución por cada casilla que faltó) | regla general | `js/13` `colisionTirar` l. ~2227 | **sale sola** | **D**: ¿quién la tira? ¿el que empujó o el empujado? | media |
+| 8 | **Choque por empujón**: el daño de colisión (una Constitución por cada casilla que faltó) | regla general | `js/13` `avisoColision` | **✅ hecho (cola de programación 5, 2026-11-11)**: en el cuadro del duelo (`danoDuelo`); contra algo sólido el empujado tira su Constitución ×N y se la come; contra otro, cada uno tira la suya y es el daño que le hace al otro | dueño: «claro, es así» | media |
 
 **Tanda 1 (2026-11-10), cómo quedó:** todas en el cuadro del duelo de siempre (`contiendaDuelo`, js/78), cada uno con su botón; el GM puede tirar
 por el ausente o elegir el valor a mano, y «✋ Terminar a mano» deja el efecto para la mesa (no se aplica solo).
@@ -136,7 +136,7 @@ duelo o se dejan?
 
 1. **Bloque 4:** los carteles propios que ya tienen botón (las trampas, las chances de las piezas, el 1d6 del Escudo elemental, el Malviaje,
    soltarse, la Confusión y la tirada extra de la zona), ¿los pasamos todos al cuadro del duelo, o te sirven así? Las trampas son el más grande.
-2. **Choque por empujón (#8):** el daño de colisión, ¿lo tira quien empujó o el empujado?
+2. ~~**Choque por empujón (#8):** el daño de colisión, ¿lo tira quien empujó o el empujado?~~ ✅ decidido y hecho el 2026-11-11: cada uno tira su propia Constitución (contra algo sólido, el empujado se la come; contra otro, se la hace al otro).
 3. **Detección del sigilo (#30):** ¿está bien que el GM la tire a escondidas?
 4. **Saque rápido (#22):** ¿sigue callado, como pediste el 2026-10-05, o ahora también con botón?
 5. **Bloques 1 a 3:** ¿se aprueban en bloque (A y B) para hacerlos de a tandas?

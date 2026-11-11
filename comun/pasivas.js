@@ -45,7 +45,7 @@ const PASIVAS_BASE = [
    detalle: 'Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón). Además, las trampas ocultas cercanas te avisan: si en tu camino quedás justo al lado de una, el movimiento se interrumpe y corresponde una tirada de percepción. Y no tenés punto ciego para el sigilo: un personaje en sigilo pegado a tu espalda también te da la tirada para descubrirlo (la casilla de atrás cuenta como zona de alerta). ⚙ Automatizado en el mapa.',
    mods: [], percepcionAumentada: true},
   {poolId: 'ojo-avizor', nombre: 'Ojo avizor', jobCosto: 1, etiquetas: ['visión', 'utilidad'],
-   detalle: '+1 al campo de visión (radio en hexágonos).', mods: [{stat: 'vision', val: 1}]},
+   detalle: '+2 al campo de visión (radio en hexágonos). Solo para personajes.', mods: [{stat: 'vision', val: 2}]},   // (dueño, 2026-11-11: «subile +2 al ojo avizor»; es para jugadores, no para creeps)
   // Resto de los stats secundarios (escalón +1 = lo que da 1 punto de su atributo).
   {poolId: 'temple-magico', nombre: 'Temple mágico', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
    detalle: '+1 Res.Esp (resistencia mágica).', mods: [{stat: 'resmg', val: 1}]},

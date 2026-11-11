@@ -490,7 +490,7 @@ function celdasDisco(R){
   for(let dq = -R; dq <= R; dq++) for(let dr = Math.max(-R, -dq - R); dr <= Math.min(R, -dq + R); dr++) res.push({dq, dr});
   return (offsetsDisco[R] = res);
 }
-// Radio de visión de un token: la luz de la escena + lo que suman sus ítems y pasivas (Visión de la ficha: base 6, ej. Ojo avizor +1).
+// Radio de visión de un token: la luz de la escena + lo que suman sus ítems y pasivas (Visión de la ficha: base 6, ej. Ojo avizor +2).
 function radioVisionDe(t){
   let bonus = 0;
   if(t && t.tipo === 'pj'){

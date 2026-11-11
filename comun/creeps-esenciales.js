@@ -449,6 +449,9 @@
   esencial({...L5, nivel: 3, atrib: [8, 7, 9, 13, 2],   // (aprobado 2026-11-11: Estocada; el sable pasa a Buena: Sable del sargento)
     equipo: ['Sable del sargento', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
     habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada'], pasivas: ['Guardia firme']});
+  esencial({...L5, nivel: 4, atrib: [9, 8, 9, 14, 2],   // (aprobado 2026-11-11: Arte de la guerra; pasiva Ojo crítico; Escudo triangular en lugar del broquel —ataja y bloquea con el escudo y contraataca con el sable, dueño: «está bien»—)
+    equipo: ['Sable del sargento', 'Escudo triangular', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada', 'Arte de la guerra'], pasivas: ['Guardia firme', 'Ojo crítico']});
 
   esencial({linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (2026-11-03, dueño: «sí»)
     equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca'],

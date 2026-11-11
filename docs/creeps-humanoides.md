@@ -769,6 +769,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 3 aprobado** (dueño, 2026-11-11: «sí»): Des 13 · Agi 9 · Con 8 · Fue 7 · Esp 2, vida 40, 9 No2; el sable pasa a Buena: **Sable del
   sargento** (Tipo 6, 2 dados, PdG en contraataque +2, Sangrado 25 %, Perfora 1): Parry 16, Bloqueo 8, Eva 10. Habilidad nueva: **Estocada**.
   **Cargado** (2026-11-11).
+  **Nivel 4 aprobado** (dueño, 2026-11-11): Des 14 · Agi 9 · Con 9 · Fue 8 · Esp 2, vida 45, 9 No2; **Escudo triangular** en lugar del broquel: Def 5,
+  Parry 16, Bloqueo 10. **Arte de la guerra** (Flash) y la pasiva **Ojo crítico**. Regla confirmada: puede atajar y bloquear con el escudo y
+  contraatacar con el sable (dueño: «está bien»); el Bloqueo del escudo cuenta solo cuando ataja con el escudo. **Cargado** (2026-11-11).
 
 - **W3 · Martillero · Warrior** (boceto aprobado 2026-11-03, dueño: «me gusta», con un punto de Con a Des en cada nivel). Estrategia: golpes que
   atontan y derriban: te deja sin turno (Demora, Pajaritos, Sentado); desordena la pelea. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1

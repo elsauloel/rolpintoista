@@ -83,6 +83,11 @@
 > stacks con una Ráfaga de cortes (≈ 78 de daño en el tiempo) y 8 con la Hoja envenenada (≈ 36), encima de lo que ya tuviera. Ideas a evaluar: tope de
 > stacks, que el veneno nuevo no sume sino que renueve, que la Ráfaga aplique el veneno una sola vez, o subirle el costo. Probarlo en una pelea.
 
+> **⚖ Sobrepeso en los creeps (2026-11-11, dueño: «anotá en pendiente, cuando terminemos con los esenciales: revisar las consecuencias de
+> contemplar el sobrepeso para creeps»).** Hoy el sobrepeso (−1 a la Evasión por punto de más o 1 No2; +1 No2 al Parry, Poner escudo y dodge roll)
+> es solo de los personajes. Revisar qué pasaría si los creeps también lo tuvieran: cuántos creeps esenciales y de la biblioteca quedarían con
+> sobrepeso con su equipo actual, cómo cambia su balance, y si conviene ajustar equipo o Carga máxima. **Hacerlo al terminar los creeps esenciales.**
+
 > **🗡 Letalidad del Asesino de las sombras nv5 (2026-11-09, abierto; para la ronda de balance).** Degollar por la espalda saliendo del sigilo
 > (Puñal de sombra +2 PdG y +2 de daño en sigilo, Paso ligero) llega a PdG 25 y 1 dado + 17 de daño, con Crítico frecuente +2 y potente +7: tumba a
 > casi cualquier personaje de un golpe. El precio: termina su turno, pasa al final del orden y queda Expuesto (Def 1, Evasión a la mitad). Idea a

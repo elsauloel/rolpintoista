@@ -763,7 +763,7 @@
   2. ~~**Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?~~ ✅ decidido el 2026-11-11 (cada uno tira su propia Constitución; cola de programación 5).
   3. **Sigilo:** ¿está bien que el GM tire a escondidas la Destreza de quien está escondido (para no delatarlo)?
   4. ~~**Saque rápido:** sigue callado ¿o pasa a tener botón?~~ ✅ decidido el 2026-11-11: se tira solo; si sale, un aviso; si falla, solo Mesa y Crónica.
-- [ ] **Revisar en el mapa el cartel de las trampas** (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
+- [x] **Revisar en el mapa el cartel de las trampas** — ✅ decidido el 2026-11-11 (dueño, probándolo en la compu: «los menús de las trampas me parecen bien»): las trampas quedan con su propio cartel paso a paso, igual para todas (no pasan al cuadro del duelo). Las trampas en flor (mitad centro / mitad toda el área) siguen en prueba. (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
   excepción: pueden tener su propio menú de trampas, estandarizado para todas»). Hoy cada trampa usa el cartel paso a paso
   (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como
   menú propio de las trampas (igual para todas) o pasa al cuadro del duelo. Junto con eso, la prueba de las trampas en flor (mitad «centro»,

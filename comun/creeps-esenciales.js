@@ -255,6 +255,9 @@
   esencial({...H1, nivel: 4, atrib: [13, 11, 8, 8, 2],
     equipo: ['Hacha del verdugo de la capital', 'Jubón de cuero tachonado', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
     habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante', 'Aguante'], pasivas: ['Impulso', 'Robustez']});
+  esencial({...H1, nivel: 5, atrib: [14, 12, 8, 9, 2],   // (aprobado 2026-11-11: Furia; Casco de bandas remachadas en lugar de la Cofia; + Guanteletes de cuero tachonado —no los de hierro, que restan Iniciativa—)
+    equipo: ['Hacha del verdugo de la capital', 'Jubón de cuero tachonado', 'Anillo de Paso Fantasma', 'Casco de bandas remachadas', 'Botas de cuero de vaca', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante', 'Aguante', 'Furia'], pasivas: ['Impulso', 'Robustez']});
   esencial({linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 6, 7, 2],
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],

@@ -1010,7 +1010,10 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Habilidades: + **Aguante**. Pasivas: Impulso · **Robustez**.
 - Números (nv3 → nv4): vida 60 → 80 · No2 8 → 9 · Def 4 = 4 · Def. esp. 1 → 3 · Dmg 10 → 11 · Bloqueo 10 → 11 · Eva/Ini/Mov 7 → 8 · crít. T4 2 → 4.
 
-### H1 Embestidor · nivel 5 — ⏸ en pausa (dueño, 2026-11-06: «dejemos el Embestidor para más adelante»)
+### H1 Embestidor · nivel 5 (aprobado 2026-11-11, cargado en el pool; estuvo en pausa desde el 2026-11-06)
+- Con 14 · Fue 12 · Agi 8 · Des 9 · Esp 2 → vida 90, No2 9; + **Furia**; Cofia → **Casco de bandas remachadas** (B) · + **Guanteletes de cuero tachonado**
+  (en lugar de los de hierro, que restan Iniciativa). Def 6 · Def. esp. 3 · PdG 9 · Bloqueo 12 · Res.CC 15. La línea H1 queda completa.
+- (La propuesta que había quedado en pausa:)
 - Propuesta pendiente: Con 14 · Fue 12 · Agi 8 · Des 9 · Esp 2 → vida 90; + **Furia**; Cofia → **Casco de bandas remachadas** (B) · + **Guanteletes de
   hierro** (Ini −1: ofrecer otra pieza de manos si molesta). Def 6 · Def. esp. 2 · PdG 9 · Bloqueo 13.
 

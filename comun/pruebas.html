@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261111esc"></script>
+<script src="combatiente.js?v=20261112sind2"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -105,7 +105,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
-<script src="efectos-golpe.js?v=20261031luz"></script>
+<script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
 <script src="duelo.js?v=20261111cpre"></script>
@@ -122,8 +122,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261111cpre"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
-<script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261111cpre"></script>
+<script src="creeps-base.js?v=20261112sind2"></script>
+<script src="skills-creep-base.js?v=20261112sind2"></script>
 <script src="creeps-esenciales.js?v=20261111h15"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1277,7 +1277,7 @@ prueba('🎆 Misiles elementales (Mago, 2026-10-25): uno por elemento y el Misil
   igual([hs.map(h => h.duelo.tipoDano).join(','), !!hs[0].duelo.danoDirecto, hs[1].duelo.efectos[0].nombre, hs[2].duelo.porDano.estado,
     ce.danoSiempre, ce.contra.join(','), ce.danoFormula, !!ce.cadena, ce.efectos[0].caras, hs[4].duelo.porDano.estado,
     Combatiente.stacksPorDano(12, pz), Combatiente.porDanoTxt(pz), el.variantes.length, el.nitrosCosto, CreepCalculo.costoSpHab(sc, el), CreepCalculo.costoSpHab(sc, hs[1]), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Misil arcano' && /no falla/.test(x.datos.detalle || ''))],
-    ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'rescc', '1d6', true, 2, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
+    ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'rescc', '1d6', true, 6, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
 });
 prueba('🪶 Levitar (Support, 2026-10-25): Levitando 2 turnos completos (levitar 100, +3 Evasión, el primer casillero gratis)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Levitar');
@@ -1793,7 +1793,7 @@ prueba('⚡ Zap (Mago, 2026-10-25): no se esquiva, 1d4 eléctrico directo, Pará
   const h = armarHabilidadDeCreep(e.datos, 2);
   const n = Duelo.limpiarHab(Combatiente.habEjecucion(h, h.duelo, {stat: () => 4})) || {};   // el camino real: la Ejecución → el duelo
   igual([h.duelo.contra.join(','), !!n.danoSiempre, h.duelo.danoFormula, h.duelo.danoDirecto, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].caras, h.duelo.cadena.paralisis.join(','), ((n.cadena || {}).paralisis || []).join(','), Combatiente.chanceDado(50).caras, Combatiente.chanceDado(25).caras, h.cd],
-    ['rescc', true, '1d4', true, 'eléctrico', 'Parálisis', undefined, '50,25', '50,25', 2, 4, 3]);
+    ['rescc', true, '1d4', true, 'eléctrico', 'Parálisis', undefined, '50,25', '50,25', 6, 4, 3]);
 });
 prueba('🛡 Armas perforantes (Support, 2026-10-25): 3 turnos, Perfora 3 y 3 contra la Defensa especial', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Armas perforantes');
@@ -5254,18 +5254,23 @@ prueba('piernas: Evasión contra oportunidad / contra contraataque suman solo co
     [[`Orco · Evasión ${forma(base)}`, `Orco · Evasión (+2 contra oportunidad) ${forma(base + 2)}`, `Orco · Evasión (+3 contra contraataque) ${forma(base + 3)}`],
      'evaopor', 'evacontra', '', `Evasión 🎲 ${forma(base + 2)} (con +2 contra oportunidad)`]);
 });
-prueba('chances: el dado de cada porcentaje (10 % d10, 13 % d8, 17 % d6, 20 % 2 en d10, 25 % d4, 33 % 2 en d6, 50 % moneda, 75 % 3 en d4) y un d5 de arma pasa a d10', () => {
+prueba('🎲 Sin d2 (2026-11-12, dueño: la moneda 3D mostraba la cara equivocada): un efecto con 2 caras se tira con d6 (4 a 6) y no queda ningún d2 en el catálogo', () => {
+  const n = EfectosGolpe.normalizar({nombre: 'Sangrado', caras: 2, exitos: 1});
+  const conD2 = CATALOGO_BASE.filter(i => (i.efectosGolpe || []).some(e => Number(e.caras) === 2) || /en d2/.test(i.detalle || '')).map(i => i.nombre);
+  igual([n.caras, n.exitos, Combatiente.chanceTexto(50), conD2.length], [6, 3, '50 % (4–6 en d6)', 0]);
+});
+prueba('chances: el dado de cada porcentaje (10 % d10, 13 % d8, 17 % d6, 20 % 2 en d10, 25 % d4, 33 % 2 en d6, 50 % 4–6 en d6 —sin d2 desde el 2026-11-12—, 75 % 3 en d4) y un d5 de arma pasa a d10', () => {
   const d = p => { const x = Combatiente.chanceDado(p); return x.exitos + '/' + x.caras; };
   const ef = EfectosGolpe.normalizar({nombre: 'Rengo', caras: 5, exitos: 1});
   igual([d(10), d(13), d(17), d(20), d(25), d(33), d(50), d(75), d(5), d(66), Combatiente.chanceTexto(20), ef.caras + '/' + ef.exitos],
-    ['1/10', '1/8', '1/6', '2/10', '1/4', '2/6', '1/2', '3/4', '1/20', '4/6', '20 % (9–10 en d10)', '10/2']);
+    ['1/10', '1/8', '1/6', '2/10', '1/4', '2/6', '3/6', '3/4', '1/20', '4/6', '20 % (9–10 en d10)', '10/2']);
 });
 prueba('piernas: Retirada limpia — 33 % = 5–6 en d6, 50 % = 4–6, 100 = siempre sin tirar; el resumen del personaje la publica', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'p1', nombre: 'Bombacha de gaucho matrero', tipoItem: 'piernas', equipado: true, mods: [{stat: 'retirada', val: 50}]}];
   igual([Combatiente.retiradaDado(33), Combatiente.retiradaTexto(33), Combatiente.retiradaTexto(50), Combatiente.retiradaDado(100), Combatiente.retiradaTexto(100),
     Combatiente.retiradaDado(0), Combatiente.retiradaPct(140), FichaResumen.resumen(S).retirada],
-    [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (2 en d2)', null, 'siempre', null, 100, 50]);
+    [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (4–6 en d6)', null, 'siempre', null, 100, 50]);
 });
 prueba('pies: Pasos de baile suma a la Evasión del duelo solo si ya se movió en el turno (window.mapaSeMovio), junto a la Evasión contra oportunidad', () => {
   const antes = window.mapaSeMovio;
@@ -5286,7 +5291,7 @@ prueba('pies: las chances (33 % = 5–6, 50 % = 4–6, siempre), Lento y los est
   const lento = estadosPresetFicha().find(e => e.nombre === 'Lento');
   igual([Combatiente.chanceTexto(33), Combatiente.chanceTexto(50), Combatiente.chanceTexto(100), Combatiente.chanceDado(50), !!(lento && lento.lento), Combatiente.esTraba(lento),
     Combatiente.esTraba({nombre: 'Veneno'}), rengo1, S.efectos.some(e => e.nombre === 'Rengo')],
-    ['33 % (5–6 en d6)', '50 % (2 en d2)', 'siempre', {caras: 2, exitos: 1}, true, true, false, 1, false]);
+    ['33 % (5–6 en d6)', '50 % (4–6 en d6)', 'siempre', {caras: 6, exitos: 3}, true, true, false, 1, false]);
 });
 prueba('zona: la tabla «según la tirada extra» (Pedos Tóxicos, 2026-10-22): vale el renglón más alto que alcance, «cae» es la vida a 0, viaja adentro del JSON de zonaEstado y la nota la cuenta', () => {
   const tabla = [{desde: 17, estado: {nombre: 'Stun', turnos: 1}}, {desde: '7', estado: {nombre: 'Pajaritos', turnos: 1}}, {desde: 20, caer: true}, {desde: 3}, {desde: 5, estado: {nombre: ''}}];

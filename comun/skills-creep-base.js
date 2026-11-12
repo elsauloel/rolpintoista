@@ -538,7 +538,7 @@
       duelo: {...MIS_BASE, tipoDano: 'hielo', porDano: {estado: 'Escarcha', cada: 5, mas1: true}, efectos: []}},
     {clave: 'rayo', nombre: 'Centella', icono: '⚡', que: 'no se esquiva; 1d6 eléctrico que salta, y 50 % de Parálisis si no la resiste',
       detalle: 'Una centella a un rival dentro de su Rango que no se esquiva: 1d6 más un cuarto de su Efecto especial de daño eléctrico (lo frenan la Defensa especial y la resistencia eléctrica), que salta al rival más cercano (4 casillas o menos) con la mitad de lo que entró, sin repetir, hasta llegar a 1. Su Probabilidad de Golpe especial contra la Resistencia al control (Res.CC) del objetivo decide la Parálisis: si gana, 50 % de Parálisis 1 turno.',
-      duelo: {...MIS_BASE, contra: ['rescc'], danoSiempre: true, danoFormula: '1d6', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4}, efectos: [{nombre: 'Parálisis', turnos: 1, caras: 2, exitos: 1}]}},
+      duelo: {...MIS_BASE, contra: ['rescc'], danoSiempre: true, danoFormula: '1d6', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4}, efectos: [{nombre: 'Parálisis', turnos: 1, caras: 6, exitos: 3}]}},
     {clave: 'acido', nombre: 'Mancha corrosiva', icono: '🧪', que: 'ácido y Armadura rota: 1, y una más cada 5 de daño',
       detalle: 'Una mancha corrosiva a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo; si pega, 2d6 más un cuarto de su Efecto especial de daño ácido (lo frenan la Defensa especial y la resistencia al ácido) y le rompe la armadura: Armadura rota 1, y una más cada 5 de daño que entra.',
       duelo: {...MIS_BASE, tipoDano: 'ácido', porDano: {estado: 'Armadura rota', cada: 5, mas1: true}, efectos: []}},

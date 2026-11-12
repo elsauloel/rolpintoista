@@ -128,7 +128,7 @@ const ItemCorto = (() => {
   const pctTxt = e => `${pctEf(e)} % (${dadoEf(e)})`;
   const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) * 2 : 6;   // (2026-11-11: 6 por Peso; un durPorPeso viejo, sobre la base de 3, se escala ×2)
   const durMax = it => typeof Combatiente !== 'undefined' && Combatiente.durMax ? Combatiente.durMax(it) : Math.max(6, Math.round(durPP(it) * Math.max(0, Math.round(num(it.peso)))));
-  // «Sangrado 50 % (2 en d2) · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 % (4 en d4), seguro si es crítico».
+  // «Sangrado 50 % (4–6 en d6) · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 % (4 en d4), seguro si es crítico».
   function efectoCorto(e){
     const pct = pctEf(e);
     let n = nombreEf(e);

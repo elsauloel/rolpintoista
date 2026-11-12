@@ -82,7 +82,7 @@ const FichaCalculo = (() => {
     {id:'evacontra', label:'Evasión contra contraataque', full:'Evasión extra cuando te contraatacan (no suma al Parry)'},
     // (2026-10-16, dueño: lo que vuela, −1 contra los ataques de rango) — Combatiente.evaExtraDuelo, con contraDisparo.
     {id:'evadisparo', label:'Evasión contra disparos', full:'Evasión extra (o de menos, si es negativa) cuando te disparan con un arma a distancia: arco, ballesta, honda o arrojadiza (no suma al Parry)'},
-    // Mecánicas de los pies (2026-10-04, dueño). Las de chance van en % (33 = 5–6 en d6, 50 = 2 en d2, 20 = 9–10 en d10…: Combatiente.chanceDado; 100 = siempre).
+    // Mecánicas de los pies (2026-10-04, dueño). Las de chance van en % (33 = 5–6 en d6, 50 = 4–6 en d6, 20 = 9–10 en d10…: Combatiente.chanceDado; 100 = siempre).
     {id:'pasosbaile', label:'Pasos de baile', full:'Evasión extra si ya te moviste en la ronda'},
     {id:'pisadaatenta', label:'Pisada atenta', full:'Al pasar al lado de una trampa escondida, tirás Percepción para descubrirla (como la Percepción aumentada, solo trampas)'},
     {id:'inamovible', label:'Inamovible (%)', full:'Chance (en %) de que no te muevan contra tu voluntad (empujes, portales): 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},

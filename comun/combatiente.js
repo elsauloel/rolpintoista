@@ -511,10 +511,10 @@ const Combatiente = (() => {
   /* Las mecánicas «con chance» de las piezas (dueño, 2026-10-04): Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta. El stat
      va en %, tope 100 (100 = siempre, sin tirar). El dado (dueño, 2026-10-06): 10 % d10, 13 % d8, 17 % d6, 20 % 2 en d10, 25 % d4, 33 % 2 en d6,
      50 % moneda (d2) — en general, el dado que da justo ese porcentaje y, si ninguno, el más cercano (a igual, el más chico). `chanceDado(pct)` →
-     {caras, exitos} o null (siempre / nunca); `chanceTexto(pct)` → «33 % (5–6 en d6)», «50 % (2 en d2)» o «siempre». (`retirada*`: los
+     {caras, exitos} o null (siempre / nunca); `chanceTexto(pct)` → «33 % (5–6 en d6)», «50 % (4–6 en d6)» o «siempre». (`retirada*`: los
      mismos, con el nombre con el que nacieron.) */
   const chancePct = v => Math.max(0, Math.min(100, Math.round(n(v))));
-  const CHANCE_CARAS = [2, 4, 6, 8, 10, 20];
+  const CHANCE_CARAS = [6, 4, 8, 10, 20];   // sin d2 (2026-11-12, dueño: «las tiradas de par o impar podemos hacerla con un dado de 6 u 8»): la moneda 3D de la librería mostraba la cara equivocada; 50 % = 4–6 en d6
   function chanceDado(v){
     const pct = chancePct(v);
     if(pct <= 0 || pct >= 100) return null;

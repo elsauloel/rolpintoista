@@ -46,7 +46,7 @@ const FichaDuelo = (() => {
   }
   // Tira la moneda: par se conserva, impar se rompe.
   function tirarMonedaReroll(S, m, ui){
-    const r = tirarDados('1d2');   // 2 = par (se conserva) · 1 = impar (se rompe)
+    const r = tirarDados('1d6');   // par (2, 4, 6) se conserva · impar (1, 3, 5) se rompe (2026-11-12: con d6, la moneda 3D mostraba la cara equivocada)
     const par = r.total % 2 === 0;
     ui.registrarTirada(`🪙 Moneda Re-Roll · ${par ? 'par: se conserva' : 'impar: se rompe'}`, r);
     if(!par){

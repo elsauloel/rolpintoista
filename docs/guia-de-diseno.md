@@ -494,3 +494,8 @@ movimiento. `Combatiente.trabaNarrativo` (vtt-hexgrid/js/06 `soltar`).
 - Quién tira: percibe un creep → el GM; percibe un personaje o invocación → quien lo maneja (si no está conectado, el GM tira por él a los 6 s).
 - **Poner una trampa es una acción incierta:** si alguna casilla queda en la zona de alerta de un rival (en el cono ya la ve), ese rival tira
   Percepción contra la dificultad de la trampa; si llega, la descubre.
+
+
+## 🎲 Sin d2 (2026-11-12, dueño)
+Las chances del 50 % y el par/impar se tiran con **d6** (4 a 6 = éxito; par/impar en el d6), no con un d2: la moneda 3D de la librería de dados mostraba
+a veces la cara contraria a la del log. Un efecto con «2 caras» (ítems viejos guardados) se tira con d6 igual (`EfectosGolpe.normalizar`).

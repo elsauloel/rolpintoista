@@ -435,7 +435,14 @@ async function dadosTirar(notacion, estilo, opts){
     dados.visibles.push({clave: c.clave});
     dadosBotonLimpiar();
     // Una tirada que se cuelga no deja la caja prendida para siempre (2026-10-16).
-    await Promise.race([c.caja.add(notacion), new Promise(r => setTimeout(r, DADOS_TRABA_MS))]);
+    /* 🎲 De a una tirada por caja (2026-11-12, dueño: «la animación muestra un número, pero el resultado en el log es el otro», sobre todo con el
+       d2): la librería precalcula la física de cada tirada (simulateThrow) y después gira la cara para que caiga el número forzado. Si entra otra
+       tirada a la misma caja mientras la anterior todavía rueda, la vuelve a simular y la anterior termina en otra cara (o ni aparece). Medido con la
+       librería real: dos d2 seguidos con 300 ms de diferencia, 7 de 10 mal; de a uno, 0 de 70. Así que cada caja tira la siguiente recién cuando la
+       anterior quedó quieta (y con el mismo tope de DADOS_TRABA_MS, para que una tirada colgada no frene las que vienen). */
+    const turno = (c.cadena || Promise.resolve()).then(() => Promise.race([c.caja.add(notacion), new Promise(r => setTimeout(r, DADOS_TRABA_MS))]));
+    c.cadena = turno.catch(() => {});
+    await turno;
     if(opts && opts.destacar){ try{ dadosDestacar(c, notacion, opts.destacar); }catch(err){ console.error('Dados 3D: no se pudo destacar el dado', err); } }
   }catch(err){
     console.error('Dados 3D:', err);

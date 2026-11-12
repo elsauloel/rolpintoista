@@ -12,6 +12,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **✅ hecho — 🎲 El d2 (moneda) mostraba otra cara que la del log** (dueño, 2026-11-12). Dos causas, medidas con la librería real (dice-box-threejs
+  0.0.12, cargada local): (1) la moneda de la librería lee mal su cara de arriba (la geometría del cilindro no sigue la cuenta de caras de los
+  demás dados) y además los dados que llegan después la dan vuelta; (2) dos tiradas seguidas en la misma caja: la segunda vuelve a simular la
+  física y la primera cae en otra cara (7 de 10 mal con 300 ms de diferencia). Arreglo: **no se usa más el d2** (el dueño: «las tiradas de par o
+  impar podemos hacerla con un dado de 6 u 8»): el 50 % se tira con d6 (4 a 6), la Moneda Re-Roll es par/impar en d6, los 86 ítems del
+  catálogo y los creeps viejos pasaron a «(4–6 en d6)», y un efecto guardado con 2 caras se tira con d6 (`EfectosGolpe.normalizar`); y las
+  tiradas de una misma caja de dados 3D van de a una (`dadosTirar`, `c.cadena`).
 - **[PRIMERO, apenas termine el dado de 2] 🪤 Trampas con el GM desconectado** (dueño, 2026-11-12, probando Reflejos en «Prueba · Carteles» desde
   la compu): Rockardo (copia, de J1) pisó la Trampa de oso con la pantalla del GM cerrada. A J1 le quedó «⏳ el GM tira el daño de la trampa…» y el GM,
   al abrir el mapa (y con Ctrl+Shift+R), no ve nada: quedó trabado. Arreglar:

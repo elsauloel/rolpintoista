@@ -115,7 +115,7 @@ duelo o se dejan?
 | 23 | **Trampas paso a paso**: «pisaste la trampa, tirá…», el daño de quien la puso | `js/19` | cartel propio, cada uno con su botón (rehecho hoy) | **D** | grande |
 | 24 | **Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta** (chances de piezas) | `js/21`, `js/23`, `js/17` | cartel propio con «🎲 Tirar 1d6» (regla del dueño del 2026-10-04: «no pueden ser silenciosas») | **D** | media |
 
-> **Decisiones del bloque 4, de a una, probándolas en el mapa «Prueba · Carteles» (dueño, 2026-11-11):** **Retirada limpia → queda como está** (su cartel propio con botón: «la dejamos como está»). **Inamovible → al cuadro del duelo** («yo lo pasaría al cuadro del duelo»): la chance la tira, con su botón, quien maneja al empujado (hoy la tira la pantalla del GM que aplica el empujón) — en la cola de programación.
+> **Decisiones del bloque 4, de a una, probándolas en el mapa «Prueba · Carteles» (dueño, 2026-11-11):** **Retirada limpia → queda como está** (su cartel propio con botón: «la dejamos como está»). **Inamovible → al cuadro del duelo** («yo lo pasaría al cuadro del duelo»): la chance la tira, con su botón, quien maneja al empujado (hoy la tira la pantalla del GM que aplica el empujón) — en la cola de programación. **Recuperarse rápido → queda como está** («dejalo»: ya tira el involucrado, con su cartel).
 | 25 | **Escudo elemental**: el 1d6 de daño al entrar o al empezar el turno pegado | `js/106` | cartel propio con botón | **D** | media |
 | 26 | **Malviaje** (Res.Mt y el 1d6) | `js/52` l. ~283 | cartel propio con botón | **D** | chica |
 | 27 | **Soltarse / ayudar a zafarse** | `js/54` | cartel propio con botón | **D** | media |

@@ -499,3 +499,10 @@ movimiento. `Combatiente.trabaNarrativo` (vtt-hexgrid/js/06 `soltar`).
 ## 🎲 Sin d2 (2026-11-12, dueño)
 Las chances del 50 % y el par/impar se tiran con **d6** (4 a 6 = éxito; par/impar en el d6), no con un d2: la moneda 3D de la librería de dados mostraba
 a veces la cara contraria a la del log. Un efecto con «2 caras» (ítems viejos guardados) se tira con d6 igual (`EfectosGolpe.normalizar`).
+
+## 🎮 El GM controla a un personaje: su dueño solo mira (dueño, 2026-11-11; programado 2026-11-12)
+Mientras el GM tiene el 🎮 control de un personaje (`resumen.control` = el uid del GM), en el mapa del jugador dueño queda un **aviso fijo arriba al
+centro** («🎮 El GM está manejando a X: las tiradas le salen a él. Mientras tanto solo podés mirar») y ese personaje **no se puede usar** desde su
+pantalla: no lo mueve (ni con Mover libre), no abre su Botonera (si estaba abierta, se cierra), no le cambia la vida ni los estados, no termina su
+turno. Los duelos y carteles ya le salen al GM. Al devolver el control, todo vuelve. La ficha suelta ya quedaba en solo lectura con su cartel.
+Regla pura: `Combatiente.controlAjeno(resumen, uid, soyGM)`; en el mapa, `controlAjeno(fichaId)` (js/04) y el aviso en js/117.

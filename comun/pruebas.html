@@ -7347,6 +7347,12 @@ prueba('🚷 Modo narrativo (dueño, 2026-11-11, corregido el mismo día: se pue
     T([{nombre: 'Inmovilizado', inmovilizado: true, activo: false}]), T([]), T(null)],
     ['Inmovilizado', 'Sentado', 'Stun', 'Sueño', 'Congelado', '', '', '', '']);
 });
+prueba('🎮 El GM controla a un personaje (dueño, 2026-11-11): su dueño solo mira; el GM y quien tiene el control lo manejan', () => {
+  const r = {control: 'gm1'};
+  igual([Combatiente.controlAjeno(r, 'j1', false), Combatiente.controlAjeno(r, 'gm1', false), Combatiente.controlAjeno(r, 'gm1', true), Combatiente.controlAjeno({}, 'j1', false),
+    Combatiente.controlAjeno(null, 'j1', false), Combatiente.controlAjeno(r, 'j2', true), /Rockardo.*las tiradas le salen a él/.test(Combatiente.AVISO_CONTROL_TXT('Rockardo'))],
+    [true, false, false, false, false, false, true]);
+});
 prueba('⚔ Dos al hilo (dueño, 2026-11-10): el segundo golpe no cobra No2 — toda la habilidad cuesta lo de un solo ataque, como el Barrido', () => {
   const h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dos al hilo');
   const txt = JSON.stringify(h);

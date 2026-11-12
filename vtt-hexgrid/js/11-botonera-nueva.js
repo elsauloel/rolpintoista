@@ -87,19 +87,25 @@ function botoneraDeToken(t){
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId) ? {creep: t.fichaId} : null;
   const v = vinculo(t);
   if(!v || (!controloFicha(t.fichaId) && (soyGM || v.duenoUid !== fbUsuario.uid))) return null;
+  if(controlAjeno(t.fichaId)) return null;   // 🎮 el GM tiene el control: su dueño solo mira (avisoControlPintar)
   const [ficha, inv] = t.fichaId.split(SEP_INVOCACION);
   return {ficha, inv: inv || ''};
 }
 // Abre la del token seleccionado; devuelve false si no hay nada que abrir.
 function abrirBotoneraDeSeleccion(){
-  const b = botoneraDeToken(seleccion ? tokens.get(seleccion) : null);
-  if(!b) return false;
+  const tSel = seleccion ? tokens.get(seleccion) : null;
+  const b = botoneraDeToken(tSel);
+  if(!b){
+    if(tSel && tSel.tipo !== 'creep' && controlAjeno(tSel.fichaId)){ toast(`🎮 El GM está manejando a ${nombreDe(tSel)}: mientras tanto solo podés mirar`); return true; }
+    return false;
+  }
   if(b.creep) abrirAcciones(b.creep); else abrirBotonera(b.ficha, undefined, b.inv);
   return true;
 }
 function abrirBotoneraPrincipal(){
   const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('No tenés un personaje con Botonera'); return; }
+  if(controlAjeno(fichaId)){ toast(`🎮 El GM está manejando a ${(fichasPub.get(fichaId) || {}).nombre || 'tu personaje'}: mientras tanto solo podés mirar`); return; }
   abrirBotonera(fichaId);
 }
 
@@ -453,7 +459,7 @@ function bnTirarAca(b){
    difiera por haberlo armado distinto, no) y el resumen público (comun/ficha-resumen.js), así el token se actualiza. */
 function bnPuedeGuardar(){
   const f = bn && bn.sesion;
-  return !!(f && f.cargada && fbUsuario && (f.duenoUid === fbUsuario.uid || (f.control && f.control.uid === fbUsuario.uid)));
+  return !!(f && f.cargada && fbUsuario && ((f.duenoUid === fbUsuario.uid && !controlAjeno(f.id || bn.fichaId)) || (f.control && f.control.uid === fbUsuario.uid)));
 }
 function bnOpcionesGuardado(f){ return opcionesGuardadoMapa(f, () => bn.S, () => bn.doc, () => !!bn && bn.sesion === f); }
 // Cómo guarda el mapa a un personaje (FichaSesion.guardar): la Botonera nueva y el Mantenimiento (A2). getS/getDoc: el personaje armado

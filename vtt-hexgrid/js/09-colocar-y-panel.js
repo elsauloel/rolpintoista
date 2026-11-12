@@ -598,7 +598,7 @@ function puedoCambiarVida(t){
   if(!t || !t.fichaId || !fbUsuario || pausaSoloMirar()) return false;   // ⏸ en pausa, solo mirar (js/04)
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
-  return !!v && ((!soyGM && v.duenoUid === fbUsuario.uid) || controloFicha(t.fichaId));
+  return !!v && ((!soyGM && v.duenoUid === fbUsuario.uid && !controlAjeno(t.fichaId)) || controloFicha(t.fichaId));   // 🎮 con el control del GM, su dueño solo mira
 }
 // Estados alterados (agregar, sacar, cambiar turnos, editar): el dueño en su personaje y el GM en TODOS (2026-09-24, pedido
 // del dueño); los creeps, el GM. La vida de un personaje sigue siendo solo de su dueño.
@@ -606,7 +606,7 @@ function puedoCambiarEstados(t){
   if(!t || !t.fichaId || !fbUsuario || pausaSoloMirar()) return false;
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
-  return !!v && (soyGM || v.duenoUid === fbUsuario.uid);
+  return !!v && (soyGM || (v.duenoUid === fbUsuario.uid && !controlAjeno(t.fichaId)));
 }
 
 // "12" fija el valor; "+5" / "-3" suma o resta. null si no se entiende.

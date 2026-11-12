@@ -1424,17 +1424,25 @@ function controloFicha(fichaId){
   const f = fichasPub.get(String(fichaId).split(SEP_INVOCACION)[0]);
   return !!(f && f.resumen && f.resumen.control === fbUsuario.uid);
 }
+/* 🎮 (dueño, 2026-11-11: «un jugador no debería poder usar su propio token mientras lo controla el GM… sólo observar»): ¿el GM tiene el control
+   de este personaje (o de una invocación suya) y yo soy su dueño? Mientras tanto el dueño solo mira: no lo mueve, no abre su Botonera, no le
+   cambia la vida ni los estados; ve el aviso fijo de abajo (avisoControlPintar). La regla pura: Combatiente.controlAjeno. */
+function controlAjeno(fichaId){
+  if(!fichaId || !fbUsuario) return false;
+  const f = fichasPub.get(String(fichaId).split(SEP_INVOCACION)[0]);
+  return Combatiente.controlAjeno(f && f.resumen, fbUsuario.uid, soyGM);
+}
 /* ⏸ Partida en pausa (dueño, 2026-10-16): un jugador mira el mapa como siempre —arrastrarlo, zoom, tocar cualquier token y ver lo mismo que
    en una sesión (su menú, sus estados, la tarjeta de un creep)— pero desde el mapa no cambia nada: ni mover ni girar, ni vida, No2 o estados,
    ni los ajustes del token. Su ficha sí la puede tocar (lo que cambie le queda anotado al GM, comun/pausa.js). Lo usan los permisos de abajo. */
 const pausaSoloMirar = () => typeof Pausa !== 'undefined' && Pausa.activa() && !soyGM;
 function puedoMover(t){
   if(!t || !fbUsuario || pausaSoloMirar()) return false;
-  return t.tipo === 'creep' ? soyGM : (t.duenoUid === fbUsuario.uid || controloFicha(t.fichaId));
+  return t.tipo === 'creep' ? soyGM : ((t.duenoUid === fbUsuario.uid && !controlAjeno(t.fichaId)) || controloFicha(t.fichaId));
 }
 function puedoMoverLibre(t){
   if(!t || !fbUsuario || pausaSoloMirar()) return false;
-  return soyGM || (t.tipo === 'pj' && t.duenoUid === fbUsuario.uid);
+  return soyGM || (t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && !controlAjeno(t.fichaId));
 }
 function activarMoverLibre(id){
   moverLibre = moverLibre === id ? null : id;

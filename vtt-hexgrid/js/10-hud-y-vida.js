@@ -79,7 +79,7 @@ function hudHtml(t){
   const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   // Una invocación la maneja el mismo dueño que su personaje: mismo ⚡
   // (Botonera propia) que un PJ, ya no queda afuera.
-  const propio = fichaDeToken && ((!soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid) || controloFicha(fichaDeToken));
+  const propio = fichaDeToken && ((!soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid && !controlAjeno(fichaDeToken)) || controloFicha(fichaDeToken));   // 🎮 con el control del GM, su dueño solo mira
   const conRayo = !pausaSoloMirar() && (propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId)));   // ⏸ en pausa, sin Botonera
 
   // Con 🦶 Mover libre prendido el HUD se limpia: solo queda el pie, en rojo, para que
@@ -1554,6 +1554,7 @@ async function cambiarNitros(t, texto){
 
 function puedeAgregarEstado(t){
   if(!t || !t.fichaId || pausaSoloMirar()) return false;
+  if(t.tipo !== 'creep' && controlAjeno(t.fichaId)) return false;   // 🎮 con el control del GM, su dueño solo mira
   return t.tipo === 'creep' ? soyGM : true;
 }
 

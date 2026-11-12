@@ -241,6 +241,9 @@
   esencial({...M3, nivel: 2, atrib: [9, 2, 5, 6, 14],   // (aprobado 2026-11-12: Parpadeo; pasiva Potencia especial; + Capucha de lana del culto y Guantes de goma: Def 3 / Def. especial 3, «dejalo así»)
     equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
     habilidades: ['Centella', 'Zap', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M3, nivel: 3, atrib: [9, 2, 6, 6, 16],   // (aprobado 2026-11-12: Cadena de rayos; la varita pasa a Buena: Varita del relámpago)
+    equipo: ['Varita del relámpago', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos'], pasivas: ['Potencia especial']});
   esencial({linea: 'M4', nombre: 'Arcano', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 6, 5, 12],
     equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],

@@ -491,6 +491,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 2 aprobado** (dueño, 2026-11-12: «dejalo así»): Esp 14 · Con 9 · Agi 5 · Des 6 · Fue 2, vida 45, SP 42 (regen 7); + Capucha de lana del culto y
   Guantes de goma: Def 3, Def. especial 3, Ef.Esp 15. **Parpadeo** (Flash) y la pasiva **Potencia especial**. **Cargado** (2026-11-12). Pedido para la cola:
   la **Varita de chispa eléctrica** pasa a **20 % de Parálisis a todos los que toca** (el primero y los saltos).
+  **Nivel 3 aprobado** (dueño, 2026-11-12: «me cierra»): Esp 16 · Con 9 · Agi 6 · Des 6 · Fue 2, vida 45, 6 No2, SP 48 (regen 8); la varita pasa a Buena:
+  **Varita del relámpago** (1d8 que se esquiva, salta, 33 % de Parálisis a cada uno). PdG.Esp 16, Ef.Esp 17. Habilidad nueva: **Cadena de rayos**.
+  **Cargado** (2026-11-12).
 - **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
   lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
   (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·

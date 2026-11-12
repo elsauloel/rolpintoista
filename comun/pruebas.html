@@ -124,7 +124,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
 <script src="skills-creep-base.js?v=20261112sind2"></script>
-<script src="creeps-esenciales.js?v=20261112m32"></script>
+<script src="creeps-esenciales.js?v=20261112m33"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -7127,7 +7127,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,M32,H12,H13,H14,H15,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,D22,D23,D24,D25,T32,T33,T34,T35,L52,L53,L54,L55,W32,W33,W34,W35,R32,R33,R34,R35,H32,H33,H34,H35,L62,L63,L64,L65,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,M32,M33,H12,H13,H14,H15,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,D22,D23,D24,D25,T32,T33,T34,T35,L52,L53,L54,L55,W32,W33,W34,W35,R32,R33,R34,R35,H32,H33,H34,H35,L62,L63,L64,L65,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -7204,6 +7204,8 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
   const m32 = d('Mago del rayo', 2);   // (M3 nv2, 2026-11-12: Parpadeo, Potencia especial)
   igual([m32.hpMax, CreepCalculo.modoSP(m32), C.defensaEfectiva(m32), C.armadmgEfectiva(m32), C.statValor(m32, 'dmgesp'), m32.habilidades.map(h => h.nombre).join()],
     [45, true, 3, 3, 15, 'Centella,Zap,Parpadeo']);
+  const m33 = d('Mago del rayo', 3);   // (M3 nv3, 2026-11-12: Cadena de rayos, Varita del relámpago)
+  igual([m33.hpMax, C.nitrosMax(m33), C.statValor(m33, 'pdgmg'), C.statValor(m33, 'dmgesp'), m33.equipo[0].nombre, m33.habilidades.length], [45, 6, 16, 17, 'Varita del relámpago', 4]);
   const w35 = d('Martillero', 5);   // (W3 nv5, 2026-11-10: Golpe demoledor; Coraza de bronce con runas)
   igual([w35.hpMax, C.nitrosMax(w35), C.defensaEfectiva(w35), C.armadmgEfectiva(w35), C.statValor(w35, 'dmg'), C.statValor(w35, 'bloqueo'), C.statValor(w35, 'parry'), C.statValor(w35, 'rescc'), w35.habilidades.length, w35.equipo.length],
     [75, 8, 8, 4, 14, 15, 10, 15, 6, 6]);

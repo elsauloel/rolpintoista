@@ -2841,6 +2841,7 @@ async function dueloTolera(d, ef){
     : {tirada, contra};
 }
 async function dueloAplicarEfecto(d, ef){
+  if(ef && ef.firme) return {nota: 'no se mueve'};   // 🦶 Inamovible (js/21, 2026-11-12): no pone ningún estado; lo lee quien lo empuja
   if(num(ef && ef.trae) > 0 && typeof dueloGanchoTraer === 'function') return dueloGanchoTraer(d);   // 🪝 el gancho de Arrastrar (js/78, 2026-11-04)
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);
   if(ef && ef.tolera){ const tl = await dueloTolera(d, ef); if(tl && tl.sinEfecto) return tl; }   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)

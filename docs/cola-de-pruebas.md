@@ -36,10 +36,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   5. (Pedido extra) **«Aplicar el daño» muestra la cuenta**: «🧮 9 de daño − Defensa 4 = 5 a la vida» (con la Defensa real, la especial, la resistencia,
      los escudos y la Vida extra) y el botón dice lo que entra a la vida: «💔 Aplicar el daño (5)». Probado con Defensa 0 y Defensa 4.
   Capturas `trampa-gm-*`.
-- **[en cola] 🦶 Inamovible al cuadro del duelo** (dueño, 2026-11-11, revisando el bloque 4 en «Prueba · Carteles»): cuando empujan o tiran de alguien con
+- **✅ hecho (2026-11-12) 🦶 Inamovible al cuadro del duelo** (dueño, 2026-11-11, revisando el bloque 4 en «Prueba · Carteles»): cuando empujan o tiran de alguien con
   una pieza Inamovible, la chance se tira en el cuadro del duelo de siempre (una tirada sin oponente, como las chances de la tanda 3), con el botón
   para **quien maneja al empujado** (su jugador; el GM para un creep; el GM tira por el ausente) y el «Aplicar» de siempre. Hoy es un cartel propio
   que tira la pantalla del GM que aplica el empujón (`vtt-hexgrid/js/21`/`23`).
+  **Hecho:** `inamovibleSale` (js/21) abre el cuadro del duelo con una sola tirada para quien maneja al empujado y el «Aplicar No se mueve» (efecto
+  `firme`, comun/duelo.js: no pone estado). El empujón sigue igual. Probado en el mapa: J1 tiró por Prueba Uno con Botas de ancla (50 %): con un 6 no
+  se movió; con un 1 lo empujó 2 casillas. Con 100 %, oculto o si el cuadro no abre, queda el cartel de antes.
 - **✅ hecho (2026-11-12) 🎮 El GM controla a un personaje** (dueño, 2026-11-11: «el aviso de que el GM está controlando a Rockardo debería estar visible
   siempre, sí, pero además un jugador no debería poder usar su propio token mientras lo controla el GM… sólo observar»). Mientras el GM tiene el 🎮
   control de un personaje: (1) en la pantalla del jugador dueño, un aviso fijo y siempre visible «🎮 El GM está manejando a <nombre>: las tiradas le

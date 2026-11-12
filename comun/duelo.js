@@ -903,6 +903,7 @@ const Duelo = (() => {
       ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
       ...(e.disipar ? {disipar: true} : {}),   // 🧿 Disipar (2026-10-25)
       ...(e.anula ? {anula: true} : {}),   // 🚫 Anulación (2026-11-01)
+      ...(e.firme ? {firme: true} : {}),   // 🦶 Inamovible (2026-11-12): si entra, no lo mueven (lo lee quien lo empuja; no pone ningún estado)
       ...(e.tolera && e.tolera.stat ? {tolera: {stat: txtCorto(e.tolera.stat, 20), contra: txtCorto(e.tolera.contra || 'dmgesp', 20), valor: Math.round(_num(e.tolera.valor))}} : {}),   // 🧪 lo tolera con un stat (la Espina tóxica, 2026-11-03)
       ...(_num(e.bajaCd) > 0 ? {bajaCd: Math.min(6, Math.round(_num(e.bajaCd)))} : {}),   // 🥁 Redoble de tambores (2026-10-25)
       ...(_num(e.spRecupera) > 0 ? {spRecupera: Math.min(20, Math.round(_num(e.spRecupera)))} : {}),   // 🔋 Pila pila (2026-11-01)
@@ -1308,6 +1309,7 @@ const Duelo = (() => {
     if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
     if(_num(ef.bajaCd) > 0) return {nombre: 'Baja cooldowns', bajaCd: Math.round(_num(ef.bajaCd)), ...(_num(ef.spRecupera) > 0 ? {spRecupera: Math.round(_num(ef.spRecupera))} : {})};   // 🥁 Redoble de tambores (2026-10-25): el mapa le baja los cooldowns
+    if(ef.firme) return {nombre: 'No se mueve', firme: true};   // 🦶 Inamovible (2026-11-12): el «Aplicar» solo lo confirma; lo lee quien lo empuja (js/21)
     if(ef.anula) return {nombre: 'Anulación', anula: true};   // 🚫 Anulación (2026-11-01; 2026-11-02: UNO, el que elige quien la usa)
     if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
     if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
@@ -1367,6 +1369,7 @@ const Duelo = (() => {
       if(e.purga) o.purga = true;   // la purga (2026-10-07)
       if(e.disipar) o.disipar = true;   // 🧿 Disipar (2026-10-25)
       if(e.anula) o.anula = true;   // 🚫 Anulación (2026-11-01)
+      if(e.firme) o.firme = true;   // 🦶 Inamovible (2026-11-12)
       if(e.tolera && e.tolera.stat) o.tolera = {stat: String(e.tolera.stat).slice(0, 20), contra: String(e.tolera.contra || 'dmgesp').slice(0, 20), valor: Math.round(_num(e.tolera.valor))};   // 🧪 lo tolera con un stat (la Espina tóxica, 2026-11-03)
       if(_num(e.bajaCd) > 0) o.bajaCd = Math.min(6, Math.round(_num(e.bajaCd)));   // 🥁 Redoble de tambores (2026-10-25)
       if(_num(e.spRecupera) > 0) o.spRecupera = Math.min(20, Math.round(_num(e.spRecupera)));   // 🔋 Pila pila (2026-11-01)
@@ -1674,9 +1677,10 @@ const Duelo = (() => {
         }
       }
       if((d.efectos || []).some(ef => ef && _num(ef.trae) > 0 && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('Lo enganchó y lo arrastró hasta dejarlo pegado.');   // 🪝 Arrastrar (2026-11-04)
+      if((d.efectos || []).some(ef => ef && ef.firme && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('¡Inamovible! No lo mueven.');   // 🦶 (2026-11-12)
       // (2026-11-09, cola de pruebas 9: el efecto que frenó el Invulnerable —nota «no entró: …»— no cuenta como que «quedó con»: se dice aparte)
       const noEntro = ef => /^no entró/i.test(String(ef.nota || ''));
-      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !noEntro(ef) && !(_num(ef.trae) > 0)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !noEntro(ef) && !(_num(ef.trae) > 0) && !ef.firme).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);
       const frenados = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && noEntro(ef)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);
       if(frenados.length) partes.push(`No le entró ${frenados.join(', ')} (${String((d.efectos.find(ef => ef && noEntro(ef)) || {}).nota).replace(/^no entró:\s*/i, '').replace(/\s*\(.*$/, '')}).`);

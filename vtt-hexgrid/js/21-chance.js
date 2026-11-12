@@ -4,7 +4,8 @@
    (2026-10-04): «el anuncio y la tirada no pueden ser silenciosas y automáticas en el log» — a quien le toca se le abre un cartel paso a paso
    (la estética del duelo) con su chance y el botón «🎲 Tirar 1d6»; los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo
    ve en la Crónica (y queda una línea en la Mesa). Con 100 % sale siempre: el cartel lo anuncia, sin tirar.
-   Inamovible y Reflejos de mangosta pasan dentro del paso a paso de las trampas (js/19, fases «firme-…» y «reflejos»). */
+   Inamovible y Reflejos de mangosta pasan dentro del paso a paso de las trampas (js/19, fases «firme-…» y «reflejos»). Inamovible ante un empujón,
+   desde el 2026-11-12, va al cuadro del duelo (abajo). */
 
 // El % de un token en uno de estos stats: un creep, de sus datos (solo el GM); un personaje o una invocación, de lo que publica la ficha de su
 // dueño (las reglas, iguales para todos: dueño, 2026-10-04).
@@ -55,15 +56,44 @@ async function chanceCartel(o){
 }
 
 /* ---------- Inamovible ante un empujón, un arrastre o un cambio de lugar (2026-11-09, cola de pruebas 19) ----------
-   Antes se tiraba en silencio (Math.random): si salía, solo una línea en la Crónica; si no, nada. La regla de las chances (arriba) es que se vea:
-   el cartel con el d6, la Mesa y la Crónica, en la pantalla que resuelve el empujón. → Promise<bool> (true = no se mueve). */
-async function inamovibleSale(t, pct, que){
+   Antes se tiraba en silencio (Math.random); después, el cartel propio con el d6 en la pantalla que resolvía el empujón (la del GM).
+   🎲 Desde el 2026-11-12 (dueño, bloque 4 de docs/auditoria-tiradas.md: «yo lo pasaría al cuadro del duelo»), en el cuadro del duelo de siempre:
+   una sola tirada, sin rival (como las chances de la tanda 3), con el «🎲 Tirar el efecto (1dN)» para QUIEN MANEJA AL EMPUJADO (su jugador; el GM
+   por un creep o por quien no está; también «✍ Elegir manualmente») y el «Aplicar» de siempre, que solo lo confirma (el efecto `firme` no pone
+   ningún estado: comun/duelo.js, js/13 dueloAplicarEfecto). Con 100 %, oculto, o si el cuadro no se pudo abrir: el cartel de antes.
+   → Promise<bool> (true = no se mueve). */
+const tokenIdDeObj = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };
+function inamovibleCartel(t, pct, que){
   const quien = nombreDe(t);
   return chanceCartel({clave: 'inamovible', icono: '🦶', titulo: 'Inamovible', mecanica: 'Inamovible', pct, t,
     paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es Inamovible ${Combatiente.chanceTexto(pct)}: si sale, no se mueve.`},
     momento: `${quien} intenta no moverse (Inamovible)`,
     exito: {grande: '¡NO SE MUEVE!', chico: 'Inamovible', cronica: '…¡salió! No se mueve.', mesa: `🦶 ${quien}: Inamovible — no se mueve`},
     fallo: {grande: 'LO MUEVEN', chico: 'Inamovible no salió', cronica: '…no salió: lo mueven.', mesa: `🦶 ${quien}: Inamovible no salió — lo mueven`}});
+}
+// La chance de Inamovible como efecto del cuadro del duelo (puro: lo prueba comun/pruebas.html). null = sin tirada (0 % o 100 %).
+function inamovibleEfecto(pct, que, quien){
+  pct = Combatiente.chancePct(pct);
+  const d = Combatiente.chanceDado(pct);
+  if(pct <= 0 || pct >= 100 || !d) return null;
+  return {nombre: 'Inamovible', caras: d.caras, exitos: d.exitos, firme: true,
+    detalle: `${que || 'Lo quieren mover'}. ${quien} es Inamovible ${Combatiente.chanceTexto(pct)}: si sale, no se mueve.`.slice(0, 200)};
+}
+async function inamovibleSale(t, pct, que){
+  pct = Combatiente.chancePct(pct);
+  if(pct <= 0) return false;
+  const quien = nombreDe(t), id = tokenIdDeObj(t);
+  const ef = inamovibleEfecto(pct, que, quien);
+  if(!ef || !id || t.oculto || typeof contiendaDuelo !== 'function' || typeof yoDeToken !== 'function') return inamovibleCartel(t, pct, que);
+  const c = await contiendaDuelo({yo: yoDeToken(id), deTokenId: id, aTokenId: id, esperar: true, extra: {secundario: true}, hab: {
+    nombre: `Inamovible: ${que || 'lo quieren mover'}`.slice(0, 60), objetivo: 'uno mismo', tira: null, contra: [], dano: null, efectos: [ef],
+    detalle: `${Combatiente.chanceTexto(pct)}: lo tira quien maneja a ${quien}.`.slice(0, 200)}});
+  if(c.falla) return inamovibleCartel(t, pct, que);   // el cuadro no se pudo abrir: el cartel de antes
+  if(c.tiempo || c.aMano || c.cancelado){
+    mesaLinea(`🦶 ${quien}: Inamovible ${Combatiente.chanceTexto(pct)} quedó sin tirar — lo mueven; si salía, devolvelo a mano`, 'recordatorio');
+    return false;
+  }
+  return chancesEntraron(c).includes('Inamovible');   // (el cuadro ya lo dejó en la Mesa: «¡Inamovible! No lo mueven.» o «No le entró…»)
 }
 
 /* ---------- Recuperarse rápido (2026-10-04, pies) ----------

@@ -12,8 +12,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **[en cola, después de las trampas] ⚡ Varita de chispa eléctrica: 20 % de Parálisis a todos los que toca** (dueño, 2026-11-12: «ponele 20 % a
-  todos los que toca, el primero y los saltos»). Hoy: 25 % al primero; los saltos, solo daño. Con el d6/d10 que corresponda (sin d2) y el texto al día.
+- **✅ hecho — ⚡ Varita de chispa eléctrica: 20 % de Parálisis a todos los que toca** (dueño, 2026-11-12: «ponele 20 % a
+  todos los que toca, el primero y los saltos»). Antes: 25 % al primero; los saltos, solo daño. Ahora 20 % (9–10 en d10) al primero, en los efectos
+  del duelo, y a cada salto, cada uno en su cuadro del duelo de a uno (`cadena.efectos`, como la Varita del relámpago), lo tira quien la usa; en el agua,
+  el doble. Probado en el mapa (mapa propio, 3 ratas): J1 tiró la chance de cada salto («Tirar el efecto (1d10)») y aplicó la que entró.
 - **✅ hecho — 🎲 El d2 (moneda) mostraba otra cara que la del log** (dueño, 2026-11-12). Dos causas, medidas con la librería real (dice-box-threejs
   0.0.12, cargada local): (1) la moneda de la librería lee mal su cara de arriba (la geometría del cilindro no sigue la cuenta de caras de los
   demás dados) y además los dados que llegan después la dan vuelta; (2) dos tiradas seguidas en la misma caja: la segunda vuelve a simular la

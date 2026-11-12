@@ -12,6 +12,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **[PRIMERO, apenas termine el dado de 2] 🪤 Trampas con el GM desconectado** (dueño, 2026-11-12, probando Reflejos en «Prueba · Carteles» desde
+  la compu): Rockardo (copia, de J1) pisó la Trampa de oso con la pantalla del GM cerrada. A J1 le quedó «⏳ el GM tira el daño de la trampa…» y el GM,
+  al abrir el mapa (y con Ctrl+Shift+R), no ve nada: quedó trabado. Arreglar:
+  1. **El paso pendiente vuelve a aparecer** cuando la pantalla del GM (o de quien le toque) entra después, como el sigilo (2026-11-11, js/16).
+  2. **Quien espera siempre tiene «✋ Resolver a mano»** (en el cartel de espera, a los pocos segundos), para no quedar trabado nunca.
+  3. **Los momentos pendientes se pueden volver a abrir**: la Crónica es un cartel que aparece y se va; hace falta un botón (con un numerito)
+     que liste lo que está esperando una tirada y lo reabra.
+  4. **Al caer en la trampa, el movimiento se frena en la casilla de la trampa**: Rockardo quedó en la casilla siguiente. (Si zafa con Reflejos,
+     queda donde eligió tirarse.)
+  (Reflejos en sí anduvo bien: apareció su cartel antes que el de la trampa.)
 - **[en cola] 🦶 Inamovible al cuadro del duelo** (dueño, 2026-11-11, revisando el bloque 4 en «Prueba · Carteles»): cuando empujan o tiran de alguien con
   una pieza Inamovible, la chance se tira en el cuadro del duelo de siempre (una tirada sin oponente, como las chances de la tanda 3), con el botón
   para **quien maneja al empujado** (su jugador; el GM para un creep; el GM tira por el ausente) y el «Aplicar» de siempre. Hoy es un cartel propio

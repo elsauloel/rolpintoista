@@ -93,6 +93,8 @@
 > casi cualquier personaje de un golpe. El precio: termina su turno, pasa al final del orden y queda Expuesto (Def 1, Evasión a la mitad). Idea a
 > evaluar: que el +2 de sigilo del Puñal no se sume con Degollar. Probarlo en una pelea.
 
+> **⭐ PRIORIDAD apenas terminen los creeps esenciales (dueño, 2026-11-12: «apenas terminemos con los esenciales vamos a encarar esto»):** el
+> costo en SP de los hechizos de los magos (ej.: la Centella cuesta «tanto SP como su Especial» → 14 SP de 42 en el Mago del rayo nv2).
 > **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas
 > mágicas y las skills mágicas; quizás le pondría un valor fijo»).** Hallazgo: con el Piromante nv3 (Esp 16, Ef.Esp 17) la Lengua de fuego hace ≈ 13
 > por 16 SP y la Bola de fuego ≈ 13 a cada uno por 16 SP, mientras el Mago jugador hace con 16 SP un Rayo mágico ≈ 34½ directo, y con 4 SP un Orbe

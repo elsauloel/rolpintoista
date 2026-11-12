@@ -756,8 +756,10 @@
 - [ ] **Seguir la revisión del bloque 4, de a uno, en el mapa «Prueba · Carteles»** (pausada el 2026-11-12, dueño: «dejemos esto para la próxima
   vez que te diga que estoy en la compu»). Hechos: Retirada (queda), Inamovible (al cuadro del duelo, en cola), Recuperarse (queda). **Sigue:
   Reflejos** (el escenario puede quedar armado), después el dado del Escudo elemental, el Malviaje, soltarse, la Confusión y la tirada extra de una
-  zona; y después, de a una, las zonas con su propio cartel. Al terminar la serie, deshacer los cambios de prueba (botas en Rockardo (copia), No2
-  de Larry (copia), borrar las Ratas de carteles y el mapa si ya no hace falta).
+  zona; y después, de a una, las zonas con su propio cartel. El escenario de **Reflejos** quedó armado: Rockardo (copia) con las **Botas de zapador** (33 %), una Trampa de oso escondida
+  debajo de él y otra debajo de Larry (copia); arrastrarlo a la marca verde. Al terminar la serie, deshacer los cambios de prueba: a Rockardo (copia)
+  sacarle las Botas de zapador (`refl-zapador`) y volver a equipar los «soquetes de lona»; los No2 de Larry (copia); borrar las Ratas de carteles 1 y 2,
+  las dos Trampas de oso (Reflejos) y el mapa «Prueba · Carteles» si ya no hace falta.
 - [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
 - [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.
 - [ ] **Auditoría de tiradas (`docs/auditoria-tiradas.md`), las preguntas abiertas** (2026-11-10, dueño: «cuando esté en la compu… las vamos a

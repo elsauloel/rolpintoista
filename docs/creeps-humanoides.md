@@ -488,6 +488,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
 - **M3 · Mago del rayo, nivel 1 aprobado** (2026-11-03): Esp 12 · Con 8 · Agi 5 · Des 6 · Fue 2, vida 40, 5 No2; Varita de chispa eléctrica +
   Escudo de escamas de lagarto · Chaleco de cuero · Anillo de chispa (Def 3, Def.Esp 1, +2 eléctrico); Centella (lenta, cd 4, 2 No2) y Zap (lenta,
   cd 3, 2 No2), las dos con la Parálisis contra Res.CC. Consumible: Poción de SP menor.
+  **Nivel 2 aprobado** (dueño, 2026-11-12: «dejalo así»): Esp 14 · Con 9 · Agi 5 · Des 6 · Fue 2, vida 45, SP 42 (regen 7); + Capucha de lana del culto y
+  Guantes de goma: Def 3, Def. especial 3, Ef.Esp 15. **Parpadeo** (Flash) y la pasiva **Potencia especial**. **Cargado** (2026-11-12). Pedido para la cola:
+  la **Varita de chispa eléctrica** pasa a **20 % de Parálisis a todos los que toca** (el primero y los saltos).
 - **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
   lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
   (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·

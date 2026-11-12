@@ -235,6 +235,12 @@
     equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa'],
     habilidades: ['Centella', 'Zap'], consumibles: ['Poción de SP menor'],
     estrategia: 'Mago del rayo. El rayo salta entre los que se juntan y paraliza: corta turnos.'});
+  // M3 Mago del rayo (niveles 2 en adelante, de a uno desde el 2026-11-12).
+  const M3 = {linea: 'M3', nombre: 'Mago del rayo', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago del rayo. El rayo salta entre los que se juntan y paraliza: corta turnos.'};
+  esencial({...M3, nivel: 2, atrib: [9, 2, 5, 6, 14],   // (aprobado 2026-11-12: Parpadeo; pasiva Potencia especial; + Capucha de lana del culto y Guantes de goma: Def 3 / Def. especial 3, «dejalo así»)
+    equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo'], pasivas: ['Potencia especial']});
   esencial({linea: 'M4', nombre: 'Arcano', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 6, 5, 12],
     equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],

@@ -96,6 +96,8 @@
 > **⭐ Después de los creeps esenciales (dueño, 2026-11-12):** (1) el costo en SP de los hechizos de los magos (abajo, con prioridad); (2) **evaluar el
 > sobrepeso en los creeps** (ver «⚖ Sobrepeso en los creeps»); (3) **probar balancear los creeps para que TODOS usen SP** en lugar de turnos de espera
 > (cooldown): qué SP máximo y regeneración les daría su atributo, cuánto costaría cada habilidad en SP, y si se juegan mejor así.
+> (4) **revisar el costo en No2 de las varitas** (dueño, 2026-11-12): hoy, por ejemplo, la Varita del relámpago cuesta 1 No2 + 3 SP (o 4 No2) y el
+> No2 sube 1 por cada uso más en el turno.
 > **⭐ PRIORIDAD apenas terminen los creeps esenciales (dueño, 2026-11-12: «apenas terminemos con los esenciales vamos a encarar esto»):** el
 > costo en SP de los hechizos de los magos (ej.: la Centella cuesta «tanto SP como su Especial» → 14 SP de 42 en el Mago del rayo nv2).
 > **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas

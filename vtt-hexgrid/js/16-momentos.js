@@ -53,10 +53,18 @@ function momentosEscuchar(){
       const sigiloPendiente = d.tipo === 'sigilo-pedido' && ['percepcionGM', 'percepcionJug', 'sigiloJugador', 'sigiloTirando', 'esperandoGM'].includes(d.estado) && Date.now() - ms < 30 * 60 * 1000;
       // (…y su resultado, en la pantalla que todavía muestra el cartel: si no, quedaba «tirá tu Sigilo» después de recargar.)
       const sigiloConCartel = d.tipo === 'sigilo-pedido' && typeof sigiloJugCartel !== 'undefined' && sigiloJugCartel.has(ch.doc.id);
-      if(ms < momentosDesde && !sigiloPendiente && !sigiloConCartel) return;
+      // 🪤 Lo mismo con una trampa sin terminar (2026-11-12, el dueño: J1 pisó una trampa con la pantalla del GM cerrada y, al abrirla, el GM
+      // no veía nada y quedaba trabada): si es de la última media hora y le falta un paso, se vuelve a mostrar a quien le toque.
+      const trampaPend = d.tipo === 'trampa' && d.estado !== 'listo' && Date.now() - ms < 30 * 60 * 1000;
+      if(ms < momentosDesde && !sigiloPendiente && !sigiloConCartel && !trampaPend) return;
       momentoRecibido(ch.doc.id, d);
     });
   }, err => console.error('Error escuchando los momentos:', err));
+  // 🪤 Las trampas sin terminar que quedaron fuera de los últimos 20 momentos (2026-11-12): una sola vez al entrar.
+  coleccionMomentos().where('tipo', '==', 'trampa').limit(100).get().then(snap => snap.docs.forEach(doc => {
+    const d = doc.data(), ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : 0;
+    if(d.estado !== 'listo' && ms && Date.now() - ms < 30 * 60 * 1000) momentoRecibido(doc.id, d);
+  })).catch(err => console.error('No se pudieron leer las trampas pendientes:', err));
   if(soyGM) momentosBarrerViejos();
 }
 // El GM borra los de más de 2 horas al entrar (no hace falta guardarlos: la Mesa queda como registro).

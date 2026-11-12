@@ -7965,6 +7965,24 @@ prueba('🚩 Estandartes (2026-11-05): las áreas se ven como estados según dó
   tk.get('c1').col = 4;
   igual(nom('c1'), '');
 });
+prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/js/19): quién quedó agarrado y «9 − Defensa 4 = 5»', async () => {
+  const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();
+  const trozo = src.slice(src.indexOf('/* PURAS-INICIO'), src.indexOf('/* PURAS-FIN */'));
+  const f = new Function('num', trozo + '\nreturn {trampaCuentaTexto, trampaPendienteDelToken};')(v => Number(v) || 0);
+  const ahora = 10 * 60 * 60 * 1000, ts = ms => ({toMillis: () => ms});
+  const m = (estado, fase, tokenId, hace, pisador = true) => ({estado, creado: ts(ahora - hace), datos: {fase, tokenId, pisador}});
+  const lista = [['a', m('listo', 'fin', 'tk1', 1000)], ['b', m('paso', 'dano', 'tk2', 1000, false)], ['c', m('paso', 'dano', 'tk1', 40 * 60 * 1000)], ['d', m('paso', 'dano-aplicar', 'tk1', 5000)]];
+  const p = f.trampaPendienteDelToken(lista, 'tk1', ahora);
+  igual([p && p.id, f.trampaPendienteDelToken(lista, 'tk2', ahora), f.trampaPendienteDelToken(lista.slice(0, 3), 'tk1', ahora)], ['d', null, null]);
+  const c0 = f.trampaCuentaTexto(9, {recibido: 9, defensa: 0, llega: 9, defPartes: [{txt: 'Defensa', v: 0}]}, false);
+  const c4 = f.trampaCuentaTexto(9, {recibido: 5, defensa: 4, llega: 5, defPartes: [{txt: 'Defensa', v: 4}]}, false);
+  const cd = f.trampaCuentaTexto(9, {recibido: 9, defensa: 0, llega: 9, defPartes: []}, true);
+  const ce = f.trampaCuentaTexto(9, {recibido: 2, defensa: 2, llega: 7, absorbido: 5, defPartes: [{txt: 'Defensa', v: 2}], capas: [{nombre: 'Escudo especial', v: 5}]}, false);
+  const ci = f.trampaCuentaTexto(9, {invulnerable: true, recibido: 0}, false);
+  igual([c0.texto, c0.final, c4.texto, c4.final, cd.texto, ce.texto, ce.final, ci.final],
+    ['9 de daño − Defensa 0 = 9 a la vida', 9, '9 de daño − Defensa 4 = 5 a la vida', 5, '9 de daño (ignora la Defensa) = 9 a la vida',
+     '9 de daño − Defensa 2 = 7 − Escudo especial (escudo) 5 = 2 a la vida', 2, 0]);
+});
 /* ---------- Resultado ---------- */
 grupo('⬡ Qué afecta a una casilla (comun/hex-info.js, 2026-11-05)');
 prueba('casilla sin nada: «Hexágono libre» y «Nada la afecta»', () => {

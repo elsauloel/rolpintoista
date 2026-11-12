@@ -417,7 +417,13 @@ function trampaDibujar(id){
   const d = trampasDatos.get(id);
   if(!d) return;
   const dt = d.datos || {}, listo = d.estado === 'listo';
-  const falta = listo ? null : trampaPasoQueFalta(dt);
+  let falta = listo ? null : trampaPasoQueFalta(dt);
+  // 🧮 «Aplicar el daño» con la cuenta a la vista (2026-11-12, dueño: «debe mostrarse también la cuenta: 9 − 0 = 9»): la Defensa real de la víctima y lo
+  // que la frena, y el botón con lo que entra a la vida. Sin poder calcularla (un creep en la pantalla de un jugador), queda el texto de siempre.
+  if(falta && dt.fase === 'dano-aplicar'){
+    const c = trampaDanoVista(id, dt);
+    if(c) falta = {...falta, texto: `🧮 ${c.texto}. ⚙ Al tocar el botón se descuenta solo de la vida de ${dt.quien}.`, boton: `💔 Aplicar el daño (${fmt(c.final)})`};
+  }
   const rodando = trampaTirandoAca === id;
   const pasos = [...(dt.pasos || [])];
   let botones = [];
@@ -432,7 +438,13 @@ function trampaDibujar(id){
       if(trampaTieneTirada(dt)) botones.push({texto: '✋ Resolver a mano', sec: true, deshabilitado: rodando || dt.tirando, alClic: () => trampaAMano(id)});
       else if(dt.fase === 'dano-aplicar') botones.push({texto: '✋ Lo aplica la mesa', sec: true, deshabilitado: rodando || dt.tirando, alClic: () => trampaTirar(id, {aplicarAMano: true})});
       trampaAvisarVisto(id, dt);
-    }else botones = [{texto: dt.fase === 'portal' ? 'Esperando…' : `⏳ ${falta.espera}`, deshabilitado: true}];
+    }else{
+      botones = [{texto: dt.fase === 'portal' ? 'Esperando…' : `⏳ ${falta.espera}`, deshabilitado: true}];
+      // ✋ Nadie queda trabado (2026-11-12, dueño: J1 esperaba «el GM tira el daño…» con la pantalla del GM cerrada y no tenía cómo seguir): a los
+      // pocos segundos de esperar, quien espera también puede resolver el paso a mano (lo toma la misma transacción: no se tira dos veces).
+      const aMano = trampaEsperaAMano(id, dt);
+      if(aMano) botones.push({texto: aMano.texto, sec: true, deshabilitado: rodando || dt.tirando, alClic: aMano.alClic});
+    }
   }
   AvisoCombate.mostrar({clave: 'trampa:' + id, icono: d.icono || '🪤', titulo: !listo && (mia || trampaMeTocaVictima(dt)) ? trampaTituloAca(id, d) : (d.titulo || ''), pasos,
     veredicto: listo ? dt.veredicto : null, botones,   // lo que va a mano ya tuvo su paso propio
@@ -445,6 +457,104 @@ function trampaDibujar(id){
       setTimeout(trampaMostrarSiguiente, 0);
     }});
 }
+
+// ✋ La salida a mano de quien ESPERA (2026-11-12): después de TRAMPA_ESPERA_MANO_MS mirando «⏳ …», el paso se puede resolver desde acá.
+const TRAMPA_ESPERA_MANO_MS = 5000, trampaEsperaDesde = new Map();
+function trampaEsperaAMano(id, dt){
+  if(!dt || !dt.fase || ['portal', 'portal-mover', 'fin'].includes(dt.fase)) return null;
+  const k = id + ':' + dt.fase;
+  if(!trampaEsperaDesde.has(k)){
+    trampaEsperaDesde.set(k, Date.now());
+    setTimeout(() => { if(trampaEnPantalla === id) trampaDibujar(id); }, TRAMPA_ESPERA_MANO_MS + 100);
+  }
+  if(Date.now() - trampaEsperaDesde.get(k) < TRAMPA_ESPERA_MANO_MS) return null;
+  const tomar = () => { trampasTomadas.set(id, dt.fase); trampasCerradas.delete(id); };
+  if(trampaTieneTirada(dt)) return {texto: '✋ Resolver a mano', alClic: () => { tomar(); trampaAMano(id); }};
+  if(dt.fase === 'dano-aplicar') return {texto: '✋ Lo aplica la mesa', alClic: () => { tomar(); trampaTirar(id, {aplicarAMano: true}); }};
+  return {texto: '▶ Seguir desde acá', alClic: () => { tomar(); trampaTirar(id); }};
+}
+
+/* ⏳ Lo pendiente (2026-11-12, dueño: «la Crónica es un cartel que aparece y desaparece, no tengo cómo abrirlo»): un botón abajo a la derecha del mapa
+   con cuántas trampas esperan una tirada (las que sigue esta pantalla; el GM, todas) y la lista para volver a abrir cada una. De paso, cada 3 s se
+   vuelve a mirar cada trampa sin terminar: si ahora le toca a esta pantalla (p. ej. entró después y recién cargaron los tokens), aparece sola. */
+const trampaPendiente30 = d => {
+  if(!d || d.estado === 'listo' || !d.datos || !d.datos.fase || d.datos.fase === 'fin') return false;
+  const ms = d.creado && typeof d.creado.toMillis === 'function' ? d.creado.toMillis() : Date.now();
+  return Date.now() - ms < TRAMPA_PENDIENTE_MS;
+};
+/* PURAS-INICIO (las prueba comun/pruebas.html, sacándolas de este archivo) */
+// 🧮 La cuenta del daño de una trampa en una línea (función pura): `r` = lo que devuelve resolverGolpe (js/10), con sus `defPartes`.
+// «9 de daño − Defensa 4 = 5 a la vida», «ignora la Defensa: 9 a la vida», con los escudos, la Armadura arcana y la Vida extra en el medio.
+function trampaCuentaTexto(monto, r, ignoraDef){
+  const n = v => String(Math.round(Number(v) || 0));
+  if(r && r.invulnerable) return {texto: `${n(monto)} de daño → Invulnerable: no le hace nada`, final: 0};
+  const partes = (r && r.defPartes) || [];
+  let t = `${n(monto)} de daño`;
+  if(!partes.length) t += ignoraDef ? ' (ignora la Defensa)' : ` − Defensa ${n(r ? r.defensa : 0)}`;
+  partes.forEach(p => { t += ` − ${p.txt} ${n(p.v)}`; });
+  if(r && num(r.perfora) > 0) t += ` (pasa${num(r.perfora) > 1 ? 'n' : ''} ${n(r.perfora)} por la Perfora)`;
+  const hay = r && (num(r.arcano) || (r.capas || []).length);
+  if(hay) t += ` = ${n(r.llega)}`;
+  if(r && num(r.arcano)) t += ` − Armadura arcana ${n(r.arcano)}`;
+  ((r && r.capas) || []).forEach(c => { t += ` − ${c.nombre}${c.vida ? ' (Vida extra)' : ' (escudo)'} ${n(c.v)}`; });
+  const final = r ? num(r.recibido) : num(monto);   // lo que entra a la vida (lo que se lleva la Vida extra ya está restado arriba)
+  return {texto: `${t} = ${n(final)} a la vida`, final};
+}
+// 🪤 ¿Este token pisó una trampa que todavía no terminó? (función pura: `lista` = [[id, momento]…], `ahora` en ms) → el momento o null.
+// La usa el mapa al soltar un movimiento (js/06): quien está agarrado por una trampa sin resolver se queda en su casilla salvo que la mesa diga.
+function trampaPendienteDelToken(lista, tokenId, ahora){
+  for(const [id, d] of lista || []){
+    const dt = (d && d.datos) || {};
+    if(!d || d.estado === 'listo' || !dt.fase || dt.fase === 'fin' || !dt.pisador || dt.tokenId !== tokenId) continue;
+    const ms = d.creado && typeof d.creado.toMillis === 'function' ? d.creado.toMillis() : num(d.creadoMs) || ahora;
+    if(ahora - ms < 30 * 60 * 1000) return {id, d};
+  }
+  return null;
+}
+/* PURAS-FIN */
+function trampasPendientesLista(){
+  return [...trampaUltimo.entries()].filter(([id, d]) => trampaPendiente30(d) && (soyGM || trampaLaSigo(id, d.datos || {})));
+}
+let trampasPendAbierto = false;
+function trampasPendientesRender(){
+  const caja = typeof $ === 'function' && $('#lienzo-caja');
+  if(!caja) return;
+  let b = document.getElementById('trampas-pendientes');
+  if(!b){
+    b = document.createElement('div');
+    b.id = 'trampas-pendientes';
+    b.style.cssText = 'position:absolute;right:12px;bottom:12px;z-index:32;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:13px';
+    b.addEventListener('click', ev => {
+      const t = ev.target.closest('[data-tp-toggle]'); if(t){ trampasPendAbierto = !trampasPendAbierto; trampasPendientesRender(); return; }
+      const o = ev.target.closest('[data-tp-abrir]'); if(o){ trampasPendAbierto = false; trampaSeguir(o.dataset.tpAbrir); trampasPendientesRender(); }
+    });
+    caja.appendChild(b);
+  }
+  const lista = trampasPendientesLista();
+  if(!lista.length){ b.hidden = true; trampasPendAbierto = false; return; }
+  b.hidden = false;
+  const fila = ([id, d]) => {
+    const dt = d.datos || {}, falta = trampaPasoQueFalta(dt);
+    const quien = trampaMeToca(id, dt) ? 'te toca a vos' : (falta && falta.espera) || 'esperando';
+    return `<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 8px;border-top:1px solid #39435c">
+      <div style="min-width:0"><div style="color:#e9ecf4">${esc(d.icono || '🪤')} ${esc(dt.quien || '')} · ${esc(dt.nombreT || 'trampa')}</div>
+      <div style="color:#8d97ad;font-size:12px">${esc(falta ? falta.titulo : '')} — ${esc(quien)}</div></div>
+      <button type="button" data-tp-abrir="${esc(id)}" style="flex:none;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #c98545;background:#2a2016;color:#f0c890;cursor:pointer">Abrir</button></div>`;
+  };
+  b.innerHTML = (trampasPendAbierto ? `<div style="width:min(320px,70vw);background:rgba(21,26,38,.96);border:1px solid #39435c;border-radius:8px;overflow:hidden">
+      <div style="padding:6px 8px;color:#f0c890;font-weight:600">⏳ Esperando una tirada</div>${lista.map(fila).join('')}</div>` : '')
+    + `<button type="button" data-tp-toggle title="Trampas que esperan una tirada" style="padding:6px 12px;border-radius:999px;border:1px solid #c98545;background:#2a2016;color:#f0c890;cursor:pointer;font-weight:600">⏳ Pendientes <span style="display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:#c98545;color:#1b1206">${lista.length}</span></button>`;
+}
+setInterval(() => {
+  try{
+    trampaUltimo.forEach((d, id) => {
+      if(!trampaPendiente30(d) || trampaEnPantalla === id || trampaCola.includes(id) || trampaCerrada(id, d.datos)) return;
+      if(trampaLaSigo(id, d.datos || {})) trampaMomento(id, d);
+      else if(soyGM) trampaRespaldoProgramar(id, d);   // (el GM, por quien no está: el respaldo de siempre)
+    });
+    trampasPendientesRender();
+  }catch(err){ console.error('Trampas pendientes:', err); }
+}, 3000);
 
 // El título en la pantalla que tiene que tirar: «Larry, pisaste la trampa…» / «Tu trampa agarró a…» / «… · tirá por él».
 function trampaTituloAca(id, d){
@@ -671,14 +781,9 @@ async function trampaPasoDano(id, dt, mano){
   await trampaGuardar(id, {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula, fase: 'dano-aplicar', pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]});
 }
 // Lo aplica (se anuncia sin la vida de un creep: es privada).
-async function trampaPasoDanoAplicar(id, dt, mano){
-  const x = tokens.get(dt.tokenId);
-  if(mano && mano.aplicarAMano){   // ✋ La mesa lo aplica (Defensa, escudos, lo excepcional) desde el círculo de vida del token
-    const m = num(dt.danoMonto);
-    const sig = {...dt, danoEntro: m, pasos: [...(dt.pasos || []), {titulo: 'Daño', texto: `${fmt(m)} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} → ✋ lo aplica la mesa a mano`}]};
-    sig.fase = trampaFaseSiguiente(sig, 'dano');
-    return trampaGuardar(id, sig);
-  }
+// 🧮 El daño de la trampa sobre la víctima: lo que la frena (Defensa, Defensa especial, resistencia, Suela gruesa) y lo que entra. Con `simular`, la
+// cuenta sin escribir nada (la vista previa del paso «Aplicar el daño», 2026-11-12); si no, lo aplica (danioPj / danioCreep / danioInv, js/10).
+async function trampaDanoCalcular(dt, x, simular){
   const agT = typeof aguaRayo === 'function' && x ? aguaRayo(x, dt.elemento, num(dt.danoMonto)) : null;   // 💧 en el agua, el rayo ×1,5 (js/50)
   const monto = agT ? agT.monto : num(dt.danoMonto);
   let res = null, freno = '', restaFreno = 0;
@@ -689,13 +794,40 @@ async function trampaPasoDanoAplicar(id, dt, mano){
       const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // la Defensa especial (también lo tóxico, 2026-10-07)
       freno = [...(arm ? [`Defensa especial ${arm}`] : []), ...(rr.res ? [Combatiente.resElementalTxt(dt.elemento, rr.res)] : [])].join(' − ');
       const suela = dt.altura === 'aire' ? 0 : Math.max(0, statPiesDe(x, 'suelagruesa'));   // solo lo que toca el piso (2026-10-07)   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
+      const resTxt = [...(dt.elemento && rr.res ? [Combatiente.ELEMENTOS[dt.elemento] ? Combatiente.ELEMENTOS[dt.elemento].etq : 'Resistencia al elemento'] : []), ...(suela ? ['Suela gruesa'] : [])].join(' + ');   // (el renglón de la cuenta)
       if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);
-      const oT = {magico: !!dt.elemento, ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
+      const oT = {magico: !!dt.elemento, ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {}), ...(resTxt ? {resTxt} : {}), ...(simular ? {simular: true} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res, oT); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
-    }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
+    }catch(err){ if(!simular) console.error('No se pudo aplicar el daño de la trampa:', err); }
   }
+  return {monto, res, freno, restaFreno};
+}
+// La vista previa, una vez por paso (se recalcula si cambia el daño); al llegar, se vuelve a dibujar el cartel.
+const trampaDanoVistas = new Map();
+function trampaDanoVista(id, dt){
+  const k = id + ':' + num(dt.danoMonto);
+  if(trampaDanoVistas.has(k)) return trampaDanoVistas.get(k);
+  trampaDanoVistas.set(k, null);
+  const x = tokens.get(dt.tokenId);
+  if(!x) return null;
+  trampaDanoCalcular(dt, x, true).then(v => {
+    const c = v && v.res && v.res.r ? trampaCuentaTexto(v.monto, v.res.r, dt.ignoraDef) : null;
+    trampaDanoVistas.set(k, c);
+    if(c && trampaEnPantalla === id) trampaDibujar(id);
+  }).catch(() => {});
+  return null;
+}
+async function trampaPasoDanoAplicar(id, dt, mano){
+  const x = tokens.get(dt.tokenId);
+  if(mano && mano.aplicarAMano){   // ✋ La mesa lo aplica (Defensa, escudos, lo excepcional) desde el círculo de vida del token
+    const m = num(dt.danoMonto);
+    const sig = {...dt, danoEntro: m, pasos: [...(dt.pasos || []), {titulo: 'Daño', texto: `${fmt(m)} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} → ✋ lo aplica la mesa a mano`}]};
+    sig.fase = trampaFaseSiguiente(sig, 'dano');
+    return trampaGuardar(id, sig);
+  }
+  const {monto, res, freno, restaFreno} = await trampaDanoCalcular(dt, x, false);
   let texto = dt.danoFijo ? `${num(dt.danoTirado)} de descarga` : monto <= 0 ? `${dt.danoFormula} = ${num(dt.danoTirado)}` : `${fmt(monto)}`;
   if(monto <= 0) texto += ' → sin daño';
   else if(res){

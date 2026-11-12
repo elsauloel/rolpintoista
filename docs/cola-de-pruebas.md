@@ -21,16 +21,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   impar podemos hacerla con un dado de 6 u 8»): el 50 % se tira con d6 (4 a 6), la Moneda Re-Roll es par/impar en d6, los 86 ítems del
   catálogo y los creeps viejos pasaron a «(4–6 en d6)», y un efecto guardado con 2 caras se tira con d6 (`EfectosGolpe.normalizar`); y las
   tiradas de una misma caja de dados 3D van de a una (`dadosTirar`, `c.cadena`).
-- **[PRIMERO, apenas termine el dado de 2] 🪤 Trampas con el GM desconectado** (dueño, 2026-11-12, probando Reflejos en «Prueba · Carteles» desde
-  la compu): Rockardo (copia, de J1) pisó la Trampa de oso con la pantalla del GM cerrada. A J1 le quedó «⏳ el GM tira el daño de la trampa…» y el GM,
-  al abrir el mapa (y con Ctrl+Shift+R), no ve nada: quedó trabado. Arreglar:
-  1. **El paso pendiente vuelve a aparecer** cuando la pantalla del GM (o de quien le toque) entra después, como el sigilo (2026-11-11, js/16).
-  2. **Quien espera siempre tiene «✋ Resolver a mano»** (en el cartel de espera, a los pocos segundos), para no quedar trabado nunca.
-  3. **Los momentos pendientes se pueden volver a abrir**: la Crónica es un cartel que aparece y se va; hace falta un botón (con un numerito)
-     que liste lo que está esperando una tirada y lo reabra.
-  4. **Al caer en la trampa, el movimiento se frena en la casilla de la trampa**: Rockardo quedó en la casilla siguiente. (Si zafa con Reflejos,
-     queda donde eligió tirarse.)
-  (Reflejos en sí anduvo bien: apareció su cartel antes que el de la trampa.)
+- **✅ hecho (2026-11-12) 🪤 Trampas con el GM desconectado** (dueño, 2026-11-12, probando Reflejos en «Prueba · Carteles»): Rockardo (copia) pisó
+  la Trampa de oso con la pantalla del GM cerrada y quedó trabado en «⏳ el GM tira el daño de la trampa…». Hecho (`vtt-hexgrid/js/16`, `js/19`, `js/06`):
+  1. **El paso pendiente vuelve a aparecer** cuando entra después la pantalla a la que le toca (como el sigilo): las trampas sin terminar de la última
+     media hora se vuelven a mostrar; cada 3 s se revisan por si recién cargaron los tokens.
+  2. **Quien espera tiene «✋ Resolver a mano»** en el cartel de espera a los 5 s (o «✋ Lo aplica la mesa» / «▶ Seguir desde acá», según el paso).
+  3. **⏳ Pendientes N** abajo a la derecha del mapa: la lista de las trampas que esperan una tirada (las tuyas; el GM, todas) con «Abrir».
+  4. **Se queda en la casilla de la trampa**: en el mapa de prueba (con la oportunidad de la rata, «Seguir sin esperar» y Reflejos) el token siempre
+     frenó en la trampa. El de Rockardo muestra que lo movieron DESPUÉS, desde la trampa a la casilla de al lado (su último camino es trampa → siguiente),
+     algo que se podía porque la trampa seguía trabada sin dejarle el Inmovilizado. Ahora, mover a quien tiene una trampa sin terminar pregunta
+     «🪤 Trampa sin terminar… ¿Moverlo igual?» (Se queda / Moverlo igual).
+  5. (Pedido extra) **«Aplicar el daño» muestra la cuenta**: «🧮 9 de daño − Defensa 4 = 5 a la vida» (con la Defensa real, la especial, la resistencia,
+     los escudos y la Vida extra) y el botón dice lo que entra a la vida: «💔 Aplicar el daño (5)». Probado con Defensa 0 y Defensa 4.
+  Capturas `trampa-gm-*`.
 - **[en cola] 🦶 Inamovible al cuadro del duelo** (dueño, 2026-11-11, revisando el bloque 4 en «Prueba · Carteles»): cuando empujan o tiran de alguien con
   una pieza Inamovible, la chance se tira en el cuadro del duelo de siempre (una tirada sin oponente, como las chances de la tanda 3), con el botón
   para **quien maneja al empujado** (su jugador; el GM para un creep; el GM tira por el ausente) y el «Aplicar» de siempre. Hoy es un cartel propio

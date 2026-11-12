@@ -603,6 +603,22 @@ function soltar(){
 // Lo que pasa al soltar un token que se arrastró (o al retomar el resto de un camino frenado por un ataque de oportunidad, js/17): sigilo,
 // trampas, percepción y oportunidad cortan la ruta donde corresponda; después se mueve (cobrando No2) o se pregunta si se pasa de los que tiene.
 function rutaSoltada(a, t){
+  // 🪤 (2026-11-12, dueño: Rockardo pisó la trampa y terminó en la casilla siguiente) quien pisó una trampa que todavía no terminó (p. ej. el GM
+  // no tiró el daño) se queda en la casilla de la trampa: moverlo pregunta antes (avisa y deja seguir).
+  if(!a.libre && a.movio && t && a.ruta && a.ruta.length > 1 && !a.trampaSigue && typeof trampaPendienteDelToken === 'function' && typeof trampaUltimo !== 'undefined'){
+    const pend = trampaPendienteDelToken([...trampaUltimo.entries()], a.id, Date.now());
+    if(pend){
+      const dt = pend.d.datos || {}, falta = typeof trampaPasoQueFalta === 'function' ? trampaPasoQueFalta(dt) : null;
+      visibles.delete(a.id); pedirDibujo();
+      Confirmar.preguntar(`${nombreDe(t)} todavía está en «${dt.nombreT || 'la trampa'}»${falta && falta.espera ? ` (${falta.espera.replace(/…$/, '')})` : ''}: se queda en la casilla de la trampa hasta que se resuelva. ¿Moverlo igual?`,
+        {titulo: 'Trampa sin terminar', icono: '🪤', si: 'Moverlo igual', no: 'Se queda'}).then(ok => {
+        if(!ok){ toast('🪤 Se queda en la casilla de la trampa: en ⏳ Pendientes se puede volver a abrir'); return; }
+        const t2 = tokens.get(a.id);
+        if(t2) rutaSoltada({...a, trampaSigue: true}, t2);
+      });
+      return;
+    }
+  }
   // Sigilo: si la ruta pisa un cono rival, se corta ahí (aparece donde lo
   // detectaron) y se anotan los pasos en las zonas de alerta.
   if(!a.libre && a.movio && t && a.ruta.length > 1 && enSigilo(t)){

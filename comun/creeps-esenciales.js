@@ -1,0 +1,617 @@
+/* =========================================================
+   ⭐ EL POOL ESENCIAL DE CREEPS (2026-11-03; diseño del dueño del 2026-11-02, docs/creeps-humanoides.md)
+   «Un pool de creeps genéricos… de cada rol una variedad, nivel 1 a 5, con un equipo acorde… todos humanoides, para poder crear creeps
+   rápidamente y cambiarles el nombre de acuerdo a su circunstancia.» Cada línea es una estrategia dentro de su rol; se diseñan de a uno, a fondo,
+   y entran acá cuando el dueño los aprueba. Se suman al final de CREEPS_BASE con `pool: 'esencial'` (la biblioteca de GM Tools los separa en la
+   pestaña «⭐ Pool esencial»; lo demás de fábrica es el «🗺 Pool de campaña»).
+
+   Se arman con lo de fábrica: el equipo sale del catálogo (comun/catalogo.js, por nombre) y las habilidades del pool de habilidades de creep
+   (comun/skills-creep-base.js, las auditadas, con su costo y cooldown). Por eso este archivo va DESPUÉS de catalogo.js, skills-creep-base.js,
+   creep-calculo.js y creeps-base.js. Si una pieza no está, se avisa en la consola y el creep sale sin ella.
+   ========================================================= */
+(function(){
+  if(typeof window.CREEPS_BASE === 'undefined') window.CREEPS_BASE = [];
+  const CAT = () => (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE : []);
+  const HABS = () => (typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : []);
+  const slug = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const faltan = [];
+  const item = nombre => {
+    const it = CAT().find(x => x && x.nombre === nombre && !x.archivo);
+    if(!it) faltan.push(nombre);
+    return it || null;
+  };
+  // Una pieza para el equipo del creep, puesta (equipado: true).
+  function pieza(nombre, k){
+    const it = item(nombre);
+    if(!it) return null;
+    const o = typeof CreepCalculo !== 'undefined' && CreepCalculo.itemParaCreep ? CreepCalculo.itemParaCreep(it) : structuredClone(it);
+    return {...o, id: 'ese-' + k + '-' + slug(nombre), equipado: true};
+  }
+  // Un consumible para el cinturón (como CreepAcciones.alCinturon).
+  function consumible(nombre, k){
+    const it = item(nombre);
+    if(!it) return null;
+    const c = structuredClone(it);
+    delete c.imagen; delete c._bib; delete c.equipado;
+    return {...c, id: 'ese-' + k + '-' + slug(nombre), consumible: true, unidades: 1, cargaActual: Math.max(1, Number(it.cargaMax) || 1)};
+  }
+  // La habilidad de fábrica por nombre (la auditada), armada para el nivel.
+  function hab(nombre, n){
+    const e = HABS().find(x => x && x.nombre === nombre && x.datos && x.datos.sp && x.datos.sp.auditada) || HABS().find(x => x && x.nombre === nombre);
+    if(!e){ faltan.push('habilidad: ' + nombre); return null; }
+    return typeof armarHabilidadDeCreep === 'function' ? armarHabilidadDeCreep(e.datos, n) : null;
+  }
+  // Una pasiva del pool (comun/pasivas.js, por nombre), como las lleva un creep (`sc.pasivas`, CreepCalculo las suma una vez).
+  function pasiva(texto, k){   // «Golpe fuerte» o «Golpe fuerte ×2» (dos compras: el tope es la mitad del nivel)
+    const m = String(texto).match(/^(.*?)\s*×\s*(\d+)$/), nombre = m ? m[1] : texto, compras = m ? Math.max(1, +m[2]) : 1;
+    const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x && x.nombre === nombre);
+    if(!p){ faltan.push('pasiva: ' + nombre); return null; }
+    return {...structuredClone(p), id: 'ese-' + k + '-' + slug(nombre), compras};
+  }
+  const ROL_COLOR = {rango: '#3E8E7E', tanque: '#5B7FA6', warrior: '#B34A3A', hibrido: '#A0522D', liviano: '#8B5A2B', mago: '#D9662B', support: '#4CB86A', debuffer: '#7A3E9D'};
+  // Oro de un humano (como los de fábrica: 5n² + 10n).
+  const oroHumano = n => 5 * n * n + 10 * n;
+
+  function esencial(c){
+    const n = c.nivel, k = slug(c.nombre);
+    const [con, fue, agl, des, esp] = c.atrib;
+    const hp = con * 5;
+    // 💧 Modo SP (dueño, 2026-11-03: «todos los que son con énfasis en especial van a trabajar con SP en vez de con cooldown»): el Especial es su
+    // atributo más alto (magos, debuffers, el Sanador). Los demás, con turnos de espera. `c.modoSP` lo fuerza para un lado o el otro.
+    const modoSP = c.modoSP !== undefined ? !!c.modoSP : esp >= Math.max(con, fue, agl, des);
+    const datos = {
+      nombre: c.nombre, nivel: n, color: ROL_COLOR[c.rol] || '#888888', hp, hpMax: hp, spd: 5, ataquesTurno: 0,
+      con, fue, agl, des, esp, defensa: 0, armaduraTipo: '', crit: [0, 0, 0, 0, 0], equipoVivo: 1,
+      equipo: c.equipo.map(x => pieza(x, k)).filter(Boolean),
+      cinturon: c.consumibles.map(x => consumible(x, k)).filter(Boolean),
+      habilidades: c.habilidades.map(h => hab(h, n)).filter(Boolean),
+      estados: [], pasivas: (c.pasivas || []).map(x => pasiva(x, k)).filter(Boolean), notas: c.estrategia, escalaTipos: 2, imagen: '',
+      tipoCriatura: 'humano', tipoCriaturaOtro: '', jefe: false, oroBase: oroHumano(n), armaNatural: false, trofeoEspecial: {nombre: '', precio: 0},
+      pool: 'esencial', linea: c.linea, ...(modoSP ? {modoSP: true} : {}),
+    };
+    // ❤ La vida con lo que suma el equipo (Cota de malla fina, Casco de bandas remachadas: Vida +5), en todos los niveles (2026-11-06, dueño: la vida
+    // de los ítems vale para los creeps igual que para los jugadores): la base es Con × 5 y `CreepCalculo.vidaAlDia` le suma el equipo (y lo anota en
+    // `hpEquipo`, así no se suma dos veces). Piromante, Sanador y Mago de escarcha de nivel 1 pasan a tener +5.
+    datos.hpEquipo = 0;
+    if(typeof CreepCalculo !== 'undefined' && CreepCalculo.vidaAlDia) CreepCalculo.vidaAlDia(datos);
+    window.CREEPS_BASE.push({
+      poolId: 'esencial-' + c.linea.toLowerCase() + '-' + n + '-' + k, nombre: c.nombre, nivel: n, pool: 'esencial',
+      etiquetas: ['esencial', c.rolTxt, 'nivel ' + n, 'humano'],
+      detalle: `${c.estrategia} Habilidades: ${c.habilidades.join(' · ')}${modoSP ? ' (con SP)' : ''}.${c.pasivas && c.pasivas.length ? ` Pasivas: ${c.pasivas.join(' · ')}.` : ''} Consumible: ${c.consumibles.join(' y ')}.`, datos,
+    });
+  }
+
+  // ---- Nivel 1 (aprobados por el dueño el 2026-11-02; detalle y porqués en docs/creeps-humanoides.md) ----
+  // Atributos en el orden Con · Fue · Agi · Des · Esp (suman 33).
+  esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 5, 7, 4],   // Con Fue Agi Des Esp (dueño, 2026-11-03)
+    equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas'],
+    habilidades: ['Provocar', 'Piel de hierro'], consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
+    estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el hacha le rompe la armadura al que lo ignora.'});
+  esencial({linea: 'M1', nombre: 'Piromante', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [7, 2, 5, 5, 14],
+    equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego'], consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de fuego. Controla el terreno: levanta un muro de llamas que corta el paso y quema de a uno a los que se acercan.'});
+  // M1 Piromante (niveles 2 en adelante, de a uno desde el 2026-11-06; en modo SP). Nv2: Parpadeo (en lugar de «Toque abrasador», sin auditar).
+  const M1 = {linea: 'M1', nombre: 'Piromante', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de fuego. Controla el terreno: levanta un muro de llamas que corta el paso y quema de a uno a los que se acercan.'};
+  esencial({...M1, nivel: 2, atrib: [8, 2, 6, 5, 15],
+    equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra', 'Babuchas bordadas del adivino'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M1, nivel: 3, atrib: [9, 2, 6, 6, 16],   // (aprobado 2026-11-06: Bola de fuego; la Varita del chorro de lava en lugar de la de la bola de fuego)
+    equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra', 'Babuchas bordadas del adivino'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego'], pasivas: ['Potencia especial']});
+  // Nivel 4 (aprobado 2026-11-06): Escudo elemental (vtt-hexgrid/js/106) y Puntería arcana; contra las flechas, no Defensa especial (dueño: «a un mago
+  // le buscaría protección contra rango»): el Chaleco de kevlar (Def +3, +2 más a distancia) en lugar de la Campera y los Escarpines (Eva +1).
+  esencial({...M1, nivel: 4, atrib: [10, 2, 7, 6, 17],
+    equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Chaleco de kevlar', 'Gorro de piel de salamandra', 'Escarpines de fieltro'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego', 'Escudo elemental'], pasivas: ['Potencia especial', 'Puntería arcana']});
+  esencial({...M1, nivel: 5, atrib: [11, 2, 7, 7, 18],   // (aprobado 2026-11-06: Meteoro; Casco de bandas remachadas —el Turbante no: «la visión al creep no le da ventaja»— y Mitones del primer conjuro)
+    equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Chaleco de kevlar', 'Casco de bandas remachadas', 'Escarpines de fieltro', 'Mitones del primer conjuro'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego', 'Escudo elemental', 'Meteoro'], pasivas: ['Potencia especial', 'Puntería arcana']});
+  esencial({linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 6, 10, 8, 3],
+    equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida'], consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Abre heridas y vuelve para agrandarlas: crece cuanto más dura la pelea. Frágil y esquivo.'});
+  // L1 Sangrador (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const L1 = {linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Abre heridas y vuelve para agrandarlas: crece cuanto más dura la pelea. Frágil y esquivo.'};
+  esencial({...L1, nivel: 2, atrib: [7, 6, 11, 9, 3],   // (aprobado 2026-11-07: Tajo al tendón en lugar de Corte profundo; pasiva Escurridizo; + Cofia)
+    equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón'], pasivas: ['Escurridizo']});
+  esencial({...L1, nivel: 3, atrib: [7, 7, 12, 10, 3],   // (aprobado 2026-11-07: Ráfaga de cortes; Hoz de cosecha en lugar de la Cuchilla)
+    equipo: ['Hoz de cosecha', 'Chaleco de cuero', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes'], pasivas: ['Escurridizo']});
+  esencial({...L1, nivel: 4, atrib: [8, 7, 13, 11, 3],   // (aprobado 2026-11-07: Paso atrás; Chaqueta del acróbata; Ojo crítico y Ojo de carancho en lugar de Escurridizo)
+    equipo: ['Hoz de cosecha', 'Chaqueta del acróbata', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes', 'Paso atrás'], pasivas: ['Ojo crítico', 'Ojo de carancho']});
+  esencial({...L1, nivel: 5, atrib: [8, 8, 14, 12, 3],   // (aprobado 2026-11-07: Corte en la arteria; Botas de mensajero en lugar de las Zapatillas; + Grebas de cuero y Guantes de agarre)
+    equipo: ['Hoz de cosecha', 'Chaqueta del acróbata', 'Botas de mensajero', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Guantes de agarre'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes', 'Paso atrás', 'Corte en la arteria'], pasivas: ['Ojo crítico', 'Ojo de carancho']});
+  esencial({linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [8, 3, 6, 4, 12],
+    equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero'],
+    habilidades: ['Sanar', 'Purificar'], consumibles: ['Pergamino de Regeneración menor'],
+    estrategia: 'Support. Mantiene vivos a los suyos: cura, limpia estados y estira la pelea. Conviene acompañarlo de un tanque.'});
+  // S1 Sanador (niveles 2 en adelante, de a uno desde el 2026-11-06; en modo SP). Nv2: Oleada sanadora y la pasiva nueva Manos de curandero.
+  const S1 = {linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', consumibles: ['Pergamino de Regeneración menor'],
+    estrategia: 'Support. Mantiene vivos a los suyos: cura, limpia estados y estira la pelea. Conviene acompañarlo de un tanque.'};
+  esencial({...S1, nivel: 2, atrib: [9, 3, 7, 4, 13],
+    equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero', 'Casco de cuero endurecido'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora'], pasivas: ['Manos de curandero']});
+  esencial({...S1, nivel: 3, atrib: [10, 3, 7, 4, 15],   // (aprobado 2026-11-06/07: Smite; Varita de cura mayor; Escarpines en lugar de las Botas)
+    equipo: ['Varita de cura mayor', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Escarpines de fieltro', 'Casco de cuero endurecido'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite'], pasivas: ['Manos de curandero']});
+  esencial({...S1, nivel: 4, atrib: [11, 3, 8, 4, 16],   // (aprobado 2026-11-07: Cambio de guardia —versión de creep—; el Peto → Chaleco de kevlar)
+    equipo: ['Varita de cura mayor', 'Orbe de luz', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Casco de cuero endurecido'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite', 'Cambio de guardia'], pasivas: ['Manos de curandero']});
+  esencial({...S1, nivel: 5, atrib: [12, 3, 8, 4, 18],   // (aprobado 2026-11-07: Círculo de sanación —no el Milagro, que va al pool y a la clase—; Orbe de la reserva; Guantes de cuero grueso)
+    equipo: ['Varita de cura mayor', 'Orbe de la reserva', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Casco de cuero endurecido', 'Guantes de cuero grueso'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite', 'Cambio de guardia', 'Círculo de sanación'], pasivas: ['Manos de curandero']});
+  esencial({linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [7, 9, 6, 7, 4],   // (2026-11-03, dueño: «fue 9, con 7, agi 6, des 7, esp 4»)
+    equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas'],
+    habilidades: ['Pegar fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Le rompe la armadura al que más se defiende y después lo castiga. Su punto débil: la magia.'});
+  esencial({linea: 'D1', nombre: 'Maldito', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 6, 4, 13],
+    equipo: ['Varita del susurro', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra'], consumibles: ['Runa de debilidad'],
+    estrategia: 'Debuffer. Les baja las defensas a los rivales para que todos los suyos peguen más; la varita no se esquiva y puede silenciar.'});
+
+  // D1 Maldito (niveles 2 en adelante, de a uno desde el 2026-11-07; en modo SP). Ruta nueva (dueño): nv2 Maldición debilitante · nv3 Escalofrío ·
+  // nv4 Aguja del desamparo (5 SP) + Potencia especial · nv5 Anulación (Extenuar, afuera).
+  const D1 = {linea: 'D1', nombre: 'Maldito', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Runa de debilidad'],
+    estrategia: 'Debuffer. Les baja las defensas a los rivales para que todos los suyos peguen más; la varita no se esquiva y puede silenciar.'};
+  esencial({...D1, nivel: 2, atrib: [9, 2, 7, 4, 14],
+    equipo: ['Varita del susurro', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante'], pasivas: ['Puntería arcana']});
+  esencial({...D1, nivel: 3, atrib: [9, 2, 7, 5, 16],   // (aprobado 2026-11-07: Escalofrío; Varita de la grieta en lugar de la del susurro)
+    equipo: ['Varita de la grieta', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante', 'Escalofrío'], pasivas: ['Puntería arcana']});
+  esencial({...D1, nivel: 4, atrib: [10, 2, 8, 5, 17],   // (aprobado 2026-11-07: Aguja del desamparo, Potencia especial; Capa de escamas de pez espejo en lugar de la Casaca)
+    equipo: ['Varita de la grieta', 'Atrapasueños', 'Capa de escamas de pez espejo', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante', 'Escalofrío', 'Aguja del desamparo'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({...D1, nivel: 5, atrib: [10, 2, 8, 6, 19],   // (aprobado 2026-11-07: Anulación; Muñeco vudú en lugar del Atrapasueños; + Guantes de cuero grueso)
+    equipo: ['Varita de la grieta', 'Muñeco vudú', 'Capa de escamas de pez espejo', 'Capucha de lana del culto', 'Casco de cuero endurecido', 'Guantes de cuero grueso'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante', 'Escalofrío', 'Aguja del desamparo', 'Anulación'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({linea: 'R1', nombre: 'Tirador de precisión', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 7, 11, 3],   // (aprobado 2026-11-03)
+    equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza'], consumibles: ['Flecha perforante'],
+    estrategia: 'Francotirador. Se queda lejos, apunta y cada disparo busca el crítico o pasar la armadura; si le llegan encima, se aleja y vuelve a disparar.'});
+  // R1 Tirador de precisión (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const R1 = {linea: 'R1', nombre: 'Tirador de precisión', rol: 'rango', rolTxt: 'rango', consumibles: ['Flecha perforante'],
+    estrategia: 'Francotirador. Se queda lejos, apunta y cada disparo busca el crítico o pasar la armadura; si le llegan encima, se aleja y vuelve a disparar.'};
+  esencial({...R1, nivel: 2, atrib: [8, 6, 7, 12, 3],   // (aprobado 2026-11-07: Vigilancia, Puntería; Casco de cuero endurecido y Guantes de agarre)
+    equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia'], pasivas: ['Puntería']});
+  esencial({...R1, nivel: 3, atrib: [8, 7, 8, 13, 3],   // (aprobado 2026-11-07: Tiro al arma; Arco de puntería en lugar del Arco de la espera)
+    equipo: ['Arco de puntería', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma'], pasivas: ['Puntería']});
+  esencial({...R1, nivel: 4, atrib: [9, 8, 8, 14, 3],   // (aprobado 2026-11-07: Disparo señalador, Ojo crítico; Chaleco de kevlar)
+    equipo: ['Arco de puntería', 'Chaleco de kevlar', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma', 'Disparo señalador'], pasivas: ['Puntería', 'Ojo crítico']});
+  esencial({...R1, nivel: 5, atrib: [10, 8, 9, 15, 3],   // (aprobado 2026-11-07: Flecha que atraviesa; Botas de mensajero; Cofia y Rodilleras de tatú por algo de Def. esp.)
+    equipo: ['Arco de puntería', 'Chaleco de kevlar', 'Botas de mensajero', 'Cofia de anillas sueltas', 'Guantes de agarre', 'Rodilleras de caparazón de tatú carreta'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma', 'Disparo señalador', 'Flecha que atraviesa'], pasivas: ['Puntería', 'Ojo crítico']});
+
+  // ---- La tanda del 2026-11-03 (nivel 1 aprobado por el dueño; detalle y porqués en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
+  // Los de Especial más alto juegan con SP (regla de arriba); los físicos, con turnos de espera.
+  esencial({linea: 'T2', nombre: 'Muralla con púas', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 7, 5, 6, 3],   // nivel 1 rehecho (Agi ≥ 5)
+    equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido'],
+    habilidades: ['Coraza de púas', 'Aguante'], consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Castiga al que le pega: púas, aguante y un hachazo con garfio. No persigue: se planta.'});
+  const T2 = {linea: 'T2', nombre: 'Muralla con púas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Castiga al que le pega: púas para el que pega de cerca, velo para el que tira magia; provoca para que le peguen a él y no persigue: se planta.'};
+  esencial({...T2, nivel: 2, atrib: [13, 8, 6, 6, 3],   // (aprobado 2026-11-07: Velo espejado; pasiva Piel curtida; + Cofia y Botas de cuero de vaca; dueño: del nv3 en adelante, subirle la Probabilidad de Golpe)
+    equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado'], pasivas: ['Piel curtida']});
+  // Orden nuevo (dueño, 2026-11-08: «espinas y provocar van muy bien para un tanque»): nv1 Coraza de púas + Aguante · nv2 Velo espejado · nv3 Provocar ·
+  // nv4 Blindaje · nv5 Escudo humano; sale Segundo aliento. Del nv3 en adelante, un punto de Fuerza pasa a Especial (Provocar tira PdG.Esp + nivel contra Res.Mt).
+  esencial({...T2, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-08: Provocar; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
+    equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar'], pasivas: ['Piel curtida']});
+  esencial({...T2, nivel: 4, atrib: [15, 7, 7, 9, 4],   // (aprobado 2026-11-08: Blindaje; pasiva Robustez; la Coraza de bronce con runas en lugar de las Pieles erizadas del plan —las Espinas no se suman—)
+    equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({...T2, nivel: 5, atrib: [16, 8, 7, 10, 4],   // (aprobado 2026-11-08: Escudo humano; el Hacha de abordaje en lugar del Hacha con garfio)
+    equipo: ['Hacha de abordaje', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje', 'Escudo humano'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
+    equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
+    habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de control. No quema: frena. Encierra, empuja, deja el piso congelado y llena de Escarcha al grupo.'});
+  const M2 = {linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de control. No quema: frena. Encierra, empuja, deja el piso congelado y llena de Escarcha al grupo.'};
+  esencial({...M2, nivel: 2, atrib: [9, 2, 5, 6, 13],   // (aprobado 2026-11-09: Parpadeo, Potencia especial; + Polainas de cuero remendado y Escarpines de fieltro. Con SP: «los magos van a usar SP, no cooldown»)
+    equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M2, nivel: 3, atrib: [9, 2, 6, 6, 15],   // (aprobado 2026-11-09: Prisión de hielo; la mano del escudo pasa a un talismán Bueno, el Orbe de resguardo mayor; la varita sigue siendo la de la ventisca)
+    equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Capa de viajero', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo'], pasivas: ['Potencia especial']});
+  esencial({...M2, nivel: 4, atrib: [10, 2, 6, 7, 17],   // (aprobado 2026-11-09: Ráfaga de viento + Temple mágico; el torso Bueno es el Chaleco de kevlar, no la Túnica del archivista: «a los magos, protección contra rango»)
+    equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Chaleco de kevlar', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo', 'Ráfaga de viento'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({...M2, nivel: 5, atrib: [10, 2, 7, 7, 19],   // (aprobado 2026-11-09: Lluvia de escarcha + el Yelmo de bronce con runas en la cabeza; M2 completa)
+    equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Chaleco de kevlar', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro', 'Yelmo de bronce con runas'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo', 'Ráfaga de viento', 'Lluvia de escarcha'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({linea: 'M3', nombre: 'Mago del rayo', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
+    equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa'],
+    habilidades: ['Centella', 'Zap'], consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago del rayo. El rayo salta entre los que se juntan y paraliza: corta turnos.'});
+  // M3 Mago del rayo (niveles 2 en adelante, de a uno desde el 2026-11-12).
+  const M3 = {linea: 'M3', nombre: 'Mago del rayo', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago del rayo. El rayo salta entre los que se juntan y paraliza: corta turnos.'};
+  esencial({...M3, nivel: 2, atrib: [9, 2, 5, 6, 14],   // (aprobado 2026-11-12: Parpadeo; pasiva Potencia especial; + Capucha de lana del culto y Guantes de goma: Def 3 / Def. especial 3, «dejalo así»)
+    equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M3, nivel: 3, atrib: [9, 2, 6, 6, 16],   // (aprobado 2026-11-12: Cadena de rayos; la varita pasa a Buena: Varita del relámpago)
+    equipo: ['Varita del relámpago', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos'], pasivas: ['Potencia especial']});
+  esencial({...M3, nivel: 4, atrib: [10, 2, 6, 7, 17],   // (aprobado 2026-11-12: Descarga arcana; pasiva Temple mágico; el escudo pasa a Buena: Escudo de lenga del monasterio)
+    equipo: ['Varita del relámpago', 'Escudo de lenga del monasterio', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos', 'Descarga arcana'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({...M3, nivel: 5, atrib: [10, 2, 7, 7, 19],   // (aprobado 2026-11-13: Tormenta arcana; Jubón de cuero tachonado en lugar del Chaleco)
+    equipo: ['Varita del relámpago', 'Escudo de lenga del monasterio', 'Jubón de cuero tachonado', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos', 'Descarga arcana', 'Tormenta arcana'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({linea: 'M4', nombre: 'Arcano', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 6, 5, 12],
+    equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
+    habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de control y movilidad. Decide dónde está cada uno: aparece, empuja con la Nova, atrae con el gancho y se va.'});
+  esencial({linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 7, 7, 7, 2],   // (2026-11-09, dueño: «bajale la fuerza»: Fue −1, Agi +1 → 7 No2, ataca y corre 3)
+    equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma'],
+    habilidades: ['Carga que derriba', 'Takle'], consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'});
+  // H1 Embestidor (niveles 2 en adelante, aprobados de a uno desde el 2026-11-06).
+  const H1 = {linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'};
+  esencial({...H1, nivel: 2, atrib: [11, 9, 7, 7, 2],
+    equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte'], pasivas: ['Impulso']});
+  esencial({...H1, nivel: 3, atrib: [12, 10, 7, 8, 2],
+    equipo: ['Hacha del verdugo de la capital', 'Chaleco de cuero', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante'], pasivas: ['Impulso']});
+  esencial({...H1, nivel: 4, atrib: [13, 11, 8, 8, 2],
+    equipo: ['Hacha del verdugo de la capital', 'Jubón de cuero tachonado', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante', 'Aguante'], pasivas: ['Impulso', 'Robustez']});
+  esencial({...H1, nivel: 5, atrib: [14, 12, 8, 9, 2],   // (aprobado 2026-11-11: Furia; Casco de bandas remachadas en lugar de la Cofia; + Guanteletes de cuero tachonado —no los de hierro, que restan Iniciativa—)
+    equipo: ['Hacha del verdugo de la capital', 'Jubón de cuero tachonado', 'Anillo de Paso Fantasma', 'Casco de bandas remachadas', 'Botas de cuero de vaca', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante', 'Aguante', 'Furia'], pasivas: ['Impulso', 'Robustez']});
+  esencial({linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 6, 7, 2],
+    equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y pega.'});
+  const H2 = {linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Híbrido. Entra saltando por encima de la primera línea y cae entre los de atrás; si lo rodean, pisotea y aguanta; sale con el Dash o saltando, y en el último nivel barre a todos los que lo rodean.'};
+  // Orden de las habilidades (dueño, 2026-11-08): nv1 Salto y Pegar fuerte · nv2 Pisotón · nv3 Aguante · nv4 Dash · nv5 Barrido.
+  esencial({...H2, nivel: 2, atrib: [10, 9, 7, 8, 2],   // (aprobado 2026-11-08: Pisotón y Piel curtida —el Barrido pasó al nv5—; + Casco de cuero endurecido y Polainas de cuero remendado; un punto de Fuerza pasó a Destreza, dueño: «un poco de destreza… no agilidad»)
+    equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón'], pasivas: ['Piel curtida']});
+  esencial({...H2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-08: Aguante —antes Pisotón, que pasó al nv2—; el hacha pasa a la del aserrador, Buena: 2 dados, Rompe armadura 33 %, Derribar 25 %)
+    equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante'], pasivas: ['Piel curtida']});
+  esencial({...H2, nivel: 4, atrib: [12, 11, 8, 9, 2],   // (aprobado 2026-11-08: Dash —antes Aguante, que pasó al nv3— y Robustez; el torso Bueno es la Coraza de primera línea —las Pieles erizadas se descartaron para que no se parezca al Berserker—)
+    equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante', 'Dash'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({...H2, nivel: 5, atrib: [13, 12, 8, 10, 2],   // (aprobado 2026-11-08: Barrido; la tercera Buena son las Grebas del carnero —Embestida +2 PdG si los últimos 2 pasos fueron en línea recta; el Salto y el Dash no cuentan—)
+    equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Grebas del carnero'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante', 'Dash', 'Barrido'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [9, 8, 6, 8, 2],   // dos armas (el ataque con la segunda, pendiente de programar en creeps)
+    equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],
+    estrategia: 'Warrior. Cuanto más herido, más peligroso: sable y facón, busca el crítico y no se cuida.'});
+  const W2 = {linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', consumibles: ['Poción de Regeneración menor'],
+    estrategia: 'Warrior. Cuanto más herido, más peligroso: espada y facón (en el nv5, dos espadas), busca el crítico y no se cuida.'};
+  esencial({...W2, nivel: 2, atrib: [10, 9, 6, 9, 2],   // (aprobado 2026-11-07: Pegar fuerte; pasiva Robustez, que compensa el −5 de vida del Anillo maldito del berserker; + Casco de cuero endurecido y el anillo)
+    equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte'], pasivas: ['Robustez']});
+  esencial({...W2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-07: Aguante; la Espada del Jefe de los Mil Caminos en lugar del sable; sube Agi y no Des: «me importan los nitros de la agilidad»; en el nv4, +1 Des)
+    equipo: ['Espada del Jefe de los Mil Caminos', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante'], pasivas: ['Robustez']});
+  esencial({...W2, nivel: 4, atrib: [12, 11, 7, 10, 2],   // (aprobado 2026-11-07: Golpe brutal; +1 Des como se dijo en el nv3; las Pieles erizadas del berserker en lugar del Chaleco; pasiva Regeneración en lugar de Voluntad de hierro, elección del dueño)
+    equipo: ['Espada del Jefe de los Mil Caminos', 'Facón de paisano', 'Pieles erizadas del berserker', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante', 'Golpe brutal'], pasivas: ['Robustez', 'Regeneración']});
+  esencial({...W2, nivel: 5, atrib: [13, 12, 8, 10, 2],   // (aprobado 2026-11-08: Barrido; la Espada larga en lugar del Facón, como segunda arma — ya con los bonos por arma: PdG 11 con ella, 10 con la del Jefe)
+    equipo: ['Espada del Jefe de los Mil Caminos', 'Espada larga', 'Pieles erizadas del berserker', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante', 'Golpe brutal', 'Barrido'], pasivas: ['Robustez', 'Regeneración']});
+  esencial({linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],
+    equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre'],
+    habilidades: ['Estocada', 'Hoja envenenada'], consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Pega con una daga untada, acumula veneno y se aleja.'});
+  // L2 Envenenador (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const L2 = {linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Pega con una daga untada, acumula veneno y se aleja.'};
+  esencial({...L2, nivel: 2, atrib: [8, 6, 9, 11, 2],   // (aprobado 2026-11-07: Tajo veloz; pasiva Escurridizo en lugar de Perforante, que se pisaba con la Estocada; + Zuecos y Calzas de escapista)
+    equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz'], pasivas: ['Escurridizo']});
+  esencial({...L2, nivel: 3, atrib: [8, 7, 10, 12, 2],   // (aprobado 2026-11-07: Golpe a la rodilla; la daga pasa a la Daga de la viuda verde, Veneno 3 siempre, sin Perfora)
+    equipo: ['Daga de la viuda verde', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla'], pasivas: ['Escurridizo']});
+  esencial({...L2, nivel: 4, atrib: [9, 7, 11, 13, 2],   // (aprobado 2026-11-07: Hit and run, Pies ligeros; Fue queda en 7 y sube Agi; Chaqueta del corredor; Perneras de cuero hervido en lugar de las Calzas de escapista)
+    equipo: ['Daga de la viuda verde', 'Chaqueta del corredor', 'Guantes de agarre', 'Zuecos de boticario', 'Perneras de cuero hervido'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla', 'Hit and run'], pasivas: ['Escurridizo', 'Pies ligeros']});
+  esencial({...L2, nivel: 5, atrib: [10, 7, 12, 14, 2],   // (aprobado 2026-11-07: Ráfaga de cortes + Anillo del pantano; fuerte a propósito, dueño: «así probamos cómo balancear algo que se puede llegar a romper por balance»; el Veneno se suma entero: una Ráfaga deja 12 stacks ≈ 78 de daño en el tiempo)
+    equipo: ['Daga de la viuda verde', 'Chaqueta del corredor', 'Guantes de agarre', 'Zuecos de boticario', 'Perneras de cuero hervido', 'Anillo del pantano'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla', 'Hit and run', 'Ráfaga de cortes'], pasivas: ['Escurridizo', 'Pies ligeros']});
+  esencial({linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 5, 9, 11, 2],
+    equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Choque liviano. Desaparece, aparece por la espalda y busca el crítico: va al golpe único.'});
+  // L3 Asesino de las sombras (niveles 2 en adelante, de a uno desde el 2026-11-09).
+  const L3 = {linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Choque liviano. Desaparece, aparece por la espalda y busca el crítico: va al golpe único.'};
+  esencial({...L3, nivel: 2, atrib: [7, 6, 9, 12, 2],   // (aprobado 2026-11-09: Finta, sin crítico desde ese día; pasiva Ojo crítico; + Guantes de agarre y Capucha de emboscada)
+    equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta'], pasivas: ['Ojo crítico']});
+  esencial({...L3, nivel: 3, atrib: [7, 7, 10, 13, 2],   // (aprobado 2026-11-09: Puñalada por la espalda; el arma pasa a Buena: Puñal de sombra)
+    equipo: ['Puñal de sombra', 'Chaleco de cuero', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda'], pasivas: ['Ojo crítico']});
+  esencial({...L3, nivel: 4, atrib: [8, 8, 10, 14, 2],   // (aprobado 2026-11-09: Dash en lugar del Tajo veloz, que se pisaba con la Finta nueva; Ropas de sombra finas)
+    equipo: ['Puñal de sombra', 'Ropas de sombra finas', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda', 'Dash'], pasivas: ['Ojo crítico', 'Paso ligero']});
+  esencial({...L3, nivel: 5, atrib: [9, 8, 11, 15, 2],   // (aprobado 2026-11-09: Degollar y la Bombacha de cuatrero; muy letal, para la ronda de balance)
+    equipo: ['Puñal de sombra', 'Ropas de sombra finas', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada', 'Bombacha de cuatrero'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda', 'Dash', 'Degollar'], pasivas: ['Ojo crítico', 'Paso ligero']});
+  esencial({linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 6, 8, 10, 2],   // (2026-11-03, dueño: «ya terminamos el L4»)
+    equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
+    habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],
+    estrategia: 'Choque liviano. Pica, se va y te hace pisar algo: tiende un cordón, pega y se aleja por arriba; el que lo persigue tropieza.'});
+  const L4 = {linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Red de caza'],
+    estrategia: 'Choque liviano. Pica, se va y te hace pisar algo: tiende un cordón, pega y se aleja por arriba; el que lo persigue tropieza.'};
+  esencial({...L4, nivel: 2, atrib: [8, 7, 8, 11, 2],   // (aprobado 2026-11-09: Tajo veloz, Pies ligeros; + Escarpines de fieltro y Capucha de emboscada)
+    equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz'], pasivas: ['Pies ligeros']});
+  esencial({...L4, nivel: 3, atrib: [8, 8, 9, 12, 2],   // (aprobado 2026-11-09: Abrojos; el arma Buena: Aguja de corsario, 2 dados, PdG +1, Perfora 1)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos'], pasivas: ['Pies ligeros']});
+  esencial({...L4, nivel: 4, atrib: [9, 9, 9, 13, 2],   // (aprobado 2026-11-09: Polvo cegador, Puntería; la Buena en las manos: Guantes del estoque, y se queda el Chaleco)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada', 'Guantes del estoque'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos', 'Polvo cegador'], pasivas: ['Pies ligeros', 'Puntería']});
+  esencial({...L4, nivel: 5, atrib: [10, 9, 10, 14, 2],   // (aprobado 2026-11-09: Dash; la tercera Buena en los pies: Botas del desertor, Retirada limpia 50 %)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Botas del desertor', 'Capucha de emboscada', 'Guantes del estoque'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos', 'Polvo cegador', 'Dash'], pasivas: ['Pies ligeros', 'Puntería']});
+  esencial({linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 9, 10, 2],
+    equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue'], consumibles: ['Flecha silbadora'],
+    estrategia: 'Rango. Se reacomoda y dispara: nunca está donde lo dejaste. Hay que ir a buscarlo.'});
+  const R2 = {linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', consumibles: ['Flecha silbadora'],
+    estrategia: 'Rango. Se reacomoda y dispara: nunca está donde lo dejaste. Hay que ir a buscarlo.'};
+  esencial({...R2, nivel: 2, atrib: [8, 6, 9, 11, 2],   // (aprobado 2026-11-09: Mantener a raya, Pies ligeros; + Guantes de agarre y Cofia de anillas sueltas)
+    equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya'], pasivas: ['Pies ligeros']});
+  esencial({...R2, nivel: 3, atrib: [8, 7, 10, 12, 2],   // (aprobado 2026-11-09: Tiro a la rodilla; el arco, Arco de la sombra)
+    equipo: ['Arco de la sombra', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla'], pasivas: ['Pies ligeros']});
+  esencial({...R2, nivel: 4, atrib: [8, 8, 11, 13, 2],   // (aprobado 2026-11-09, dueño: el punto de Constitución a Agilidad; la pasiva, Escurridizo en lugar de Prisa)
+    equipo: ['Arco de la sombra', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla', 'Disparo señalador'], pasivas: ['Pies ligeros', 'Escurridizo']});
+  esencial({...R2, nivel: 5, atrib: [9, 8, 12, 14, 2],   // (aprobado 2026-11-09, dueño: «me cierra el nivel cinco»; los Guantes de cetrero: PdG a distancia +2)
+    equipo: ['Arco de la sombra', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Guantes de cetrero', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla', 'Disparo señalador', 'Ráfaga encadenada'], pasivas: ['Pies ligeros', 'Escurridizo']});
+  const S2 = {linea: 'S2', nombre: 'Abanderado', rol: 'support', rolTxt: 'apoyo', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Support. El soldado de la bandera: no cura, hace pegar más a los suyos y pelea con lanza al lado del grupo.'};
+  esencial({...S2, nivel: 1, atrib: [10, 7, 6, 7, 3],
+    equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero'],
+    habilidades: ['Potencia', '¡A la carga!']});
+  esencial({...S2, nivel: 2, atrib: [11, 7, 7, 8, 3],   // (aprobado 2026-11-09: Bendecir el arma, Marcar el ritmo; + Cofia de anillas sueltas y Guantes de agarre)
+    equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma'], pasivas: ['Marcar el ritmo']});
+  esencial({...S2, nivel: 3, atrib: [12, 8, 7, 8, 4],   // (aprobado 2026-11-10: Redoble de tambores; el estandarte, de Buena: el Estandarte de la vanguardia, creado ese día)
+    equipo: ['Lanza corta', 'Estandarte de la vanguardia', 'Chaleco de cuero', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores'], pasivas: ['Marcar el ritmo']});
+  esencial({...S2, nivel: 4, atrib: [13, 8, 8, 9, 4],   // (aprobado 2026-11-10: Arenga, Voluntad de hierro; el chaleco, de Buena: el Peto de cuero de oficial)
+    equipo: ['Lanza corta', 'Estandarte de la vanguardia', 'Peto de cuero de oficial', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores', 'Arenga'], pasivas: ['Marcar el ritmo', 'Voluntad de hierro']});
+  esencial({...S2, nivel: 5, atrib: [14, 9, 8, 9, 5],   // (aprobado 2026-11-10: Estandarte de guerra; la lanza, de Buena: la Lanza del abanderado, creada porque no había lanza Buena de una mano)
+    equipo: ['Lanza del abanderado', 'Estandarte de la vanguardia', 'Peto de cuero de oficial', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores', 'Arenga', 'Estandarte de guerra'], pasivas: ['Marcar el ritmo', 'Voluntad de hierro']});
+  esencial({linea: 'S3', nombre: 'Armero', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 8, 6, 6, 3],
+    equipo: ['Hacha del herrero de pueblo', 'Chaleco de cuero', 'Cofia de anillas sueltas'],
+    habilidades: ['Bendecir el arma', 'Arma elemental'], consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Support. El herrero del grupo: les mejora las armas a los suyos (bendición, elemento) y pelea al lado.'});
+  esencial({linea: 'S4', nombre: 'Protector', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [9, 2, 6, 4, 12],
+    equipo: ['Varita de los pilares', 'Escudo de madera forrado en lienzo', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
+    habilidades: ['Potencia', 'Arrojo'], consumibles: ['Poción de HP'],
+    estrategia: 'Support. Juega en el turno de los demás: escudo y +3 a la defensa en el momento justo; con los pilares tapa al que dispara.'});
+  const D2 = {linea: 'D2', nombre: 'Tóxico', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Polvo de adormidera'],
+    estrategia: 'Debuffer. Envenena el aire: el grupo se tiene que mover o se pudre adentro.'};
+  esencial({...D2, nivel: 1, atrib: [8, 2, 6, 5, 12],
+    equipo: ['Varita de miasma', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
+    habilidades: ['Espina tóxica', 'Nube tóxica']});
+  esencial({...D2, nivel: 2, atrib: [9, 2, 6, 5, 14],   // (aprobado 2026-11-10: Corroer, Puntería arcana; + Polainas de cuero remendado y Casco de cuero endurecido. Con SP)
+    equipo: ['Varita de miasma', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer'], pasivas: ['Puntería arcana']});
+  esencial({...D2, nivel: 3, atrib: [9, 2, 7, 6, 15],   // (aprobado 2026-11-10: Maldición de la sequía; la Varita de la ponzoña, Buena, en lugar de la de miasma. Con SP)
+    equipo: ['Varita de la ponzoña', 'Piedra bezoar', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía'], pasivas: ['Puntería arcana']});
+  esencial({...D2, nivel: 4, atrib: [10, 2, 7, 6, 17],   // (aprobado 2026-11-10: Maldición tormentosa, Potencia especial; Chaleco de kevlar (Buena) por la regla del dueño para los magos: protegerlos del rango. Con SP)
+    equipo: ['Varita de la ponzoña', 'Piedra bezoar', 'Chaleco de kevlar', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía', 'Maldición tormentosa'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({...D2, nivel: 5, atrib: [10, 2, 8, 7, 18],   // (aprobado 2026-11-10: Polen somnífero; Orbe de eco (Buena) en lugar de la Piedra bezoar. Con SP. Línea D2 completa)
+    equipo: ['Varita de la ponzoña', 'Orbe de eco', 'Chaleco de kevlar', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
+    habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía', 'Maldición tormentosa', 'Polen somnífero'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 7, 4, 12],
+    equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima'],
+    habilidades: ['Escalofrío', 'Robar el aliento'], consumibles: ['Gas adormecedor'],
+    estrategia: 'Debuffer. Le saca al rival lo que necesita para pelear (nitros, puntería) y se queda con parte.'});
+  esencial({linea: 'D4', nombre: 'Control mental y ceguera', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [9, 2, 6, 4, 12],
+    equipo: ['Varita del destello', 'Botella con un diablito', 'Chaleco de cuero', 'Capucha de lana del culto'],
+    habilidades: ['Punzada mental', 'Cegar'], consumibles: ['Polvo de adormidera'],
+    estrategia: 'Debuffer. Te saca el control: te ciega, te abre la mente y te confunde. Con daño, para que no lo ignoren.'});
+
+  esencial({linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 6, 7, 3],   // (2026-11-03, dueño: «me gusta, sí»)
+    equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto'],
+    habilidades: ['Provocar', 'Escudo humano'], consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'});
+  // T3 Guardaespaldas (niveles 2 en adelante, de a uno desde el 2026-11-10).
+  const T3 = {linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'};
+  esencial({...T3, nivel: 2, atrib: [13, 6, 6, 7, 4],   // (aprobado 2026-11-10: Golpe de escudo —1d10 + peso del escudo + Dmg, sin crítico, cooldown 3—; pasiva Guardia firme; + Botas de cuero de vaca y Guantes de pelea callejera)
+    equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo'], pasivas: ['Guardia firme']});
+  esencial({...T3, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-10: Interponerse; el escudo pasa a Buena: Escudo de la guardia, Guardián +1)
+    equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse'], pasivas: ['Guardia firme']});
+  esencial({...T3, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-11: Tirar la bronca; pasiva Robustez; Coraza consagrada en lugar de la de cuero hervido, para bancarse la magia)
+    equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza consagrada', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca'], pasivas: ['Guardia firme', 'Robustez']});
+  esencial({...T3, nivel: 5, atrib: [16, 9, 7, 9, 4],   // (aprobado 2026-11-11: Desarmar; Espada del herrero en lugar de la del comisario, para que pegue)
+    equipo: ['Espada del herrero', 'Escudo de la guardia', 'Coraza consagrada', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
+    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca', 'Desarmar'], pasivas: ['Guardia firme', 'Robustez']});
+  esencial({linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 8, 11, 2],   // (2026-11-03, dueño: «me parece bien»)
+    equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
+    habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'});
+  // L5 Duelista (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const L5 = {linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'};
+  esencial({...L5, nivel: 2, atrib: [8, 6, 8, 12, 2],   // (aprobado 2026-11-11: Contraataque; pasiva Guardia firme; + Guantes de esgrimista y Casco de cuero endurecido)
+    equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque'], pasivas: ['Guardia firme']});
+  esencial({...L5, nivel: 3, atrib: [8, 7, 9, 13, 2],   // (aprobado 2026-11-11: Estocada; el sable pasa a Buena: Sable del sargento)
+    equipo: ['Sable del sargento', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada'], pasivas: ['Guardia firme']});
+  esencial({...L5, nivel: 4, atrib: [9, 8, 9, 14, 2],   // (aprobado 2026-11-11: Arte de la guerra; pasiva Ojo crítico; Escudo triangular en lugar del broquel —ataja y bloquea con el escudo y contraataca con el sable, dueño: «está bien»—)
+    equipo: ['Sable del sargento', 'Escudo triangular', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada', 'Arte de la guerra'], pasivas: ['Guardia firme', 'Ojo crítico']});
+  esencial({...L5, nivel: 5, atrib: [10, 8, 10, 15, 2],   // (aprobado 2026-11-11: Ráfaga de cortes; Cota de malla fina en lugar del Chaleco, por la Defensa y la vida)
+    equipo: ['Sable del sargento', 'Escudo triangular', 'Cota de malla fina', 'Escarpines de fieltro', 'Guantes de esgrimista', 'Casco de cuero endurecido'],
+    habilidades: ['Finta', 'Golpe a la rodilla', 'Contraataque', 'Estocada', 'Arte de la guerra', 'Ráfaga de cortes'], pasivas: ['Guardia firme', 'Ojo crítico']});
+
+  esencial({linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (2026-11-03, dueño: «sí»)
+    equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Puño de roca', 'Pisotón'], consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Golpes que atontan y derriban: te deja sin turno con Demora y Pajaritos; si lo rodean, Pisotón.'});
+  // W3 Martillero (niveles 2 en adelante, de a uno desde el 2026-11-10).
+  const W3 = {linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Golpes que atontan y derriban: te deja sin turno con Demora y Pajaritos; si lo rodean, Pisotón.'};
+  esencial({...W3, nivel: 2, atrib: [9, 11, 6, 8, 2],   // (aprobado 2026-11-10: Dos al hilo en lugar de Pegar fuerte, para no repetir; pasiva Robustez; + Casco de cuero endurecido y Pantalón acolchado de aprendiz)
+    equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Pantalón acolchado de aprendiz'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo'], pasivas: ['Robustez']});
+  esencial({...W3, nivel: 3, atrib: [10, 12, 7, 8, 2],   // (aprobado 2026-11-10: Salto aplastante; el Martillo de bola a dos manos suelta el escudo; + Guanteletes de cuero tachonado, pedido del dueño, para no perder tanta Defensa)
+    equipo: ['Martillo de bola', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante'], pasivas: ['Robustez']});
+  esencial({...W3, nivel: 4, atrib: [11, 13, 7, 9, 2],   // (aprobado 2026-11-10: Golpe en la sien en lugar de Golpe brutal —«apostar al crítico con el martillo es una mala inversión»—; Capellina de hierro; Voluntad de hierro)
+    equipo: ['Martillo de bola', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Capellina de hierro', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante', 'Golpe en la sien'], pasivas: ['Robustez', 'Voluntad de hierro']});
+  esencial({...W3, nivel: 5, atrib: [12, 14, 8, 9, 2],   // (aprobado 2026-11-10: Golpe demoledor; Coraza de bronce con runas en lugar del Chaleco, para la Defensa especial)
+    equipo: ['Martillo de bola', 'Coraza de bronce con runas', 'Botas de cuero de vaca', 'Capellina de hierro', 'Pantalón acolchado de aprendiz', 'Guanteletes de cuero tachonado'],
+    habilidades: ['Puño de roca', 'Pisotón', 'Dos al hilo', 'Salto aplastante', 'Golpe en la sien', 'Golpe demoledor'], pasivas: ['Robustez', 'Voluntad de hierro']});
+
+  esencial({linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 6, 11, 2],   // (2026-11-03, dueño: «vamos a probarlo con la ballesta»)
+    equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla'], consumibles: ['Virote de red'],
+    estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'});
+  // R3 Trabador (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const R3 = {linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', consumibles: ['Virote de red'],
+    estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'};
+  esencial({...R3, nivel: 2, atrib: [9, 7, 6, 12, 2],   // (aprobado 2026-11-11: Red tendida; pasiva Puntería; + Casco de cuero endurecido y Guantes de agarre)
+    equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida'], pasivas: ['Puntería']});
+  esencial({...R3, nivel: 3, atrib: [9, 8, 7, 13, 2],   // (aprobado 2026-11-11: Clavar a la pared; el arma pasa a Buena: la Ballesta del pialador, creada para él —no había ballestas Buenas fuera del archivo—, dueño: «creemos alguna ballesta buena y listo»)
+    equipo: ['Ballesta del pialador', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared'], pasivas: ['Puntería']});
+  esencial({...R3, nivel: 4, atrib: [10, 9, 7, 14, 2],   // (aprobado 2026-11-11: Mantener a raya; pasiva Escurridizo en lugar de Vista de halcón —«con la destreza que tiene, el rango me parece suficiente»—; Guantes de cetrero)
+    equipo: ['Ballesta del pialador', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de cetrero'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared', 'Mantener a raya'], pasivas: ['Puntería', 'Escurridizo']});
+  esencial({...R3, nivel: 5, atrib: [11, 9, 8, 15, 2],   // (aprobado 2026-11-11: Vigilancia; Chaleco de kevlar en lugar del de cuero)
+    equipo: ['Ballesta del pialador', 'Chaleco de kevlar', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de cetrero'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla', 'Red tendida', 'Clavar a la pared', 'Mantener a raya', 'Vigilancia'], pasivas: ['Puntería', 'Escurridizo']});
+
+  esencial({linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 5, 8, 2],   // (2026-11-03, dueño: «va así»)
+    equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],
+    habilidades: ['Estocada', 'Desarmar'], consumibles: ['Pergamino grupal de Reflejo de Acero'],
+    estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'});
+  // H3 Duelista pesado (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const H3 = {linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Pergamino grupal de Reflejo de Acero'],
+    estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'};
+  esencial({...H3, nivel: 2, atrib: [10, 10, 6, 8, 2],   // (aprobado 2026-11-11: Romper armadura; pasiva Guardia firme; + Casco de cuero endurecido y Guantes de esgrimista)
+    equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura'], pasivas: ['Guardia firme']});
+  esencial({...H3, nivel: 3, atrib: [10, 11, 7, 9, 2],   // (aprobado 2026-11-11: Dos al hilo; el arma pasa a Buena: Espada del herrero)
+    equipo: ['Espada del herrero', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura', 'Dos al hilo'], pasivas: ['Guardia firme']});
+  esencial({...H3, nivel: 4, atrib: [11, 12, 8, 9, 2],   // (aprobado 2026-11-11: Remate; pasiva Desvío hábil; Coraza de primera línea en lugar de la de cuero hervido, por la vida)
+    equipo: ['Espada del herrero', 'Escudo de asalto', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura', 'Dos al hilo', 'Remate'], pasivas: ['Guardia firme', 'Desvío hábil']});
+  esencial({...H3, nivel: 5, atrib: [12, 13, 8, 10, 2],   // (aprobado 2026-11-11: Golpe demoledor; Escudo triangular en lugar del de asalto)
+    equipo: ['Espada del herrero', 'Escudo triangular', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de esgrimista'],
+    habilidades: ['Estocada', 'Desarmar', 'Romper armadura', 'Dos al hilo', 'Remate', 'Golpe demoledor'], pasivas: ['Guardia firme', 'Desvío hábil']});
+
+  // ---- La tanda del 2026-11-05 (nivel 1 aprobado por el dueño; detalle en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
+  esencial({linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [8, 6, 8, 9, 2],   // (dueño: «vamos a definir el nivel 1»; el Jubón en vez del chaleco)
+    equipo: ['Navaja del compadrito', 'Jubón de cuero curtido', 'Calzas de cuero flexible'],
+    habilidades: ['Finta', 'Patotear'], consumibles: ['Pergamino grupal de Puntería Certera'],
+    estrategia: 'Choque liviano. Pelea en patota: cuantos más de los suyos rodean al rival, más le pega.'});
+  // L6 Patotero (niveles 2 en adelante, de a uno desde el 2026-11-11).
+  const L6 = {linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Pergamino grupal de Puntería Certera'],
+    estrategia: 'Choque liviano. Pelea en patota: cuantos más de los suyos rodean al rival, más le pega.'};
+  esencial({...L6, nivel: 2, atrib: [9, 7, 8, 10, 2],   // (aprobado 2026-11-11: Hit and run; pasiva Pies ligeros; + Escarpines de fieltro y Guantes de agarre)
+    equipo: ['Navaja del compadrito', 'Jubón de cuero curtido', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run'], pasivas: ['Pies ligeros']});
+  esencial({...L6, nivel: 3, atrib: [9, 8, 9, 11, 2],   // (aprobado 2026-11-11: Tajo de carnicero; el arma pasa a Buena: Facón de plata)
+    equipo: ['Facón de plata', 'Jubón de cuero curtido', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero'], pasivas: ['Pies ligeros']});
+  esencial({...L6, nivel: 4, atrib: [9, 9, 10, 12, 2],   // (aprobado 2026-11-11: Golpe a la rodilla; pasiva Ojo crítico; Jubón de cuero tachonado en lugar del curtido, por la vida)
+    equipo: ['Facón de plata', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero', 'Golpe a la rodilla'], pasivas: ['Pies ligeros', 'Ojo crítico']});
+  esencial({...L6, nivel: 5, atrib: [10, 10, 10, 13, 2],   // (aprobado 2026-11-11: Ráfaga de cortes; + Capellina de hierro en la cabeza)
+    equipo: ['Facón de plata', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre', 'Capellina de hierro'],
+    habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero', 'Golpe a la rodilla', 'Ráfaga de cortes'], pasivas: ['Pies ligeros', 'Ojo crítico']});
+  esencial({linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
+    equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca'],
+    habilidades: ['Takle', 'Pisotón'], consumibles: ['Grasa de carpincho'],
+    estrategia: 'Tanque. Empuja, tira y demora: no aguanta como el Escudero, desordena al grupo rival y le corta los turnos.'});
+  esencial({linea: 'W4', nombre: 'Verdugo', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (dueño: «vamos con avisa y golpe fuerte»)
+    equipo: ['Hacha de verdugo de pueblo', 'Peto de hierro', 'Casco de cuero endurecido'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte'], consumibles: ['Poción de Puntería Certera'],
+    estrategia: 'Warrior. Anuncia a quién va a ejecutar y descarga un golpe enorme que no se para; elige a su víctima y la termina.'});
+  esencial({linea: 'R4', nombre: 'Hunter', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 7, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador'], consumibles: ['Trampa de oso'],
+    estrategia: 'Rango. Prepara el terreno: pone trampas donde va a pasar el rival, marca a la presa y deja que el grupo la cace.'});
+  esencial({linea: 'H4', nombre: 'Bruto que aguanta', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 9, 6, 6, 2],   // (dueño: «me copan»)
+    equipo: ['Hachuela de camping', 'Pechera de hierro', 'Botas de cuero de vaca'],
+    habilidades: ['Aguante', 'Contraataque'], consumibles: ['Sales aromáticas'],
+    estrategia: 'Híbrido. Se la banca y devuelve: busca que le peguen, contesta cada vez que para un golpe y descarga lo que juntó.'});
+  esencial({linea: 'L7', nombre: 'Degollador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Facón de paisano', 'Chaleco de cuero', 'Calzas de cuero flexible'],
+    habilidades: ['Golpe que sangra', 'Remate'], consumibles: ['Aceite del punto débil'],
+    estrategia: 'Choque liviano. Abre la herida y la termina: va siempre por el más golpeado.'});
+  esencial({linea: 'L8', nombre: 'Acróbata', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 10, 9, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Sable del tahúr', 'Chaleco de cuero', 'Escarpines de fieltro'],
+    habilidades: ['Salto', 'Tajo veloz'], consumibles: ['Mate cebado'],
+    estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'});
+
+  // ---- Niveles 2 a 5 (la ronda del 2026-11-05: uno por rol, nivel por nivel; detalle y números en docs/creeps-humanoides.md) ----
+  // W1 Hachero (ruta final aprobada 2026-11-05; Arte de la guerra en lugar de «Partir en dos»). En el nivel 4, Piel curtida (+1 Defensa) en lugar
+  // de Sed de sangre (dueño, 2026-11-06: «si ya tenía Golpe fuerte… la que da más defensa») (dueño, 2026-11-06: las pasivas que se activan cuando cae un rival no van para creeps: «le pondría más uno al daño y ya»).
+  const W1 = {linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Le rompe la armadura al que más se defiende y después lo castiga. Su punto débil: la magia.'};
+  esencial({...W1, nivel: 2, atrib: [8, 10, 7, 7, 4],
+    equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido'], pasivas: ['Golpe fuerte']});
+  esencial({...W1, nivel: 3, atrib: [9, 11, 7, 8, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor'], pasivas: ['Golpe fuerte']});
+  esencial({...W1, nivel: 4, atrib: [10, 12, 8, 8, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Guanteletes de hierro'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra'], pasivas: ['Golpe fuerte', 'Piel curtida']});
+  esencial({...W1, nivel: 5, atrib: [11, 13, 8, 9, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Casco de bandas remachadas', 'Grebas de cuero', 'Guanteletes de hierro', 'Botas de estibador'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra', 'Remate'], pasivas: ['Golpe fuerte', 'Piel curtida']});
+  // T1 Escudero (niveles 2 y 3 aprobados 2026-11-05/06; Aguante en lugar de «Plantarse»).
+  const T1 = {linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
+    estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el escudo lo tira y lo demora.'};
+  esencial({...T1, nivel: 2, atrib: [13, 6, 6, 7, 4],
+    equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo'], pasivas: ['Guardia firme']});
+  esencial({...T1, nivel: 3, atrib: [14, 7, 6, 8, 4],
+    equipo: ['Hacha de piedra', 'Escudo de escamas', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante'], pasivas: ['Guardia firme']});
+  esencial({...T1, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-06: Interponerse, Devolver gentileza, Media armadura de escudero)
+    equipo: ['Hacha de piedra', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse'], pasivas: ['Guardia firme', 'Devolver gentileza']});
+  esencial({...T1, nivel: 5, atrib: [16, 9, 7, 9, 4],   // (aprobado 2026-11-06: Escudo humano en lugar de «Muro de escudos»; Hacha del forjador)
+    equipo: ['Hacha del forjador', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Botas de estibador'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse', 'Escudo humano'], pasivas: ['Guardia firme', 'Devolver gentileza']});
+
+  if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
+  window.CREEPS_ESENCIALES_FALTAN = faltan;
+})();

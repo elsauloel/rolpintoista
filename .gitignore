@@ -2,3 +2,7 @@
 Thumbs.db
 desktop.ini
 .DS_Store
+__pycache__/
+
+# Datos de partidas reales exportados para simular (no se suben)
+herramientas/sim-datos/

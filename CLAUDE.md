@@ -1,27 +1,160 @@
-# Piratas en el espacio — herramientas de campaña
+# Rol Pintoísta — herramientas de campaña (rama `nueva-version`)
 
-Conjunto de herramientas HTML standalone para una campaña de rol homebrew.
-No hay backend ni base de datos: cada herramienta es un único archivo
-`.html` que se abre haciendo doble clic (o arrastrándolo a una pestaña del
-navegador), y el estado de la partida vive en archivos `.json` — ya sea
-local, en descargas/cargas manuales, o sincronizado con este repo de
-GitHub vía la API de contenidos (con un token personal guardado en
-`localStorage`, nunca en el repo).
+> **🇦🇷 IDIOMA: TODO EN ESPAÑOL (rioplatense), SIEMPRE.** Cada mensaje al dueño —los avisos cortos de avance, las propuestas, las tablas y el
+> resumen final— va en español, aunque la conversación sea larga, venga de mucho trabajo técnico o de un resumen automático. Nunca en inglés.
+> (Pasó varias veces, la última el 2026-10-27, y molesta mucho. Antes de mandar cada mensaje, revisar el idioma.)
+
+> **☁ Se trabaja desde la compu y desde la nube** (Claude Code en la nube, manejado desde el celular; desde el 2026-10-31).
+> - **En una sesión en la nube**: antes de empezar, leer [`docs/memoria-claude.md`](docs/memoria-claude.md) (lo que Claude aprendió del dueño: cómo
+>   hablarle, cómo trabajar, criterios de diseño, cómo probar) y **subir directo a `nueva-version`**, no a una rama `claude/…` (si no, no se publica).
+> - **En la compu**: antes de empezar, `git pull` (puede haber trabajo hecho desde la nube). Lo nuevo que tenga que valer en cualquier sesión se
+>   suma también a `docs/memoria-claude.md`. El repo es **público**: ahí no van emails ni ids de partidas, personajes o cuentas.
+
+> Esta rama (carpeta `rol-nueva-version`) es el sistema nuevo: herramientas
+> de campaña en vivo con Firebase. **Antes de tocar código acá**, leer
+> [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (qué se
+> decidió y en qué estado está cada paso) y
+> [`docs/workflow-firebase.md`](docs/workflow-firebase.md) (cómo está
+> armado Firebase: estructura de datos, permisos, cómo se prueba).
+>
+> **Preguntas de diseño abiertas → [`docs/preguntas-abiertas.md`](docs/preguntas-abiertas.md).**
+> Regla para todas las conversaciones: cada pregunta de diseño o regla que
+> quede sin decidir (y cada `PLACEHOLDER` nuevo en el código) se agrega ahí,
+> con número, contexto y fecha; al decidirla se aplica, se documenta y se
+> marca ✅ ahí. Antes de preguntarle algo de diseño al usuario, mirar si ya
+> está en esa lista.
+>
+> **Rework del catálogo (en curso) → [`docs/rework-armas.md`](docs/rework-armas.md)** (hoja de trabajo con las preguntas, propuestas y respuestas, pensada para retomarla desde otra conversación) y [`docs/hoja-de-ruta-rework-catalogo.md`](docs/hoja-de-ruta-rework-catalogo.md). Criterios de diseño: [`docs/guia-de-diseno.md`](docs/guia-de-diseno.md).
+>
+> **Subir / bajar / auditar elementos (skills, creeps, ítems…) → [`docs/plan-subida-unificada.md`](docs/plan-subida-unificada.md)**
+> (en curso desde 2026-09-29): un solo mecanismo para todo tipo de elemento, con la configuración completa
+> incluida la automatización, partiendo de la Biblioteca de Firebase. No armar otro camino en paralelo.
+>
+> **Plan de consolidación (en curso, por pasos) → [`docs/plan-consolidacion.md`](docs/plan-consolidacion.md)**: un solo
+> motor de reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas. Se lleva adelante
+> de a un paso, pausable. Antes y después de cada paso: [`comun/pruebas.html`](comun/pruebas.html) en verde y las
+> [`docs/pruebas-de-humo.md`](docs/pruebas-de-humo.md). **Dónde quedó (2026-10-01)**: paso 4, etapa 3 (la Botonera la dibuja
+> el mapa): 3a–3c terminadas; 3d en curso (⚗ ya disponible para todos, falta probarla en una sesión real) — leer la sección **"▶ Para retomar"** de [`docs/plan-paso4-etapa3.md`](docs/plan-paso4-etapa3.md). **En paralelo, etapa 4** (Acciones de los creeps y Botonera de las invocaciones en el mapa): 4a, 4b y 4c hechas (las Acciones nuevas de un creep ya hacen todo solas, salvo Editar/Subir/Reemplazar una habilidad); la 4d (probarlas en una sesión real) la hace el dueño; mientras, **4e y 4f (invocaciones, con sus zonas y trampas) terminadas**: con ⚗, la Botonera nueva de una invocación lo hace todo sola. **Desde el 2026-10-02 la Botonera nueva (y las Acciones nuevas) es la de todos**: siempre prendida, sin el interruptor ⚗ (decisión del dueño; `BN_SIEMPRE` en `vtt-hexgrid/js/11-botonera-nueva.js` la devuelve). Se trabaja solo sobre ella.
+> El paso 6 (una sola página) **se descartó** (dueño, 2026-10-02); en su lugar, la **ficha lite** (2026-10-02, hecha): el 📜 de un
+> token o la F abren encima del mapa lo esencial del combate, para personajes, invocaciones y creeps (`comun/ficha-lite.js`,
+> `vtt-hexgrid/js/15-ficha-lite.js`).
+>
+> **Hoja de ruta A (estructural, 2026-10-02) → [`docs/pendientes.md`](docs/pendientes.md) §0**: A1–A6 hechas (el mapa ya no carga la
+> ficha ni GM Tools escondidas para nada; los editores son comunes: `comun/ficha-editor.js`, `comun/creep-editor.js`). Falta la limpieza
+> A′ (después de tres sesiones reales). De la B (lo puntual), 7, 7b y 8 hechas (lo que le llega a un personaje lo aplica también el
+> mapa: `comun/recibidos.js`); lo que queda (9–12) espera decisiones del dueño o del grupo.
+>
+> **Paso a paso unificado → [`docs/plan-paso-a-paso.md`](docs/plan-paso-a-paso.md)**: crear y editar casi todo en la ventana común
+> (`comun/paso-a-paso.js`). Tandas 1–7 hechas (2026-10-02, la 7 = **personaje nuevo**, `comun/asistente-personaje.js`). Sigue: cómo se ven los ítems
+> en el catálogo y las tiendas (solo lo que hacen en la grilla; «Detalles técnicos» en Ver). Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
+> [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md), [`docs/reporte-b7-b8-2026-10-02.md`](docs/reporte-b7-b8-2026-10-02.md).
+>
+> **Auditoría de las habilidades de creep (en curso, 2026-10-20) → [`docs/auditoria-skills-creep.md`](docs/auditoria-skills-creep.md)**: una por una, empezando por las de choque; criterios y lo auditado.
+> **Desde el 2026-10-21 se diseña rol por rol → [`docs/diseno-roles-creep.md`](docs/diseno-roles-creep.md)**: los roles, la lista de ideas de cada uno (se retoma al volver al rol) y la forma de trabajo.
+>
+> **Creeps humanoides nuevos (en curso, 2026-10-26) → [`docs/creeps-humanoides.md`](docs/creeps-humanoides.md)**: 36 líneas (4 warriors, 4 tanques, 4 híbridos, 8 livianos, 4 de rango, 4 magos, 4 supports, 4 debuffers) de nivel 1 a 5, hasta Buena calidad, con las skills auditadas; un creep por rol, rotando; se diseña primero y se programa después.
+>
+> **Pruebas pendientes en el mapa → [`docs/pruebas-en-el-mapa.md`](docs/pruebas-en-el-mapa.md)** (protocolo del dueño, 2026-10-09): lo que hay que ver en el mapa, si no se puede (Chrome desconectado, falta una cuenta), no se prueba «por detrás»: se anota ahí y se prueba apenas se pueda, con capturas.
+>
+> **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
+> siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
+>
+> El repo tiene otra rama, `main`: la versión vieja de la campaña "Piratas
+> en el espacio", con sincronización manual por GitHub en vez de Firebase.
+> Queda congelada como archivo histórico — no se migran sus personajes ni
+> sus datos, y no hace falta convivir con ella.
+
+## La esencia del Rol Pintoísta (ADN del proyecto)
+
+**El Rol Pintoísta ofrece una plataforma, no un corsé.** Es un juego de rol
+*sandbox* y promueve ese espíritu:
+
+- **Las reglas son referencias**, no leyes estrictas. La mesa las usa, las
+  dobla o las ignora según convenga a la historia.
+- **Los personajes, los equipos y todo el catálogo son sugerencias e
+  invitaciones**, no requisitos. Los números de un ítem, una clase o un creep
+  son un punto de partida que cualquiera puede cambiar o inventar de cero.
+- **Es una invitación a la creación colectiva.** Cada quien imagina a su
+  personaje como quiere: un paladín de la piedad y la justicia, una piedra
+  consciente que se construyó un robot, un pendorcho galáctico (figura
+  geométrica telepática), un gusano pedorro estilo Ren y Stimpy, un asesino
+  invocador de abejas con sigilo, veneno y trampas, un sacerdote con escopeta
+  de balas de agua bendita… Todo entra. **El rol del GM no es limitar sino
+  acompañar y moderar.**
+- **La creación colectiva es del grupo, no solo del GM** (dicho por el dueño,
+  2026-09-22). Cualquier jugador puede proponer cambios, creaciones y diseño;
+  definirlo, aprobarlo, ajustarlo y consensuarlo es de la mesa — no una
+  decisión que baja de arriba. Es parte esencial del juego, no un detalle de
+  implementación. **Objetivo a futuro, si el proyecto se abre a más gente que
+  el grupo actual**: que cualquier jugador pueda subir su propia habilidad o
+  personaje a una biblioteca (como ya se hace hoy con creeps, pasivas,
+  trampas y habilidades de creep — ver `comun/biblioteca.js`), y que desde ahí
+  la dirección del proyecto revise y sume lo que corresponda al catálogo
+  general que van a poder ver otros usuarios. El mecanismo de propuesta y
+  aprobación que ya existe es, a propósito, el camino pensado para eso —
+  extenderlo a habilidades y personajes de jugador es trabajo pendiente, no
+  una pieza nueva de filosofía.
+- **Regla de automatización** (dicha por el dueño, 2026-09-20): **siempre que un
+  efecto pueda automatizarse, se automatiza; cuando no se puede, se aclara** en la
+  descripción de algún modo ("⚙ Automatizado: …" / "✋ A mano: …", como en las
+  habilidades de los creeps base y las trampas del catálogo).
+- **Salida a mano en lo automático** (dueño, 2026-10-30): poder ofrecer, en el momento en que algo automático pasa, **«Aplicar automático»** y
+  **«Resolver a mano»** (por si pasa algo excepcional que el sistema no tiene programado). **Cada vez que se automatice algo nuevo, evaluar con el
+  dueño si vale la pena esa instancia a mano o no** (no va siempre: se decide sobre la marcha). La auditoría de lo ya automatizado queda para otro
+  momento (`docs/pendientes.md`, «Automático, pero con salida a mano»).
+- **Consecuencia para el código y el diseño**: las herramientas *ayudan y
+  recuerdan*, no *prohíben ni obligan*. Preferir avisar (y dejar seguir) antes
+  que bloquear; dejar siempre una salida manual (editar un valor, forzar una
+  acción, crear un ítem propio); no encerrar al GM ni a los jugadores en el
+  balance del catálogo. Automatizar lo que ahorra trabajo, nunca lo que le
+  quita al grupo la decisión. Ante la duda entre "regla estricta" y "libertad
+  de mesa", gana la libertad.
+
+Conjunto de herramientas HTML standalone para jugar Rol Pintoísta en vivo,
+cada uno desde su casa: mapa de hexágonos con tokens, fichas de personaje,
+panel de combate del GM, generador de tiendas. Un "Roll20 propio" con solo
+lo que el grupo usa.
 
 ## Stack
 
-- **HTML/CSS/JS puro**, sin build step, sin dependencias externas más que
-  Google Fonts. Cada archivo `.html` es una app completa y autocontenida.
-- **Guardado/carga en JSON**: cada herramienta puede descargar su estado a
-  un `.json`, cargar uno local, y (la mayoría) sincronizarlo con GitHub
-  directamente desde el navegador — mismo patrón de token en las tres.
-- **Python** (`herramientas/`) solo para mantener el catálogo de ítems
-  sincronizado entre Excel, el editor HTML y las tres apps de juego. No
-  es parte del runtime de ninguna herramienta.
-- **Sin CORS entre archivos locales**: por eso todo lo que una herramienta
-  necesita en vivo de otra (personajes, catálogo, tablero, tienda) se lee
-  vía la API de GitHub (`https://api.github.com/repos/.../contents/...`),
-  no leyendo el archivo del disco directamente.
+- **La ficha y GM Tools están partidas en archivos** (2026-09-30, paso 5): `ficha-personaje/ficha.html` (pantalla) +
+  `ficha.css` + `ficha-personaje/js/01…14-*.js`, y `gm-toolset/gm-tools.html` + `gm-tools.css` + `gm-toolset/js/01…12-*.js`
+  (su código, en orden). Ver [`ficha-personaje/CLAUDE.md`](ficha-personaje/CLAUDE.md) y
+  [`gm-toolset/CLAUDE.md`](gm-toolset/CLAUDE.md) para saber qué hay en cada uno antes de buscar. **El mapa también** (2026-10-02):
+  `vtt-hexgrid/mapa.html` (pantalla) + `mapa.css` + `vtt-hexgrid/js/01…14-*.js` — ver [`vtt-hexgrid/CLAUDE.md`](vtt-hexgrid/CLAUDE.md).
+- **HTML/CSS/JS puro, sin build step.** Cada herramienta (`ficha.html`,
+  `gm-tools.html`, `vendor-generator.html`, `mapa.html`, `index.html`) es
+  una página completa y se abre con doble clic o por el sitio publicado;
+  lo que comparten entre sí vive en `comun/` y se suma con
+  `<script src="../comun/archivo.js">` — **nunca se copia adentro del
+  HTML** (ver [`comun/CLAUDE.md`](comun/CLAUDE.md)).
+- **Firebase (Firestore) es el backend en vivo**: cuentas, partidas,
+  fichas, creeps, mapa, tokens, tiradas, tienda y bitácora se leen y
+  escriben ahí en tiempo real, sin "Subir datos"/"Bajar datos". SDK
+  *compat* cargado por `<script>` desde `gstatic.com`. Ver
+  [`docs/workflow-firebase.md`](docs/workflow-firebase.md) para la
+  estructura completa y [`firebase/firestore.rules`](firebase/firestore.rules)
+  para los permisos (hay que pegarlos a mano en la consola cada vez que
+  cambian).
+- **Catálogo de ítems** (desde 2026-09-29, paso 5 de
+  [`docs/plan-subida-unificada.md`](docs/plan-subida-unificada.md)): una
+  sola copia de fábrica, **`comun/catalogo.js`** (`CATALOGO_BASE`, un ítem
+  por renglón), que cargan la ficha, GM Tools, el generador de tiendas y el
+  editor (`datos/catalogo-editor.html`, que la escribe directo en
+  `nueva-version`). Lo que suben jugadores y GM desde el juego (⬆ Subir al
+  catálogo) vive en Firebase (`biblioteca_items`) y cada herramienta lo suma
+  (`comun/items-subidos.js`). Se retiraron el Excel, `datos/catalogo.json`,
+  la rama `main` para el catálogo y los scripts que lo copiaban adentro de
+  los HTML. Ver [`datos/CLAUDE.md`](datos/CLAUDE.md).
+- **Python** (`herramientas/`): scripts de diseño que leen y escriben
+  `comun/catalogo.js` (`herramientas/catalogo_comun.py`): calculadora de
+  armas, equipo de los creeps, reajuste de defensa, publicar ítems del
+  rework. No son parte del runtime de ninguna herramienta.
+- **`gestor.html` se retiró** (2026-10-25, dueño: «`main` quedó completamente obsoleto»): actualizaba el código de las herramientas
+  desde `main`. La plataforma vieja de sync por GitHub (Subir/Bajar datos, Traer última versión) tampoco existe en `nueva-version`.
+- **Sitio publicado**: la rama `nueva-version` se publica sola en GitHub
+  Pages, en `https://elsauloel.github.io/rolpintoista/` — cada push se
+  publica en 1–2 minutos, así que solo se sube lo ya probado.
 
 ## Convenciones de nombres
 
@@ -29,49 +162,73 @@ GitHub vía la API de contenidos (con un token personal guardado en
   palabra (`ficha-personaje/`, `gm-toolset/`, `manual-usuario/`,
   `vtt-hexgrid/`).
 - Dentro del JS de cada herramienta: identificadores y comentarios en
-  español, `camelCase` para variables/funciones (`aplicarDatos`,
-  `ghSubir`, `renderLista`). Los nombres de conceptos del juego (PdG,
-  Bloqueo, Res.Mt) se usan tal cual, sin traducir a inglés.
-- IDs de ítems de catálogo: `cat-<slug>` para los originales, `new-<slug>`
-  para los agregados por el importador cuando no traían id.
-- Rutas de sincronización con GitHub (los strings que ven `ghSubir`/
-  `ghLeerJson`) son siempre relativas a la raíz del repo, no al archivo
-  HTML que las usa — por eso no cambian aunque una herramienta se mueva de
-  carpeta.
+  español, `camelCase` para variables/funciones (`aplicarFicha`,
+  `renderBotonera`, `mesaPublicar`). Los nombres de conceptos del juego
+  (PdG, Bloqueo, Res.Mt, No2) se usan tal cual, sin traducir a inglés.
+- IDs de ítems de catálogo: `cat-<slug>` / `new-<slug>` / `nuevo-<slug>` /
+  `ia-<slug>` para los de fábrica (quedaron de distintas tandas), y
+  `usr-<id>` para los que se suben desde el juego (una corrección de uno de
+  fábrica conserva su id).
 
 ## Qué hay en cada carpeta
 
 | Carpeta | Contenido | Estado |
 |---|---|---|
-| [`ficha-personaje/`](ficha-personaje/CLAUDE.md) | Ficha de personaje interactiva (`ficha.html`) | En desarrollo activo |
-| [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas | En desarrollo activo |
-| [`datos/`](datos/CLAUDE.md) | JSONs de la partida (personajes, tablero, catálogo) + el editor de catálogo | En uso activo |
-| [`manual-usuario/`](manual-usuario/CLAUDE.md) | Manual de reglas de la campaña | **En construcción, sin contenido todavía** — solo el esqueleto |
-| [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa hexagonal virtual | **En pausa** — sin spec ni código todavía |
-| [`docs/`](docs/CLAUDE.md) | Workflow de GitHub/Gestor, notas generales | Con contenido básico |
-| `herramientas/` | Scripts Python que sincronizan el catálogo (Excel ↔ `datos/catalogo.json` ↔ los HTML) | Fuera del alcance de esta reorganización de carpetas — ver `herramientas/LEEME.md` |
+| [`ficha-personaje/`](ficha-personaje/CLAUDE.md) | Ficha de personaje interactiva (`ficha.html`), en vivo con Firebase | En desarrollo activo |
+| [`gm-toolset/`](gm-toolset/CLAUDE.md) | Panel de combate del GM y generador de tiendas, en vivo con Firebase | En desarrollo activo |
+| [`vtt-hexgrid/`](vtt-hexgrid/CLAUDE.md) | Mapa de hexágonos en vivo con tokens (`mapa.html`, Firebase) | En desarrollo activo |
+| [`comun/`](comun/CLAUDE.md) | Código JS compartido entre las herramientas (sesión, menú, Mesa, dados, lupa, asistente de ítems…) | En uso activo |
+| [`datos/`](datos/CLAUDE.md) | Editor del catálogo de ítems (el catálogo vive en `comun/catalogo.js`), herramientas de auditoría, esquema | En uso activo |
+| [`manual-usuario/`](manual-usuario/CLAUDE.md) | El manual, navegable como un vault de Obsidian (buscador, enlaces, backlinks, mapa, pendientes); fuente en `notas/*.md` | Primera versión completa (2026-09-20), con preguntas abiertas para completar |
+| [`docs/`](docs/CLAUDE.md) | Plan del sistema nuevo, workflow de Firebase/GitHub, preguntas de diseño abiertas | Con contenido activo |
+| `herramientas/` | Scripts Python de diseño que leen/escriben `comun/catalogo.js` (y el compilador del manual) | Ver `herramientas/LEEME.md` |
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |
-| `gestor.html` (raíz) | Actualiza las herramientas desde GitHub o publica cambios locales | Se queda en la raíz a propósito: usa la File System Access API sobre la carpeta elegida por el usuario, y necesita encontrar `gestor.html` mismo como ancla |
+| `firebase/` | `firestore.rules`, la copia versionada de los permisos | En uso activo |
+| [`preguntas-diseno/`](preguntas-diseno/CLAUDE.md) | "🛠 Herramientas de diseño": log compartido con tres pestañas — Preguntas, A desarrollar (propuestas + resumen de lo incorporado) y Falta testear —, pensado para el celular (excepción a "solo compu") | En uso activo |
 
-Esquema de datos compartido entre las herramientas: [`datos/esquema.md`](datos/esquema.md).
+Esquema de datos de Firebase: [`docs/workflow-firebase.md`](docs/workflow-firebase.md).
+Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.md).
 
 ## Cosas que hay que saber antes de tocar código acá
 
-- **"Traer última versión" (en `gestor.html` y en el botón ⚙ de la ficha)
-  sobreescribe el archivo local sin avisar si hay cambios sin commitear.**
-  Ya pasó una vez que esto pisó trabajo en curso. Regla operativa: commitear
-  y pushear cada bloque de cambios apenas queda probado, no dejar trabajo
-  grande sin subir.
-- Las rutas de sincronización con GitHub embebidas en cada HTML
-  (`personajes/...`, `tablero/...`, `creeps-publico.json`,
-  `tienda-publica.json`) son independientes de dónde vive el archivo HTML
-  en el repo — apuntan a `datos/...` porque ahí es donde están los datos
-  ahora, no porque el HTML esté cerca.
+- **La palabra "trampa" es solo para la mecánica de colocar trampas** (regla del dueño, 2026-09-24): un skill, ítem o texto que se llame "trampa" tiene que colocar una trampa real en el mapa (elemento con `trampa: true`, o `trampaColocar` en una habilidad de creep). Lo que no coloca ninguna se nombra distinto ("Raíces que atrapan", "jugar con ventaja" en lugar de "hacer trampa", etc.). Las habilidades que actúan sobre trampas (Desarmar trampa, Cazador de trampas…) y los creeps Tramperos sí pueden llevar la palabra.
+
+- **Evitar dos conversaciones tocando el mismo archivo grande a la vez**
+  (sobre todo `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`,
+  los que más cambian). Antes de un cambio grande ahí: `git status` y
+  `git log --oneline -5` para ver si hay trabajo de otra conversación en
+  curso o recién subido, y avisar si el archivo cambió de abajo mientras
+  se estaba editando (el propio Edit ya avisa "el archivo había sido
+  modificado" — no ignorarlo, releer y seguir desde ese estado). Subir en
+  bloques chicos (ver el punto siguiente) para que la ventana de choque
+  entre conversaciones sea corta.
+- **Subir el trabajo apenas queda probado.** No hay "Traer última
+  versión" que pueda pisar nada en esta carpeta (ni el botón ni el código
+  existen), pero cada push a `nueva-version` se publica solo en GitHub
+  Pages — no dejar trabajo grande sin subir ni a medio probar en el sitio
+  público.
+- **Código compartido en `comun/`** (se carga con `<script src>` en cada
+  herramienta; no copiarlo adentro de los HTML): `sesion.js` (cuenta y
+  partida), `menu-sitio.js` (☰), `mesa.js` (Mesa de tiradas),
+  `tiradas.js` (fórmulas de dados), `lupa.js` (cuadro 🔍),
+  `mesa-historial.js`, `grilla-dados.js`, `dados3d.js`, `respaldo.js`,
+  `efectos-golpe.js`, `asistente-item.js`. Si algo se repite en dos
+  herramientas, va ahí — ver [`comun/CLAUDE.md`](comun/CLAUDE.md).
+- Crear o editar ítems (menos consumibles) en la ficha, gm-tools, el
+  generador de tiendas y el editor de catálogo pasa por un solo asistente
+  paso a paso compartido: `comun/asistente-item.js`.
 - Los efectos de arma que se aplican al personaje **golpeado** (Rompe
-  armadura, Sangrado como texto de arma, etc.) son intencionalmente
-  manuales — no hay sistema de "efecto al golpear sobre el rival" y no es
-  un hueco a rellenar salvo que se pida construir eso específicamente.
-- `ficha-personaje/ficha.html` pesa ~1.3 MB, la mayoría son imágenes del
-  catálogo embebidas en base64. Es liviano para el navegador; lo único que
-  vuelve pesado es tocarlo a mano — para eso está `datos/catalogo.json` +
-  `datos/catalogo-editor.html`.
+  armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma: al tirar
+  el Daño se **recuerdan** resaltados en la Mesa y, si tienen porcentaje,
+  se **tiran** en un pop-up (`comun/efectos-golpe.js`). Aplicarlos sobre el
+  rival sigue siendo manual, a propósito: no hay que automatizar el estado
+  en el objetivo salvo que se pida.
+- **El catálogo va sin imágenes mientras dura el desarrollo** (decidido
+  2026-09-17): no cargar imágenes de ítems ni volver a ponerlas. La
+  función de cargar imagen sigue en las herramientas, a propósito. Para
+  tocar el catálogo de fábrica está `datos/catalogo-editor.html` (o una
+  conversación editando `comun/catalogo.js`); desde el juego, ⬆ Subir al
+  catálogo.
+- **Solo compu, no celular** (decidido 2026-09-17): no adaptar ni probar
+  nada para pantallas de celular salvo que se pida explícitamente — ver
+  [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md).

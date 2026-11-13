@@ -1,0 +1,344 @@
+# Ideas para arcos, flechas y el carcaj (lluvia de ideas, 2026-10-09)
+
+> Guardada a pedido del dueño («guardala porque es espectacular la lista, se abrió todo un universo de diseño con las flechas»). Para podar
+> después: el dueño dice cuáles van. Marcas: ✔ ya existe en el juego · ⚙ hay que programar algo chico · 🔧 hay que programar una pieza nueva.
+> Lo ya decidido y programado de los arcos: [`rework-armas-rango.md`](rework-armas-rango.md) y [`balance-combate.md`](balance-combate.md).
+
+## Lo que eligió el dueño de entrada: flechas especiales y el carcaj (a desarrollar)
+
+- **Las flechas comunes son ilimitadas**; las **especiales** se compran en la **Talabartería** (y salen de botín), cada una con su calidad, su
+  valor en oro y su efecto. «Abre todo un universo de posibilidades.»
+- **Todo arco que se compra viene con un carcaj con lugar para 10 flechas especiales.**
+- **Propuesta de Claude (falta la confirmación del dueño; respondió «Esto también», sin el resto):**
+  1. El carcaj es **una pieza aparte** (su lugar en el equipo, como el cinturón), que viene gratis con el arco; en la Talabartería, **carcajes
+     mejores** (de 15, de saque rápido, con bolsillo protegido…). Las flechas de la mochila no se disparan: se pasan al carcaj (fuera de combate
+     gratis; en combate, como sacar del cinturón).
+  2. Elegir la flecha **no cuesta No2** (sacarla es parte del disparo); un carcaj barato podría cobrar 1 como debilidad.
+  3. La flecha **se pierde siempre**, pegue o no.
+  4. Al atacar con un arco: **«¿Qué flecha?»** (la común o una del carcaj, con lo que hace cada una); su efecto va al duelo (el bono del tiro,
+     efectos al golpear, daño elemental).
+  5. Precio: la calculadora, como una fracción del efecto (es de un solo uso).
+  6. Tandas: (1) el tipo «flecha» y el carcaj (lugar, el que viene con el arco, pasar de la mochila, la Talabartería); (2) «¿Qué flecha?» y su
+     efecto en el duelo (personajes, creeps, invocaciones); (3) el catálogo de flechas y sus precios; después, las que hacen algo en el mapa.
+- **Qué pueden hacer las flechas:** efecto al golpear (sangrado, veneno, marcado, cascabel, derribar, silbadora, clavar); daño elemental aparte
+  (fuego, hielo, rayo, ácido: el daño híbrido; más fuerte cuanto más calidad); precisión o crítico (punta de aguja que perfora, balanceada +PdG, de
+  caza +crítico); en el mapa (humo, luz, soga, señuelo).
+
+## Perfora N (ignora N de Defensa) — dueño, 2026-10-09, a diseñar
+
+- Un arma que **ignora 1, 2 o 3 puntos de Defensa** (no toda). «Tiene que ser un efecto bueno.» **Su casa: las punzantes** (en muchas), en
+  **alguna cortante**, en **algunas flechas** y es **la marca distintiva de los virotes de ballesta**.
+- **La casa de diseño de la ballesta va a ser Rompe armadura** (anotarlo para cuando se diseñen las ballestas).
+- **Perfora N como bono de las armas chicas y medianas (Tipo 4 y 6)** (dueño, 2026-10-09, a desarrollar): «hay que tener cuidado de combinarla con
+  los efectos que solo se activan cuando pasa el daño» (Veneno, Sangrado, Lisiado…): perforar hace que el daño entre más seguido, así que la
+  combinación es fuerte. En la calculadora: **la combinación vale más que la suma de las partes** (un recargo de sinergia aparte del de combo).
+- Medida (criterio de Claude, a confirmar con la herramienta): un punto de Perfora vale como mucho +1 de daño fijo, y un poco menos (solo sirve
+  en un golpe sin crítico que llega a la armadura; el crítico ya ignora la Defensa entera). Propuesta: **0,8 de lo que vale +1 de daño fijo por
+  punto** en `calculadora_armas.py`; en el duelo, se resta de la Defensa al guardar el daño (como `--perfora` de `balance_combate.py`).
+
+## La lista completa (para podar)
+
+**Efectos al golpear**
+1. ✔ Sangrado doble (2 stacks por flecha).
+2. ✔ Sangrado seguro si es crítico.
+3. ✔ Veneno que se acumula fuerte (×3, ×4) a cambio de poco daño.
+4. ✔ Pajaritos (la flecha que pega en el casco).
+5. ✔ Rompe armadura (punta de acero; raro en un arco, de calidad alta).
+6. ✔ Rengo (flecha a la pierna).
+7. ✔ Quemadura (daño por turno), distinta de Prende fuego (terreno incendiado).
+8. ⚙ Cegar: −Visión o −PdG un turno.
+9. ⚙ Silenciar: sin habilidades con SP un turno.
+10. ⚙ Desarmar: chance de que suelte el arma (ya existe en varitas).
+11. ⚙ Miedo: en su turno tiene que alejarse del arquero, o pierde No2.
+
+**Elementales y daño híbrido (desde Rara)**
+12. ✔ Fuego, hielo, rayo, tóxico o ácido como dado aparte que ignora la Defensa.
+13. ⚙ Ácido que además deja Armadura rota.
+14. ⚙ Rayo que salta con crítico (rayo en cadena).
+15. ⚙ Hielo que congela con crítico (Inmovilizado 1 turno).
+16. ⚙ Fuego que se contagia (Quemadura a los de al lado).
+
+**Posición y distancia**
+17. ✔ Distancia ideal con un efecto distinto por franja.
+18. ⚙ Tirador quieto: +PdG si no se movió.
+19. ⚙ Tiro en movimiento / disparo gratis al terminar de moverse (arco de jinete).
+20. ⚙ Disparo de retirada: un paso atrás gratis después de disparar.
+21. ⚙ Altura: +PdG desde un elemento alto (cuando haya alturas).
+22. ⚙ Contra el que está quieto: +PdG si el objetivo no se movió.
+23. 🔧 Más allá del alcance, con −PdG por casillero.
+
+**Crítico**
+24. ✔ Ojo de halcón: +1 d20 en el crítico.
+25. ✔ Ignora Resistencia a crítico (puntas perforantes).
+26. ⚙ Crítico que no gasta: si sale crítico, ese disparo no cuesta No2.
+27. ⚙ Crítico que marca.
+28. ⚙ Primer disparo del combate: Crítico frecuente +2.
+
+**Ritmo y No2**
+29. ✔ Primer disparo del turno −1 No2.
+30. ⚙ Tiro rápido: todos los siguientes −1 No2.
+31. 🔧 Apuntar: gastar No2 antes de disparar para sumar PdG (¿firma de todos los arcos?).
+32. 🔧 Disparo doble: dos flechas con la mitad de los dados.
+33. 🔧 Ráfaga: tres flechas con −2 PdG cada una.
+
+**Táctica y control**
+34. ✔ Silbadora (Demora).
+35. ⚙ Flecha que clava: Inmovilizado; más fuerte contra una pared.
+36. ⚙ Empuje 1 casillero.
+37. 🔧 Flecha que atraviesa: sigue al siguiente de la línea.
+38. 🔧 Garfio: atrae al objetivo o lleva al arquero.
+39. ⚙ Fuego de cobertura: el aliado cubierto suma +1 Evasión hasta el próximo turno del arquero.
+40. ⚙ Tiro de aviso: el rival elige entre alejarse o perder No2.
+
+**Sigilo, trampas e invocaciones (para el Cazador)**
+41. ⚙ Disparo silencioso: tirada para no ser escuchado (P184).
+42. ⚙ Detonador: disparar a una trampa propia la dispara a distancia.
+43. ⚙ Flecha con cascabel: no puede entrar en sigilo por 3 turnos.
+44. ⚙ Vínculo con la invocación: +PdG o +daño si tu invocación está al lado del objetivo.
+45. ⚙ Señuelo: un ruido en una casilla; los creeps cercanos giran hacia ahí.
+
+**Utilidad fuera del golpe**
+46. ✔ Mira: +Visión o +Percepción.
+47. ⚙ Flecha de luz: ilumina una flor de 7 y revela lo oculto.
+48. ⚙ Flecha de humo: nube que tapa la vista.
+49. ⚙ Flecha con soga (narrativo, ✋ a mano).
+50. 🔧 Flechas especiales como consumible del carcaj (elegido por el dueño: ver arriba).
+
+**Debilidades (para abaratar)**
+51. ✔ Sin tiro alto.
+52. ✔ Frágil.
+53. ⚙ Lento de tensar: el primer disparo del turno +1 No2.
+54. ⚙ Ruidoso: rompe el sigilo siempre, sin tirada.
+55. ⚙ Pesado: −1 Evasión equipado (ya se puede con un bono negativo).
+56. ⚙ Corto alcance: Rango −1.
+57. ⚙ Impreciso de lejos: −PdG fuera de la distancia ideal.
+
+**De la primera tanda (anteriores):** flecha que marca ✔, de hielo ✔, relámpago ✔, daño híbrido desde Rara ✔, que derriba ✔, Veneno severo ✔,
+Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levita ⚙, efecto solo en la distancia ideal ⚙, comba (P185).
+
+## Decidido y programado (2026-10-09)
+- **Carcaj**: pieza aparte, **viene con todo arco (10 lugares)**; se compran mejores (de cazador 15, **veloces**: las primeras N flechas especiales del turno que cuestan No2 tiran
+  una moneda, 2 = no cobran su No2 (dueño: «la primera es la que vale más»; de saque rápido Buena N=1, del jinete Rara N=2 y 12 lugares, del
+  viento Excepcional N=3 y 15 lugares), de la guardia 20 con PdG a distancia +1). Pasar flechas de la mochila al carcaj: gratis fuera de combate.
+- **Las flechas compradas no trabajan con %** (dueño: «es muy decepcionante gastar plata, tiempo, espacio en el carcaj para que el dado falle»): sus
+  efectos son **siempre** que pegan; lo fuerte se paga con **No2 extra** (0 lo leve, 1 un estado o daño elemental, 2 control fuerte, 3 el Stun) y oro.
+- **Si erra, queda en el suelo siempre** (en la casilla más lejana del alcance, siguiendo la línea), salvo que choque contra algo con colisión: ahí
+  50 % de romperse.
+- **Todo creep que pelea con arco deja siempre una flecha especial** como botín.
+- **Perfora N** (ignora N de Defensa): programado para las flechas (la Perforante 1, la de acero templado 2).
+- Las 21 flechas cargadas: Balanceada, Perforante, Marcadora, Silbadora, De caza, De punta roma (Comunes); De aguja, Envenenada, De fuego, De
+  escarcha, Relámpago, De ácido, Cegadora, De arpón (Buenas); Del rastreador, De acero templado, De fuego vivo, De hielo negro, Aulladora,
+  Silenciadora, De tormenta (Raras).
+- **Las flechas elementales son siempre híbridas** (dueño, 2026-10-09; descartadas las puramente especiales porque se pisan con las varitas): el
+  daño del arco (físico: resta la Defensa, critea) + un daño elemental aparte, directo (no resta la Defensa ni la Defensa especial, solo la
+  resistencia a ese elemento; no se multiplica con el crítico) + el efecto que les da identidad. Identidad de cada una (dueño, 2026-10-09): **fuego** el daño que sigue
+  (Quemadura); **hielo** Escarcha 1 turno, que entra aunque la armadura pare el golpe; **ácido** Armadura rota; **eléctrico**: la Relámpago (Buena, +1 No2,
+  $45) no tiene daño extra: Parálisis 1 turno garantizada y salta una vez (50 % de Parálisis al segundo); la de Tormenta (Rara, +3 No2, $150): +2d4
+  eléctrico que salta a la mitad (con 1 se corta), Parálisis al blanco y 50 % / 25 % a los dos siguientes. **Envenenada**: Perfora 1 + Veneno ×3 (el
+  veneno sigue necesitando que pase el daño: para eso perfora).
+
+## Segunda ronda: mecánicas de arco (2026-10-11, lluvia de ideas para podar)
+El dueño: «siento que es más acotado en efectos que otras armas». Mismo protocolo que con las armas cuerpo a cuerpo: el dueño marca **sí / no /
+desde tal calidad**. ✔ = la mecánica ya existe en el juego (solo falta ponerla en un arco).
+
+**A. Ritmo y tensar:** 1 Tensar (1 No2 extra antes de disparar: +2 PdG o +1 dado) · 2 Disparo doble (dos flechas al mismo objetivo, −2 PdG cada
+una) · 3 Ráfaga (una flecha a cada uno de hasta 3 objetivos en un cono, una sola PdG) · 4 Tiro rápido (los disparos después del primero −1 No2) ·
+5 Llega cargado (si no disparó el turno anterior, el primero suma +2 de daño) · 6 ✔ Primer disparo del turno −1 No2.
+**B. Distancia y posición:** 7 ✔ Tirador quieto (+PdG si no se movió) · 8 Disparo de retirada (un paso atrás gratis, sin oportunidad) · 9 Tiro en
+movimiento (disparar a mitad del movimiento) · 10 Largo alcance (más allá del Rango con −1 PdG por casillero) · 11 ✔ Distancia ideal con dos franjas
+distintas · 12 Contra el que se acerca (+PdG contra un rival que se movió hacia vos este turno) · 13 Distancia mínima menor (tira con 1 casillero
+libre en el medio) · 14 Altura (+PdG desde un elemento alto, cuando haya alturas).
+**C. Crítico y precisión:** 15 ✔ +1 d20 en el crítico · 16 ✔ Ignora Resistencia a crítico · 17 Emboscada (primer disparo del combate: Crítico
+frecuente +2) · 18 El crítico no cuesta No2 · 19 ✔ El crítico marca · 20 A la articulación (con crítico, Rengo o Lisiado seguro) · 21 Paciencia
+(+1 PdG por turno sin disparar, hasta +3).
+**D. Sobre el objetivo:** 22 Matabestias (+daño contra bestias) · 23 Contra lo que vuela o levita (+PdG) · 24 Contra el Marcado (+PdG o +daño) ·
+25 Contra el que estaba en sigilo y lo acaban de descubrir (+daño) · 26 Empuje 1 casillero · 27 ✔ Clava contra una pared (Inmovilizado) ·
+28 ✔ Silbadora (Demora) · 29 ✔ Derriba (Sentado) con crítico.
+**E. Cobertura y defensa:** 30 Fuego de cobertura (un aliado al lado del objetivo suma +1 Evasión hasta tu próximo turno) · 31 Supresión (si
+pega, el objetivo paga +1 No2 por casillero para acercarse a vos en su turno) · 32 Guardia (+1 Evasión con el arco en las manos si no disparaste
+este turno) · 33 Arco con hojas (rompe la regla: deja pegar cuerpo a cuerpo con el arco, débil).
+**F. Sigilo y caza:** 34 Disparo silencioso (disparar no rompe el sigilo, o con tirada) · 35 Por la espalda a distancia (el primer disparo desde el
+sigilo cuenta como por la espalda) · 36 Rastro (el objetivo queda a la vista en la niebla N turnos) · 37 Detonador (disparar a una trampa propia
+la dispara) · 38 Señuelo (una flecha que suena en una casilla: los creeps de cerca miran hacia ahí).
+**G. Utilidad:** 39 ✔ Mira (+Visión o +Percepción) · 40 ✔ Iniciativa +N · 41 Garfio o soga (moverse hasta un punto) · 42 ✔ Disparo de señal (luz).
+**H. El arco y sus flechas:** 43 Afinidad (con un tipo de flecha, su efecto +1) · 44 Recupera (una flecha especial que erra vuelve al carcaj con
+moneda) · 45 Arco rúnico (sus flechas comunes hacen daño elemental, desde Rara) · 46 Doble carga (dos flechas especiales a la vez).
+**I. Identidad del arco:** 47 Arco de guerra (suma la Fuerza entera) · 48 Arco compuesto (suma la mitad de la Destreza en vez de la Fuerza: el arco
+del Shooter) · 49 Arco arcano (suma la mitad del Efecto especial) · 50 Arco de mano (Tipo 4, una mano) · 51 Arco maldito (+daño, pero −1 HP por
+disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el combate).
+**J. Debilidades (abaratan):** 53 Ruidoso (rompe el sigilo siempre) · 54 ✔ Frágil · 55 Pesado (−1 Evasión equipado) · 56 Corto alcance (Rango −2) ·
+57 Cuerda floja (si todos los dados salen 1, se corta: 1 No2 para arreglarla) · 58 ✔ Sin tiro alto.
+
+### Lo que eligió el dueño de la segunda ronda (2026-10-11)
+«Habría que ampliar el catálogo con estos efectos; si alguno necesita ajuste y definición, lo charlamos. Se les busca el mecanismo y el tier.»
+- **Al catálogo de arcos:** Marca (deja Marcado al golpeado), **desde Común** · Silbadora (Demora), **desde Común, con %** · **Tensar** (pagás 1 No2
+  extra: +2 PdG o un dado más) — evaluar su valor y su calidad · **Tiro rápido** (los disparos después del primero −1 No2) — parece poderoso,
+  evaluar la calidad · **Largo alcance** (más allá del Rango, con −1 o −2 PdG por casillero, valores distintos según el arco) · **Perfora** en algunos
+  arcos (**Rompe armadura: exclusivo de las ballestas**) · **Emboscada** (el primer disparo del combate, Crítico frecuente +2), un bono valioso ·
+  **Matabestias** (+daño contra bestias) · **Contra lo que vuela o levita** (+PdG) · **Contra el Marcado** (+PdG o +daño); si no hay flecha que marca en
+  la Talabartería, crearla (también va a ser skill del Hunter) · **Por la espalda a distancia** (+PdG y/o +daño si la trayectoria no toca los
+  casilleros de visión del rival) · **Afinidad elemental** (+1 al efecto de las flechas elementales) · **Arco rúnico** (sus flechas comunes hacen
+  daño elemental, desde Rara) · **Arco que se calienta** (+1 de daño por cada rival que cae en el combate), puede ser · **Corto alcance** (Rango −2),
+  como debilidad · **Arco compuesto** (la mitad de la Destreza en vez de la Fuerza): evaluar en Raro, «miedo a que rompa todo».
+- **Flechas especiales:** Empuje (lo corre 1 casillero) · Silbadora (Demora) · Rastro (el objetivo queda a la vista unos turnos). **Las flechas
+  elementales comunes, siempre en la góndola de la Talabartería.**
+- **Skills, no mecánicas de arco:** Disparo doble (creep o Shooter) · Disparo de retirada · A la articulación (con crítico, Rengo o Lisiado seguro) ·
+  Paciencia (pasiva: +2 PdG por cada turno sin disparar, con arcos) · Contra el recién descubierto (pasiva).
+- **No:** Derriba con crítico (Sentado no va con los proyectiles Tipo 4).
+
+### Hecho (2026-10-11)
+- **Programado** (`Combatiente.RASGOS_ARCO`, el mapa en `vtt-hexgrid/js/35-arcos.js`, el asistente de ítems, el glosario y la calculadora):
+  **Tensar N** (1 No2 más → +N PdG, se pregunta en cada disparo), **Largo alcance N** (hasta 4 casilleros más allá del alcance, −N PdG por cada uno),
+  **Emboscada N** (primer disparo desde que el mapa pasa a combate: Crítico frecuente +N), **Matabestias N** (+N de daño contra una bestia; el tipo
+  de criatura ahora es público), **Contra el Marcado N** (+N PdG), **Espalda a distancia** {PdG, daño} (todo el trayecto por el punto ciego del
+  objetivo, sin sigilo) y **Afinidad elemental** (+1 a cada dado elemental de las flechas especiales). Valen en cualquier arma de rango.
+- **Datos:** la Flecha de punta roma, archivada; las 4 flechas elementales (fuego, escarcha, relámpago, ácido) siempre en la góndola de la
+  Talabartería (`gondolaFija`), sin dejar de ser Buenas.
+- **12 arcos nuevos** (precio de la calculadora; el daño base, medido en la banda de los Comunes):
+  - Común: Arco del monte (1 dado +1, Matabestias +2, 50) · de batidor (1 dado +1, Iniciativa +1, Largo alcance −2, 55) · de acecho (1 dado,
+    Emboscada +2, 50) · de cuerda doble (1 dado +1, Tensar +2, 55) · de punta de hueso (1 dado +1, Perfora 1, 45) · del cuatrero (1 dado, Espalda a
+    distancia +2 PdG / +1 daño, 50) · petizo (Tipo 6, 1 dado +1, Rango −2, 30).
+  - Buena: Arco largo de cazador (Tipo 6, 2 dados, Rango +4, Largo alcance −1, 110) · de doble curva (2 dados, +1, Rango +4, Perfora 1, Tensar +2,
+    160) · del rastreador de bestias (Tipo 6, 2 dados, Rango +4, Matabestias +3, Contra el Marcado +2, 150) · de las brasas (2 dados, +1, Rango +4,
+    Afinidad elemental, 100) · de la sombra (2 dados, Rango +4, Emboscada +1, Espalda a distancia +2 PdG / +1 daño, 160).
+- **Falta (Rara en adelante):** Tiro rápido, Arco rúnico, Arco que se calienta, Arco compuesto y la Flecha de empuje.
+
+### Bonos de arco para diseñar los otros tiers (Rara, Excepcional, Legendaria) — 2026-10-11, pedido del dueño
+> «Dejá anotados los bonos para arcos para cuando sigamos diseñando los otros tiers.» La caja de herramientas para armar los arcos de
+> Rara en adelante. ✅ = ya existe (se carga en el ítem y anda) · ⚙ = elegido por el dueño, falta programarlo. Precio: siempre con
+> `herramientas/calculadora_armas.py`; el daño base, medido con `balance_combate.py` contra la banda del tier.
+
+**Daño y base**
+- ✅ Dados (Peso) y dados amplificados · ✅ daño fijo · ✅ Tipo 4 o 6 · ✅ suma la mitad del Dmg (todos los arcos).
+- ⚙ **Arco compuesto** (la mitad de la Destreza en vez de la mitad de la Fuerza): candidato a Raro; medirlo antes («miedo a que rompa todo»).
+
+**Puntería y crítico**
+- ✅ PdG +N · ✅ Crítico frecuente / potente +N · ✅ ignora N de Res. crítico · ✅ +N d20 en el crítico.
+- ✅ **Distancia ideal** (cerca / media / lejos / franja fija, con PdG, crítico, daño o ignora).
+- ✅ **Tensar N** (1 No2 más → +N PdG; en Común +2).
+- ✅ **Emboscada N** (primer disparo del combate: Crítico frecuente +N; «un bono valioso»; Común +2, Buena +1 junto con otra cosa).
+- ✅ **Contra el Marcado N** (+N PdG; combina con la Flecha marcadora y con la skill del Hunter).
+- ⚙ **Contra lo que vuela o levita** (+PdG): espera a que exista el vuelo (pendientes, «🕊 Vuelo»).
+
+**Distancia**
+- ✅ Rango +N (como bono, ~1/3 de los arcos; tope por tier en la calculadora) · ✅ Corto alcance (Rango −2, debilidad).
+- ✅ **Largo alcance −1 / −2 PdG por casillero** (hasta 4 de más; −1 es el bueno).
+- ✅ Tiro alto (todos los arcos) · ✅ Sin tiro alto (debilidad).
+
+**Contra la armadura y el objetivo**
+- ✅ **Perfora 1** desde Común; **Perfora 2 desde Rara** (dueño). Rompe armadura: **no** (exclusivo de las ballestas).
+- ✅ **Matabestias N** (+N de daño contra bestias).
+- ✅ **Espalda a distancia** {PdG, daño} (todo el trayecto por el punto ciego, sin sigilo).
+- ✅ Efectos al golpear con % (Lisiado, Sangrado, Veneno, Prende fuego, Rengo…): los de siempre de las armas.
+
+**Elemental y mágico**
+- ✅ **Afinidad elemental** (+1 a cada dado elemental de las flechas especiales).
+- ✅ Daño mágico de un efecto con dado (`danoMagico`): ya funciona en armas.
+- ⚙ **Arco rúnico** (sus flechas comunes hacen daño elemental), **desde Rara**: se arma con `efectosGolpe` con `danoMagico` y su elemento
+  (casi sin código nuevo); falta decidir el dado por tier.
+
+**Ritmo y combate largo**
+- ✅ Primer ataque del turno −N No2 · ✅ Iniciativa +N.
+- ⚙ **Tiro rápido** (los disparos después del primero del turno, −1 No2): «poderoso, evaluar el tier» → candidato a Raro.
+- ⚙ **Arco que se calienta** (+1 de daño por cada rival que cae en el combate, lo voltee quien lo voltee; +3 si el golpe de gracia lo da ese
+  mismo arco): «puede ser»; candidato a Raro o Excepcional.
+
+**Flechas (van aparte, no en el arco)**
+- ⚙ **Flecha de empuje** (lo corre 1 casillero hacia atrás). ✅ Marcadora y Silbadora (Demora), en la tienda. ✅ Elementales siempre en la góndola.
+
+**Skills, no arcos** (para el Shooter, el Hunter o los creeps): Disparo doble · Disparo de retirada · A la articulación · Paciencia (pasiva) ·
+Contra el recién descubierto (pasiva).
+
+## 2026-10-11 · Arcos Comunes: lo que hay, lo medido y la tercera ronda de ideas (el mismo proceso que las ballestas)
+**Lo que hay:** 13 Comunes en venta (corto, de rama, de pastor, de liebrero, de tiro ligero, de cazador de pájaros, del monte, de batidor, de acecho,
+de cuerda doble, de punta de hueso, del cuatrero, petizo) + el del rastreador (solo botín). La meta para quedar parejos con una familia cuerpo a
+cuerpo: ~24.
+**Medido** (`combate_ballestas.py --familia arco`: 4 rondas, nivel 1; Shooter contra liviano / medio / pesado): casi todos entre 67 % y 108 % contra el
+medio; **contra el pesado, todos 0 % salvo de punta de hueso (63 %, la única con Perfora) y de acecho (32 %)**; al Mago no le sirve casi ninguno. Se
+pasan: **de cuerda doble 159 %** (Tensar +2, lo mismo que en la ballesta) y **corto 155 % contra el liviano** (2d4 + la mitad de la Fuerza). Flojos: **del
+cuatrero 52 %** (Espalda a distancia no entra en la medida) y de rama 67 %. La simulación todavía no cuenta: distancia ideal, Espalda a distancia,
+Largo alcance, tiro alto, ni la mínima del arco.
+**La identidad ya decidida:** suma la mitad de la Fuerza · Tipo 4 (liviano, juega al crítico) y Tipo 6 (largo, parejo) · tiro alto de todos (salvo
+«sin tiro alto») · un casillero libre de mínima · no pega cuerpo a cuerpo ni hace oportunidad · no se parrea con él · carcaj y flechas especiales
+(efecto seguro, No2 de más) · distancia ideal · Perfora 1 desde Común (algunos), 2 desde Rara · Rompe armadura es de las ballestas · mecánicas
+elegidas: Tensar, Largo alcance, Emboscada, Matabestias, Contra el Marcado, Espalda a distancia, Afinidad, Corto alcance (debilidad); para Rara: Tiro
+rápido, Arco rúnico, Que se calienta, Compuesto; Contra lo que vuela (cuando haya vuelo).
+
+### Tercera ronda: ideas nuevas para arcos (para podar; no repite las dos anteriores)
+**A. Ritmo y No2:** 1 Flecha en la cuerda (si terminás el turno sin disparar, el primer disparo del siguiente −1 No2) · 2 Encadenar (si el disparo
+anterior del turno pegó, el siguiente −1 No2) · 3 Respiración contenida (+2 PdG si es el único disparo del turno) · 4 Arco de jinete (moverse 1
+casillero gratis entre dos disparos del mismo turno).
+**B. Puntería y crítico:** 5 Racha (si sacás crítico, el próximo disparo del turno Crítico frecuente +1) · 6 Lectura del viento (+1 PdG por cada
+disparo anterior al mismo blanco en el combate, hasta +3; errar la vuelve a 0: la «remachadora» del arco) · 7 Línea limpia (+1 PdG si la línea de
+tiro está libre: ni tapada ni rozando) · 8 Tiro alto sin castigo (el tiro alto no resta PdG) · 9 Contra lo pesado (+PdG contra un blanco de Defensa
+alta: al arco le cuesta el pesado, así le mete crítico) · 10 Exponer (con crítico, el blanco queda Expuesto un turno).
+**C. Posición y movimiento:** 11 Contra el que corre (+PdG contra un rival que se movió 3 o más casilleros este turno) · 12 Parapeto (+1 Evasión si
+disparás con un Sólido al lado) · 13 Arco de mano (puede disparar pegado al blanco, con −2 PdG; rompe la mínima).
+**D. Varios blancos:** 14 Abanico (si reparte los disparos del turno entre blancos distintos, +1 PdG cada vez que cambia) · 15 Contra el montón (+1 de
+daño por cada rival pegado al blanco).
+**E. Efectos al golpear (estados que ya existen):** 16 Cansado 25 % · 17 Ceguera 1 turno 17 % · 18 Demora 25 % (la silbadora como rasgo del arco) ·
+19 Pajaritos con crítico.
+**F. Contra un tipo de criatura (como Matabestias):** 20 Matamuertos (no-muertos) · 21 Matagigantes / constructos · 22 Matabrujos (elementales y
+alienígenas) · 23 Contra humanos y humanoides (el arco del cazador de recompensas).
+**G. Flechas:** 24 Afinidad con un tipo de flecha que no es elemental (+1 al Veneno, al Sangrado o al Marcado de la flecha) · 25 Flecha de más: la
+primera flecha especial del combate no cobra su No2.
+**H. Debilidades (abaratan):** 26 Arco duro (−2 PdG si la Fuerza es baja) · 27 Mínima más larga (2 casilleros libres) · 28 Crítico corto (el
+crítico multiplica como mucho ×2) · 29 Cuerda floja con lluvia o agua (✋ a mano).
+
+### 2026-10-11 · Pautas del dueño para recrear los arcos Comunes («guidelines generales, no estrictos»)
+- **Todos Tipo 4** (se deja de lado lo de corto y largo).
+- **Proporciones de efectos** (pueden superponerse y estar en distintos %, para dar variedad y combinaciones): **Veneno en 1/4**; **Crítico frecuente /
+  potente en 1/4**; **Rango de bono en 1/3**; **Perfora en 1/4** (Perfora 1 desde Común en algunos, 2 desde Rara); **distancia ideal en 1/5 – 1/4** (el
+  dueño quiere definirla mejor); **Lisiado / Sangrado en 1/5**, con distintos % y «seguro si es crítico»; **Emboscada en ~1/3** (efectos al primer
+  disparo del combate: Crítico frecuente y/o potente, −1 No2, otros); **Tensar +1, +2 o +3**, según eso se cuadra la calidad («ideal para el arco»).
+- **Sin tiro alto** se usa como desventaja para emparejar con otros efectos.
+- **Rompe armadura**, alguno desde Buena, en no más de 1/5.
+- **Mecánicas para Común y Buena:** Tensar, Largo alcance, Emboscada, Matabestias, Espalda a distancia, **Afinidad especial** (antes «elemental»: fuego,
+  hielo, eléctrico, tóxico y ácido), Corto alcance (debilidad). **Rara:** Tiro rápido, Arco rúnico, Que se calienta, Compuesto. Contra lo que vuela,
+  cuando exista el vuelo.
+- **De la tercera ronda (para evaluar si entran en Común o Buena):** Flecha en la cuerda (evaluar peso) · Encadenar · Respiración contenida (probar en
+  uno o dos) · Racha · Lectura del viento (disparos consecutivos al mismo blanco) · Línea limpia (**desde Buena**) · Tiro alto sin castigo · Exponer
+  (con crítico; un bono leve) · Contra el que corre · Abanico · Lisiado / Sangrado con crítico · Contra adefesios y alienígenas · Contra humanos y
+  humanoides (el arco del cazador de recompensas) · Flecha de más · Arco duro (−2 PdG con poca Fuerza: fijar el mínimo) · Mínima más larga (2 libres).
+  **Ceguera y Demora: para flechas especiales**, no para el arco.
+- **El pesado:** «no debería ser un problema; quizás con las nuevas mecánicas alguno puede entrarle».
+- **Lo que no entre en Común queda asentado para Buena y más** (lista abajo, cuando esté la escalera).
+
+### 2026-10-11 · Propuesta: los 24 arcos Comunes nuevos (todos Tipo 4; para el OK del dueño, después se testean uno por uno)
+Precio y calidad con la calculadora ya conectada a la planilla medida (`herramientas/tabla_arcos.py`); todavía **sin la pelea simulada** (el dueño:
+«primero armamos los 24, y corremos la tabla sobre los ítems concretos»). Reemplazan a los 13 Comunes de hoy (13 nombres se reusan, 11 son nuevos).
+Cambios del dueño (2026-10-11, leyendo la lista): **Rango 3 = sin bono** (más es bono, menos es desventaja); distancia ideal cerca = a 3 o 4,
+lejos = los 3 últimos del alcance (desde 8); +daño en la distancia ideal, +2 como mínimo; «Contra adefesios» → **Contra lo sobrenatural** (no-muertos,
+demonios e interdimensionales); en el del forastero, **Stun** con crítico en lugar de Expuesto («Expuesto con flechas no me gusta»).
+1. **Arco corto** — 2d4 · Rango 3 · distancia ideal cerca (a 3 o 4): +1 PdG · $90
+2. **Arco de rama** — 1d4+2 · Rango 4 · Flecha en la cuerda · Veneno 25 % (2) · sin tiro alto · $80
+3. **Arco de pastor** — 1d4+1 · Rango 4 · Crítico potente +1 · Emboscada: Crítico frecuente +1 · $100
+4. **Arco de liebrero** — 1d4+1 · Rango 3 · distancia ideal cerca (a 3 o 4): Crítico potente +2 · Contra el que corre +2 · $95
+5. **Arco de punta de hueso** — 1d4+1 · Perfora 1 · Rango 3 · $80
+6. **Arco del monte** — 1d4+1 · Rango 4 · Matabestias +2 · Emboscada: Crítico potente +1 · Veneno 25 % (2) · $100
+7. **Arco de batidor** — 1d4+1 · Rango 3 · Largo alcance 2 · distancia ideal lejos: +2 de daño · $100
+8. **Arco de acecho** — 1d4+1 · Rango 3 · Emboscada: Crítico frecuente +2 y potente +1 · $100
+9. **Arco de cuerda doble** — 1d4 · Rango 4 · Tensar +1 · $90
+10. **Arco del cuatrero** — 1d4+1 · Rango 3 · Espalda a distancia (+2 PdG, +1 de daño) · $85
+11. **Arco petizo** — 1d4+1 (ajustado: era +3) · Rango 1 (corto alcance) · Crítico potente +1 · Emboscada: Crítico frecuente +1 · Veneno 25 % (2) · sin tiro alto · $100
+12. **Arco de la víbora** — 1d4 (ajustado: sin Perfora) · Rango 3 · Veneno 50 % (2), seguro con crítico · $100
+13. **Arco del baqueano** — 1d4+1 · Rango 3 · Lectura del viento (ajustado: hasta +1) · Emboscada: +1 PdG · $100
+14. **Arco de cazador de pájaros** — 1d4+1 · Rango 4 · Lisiado 33 %, seguro con crítico · $85
+15. **Arco de tiro ligero** — 1d4+1 · Rango 4 · Encadenar · Racha · $95
+16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 3 · Sangrado 25 % (ajustado: sin el seguro con crítico) · $90
+17. **Arco de la espera** — 1d4+1 · Rango 3 · Respiración contenida · distancia ideal lejos: +1 PdG · $95
+18. **Arco del cazador de recompensas** — 1d4+1 · Rango 3 · Contra humanos +2 de daño · Lisiado 25 %, seguro con crítico · $100
+19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 3 · Afinidad especial · Veneno 25 % (2) (ajustado: era 3 stacks y Crítico potente +1) · sin tiro alto · $85
+20. **Arco de quebracho** — 1d4 · Perfora 1 · Rango 4 · Tensar +1 · Arco duro (Fuerza 4) · Mínima más larga · $95
+21. **Arco de la tropilla** — 1d4+1 · Rango 3 · Abanico · Emboscada: +1 PdG · Sangrado 50 % · $110
+22. **Arco del tero** — 1d4+1 · Rango 3 · Tiro alto sin castigo · distancia ideal media (3): +1 PdG · $95
+23. **Arco del forastero** — 1d4+1 · Rango 3 · Contra lo sobrenatural +1 de daño (ajustado) · Emboscada: +1 PdG · con crítico, Veneno ×4 seguro · $100
+24. **Arco de caña** — 1d4+1 · Rango 3 · Tensar +1 · Flecha de más · $95
+
+**Proporciones:** Veneno 5 · Crítico potente / frecuente 5 (más la Racha) · Rango de bono 7 (y uno con desventaja) · Perfora 5 · distancia ideal 5 ·
+Lisiado / Sangrado 4 · Emboscada 7 · Tensar 3 · sin tiro alto 3.
+
+**Lo que no entró en Común (queda para Buena y más):** Crítico frecuente fijo en el arco (+1 en un Tipo 4 vale 5,25 por sí solo: con cualquier daño
+pasa a Buena) · Tensar +2 y +3 · Perfora 1 junto con Tensar o con Espalda a distancia · Perfora 1 con un daño de 1d4+2 o más · Emboscada de Crítico
+frecuente junto con otra Emboscada y un efecto · dos efectos al golpear con Rango de bono · Rompe armadura (desde Buena, no más de 1/5) · Línea
+limpia (desde Buena) · Emboscada «−1 No2 al primer disparo» (falta programarla).

@@ -116,6 +116,13 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **🌩☄ Ver en el mapa la Tormenta arcana y el Meteoro de a uno (dueño, 2026-11-13: «cuando esté en la compu, ver el resultado de la tormenta
+>   arcana»).** Hecho y probado por un ayudante (commit b3a05dfc): el área sigue al mouse (todas las de área), el d20 en el cuadro, la ronda de
+>   «¿Esquiva?» por iniciativa, la lluvia con contador, el daño de a uno (creeps Nd4+1); el Meteoro, la misma ronda y el daño de a uno. Para mirar:
+>   (1) el dodge roll arrastrando el token falló varias veces en las pruebas (sobre todo con el ataque de oportunidad del vecino o sin No2: «Hacerlo
+>   igual»); hay un respaldo que lo resuelve solo si el token se movió; (2) los carteles que piden algo ahora van encima del cuadro del duelo, en todo
+>   el mapa; (3) duda: ¿el dodge roll de un área sigue dando ataque de oportunidad al alejarse de un rival?; (4) antes de tirar el daño aparece el
+>   cartel genérico «no hay nada que resistir: se aplica».
 > - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Soltarse (dueño, 2026-11-13).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
 >   Escudo elemental y el Malviaje → quedan como están; Inamovible → al cuadro del duelo (hecho). Quedó preguntado Soltarse (¿queda con su cartel, o al
 >   cuadro del duelo? con ayuda se suman varias tiradas de un lado). Después: Confusión, la tirada extra de las zonas y las zonas una por una.

@@ -528,6 +528,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Potencia** (rápida, Flash) | **Desvío hábil** (+1 Parry) | + un torso Bueno |
   | 5 | **Señalar la presa** | — | + un yelmo Bueno |
   Consumible: Pergamino grupal de Furia de Combate. Ojo: el Arma elemental sobre un aliado que ya pega fuerte puede ser mucho en nivel 1.
+  - **Nivel 2 aprobado (dueño, 2026-11-13: «va»)**: atrib [11, 9, 6, 7, 3] (con, fue, agi, des, esp); + Botas de caña alta de estanciero y Guantes de
+    cuero grueso; Armas perforantes; Piel curtida. Vida 55, No2 6, Defensa 6, Def.Esp 2, PdG 7, Dmg 9, Parry 8, Bloqueo 9, Evasión 6. Sin SP (espera de turnos).
+    **Falta cargarlo** en `comun/creeps-esenciales.js` (con su prueba en `comun/pruebas.html`): se carga cuando termine el ayudante de la Tormenta.
 
 - **W2 · Berserker · Warrior** (boceto aprobado 2026-11-03; dueño: «me cierra como ruta», con Fue −2 y Des +2, espadas en vez del hacha y la
   poción de regeneración chica). Estrategia: cuanto más herido, más peligroso; espadachín de dos armas que busca el crítico. Atributos
@@ -1268,7 +1271,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L6 | ✅ (2026-11-05, cargado) | | | | |
 | R3 | ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
-| S3 | ✅ (2026-11-03) | | | | |
+| S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | | | |
 | D3 | ✅ (2026-11-03) | | | | |
 | W4 | ✅ (2026-11-05, cargado) | | | | |
 | T4 | ✅ (2026-11-05, cargado) | | | | |

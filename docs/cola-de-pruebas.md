@@ -12,6 +12,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🌩 Tormenta arcana: la ronda de a uno** (dueño, 2026-11-13, probándola: el cuadro del duelo tapaba el cartelito del dodge roll).
+  La secuencia:
+  1. **Elegir el área viéndola**: mientras se mueve el mouse, la flor ya se dibuja en el mapa siguiendo el puntero; el clic la fija.
+     **Vale para todas las habilidades de área** (Meteoro, Orbe, zonas…).
+  2. **¿Cuántos proyectiles?**: quien la lanza tira el 1d20 con su botón, en el cuadro del duelo.
+  3. **Ronda de «¿Esquiva?»**, de a uno, **en el orden de la iniciativa**: pulso en el token, se despliega su menú Sí / No; «Sí» = el dodge roll de
+     siempre (arrastrar hasta 2 casilleros pagando sus No2; si sale del área queda a salvo). Recién al terminar uno se pasa al siguiente.
+  4. **La lluvia**: con los que quedaron adentro, una secuencia de rayos que caen al azar sobre los tokens, uno por proyectil, con un contador
+     sobre cada token que suma 1 por rayo; al terminar, cada token queda con su número.
+  5. **El daño**, de a uno, en el orden de la iniciativa: pulso en el token, menú «Tirá el daño: Nd4» (lo tira quien la lanzó), después
+     «Aplicar el daño» (lo toca el afectado, con el GM de respaldo si no responde, como en las trampas) y se pasa al siguiente.
+  - La versión de los creeps: **Nd4+1** (el +1 una sola vez, no por proyectil; hoy suma +1 por cada uno).
+  - El reparto pasa a hacerse **después** del dodge roll (hoy se hace al lanzarla, antes).
 - **✅ hecho — ⚡ Varita de chispa eléctrica: 20 % de Parálisis a todos los que toca** (dueño, 2026-11-12: «ponele 20 % a
   todos los que toca, el primero y los saltos»). Antes: 25 % al primero; los saltos, solo daño. Ahora 20 % (9–10 en d10) al primero, en los efectos
   del duelo, y a cada salto, cada uno en su cuadro del duelo de a uno (`cadena.efectos`, como la Varita del relámpago), lo tira quien la usa; en el agua,

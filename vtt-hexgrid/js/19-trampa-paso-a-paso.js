@@ -421,7 +421,7 @@ function trampaDibujar(id){
   // 🧮 «Aplicar el daño» con la cuenta a la vista (2026-11-12, dueño: «debe mostrarse también la cuenta: 9 − 0 = 9»): la Defensa real de la víctima y lo
   // que la frena, y el botón con lo que entra a la vida. Sin poder calcularla (un creep en la pantalla de un jugador), queda el texto de siempre.
   if(falta && dt.fase === 'dano-aplicar'){
-    const c = trampaDanoVista(id, dt);
+    const c = dt.danoCuenta && dt.danoCuenta.texto && num(dt.danoCuenta.base) === num(dt.danoMonto) ? dt.danoCuenta : trampaDanoVista(id, dt);   // la guardada al tirar el daño; si no, la de esta pantalla
     if(c) falta = {...falta, texto: `🧮 ${c.texto}. ⚙ Al tocar el botón se descuenta solo de la vida de ${dt.quien}.`, boton: `💔 Aplicar el daño (${fmt(c.final)})`};
   }
   const rodando = trampaTirandoAca === id;
@@ -778,7 +778,16 @@ async function trampaPasoDano(id, dt, mano){
   const monto = dt.evita === 'mitad' ? Math.floor(r.total / 2) : r.total;
   if(dt.danoFijo || monto <= 0) return trampaPasoDanoAplicar(id, {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula});
   const texto = `${r.formula} = ${r.total}${r.aMano ? ' (✋ a mano)' : ''}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}${trampaTiraLaTrampa(dt) ? (trampaMeTocaVictima(dt) ? '' : ` · lo tiró ${trampaNombreDueno(dt)}`) : ` · lo tiró el GM por ${trampaNombreDueno(dt)}`}`;
-  await trampaGuardar(id, {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula, fase: 'dano-aplicar', pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]});
+  const sigD = {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula, fase: 'dano-aplicar', pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]};
+  // 🧮 La cuenta la arma quien tira el daño y queda guardada en la trampa (2026-11-13, dueño: «el mensaje para el jugador es muy distinto que el del
+  // master»): así todas las pantallas muestran la misma «8 de daño − Defensa 15 = 0 a la vida», no solo la que pudo calcularla.
+  const xD = tokens.get(dt.tokenId);
+  if(xD) try{
+    const v = await trampaDanoCalcular(sigD, xD, true);
+    const c = v && v.res && v.res.r ? trampaCuentaTexto(v.monto, v.res.r, sigD.ignoraDef) : null;
+    if(c) sigD.danoCuenta = {...c, base: monto};
+  }catch(err){ console.warn('La cuenta del daño de la trampa:', err); }
+  await trampaGuardar(id, sigD);
 }
 // Lo aplica (se anuncia sin la vida de un creep: es privada).
 // 🧮 El daño de la trampa sobre la víctima: lo que la frena (Defensa, Defensa especial, resistencia, Suela gruesa) y lo que entra. Con `simular`, la
@@ -800,7 +809,7 @@ async function trampaDanoCalcular(dt, x, simular){
       const oT = {magico: !!dt.elemento, ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {}), ...(resTxt ? {resTxt} : {}), ...(simular ? {simular: true} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res, oT); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
-    }catch(err){ if(!simular) console.error('No se pudo aplicar el daño de la trampa:', err); }
+    }catch(err){ if(!simular) console.error('No se pudo aplicar el daño de la trampa:', err); else console.warn('La cuenta del daño de la trampa (vista previa):', err); }
   }
   return {monto, res, freno, restaFreno};
 }

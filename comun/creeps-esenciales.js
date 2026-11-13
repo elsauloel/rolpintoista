@@ -247,6 +247,9 @@
   esencial({...M3, nivel: 4, atrib: [10, 2, 6, 7, 17],   // (aprobado 2026-11-12: Descarga arcana; pasiva Temple mágico; el escudo pasa a Buena: Escudo de lenga del monasterio)
     equipo: ['Varita del relámpago', 'Escudo de lenga del monasterio', 'Chaleco de cuero', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
     habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos', 'Descarga arcana'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({...M3, nivel: 5, atrib: [10, 2, 7, 7, 19],   // (aprobado 2026-11-13: Tormenta arcana; Jubón de cuero tachonado en lugar del Chaleco)
+    equipo: ['Varita del relámpago', 'Escudo de lenga del monasterio', 'Jubón de cuero tachonado', 'Anillo de chispa', 'Capucha de lana del culto', 'Guantes de goma'],
+    habilidades: ['Centella', 'Zap', 'Parpadeo', 'Cadena de rayos', 'Descarga arcana', 'Tormenta arcana'], pasivas: ['Potencia especial', 'Temple mágico']});
   esencial({linea: 'M4', nombre: 'Arcano', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 6, 5, 12],
     equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],

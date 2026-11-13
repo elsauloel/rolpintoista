@@ -496,6 +496,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Cargado** (2026-11-12).
   **Nivel 4 aprobado** (dueño, 2026-11-12: «sí»): Esp 17 · Con 10 · Agi 6 · Des 7 · Fue 2, vida 50, SP 51; el escudo pasa a Buena: **Escudo de lenga del
   monasterio** (Res. eléctrica +2, Res. hielo +2). **Descarga arcana** y la pasiva **Temple mágico**. **Cargado** (2026-11-12).
+  **Nivel 5 aprobado** (dueño, 2026-11-13: «me cierra así»): Esp 19 · Con 10 · Agi 7 · Des 7 · Fue 2, vida 60, 7 No2, SP 57; **Jubón de cuero tachonado**
+  en lugar del Chaleco: Def 3, Def. especial 5. Habilidad nueva: **Tormenta arcana** (se queda la arcana como gran final). **Cargado** (2026-11-13).
+  La línea M3 queda completa.
 - **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
   lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
   (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·

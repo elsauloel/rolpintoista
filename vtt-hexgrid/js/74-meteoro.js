@@ -30,8 +30,8 @@ function marcarMeteoro(sc, h){
   const m = h.meteoro || {};
   const radio = Math.max(1, Math.round(num(m.radio)) || 2);
   const rng = Math.max(1, Math.round(num((rangoDeToken(tOrig) || {}).rng)) || 1);
-  const pedir = () => elegirDestino(async c => {
-    if(distanciaHex(c, {col: tOrig.col, fila: tOrig.fila}) > rng){ toast(`Ese punto queda fuera del Rango de ${sc.nombre} (${rng}): elegí otro más cerca`); pedir(); return; }
+  const pedir0 = () => elegirDestino(async c => {
+    if(distanciaHex(c, {col: tOrig.col, fila: tOrig.fila}) > rng){ toast(`Ese punto queda fuera del Rango de ${sc.nombre} (${rng}): elegí otro más cerca`); pedir1(); return; }
     try{
       await modificarCreep(sc.id, x => { x.meteoro = {col: c.col, fila: c.fila, radio, fisico: String(m.fisico || '4d6'), fuego: String(m.fuego || '2d6'),
         nombre: String(h.nombre || 'Meteoro').slice(0, 60), paso: Math.round(num(iniciativa.paso)), mant: Math.round(num(mantenimientoNumero)),
@@ -39,9 +39,10 @@ function marcarMeteoro(sc, h){
     }catch(err){ console.error('No se pudo marcar el meteoro:', err); toast('No se pudo marcar el meteoro — mirá la consola'); return; }
     const txt = `Una sombra cubre el suelo (${Combatiente.areaTxt(radio)}): algo cae del cielo. Cae al empezar el próximo turno de ${sc.nombre}`;
     try{ mesaLinea(`☄ ${sc.nombre}: ${txt}.`, 'recordatorio'); }catch(err){}
-    try{ momentoAbrir({tipo: 'meteoro', icono: '☄', titulo: `${sc.nombre} llama a un meteoro`, resultado: `${txt}: los que sigan adentro tienen un dodge roll para salir.`, estado: 'listo', datos: {centro: true}}); }catch(err){}
+    try{ momentoAbrir({tipo: 'meteoro', icono: '☄', titulo: `${sc.nombre} llama a un meteoro`, resultado: `${txt}: los que sigan adentro, de a uno, eligen si esquivan (dodge roll).`, estado: 'listo', datos: {centro: true}}); }catch(err){}
   }, `<b>☄ ${esc(h.nombre || 'Meteoro')}: marcá dónde cae</b> <span>el centro, dentro de su Rango (${rng} casilla${rng === 1 ? '' : 's'}) · ${Combatiente.areaTxt(radio)} · Esc o clic derecho cancelan</span>`, true);
-  pedir();
+  const pedir1 = () => { pedir0(); if(typeof areaPrevia === 'function') areaPrevia(radio, '#ff9650'); };   // 👁 la sombra sigue al mouse (js/118)
+  pedir1();
 }
 
 // Hacerlo caer (la pantalla del GM): la explosión, el anuncio y el área con dodge roll.
@@ -51,8 +52,8 @@ async function meteoroCaer(id, t, sc){
   const celdas = meteoroCeldas({col: m.col, fila: m.fila}, m.radio);
   const explota = {clave: 'meteoro:' + sc.id + ':' + Date.now(), celdas: celdas.flatMap(c => [c.col, c.fila])};
   try{ await momentoAbrir({tipo: 'estallido', icono: '☄', titulo: `¡Cae el meteoro de ${sc.nombre}!`, estado: 'listo',
-    resultado: `${m.fisico} de daño físico y ${m.fuego} de fuego a los que sigan adentro (dodge roll para salir).`, datos: {explota}}); }catch(err){}
-  try{ mesaLinea(`☄ ¡Cae el meteoro de ${sc.nombre}! ${m.fisico} físico (lo frena la Defensa) y ${m.fuego} de fuego (menos la resistencia al fuego) a los que sigan adentro: cada uno tiene un dodge roll para salir`, 'recordatorio'); }catch(err){}
+    resultado: `${m.fisico} de daño físico y ${m.fuego} de fuego a los que sigan adentro (de a uno: ¿esquiva? y después el daño).`, datos: {explota}}); }catch(err){}
+  try{ mesaLinea(`☄ ¡Cae el meteoro de ${sc.nombre}! ${m.fisico} físico (lo frena la Defensa) y ${m.fuego} de fuego (menos la resistencia al fuego) a los que sigan adentro: de a uno, cada uno elige si esquiva (dodge roll) y después el daño`, 'recordatorio'); }catch(err){}
   if(typeof explosionEmpezar === 'function') explosionEmpezar(explota);
   const hab = {nombre: m.nombre || 'Meteoro', objetivo: 'area', radio: m.radio, tira: null, contra: [{modo: 'eva', stat: 'eva', etq: 'Evasión'}],
     dano: {formula: m.fisico, tipo: 'fisico', ignoraDef: false, extra: {formula: m.fuego, tipo: 'fuego'}}, efectos: [], soloDodge: true, meteoro: true, fuegoAmigo: true};

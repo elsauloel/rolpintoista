@@ -85,9 +85,9 @@ const AvisoCombate = (() => {
     if(document.getElementById('aviso-cartel-css')) return;
     const s = document.createElement('style');
     s.id = 'aviso-cartel-css';
-    s.textContent = `.aviso-carteles-col{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:78;width:min(520px,94vw);display:flex;flex-direction:column;gap:10px;max-height:88vh;overflow:auto}
+    s.textContent = `.aviso-carteles-col{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:99500;width:min(520px,94vw);display:flex;flex-direction:column;gap:10px;max-height:88vh;overflow:auto}
       .aviso-carteles-col:empty{display:none}
-      .aviso-combate-cartel.abajo{position:fixed;left:50%;bottom:calc(16px + var(--duelo-avisos-alto, 0px));transform:translateX(-50%);z-index:78;width:min(520px,94vw);max-height:calc(100vh - 32px - var(--duelo-avisos-alto, 0px));overflow:auto}
+      .aviso-combate-cartel.abajo{position:fixed;left:50%;bottom:calc(16px + var(--duelo-avisos-alto, 0px));transform:translateX(-50%);z-index:99500;width:min(520px,94vw);max-height:calc(100vh - 32px - var(--duelo-avisos-alto, 0px));overflow:auto}
       .aviso-combate-cartel .duelo-caja{width:100%;max-height:70vh}
       .aviso-combate-cartel .duelo-cuerpo{gap:12px}
       .aviso-combate-cartel .duelo-paso p,.aviso-combate-cartel .aviso-texto{margin:0;line-height:1.45}
@@ -96,6 +96,8 @@ const AvisoCombate = (() => {
       .aviso-combate-cartel .duelo-pie button:disabled{opacity:.55;cursor:default}`;
     document.head.appendChild(s);
   }
+  // (2026-11-13, dueño: «el menú del duelo tapa un menú chico… donde se le ofrece tirar dodge roll»): los carteles que piden algo van POR ENCIMA del
+  // cuadro del duelo (99000): son chicos y si quedan tapados nadie contesta (el dodge roll, el ataque de oportunidad del GM…).
   // Los del centro van en una columna (uno debajo del otro, sin taparse); el de abajo (dodge roll) va suelto.
   function columna(){
     let c = document.getElementById('aviso-carteles-col');

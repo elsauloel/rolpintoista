@@ -513,6 +513,7 @@ function zonaPersistenteDeHabilidad(msg){
   const radio = Math.max(1, Math.round(num(msg.radio) || 1));
   if(msg.niebla){
     elegirDestino(h => crearNiebla(h, radio, msg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}marcá el centro de la niebla</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
+    if(typeof areaPrevia === 'function') areaPrevia(radio, '#8a94a8');
     return;
   }
   const cfg = {
@@ -553,12 +554,14 @@ function zonaPersistenteDeHabilidad(msg){
     return true;
   };
   if(rangoZ > 0 || (yoZ && msg.zonaSoloVisible)){
-    const pedirZ = () => elegirDestino(h => { if(!centroOk(h)){ pedirZ(); return; } crearElementoZona(h, cfg); },
+    const pedirZ0 = () => elegirDestino(h => { if(!centroOk(h)){ pedirZ(); return; } crearElementoZona(h, cfg); },
       `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}elegí dónde cae</b> <span>${rangoZ > 0 ? `a ${rangoZ} o menos de vos (tu Rango), ` : ''}en una casilla que veas · Esc o clic derecho cancelan</span>`);
+    const pedirZ = () => { pedirZ0(); if(typeof areaPrevia === 'function') areaPrevia(radio, msg.zonaColor || '#7fbf6a'); };
     pedirZ();
     return;
   }
   elegirDestino(h => crearElementoZona(h, cfg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
+  if(typeof areaPrevia === 'function') areaPrevia(radio, msg.zonaColor || '#7fbf6a');
 }
 /* Casillas en línea recta (2026-10-08: el muro de fuego, el muro): el primer clic es donde empieza y el segundo, hacia dónde sigue (el lado más
    cercano a ese clic). Se corta antes de un Sólido. `fin(celdas)` con las casillas [{col, fila}]. */
@@ -794,6 +797,7 @@ function abrirAsistenteZonaNueva(){
         estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso, altura: r.altura,
         casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
       }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
+      if(typeof areaPrevia === 'function') areaPrevia(radio, r.color);
     },
   });
 }
@@ -1256,7 +1260,7 @@ let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el
 
 const AREA_ATASCADA_MS = 5 * 60 * 1000;   // si sigue 'en-curso' pasado esto, se cierra sola (ver más abajo)
 function escucharAreas(){
-  coleccionAreas().where('estado', 'in', ['en-curso', 'eligiendo', AREA_EN_CURSO, AREA_ELIGIENDO]).onSnapshot(snap => {
+  coleccionAreas().where('estado', 'in', ['en-curso', 'eligiendo', AREA_EN_CURSO, AREA_ELIGIENDO, 'secuencia-mapa']).onSnapshot(snap => {
     areasActivas.clear();
     snap.docs.forEach(doc => areasActivas.set(doc.id, doc.data()));
     pedirDibujo();
@@ -1266,6 +1270,12 @@ function escucharAreas(){
     // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
     if(soyGM) areasActivas.forEach((a, id) => {
       if(areaDeOtroMapa(a)) return;   // 🗺 la lleva la pantalla del GM que está en ese mapa
+      // 🌩☄ La Tormenta y el Meteoro de a uno (js/118): los lleva la pantalla que la lanzó; acá, solo el seguro de que no quede para siempre.
+      if(a.estado === 'secuencia-mapa'){
+        const c0 = a.creado && a.creado.toMillis ? a.creado.toMillis() : 0;
+        if(c0 && Date.now() - c0 > 40 * 60000) coleccionAreas().doc(id).update({estado: 'terminado'}).catch(err => console.error('No se pudo cerrar el área atascada:', err));
+        return;
+      }
       // 💨 Las tandas de una misma zona con duelo (js/112), de a una: la más nueva espera a que termine la anterior.
       if(areaEnCurso(a) && !(a.duelos || [])[num(a.indice)] && typeof zonaDueloEspera === 'function' && zonaDueloEspera(id, a)) return;
       if(areaEnCurso(a) && !(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
@@ -1418,10 +1428,19 @@ function dueloDodgeEmpieza(d){
       .catch(err => console.error('No se pudo resolver el dodge roll de un Expuesto:', err));
     return;
   }
+  // 🌩 El «¿Esquiva?» de a uno (js/118): el cuadro se queda abierto con la pregunta; recién con «Sí» se aparta y aparece el cartel (dueloDodgeSi).
+  if(d.hab && d.hab.esquiva){ Duelo.abrir(d.id); return; }
   Duelo.abrir(d.id);
   Duelo.minimizar();
   seleccionar(d.defensor.tokenId);
   dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {}), ...(d.hab && d.hab.meteoro ? {meteoro: `${(d.hab.dano && d.hab.dano.formula) || '?'} físico${d.hab.dano && d.hab.dano.extra ? ` + ${d.hab.dano.extra.formula} de ${d.hab.dano.extra.tipo}` : ''}`} : {})};   // (la Tormenta arcana: sin tirada · ☄ el Meteoro)
+  renderDodgeBanner();
+}
+// 🌩 «Sí, esquiva» (comun/duelo.js, el cuadro ya se apartó): el token seleccionado y el cartel para arrastrarlo.
+function dueloDodgeSi(d){
+  if(!d || !d.defensor) return;
+  seleccionar(d.defensor.tokenId);
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, esquiva: true};
   renderDodgeBanner();
 }
 function dueloDodgeTermina(d){
@@ -1476,6 +1495,13 @@ function renderDodgeBanner(){
     AvisoCombate.cartel('dodge', {icono: '🪵', titulo: `${dodgeBanner.nombre} esquivó: dodge roll`, posicion: 'abajo',
       texto: 'Arrastrá el token hasta 2 casilleros (paga sus No2; sin ataque de oportunidad).',
       botones: [{texto: '✋ Me quedo', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
+  if(dodgeBanner.esquiva){   // 🌩 la ronda de a uno (js/118): por encima de cualquier cuadro, para que nunca quede tapado
+    const el = AvisoCombate.cartel('dodge', {icono: '🏃', titulo: `${dodgeBanner.nombre} esquiva: dodge roll`, posicion: 'abajo',
+      texto: 'Arrastrá el token hasta 2 casilleros para salir del área (paga sus No2): al soltarlo se revisa solo si salió.',
+      botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ Me quedo donde estoy', alClic: () => dodgeDeclinar()}]});
+    if(el) el.style.zIndex = '99500';
     return;
   }
   AvisoCombate.cartel('dodge', {icono: dodgeBanner.meteoro ? '☄' : dodgeBanner.tormenta ? '🌩' : '🏃', titulo: dodgeBanner.meteoro ? `Le cae el meteoro a ${dodgeBanner.nombre} (${dodgeBanner.meteoro})` : dodgeBanner.tormenta ? `Le cae la tormenta a ${dodgeBanner.nombre} (${dodgeBanner.tormenta})` : `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
@@ -1669,7 +1695,8 @@ function dueloElegirAreaMapa(msg){
     if(!objetivos.length && hab.anula) return;   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
     if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
     let habArea = hab, objetivosArea = objetivos;
-    if(hab.tormenta){ const t = tormentaRepartir(hab, objetivos); habArea = t.hab; objetivosArea = t.objetivos; if(!objetivosArea.length) return; }   // Tormenta arcana (js/44)
+    // 🌩☄ La Tormenta arcana y el Meteoro, de a uno (2026-11-13, dueño): el d20, la ronda de «¿Esquiva?», la lluvia y el daño (js/118).
+    if((hab.tormenta || hab.meteoro) && typeof secuenciaArea === 'function'){ secuenciaArea({yo, casteador, hab, centro: {col: h.col, fila: h.fila}, radio, objetivos}); return; }
     // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03), y el duelo recién cuando se terminó de ver (dueño, el mismo día: «el
     // menú del duelo se abrió antes de que se terminara de apreciar la animación. Dale un margen de algunos ms»).
     // Desde el 2026-11-03 también las otras ondas (Pisotón, Nova arcana, Remolino, Grito…) y el cono del Sonic Boom, cada una con su variante.
@@ -1728,7 +1755,7 @@ function dueloElegirAreaMapa(msg){
   if(msg.centroFijo){ lanzar({col: msg.centroFijo.col, fila: msg.centroFijo.fila}); return; }
   // El centro, cerca (2026-10-13, Golpe al piso): a `centroAlcance` casillas o menos, y no en la propia casilla.
   const cAlc = Math.round(num(hab.centroAlcance)), mioC = cAlc > 0 ? [...tokens.values()].find(propio) : null;
-  const pedirCentro = () => elegirDestino(async h => {
+  const pedirCentro0 = () => elegirDestino(async h => {
     if(!(await cegueraPermite([...tokens.values()].find(propio), h))){ pedirCentro(); return; }   // 🙈 ciego
     // El centro, dentro del alcance de quien la usa (2026-10-20, la Luz cegadora: «el rango del caster»): si queda más lejos, avisa (lo decide la mesa).
     const alc = Math.round(num(msg.ataque && msg.ataque.alcance)), mioA = alc > 0 ? [...tokens.values()].find(propio) : null;
@@ -1736,6 +1763,7 @@ function dueloElegirAreaMapa(msg){
     if(mioC){ const d = distanciaHex(h, mioC); if(d < 1 || d > cAlc){ toast(cAlc === 1 ? 'Tiene que caer en una casilla pegada a quien la usa' : `Tiene que caer a ${cAlc} casillas o menos (no en la propia)`); pedirCentro(); return; } }
     lanzar(h);
   }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}${mioC ? cAlc === 1 ? ', en una casilla pegada' : `, a ${cAlc} o menos` : ''}) · Esc o clic derecho cancelan</span>`, true, cancelado);
+  const pedirCentro = () => { pedirCentro0(); if(typeof areaPrevia === 'function') areaPrevia(radio); };   // 👁 el área sigue al mouse (js/118)
   pedirCentro();
 }
 

@@ -12,7 +12,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🌩 Tormenta arcana: la ronda de a uno** (dueño, 2026-11-13, probándola: el cuadro del duelo tapaba el cartelito del dodge roll).
+- **✅ hecho (2026-11-13) — 🌩 Tormenta arcana: la ronda de a uno** (dueño, 2026-11-13, probándola: el cuadro del duelo tapaba el cartelito del dodge roll).
   La secuencia:
   1. **Elegir el área viéndola**: mientras se mueve el mouse, la flor ya se dibuja en el mapa siguiendo el puntero; el clic la fija.
      **Vale para todas las habilidades de área** (Meteoro, Orbe, zonas…).
@@ -28,6 +28,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   - **☄ El Meteoro, con la misma secuencia** (dueño, 2026-11-13: «dejá el dodge roll, y que la secuencia de acciones sea igual que con la tormenta
     arcana»): cuando cae, la ronda de «¿Esquiva?» de a uno por iniciativa (el dodge roll de siempre) y después el daño de a uno (pulso, «Tirá el daño»
     —4d6 físico + 2d6 de fuego, lo tira quien lo lanzó—, «Aplicar el daño», el siguiente). Sin d20 ni lluvia: es un solo golpe para todos los de adentro.
+  *Resultado* (`vtt-hexgrid/js/118-secuencia-area.js`; comun/duelo.js `hab.soloTirada` y `hab.esquiva`): probado en un mapa propio («Prueba · Tormenta»,
+  ya borrado) con un creep que la lanza, 3 ratas y un personaje del J1. La flor sigue al mouse; el GM tiró «🎲 Tirar proyectiles · 1d20» en el cuadro; la
+  ronda salió en el orden de la iniciativa (Rata T3 → Prueba Uno → Rata T2 → Rata T4), de a uno; el J1 contestó «Sí» y arrastró su token afuera
+  («logró salir»), las ratas «No» / «Sí y me quedo»; la lluvia con el contador en todas las pantallas; el daño de a uno («3d4+1» con 3 proyectiles), el
+  J1 tocó «Aplicar el daño» para su personaje. El Meteoro: igual, 4d6 + 2d6 de fuego, el que salió no recibió nada. **De paso:** los carteles que piden
+  algo (el dodge roll, el ataque de oportunidad del GM…) van por encima del cuadro del duelo (comun/aviso-combate.js). Video: `tormenta-ronda-y-lluvia-*.mp4`.
 - **⬜ en cola (después de la Tormenta) — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.

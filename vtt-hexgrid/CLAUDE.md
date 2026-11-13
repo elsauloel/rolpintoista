@@ -851,6 +851,16 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   dos copias. Duración: un charco no vence, así que el junto tampoco (si todos tuvieran turnos, el que dura más). El hielo y la lava no se juntan.
   Probado en «Claude · pruebas» / «Prueba · Escudo de rayo» (dos que se pisan, un tercero pegado, uno suelto que queda aparte).
 
+- **🌩☄ La Tormenta arcana y el Meteoro, de a uno** (2026-11-13, dueño; `js/118-secuencia-area.js`): `dueloElegirAreaMapa` (js/13) los manda a
+  `secuenciaArea`, que lleva la pantalla que la lanzó: un área con estado `secuencia-mapa` (la ven todos; la cascada de js/13 no la toca, solo la
+  cierra si queda 40 min) → la Tormenta: el d20 en el cuadro del duelo (`hab.soloTirada` en comun/duelo.js: «🎲 Tirar proyectiles · 1d20», termina sin
+  aplicar nada) → la ronda de «¿Esquiva?» de a uno, en el orden de la iniciativa desde el que tiene el turno (`hab.esquiva`: directo a la fase dodge con
+  Sí / No; «Sí» aparta el cuadro y `dueloDodgeSi` muestra el cartel para arrastrar el token; al soltar se revisa solo, y si el token se movió y quedó
+  quieto, también lo revisa la pantalla que la lanzó) → la lluvia (la Tormenta): el reparto al azar entre los que quedaron, en `centro.lluvia.seq` del
+  área; cada pantalla dibuja los rayos con el contador sobre cada token (`lluviaDibujar`, desde js/05) → el daño de a uno (`contiendaDuelo` sin
+  oposición: lo tira quien la lanzó, lo aplica el afectado o el GM por él). Creeps: Nd4+1 (el +1 una vez). El Meteoro: igual, sin d20 ni lluvia.
+  **Vista previa del área** (`areaPrevia(radio, color)`, llamado justo después de `elegirDestino`): la flor sigue al mouse mientras se marca el centro
+  (áreas de duelo, el Meteoro, las zonas y la niebla).
 - **🎲 Las tiradas las hace el involucrado, en el cuadro del duelo de siempre** (2026-11-10, dueño: «no quiero que las tiradas las haga sola el
   mapa»; «¿por qué no usás el menú del duelo habitual?»): `contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido?, esperar?})` (js/78) abre un
   duelo de habilidad común (`Duelo.crear` con `ataque.hab`: tira, contra, efectos, `empatePierde` / `empateGana` —nuevo en comun/duelo.js: el empate lo

@@ -976,6 +976,10 @@ const Duelo = (() => {
       ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}), ...(h.empateGana ? {empateGana: true} : {}),   // empate: gana quien la usa (Tolerar un efecto: hay que superarlo, 2026-11-10)   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
       ...(h.tiraCadaUno ? {tiraCadaUno: true} : {}), ...(h.zonaId ? {zonaId: txtCorto(h.zonaId, 40)} : {}),   // 💨 una zona con duelo por token (js/112): quien la creó tira de nuevo contra cada uno
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
+      // 🌩 La ronda de a uno (2026-11-13, dueño; vtt-hexgrid/js/118): `soloTirada` = una tirada de quien la usa que no es daño (los proyectiles de la
+      // Tormenta: «🎲 Tirar los proyectiles · 1d20»; queda en `dano.crudo` y el duelo termina ahí, sin aplicar nada); `esquiva` = el «¿Esquiva?» de un
+      // objetivo (directo a la fase dodge, con Sí / No; sin daño: el daño viene después, de a uno).
+      ...(h.soloTirada ? {soloTirada: {etq: txtCorto((h.soloTirada && h.soloTirada.etq) || 'Tirada', 30)}} : {}), ...(h.esquiva ? {esquiva: true} : {}),
       ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
         ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
         ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
@@ -1289,7 +1293,7 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dodge') return;
       if(logroSalir){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; anuncio = `🏃 ${m.defensor.nombre} logró salir del área de ${m.hab.nombre}: esquivó`; }
-      else{ m.resultado = 'pego'; entrarHab(m); anuncio = `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
+      else{ m.resultado = 'pego'; entrarHab(m); anuncio = m.hab && m.hab.esquiva ? `${m.hab.meteoro ? '☄' : '🌩'} ${m.defensor.nombre} sigue adentro del área de ${m.hab.nombre}` : `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
       tx.update(ref, cambiosDe(m));
     });
     anunciarMesa(anuncio);
@@ -1519,6 +1523,7 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: LIBRE, aplicado: false};
+      if(m.hab && m.hab.soloTirada){ m.dano.aplicado = true; m.dano.cuenta = true; m.resultado = 'pego'; m.fase = 'fin'; m.estado = 'resuelto'; mFinal = m; tx.update(ref, cambiosDe(m)); return; }   // 🌩 no es daño: es la cuenta (js/118)
       if(o && o.defensaManual !== undefined && o.defensaManual !== null) m.dano.defensaManual = o.defensaManual === 'no' ? 'no' : Math.max(0, Math.round(_num(o.defensaManual)));   // ✍ (2026-10-15)
       const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
@@ -1695,6 +1700,7 @@ const Duelo = (() => {
   // Cuando un duelo termina, quien lo creó publica UNA línea de resumen en la Mesa (se «reclama» con `resumido`).
   async function publicarResumenSiCorresponde(d){
     if(d.estado !== 'resuelto' || d.resumido || d.creadoPor !== yo() || aplicando.has(d.id + ':resumen')) return;
+    if(d.hab && (d.hab.soloTirada || d.hab.esquiva)) return;   // 🌩 la cuenta de proyectiles y el «¿Esquiva?» (js/118): ya los cuenta la Mesa con su línea
     aplicando.add(d.id + ':resumen');
     const ref = col().doc(d.id);
     let datos = null;
@@ -2690,7 +2696,11 @@ const Duelo = (() => {
     const efectoLibre = d.hab && d.hab.efectoLibre
       ? `<div class="duelo-motivo">✋ ${_esc(d.hab.efectoLibre)}${d.contacto ? ` <b>(diferencia: ${_fmt(Math.abs(_num(d.contacto.dif)))})</b>` : ''}</div>` : '';
     let caja;
-    if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
+    if(d.hab && d.hab.esquiva) caja = d.resultado === 'fallo' ? `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🏃 SALIÓ DEL ÁREA</div><div class="chico">${_esc(d.defensor.nombre)} esquivó: ${_esc(d.hab.nombre)} no le llega</div></div>`
+      : `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} SIGUE ADENTRO</div><div class="chico">${_esc(d.defensor.nombre)} queda en el área de ${_esc(d.hab.nombre)}</div></div>`;
+    else if(d.hab && d.hab.soloTirada && !d.dano) caja = '';
+    else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">🌩 ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
+    else if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego' && d.contacto && d.contacto.resistioEstado) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚡ EL DAÑO ENTRA</div><div class="chico">${_esc(d.defensor.nombre)} resistió los estados de ${_esc(d.hab.nombre)} (${_esc(etqContra(d))}), pero no se esquiva: el daño pasa igual</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'fallo') caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 SE RESISTIÓ</div><div class="chico">${_esc(d.defensor.nombre)} resistió ${_esc(d.hab.nombre)} (${_esc(etqContra(d))})</div>${mot}</div>`;
@@ -2854,6 +2864,17 @@ const Duelo = (() => {
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
   function danoHtml(d){
     const dn = d.dano;
+    // 🌩 Una tirada que no es daño (los proyectiles de la Tormenta, js/118): el botón de quien la usa y, ya tirada, el número grande.
+    if(d.hab && d.hab.soloTirada){
+      const etq = d.hab.soloTirada.etq || 'Tirada', f = d.hab.dano ? d.hab.dano.formula : '';
+      let cuerpo;
+      if(dn) cuerpo = `<div class="duelo-danobox"><div class="duelo-danonum">${_fmt(dn.crudo)}</div><div class="duelo-danosub">${_esc(etq)}${f ? ` (${_esc(f)}${(dn.rolls || []).length ? ': ' + (dn.rolls || []).map(_fmt).join(' + ') : ''})` : ''}</div></div>`;
+      else if(esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar ${_esc(etq.toLowerCase())} · ${_esc(f)}</button></div>${manualHtml(d, 'dano')}`;
+      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>
+        <div class="duelo-man"><input type="number" min="0" data-manual="dano" placeholder="${_esc(etq.toLowerCase())}" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
+      else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>`;
+      return `<div class="duelo-paso"><h4><span class="n">2</span>${_esc(etq)}</h4>${cuerpo}</div>`;
+    }
     const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
     const mult = crit ? d.crit.mult : 1;
     const arma = d.ataque.armaNombre ? ` · ${_esc(d.ataque.armaNombre)}` : '';
@@ -2952,6 +2973,19 @@ const Duelo = (() => {
   function dodgeHtml(d, nuevo){
     const puedeMapa = !!(cfgEscuchar && cfgEscuchar.chequearDodge);
     const puedeAMano = esMio(d.defensor) || soyGM();
+    // 🌩 «¿Esquiva?» de a uno (2026-11-13, dueño: «la ronda de "¿esquiva?" sí/no, uno por uno a los afectados»; vtt-hexgrid/js/118). Sí = el dodge
+    // roll de siempre (se arrastra el token, paga sus No2; al soltarlo se revisa si salió); No = se queda adentro.
+    if(d.hab && d.hab.esquiva){
+      const que = d.hab.meteoro ? '☄ ¡CAE EL METEORO!' : d.hab.tormenta ? '🌩 ¡SE VIENE LA TORMENTA!' : `🏃 ${_esc(String(d.hab.nombre || '').toUpperCase())}`;
+      const suyo = esMio(d.defensor);
+      return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
+        <div class="grande">${que}</div>
+        <div class="chico">${suyo ? '¿Esquivás?' : `¿${_esc(d.defensor.nombre)} esquiva?`} Esquivar es el <b>dodge roll</b>: hasta 2 casilleros, arrastrando el token (paga sus No2). Si sale del área, no le cae nada; si sigue adentro, ${d.hab.meteoro ? 'le cae el meteoro' : 'puede tocarle algún proyectil'}.</div>
+        ${puedeAMano ? `<div class="duelo-pie" style="justify-content:center;margin-top:10px"><button type="button" data-dodge-si>🏃 Sí, esquiva${suyo ? '' : ` (por ${_esc(d.defensor.nombre)})`}</button><button type="button" class="sec" data-dodge-manual="0">✋ No, se queda</button></div>
+          ${soyGM() && !suyo ? '<div class="duelo-pie" style="justify-content:center;margin-top:4px"><button type="button" class="sec" data-dodge-manual="1">✔ A mano: ya salió</button></div>' : ''}`
+          : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} decida…</div>`}
+      </div>`;
+    }
     const tormenta = d.hab && d.hab.soloDodge;   // Tormenta arcana: no hubo tirada, el dodge roll es la única salida
     const meteoro = tormenta && d.hab.meteoro;   // ☄ el Meteoro
     return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
@@ -3264,6 +3298,11 @@ const Duelo = (() => {
       let adentro = true;
       try{ adentro = !!cfgEscuchar.chequearDodge(d); }catch(err){ console.error('Duelo: chequearDodge', err); }
       resolverDodge(d.id, !adentro).catch(err => { console.error(err); _toast('No se pudo resolver el dodge roll'); bDodgeResolver.disabled = false; });
+    };
+    const bDodgeSi = f.querySelector('[data-dodge-si]');
+    if(bDodgeSi) bDodgeSi.onclick = () => {   // 🌩 «Sí, esquiva»: el cuadro se aparta y el mapa muestra el cartel para arrastrar el token (js/13 dodgeSi)
+      minimizar();
+      if(typeof cfgEscuchar.dodgeSi === 'function') try{ cfgEscuchar.dodgeSi(d); }catch(err){ console.error('Duelo: dodgeSi', err); }
     };
     f.querySelectorAll('[data-dodge-manual]').forEach(b => b.onclick = () => {
       f.querySelectorAll('[data-dodge-manual]').forEach(x => x.disabled = true);
@@ -3709,10 +3748,12 @@ const Duelo = (() => {
     mostrar.forEach((d, id) => {
       const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
       const txt = d.estado === 'resuelto'
-        ? (d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)
+        ? (d.hab && d.hab.soloTirada && d.dano ? `🌩 ${d.hab.nombre}: ${_fmt(d.dano.crudo)} ${String(d.hab.soloTirada.etq || '').toLowerCase()} · ver`
+          : d.hab && d.hab.esquiva ? `${d.resultado === 'fallo' ? '🏃' : '🌩'} ${d.defensor.nombre}: ${d.resultado === 'fallo' ? 'salió del área' : 'sigue adentro'} · ver`
+          : d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)
           : `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`)
         : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
-        : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
+        : d.fase === 'dodge' ? (d.hab && d.hab.esquiva ? `🏃 ¿${d.defensor.nombre} esquiva? · ${d.hab.nombre}` : `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`)
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
         : ult ? `${d.hab ? '✨' : '⚔'} ${d.atacante.nombre} → ${d.defensor.nombre} · ${ult.txt}`
         : d.hab ? `✨ Ver ejecución: ${d.atacante.nombre} → ${d.defensor.nombre}` : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;

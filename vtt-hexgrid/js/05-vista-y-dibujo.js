@@ -1310,7 +1310,9 @@ function dibujarLienzo(){
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;
   if(typeof dibujarEfectosOnda === 'function' && dibujarEfectosOnda(z)) animando = true;   // 💥 la onda del Shockwave (js/94)
   if(typeof dibujarEfectosEscudoHumano === 'function' && dibujarEfectosEscudoHumano(z)) animando = true;   // 🛡 el lazo y el golpe repartido del Escudo humano (js/95)
-  if(typeof dibujarEfectosTransfusion === 'function' && dibujarEfectosTransfusion(z)) animando = true;   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
+  if(typeof dibujarEfectosTransfusion === 'function' && dibujarEfectosTransfusion(z)) animando = true;
+  if(typeof lluviaDibujar === 'function' && lluviaDibujar(z)) animando = true;   // 🌩 la lluvia de la Tormenta con su contador (js/118)
+  if(typeof areaPreviaDibujar === 'function') areaPreviaDibujar(z);   // 👁 el área siguiendo al mouse mientras se marca el centro (js/118)   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosGancho === 'function' && dibujarEfectosGancho(z)) animando = true;
   if(typeof dibujarEfectosBlinkTv === 'function' && dibujarEfectosBlinkTv(z)) animando = true;   // 📺 el Parpadeo como un televisor viejo (js/111)
   if(typeof dibujarEfectosCambio === 'function' && dibujarEfectosCambio(z)) animando = true;   // 🔄 Cambiar de lugar (js/107)   // 🪝 la cadena y el gancho de Arrastrar (js/96)

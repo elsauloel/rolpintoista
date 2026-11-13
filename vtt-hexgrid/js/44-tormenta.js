@@ -1,4 +1,5 @@
-/* 🌩 TORMENTA ARCANA (Mago, 2026-10-13, dueño; docs/clases-borrador.md). Un área (flor de diámetro 5) sin tirada: al lanzarla se tiran los
+/* 🌩 TORMENTA ARCANA (Mago, 2026-10-13, dueño; docs/clases-borrador.md). Desde el 2026-11-13 la lleva js/118 (de a uno: el d20 con el botón de
+   quien la lanza, la ronda de «¿Esquiva?», la lluvia con el contador y el daño); lo de abajo quedó para lo que se haya lanzado antes. Un área (flor de diámetro 5) sin tirada: al lanzarla se tiran los
    proyectiles (1d20) y cada uno cae al azar sobre uno de los que están adentro —rivales y aliados, menos quien la lanza y los caídos—. Cada
    sub-duelo de la cascada arranca en el dodge roll (`hab.soloDodge`, comun/duelo.js): quien logra salir no recibe nada; quien sigue adentro
    recibe sus proyectiles (k × 1d4), daño arcano directo a la vida (ni Defensa ni Defensa especial). A quien no le tocó ninguno no se le abre
@@ -17,9 +18,9 @@ function tormentaRepartir(hab, objetivos){
 // El daño de un objetivo: sus proyectiles (k × «cada»), directo a la vida.
 function tormentaHabDe(hab, tokenId){
   if(!hab || !hab.tormenta || !hab.tormenta.cuenta) return hab;
-  // (2026-10-26, la versión creep: «1d4+1» por proyectil → k d4 + k)
+  // (la versión creep: «1d4+1» → k d4 + 1)
   const k = Math.max(0, Math.round(num(hab.tormenta.cuenta[tokenId]))), m = String(hab.tormenta.cada || '1d4').match(/(\d*)d(\d+)(?:\s*\+\s*(\d+))?/i);
-  const fijo = m && m[3] ? k * num(m[3]) : 0;
+  const fijo = m && m[3] ? num(m[3]) : 0;   // (2026-11-13, dueño: «en realidad sería "nd4+1"»: el +1 una sola vez, no por proyectil)
   const formula = m ? `${k * (num(m[1]) || 1)}d${m[2]}${fijo > 0 ? '+' + fijo : ''}` : `${k}d4`;
   return {...hab, dano: {...(hab.dano || {}), formula, tipo: 'arcano', ignoraDef: true, directo: true}};
 }

@@ -116,6 +116,9 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Soltarse (dueño, 2026-11-13).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
+>   Escudo elemental y el Malviaje → quedan como están; Inamovible → al cuadro del duelo (hecho). Quedó preguntado Soltarse (¿queda con su cartel, o al
+>   cuadro del duelo? con ayuda se suman varias tiradas de un lado). Después: Confusión, la tirada extra de las zonas y las zonas una por una.
 > - [ ] **👀 Pruebas que tiene que ver el dueño (2026-10-30, dueño: «lo que tengo que ver yo, anotalo en pendiente para cuando esté en la compu»)** —
 >   detalle en `docs/pruebas-en-el-mapa.md`: el 💪 Empower desde juan (pagar, tirar en un duelo y dárselo a un aliado); ✨ levantar un arma con un clic
 >   en combate (en tu turno y fuera de él); 🤺 el desarme (el cartel, la ruleta, el duelo que vuelve) y un Warrior desarmando desde su cuenta; ⏬ la

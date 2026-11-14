@@ -933,6 +933,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     que se dispara al matar casi no se usa; vale igual para Sed de batalla). Vida 45, No2 6, Defensa 5, PdG 9, Dmg 11, Parry 8, Bloqueo 11. **Falta cargarlo.**
   - **Nivel 3 aprobado (dueño, 2026-11-14: «lo dejamos así»)**: atrib [10, 12, 7, 8, 2]; el Hacha del verdugo de la capital (Buena, 2 dados) en
     lugar de la de pueblo; Furia. Vida 50, No2 7, Defensa 5, PdG 9, daño 2d8 + 12, Parry 8, Bloqueo 12, Evasión 7. **Falta cargarlo.**
+  - **Nivel 4 aprobado (dueño, 2026-11-14: «el verdugo ok»)**: atrib [11, 13, 7, 9, 2]; los Guantes del verdugo (Buena: Crítico potente +5, Def +1,
+    Parry +1) en lugar de los de agarre; Golpe demoledor; Robustez. Vida 60, No2 7, Defensa 6, PdG 9, daño 2d8 + 13, Parry 10, Bloqueo 13. **Falta cargarlo.**
 - **R4 · Hunter · Rango** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): trampas y marcar a la presa; prepara el terreno y deja que el grupo
   cace. Ruta: nv1 **Disparo señalador** (rápida) · **Cepo del cazador** (lenta); nv2 Tiro que derriba + **Percepción aumentada**; nv3 Mina del
   cazador (el arco, de Buena); nv4 Cebo + **Puntería**; nv5 Abanico. **Nivel 1 aprobado**: Des 10 · Con 8 · Agi 7 · Fue 6 · Esp 2 → vida 40, 7 No2,

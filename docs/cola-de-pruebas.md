@@ -56,8 +56,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 😵 Un caído no esquiva ni recibe carteles de esquivar** (dueño, 2026-11-14: «al personaje caído no le tienen que aparecer ni
   siquiera notificaciones de esquivar ni nada»; lo vio el ayudante: uno en 0 de vida pudo arrastrar su token para terminar el dodge roll). Con 0 de
   vida (caído / inconsciente): la ronda de «¿Esquiva?» de la Tormenta y el Meteoro lo saltea sin preguntarle (sigue adentro, sin cartel), lo mismo
-  la fase de dodge roll de cualquier área y los otros dodge roll (Tronco de huída, el del arco); y no puede arrastrar su token para eso. Revisar que
-  tampoco le salgan otros carteles de defensa que no puede usar. Probar en el mapa con las dos cuentas.
+  la fase de dodge roll de cualquier área y los otros dodge roll (Tronco de huída, el del arco). **El token se puede seguir arrastrando** (dueño,
+  2026-11-14: «no debería haber restricciones para arrastrar el token, porque puede haber alguna circunstancia que lo requiera»): solo que arrastrarlo
+  no cuenta como dodge roll. Y **se le saltean los turnos mientras esté caído** (revisar que el orden de turnos ya lo haga). Revisar que tampoco le
+  salgan otros carteles de defensa que no puede usar. Probar en el mapa con las dos cuentas.
 - **⬜ en cola — 🧌 Cargar los esenciales aprobados y probarlos en el mapa** (dueño, 2026-11-14: «¿los estás poniendo en cola para probarlos en el
   mapa después?»).
   1. **Cargar** en `comun/creeps-esenciales.js` (con su prueba de números en `comun/pruebas.html`) lo aprobado y todavía sin cargar: **S3 Armero

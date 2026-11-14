@@ -85,7 +85,7 @@ const tokenIdDeObj = t => { for(const [id, x] of tokens) if(x === t) return id; 
 function inamovibleCartel(t, pct, que){
   const quien = nombreDe(t);
   return chanceCartel({clave: 'inamovible', icono: '🦶', titulo: 'Inamovible', mecanica: 'Inamovible', stat: 'inamovible', pct, t,
-    paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es ${chanceEtq(t, 'inamovible', 'Inamovible', pct)}: si sale, no se mueve.`},
+    paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es Inamovible: si sale, no se mueve.`},
     momento: `${quien} intenta no moverse (Inamovible)`,
     exito: {grande: '¡NO SE MUEVE!', chico: 'Inamovible', cronica: '…¡salió! No se mueve.', mesa: `🦶 ${quien}: Inamovible — no se mueve`},
     fallo: {grande: 'LO MUEVEN', chico: 'Inamovible no salió', cronica: '…no salió: lo mueven.', mesa: `🦶 ${quien}: Inamovible no salió — lo mueven`}});
@@ -146,7 +146,7 @@ async function recuperarseSiguiente(){
   try{
     const pct = chanceDe(t, 'recuperarse'), quien = nombreDe(t);
     const ok = await chanceCartel({clave: 'recuperarse', icono: '🦶', titulo: 'Recuperarse rápido', mecanica: 'Recuperarse rápido', stat: 'recuperarse', pct, t,
-      paso1: {titulo: `${quien} quedó ${nombre}`, texto: `${chanceEtq(t, 'recuperarse', 'Recuperarse rápido', pct)}: si sale, ${nombre} le dura 1 turno menos.`},
+      paso1: {titulo: `${quien} quedó ${nombre}`, texto: `Con Recuperarse rápido, si sale, ${nombre} le dura 1 turno menos.`},
       momento: `${quien} intenta sacarse de encima ${nombre} (Recuperarse rápido)`,
       exito: {grande: '¡SE RECUPERA!', chico: `${nombre}: 1 turno menos`, cronica: `…¡salió! ${nombre} le dura 1 turno menos.`, mesa: `🦶 ${quien}: Recuperarse rápido — ${nombre} le dura 1 turno menos`},
       fallo: {grande: 'NO ALCANZÓ', chico: `${nombre} dura lo de siempre`, cronica: `…no salió: ${nombre} dura lo de siempre.`, mesa: `🦶 ${quien}: Recuperarse rápido no salió — ${nombre} dura lo de siempre`}});

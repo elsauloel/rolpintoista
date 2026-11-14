@@ -165,7 +165,7 @@ async function oporRetirada(t, r, p){
   const sale = await chanceCartel({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', mecanica: 'Retirada limpia', stat: 'retirada', pct, t,
     paso1: {titulo: `${p.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: pct >= 100
       ? 'Tus piernas te sacan siempre del cuerpo a cuerpo: te alejás sin darle ataque de oportunidad.'
-      : `${chanceEtq(t, 'retirada', 'Retirada limpia', pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
+      : `Con Retirada limpia, si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
     momento: `${nomT} intenta una Retirada limpia de ${nomR}`,
     exito: {grande: '¡RETIRADA LIMPIA!', chico: 'Seguís tu camino sin ataque de oportunidad', cronica: '…¡se fue limpio! Sin ataque de oportunidad.',
       mesa: `⚔ ${nomT} se alejó de ${nomR} con Retirada limpia: sin ataque de oportunidad`},

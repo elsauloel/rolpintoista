@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261112sind2"></script>
+<script src="combatiente.js?v=20261114cha"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261111sob2"></script>
+<script src="ficha-resumen.js?v=20261114cha"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -8015,6 +8015,15 @@ prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/j
   igual([c0.texto, c0.final, c4.texto, c4.final, cd.texto, ce.texto, ce.final, ci.final],
     ['9 de daño − Defensa 0 = 9 a la vida', 9, '9 de daño − Defensa 4 = 5 a la vida', 5, '9 de daño (ignora la Defensa) = 9 a la vida',
      '9 de daño − Defensa 2 = 7 − Escudo especial (escudo) 5 = 2 a la vida', 2, 0]);
+});
+prueba('🎲 Carteles de chance: de qué pieza sale y con qué número (2026-11-14, Combatiente.chanceSale / chanceEtiqueta)', () => {
+  igual([Combatiente.chanceSale(33), Combatiente.chanceSale(50), Combatiente.chanceSale(17), Combatiente.chanceSale(20), Combatiente.chanceSale(100), Combatiente.chanceSale(0),
+    Combatiente.chanceEtiqueta('Reflejos de mangosta', 'Botas de zapador', 33), Combatiente.chanceEtiqueta('Inamovible', '', 50), Combatiente.chanceEtiqueta('Retirada limpia', 'X', 100)],
+    ['sale con 5 o 6', 'sale con 4, 5 o 6', 'sale con 6', 'sale con 9 o 10', 'sale siempre', '',
+     'Reflejos de mangosta (Botas de zapador, 33 %)', 'Inamovible (50 %)', 'Retirada limpia (X, siempre)']);
+  const S = FichaGuardado.normalizar({inventario: [{id: 'b1', nombre: 'Botas de zapador', tipoItem: 'pies', equipado: true, mods: [{stat: 'reflejos', val: 33}]}]}).S;
+  const r = FichaResumen.resumen(S, {});
+  igual([r.reflejos, (r.chanceDe || {}).reflejos, (r.chanceDe || {}).retirada], [33, 'Botas de zapador', undefined]);
 });
 prueba('🦶 Inamovible al cuadro del duelo (2026-11-12, vtt-hexgrid/js/21): una chance sin rival, que no pone estado', async () => {
   const src = await (await fetch('../vtt-hexgrid/js/21-chance.js', {cache: 'no-store'})).text();

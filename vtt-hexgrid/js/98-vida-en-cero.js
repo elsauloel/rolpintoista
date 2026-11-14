@@ -65,6 +65,13 @@ function tokenCaido(t){
   if(String(t.fichaId).includes(SEP_INVOCACION)) return num(r.hp) <= 0 && !r.dormida;
   return num(r.hp) <= 0 || r.muerto === true;
 }
+// 💀 ¿Está fuera de combate (0 de vida)? Por id: lo de la iniciativa (creep derrotado, personaje en 0) o tokenCaido (también una invocación).
+// (2026-11-14, dueño: a alguien en 0 de vida no se lo ataca, y no da ni recibe ataques de oportunidad.)
+function tokenFueraDeCombate(id){
+  const t = tokens.get(id);
+  if(!t) return false;
+  return !!((typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) || tokenCaido(t));
+}
 function maxVidaDe(t){
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? num(sc.hpMax) : 0; }
   const r = ((vinculo(t) || {}).resumen) || {};

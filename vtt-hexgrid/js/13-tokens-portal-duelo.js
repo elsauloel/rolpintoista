@@ -952,6 +952,9 @@ function dueloElegirObjetivoMapa(msg){
   if(msg.objetivoFijo && tokens.get(msg.objetivoFijo)){
     const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio), t = tokens.get(msg.objetivoFijo);
     if(!mio0){ toast(`${(ataque && ataque.habNombre) || 'Habilidad'}: no encontré tu token en este mapa`); return; }
+    { const obj0 = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';   // 💀 un caído no se ataca (salvo lo que es para un aliado)
+      if(obj0 !== 'aliado' && !habEsCura(ataque && ataque.hab) && typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(msg.objetivoFijo)){
+        toast(`💀 ${nombreDe(t)} está caído: no se lo puede atacar.`); if(msg.alCancelar) msg.alCancelar(); return; } }
     (async () => {
       // 💥 La carrera del Takle (2026-10-26, visto en el mapa: con el botón ✨ el objetivo viene elegido y se salteaba): corre hasta quedar pegado.
       const conSalto0 = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
@@ -974,7 +977,9 @@ function dueloElegirObjetivoMapa(msg){
   const califica = t => { const r = objetivoCalifica(ataque, t); return !r || r.ok; };   // 🎯 una habilidad con condición: brillan solo los que califican
   const esCura = habEsCura(ataque && ataque.hab), idDe = t => { for(const [id, x] of tokens) if(x === t || (x.fichaId === t.fichaId && x.tipo === t.tipo && x.col === t.col && x.fila === t.fila)) return id; return t.id; };
   const caido = t => esCura && iniciativaFueraDeJuego(t.id || idDe(t));   // 💚 una curación: el caído ni brilla ni se puede elegir (dueño, 2026-10-23)
-  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t) && !caido(t);
+  // 💀 A alguien en 0 de vida no se lo ataca (dueño, 2026-11-14): ni brilla ni se puede elegir, salvo lo que es para un aliado (curas, revivir…).
+  const atacaCaido = t => !esCura && objetivoTipo !== 'aliado' && typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(t.id || idDe(t));
+  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t) && !caido(t) && !atacaCaido(t);
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
@@ -1006,6 +1011,7 @@ function dueloElegirObjetivoMapa(msg){
       if(!cand.length){ toast([...tokens.values()].some(t => t.col === h.col && t.fila === h.fila && etereoDe(t)) ? '👁 Es etéreo: no se le puede hacer nada' : 'Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
       if(caido(t)){ toast(`💚 ${nombreDe(t)} está caído: una curación no lo levanta. Elegí otro.`); pedir(); return; }
+      if(atacaCaido(t)){ toast(`💀 ${nombreDe(t)} está caído: no se lo puede atacar. Elegí otro.`); pedir(); return; }
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival.${typeof floripondioDe === 'function' && floripondioDe(todos.find(propio)) ? ' 🌺 Pero estás malviajando: lo ves como a un enemigo.' : ''} ¿Igual atacarlo?`;
         if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }

@@ -10,7 +10,7 @@
 async function trampaReflejosAntes(tokenId, t, el){
   const quien = t.oculto ? 'Alguien' : nombreDe(t), creep = t.tipo === 'creep';
   const dif = Math.max(1, Math.round(num(el.trampaDetectar)) || 6);
-  const pct = chanceDe(t, 'reflejos'), d = Combatiente.chanceDado(pct);
+  const pct = chanceDe(t, 'reflejos'), d = Combatiente.chanceDado(pct), etqR = chanceEtq(t, 'reflejos', 'Reflejos de mangosta', pct);   // «Reflejos de mangosta (Botas de zapador, 33 %)»
   const titulo = `${quien} pisó una trampa`;
   const momentoId = await momentoAbrir({tipo: 'reflejos', icono: '🐍', titulo, estado: 'paso', datos: {centro: true, lineas: ['Reflejos de mangosta: intenta zafar…']}});
   const lineas = [];
@@ -37,13 +37,13 @@ async function trampaReflejosAntes(tokenId, t, el){
   // 1 · La chance de Reflejos.
   if(d){
     const nec = d.caras - d.exitos + 1;
-    const v = await preguntar([{titulo: 'Reflejos de mangosta', texto: `${Combatiente.chanceTexto(pct)}: con ${nec} o más en 1d${d.caras}, reaccionás a tiempo.`, espera: true}],
+    const v = await preguntar([{titulo: etqR, texto: `1d${d.caras}: ${Combatiente.chanceSale(pct)}. Si sale, reaccionás a tiempo.`, espera: true}],
       [{texto: `🎲 Tirar Reflejos (1d${d.caras})`, valor: 'tirar'}]);
     if(v !== 'tirar'){ cronica('no lo intentó: la trampa se dispara', true); AvisoCombate.cerrar(); return null; }
     const r = tirarDados('1d' + d.caras);
-    await publicar(`Reflejos de mangosta · ${Combatiente.chanceTexto(pct)}`, r);
+    await publicar(etqR, r);
     const ok = r.total >= nec;
-    pasos.push({titulo: 'Reflejos de mangosta', texto: `1d${d.caras} = ${r.total} (con ${nec} o más) → ${ok ? 'reacciona a tiempo' : 'no reacciona: la trampa se dispara'}`});
+    pasos.push({titulo: etqR, texto: `1d${d.caras} = ${r.total} (${Combatiente.chanceSale(pct)}) → ${ok ? 'reacciona a tiempo' : 'no reacciona: la trampa se dispara'}`});
     cronica(`Reflejos: ${r.total} en 1d${d.caras} → ${ok ? 'reacciona' : 'no reacciona'}`);
     if(!ok) return seDispara();
   }

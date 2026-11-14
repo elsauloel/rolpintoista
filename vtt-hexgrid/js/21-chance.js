@@ -18,6 +18,24 @@ function chanceDe(t, stat){
   const f = fichasPub.get(t.fichaId);
   return Combatiente.chancePct(f && f.resumen && f.resumen[CHANCE_RESUMEN[stat] || stat]);
 }
+// 🎲 De qué pieza sale la chance (2026-11-13, dueño: «¿el valor de "5 o más" de dónde sale?»): un personaje, lo que publica su ficha (`resumen.chanceDe`);
+// un creep (el GM), las piezas y pasivas que lo dan. '' si no se sabe (una ficha que todavía no se volvió a guardar, una invocación).
+function chanceFuente(t, stat){
+  try{
+    if(!t || !t.fichaId) return '';
+    if(t.tipo === 'creep'){
+      const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null;
+      if(!sc) return '';
+      const da = x => (x && Array.isArray(x.mods) ? x.mods : []).some(m => m && m.stat === stat && num(m.val) > 0);
+      return [...(sc.equipo || []).filter(i => i && i.equipado !== false && da(i)), ...(sc.pasivas || []).filter(da)].map(x => String(x.nombre || '')).filter(Boolean).slice(0, 3).join(' + ');
+    }
+    if(String(t.fichaId).includes(SEP_INVOCACION)) return '';
+    const f = fichasPub.get(t.fichaId), cd = f && f.resumen && f.resumen.chanceDe;
+    return cd && cd[stat] ? String(cd[stat]) : '';
+  }catch(e){ return ''; }
+}
+// «Reflejos de mangosta (Botas de zapador, 33 %)».
+const chanceEtq = (t, stat, nombre, pct) => Combatiente.chanceEtiqueta(nombre, chanceFuente(t, stat), pct);
 const chanceMesa = texto => mesaLinea(texto);   // la línea común de la Mesa (comun/mesa.js)
 /* El cartel de una chance → Promise<bool> (salió o no). o = {clave, icono, titulo (del cartel), mecanica (nombre para la Mesa), pct, t (el token),
    paso1: {titulo, texto}, momento: el título para la Crónica, exito: {grande, chico, cronica, mesa}, fallo: {grande, chico, cronica, mesa},
@@ -25,6 +43,7 @@ const chanceMesa = texto => mesaLinea(texto);   // la línea común de la Mesa (
 async function chanceCartel(o){
   const pct = Combatiente.chancePct(o.pct), d = Combatiente.chanceDado(pct), quien = nombreDe(o.t);
   if(pct <= 0) return false;
+  const etq = o.stat ? chanceEtq(o.t, o.stat, o.mecanica, pct) : `${o.mecanica} · ${Combatiente.chanceTexto(pct)}`;   // «Retirada limpia (Botas de…, 33 %)»
   const necesita = d ? d.caras - d.exitos + 1 : 0;
   const momentoId = await momentoAbrir({tipo: 'chance', icono: o.icono, titulo: o.momento, estado: 'tirando', datos: {centro: true}});
   const base = {clave: o.clave, icono: o.icono, titulo: o.titulo};
@@ -43,13 +62,13 @@ async function chanceCartel(o){
       if(listo) return;
       const tr = tirarDados('1d' + d.caras);
       if(!tr) return;
-      AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: `Rodando el d${d.caras}…`, espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
-      try{ await mesaPublicar(`${o.mecanica} · ${Combatiente.chanceTexto(pct)}`, {formula: tr.formula, rolls: tr.rolls, mod: tr.mod, total: tr.total, quien, ...(o.t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
+      AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: etq, texto: `Rodando el d${d.caras}…`, espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
+      try{ await mesaPublicar(etq, {formula: tr.formula, rolls: tr.rolls, mod: tr.mod, total: tr.total, quien, ...(o.t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
       await new Promise(res => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(res) : res());
       const ok = tr.total >= necesita;
-      final(ok, {titulo: 'Tirada', texto: `Sacaste ${tr.total} en el d${d.caras} (${ok ? 'salía' : 'salías'} con ${necesita} o más).`});
+      final(ok, {titulo: etq, texto: `1d${d.caras} = ${tr.total} (${Combatiente.chanceSale(pct)}) → ${ok ? 'salió' : 'no salió'}`});
     };
-    AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: `1d${d.caras}: sale con ${necesita} o más.`, espera: true}],
+    AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: etq, texto: `1d${d.caras}: ${Combatiente.chanceSale(pct)}.`, espera: true}],
       botones: [{texto: `🎲 Tirar 1d${d.caras}`, alClic: tirar}],
       alCerrar: () => { if(listo) return; listo = true; momentoActualizar(momentoId, {estado: 'listo', resultado: '…no la intentó.'}); fin(false); }});
   });
@@ -65,32 +84,32 @@ async function chanceCartel(o){
 const tokenIdDeObj = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };
 function inamovibleCartel(t, pct, que){
   const quien = nombreDe(t);
-  return chanceCartel({clave: 'inamovible', icono: '🦶', titulo: 'Inamovible', mecanica: 'Inamovible', pct, t,
-    paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es Inamovible ${Combatiente.chanceTexto(pct)}: si sale, no se mueve.`},
+  return chanceCartel({clave: 'inamovible', icono: '🦶', titulo: 'Inamovible', mecanica: 'Inamovible', stat: 'inamovible', pct, t,
+    paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es ${chanceEtq(t, 'inamovible', 'Inamovible', pct)}: si sale, no se mueve.`},
     momento: `${quien} intenta no moverse (Inamovible)`,
     exito: {grande: '¡NO SE MUEVE!', chico: 'Inamovible', cronica: '…¡salió! No se mueve.', mesa: `🦶 ${quien}: Inamovible — no se mueve`},
     fallo: {grande: 'LO MUEVEN', chico: 'Inamovible no salió', cronica: '…no salió: lo mueven.', mesa: `🦶 ${quien}: Inamovible no salió — lo mueven`}});
 }
 // La chance de Inamovible como efecto del cuadro del duelo (puro: lo prueba comun/pruebas.html). null = sin tirada (0 % o 100 %).
-function inamovibleEfecto(pct, que, quien){
+function inamovibleEfecto(pct, que, quien, fuente){
   pct = Combatiente.chancePct(pct);
   const d = Combatiente.chanceDado(pct);
   if(pct <= 0 || pct >= 100 || !d) return null;
   return {nombre: 'Inamovible', caras: d.caras, exitos: d.exitos, firme: true,
-    detalle: `${que || 'Lo quieren mover'}. ${quien} es Inamovible ${Combatiente.chanceTexto(pct)}: si sale, no se mueve.`.slice(0, 200)};
+    detalle: `${que || 'Lo quieren mover'}. ${quien} es ${Combatiente.chanceEtiqueta('Inamovible', fuente, pct)}: ${Combatiente.chanceSale(pct)} en 1d${d.caras}; si sale, no se mueve.`.slice(0, 200)};
 }
 async function inamovibleSale(t, pct, que){
   pct = Combatiente.chancePct(pct);
   if(pct <= 0) return false;
   const quien = nombreDe(t), id = tokenIdDeObj(t);
-  const ef = inamovibleEfecto(pct, que, quien);
+  const ef = inamovibleEfecto(pct, que, quien, chanceFuente(t, 'inamovible'));
   if(!ef || !id || t.oculto || typeof contiendaDuelo !== 'function' || typeof yoDeToken !== 'function') return inamovibleCartel(t, pct, que);
   const c = await contiendaDuelo({yo: yoDeToken(id), deTokenId: id, aTokenId: id, esperar: true, extra: {secundario: true}, hab: {
     nombre: `Inamovible: ${que || 'lo quieren mover'}`.slice(0, 60), objetivo: 'uno mismo', tira: null, contra: [], dano: null, efectos: [ef],
-    detalle: `${Combatiente.chanceTexto(pct)}: lo tira quien maneja a ${quien}.`.slice(0, 200)}});
+    detalle: `${chanceEtq(t, 'inamovible', 'Inamovible', pct)}: lo tira quien maneja a ${quien}.`.slice(0, 200)}});
   if(c.falla) return inamovibleCartel(t, pct, que);   // el cuadro no se pudo abrir: el cartel de antes
   if(c.tiempo || c.aMano || c.cancelado){
-    mesaLinea(`🦶 ${quien}: Inamovible ${Combatiente.chanceTexto(pct)} quedó sin tirar — lo mueven; si salía, devolvelo a mano`, 'recordatorio');
+    mesaLinea(`🦶 ${quien}: ${chanceEtq(t, 'inamovible', 'Inamovible', pct)} quedó sin tirar — lo mueven; si salía, devolvelo a mano`, 'recordatorio');
     return false;
   }
   return chancesEntraron(c).includes('Inamovible');   // (el cuadro ya lo dejó en la Mesa: «¡Inamovible! No lo mueven.» o «No le entró…»)
@@ -126,8 +145,8 @@ async function recuperarseSiguiente(){
   recupOcupado = true;
   try{
     const pct = chanceDe(t, 'recuperarse'), quien = nombreDe(t);
-    const ok = await chanceCartel({clave: 'recuperarse', icono: '🦶', titulo: 'Recuperarse rápido', mecanica: 'Recuperarse rápido', pct, t,
-      paso1: {titulo: `${quien} quedó ${nombre}`, texto: `Recuperarse rápido ${Combatiente.chanceTexto(pct)}: si sale, ${nombre} le dura 1 turno menos.`},
+    const ok = await chanceCartel({clave: 'recuperarse', icono: '🦶', titulo: 'Recuperarse rápido', mecanica: 'Recuperarse rápido', stat: 'recuperarse', pct, t,
+      paso1: {titulo: `${quien} quedó ${nombre}`, texto: `${chanceEtq(t, 'recuperarse', 'Recuperarse rápido', pct)}: si sale, ${nombre} le dura 1 turno menos.`},
       momento: `${quien} intenta sacarse de encima ${nombre} (Recuperarse rápido)`,
       exito: {grande: '¡SE RECUPERA!', chico: `${nombre}: 1 turno menos`, cronica: `…¡salió! ${nombre} le dura 1 turno menos.`, mesa: `🦶 ${quien}: Recuperarse rápido — ${nombre} le dura 1 turno menos`},
       fallo: {grande: 'NO ALCANZÓ', chico: `${nombre} dura lo de siempre`, cronica: `…no salió: ${nombre} dura lo de siempre.`, mesa: `🦶 ${quien}: Recuperarse rápido no salió — ${nombre} dura lo de siempre`}});

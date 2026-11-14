@@ -65,10 +65,11 @@ function oportunidadCorte(t, id, ruta){
   if(modoMapa !== 'combate') return null;
   const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(id) : null;   // 🏃 el dodge roll: no a quien lo originó (js/13, 2026-11-14)
   if(dop && dop.todos) return null;   // 💨 un movimiento libre (Hit and run…): a nadie   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
-  if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
+  if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;
+  if(typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(id)) return null;   // 💀 en 0 de vida no da oportunidad (lo arrastren o se mueva; dueño, 2026-11-14)   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
   oportunidadSecretas = [];
-  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !(dop && dop.excluir && rid === dop.excluir) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid), escondido: !oporRivalVisible(r)}));
+  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !(dop && dop.excluir && rid === dop.excluir) && !r.bajoTierra && !etereoDe(r) && !(typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(rid)) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid), escondido: !oporRivalVisible(r)}));
   const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has(vigClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
   if(!ids.length && !vig.length) return null;
   for(let i = 1; i < ruta.length; i++){
@@ -99,9 +100,10 @@ function oporNegadaAvisar(t, id, ruta, motivo, excluir, solo){   // `solo`: el �
   try{
     if(modoMapa !== 'combate' || !t || !Array.isArray(ruta) || ruta.length < 2) return [];
     if(t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t)) return [];   // ahí tampoco había oportunidad
+    if(typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(id)) return [];   // 💀 en 0 de vida tampoco
     const rivales = new Set(rivalesDe(t)), negados = [];
     for(const [rid, r] of tokens){
-      if(rid === id || rid === excluir || (solo && rid !== solo) || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || !oporRivalVisible(r) || !oporPuede(r)) continue;
+      if(rid === id || rid === excluir || (solo && rid !== solo) || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || (typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(rid)) || !oporRivalVisible(r) || !oporPuede(r)) continue;
       if(oportunidadUsadas.has(oporClave(id, rid))) continue;   // ya se le ofreció por esta misma salida y siguen pegados (no es un tope por ronda: el único límite son los No2)
       const c = {col: r.col, fila: r.fila};
       if(ruta.some((b, i) => i > 0 && distanciaHex(ruta[i - 1], c) === 1 && distanciaHex(b, c) !== 1)) negados.push([rid, r]);
@@ -160,10 +162,10 @@ async function oporRetirada(t, r, p){
   if(pct <= 0) return false;
   const nomT = nombreDe(t), nomR = nombreDe(r);
   // El cartel común de las chances (js/21: cartel, dados, resultado, Crónica y Mesa).
-  const sale = await chanceCartel({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', mecanica: 'Retirada limpia', pct, t,
+  const sale = await chanceCartel({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', mecanica: 'Retirada limpia', stat: 'retirada', pct, t,
     paso1: {titulo: `${p.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: pct >= 100
       ? 'Tus piernas te sacan siempre del cuerpo a cuerpo: te alejás sin darle ataque de oportunidad.'
-      : `Retirada limpia ${Combatiente.chanceTexto(pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
+      : `${chanceEtq(t, 'retirada', 'Retirada limpia', pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
     momento: `${nomT} intenta una Retirada limpia de ${nomR}`,
     exito: {grande: '¡RETIRADA LIMPIA!', chico: 'Seguís tu camino sin ataque de oportunidad', cronica: '…¡se fue limpio! Sin ataque de oportunidad.',
       mesa: `⚔ ${nomT} se alejó de ${nomR} con Retirada limpia: sin ataque de oportunidad`},

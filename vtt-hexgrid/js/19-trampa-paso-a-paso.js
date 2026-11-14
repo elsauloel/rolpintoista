@@ -79,8 +79,9 @@ function trampaPasoQueFalta(dt){
     const pct = dt.inamovible, siempre = num(pct) >= 100;
     const que = dt.fase === 'firme-portal' ? 'el portal no se lo lleva' : 'no sale despedido';
     const d = Combatiente.chanceDado(pct), necesita = d ? d.caras - d.exitos + 1 : 0;
+    const etqI = typeof chanceEtq === 'function' ? chanceEtq(tokens.get(dt.tokenId), 'inamovible', 'Inamovible', pct) : `Inamovible ${Combatiente.chanceTexto(pct)}`;   // «Inamovible (Botas de ancla, 33 %)»
     return {titulo: 'Inamovible',
-      texto: siempre ? `Inamovible (siempre): ${que}.` : `Inamovible ${Combatiente.chanceTexto(pct)}: con ${necesita} o más en 1d${d ? d.caras : 6}, ${que}.`,
+      texto: siempre ? `${etqI}: ${que}.` : `${etqI} · 1d${d ? d.caras : 6}: ${Combatiente.chanceSale(pct)}. Si sale, ${que}.`,
       boton: siempre ? '▶ Seguir' : `🎲 Tirar Inamovible (1d${d ? d.caras : 6})`, espera: `${dt.quien} tira Inamovible…`};
   }
   if(dt.fase === 'empuje') return {titulo: 'Sale despedido', texto: 'El muro sale justo donde está parado: tira 1d6 para ver a qué casilla vecina sale despedido (las 6 vecinas en ronda, la 1 hacia el frente del muro; si le toca una ocupada, la siguiente libre). Después, 1d6 de daño directo.',
@@ -685,21 +686,21 @@ async function trampaTirar(id, mano){
 // La chance de Inamovible (pies, 2026-10-04): si sale, no lo mueve (ni el muro ni el portal). Con 100 % sale siempre, sin tirar.
 async function trampaPasoChance(id, dt, fase, mano){
   const pct = Combatiente.chancePct(dt.inamovible), d = Combatiente.chanceDado(pct);
-  const mec = 'Inamovible';
+  const mec = 'Inamovible', etqI = typeof chanceEtq === 'function' ? chanceEtq(tokens.get(dt.tokenId), 'inamovible', mec, pct) : `${mec} · ${Combatiente.chanceTexto(pct)}`;
   let ok = pct >= 100, texto = `${mec} (siempre)`;
   if(d){
     const r = trampaDado('1d' + d.caras, mano);
     if(!r.aMano){
-      try{ await mesaPublicar(`${mec} · ${Combatiente.chanceTexto(pct)} (${dt.nombreT})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: dt.quien, ...(dt.creep ? {desde: 'gm'} : {})}); }catch(err){}
+      try{ await mesaPublicar(`${etqI} (${dt.nombreT})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: dt.quien, ...(dt.creep ? {desde: 'gm'} : {})}); }catch(err){}
       await trampaEsperarDados();
     }
     const necesita = d.caras - d.exitos + 1;
     ok = r.total >= necesita;
-    texto = `1d${d.caras} = ${r.total}${r.aMano ? ' (✋ a mano)' : ''} (con ${necesita} o más)`;
+    texto = `1d${d.caras} = ${r.total}${r.aMano ? ' (✋ a mano)' : ''} (${Combatiente.chanceSale(pct)})`;
   }
   const res = fase === 'firme-portal' ? (ok ? 'no se mueve: el portal no se lo lleva' : 'no alcanzó: el portal se lo lleva')
     : (ok ? 'no se mueve: el muro no lo despide' : 'no alcanzó: sale despedido');
-  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: mec, texto: `${texto} → ${res}`}]};
+  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: etqI, texto: `${texto} → ${res}`}]};
   if(fase === 'firme-portal'){
     sig.firmePortal = ok ? 'si' : 'no';
     sig.fase = ok ? trampaFaseSiguiente(sig, 'portal') : 'portal';

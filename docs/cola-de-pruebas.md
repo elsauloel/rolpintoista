@@ -111,13 +111,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Los errores 400 eran reintentos de transacciones de Firebase («Commit failed-precondition»: dos pantallas escribiendo el mismo documento a la vez);
   Firebase reintenta solo y la escritura entra (verificado: el Derribar y la Sanguijuela llegaron igual). No se repitieron con Derribar sobre un
   personaje. (2) Abrojos, Cordón oculto y Polvo cegador ya no dicen «del pícaro» sino «de quien los puso / lo tendió / las escondió».
-- **⬜ en cola — 💀 A alguien en 0 de vida no se lo ataca** (dueño, 2026-11-14: «corregirlo como sugerís»). Un token en 0 de vida (caído) no se
+- **✅ hecho (2026-11-14) — 💀 A alguien en 0 de vida no se lo ataca** (dueño, 2026-11-14: «corregirlo como sugerís»). Un token en 0 de vida (caído) no se
   puede elegir como objetivo de un ataque ni de una habilidad dirigida contra un rival: si se intenta, aviso «está caído» y no se abre el duelo (sin
   «Elegí cómo te defendés»). Tampoco da ni recibe ataques de oportunidad (ni cuando alguien lo arrastra al lado de rivales). Curas y lo que lo levanta
   (revivir, Ankh, Pacto…) siguen funcionando. Probar en el mapa con las dos cuentas.
-- **⬜ en cola — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
+  *Resultado:* `tokenFueraDeCombate(id)` (js/98: iniciativa o vida en 0, también invocaciones). Al elegir objetivo (js/13) un caído no brilla y, si se lo
+  toca, «💀 X está caído: no se lo puede atacar. Elegí otro.» (también con el objetivo ya elegido); lo que es para un aliado o una cura sigue igual. El
+  ataque de oportunidad (js/17) no lo da ni lo recibe un caído (ni el aviso de oportunidad negada). El Barrido y las áreas ya lo salteaban. Probado en el
+  mapa con las dos cuentas: el GM no pudo elegir a Prueba Uno en 0; Prueba Uno en 0 se alejó del Verdugo pegado sin oportunidad; Prueba Uno vivo se
+  alejó del Verdugo en 0 sin oportunidad (capturas `scratchpad/chance-caido/01…09`).
+- **✅ hecho (2026-11-14) — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.
+  *Resultado:* `Combatiente.chanceSale` («sale con 5 o 6») y `chanceEtiqueta` («Reflejos de mangosta (Botas de zapador, 33 %)»); la ficha publica de qué
+  pieza sale cada chance (`resumen.chanceDe`: Retirada limpia, Inamovible, Recuperarse rápido, Reflejos) y el GM la saca del equipo y las pasivas del
+  creep (`chanceFuente`, js/21). Cambiados: el cartel común de chances (Retirada, Inamovible, Recuperarse), Reflejos (js/23), Inamovible en las trampas
+  (js/19) y en el cuadro del duelo, y las líneas de la Mesa. Probado en el mapa: Retirada limpia (Bombacha de gaucho matrero, 50 %) · «1d6 = 2 (sale con
+  4, 5 o 6) → no salió»; Reflejos de mangosta (Botas de zapador, 33 %) · «1d6 = 4 (sale con 5 o 6)». Una ficha que no se volvió a guardar todavía no
+  publica la pieza: sale «(33 %)» sin nombre hasta que se guarde. Capturas `scratchpad/chance-caido/41…58`.
 - **✅ hecho — ⚡ Varita de chispa eléctrica: 20 % de Parálisis a todos los que toca** (dueño, 2026-11-12: «ponele 20 % a
   todos los que toca, el primero y los saltos»). Antes: 25 % al primero; los saltos, solo daño. Ahora 20 % (9–10 en d10) al primero, en los efectos
   del duelo, y a cada salto, cada uno en su cuadro del duelo de a uno (`cadena.efectos`, como la Varita del relámpago), lo tira quien la usa; en el agua,

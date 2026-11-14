@@ -172,6 +172,11 @@ const FichaResumen = (() => {
       wildcards: Math.max(0, Math.round(n(S.meta && S.meta.wildcards))),   // 🃏 (2026-10-15): el mapa muestra la carta y prende el 🪙
       pacto: !!(S.meta && S.meta.pacto),   // 😇 (2026-10-28): el botón de arriba del mapa
       moneda: [...(S.cinturon || []), ...(S.inventario || [])].some(i => i && (i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || ''))) && n(i.unidades) > 0 && !i.reservado && !i.enMesa),
+      // 🎲 De qué pieza (o pasiva, o estado) sale cada chance de los pies y las piernas (2026-11-13): el mapa lo muestra en el cartel («Botas de zapador, 33 %»).
+      ...(() => { const ms = FichaCalculo.modsDe(S), o = {};
+        ['retirada', 'inamovible', 'recuperarse', 'reflejos'].forEach(k => { const f = (ms[k] || []).filter(m => num(m.val) > 0).map(m => String(m.origen || '').slice(0, 40)).filter(Boolean);
+          if(f.length) o[k] = f.slice(0, 3).join(' + '); });
+        return Object.keys(o).length ? {chanceDe: o} : {}; })(),
       pisadaAtenta: n(c.final.pisadaatenta) > 0 || !!desarmaTrampasDe(S), inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
       // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.

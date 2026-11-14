@@ -602,6 +602,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     Escarpines de piel de cururú; Sanguijuela; Puntería arcana. Vida 45, No2 7, SP 44 (7 por turno), Defensa 3, Def.Esp 2, PdG.Esp 16, Ef.Esp 14.
     Pedido junto (dueño): **la Sanguijuela muerde de nuevo al empezar el turno del afectado** (1d6, cura la mitad de lo que entró, para arriba) —
     detalle en la cola de programación. **Falta cargarlo** en `comun/creeps-esenciales.js`.
+  - **Nivel 3 aprobado (dueño, 2026-11-14: «el resto para ladrón de fuerza está bien»)**: atrib [9, 2, 8, 5, 15]; la varita de Buena: la
+    **Varita sanguijuela, que pasa a llamarse «Varita chupasangre»** (dueño, mismo día; mismo id, renombrarla en `comun/catalogo.js` y donde se
+    nombre) en lugar de la Varita arcana; Mal de ojo (Flash, 5 SP; 10 en turno ajeno). Vida 45, No2 8, SP 47 (7), Defensa 3, Def.Esp 2, PdG.Esp 17,
+    Ef.Esp 15, Evasión 8. **Falta cargarlo** (y el cambio de nombre).
 
 - **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
   va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):

@@ -12,13 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 😜 Provocar de los creeps pasa a llamarse «¡Tu vieeeeja! 😜»** (dueño, 2026-11-14: «dejar provocar y le vamos a cambiar el nombre
+- **✅ hecho (2026-11-14) — 😜 Provocar de los creeps pasa a llamarse «¡Tu vieeeeja! 😜»** (dueño, 2026-11-14: «dejar provocar y le vamos a cambiar el nombre
   en la versión para creeps»). Solo la habilidad de creep (`comun/skills-creep-base.js`); el **Taunt** de la clase Tanque de los jugadores no cambia.
   Mismo funcionamiento (PdG.Esp + nivel contra la Res.Mt, Provocado 2 turnos, Desafiante). Renombrar en todos los creeps que la usan
   (`comun/creeps-esenciales.js` y donde se nombre: etiquetas, `APLICA`, pruebas, docs vigentes) y que un creep ya guardado en Firebase con «Provocar»
   la siga encontrando (alias del nombre viejo, si el código busca por nombre). Ojo: en la biblioteca de Firebase hay otra, «¡Tu vieeeja!» (tres e,
   la subió el dueño el 2026-10-16 para el escudero kobold: tira Fuerza contra Res.Esp) — no tocarla; avisar si los nombres chocan en algún lado.
   Probar en el mapa que un creep la usa y se ve el nombre nuevo (capturas).
+  *Resultado:* renombrada en `comun/skills-creep-base.js` (y su etiqueta), en los 13 usos de `comun/creeps-esenciales.js` y en `comun/pruebas.html`; un
+  creep guardado con «Provocar» se renombra solo al cargarse (`Combatiente.migrarLuzSanadora`, `RENOMBRES_LUZ`; la puesta al día de su tirada acepta los
+  dos nombres). El Taunt de clase y la «¡Tu vieeeja!» de la biblioteca no se tocaron (los nombres no chocan: tres e contra cuatro y el emoji). Probado
+  en el mapa (mapa propio, borrado después): un Escudero nuevo y uno guardado con «Provocar» muestran «¡Tu vieeeeja! 😜» en sus Acciones, y al
+  Ejecutar se ve en el cartel de elegir objetivo y en la Mesa. 868 pruebas en verde.
 
 - **✅ hecho (2026-11-13) — 🌩 Tormenta arcana: la ronda de a uno** (dueño, 2026-11-13, probándola: el cuadro del duelo tapaba el cartelito del dodge roll).
   La secuencia:

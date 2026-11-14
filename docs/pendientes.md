@@ -139,6 +139,8 @@
 >   al GM; frenado a mitad de camino y dejado pasar → salió (antes: «sigue adentro»); con 0 No2 → esquivó y quedó en −2; con −1 → el aviso en las dos
 >   pantallas y le cayó el meteoro. **Para ver vos en la compu:** lo mismo con Larry en una mesa real.
 >   (Visto de paso, sin tocar: un personaje en 0 de vida, inconsciente, igual pudo arrastrar su token para terminar el dodge roll.)
+> - [ ] **😵 ¿Un personaje caído (0 de vida) puede hacer el dodge roll? (2026-11-14, visto por el ayudante probando el dodge roll).** En la prueba,
+>   un personaje en 0 de vida pudo arrastrar su token para terminar el dodge roll de un área. Decidir si un caído no esquiva (se queda) o si se deja.
 > - [ ] **🌩☄ Ver en el mapa la Tormenta arcana y el Meteoro de a uno (dueño, 2026-11-13: «cuando esté en la compu, ver el resultado de la tormenta
 >   arcana»).** Hecho y probado por un ayudante (commit b3a05dfc): el área sigue al mouse (todas las de área), el d20 en el cuadro, la ronda de
 >   «¿Esquiva?» por iniciativa, la lluvia con contador, el daño de a uno (creeps Nd4+1); el Meteoro, la misma ronda y el daño de a uno. Para mirar:

@@ -928,6 +928,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   partir de nivel 1»: vale para toda la ruta); Hacha de verdugo de pueblo (Común, Tipo 8, Derribar 50 %) · Peto de hierro ·
   Casco de cuero endurecido; consumible **Poción de Puntería Certera** (dueño: «el consumible, más de crítico frecuente le pondría uno de más de
   probabilidad de golpe»). Turnos de espera (Esp 2). **Nivel 1 aprobado** (2026-11-05).
+  - **Nivel 2 aprobado (dueño, 2026-11-14)**: atrib [9, 11, 6, 8, 2] (con, fue, agi, des, esp); + Guantes de agarre y Polainas de cuero remendado;
+    Remate; pasiva **Ojo de carancho** en lugar de Sed de sangre (dueño: «los creeps no deberían matar jugadores con frecuencia», así que una pasiva
+    que se dispara al matar casi no se usa; vale igual para Sed de batalla). Vida 45, No2 6, Defensa 5, PdG 9, Dmg 11, Parry 8, Bloqueo 11. **Falta cargarlo.**
 - **R4 · Hunter · Rango** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): trampas y marcar a la presa; prepara el terreno y deja que el grupo
   cace. Ruta: nv1 **Disparo señalador** (rápida) · **Cepo del cazador** (lenta); nv2 Tiro que derriba + **Percepción aumentada**; nv3 Mina del
   cazador (el arco, de Buena); nv4 Cebo + **Puntería**; nv5 Abanico. **Nivel 1 aprobado**: Des 10 · Con 8 · Agi 7 · Fue 6 · Esp 2 → vida 40, 7 No2,

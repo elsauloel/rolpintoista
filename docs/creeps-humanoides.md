@@ -930,6 +930,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     Demora del Puño de roca y la de la maza en el mismo golpe se suman (2 lugares) o quedan en uno.
   - **Nivel 4 aprobado (dueño, 2026-11-14: «va así»)**: atrib [12, 9, 8, 8, 4]; la Media armadura de escudero (Buena) en lugar del Peto de hierro;
     Arrastrar; Marcar el ritmo. Vida 65, No2 8, Defensa 7, PdG 8, daño 1d10 + 9, Parry 9, Bloqueo 11, Evasión 8. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-14: «va así»)**: atrib [13, 10, 8, 9, 4]; el Capacete de hierro (Buena) en lugar del Casco de cuero
+    endurecido; Barrido. Vida 70, No2 8, Defensa 9, PdG 9, daño 1d10 + 10, Parry 10, Bloqueo 12, Evasión 8. **Falta cargarlo.** Línea T4 completa.
 - **W4 · Verdugo · Warrior** (2026-11-05): avisa a quién va a ejecutar y lo remata. **Ruta aprobada** (dueño: «me cierra la ruta»): **nv1 El que avisa no traiciona · Golpe fuerte** (dueño: «vamos con avisa y golpe fuerte»); **nv2 Remate** + pasiva **Sed de sangre**;
   nv3 Furia (Hacha del verdugo de la capital, Buena); nv4 Golpe demoledor + **Robustez** (Guantes del verdugo, Buena); nv5 Golpe brutal. Nivel 1
   propuesto: Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2 → vida 40, 6 No2 (dueño: «le bajaría un punto en constitución y le subiría uno en destreza, a
@@ -1310,7 +1312,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
 | D3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
 | W4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
-| T4 | ✅ (2026-11-05, cargado) | | | | |
+| T4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
 | H4 | ✅ (2026-11-05, cargado) | | | | |
 | L7 | ✅ (2026-11-05, cargado) | | | | |
 | L8 | ✅ (2026-11-05, cargado) | | | | |

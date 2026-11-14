@@ -959,6 +959,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   T4 +1): Def 5. Consumible: **Sales aromáticas**. Sin programar. Su Contraataque sigue las reglas nuevas (ver docs/pendientes.md, «⚔ Contraataque»).
   - **Nivel 2 aprobado (dueño, 2026-11-14: «va así»)**: atrib [11, 10, 6, 7, 2] (con, fue, agi, des, esp); + Casco de cuero endurecido y Guantes de
     duelista de taberna; Golpe desesperado; Robustez. Vida 60, No2 6, Defensa 6, PdG 7, Dmg 10, Parry 9, Bloqueo 11, Evasión 6. **Falta cargarlo.**
+  - **Ruta cambiada (dueño, 2026-11-14)**: nv3 **¡Tu vieeeeja! 😜** (el Provocar de los creeps, renombrado ese día) en lugar de Piel de hierro, y
+    **Piel de hierro** pasa al nv5 en lugar de Golpe brutal (ya lo tiene el Verdugo).
+  - **Nivel 3 aprobado (dueño, 2026-11-14)**: atrib [12, 10, 7, 8, 3] (+1 de Especial «de regalo», para la provocación: tira 3 + su nivel); el Hacha de
+    la furia roja (Buena, 2 dados, Bloqueo +1, Rompe armadura 33 %) en lugar de la Hachuela; ¡Tu vieeeeja! 😜. Vida 65, No2 7, Defensa 6, PdG 8, daño
+    2d8 + 10, Parry 9, Bloqueo 11, Evasión 7. **Falta cargarlo.**
 - **L7 · Degollador · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): abre la herida y la termina; va por el más golpeado.
   Ruta: nv1 **Golpe que sangra** (rápida) · **Remate**; nv2 Ojo de asesino + **Ojo crítico**; nv3 Corte profundo (el arma, de Buena); nv4 Degollar +
   **Sed de sangre**; nv5 Puñalada trapera. **Nivel 1 aprobado**: Des 10 · Agi 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 9 No2, turnos de espera; **Facón de

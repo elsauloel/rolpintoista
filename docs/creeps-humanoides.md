@@ -598,6 +598,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Varita arcana + Grimorio gastado (PdG.Esp +1, SP +2) · Chaleco de cuero · Vincha de cuero de mula ánima: Def 2, Def.Esp 1. Escalofrío (1 No2,
   1 SP) y Robar el aliento (2 No2, 3 SP), que **pasa a sacar 1 No2 + la diferencia** (dueño, mismo día; programado). Con SP puede repetir
   habilidades en el turno: «lo dejamos así». Consumible: Gas adormecedor. Sin cargar hasta que el dueño diga.
+  - **Nivel 2 aprobado (dueño, 2026-11-14: «va así»)**: atrib [9, 2, 7, 4, 14] (con, fue, agi, des, esp); + Polainas de cuero remendado y
+    Escarpines de piel de cururú; Sanguijuela; Puntería arcana. Vida 45, No2 7, SP 44 (7 por turno), Defensa 3, Def.Esp 2, PdG.Esp 16, Ef.Esp 14.
+    Pedido junto (dueño): **la Sanguijuela muerde de nuevo al empezar el turno del afectado** (1d6, cura la mitad de lo que entró, para arriba) —
+    detalle en la cola de programación. **Falta cargarlo** en `comun/creeps-esenciales.js`.
 
 - **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
   va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):

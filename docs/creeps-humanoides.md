@@ -608,6 +608,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     Ef.Esp 15, Evasión 8. **Falta cargarlo** (y el cambio de nombre).
   - **Nivel 4 aprobado (dueño, 2026-11-14: «va»)**: atrib [10, 2, 8, 5, 17]; el Sombrero humectante bordado (Buena) en lugar de la Vincha;
     Disipar; Largo alcance arcano. Vida 50, No2 8, SP 53 (9), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 19, Ef.Esp 17. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-14: «va así»)**: atrib [10, 2, 9, 6, 18]; el Muñeco vudú (Buena) en lugar del Grimorio gastado;
+    Maldición tormentosa. Vida 50, No2 9, SP 54 (10), Rango 7, Defensa 3, Def.Esp 2, PdG.Esp 20, Ef.Esp 18. **Falta cargarlo.** Línea D3 completa.
 
 - **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
   va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):
@@ -1289,7 +1291,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R3 | ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
 | S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
-| D3 | ✅ (2026-11-03) | | | | |
+| D3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
 | W4 | ✅ (2026-11-05, cargado) | | | | |
 | T4 | ✅ (2026-11-05, cargado) | | | | |
 | H4 | ✅ (2026-11-05, cargado) | | | | |

@@ -986,6 +986,7 @@ function dibujarLienzo(){
     if(typeof curaDibujarDestello === 'function' && curaDibujarDestello(d.id, x, y, rad, z)) animando = true;   // ✨ la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
     if(vaquitaDibujarToken(d.id, est, x, y, rad, z)) animando = true;   // 🐞 la Vaquita de San Antonio (y cuando se va volando)
+    if(typeof sanguijuelaDibujarToken === 'function' && sanguijuelaDibujarToken(d.id, est, x, y, rad, z)) animando = true;   // 🪱 la Sanguijuela pegada (y cuando cae, js/119)
     if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;
     if(typeof estoicoDibujar === 'function' && estoicoDibujar(d.id, x, y, rad, z)) animando = true;   // 🗿 el ±2 🛡 del Estoicismo (js/85)
     if(typeof provocadoDibujar === 'function' && provocadoDibujar(d.id, x, y, rad, z)) animando = true;   // 😤 contra quién va un provocado (js/77)   // ⬆⬇ recibió un buff o un debuff (js/75)

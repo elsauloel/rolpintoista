@@ -24,8 +24,14 @@ function transfusionFxRecibido(id, d){
   transfusionFxVistos.add(id);
   transfusionFxEmpezar(d.datos.de, d.datos.a, num(d.datos.semilla) || 1);
 }
-function transfusionFxEmpezar(de, a, semilla){
+// (2026-11-14, dueño: «una vez que se hacen todas las notificaciones y se minimizan los menús, tiene que estar la animación»): espera a que esta
+// pantalla no tenga el cuadro del duelo ni un aviso al centro abiertos (como mucho 25 s; después sale igual).
+function transfusionFxEmpezar(de, a, semilla, t0){
   if(typeof FxTransfusion === 'undefined' || !tokens.get(de) || !tokens.get(a)) return;
+  t0 = t0 || Date.now();
+  const tapado = (typeof Duelo !== 'undefined' && Duelo.abiertoId && Duelo.abiertoId()) || (typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto());
+  if(tapado && Date.now() - t0 < 25000){ setTimeout(() => transfusionFxEmpezar(de, a, semilla, t0), 400); return; }
+  if(typeof sanguijuelaLatido === 'function') sanguijuelaLatido(de);   // 🪱 si sale de un token con una sanguijuela, chupa fuerte (js/119)
   const poco = transfusionPocoMovimiento();
   TRANSFUSION_FX.push({de, a, semilla, t0: performance.now(), dur: poco ? 1100 : FxTransfusion.DURACION, poco, gotas: FxTransfusion.gotitas(semilla, poco ? 0 : 18)});
   pedirDibujo();

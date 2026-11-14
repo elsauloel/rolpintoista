@@ -21,10 +21,12 @@ async function soltarAlEmpezarRevisar(){
     if(t.tipo === 'creep'){
       if(!soyGM) return;
       const p = creepsPriv.get(ref), sc = p && p.sc;
-      const est = sc && soltarAlEmpezarDe(sc.estados);
-      if(!est) return;
+      const est = sc && soltarAlEmpezarDe(sc.estados), sang = sc && (sc.estados || []).find(e => typeof esSanguijuelaEst === 'function' && esSanguijuelaEst(e));
+      if(!est && !sang) return;
       soltarAlEmpezarHechos.add(clave);
-      soltarAlEmpezarCartel(clave, sc.nombre, est, ayuda => soltarAlEmpezarCreep(clave, ref, t, ayuda), t, num(sc.nitros));
+      // 🪱 Primero la mordida de la Sanguijuela, después el intento de soltarse (dueño, 2026-11-14; js/119).
+      if(sang && typeof sanguijuelaMorder === 'function') await sanguijuelaMorder(o.id, sc.nombre, {...sang}, iniciativa.paso);
+      if(est) soltarAlEmpezarCartel(clave, sc.nombre, est, ayuda => soltarAlEmpezarCreep(clave, ref, t, ayuda), t, num(sc.nitros));
       return;
     }
     if(!ref) return;
@@ -33,13 +35,16 @@ async function soltarAlEmpezarRevisar(){
     let info = null;
     await editarPersonajeMapa(fichaId, S => {
       const x = invId ? (S.invocaciones || []).find(i => i && i.id === invId) : null;
-      const est = soltarAlEmpezarDe(invId ? (x && x.estados) : S.efectos);
-      if(est) info = {nombre: invId ? x.nombre : ((S.meta && S.meta.nombre) || 'Personaje'), est: {...est}, nitros: num(invId ? x.nitros : S.nitros)};
+      const lista = invId ? (x && x.estados) : S.efectos;
+      const est = soltarAlEmpezarDe(lista), sang = (lista || []).find(e => typeof esSanguijuelaEst === 'function' && esSanguijuelaEst(e));
+      if(est || sang) info = {nombre: invId ? x.nombre : ((S.meta && S.meta.nombre) || 'Personaje'), est: est ? {...est} : null, sang: sang ? {...sang} : null, nitros: num(invId ? x.nitros : S.nitros)};
       return false;   // solo mirar
     });
     if(!info) return;
     soltarAlEmpezarHechos.add(clave);
-    soltarAlEmpezarCartel(clave, info.nombre, info.est, ayuda => soltarAlEmpezarPj(clave, fichaId, invId, t, ayuda), t, info.nitros);
+    // 🪱 Primero la mordida de la Sanguijuela, después el intento de soltarse (dueño, 2026-11-14; js/119).
+    if(info.sang && typeof sanguijuelaMorder === 'function') await sanguijuelaMorder(o.id, info.nombre, info.sang, iniciativa.paso);
+    if(info.est) soltarAlEmpezarCartel(clave, info.nombre, info.est, ayuda => soltarAlEmpezarPj(clave, fichaId, invId, t, ayuda), t, info.nitros);
   }catch(err){ console.error('Soltarse al empezar el turno:', err); }
 }
 function soltarAlEmpezarCartel(clave, nombre, est, tirar, t, nitros){

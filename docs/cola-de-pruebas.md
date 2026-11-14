@@ -34,7 +34,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   («logró salir»), las ratas «No» / «Sí y me quedo»; la lluvia con el contador en todas las pantallas; el daño de a uno («3d4+1» con 3 proyectiles), el
   J1 tocó «Aplicar el daño» para su personaje. El Meteoro: igual, 4d6 + 2d6 de fuego, el que salió no recibió nada. **De paso:** los carteles que piden
   algo (el dodge roll, el ataque de oportunidad del GM…) van por encima del cuadro del duelo (comun/aviso-combate.js). Video: `tormenta-ronda-y-lluvia-*.mp4`.
-- **⬜ en cola (la próxima) — 🩸 Sanguijuela: muerde de nuevo al empezar el turno, y la animación de toda transferencia de vida** (dueño, 2026-11-14).
+- **✅ hecho (2026-11-14) — 🩸 Sanguijuela: muerde de nuevo al empezar el turno, y la animación de toda transferencia de vida** (dueño, 2026-11-14).
+  *Resultado:* `vtt-hexgrid/js/119-sanguijuela.js` (nuevo) + js/54, js/13, js/78, js/92, js/05, `comun/ficha-mantenimiento.js`. Probado en «Claude · pruebas»
+  (mapa propio, borrado al terminar) con Rockardo (copia) (J1; respaldado y restaurado) y un creep con la Sanguijuela: la Varita sanguijuela drena con la
+  animación; la Sanguijuela pega, drena y queda pegada (el gusanito latiendo sobre el token); al empezar el turno de Rockardo: «▶ Empieza tu turno» →
+  el aviso «la cura no fue para vos» (su Regeneración +3 se la lleva el Ladrón, con la animación) → «tenés una sanguijuela» → el 1d6 en el cuadro del
+  duelo (lo tira el GM por el creep; directo) y la cura de la mitad → «¿se suelta?»; con «Ahora no» sigue pegada; al soltarse, se suelta y cae.
+  Orden real: la Regeneración robada sale antes de la mordida (es parte del «Empieza tu turno»). Capturas y videos en el scratchpad de la sesión
+  (`sanguijuela-videos/`, `sanguijuela-capturas/`).
   1. **La regla:** al empezar el turno de quien la tiene pegada, la sanguijuela le hace **1d6** de daño y quien la lanzó se cura **la mitad de lo
      que entró, para arriba**. Lo tira **quien lanzó la sanguijuela** con su botón, en el cuadro del duelo (el GM por un creep). Definido por el dueño
      (2026-11-14): **daño directo** (no lo frena la Def.Esp), **sí lo frena la Res. siniestro**; **primero la mordida y después** el intento de

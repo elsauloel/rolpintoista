@@ -48,7 +48,13 @@ const FichaMantenimiento = (() => {
   // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
   function aplicarVida(S, ui, hpDelta, hpAntes, rep){
     const robo = Combatiente.curaRobada(S.hp, hpDelta, S.efectos);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
-    if(robo){ rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim()) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim()))); return; }
+    if(robo){
+      // De dónde venía la cura, para el aviso (2026-11-14, dueño: «se le tiene que comunicar que su Regeneración no lo curó a él»).
+      const fuentes = [...new Set(rep.map(l => (String(l).match(/^(.+?)(?: \([^)]*\))?: \+[\d.,]+ HP/) || [])[1]).filter(Boolean))];
+      const fuente = fuentes.length ? `tu ${fuentes.join(' y tu ')}` : 'la cura de este turno';
+      rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim(), fuente) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim())));
+      return;
+    }
     if(hpDelta > 0 && !Combatiente.curaQueEntra(S.hp, hpDelta, S.efectos)){ rep.push(num(S.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : `Caído: la cura de este turno no lo levanta (hace falta revivirlo)`); return; }
     if(!hpDelta) return;
     ui.fijarHp(num(S.hp) + hpDelta);

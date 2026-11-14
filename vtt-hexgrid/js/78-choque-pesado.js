@@ -416,9 +416,10 @@ async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, espe
    no es un golpe, así que ni Espinas ni Espejo, ni los bonos de daño de quien lo causa. `fisico`: lo frena la Defensa (la mordida); si no, ignora la
    Defensa y, con `directo`, también la Defensa especial (el fuego del virote, la explosión de la Varita inestable). Lo usan dueloRiesgo (js/13),
    virotEstalla (js/33) y mordidaDano (js/54). Mismas respuestas que contiendaDuelo. */
-function danoDuelo({yo, deTokenId, aTokenId, nombre, formula, tipo, fisico, directo, esperar}){
+// `danoExtra` (2026-11-14, la mordida de la Sanguijuela): campos más para `hab.dano` (drena / drenaPct / sinIdentidad).
+function danoDuelo({yo, deTokenId, aTokenId, nombre, formula, tipo, fisico, directo, esperar, danoExtra}){
   const hab = {nombre: String(nombre || 'Daño').slice(0, 60), objetivo: deTokenId && deTokenId === aTokenId ? 'uno mismo' : 'enemigo', tira: null, contra: [], efectos: [],
-    dano: {formula: String(formula || ''), tipo: tipo || (fisico ? 'físico' : 'arcano'), ignoraDef: !fisico, ...(directo && !fisico ? {directo: true} : {})}};
+    dano: {formula: String(formula || ''), tipo: tipo || (fisico ? 'físico' : 'arcano'), ignoraDef: !fisico, ...(directo && !fisico ? {directo: true} : {}), ...(danoExtra || {})}};
   return contiendaDuelo({yo, deTokenId, aTokenId, hab, esperar, extra: {secundario: true, danoSuelto: true}});
 }
 /* 🎲 Una chance «entra / no entra» en el cuadro del duelo de siempre (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10; dueño: «las tiradas las hace

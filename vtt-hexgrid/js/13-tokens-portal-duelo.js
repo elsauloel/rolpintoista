@@ -1870,7 +1870,18 @@ async function dueloEspejo(d, especial){
    máxima queda como Vida extra, hasta `drenaTope` % del máximo (sumado al que ya tenía). A un personaje, la vida en su parte
    `general` (como dueloCurar) y el Excedente por su cola de estados (comun/recibidos.js); a un creep, todo en sus datos; a una invocación,
    la vida (el excedente, a mano). */
+// 🩸 Toda transferencia de vida se ve con la animación de la Transfusión (dueño, 2026-11-14): lo que drena una habilidad, un arma o la Varita
+// chupasangre viaja del golpeado a quien pegó (js/92; espera a que se cierren los cuadros). La Luz sanadora (`sinExtra`) no: es una cura de luz.
 async function dueloDrenar(d, monto, opts){
+  const r = await dueloDrenarBase(d, monto, opts);
+  try{
+    if(r && !r.manual && num(r.monto) > 0 && !(opts && opts.sinExtra) && !String(r.nota || '').startsWith('🪱')
+      && d.defensor && d.atacante && d.defensor.tokenId !== d.atacante.tokenId && typeof transfusionFxPublicar === 'function')
+      transfusionFxPublicar(d.defensor.tokenId, d.atacante.tokenId, `${d.atacante.nombre} le saca vida a ${d.defensor.nombre}`, `${d.hab ? d.hab.nombre : (d.ataque && d.ataque.armaNombre) || 'Drenaje'}: +${fmt(num(r.monto))} de vida`);
+  }catch(e){}
+  return r;
+}
+async function dueloDrenarBase(d, monto, opts){
   const quien = d.atacante.nombre;
   monto = Math.max(0, Math.round(num(monto)));
   if(!monto) return {quien, monto: 0, nota: 'no hizo daño: no drena nada'};

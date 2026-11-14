@@ -925,6 +925,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 2 aprobado (dueño, 2026-11-14)**: atrib [10, 7, 7, 7, 4] (con, fue, agi, des, esp; el punto de Fuerza pasó a Destreza: «así el parry
     tiene un poco más de sentido»); + Casco de cuero endurecido y Guantes de duelista de taberna; Desarmar; Guardia firme. Vida 50, No2 7, Defensa 5,
     PdG 7, Dmg 7, Parry 8, Bloqueo 8. **Falta cargarlo.**
+  - **Nivel 3 aprobado (dueño, 2026-11-14: «va»)**: atrib [11, 8, 7, 8, 4]; la Maza de guerra (Buena: Demora 50 %, Pajaritos 25 %) en lugar del
+    Mazo de carnicero; Puño de roca. Vida 55, No2 7, Defensa 5, PdG 8, daño 1d10 + 8, Parry 9, Bloqueo 9. **Falta cargarlo.** Al cargarlo, revisar si la
+    Demora del Puño de roca y la de la maza en el mismo golpe se suman (2 lugares) o quedan en uno.
 - **W4 · Verdugo · Warrior** (2026-11-05): avisa a quién va a ejecutar y lo remata. **Ruta aprobada** (dueño: «me cierra la ruta»): **nv1 El que avisa no traiciona · Golpe fuerte** (dueño: «vamos con avisa y golpe fuerte»); **nv2 Remate** + pasiva **Sed de sangre**;
   nv3 Furia (Hacha del verdugo de la capital, Buena); nv4 Golpe demoledor + **Robustez** (Guantes del verdugo, Buena); nv5 Golpe brutal. Nivel 1
   propuesto: Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2 → vida 40, 6 No2 (dueño: «le bajaría un punto en constitución y le subiría uno en destreza, a

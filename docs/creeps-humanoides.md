@@ -957,6 +957,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Mañas de sobreviviente**; nv5 Golpe brutal. **Nivel 1 aprobado**: Con 10 · Fue 9 · Des 6 · Agi 6 · Esp 2 → vida 50, 6 No2, turnos de espera;
   **Hachuela de camping** (Común, Tipo 8, Parry +1, Bloqueo +1) · **Pechera de hierro** (Def +4) · **Botas de cuero de vaca** (Def +1, Res. crít.
   T4 +1): Def 5. Consumible: **Sales aromáticas**. Sin programar. Su Contraataque sigue las reglas nuevas (ver docs/pendientes.md, «⚔ Contraataque»).
+  - **Nivel 2 aprobado (dueño, 2026-11-14: «va así»)**: atrib [11, 10, 6, 7, 2] (con, fue, agi, des, esp); + Casco de cuero endurecido y Guantes de
+    duelista de taberna; Golpe desesperado; Robustez. Vida 60, No2 6, Defensa 6, PdG 7, Dmg 10, Parry 9, Bloqueo 11, Evasión 6. **Falta cargarlo.**
 - **L7 · Degollador · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): abre la herida y la termina; va por el más golpeado.
   Ruta: nv1 **Golpe que sangra** (rápida) · **Remate**; nv2 Ojo de asesino + **Ojo crítico**; nv3 Corte profundo (el arma, de Buena); nv4 Degollar +
   **Sed de sangre**; nv5 Puñalada trapera. **Nivel 1 aprobado**: Des 10 · Agi 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 9 No2, turnos de espera; **Facón de

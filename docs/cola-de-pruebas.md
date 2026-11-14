@@ -75,7 +75,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cierra; caído → Tronco y arco sin cartel, arrastra 1 casilla; ▶ Siguiente lo saltea. Capturas `caido-a/`, `caido-b/`, `caido-c/` del scratchpad.
   **Dudas para el dueño:** (1) a un caído se lo puede atacar con un ataque directo y le sale «Elegí cómo te defendés» (no se tocó: ¿se puede
   rematar a un caído?); (2) si alguien arrastra el token de un caído al lado de rivales, a esos rivales se les puede ofrecer el ataque de oportunidad.
-- **⬜ en cola — 🧌 Cargar los esenciales aprobados y probarlos en el mapa** (dueño, 2026-11-14: «¿los estás poniendo en cola para probarlos en el
+- **✅ hecho (2026-11-14) — 🧌 Cargar los esenciales aprobados y probarlos en el mapa**. *Resultado:* cargados S3 Armero, D3 Ladrón de fuerzas, W4
+  Verdugo y T4 Peleador de control, niveles 2 a 5 (commit 560dc7bb), con su prueba de números en `comun/pruebas.html` (864 en verde); la Varita
+  sanguijuela pasó a **Varita chupasangre** (mismo id). Probado en el mapa (mapa propio «Prueba · Esenciales», los cuatro de nivel 5 contra Prueba Uno,
+  las dos cuentas): **anduvo todo** — Armas perforantes, Ojo certero y Potencia sobre el Verdugo (y el golpe siguiente con crítico ×2); Abrojos (trampa
+  a la vista, Prueba Uno la pisa: 2d6+2 − Defensa, Res.CC contra 8 → Rengo); el Martillo de herrero con Derribar 25 %; Disipar (le sacó Bendecido);
+  Maldición tormentosa (Atormentado + Herida sombría) y el **Muñeco vudú** (Debilitado al primer daño especial); la Varita chupasangre (drena);
+  **Mal de ojo** en turno ajeno (10 SP, el jugador repite la Evasión y queda la peor); Remate (+2 dados con la mitad de la vida) con **Ojo de carancho**
+  (+1 contra alguien con Rengo); Furia; Golpe demoledor; Golpe brutal (crítico ×2); Puño de roca (Demora); Arrastrar (lo trae y queda Desequilibrado);
+  Barrido; **Marcar el ritmo** (el Armero pegado sube 3.º → 2.º al empezar la ronda); **Desarmar** tras un Parry ganado (su Bloqueo contra la Fuerza del
+  golpe: «desarmó al otro», la daga quedó en el piso; en turno ajeno, cooldown 6). **Dudas:** (1) la Demora del Puño de roca y la de la Maza de guerra
+  en el mismo golpe **se suman** (dos efectos «Demora» separados en el duelo: baja 2 lugares si entran los dos); (2) al aplicar Derribar o la Armadura
+  rota doble del Golpe demoledor sobre un personaje **sin armadura** aparecen errores 400 en la consola (el Derribar entra igual; la Armadura rota no
+  tiene pieza que romper) — a mirar; (3) el texto de Abrojos dice «la Destreza del pícaro» aunque la ponga el Armero.
+  Videos y capturas: `scratchpad/esenciales/` (de la sesión). (dueño, 2026-11-14: «¿los estás poniendo en cola para probarlos en el
   mapa después?»).
   1. **Cargar** en `comun/creeps-esenciales.js` (con su prueba de números en `comun/pruebas.html`) lo aprobado y todavía sin cargar: **S3 Armero
      nv2–5**, **D3 Ladrón de fuerzas nv2–5** y lo que se siga aprobando (W4 Verdugo…); renombrar la **Varita sanguijuela → Varita chupasangre**

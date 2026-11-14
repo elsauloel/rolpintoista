@@ -84,6 +84,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      suma, sobre todo lo que nunca se usó con un creep esencial: Armero (Armas perforantes, Ojo certero, Potencia, **Abrojos**, el Martillo de herrero
      con Derribar); Ladrón (Sanguijuela, **Mal de ojo** en turno ajeno, **Disipar**, **Maldición tormentosa**, el **Muñeco vudú** con su Debilitado, la
      Varita chupasangre); Verdugo (Remate, **Sed de sangre** subiendo en la fila). Reporte con lo que anduvo y lo que no.
+- **⬜ en cola — ▶ Optimizar los avisos del inicio del turno** (dueño, 2026-11-14: «hay por lo menos tres y algunas son redundantes»; aprobó la
+  propuesta de seis puntos). Lo que se vio con Rockardo (copia) y la Sanguijuela (capturas en el scratchpad, `sanguijuela-capturas/41…57`):
+  la ventana «▶ Empieza tu turno» (estados, vida y SP, No2, «Además») con «Aplicar»; después la MISMA ventana repetida con «5 · Aplicado», «✔ YA SE
+  APLICÓ» y «Entendido»; cuatro avisos chicos a la derecha («Empieza el turno de…», «La Sanguijuela… muerde…», y el de la cura robada DOS veces);
+  el cuadro de la mordida; el «¿se suelta?» encima del cuadro todavía abierto; y en la Mesa la línea de la cura robada dos veces.
+  1. **Una sola ventana de inicio de turno**, con un solo botón: estados, vida, SP, No2 y la cura robada en renglones cortos; al tocar «Aplicar» se
+     cierra, sin el segundo paso («Ya se aplicó»).
+  2. **Sacar los avisos chicos que repiten lo de la ventana:** el «Empieza el turno de…» y el de la cura robada (que quede una sola vez: el renglón).
+  3. **La mordida de la sanguijuela** va directo al cuadro del duelo, sin aviso chico antes.
+  4. **El «¿se suelta?»** aparece recién cuando se cierra el cuadro del duelo (vale para cualquier estado que se suelte al empezar el turno).
+  5. **En la Mesa**, una sola línea por cosa (la cura robada salía dos veces: revisar por qué).
+  6. **Los estados que no cambian no se muestran** («Sanguijuela: 4 turnos → 4 turnos»; revisar además si ese turno debía bajar).
+  Para el GM y los demás jugadores no cambia nada (la Mesa y lo de siempre). Probar en el mapa con las dos cuentas, con capturas: un turno normal y
+  uno con la Sanguijuela + Regeneración.
 - **⬜ en cola — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.

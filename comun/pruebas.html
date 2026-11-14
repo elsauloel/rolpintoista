@@ -56,7 +56,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261114sang"></script>
-<script src="estados-aplicar.js?v=20261110vaq"></script>
+<script src="estados-aplicar.js?v=20261114av"></script>
 <script src="recibidos.js?v=20261110vaq"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
@@ -231,6 +231,14 @@ prueba('Invulnerable bloquea un debuff', () => {
   igual(EstadosAplicar.aplicarACreep(sc, {nombre: 'Pajaritos'}).motivo, 'Invulnerable');
 });
 prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
+// 🛡 Sin armadura no hay nada que romper (dueño, 2026-11-14): un creep con su equipo en vivo y ninguna pieza de armadura no recibe la Armadura rota.
+prueba('Armadura rota: un creep sin armadura no la recibe', () => {
+  const sc = {estados: [], equipoVivo: 1, equipo: [{nombre: 'Garrote', tipoItem: 'arma_1m', equipado: true}]};
+  const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Armadura rota'});
+  igual(r.ok, false); igual(r.sinArmadura, true); igual(sc.estados.length, 0);
+});
+prueba('Armadura rota: con una pieza de armadura puesta, entra', () => igual(EstadosAplicar.aplicarACreep({estados: [], equipoVivo: 1, equipo: [{nombre: 'Peto de hierro', tipoItem: 'armadura_rigida', equipado: true}]}, {nombre: 'Armadura rota'}).ok, true));
+prueba('Armadura rota: un creep viejo (sin equipo en vivo) la recibe como siempre', () => igual(EstadosAplicar.aplicarACreep({estados: []}, {nombre: 'Armadura rota'}).ok, true));
 prueba('😈 jefe v2: inmune a Sueño, Parálisis, Confusión y Pánico; Miedo de 2 turnos queda en 1; Sentado (permanente) en 1; Veneno normal', () => {
   const sc = {estados: [], jefe: true, nombre: 'Jefe'};
   const m = n => EstadosAplicar.aplicarACreep(sc, {nombre: n}).motivo || '';

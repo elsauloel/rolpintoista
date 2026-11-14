@@ -45,20 +45,15 @@ async function sanguijuelaMorder(victimaId, nombre, est, paso){
     libre = ocupado ? 0 : libre + 500;
     await new Promise(r => setTimeout(r, 500));
   }
-  // El aviso a quien la tiene (al centro, se cierra solo a los 10 s) y la Crónica para todos.
+  // La Crónica para los demás (en esta pantalla no: la mordida se ve directo en el cuadro del duelo — 2026-11-14, dueño: «la mordida va directo al
+  // cuadro del duelo, sin aviso chico antes»; antes salían un aviso al centro «tenés una sanguijuela» y la tarjeta).
   try{ momentoAbrir({tipo: 'sanguijuela', icono: '🪱', titulo: `La Sanguijuela de ${quien} muerde a ${nombre}`, estado: 'listo',
-    resultado: `Empieza su turno con la sanguijuela pegada: ${quien} tira 1d6 de daño siniestro directo y se cura la mitad de lo que entre.`, datos: {chico: true}}); }catch(e){}
-  await new Promise(fin => {
-    let listo = false;
-    const cerrar = () => { if(listo) return; listo = true; try{ if(AvisoCombate.abiertoClave() === 'sanguijuela-' + clave) AvisoCombate.cerrar(); }catch(e){} fin(); };
-    AvisoCombate.mostrar({clave: 'sanguijuela-' + clave, icono: '🪱', titulo: `${nombre}: tenés una sanguijuela`,
-      texto: `Empieza tu turno y la sanguijuela de ${quien} te muerde: ${quien} tira 1d6 de daño siniestro directo (no lo frena la Defensa especial; sí la Res. siniestro) y se cura la mitad de lo que te saque. Después podés intentar arrancártela.`,
-      botones: [{texto: 'Entendido', alClic: cerrar}], alCerrar: cerrar});
-    setTimeout(cerrar, 10000);
-  });
+    resultado: `Empieza su turno con la sanguijuela pegada: ${quien} tira 1d6 de daño siniestro directo y se cura la mitad de lo que entre.`, datos: {centro: true}}); }catch(e){}
   sanguijuelaLatido(victimaId);
-  const r = await danoDuelo({yo: {...yoDeToken(lz.id), nombre: quien}, deTokenId: lz.id, aTokenId: victimaId, nombre: '🪱 La sanguijuela muerde', formula: '1d6',
+  const r = await danoDuelo({yo: {...yoDeToken(lz.id), nombre: quien}, deTokenId: lz.id, aTokenId: victimaId, nombre: `🪱 La sanguijuela muerde a ${nombre}`.slice(0, 60), formula: '1d6',
     tipo: 'siniestro', directo: true, esperar: true, danoExtra: {sinIdentidad: true, drena: true, drenaPct: 50}}).catch(err => { console.error('Sanguijuela: no se pudo abrir la mordida', err); return null; });
+  // El «¿se suelta?» (js/54) recién cuando se cierra el cuadro de la mordida (2026-11-14, dueño: salía encima del cuadro todavía abierto).
+  await sanguijuelaEsperarAviso(180000, true);
   return r;
 }
 
@@ -149,15 +144,18 @@ const manejoEsteToken = t => !!t && (t.tipo === 'creep' ? !!soyGM : (() => {
 if(typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar && !EstadosAplicar.curaRobadaEnviar.__mapa){
   const curaRobadaOriginal = EstadosAplicar.curaRobadaEnviar;
   // `fuente` (opcional): de dónde venía la cura («tu Regeneración»), para el aviso.
-  EstadosAplicar.curaRobadaEnviar = function(robo, quien, fuente){
+  // `o.inicioTurno` (2026-11-14): viene del «Empieza tu turno», que ya lo dice en un renglón → en esta pantalla, sin aviso al centro ni tarjeta (solo la
+  // animación); para los demás, la tarjeta de siempre.
+  EstadosAplicar.curaRobadaEnviar = function(robo, quien, fuente, o){
     const txt = curaRobadaOriginal(robo, quien);
+    const deInicio = !!(o && o.inicioTurno);
     try{
       if(robo && robo.estado && num(robo.monto) > 0 && !EstadosAplicar.lanzadorPerdido(robo.estado)){
         const p = sanguijuelaPortador(robo.estado, quien), lz = sanguijuelaLanzador(robo.estado);
         const de = String(robo.estado.chupaNombre || (lz && nombreDe(lz.t)) || 'quien te la puso');
         if(p && lz && typeof transfusionFxPublicar === 'function')
-          transfusionFxPublicar(p.id, lz.id, `La Sanguijuela le lleva la cura de ${nombreDe(p.t)} a ${de}`, `${fuente ? fuente.charAt(0).toUpperCase() + fuente.slice(1) + ': ' : ''}+${fmt(num(robo.monto))} de vida para ${de}`);
-        if(p && p.t.tipo !== 'creep' && manejoEsteToken(p.t)){
+          transfusionFxPublicar(p.id, lz.id, `La Sanguijuela le lleva la cura de ${nombreDe(p.t)} a ${de}`, `${fuente ? fuente.charAt(0).toUpperCase() + fuente.slice(1) + ': ' : ''}+${fmt(num(robo.monto))} de vida para ${de}`, {sinTarjetaAca: deInicio});
+        if(p && p.t.tipo !== 'creep' && manejoEsteToken(p.t) && !deInicio){
           const que = fuente || 'la cura';
           sanguijuelaEsperarAviso(60000, true).then(() => AvisoCombate.mostrar({clave: 'sang-robada-' + Date.now(), icono: '🪱', titulo: `${nombreDe(p.t)}: la cura no fue para vos`,
             texto: `${que.charAt(0).toUpperCase() + que.slice(1)} (+${fmt(num(robo.monto))}) no te curó a vos: se la llevó ${de} con su Sanguijuela. Mientras la tengas pegada, toda cura que recibas se la lleva ${de}.`,

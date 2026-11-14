@@ -179,6 +179,8 @@ function momentoRecibido(id, d){
   // Un aviso chico (2026-10-06, la Coraza del guardián): a quien le toca, un toast — y la Crónica sigue, como para todos.
   // 🙈 Solo para el GM (2026-11-05: un token oculto que se mueve fuera de su turno): los jugadores no lo ven ni en la Crónica.
   if(d.datos && d.datos.soloGM && !soyGM){ momentosFeed.delete(id); renderMomentosFeed(); return; }
+  // ▶ «Empieza el turno de X» (2026-11-14, dueño): a quien maneja a X no le sale la tarjeta: ya tiene la ventana «Empieza tu turno».
+  if(d.tipo === 'turno' && d.datos && d.datos.tokenId && inicioTurnoTarjetaSobra(d.datos.tokenId)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   const chicoParaMi = d.datos && d.datos.chico && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid;
   if(chicoParaMi && !momentosChicosVistos.has(id)){ momentosChicosVistos.add(id); toast(`${d.icono || ''} ${d.titulo}: ${d.resultado || ''}`.trim()); }
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
@@ -203,7 +205,7 @@ function momentoRecibido(id, d){
 /* ▶ Empieza tu turno (js/04, 2026-10-17): a su dueño (o a quien tiene 🎮 su control), al centro, con lo que va a pasar y «✔ Aplicar»; al tocarlo,
    el mismo cartel dice «✔ Ya se aplicó» y se cierra con «Entendido». El resto lo ve en la Crónica (el GM, con «▶ Aplicar por él» mientras
    espera). → true si esta pantalla lo mostró al centro. */
-const inicioMostrados = new Set();
+const inicioMostrados = new Set(), inicioAplicadoAca = new Set(), inicioNoAplicadoVisto = new Set();
 function inicioTurnoMomento(id, d){
   const dt = d.datos || {};
   if(!dt.paraUid || dt.paraUid !== fbUsuario.uid) return false;
@@ -211,20 +213,35 @@ function inicioTurnoMomento(id, d){
     if(inicioMostrados.has(id)) return true;
     inicioMostrados.add(id);
     AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], soloBoton: true,   // solo con «✔ Aplicar» (2026-10-22)
+      // Al tocar «Aplicar» se cierra (2026-11-14, dueño: una sola ventana, sin el segundo paso «Ya se aplicó»). Si falla, avisa con un toast.
       texto: '', botones: [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => {
-        const b = document.getElementById('inicio-turno-aplicar'); if(b){ b.disabled = true; b.textContent = 'Aplicando…'; }
+        inicioAplicadoAca.add(id);
+        AvisoCombate.cerrar();
         inicioTurnoAplicar(id, d, false);
       }}],
       alCerrar: () => { inicioMostrados.delete(id); }});   // cerrado sin aplicar: el GM lo puede aplicar por él, y al pasar el turno se aplica solo
     return true;
   }
-  // Ya aplicado: el mismo cartel, con lo que pasó, y «Entendido».
+  // Ya aplicado desde acá: la ventana ya se cerró (2026-11-14). Solo si el turno cambió en el medio, el aviso de que no se aplicó.
+  if(d.estado === 'listo' && inicioAplicadoAca.has(id)){
+    if(dt.noAplicado && !inicioNoAplicadoVisto.has(id)){ inicioNoAplicadoVisto.add(id); AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', texto: '', soloBoton: true,
+      veredicto: {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]}); }
+    return true;
+  }
+  // Ya aplicado (por el GM, con la ventana abierta acá): el mismo cartel, con lo que pasó, y «Entendido».
   if(d.estado === 'listo' && inicioMostrados.has(id) && AvisoCombate.abiertoClave && AvisoCombate.abiertoClave() === 'inicio-turno:' + id){
     AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '', soloBoton: true,
       veredicto: dt.noAplicado ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'} : {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
     return true;
   }
   return d.estado === 'listo' && inicioMostrados.has(id);
+}
+// ¿Esta pantalla maneja ese token y le va a salir su «Empieza tu turno»? (un personaje o una invocación; los creeps no tienen la ventana)
+function inicioTurnoTarjetaSobra(tokenId){
+  const t = tokens.get(tokenId);
+  if(!t || t.tipo === 'creep' || !t.fichaId || !fbUsuario) return false;
+  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), ctrl = f && f.resumen && f.resumen.control;
+  return ctrl ? ctrl === fbUsuario.uid : (t.duenoUid === fbUsuario.uid || !!(f && f.duenoUid === fbUsuario.uid));
 }
 let momentosFeedTimer = null;
 function renderMomentosFeed(){

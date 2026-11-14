@@ -10,11 +10,12 @@ const transfusionFxVistos = new Set();
 const transfusionPocoMovimiento = () => { try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
 
 // La publica quien hace la Transfusión (después de aplicarla). Si el momento no se puede publicar, la ve al menos esta pantalla.
-async function transfusionFxPublicar(deId, aId, titulo, resultado){
+// `o.sinTarjetaAca` (2026-11-14): en esta pantalla, solo la animación (sin la tarjeta de la Crónica: ya lo dijo otra ventana); las demás, igual.
+async function transfusionFxPublicar(deId, aId, titulo, resultado, o){
   if(!deId || !aId || deId === aId) return;
   const semilla = Math.floor(Math.random() * 1e9);
   const id = typeof momentoAbrir === 'function'
-    ? await momentoAbrir({tipo: 'transfusion', icono: '🩸', titulo: String(titulo || 'Transfusión sanguínea'), resultado: resultado || '', estado: 'listo', datos: {de: deId, a: aId, semilla}})
+    ? await momentoAbrir({tipo: 'transfusion', icono: '🩸', titulo: String(titulo || 'Transfusión sanguínea'), resultado: resultado || '', estado: 'listo', datos: {de: deId, a: aId, semilla, ...(o && o.sinTarjetaAca ? {centro: true} : {})}})
     : null;
   if(!id) transfusionFxEmpezar(deId, aId, semilla);
 }

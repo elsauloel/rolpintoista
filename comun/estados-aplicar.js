@@ -94,10 +94,19 @@ const EstadosAplicar = (() => {
 
   // Lo pone en un creep (objeto de gm-tools o de su parte privada). Devuelve {ok, estado?, motivo?}.
   // `o.propio` (2026-11-10): lo que se pone el creep a sí mismo no gasta la 🐞 Vaquita de San Antonio (lo que viene de otro, sí).
+  const SIN_ARMADURA_TXT = 'no tiene armadura que romper';
+  const SLOTS_ARMADURA_CREEP = ['armadura_blanda', 'armadura_rigida', 'cabeza', 'manos', 'piernas', 'pies'];
+  function creepTieneArmadura(sc){
+    if(!sc || !(Number(sc.equipoVivo) >= 1)) return true;   // ante la duda (un creep sin convertir), sí
+    return (sc.equipo || []).some(it => it && it.equipado !== false && !it.consumible && SLOTS_ARMADURA_CREEP.includes(it.tipoItem));
+  }
   function aplicarACreep(sc, spec, o){
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
     const nuevo = componer(spec);
+    // 🛡 Sin armadura no hay nada que romper (dueño, 2026-11-14: «romper armadura a alguien sin armadura no debería ser posible»): un creep con su
+    // equipo en vivo y ninguna pieza de armadura puesta no recibe la Armadura rota. Un creep viejo (la Defensa en la base, sin equipo): como siempre.
+    if(nuevo && nuevo.nombre === 'Armadura rota' && !creepTieneArmadura(sc)) return {ok: false, motivo: SIN_ARMADURA_TXT, sinArmadura: true};
     if(!Combatiente.bezoar(nuevo, Combatiente.equipoPuesto(sc))) return {ok: false, motivo: 'la Piedra bezoar se tragó el Veneno'};   // 🔮 (2026-10-18)
     const r = Combatiente.agregarEstado(sc.estados, nuevo, o && o.propio ? sc : {...sc, vaquita: true});
     if(!r.ok) return {ok: false, motivo: r.motivo, ...(r.vaquita ? {vaquita: r.vaquita} : {})};
@@ -187,5 +196,5 @@ const EstadosAplicar = (() => {
     return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, encolarCuraRobada, curaRobadaEnviar, lanzadorPerdido, texto};
+  return {SIN_ARMADURA_TXT, creepTieneArmadura, DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, encolarCuraRobada, curaRobadaEnviar, lanzadorPerdido, texto};
 })();

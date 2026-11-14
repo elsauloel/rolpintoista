@@ -97,24 +97,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      suma, sobre todo lo que nunca se usó con un creep esencial: Armero (Armas perforantes, Ojo certero, Potencia, **Abrojos**, el Martillo de herrero
      con Derribar); Ladrón (Sanguijuela, **Mal de ojo** en turno ajeno, **Disipar**, **Maldición tormentosa**, el **Muñeco vudú** con su Debilitado, la
      Varita chupasangre); Verdugo (Remate, **Sed de sangre** subiendo en la fila). Reporte con lo que anduvo y lo que no.
-- **⬜ en cola — ▶ Optimizar los avisos del inicio del turno** (dueño, 2026-11-14: «hay por lo menos tres y algunas son redundantes»; aprobó la
-  propuesta de seis puntos). Lo que se vio con Rockardo (copia) y la Sanguijuela (capturas en el scratchpad, `sanguijuela-capturas/41…57`):
-  la ventana «▶ Empieza tu turno» (estados, vida y SP, No2, «Además») con «Aplicar»; después la MISMA ventana repetida con «5 · Aplicado», «✔ YA SE
-  APLICÓ» y «Entendido»; cuatro avisos chicos a la derecha («Empieza el turno de…», «La Sanguijuela… muerde…», y el de la cura robada DOS veces);
-  el cuadro de la mordida; el «¿se suelta?» encima del cuadro todavía abierto; y en la Mesa la línea de la cura robada dos veces.
-  1. **Una sola ventana de inicio de turno**, con un solo botón: estados, vida, SP, No2 y la cura robada en renglones cortos; al tocar «Aplicar» se
-     cierra, sin el segundo paso («Ya se aplicó»).
-  2. **Sacar los avisos chicos que repiten lo de la ventana:** el «Empieza el turno de…» y el de la cura robada (que quede una sola vez: el renglón).
-  3. **La mordida de la sanguijuela** va directo al cuadro del duelo, sin aviso chico antes.
-  4. **El «¿se suelta?»** aparece recién cuando se cierra el cuadro del duelo (vale para cualquier estado que se suelte al empezar el turno).
-  5. **En la Mesa**, una sola línea por cosa (la cura robada salía dos veces: revisar por qué).
-  6. **Los estados que no cambian no se muestran** («Sanguijuela: 4 turnos → 4 turnos»; revisar además si ese turno debía bajar).
-  Para el GM y los demás jugadores no cambia nada (la Mesa y lo de siempre). Probar en el mapa con las dos cuentas, con capturas: un turno normal y
-  uno con la Sanguijuela + Regeneración.
-- **⬜ en cola — 🔧 Dos arreglos chicos que salieron probando los esenciales** (2026-11-14): (1) errores 400 en la consola al aplicar Derribar y la
-  Armadura rota doble del Golpe demoledor sobre un personaje sin armadura (el Derribar entra igual): encontrar qué escritura rechaza Firebase y
-  arreglarla; (2) el texto de **Abrojos** dice «la Destreza del pícaro» aunque la ponga el Armero → «de quien los puso» (revisar las otras trampas
-  con el mismo texto).
+- **✅ hecho (2026-11-14) — ▶ Optimizar los avisos del inicio del turno.** Resultado: la ventana «Empieza tu turno» se cierra al tocar «Aplicar» (sin
+  el segundo paso; solo si el turno cambió en el medio avisa «ya no es tu turno»); a quien maneja ese personaje no le sale la tarjeta «Empieza el turno
+  de…»; la cura robada es un solo renglón en «Vida y SP» («🪱 Tu Regeneración (+3) no te curó a vos: se la llevó X con su Sanguijuela», sin el «+3 HP»
+  que no entró) y sin aviso al centro ni tarjeta en esa pantalla; la mordida abre directo el cuadro del duelo («🪱 La sanguijuela muerde a X»); el
+  «¿se suelta?» sale recién al cerrarse el cuadro; los estados que no cambian no se muestran. **Por qué la cura robada salía dos veces:** la vista
+  previa del inicio del turno (que solo mira) también la mandaba → a quien lanzó la sanguijuela le llegaba DOS veces (+6 en vez de +3) y salían dos
+  avisos y dos líneas en la Mesa; ahora la vista previa no manda nada (`ui.simular`, comun/ficha-mantenimiento.js). «4 turnos → 4 turnos»: no era un
+  error (lo recién puesto no baja en su primer inicio de turno, P177). Probado con Rockardo (copia) y un creep con Sanguijuela, las dos cuentas.
+- **✅ hecho (2026-11-14) — 🔧 Dos arreglos chicos.** (1) Regla del dueño: «romper armadura a alguien sin armadura no debería ser posible» → un
+  personaje sin piezas de armadura puestas ya no recibía nada (quedó con el texto «Rompe armadura: no tiene armadura que romper»); un creep con su equipo
+  en vivo y sin ninguna pieza de armadura, tampoco (`EstadosAplicar.creepTieneArmadura`, sin escribir nada; un creep viejo sin equipo, como siempre).
+  Los errores 400 eran reintentos de transacciones de Firebase («Commit failed-precondition»: dos pantallas escribiendo el mismo documento a la vez);
+  Firebase reintenta solo y la escritura entra (verificado: el Derribar y la Sanguijuela llegaron igual). No se repitieron con Derribar sobre un
+  personaje. (2) Abrojos, Cordón oculto y Polvo cegador ya no dicen «del pícaro» sino «de quien los puso / lo tendió / las escondió».
 - **⬜ en cola — 💀 A alguien en 0 de vida no se lo ataca** (dueño, 2026-11-14: «corregirlo como sugerís»). Un token en 0 de vida (caído) no se
   puede elegir como objetivo de un ataque ni de una habilidad dirigida contra un rival: si se intenta, aviso «está caído» y no se abre el duelo (sin
   «Elegí cómo te defendés»). Tampoco da ni recibe ataques de oportunidad (ni cuando alguien lo arrastra al lado de rivales). Curas y lo que lo levanta

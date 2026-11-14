@@ -2755,7 +2755,7 @@ const Combatiente = (() => {
       }
       // 🪢 El Cordón oculto nuevo (dueño, 2026-11-03): avanza siempre y tira Agilidad; si gana, cae parado; si pierde, Sentado y Tropezado.
       if(h && h.nombre === 'Cordón oculto' && h.trampaColocar && typeof h.trampaColocar === 'object' && !(h.trampaColocar.salvacion && h.trampaColocar.salvacion.logra)){
-        h.detalle = 'Tiende un cordón a ras del piso, una línea de 4 casillas dentro de su Rango y fuera de la vista de los rivales (solo lo disparan sus rivales). El que lo pisa tropieza: avanza una casilla en la dirección en que venía (si hay lugar) y tira Agilidad contra la Destreza del pícaro. Si gana, cae parado y no pasa nada. Si pierde, queda Sentado y Tropezado: no puede moverse más en este turno (puede levantarse y usar el resto de sus No2 ahí mismo). No hace daño. Se detecta con Percepción contra su Destreza.';
+        h.detalle = 'Tiende un cordón a ras del piso, una línea de 4 casillas dentro de su Rango y fuera de la vista de los rivales (solo lo disparan sus rivales). El que lo pisa tropieza: avanza una casilla en la dirección en que venía (si hay lugar) y tira Agilidad contra la Destreza de quien lo tendió. Si gana, cae parado y no pasa nada. Si pierde, queda Sentado y Tropezado: no puede moverse más en este turno (puede levantarse y usar el resto de sus No2 ahí mismo). No hace daño. Se detecta con Percepción contra su Destreza.';
         h.ataqueTxt = 'un cordón de 4 casillas: el que lo pisa avanza una casilla y tira Agilidad contra su Destreza; si pierde, Sentado y sin moverse el resto del turno';
         if(h.trampaColocar.salvacion) h.trampaColocar.salvacion = {...h.trampaColocar.salvacion, logra: 'cae parado'};
         cambio = true;

@@ -545,7 +545,7 @@ async function iniciativaSiguiente(o){
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
   const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
   const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
-    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.']}});
+    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {})}});
   const lineas = [];
   if(termina && !terminaRepetido) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
   // 🫨 Al terminar el turno de quien arrastró, los que arrastró recuperan el equilibrio (js/78; dueño, 2026-11-05).
@@ -768,14 +768,14 @@ async function inicioTurnoPendiente(tokenId, clave){
       const est = () => (invId ? (((C.invocaciones || []).find(x => x && x.id === invId) || {}).estados) : C.efectos) || [];
       const antes = est().filter(e => e && e.activo !== false && !e.permanente && num(e.turnos) > 0).map(e => ({id: e.id, nombre: e.nombre, turnos: num(e.turnos)}));
       const antesMalviaje = typeof esMalviaje === 'function' ? (est().find(esMalviaje) || null) : null;
-      const r = FichaMantenimiento.inicioTurno(C, {fijarHp: v => FichaAcciones.fijarHp(C, v)}, clave, invId || '', conTurno, numero);
+      const r = FichaMantenimiento.inicioTurno(C, {fijarHp: v => FichaAcciones.fijarHp(C, v), simular: true}, clave, invId || '', conTurno, numero);   // (simular: la vista previa no manda la cura robada)
       if(!r) return false;
       const despues = new Map(est().map(e => [e.id, e]));
       const pv = est().find(e => e && e.activo !== false && /^Provocado/i.test(String(e.nombre || '')));   // 😤 sigue provocado este turno
       const mvE = typeof esMalviaje === 'function' ? (est().find(esMalviaje) || antesMalviaje) : null;   // 🌺 malviajando (aunque se termine este turno)
       const tt = n => `${fmt(n)} turno${n === 1 ? '' : 's'}`;
       const humo = n => r.rep.some(l => /^Sahumerio/.test(l) && l.endsWith(`se llevó ${n}`));   // 🔮 lo sacó el Sahumerio, no se terminó
-      prev = {malviaje: mvE ? {nombre: mvE.nombre, floripondio: true, ...(malviajeDifDe(mvE) ? {efEsp: malviajeDifDe(mvE)} : {})} : null, prov: pv ? {de: String(pv.provocaDe || ''), quien: String(pv.provocaDeNombre || '') || ((String(pv.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/) || [])[1] || '').trim()} : null, rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : humo(a.nombre) ? `${a.nombre}: se lo llevó el humo` : `${a.nombre}: se termina`; })};
+      prev = {malviaje: mvE ? {nombre: mvE.nombre, floripondio: true, ...(malviajeDifDe(mvE) ? {efEsp: malviajeDifDe(mvE)} : {})} : null, prov: pv ? {de: String(pv.provocaDe || ''), quien: String(pv.provocaDeNombre || '') || ((String(pv.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/) || [])[1] || '').trim()} : null, rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? (num(e.turnos) === a.turnos ? '' : `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}`) : humo(a.nombre) ? `${a.nombre}: se lo llevó el humo` : `${a.nombre}: se termina`; }).filter(Boolean)};   // (2026-11-14, dueño: los estados que no cambian no se muestran)
       return false;   // solo mirar: no se guarda nada
     });
   }catch(err){ console.error('No se pudo calcular el inicio del turno:', err); return false; }

@@ -3184,6 +3184,9 @@ async function dueloAplicarEfectoBase(d, ef){
   const veces = spec.nombre === 'Armadura rota' ? Math.max(1, num(spec.stacks) || 1) : 1;
   const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota', ...(spec.item && t.tipo !== 'creep' ? {item: spec.item} : {})} : spec;   // (`item`: el escudo que paró el disparo, js/26)
   if(t.tipo === 'creep'){
+    // 🛡 Sin armadura, nada que romper (2026-11-14): ni estado ni escritura.
+    const scSin = spec.nombre === 'Armadura rota' && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null;
+    if(scSin && !EstadosAplicar.creepTieneArmadura(scSin)) return {nota: `Rompe armadura: ${EstadosAplicar.SIN_ARMADURA_TXT}`, sinEfecto: true};
     const res = await modificarCreep(t.fichaId, sc => {
       let r = {ok: false};
       for(let i = 0; i < veces; i++) r = EstadosAplicar.aplicarACreep(sc, unico);
@@ -3192,12 +3195,13 @@ async function dueloAplicarEfectoBase(d, ef){
     });
     const sumado = EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '');
     const total = res && res.total > Math.max(1, num(unico.stacks) || 1) * veces ? ` → ahora ×${res.total}` : '';
+    if(res && res.sinArmadura) return {nota: `Rompe armadura: ${EstadosAplicar.SIN_ARMADURA_TXT}`, sinEfecto: true};   // 🛡 (2026-11-14)
     return res && res.ok ? {nota: sumado + total} : {nota: 'no entró: ' + ((res && res.motivo) || 'está protegido')};
   }
   // 🛡 Sin armadura puesta, el Rompe armadura de un golpe no tiene efecto (dueño, 2026-10-29: «no tiene efecto, no tiene armadura»): en un personaje la
   // rotura va a las piezas de armadura (el escudo, solo con Parry o Bloqueo, que llegan con `item`).
   if(spec.nombre === 'Armadura rota' && !spec.item && !String(t.fichaId).includes(SEP_INVOCACION) && !(await pjTieneArmadura(t.fichaId)))
-    return {nota: 'Rompe armadura: no tiene efecto, no tiene armadura puesta', sinEfecto: true};
+    return {nota: `Rompe armadura: ${EstadosAplicar.SIN_ARMADURA_TXT}`, sinEfecto: true};
   // 🛡 (2026-11-09, la cola de pruebas: el GM leía «le llegó a su ficha: Sangrado» de un personaje que estaba Invulnerable y no lo recibió):
   // con lo que publica la ficha (sus estados), si algo lo frena (Invulnerable, Inmunidad a CC, Sangre pura…) el duelo lo dice. El aviso igual
   // viaja (la ficha decide con lo suyo, por si lo publicado está atrasado).

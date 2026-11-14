@@ -50,9 +50,19 @@ const FichaMantenimiento = (() => {
     const robo = Combatiente.curaRobada(S.hp, hpDelta, S.efectos);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
     if(robo){
       // De dónde venía la cura, para el aviso (2026-11-14, dueño: «se le tiene que comunicar que su Regeneración no lo curó a él»).
-      const fuentes = [...new Set(rep.map(l => (String(l).match(/^(.+?)(?: \([^)]*\))?: \+[\d.,]+ HP/) || [])[1]).filter(Boolean))];
-      const fuente = fuentes.length ? `tu ${fuentes.join(' y tu ')}` : 'la cura de este turno';
-      rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim(), fuente) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim())));
+      const reCura = /^(.+?)(?: \([^)]*\))?: \+[\d.,]+ HP/;
+      const fuentes = [...new Set(rep.map(l => (String(l).match(reCura) || [])[1]).filter(Boolean))];
+      const fuente = fuentes.length ? `tu ${fuentes.join(' y tu ')}` : 'la cura que te tocaba';
+      const quien = ((S.meta && S.meta.nombre) || '').trim();
+      // ▶ La vista previa del inicio del turno (`ui.simular`, js/04) NO la manda: antes se mandaba dos veces (al mirar y al aplicar) — la cura le llegaba
+      // dos veces a quien la lanzó y salían dos avisos (2026-11-14). Solo al aplicar de verdad.
+      if(!(ui && ui.simular) && typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar) EstadosAplicar.curaRobadaEnviar(robo, quien, fuente, {inicioTurno: true});
+      // Un solo renglón en el reporte (dueño, 2026-11-14: «la cura robada, una sola vez»): sin el «+N HP» que no entró.
+      for(let i = rep.length - 1; i >= 0; i--) if(reCura.test(String(rep[i]))) rep.splice(i, 1);
+      const de = String((robo.estado && robo.estado.chupaNombre) || '').trim() || 'quien te la puso';
+      const perdido = typeof EstadosAplicar !== 'undefined' && EstadosAplicar.lanzadorPerdido ? EstadosAplicar.lanzadorPerdido(robo.estado) : null;
+      rep.push(perdido ? Combatiente.curaPerdidaTxt(robo, perdido)
+        : `🪱 ${fuente.charAt(0).toUpperCase() + fuente.slice(1)} (+${fmt(num(robo.monto))}) no te curó a vos: se la llevó ${de} con su Sanguijuela`);
       return;
     }
     if(hpDelta > 0 && !Combatiente.curaQueEntra(S.hp, hpDelta, S.efectos)){ rep.push(num(S.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : `Caído: la cura de este turno no lo levanta (hace falta revivirlo)`); return; }
@@ -102,7 +112,7 @@ const FichaMantenimiento = (() => {
     }
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp, inv.estados);
     const roboInv = Combatiente.curaRobada(inv.hp, d.hp, inv.estados);   // 🪱 (2026-11-03)
-    if(roboInv) rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(roboInv, inv.nombre) : Combatiente.curaRobadaTxt(roboInv, inv.nombre)));
+    if(roboInv) rep.push((!simulando && typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(roboInv, inv.nombre) : Combatiente.curaRobadaTxt(roboInv, inv.nombre)));
     else if(d.hp > 0 && !dhInv) rep.push(num(inv.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
     // Sus turnos (dueño, 2026-10-30: «que cero turnos no borra un token de manera automática anymore, pero sí avisa»): al llegar a 0 no se duerme
@@ -194,7 +204,14 @@ const FichaMantenimiento = (() => {
     rep.push(`Sahumerio de palo santo: 1d${caras} → ${dado}, el humo se llevó ${e.nombre}`);
     return {dado, saco: e.nombre};
   }
+  // ▶ La vista previa del inicio del turno (ui.simular): no manda nada afuera (la cura robada de una invocación tampoco).
+  let simulando = false;
   function inicioTurno(S, ui, clave, invId, conTurno, numero){
+    simulando = !!(ui && ui.simular);
+    try{ return inicioTurnoReal(S, ui, clave, invId, conTurno, numero); }
+    finally{ simulando = false; }
+  }
+  function inicioTurnoReal(S, ui, clave, invId, conTurno, numero){
     const turno = num(numero), sin = new Set(conTurno || []);
     if(invId){
       const inv = (S.invocaciones || []).find(i => i && i.id === invId);

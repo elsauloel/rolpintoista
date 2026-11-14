@@ -606,6 +606,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     **Varita sanguijuela, que pasa a llamarse «Varita chupasangre»** (dueño, mismo día; mismo id, renombrarla en `comun/catalogo.js` y donde se
     nombre) en lugar de la Varita arcana; Mal de ojo (Flash, 5 SP; 10 en turno ajeno). Vida 45, No2 8, SP 47 (7), Defensa 3, Def.Esp 2, PdG.Esp 17,
     Ef.Esp 15, Evasión 8. **Falta cargarlo** (y el cambio de nombre).
+  - **Nivel 4 aprobado (dueño, 2026-11-14: «va»)**: atrib [10, 2, 8, 5, 17]; el Sombrero humectante bordado (Buena) en lugar de la Vincha;
+    Disipar; Largo alcance arcano. Vida 50, No2 8, SP 53 (9), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 19, Ef.Esp 17. **Falta cargarlo.**
 
 - **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
   va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):

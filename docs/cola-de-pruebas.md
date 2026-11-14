@@ -111,6 +111,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   6. **Los estados que no cambian no se muestran** («Sanguijuela: 4 turnos → 4 turnos»; revisar además si ese turno debía bajar).
   Para el GM y los demás jugadores no cambia nada (la Mesa y lo de siempre). Probar en el mapa con las dos cuentas, con capturas: un turno normal y
   uno con la Sanguijuela + Regeneración.
+- **⬜ en cola — 🔧 Dos arreglos chicos que salieron probando los esenciales** (2026-11-14): (1) errores 400 en la consola al aplicar Derribar y la
+  Armadura rota doble del Golpe demoledor sobre un personaje sin armadura (el Derribar entra igual): encontrar qué escritura rechaza Firebase y
+  arreglarla; (2) el texto de **Abrojos** dice «la Destreza del pícaro» aunque la ponga el Armero → «de quien los puso» (revisar las otras trampas
+  con el mismo texto).
 - **⬜ en cola — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.

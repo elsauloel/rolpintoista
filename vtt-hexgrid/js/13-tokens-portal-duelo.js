@@ -1420,8 +1420,25 @@ function tokenExpuesto(t){
   const v = vinculo(t);
   return expuestoPub(v && v.resumen);
 }
+/* 😵 Un caído no esquiva (dueño, 2026-11-14: «al personaje caído no le tienen que aparecer ni siquiera notificaciones de esquivar ni nada»): con la vida
+   en 0 (caído, inconsciente o muerto) no se le ofrece ningún dodge roll —el de un área, el «¿Esquiva?» de la Tormenta y el Meteoro (js/118), el de
+   Tronco de huída ni el del arco— ni se le muestra el cartel; si cae mientras lo está haciendo (un ataque de oportunidad), el cartel se cierra, queda
+   donde está y el área no lo alcanza (`resolverDodge(id, false, true)`, comun/duelo.js). El token se puede seguir arrastrando igual (dueño: «no debería haber restricciones para arrastrar el token»), pero eso no cuenta como
+   dodge roll. Un caído es un cuerpo: ningún área lo alcanza (P225), así que «se queda» no le hace nada. */
+function dodgeCaido(id){
+  const t = tokens.get(id);
+  if(!t) return false;
+  return !!((typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) || (typeof tokenCaido === 'function' && tokenCaido(t)));
+}
+// Lo resuelve la pantalla del GM o la de quien lo maneja (una transacción: lo toma una sola), sin cartel: la línea en la Mesa la pone el duelo.
+function dodgeCaidoResolver(d){
+  if(!d || !d.id || !d.defensor) return;
+  if(!soyGM && !(fbUsuario && d.defensor.uid === fbUsuario.uid)) return;
+  Duelo.resolverDodge(d.id, false, true).catch(err => console.error('No se pudo resolver el dodge roll de un caído:', err));   // (una transacción: lo toma una sola pantalla; el anuncio lo pone el duelo)
+}
 function dueloDodgeEmpieza(d){
   if(!d.defensor || !(soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) return;
+  if(dodgeCaido(d.defensor.tokenId)){ dodgeCaidoResolver(d); return; }   // 😵 un caído no esquiva: ni el cuadro ni el cartel
   // Expuesto (Degollar, 2026-10-10): sin dodge roll — se queda en el área (lo resuelve el mapa del GM, una sola vez).
   if(tokenExpuesto(tokens.get(d.defensor.tokenId))){
     if(soyGM) Duelo.resolverDodge(d.id, false).then(() => mesaLinea(`😱 ${d.defensor.nombre} está Expuesto: no puede hacer el dodge roll y se queda en el área`, 'recordatorio'))
@@ -1446,13 +1463,14 @@ function dueloDodgeEmpieza(d){
 // 🌩 «Sí, esquiva» (comun/duelo.js, el cuadro ya se apartó): el token seleccionado y el cartel para arrastrarlo.
 function dueloDodgeSi(d){
   if(!d || !d.defensor) return;
+  if(dodgeCaido(d.defensor.tokenId)){ dodgeCaidoResolver(d); return; }   // 😵 (cayó entre la pregunta y el «Sí»)
   seleccionar(d.defensor.tokenId);
   dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, esquiva: true, atacanteId: (d.atacante && d.atacante.tokenId) || ''};
   renderDodgeBanner();
 }
 function dueloDodgeTermina(d){
   if(dodgeBanner && dodgeBanner.id === d.id){ dodgeBanner = null; renderDodgeBanner(); }
-  if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) Duelo.abrir(d.id);
+  if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid)) && !dodgeCaido(d.defensor.tokenId)) Duelo.abrir(d.id);   // 😵 a un caído no se le reabre el cuadro
 }
 /* 🪵 Tronco de huída (2026-10-10): esquivó un golpe directo con el Flash que da dodge roll → en la pantalla de quien esquivó, el mismo cartel
    del dodge roll (`libre`): puede moverse hasta 2 casilleros pagando sus No2 (aunque no le alcancen, como cualquier dodge); quien lo atacó no tiene
@@ -1460,6 +1478,7 @@ function dueloDodgeTermina(d){
 function dueloDodgeLibre(d){
   const t = d.defensor && tokens.get(d.defensor.tokenId);
   if(!t) return;
+  if(dodgeCaido(d.defensor.tokenId)) return;   // 😵 un caído no esquiva (ni Tronco de huída ni el del arco): sin cartel
   if(tokenExpuesto(t)){ toast(`${d.defensor.nombre} está Expuesto: no puede hacer el dodge roll`); return; }
   seleccionar(d.defensor.tokenId);
   // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll es obligatorio para contraatacar: 1 casillero más lejos del atacante, pagando sus No2.
@@ -1531,8 +1550,18 @@ function renderDodgeBanner(){
 }
 // 🏃 Al soltar el movimiento del que hace el dodge roll de un área, se revisa solo si salió (2026-10-26, dueño: antes había que abrir el duelo
 // y tocar «Ya se movió: revisar», y el cartel seguía diciendo «Arrastrá…» con «No me quiero mover»).
+// 😵 Si el que estaba haciendo el dodge roll cae (un ataque de oportunidad lo dejó en 0), el cartel se cierra solo y queda donde está (el de un área,
+// «se queda»: no le pasa nada, un caído es un cuerpo). Arrastrarlo después ya no cuenta como dodge roll.
+setInterval(() => {
+  if(!dodgeBanner || !dodgeCaido(dodgeBanner.tokenId)) return;
+  const b = dodgeBanner;
+  dodgeBanner = null; renderDodgeBanner();
+  dodgeFrenado.delete(b.tokenId);
+  if(!b.libre && b.id) Duelo.resolverDodge(b.id, false, true).catch(err => console.error('No se pudo cerrar el dodge roll de un caído:', err));
+  else mesaLinea(`💀 ${b.nombre} cayó: se termina su dodge roll`, 'recordatorio');
+}, 1000);
 function dodgeTrasMover(id){
-  if(!dodgeBanner || dodgeBanner.libre || dodgeBanner.tokenId !== id || dodgeFrenado.has(id)) return;
+  if(!dodgeBanner || dodgeBanner.libre || dodgeBanner.tokenId !== id || dodgeFrenado.has(id) || dodgeCaido(id)) return;
   setTimeout(() => { if(dodgeBanner && !dodgeBanner.libre && dodgeBanner.tokenId === id && !dodgeFrenado.has(id)) dodgeDeclinar(); }, 400);
 }
 async function dodgeDeclinar(){

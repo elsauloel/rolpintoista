@@ -128,7 +128,7 @@ async function secuenciaArea(o){
     const ronda = secuenciaOrden(o.objetivos, centro);
     for(let i = 0; i < ronda.length; i++){
       const id = ronda[i], t = tokens.get(id);
-      if(!t || !secuenciaAdentro(area, id)) continue;   // ya salió (lo movieron) o cayó
+      if(!t || !secuenciaAdentro(area, id)) continue;   // ya salió (lo movieron) o cayó (😵 un caído no recibe la pregunta: secuenciaAdentro lo deja afuera, js/13 dodgeCaido)
       await secuenciaPausa(i ? 900 : 300);
       // ⚖ Con los No2 ya en negativo no hay dodge roll (dueño, 2026-11-14): no se le ofrece «Sí, esquiva»; el aviso, y se queda en el área.
       const neg = dodgeNo2Negativos(t);
@@ -152,7 +152,7 @@ async function secuenciaArea(o){
         const k = x.col + ',' + x.fila;
         if(!quieto || quieto.k !== k){ quieto = {k, t: Date.now()}; return; }
         if(secuenciaOporEsperando(id)){ vigila = false; return; }   // 🏃 lo frenó un ataque de oportunidad (2026-11-14): el respaldo se apaga; lo revisa la pantalla de quien esquiva al terminar de moverse
-        if(Date.now() - quieto.t > 2500){ vigila = false; Duelo.resolverDodge(dId, !secuenciaAdentro(area, id)).catch(err => console.error(`${nombre}: revisar el dodge roll`, err)); }
+        if(Date.now() - quieto.t > 2500){ vigila = false; Duelo.resolverDodge(dId, !iniciativaFueraDeJuego(id) && !secuenciaAdentro(area, id), iniciativaFueraDeJuego(id)).catch(err => console.error(`${nombre}: revisar el dodge roll`, err)); }   // (😵 un caído no «salió»: se queda)
       }, 700);
       await secuenciaEsperar(dId);
       clearInterval(reloj);
@@ -160,8 +160,9 @@ async function secuenciaArea(o){
     // 3) Quiénes quedaron adentro (por donde están ahora).
     const adentro = secuenciaOrden(o.objetivos.filter(id => secuenciaAdentro(area, id)), centro);
     if(!adentro.length){
-      mesaLinea(`${meteoro ? '☄' : '🌩'} ${nombre}: todos salieron del área — no le cae nada a nadie`, 'recordatorio');
-      momentoAbrir({tipo: 'tormenta', icono: meteoro ? '☄' : '🌩', titulo: `${nombre}: todos esquivaron`, resultado: 'Nadie quedó adentro del área.', estado: 'listo'}).catch(() => {});
+      const hayCaidos = o.objetivos.some(id => tokens.get(id) && iniciativaFueraDeJuego(id));   // 😵 un caído no cuenta: el área no lo alcanza
+      mesaLinea(`${meteoro ? '☄' : '🌩'} ${nombre}: ${hayCaidos ? 'nadie quedó adentro (salieron, o están caídos y el área no los alcanza)' : 'todos salieron del área'} — no le cae nada a nadie`, 'recordatorio');
+      momentoAbrir({tipo: 'tormenta', icono: meteoro ? '☄' : '🌩', titulo: `${nombre}: ${hayCaidos ? 'no le cae a nadie' : 'todos esquivaron'}`, resultado: 'Nadie quedó adentro del área.', estado: 'listo'}).catch(() => {});
       return;
     }
     // 4) La lluvia (la Tormenta): cada proyectil cae al azar sobre uno de los que quedaron adentro; todas las pantallas la ven con el contador.

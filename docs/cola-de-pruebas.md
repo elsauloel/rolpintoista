@@ -60,13 +60,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   4. **La prueba:** en «Claude · pruebas», con **Rockardo (copia)** como objetivo (tiene Regeneración como pasiva) y un Ladrón de fuerzas que le
      pone la sanguijuela; las dos cuentas (GM y jugador), capturas de las dos pantallas y videos mp4 de la animación. Respaldo de Rockardo (copia)
      antes y restaurarlo después. Reporte al dueño con capturas y videos.
-- **⬜ en cola — 😵 Un caído no esquiva ni recibe carteles de esquivar** (dueño, 2026-11-14: «al personaje caído no le tienen que aparecer ni
+- **✅ hecho (2026-11-14) — 😵 Un caído no esquiva ni recibe carteles de esquivar** (dueño, 2026-11-14: «al personaje caído no le tienen que aparecer ni
   siquiera notificaciones de esquivar ni nada»; lo vio el ayudante: uno en 0 de vida pudo arrastrar su token para terminar el dodge roll). Con 0 de
   vida (caído / inconsciente): la ronda de «¿Esquiva?» de la Tormenta y el Meteoro lo saltea sin preguntarle (sigue adentro, sin cartel), lo mismo
   la fase de dodge roll de cualquier área y los otros dodge roll (Tronco de huída, el del arco). **El token se puede seguir arrastrando** (dueño,
   2026-11-14: «no debería haber restricciones para arrastrar el token, porque puede haber alguna circunstancia que lo requiera»): solo que arrastrarlo
   no cuenta como dodge roll. Y **se le saltean los turnos mientras esté caído** (revisar que el orden de turnos ya lo haga). Revisar que tampoco le
   salgan otros carteles de defensa que no puede usar. Probar en el mapa con las dos cuentas.
+  *Resultado:* `dodgeCaido` (vtt-hexgrid/js/13): con 0 de vida no se le abre el «¿Esquiva?» ni ningún cartel de dodge roll (área, Tronco de huída,
+  arco); si cae mientras lo hace, el cartel se cierra solo y el duelo termina «💀 CAÍDO · el área no lo alcanza» (`Duelo.resolverDodge(id, false,
+  true)`, el veredicto, el chip y la Mesa lo dicen así; no se le reabre el cuadro). La ronda de la Tormenta y el Meteoro ya lo salteaba (un caído es
+  un cuerpo: ningún área lo alcanza, P225). El token se puede arrastrar igual y no cuenta como dodge roll. Los turnos ya salteaban a los caídos.
+  Probado en el mapa (Meteoro, Prueba Uno del J1, GM + J1): caído desde antes → no le preguntan nada; cae en medio del dodge roll → el cartel se
+  cierra; caído → Tronco y arco sin cartel, arrastra 1 casilla; ▶ Siguiente lo saltea. Capturas `caido-a/`, `caido-b/`, `caido-c/` del scratchpad.
+  **Dudas para el dueño:** (1) a un caído se lo puede atacar con un ataque directo y le sale «Elegí cómo te defendés» (no se tocó: ¿se puede
+  rematar a un caído?); (2) si alguien arrastra el token de un caído al lado de rivales, a esos rivales se les puede ofrecer el ataque de oportunidad.
 - **⬜ en cola — 🧌 Cargar los esenciales aprobados y probarlos en el mapa** (dueño, 2026-11-14: «¿los estás poniendo en cola para probarlos en el
   mapa después?»).
   1. **Cargar** en `comun/creeps-esenciales.js` (con su prueba de números en `comun/pruebas.html`) lo aprobado y todavía sin cargar: **S3 Armero

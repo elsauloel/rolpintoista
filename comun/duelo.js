@@ -1283,7 +1283,8 @@ const Duelo = (() => {
       tx.update(ref, {contacto: {...c, dodgeHecho: true}});
     });
   }
-  async function resolverDodge(id, logroSalir){
+  // `caido` (😵 2026-11-14): el defensor está caído — no esquiva y el área no lo alcanza (un caído es un cuerpo, P225): el duelo termina sin efecto.
+  async function resolverDodge(id, logroSalir, caido){
     const ref = col().doc(id);
     let anuncio = '';
     await fbDb.runTransaction(async tx => {
@@ -1292,7 +1293,8 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dodge') return;
-      if(logroSalir){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; anuncio = `🏃 ${m.defensor.nombre} logró salir del área de ${m.hab.nombre}: esquivó`; }
+      if(caido){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; m.contacto = {...(m.contacto || {}), caido: true}; anuncio = `💀 ${m.defensor.nombre} está caído: no esquiva y ${m.hab && m.hab.nombre ? m.hab.nombre : 'el área'} no lo alcanza`; }
+      else if(logroSalir){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; anuncio = `🏃 ${m.defensor.nombre} logró salir del área de ${m.hab.nombre}: esquivó`; }
       else{ m.resultado = 'pego'; entrarHab(m); anuncio = m.hab && m.hab.esquiva ? `${m.hab.meteoro ? '☄' : '🌩'} ${m.defensor.nombre} sigue adentro del área de ${m.hab.nombre}` : `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
       tx.update(ref, cambiosDe(m));
     });
@@ -1648,7 +1650,7 @@ const Duelo = (() => {
       else if(ef.aplicado) L.push(`✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + ' %)'}: aplicado${ef.nota ? ' · ' + ef.nota : ''}`);
       else L.push(`? ${ef.nombre}: quedó sin resolver`);
     });
-    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
+    const fin = d.contacto && d.contacto.caido ? `${d.defensor.nombre} está caído: no esquiva y el área no lo alcanza` : d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
     if(fin) L.push(`Resultado: ${fin}`);
     return L;
   }
@@ -2696,7 +2698,8 @@ const Duelo = (() => {
     const efectoLibre = d.hab && d.hab.efectoLibre
       ? `<div class="duelo-motivo">✋ ${_esc(d.hab.efectoLibre)}${d.contacto ? ` <b>(diferencia: ${_fmt(Math.abs(_num(d.contacto.dif)))})</b>` : ''}</div>` : '';
     let caja;
-    if(d.hab && d.hab.esquiva) caja = d.resultado === 'fallo' ? `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🏃 SALIÓ DEL ÁREA</div><div class="chico">${_esc(d.defensor.nombre)} esquivó: ${_esc(d.hab.nombre)} no le llega</div></div>`
+    if(d.contacto && d.contacto.caido) caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">💀 CAÍDO</div><div class="chico">${_esc(d.defensor.nombre)} está caído: no esquiva y ${_esc((d.hab && d.hab.nombre) || 'el área')} no lo alcanza</div></div>`;   // 😵 (2026-11-14)
+    else if(d.hab && d.hab.esquiva) caja = d.resultado === 'fallo' ? `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🏃 SALIÓ DEL ÁREA</div><div class="chico">${_esc(d.defensor.nombre)} esquivó: ${_esc(d.hab.nombre)} no le llega</div></div>`
       : `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} SIGUE ADENTRO</div><div class="chico">${_esc(d.defensor.nombre)} queda en el área de ${_esc(d.hab.nombre)}</div></div>`;
     else if(d.hab && d.hab.soloTirada && !d.dano) caja = '';
     else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">🌩 ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
@@ -3681,7 +3684,7 @@ const Duelo = (() => {
       else if(ef.res) P.push({clave: 'ef' + i, dados: siempreEf(ef) ? 0 : 1, txt: `${ef.nombre}: ${ef.res.exito ? 'funcionó' : 'no funcionó'}`});
     });
     if(d.estado === 'resuelto'){
-      const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado]
+      const fin = d.contacto && d.contacto.caido ? `${d.defensor.nombre} está caído: no esquiva y el área no lo alcanza` : d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado]
         : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño'}[d.resultado];
       P.push({clave: 'fin', txt: `🏁 ${fin || 'Terminó'}`});
     }
@@ -3749,6 +3752,7 @@ const Duelo = (() => {
       const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
       const txt = d.estado === 'resuelto'
         ? (d.hab && d.hab.soloTirada && d.dano ? `🌩 ${d.hab.nombre}: ${_fmt(d.dano.crudo)} ${String(d.hab.soloTirada.etq || '').toLowerCase()} · ver`
+          : d.contacto && d.contacto.caido ? `💀 ${d.defensor.nombre}: caído, el área no lo alcanza · ver`
           : d.hab && d.hab.esquiva ? `${d.resultado === 'fallo' ? '🏃' : '🌩'} ${d.defensor.nombre}: ${d.resultado === 'fallo' ? 'salió del área' : 'sigue adentro'} · ver`
           : d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)
           : `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`)

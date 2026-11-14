@@ -53,6 +53,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   4. **La prueba:** en «Claude · pruebas», con **Rockardo (copia)** como objetivo (tiene Regeneración como pasiva) y un Ladrón de fuerzas que le
      pone la sanguijuela; las dos cuentas (GM y jugador), capturas de las dos pantallas y videos mp4 de la animación. Respaldo de Rockardo (copia)
      antes y restaurarlo después. Reporte al dueño con capturas y videos.
+- **⬜ en cola — 🧌 Cargar los esenciales aprobados y probarlos en el mapa** (dueño, 2026-11-14: «¿los estás poniendo en cola para probarlos en el
+  mapa después?»).
+  1. **Cargar** en `comun/creeps-esenciales.js` (con su prueba de números en `comun/pruebas.html`) lo aprobado y todavía sin cargar: **S3 Armero
+     nv2–5**, **D3 Ladrón de fuerzas nv2–5** y lo que se siga aprobando (W4 Verdugo…); renombrar la **Varita sanguijuela → Varita chupasangre**
+     (mismo id) en el catálogo y donde se nombre. Ver `docs/creeps-humanoides.md`.
+  2. **Probar en el mapa** (mapa propio en «Claude · pruebas», las dos cuentas, capturas; video si hay animación) cada creep nuevo usando lo que
+     suma, sobre todo lo que nunca se usó con un creep esencial: Armero (Armas perforantes, Ojo certero, Potencia, **Abrojos**, el Martillo de herrero
+     con Derribar); Ladrón (Sanguijuela, **Mal de ojo** en turno ajeno, **Disipar**, **Maldición tormentosa**, el **Muñeco vudú** con su Debilitado, la
+     Varita chupasangre); Verdugo (Remate, **Sed de sangre** subiendo en la fila). Reporte con lo que anduvo y lo que no.
 - **⬜ en cola — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.

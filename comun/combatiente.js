@@ -2708,7 +2708,9 @@ const Combatiente = (() => {
     'Lanza arcana': {pct: 0, txt: ' Luz sanadora 25 %: se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.'},
   };
   // Los nombres nuevos (dueño, 2026-10-31): «Lanza de luz» → «Lanza arcana» («no es una lanza de luz»), «Luz para los suyos» → «Destello revelador».
-  const RENOMBRES_LUZ = {'Lanza de luz': {nombre: 'Lanza arcana', texto: [/lanza de luz/g, 'lanza arcana']}, 'Luz para los suyos': {nombre: 'Destello revelador'}};
+  const RENOMBRES_LUZ = {'Lanza de luz': {nombre: 'Lanza arcana', texto: [/lanza de luz/g, 'lanza arcana']}, 'Luz para los suyos': {nombre: 'Destello revelador'},
+    // 😜 El Provocar de los creeps pasa a llamarse «¡Tu vieeeeja! 😜» (dueño, 2026-11-14: «en la versión para creeps»; el Taunt de clase no cambia).
+    'Provocar': {nombre: '¡Tu vieeeeja! 😜'}};
   /* 🛡 La Defensa y la Defensa especial nunca bajan de 0 (dueño, 2026-11-03: «la defensa especial queda en 0, por la maldición o por cualquier efecto,
      salvo que la habilidad diga lo contrario»): un estado activo con `permiteNegativa: true` deja pasar el negativo (que suma daño). Los creeps y las
      invocaciones ya tenían el piso; los personajes no (una Coraza maldita dejaba −2 y la Lengua de fuego entraba +2). */
@@ -2794,7 +2796,7 @@ const Combatiente = (() => {
       }
       // 🛡 Provocar tira PdG.Esp + su nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas
       // horas del mismo día fue Ef.Esp + 2): el guardado en un creep (con cualquiera de las dos) se pone al día.
-      if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){
+      if(h && (h.nombre === 'Provocar' || h.nombre === '¡Tu vieeeeja! 😜') && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){
         h.duelo.tira = 'pdgmg'; h.duelo.tiraBonoNivel = true; delete h.duelo.tiraBono;
         ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Efecto especial + 2', 'su Probabilidad de Golpe especial + su nivel').replace('Ef.Esp + 2', 'PdG.Esp + su nivel'); });
         cambio = true;

@@ -85,7 +85,7 @@
   // Atributos en el orden Con · Fue · Agi · Des · Esp (suman 33).
   esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 5, 7, 4],   // Con Fue Agi Des Esp (dueño, 2026-11-03)
     equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas'],
-    habilidades: ['Provocar', 'Piel de hierro'], consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
+    habilidades: ['¡Tu vieeeeja! 😜', 'Piel de hierro'], consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
     estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el hacha le rompe la armadura al que lo ignora.'});
   esencial({linea: 'M1', nombre: 'Piromante', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [7, 2, 5, 5, 14],
     equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra'],
@@ -206,13 +206,13 @@
   // nv4 Blindaje · nv5 Escudo humano; sale Segundo aliento. Del nv3 en adelante, un punto de Fuerza pasa a Especial (Provocar tira PdG.Esp + nivel contra Res.Mt).
   esencial({...T2, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-08: Provocar; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
     equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
-    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar'], pasivas: ['Piel curtida']});
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', '¡Tu vieeeeja! 😜'], pasivas: ['Piel curtida']});
   esencial({...T2, nivel: 4, atrib: [15, 7, 7, 9, 4],   // (aprobado 2026-11-08: Blindaje; pasiva Robustez; la Coraza de bronce con runas en lugar de las Pieles erizadas del plan —las Espinas no se suman—)
     equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
-    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje'], pasivas: ['Piel curtida', 'Robustez']});
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', '¡Tu vieeeeja! 😜', 'Blindaje'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({...T2, nivel: 5, atrib: [16, 8, 7, 10, 4],   // (aprobado 2026-11-08: Escudo humano; el Hacha de abordaje en lugar del Hacha con garfio)
     equipo: ['Hacha de abordaje', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
-    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje', 'Escudo humano'], pasivas: ['Piel curtida', 'Robustez']});
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', '¡Tu vieeeeja! 😜', 'Blindaje', 'Escudo humano'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
     habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],
@@ -463,23 +463,23 @@
 
   esencial({linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 6, 7, 3],   // (2026-11-03, dueño: «me gusta, sí»)
     equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto'],
-    habilidades: ['Provocar', 'Escudo humano'], consumibles: ['Poción de Cuero Duro'],
+    habilidades: ['¡Tu vieeeeja! 😜', 'Escudo humano'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'});
   // T3 Guardaespaldas (niveles 2 en adelante, de a uno desde el 2026-11-10).
   const T3 = {linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'};
   esencial({...T3, nivel: 2, atrib: [13, 6, 6, 7, 4],   // (aprobado 2026-11-10: Golpe de escudo —1d10 + peso del escudo + Dmg, sin crítico, cooldown 3—; pasiva Guardia firme; + Botas de cuero de vaca y Guantes de pelea callejera)
     equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
-    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo'], pasivas: ['Guardia firme']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Escudo humano', 'Golpe de escudo'], pasivas: ['Guardia firme']});
   esencial({...T3, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-10: Interponerse; el escudo pasa a Buena: Escudo de la guardia, Guardián +1)
     equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza de cuero hervido', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
-    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse'], pasivas: ['Guardia firme']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Escudo humano', 'Golpe de escudo', 'Interponerse'], pasivas: ['Guardia firme']});
   esencial({...T3, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-11: Tirar la bronca; pasiva Robustez; Coraza consagrada en lugar de la de cuero hervido, para bancarse la magia)
     equipo: ['Espada del comisario', 'Escudo de la guardia', 'Coraza consagrada', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
-    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca'], pasivas: ['Guardia firme', 'Robustez']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca'], pasivas: ['Guardia firme', 'Robustez']});
   esencial({...T3, nivel: 5, atrib: [16, 9, 7, 9, 4],   // (aprobado 2026-11-11: Desarmar; Espada del herrero en lugar de la del comisario, para que pegue)
     equipo: ['Espada del herrero', 'Escudo de la guardia', 'Coraza consagrada', 'Capucha de lana del culto', 'Botas de cuero de vaca', 'Guantes de pelea callejera'],
-    habilidades: ['Provocar', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca', 'Desarmar'], pasivas: ['Guardia firme', 'Robustez']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Escudo humano', 'Golpe de escudo', 'Interponerse', 'Tirar la bronca', 'Desarmar'], pasivas: ['Guardia firme', 'Robustez']});
   esencial({linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 8, 11, 2],   // (2026-11-03, dueño: «me parece bien»)
     equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],
@@ -653,16 +653,16 @@
     estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el escudo lo tira y lo demora.'};
   esencial({...T1, nivel: 2, atrib: [13, 6, 6, 7, 4],
     equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
-    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo'], pasivas: ['Guardia firme']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Piel de hierro', 'Golpe de escudo'], pasivas: ['Guardia firme']});
   esencial({...T1, nivel: 3, atrib: [14, 7, 6, 8, 4],
     equipo: ['Hacha de piedra', 'Escudo de escamas', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
-    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante'], pasivas: ['Guardia firme']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Piel de hierro', 'Golpe de escudo', 'Aguante'], pasivas: ['Guardia firme']});
   esencial({...T1, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-06: Interponerse, Devolver gentileza, Media armadura de escudero)
     equipo: ['Hacha de piedra', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero'],
-    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse'], pasivas: ['Guardia firme', 'Devolver gentileza']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse'], pasivas: ['Guardia firme', 'Devolver gentileza']});
   esencial({...T1, nivel: 5, atrib: [16, 9, 7, 9, 4],   // (aprobado 2026-11-06: Escudo humano en lugar de «Muro de escudos»; Hacha del forjador)
     equipo: ['Hacha del forjador', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Botas de estibador'],
-    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse', 'Escudo humano'], pasivas: ['Guardia firme', 'Devolver gentileza']});
+    habilidades: ['¡Tu vieeeeja! 😜', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse', 'Escudo humano'], pasivas: ['Guardia firme', 'Devolver gentileza']});
 
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;

@@ -116,12 +116,31 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **🏃 Revisar en la compu: el token que no se mueve en el dodge roll de un área (dueño, 2026-11-14: «anotalo con un detalle bien explicado,
+>   porque no termino de entender qué es lo que puede fallar en esa acción»).**
+>   **Qué tiene que pasar:** en la Tormenta o el Meteoro, el que dice «Sí, esquiva» arrastra su token hasta 2 casilleros. Al soltarlo, el mapa
+>   guarda la casilla nueva, mira si quedó afuera del área y la ronda pasa al siguiente.
+>   **Qué pasó en las pruebas del ayudante** (con un robot que arrastraba el token del jugador de prueba): de 5 intentos, en 2 salió bien y en 3 el
+>   token se quedó en su casilla y la ronda quedó esperando, con el cartel «🏃 esquiva: dodge roll» abierto.
+>   **Por qué puede pasar — tres causas posibles:**
+>   1. **El ataque de oportunidad (le puede pasar a una persona).** Si al esquivar te alejás de un rival pegado, el movimiento queda «en pausa»
+>      hasta que el rival (el GM, si es un creep) conteste si te pega o te deja pasar. Mientras nadie contesta, el token no se mueve. En las pruebas,
+>      la pregunta del GM quedaba tapada por el cuadro del duelo y nadie la veía. **Ya está arreglado** (los carteles van encima del cuadro) y el
+>      que esquiva tiene «Seguir sin esperar».
+>   2. **Sin No2 (le puede pasar a una persona).** Si ya está en No2 negativos, sale «Hacerlo igual (discutilo con la mesa)». Hasta tocarlo, el
+>      token no se mueve. Es lo esperado; solo hay que ver que el cartel se vea y se entienda.
+>   3. **Una que no está clara.** En 1 caso el GM sí dejó pasar y el token igual no se movió, y en otro no apareció ningún cartel. Lo más probable
+>      es que el robot «agarró» mal: al decir «Sí» aparecen los circulitos del token (vida, SP, No2) y el clic pudo caer ahí en vez del token. Una
+>      persona apunta mejor, pero no se puede descartar que, después de la oportunidad, el movimiento no llegue a guardarse.
+>   **Qué hay de respaldo:** la pantalla de quien lanzó la habilidad mira el token; si se movió y quedó quieto 2,5 s, resuelve sola si salió o no.
+>   Si nunca se movió, siguen las salidas a mano: «✋ Me quedo donde estoy» (el jugador) y «✋ No, se queda» / «✔ A mano: ya salió» (el GM).
+>   **Para probar en la compu:** la Tormenta con Larry pegado a un creep: decir «Sí», arrastrar alejándose del creep, contestar la oportunidad
+>   desde el GM («dejarlo pasar»), y ver si el token llega a la casilla y la ronda sigue. Repetir sin rival pegado y con No2 en negativo.
 > - [ ] **🌩☄ Ver en el mapa la Tormenta arcana y el Meteoro de a uno (dueño, 2026-11-13: «cuando esté en la compu, ver el resultado de la tormenta
 >   arcana»).** Hecho y probado por un ayudante (commit b3a05dfc): el área sigue al mouse (todas las de área), el d20 en el cuadro, la ronda de
 >   «¿Esquiva?» por iniciativa, la lluvia con contador, el daño de a uno (creeps Nd4+1); el Meteoro, la misma ronda y el daño de a uno. Para mirar:
->   (1) el dodge roll arrastrando el token falló varias veces en las pruebas (sobre todo con el ataque de oportunidad del vecino o sin No2: «Hacerlo
->   igual»); hay un respaldo que lo resuelve solo si el token se movió; (2) los carteles que piden algo ahora van encima del cuadro del duelo, en todo
->   el mapa; (3) duda: ¿el dodge roll de un área sigue dando ataque de oportunidad al alejarse de un rival?; (4) antes de tirar el daño aparece el
+>   (1) el token que no se mueve en el dodge roll: ver el punto de arriba; (2) los carteles que piden algo ahora van encima del cuadro del duelo, en todo
+>   el mapa; (3) el dodge roll de un área sigue dando ataque de oportunidad al alejarse de un rival (dueño, 2026-11-14: queda así); (4) antes de tirar el daño aparece el
 >   cartel genérico «no hay nada que resistir: se aplica».
 > - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Soltarse (dueño, 2026-11-13).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
 >   Escudo elemental y el Malviaje → quedan como están; Inamovible → al cuadro del duelo (hecho). Quedó preguntado Soltarse (¿queda con su cartel, o al

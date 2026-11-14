@@ -532,7 +532,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     cuero grueso; Armas perforantes; Piel curtida. Vida 55, No2 6, Defensa 6, Def.Esp 2, PdG 7, Dmg 9, Parry 8, Bloqueo 9, Evasión 6. Sin SP (espera de turnos).
   - **Nivel 3 aprobado (dueño, 2026-11-14: «el armero nivel 3 está ok»)**: atrib [12, 9, 7, 7, 4]; el Martillo de herrero (Buena) en lugar del
     hacha; Ojo certero. Vida 60, No2 7, Defensa 6, Def.Esp 2, PdG 7, daño 1d10 + 10, Parry 8, Bloqueo 10, Evasión 7.
-  - **Niveles 2 y 3: falta cargarlos** en `comun/creeps-esenciales.js` (con su prueba en `comun/pruebas.html`), cuando no haya un ayudante tocando esos archivos.
+  - **Nivel 4 aprobado (dueño, 2026-11-14: «va así»)**: atrib [13, 10, 7, 8, 4]; la Coraza de hierro batido (Buena) en lugar del Chaleco de cuero;
+    Potencia; Desvío hábil. Vida 65, No2 7, Defensa 9, Def.Esp 2, PdG 8, daño 1d10 + 11, Parry 10, Bloqueo 11, Evasión 7.
+  - **Niveles 2, 3 y 4: falta cargarlos** en `comun/creeps-esenciales.js` (con su prueba en `comun/pruebas.html`), cuando no haya un ayudante tocando esos archivos.
 
 - **W2 · Berserker · Warrior** (boceto aprobado 2026-11-03; dueño: «me cierra como ruta», con Fue −2 y Des +2, espadas en vez del hacha y la
   poción de regeneración chica). Estrategia: cuanto más herido, más peligroso; espadachín de dos armas que busca el crítico. Atributos
@@ -1273,7 +1275,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L6 | ✅ (2026-11-05, cargado) | | | | |
 | R3 | ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
-| S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | ✅ aprobado (2026-11-14), a cargar | | |
+| S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | |
 | D3 | ✅ (2026-11-03) | | | | |
 | W4 | ✅ (2026-11-05, cargado) | | | | |
 | T4 | ✅ (2026-11-05, cargado) | | | | |

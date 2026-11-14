@@ -489,9 +489,10 @@ function oportunidadEvaluarRuta(t, ruta){
   if(!ruta || ruta.length < 2) return [];
   if(t.oculto || enSigilo(t) || etereoDe(t)) return [];  // un token oculto no delata su movimiento (👁 uno etéreo no da oportunidad)
   const id = rutaTokenId(t);
-  if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return [];   // 🪵 el dodge roll de Tronco de huída: sin oportunidad
+  const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(id) : null;   // 🏃 el dodge roll: no a quien lo originó (js/13, 2026-11-14)
+  if(dop && dop.todos) return [];   // 💨 un movimiento libre (Hit and run…): a nadie
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !oporPuede(r) && oporRivalVisible(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));   // 🥷 del que no se ve, ni el aviso (P235)
+  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !(dop && dop.excluir && rid === dop.excluir) && !oporPuede(r) && oporRivalVisible(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));   // 🥷 del que no se ve, ni el aviso (P235)
   const salidos = [];
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];

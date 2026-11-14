@@ -63,11 +63,12 @@ function oporPuede(r){
 // El primer punto del camino en que se aleja de un rival que puede aprovecharlo → {indice (último casillero al lado), rivalId} o null.
 function oportunidadCorte(t, id, ruta){
   if(modoMapa !== 'combate') return null;
-  if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return null;   // 🪵 el dodge roll de Tronco de huída no da oportunidad   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
+  const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(id) : null;   // 🏃 el dodge roll: no a quien lo originó (js/13, 2026-11-14)
+  if(dop && dop.todos) return null;   // 💨 un movimiento libre (Hit and run…): a nadie   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
   if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
   oportunidadSecretas = [];
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid), escondido: !oporRivalVisible(r)}));
+  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !(dop && dop.excluir && rid === dop.excluir) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid), escondido: !oporRivalVisible(r)}));
   const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has(vigClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
   if(!ids.length && !vig.length) return null;
   for(let i = 1; i < ruta.length; i++){
@@ -94,13 +95,13 @@ function oportunidadCorte(t, id, ruta){
    centro —a quien lo maneja: el GM si es un creep o tiene 🎮 el control— y queda la línea en la Mesa. Un rival que quien se mueve no ve (oculto, en
    sigilo, en la niebla) no se nombra: no se avisa. `ruta` = las casillas, de la de salida a la de llegada (un teletransporte: [desde, hasta]);
    `excluir` = el id de un rival que no cuenta (el que atraviesa un Dash: a ese le pega). */
-function oporNegadaAvisar(t, id, ruta, motivo, excluir){
+function oporNegadaAvisar(t, id, ruta, motivo, excluir, solo){   // `solo`: el único rival a avisar (el dodge roll: a quien lo originó, 2026-11-14)
   try{
     if(modoMapa !== 'combate' || !t || !Array.isArray(ruta) || ruta.length < 2) return [];
     if(t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t)) return [];   // ahí tampoco había oportunidad
     const rivales = new Set(rivalesDe(t)), negados = [];
     for(const [rid, r] of tokens){
-      if(rid === id || rid === excluir || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || !oporRivalVisible(r) || !oporPuede(r)) continue;
+      if(rid === id || rid === excluir || (solo && rid !== solo) || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || !oporRivalVisible(r) || !oporPuede(r)) continue;
       if(oportunidadUsadas.has(oporClave(id, rid))) continue;   // ya se le ofreció por esta misma salida y siguen pegados (no es un tope por ronda: el único límite son los No2)
       const c = {col: r.col, fila: r.fila};
       if(ruta.some((b, i) => i > 0 && distanciaHex(ruta[i - 1], c) === 1 && distanciaHex(b, c) !== 1)) negados.push([rid, r]);
@@ -207,6 +208,7 @@ async function oportunidadSecretasPublicar(tokenId){
 }
 // Sigue el camino que había marcado, desde donde se frenó (el resto pasa por las mismas reglas: trampas, percepción, otros rivales).
 function oporContinuar(e){
+  if(typeof dodgeFrenado !== 'undefined') dodgeFrenado.delete(e.tokenId);   // 🏃 sigue el dodge roll: al llegar, se revisa si salió (js/13)
   const t = tokens.get(e.tokenId);
   if(!t || !e.resto || e.resto.length < 2) return;
   // 🐞 (2026-11-03, pruebas en el mapa): si el token ya no está donde se frenó (lo movieron después, p. ej. el GM lo arrastró de nuevo), no se
@@ -224,8 +226,10 @@ function oporSigueDondeSeFreno(t, resto){
   return !!(t && c) && Math.round(num(t.col)) === Math.round(num(c.col)) && Math.round(num(t.fila)) === Math.round(num(c.fila));
 }
 // Llega o cambia un momento de oportunidad (lo llama momentoRecibido, js/16).
+const oporPorMover = new Map();   // 🏃 tokenId → estado de su último momento de oportunidad (lo mira el respaldo de la ronda de «¿Esquiva?», js/118)
 function oporMomento(id, d){
   if(d.tipo !== 'oportunidad') return;
+  if(d.datos && d.datos.moverId) oporPorMover.set(String(d.datos.moverId), d.estado);
   // Quien decide: la pregunta al centro.
   if(d.estado === 'esperando' && oporSoyDecisor(d) && !(oporDecision && oporDecision.id === id)){ oporDecision = {id, d, paso: 'pregunta', armas: null}; renderOporDecision(); }
   if(d.estado !== 'esperando' && oporDecision && oporDecision.id === id && !oporDecision.cerrar){ oporDecision = null; renderOporDecision(); }   // lo contestó otra pantalla
@@ -239,7 +243,9 @@ function oporMomento(id, d){
     if(d.estado === 'no'){ const e = oporEspera; oporEspera = null; renderOporEspera(); oporContinuar(e); toast(`⚔ ${d.resultado && /nadie/.test(d.resultado) ? 'Seguís tu camino' : 'Te dejó pasar: seguís tu camino'}`); }
     else if(d.estado === 'si'){
       const r = tokens.get(oporEspera.rivalId);
-      oporEspera.resultado = `${r ? nombreDe(r) : 'El rival'} ${oporEspera.vigilancia ? 'te dispara desde la vigilancia' : 'te ataca de oportunidad'}: resolvé el duelo y después seguí tu turno como quieras.`;
+      // 🏃 En medio de un dodge roll (2026-11-14): el camino se descarta como siempre, pero el dodge roll sigue — su cartel queda para volver a arrastrar el token.
+      const enDodgeRoll = typeof dodgeFrenado !== 'undefined' && dodgeFrenado.delete(oporEspera.tokenId);
+      oporEspera.resultado = `${r ? nombreDe(r) : 'El rival'} ${oporEspera.vigilancia ? 'te dispara desde la vigilancia' : 'te ataca de oportunidad'}: ${enDodgeRoll ? 'resolvé el duelo y después volvé a arrastrar el token para terminar el dodge roll (o tocá «Me quedo»).' : 'resolvé el duelo y después seguí tu turno como quieras.'}`;
       renderOporEspera();
     }
   }

@@ -3935,6 +3935,9 @@ const Duelo = (() => {
         if(ahora - t > AUTOABRIR_MS) return;
         autoAbiertos.add(d.id);
         if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
+        // 🏃 (2026-11-14) Con el cuadro de otro duelo minimizado (el «¿Esquiva?» mientras se arrastra el token del dodge roll), un duelo nuevo donde esta
+        // pantalla tiene que hacer algo (el ataque de oportunidad que le cae a quien esquiva) se abre igual: si no, quedaba en un botón abajo y nadie lo veía.
+        else if(actual.min && (esMio(d.defensor) || esMio(d.atacante))) abrir(d.id);
       });
       revisarPasos();
       dibujarChips();

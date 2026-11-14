@@ -116,26 +116,29 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
-> - [ ] **🏃 Revisar en la compu: el token que no se mueve en el dodge roll de un área (dueño, 2026-11-14: «anotalo con un detalle bien explicado,
->   porque no termino de entender qué es lo que puede fallar en esa acción»).**
->   **Qué tiene que pasar:** en la Tormenta o el Meteoro, el que dice «Sí, esquiva» arrastra su token hasta 2 casilleros. Al soltarlo, el mapa
->   guarda la casilla nueva, mira si quedó afuera del área y la ronda pasa al siguiente.
->   **Qué pasó en las pruebas del ayudante** (con un robot que arrastraba el token del jugador de prueba): de 5 intentos, en 2 salió bien y en 3 el
->   token se quedó en su casilla y la ronda quedó esperando, con el cartel «🏃 esquiva: dodge roll» abierto.
->   **Por qué puede pasar — tres causas posibles:**
->   1. **El ataque de oportunidad (le puede pasar a una persona).** Si al esquivar te alejás de un rival pegado, el movimiento queda «en pausa»
->      hasta que el rival (el GM, si es un creep) conteste si te pega o te deja pasar. Mientras nadie contesta, el token no se mueve. En las pruebas,
->      la pregunta del GM quedaba tapada por el cuadro del duelo y nadie la veía. **Ya está arreglado** (los carteles van encima del cuadro) y el
->      que esquiva tiene «Seguir sin esperar».
->   2. **Sin No2 (le puede pasar a una persona).** Si ya está en No2 negativos, sale «Hacerlo igual (discutilo con la mesa)». Hasta tocarlo, el
->      token no se mueve. Es lo esperado; solo hay que ver que el cartel se vea y se entienda.
->   3. **Una que no está clara.** En 1 caso el GM sí dejó pasar y el token igual no se movió, y en otro no apareció ningún cartel. Lo más probable
->      es que el robot «agarró» mal: al decir «Sí» aparecen los circulitos del token (vida, SP, No2) y el clic pudo caer ahí en vez del token. Una
->      persona apunta mejor, pero no se puede descartar que, después de la oportunidad, el movimiento no llegue a guardarse.
->   **Qué hay de respaldo:** la pantalla de quien lanzó la habilidad mira el token; si se movió y quedó quieto 2,5 s, resuelve sola si salió o no.
->   Si nunca se movió, siguen las salidas a mano: «✋ Me quedo donde estoy» (el jugador) y «✋ No, se queda» / «✔ A mano: ya salió» (el GM).
->   **Para probar en la compu:** la Tormenta con Larry pegado a un creep: decir «Sí», arrastrar alejándose del creep, contestar la oportunidad
->   desde el GM («dejarlo pasar»), y ver si el token llega a la casilla y la ronda sigue. Repetir sin rival pegado y con No2 en negativo.
+> - [ ] **🏃 El dodge roll de un área: revisado y arreglado (2026-11-14); queda verlo en la compu.** El dueño pidió: «fijate si el problema es que el cartel
+>   quedara tapado… valete de la cuenta de jugador y la de GM» y la regla de los No2. Un ayudante lo volvió a probar con las dos cuentas a la vez
+>   (capturas de las dos pantallas en cada paso), arrastrando bien el token. **Qué fallaba (tres cosas, las tres arregladas):**
+>   1. **El duelo del ataque de oportunidad no se abría para el que esquiva.** Si el rival le pegaba de oportunidad, el cuadro de ese duelo le quedaba
+>      como un botón chico abajo («⚔ Ver duelo…»), porque ya tenía otro cuadro (el «¿Esquiva?») minimizado. Nadie tiraba la Evasión y todo quedaba
+>      esperando. Ahora un duelo nuevo donde te toca hacer algo se abre aunque tengas otro minimizado.
+>   2. **Se daba por «sigue adentro» antes de tiempo.** Si el ataque de oportunidad lo frenaba a mitad de camino (todavía adentro del área), el mapa
+>      revisaba ahí mismo y lo daba por que se quedó, aunque después el rival lo dejara pasar y saliera. Ahora espera a que termine de moverse.
+>   3. (Lo que se sospechaba) **el cartel tapado**: ya estaba arreglado del día anterior; en las pruebas se vio siempre arriba.
+>   **Regla del ataque de oportunidad en el dodge roll (dueño, 2026-11-14):** al que originó lo que se esquiva (el que te atacó, o quien lanzó el área) no
+>   le da oportunidad; a otro rival pegado, sí. Así quedó en el dodge roll de un área (Tormenta, Meteoro y las áreas del duelo) y en el de Tronco de
+>   huída y el del arco (antes esos dos no le daban oportunidad a nadie). Al que se le niega, le llega el aviso «se alejó con un dodge roll: no permite
+>   ataque de oportunidad». Los movimientos libres que no son dodge roll (Hit and run, Disparo y repliegue, Bomba de humo, la huida del robo) siguen sin
+>   darle oportunidad a nadie.
+>   **Regla de los No2 (dueño, 2026-11-14):** con 0 No2 o más, el dodge roll se puede hacer aunque cueste más (queda en negativo); con los No2 **ya en
+>   negativo, no hay dodge roll**: en la ronda de «¿Esquiva?» no se le ofrece «Sí, esquiva», le sale a él y al GM «X no puede esquivar: sus No2 están en
+>   −N. Se queda en el área» con «Entendido», y la ronda sigue. Igual en la fase de dodge roll de las otras áreas del duelo. El de Tronco de huída y el
+>   del arco no cambiaron: Tronco se hace aunque no alcancen (y si ya estaba en negativo, pregunta «Hacerlo igual»); el del arco necesita que alcancen.
+>   **Probado en el mapa** (Meteoro, mapa propio, J1 con Prueba Uno y el GM): sin rival pegado → salió; con una rata pegada, el GM «dejarlo pasar» →
+>   salió; el GM «atacar» → se abrió el duelo para los dos, se resolvió y al volver a arrastrar salió; el que lanzó pegado → sin oportunidad, con el aviso
+>   al GM; frenado a mitad de camino y dejado pasar → salió (antes: «sigue adentro»); con 0 No2 → esquivó y quedó en −2; con −1 → el aviso en las dos
+>   pantallas y le cayó el meteoro. **Para ver vos en la compu:** lo mismo con Larry en una mesa real.
+>   (Visto de paso, sin tocar: un personaje en 0 de vida, inconsciente, igual pudo arrastrar su token para terminar el dodge roll.)
 > - [ ] **🌩☄ Ver en el mapa la Tormenta arcana y el Meteoro de a uno (dueño, 2026-11-13: «cuando esté en la compu, ver el resultado de la tormenta
 >   arcana»).** Hecho y probado por un ayudante (commit b3a05dfc): el área sigue al mouse (todas las de área), el d20 en el cuadro, la ronda de
 >   «¿Esquiva?» por iniciativa, la lluvia con contador, el daño de a uno (creeps Nd4+1); el Meteoro, la misma ronda y el daño de a uno. Para mirar:

@@ -646,7 +646,8 @@ function rutaSoltada(a, t){
     // casillero al lado de ese rival y espera la decisión; el resto del camino queda guardado.
     const opor = oportunidadCorte(t, a.id, a.ruta);
     if(opor && (indice < 0 || opor.indice < indice)){
-      oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice), ...(opor.cruza ? {cruza: true} : {}), ...(opor.vigilancia ? {vigilancia: true} : {})};   // 🕊 cruza: pasa por encima (js/17)   // 👁 en la mira de quien vigila (js/58)
+      oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice), ...(opor.cruza ? {cruza: true} : {}), ...(opor.vigilancia ? {vigilancia: true} : {})};
+      { const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(a.id) : null; if(dop && !dop.todos) dodgeFrenado.add(a.id); }   // 🏃 un dodge roll frenado: no se revisa si salió hasta que siga (js/13)   // 🕊 cruza: pasa por encima (js/17)   // 👁 en la mira de quien vigila (js/58)
       a.ruta = a.ruta.slice(0, opor.indice + 1);
       const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
       a.x = pc.x; a.y = pc.y;
@@ -705,8 +706,10 @@ function rutaSoltada(a, t){
     }
     const alMoverAntes = libre && dodgeBanner.antes && typeof dodgeBanner.alMover === 'function' ? dodgeBanner.alMover : null;   // 💨 Disparo y repliegue (js/57): después de moverse, el disparo   // 💨 Picar y alejarse (js/57): los primeros N, gratis   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
-    if(libre && typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, a.id, a.ruta, dodgeBanner.motivo);   // 💨 a quien se le niega la oportunidad, el aviso (js/17)
-    if(libre){ dodgeBanner = null; renderDodgeBanner(); }
+    // 💨 a quien se le niega la oportunidad, el aviso (js/17). 🏃 En un dodge roll (2026-11-14) solo a quien lo originó: los demás rivales pegados sí la tienen.
+    { const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(a.id) : null;
+      if(dop && typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, a.id, a.ruta, dodgeBanner.motivo || 'un dodge roll', null, dop.todos ? null : (dop.excluir || '-')); }
+    if(libre && !dodgeFrenado.has(a.id)){ dodgeBanner = null; renderDodgeBanner(); }   // (frenado por una oportunidad: el cartel sigue hasta terminar el dodge roll)
     if(alMoverAntes) setTimeout(alMoverAntes, 450);   // (que el token ya esté en su casilla nueva al elegir el objetivo)
     if(dodgeArco){
       const at = tokens.get(dodgeArco.atacanteId), ini = a.ruta[0], fin = a.ruta[a.ruta.length - 1];
@@ -731,6 +734,13 @@ function rutaSoltada(a, t){
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, miedo: a.costo.miedo, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
         gratis: Math.min(pasos, num(a.costo.gratis)), sprint: Math.min(Math.max(0, pasos - num(a.costo.gratis)), num(a.costo.sprint)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita)), avisoFin: a.avisoFin || ''};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
+      // ⚖ El dodge roll de un área (dueño, 2026-11-14): con los No2 ya en negativo no hay dodge roll — no se mueve y se queda en el área (sin «Hacerlo igual»).
+      if(dodgeRegla && enDodge(a.id) && !libre){
+        rutaPendiente = null; visibles.delete(a.id); pedirDibujo();
+        AvisoCombate.mostrar({icono: '⚖', titulo: 'No podés hacer el dodge roll', texto: `Tus No2 están en ${fmt(num(a.costo.disponibles))}: con los No2 en negativo no hay dodge roll. Te quedás en el área.`, boton: 'Entendido'});
+        dodgeDeclinar();
+        return;
+      }
       if(dodgeRegla){
         const rp = rutaPendiente;
         rp.esperaRegla = true;   // mientras está el cartel, el clic en sus botones no confirma la ruta (js/08: «un clic en cualquier otro lado lo confirma»; 2026-11-03)

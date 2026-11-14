@@ -65,6 +65,33 @@ function secuenciaEsperar(id, topeMs){
   });
 }
 const secuenciaPausa = ms => new Promise(r => setTimeout(r, ms));
+/* ⚖ El dodge roll y los No2 (dueño, 2026-11-14: «con 0 No2 o más, el dodge roll se puede hacer —aunque cueste más de lo que tiene y quede en negativo—;
+   con los No2 YA en negativo, no hay dodge roll»). Vale para el dodge roll de un área (esta ronda y la fase dodge de las áreas del duelo, js/13); el de
+   Tronco de huída y el del arco siguen con su regla. → los No2 (negativos) si ya está en negativo, o null (puede, o no se sabe: un creep en otra pantalla). */
+function dodgeNo2Negativos(t){
+  const c = t && typeof costoMoverDe === 'function' ? costoMoverDe(t) : null;
+  if(!c || c.disponibles === undefined || c.disponibles === null || !Number.isFinite(Number(c.disponibles))) return null;
+  return num(c.disponibles) < 0 ? num(c.disponibles) : null;
+}
+// El aviso, a quien lo maneja y al GM (al centro, con «Entendido»), y la línea en la Mesa.
+function dodgeSinNo2Avisar(t, id, nombre, neg, meteoro){
+  const quien = nombreDe(t), decide = typeof oporDecide === 'function' ? oporDecide(t) : 'gm';
+  const gmUid = (fbPartida && fbPartida.gmUid) || (soyGM ? fbUsuario.uid : '');
+  const uids = [...new Set([decide === 'gm' ? gmUid : decide, gmUid].filter(Boolean))];
+  const texto = `No puede hacer el dodge roll: sus No2 están en ${fmt(neg)}. ${quien} se queda en el área de ${nombre}.`;
+  try{ mesaLinea(`${meteoro ? '☄' : '🌩'} ${texto}`, 'recordatorio'); }catch(e){}
+  momentoAbrir({tipo: 'dodge-sin-no2', icono: '⚖', titulo: `${quien} no puede esquivar`, resultado: texto, estado: 'listo',
+    datos: {aviso: true, paraUids: uids, boton: 'Entendido', pasos: [{titulo: `${meteoro ? '☄ ¡Cae el meteoro!' : '🌩 ¡Se viene la tormenta!'}`,
+      texto: `${quien} no puede hacer el dodge roll: sus No2 están en ${fmt(neg)} (con los No2 en negativo no hay dodge roll). Se queda en el área.`}]}}).catch(() => {});
+}
+// ¿Ese token está frenado esperando un ataque de oportunidad (o su duelo)? Lo ve cualquier pantalla por los momentos (js/16) y los duelos abiertos.
+function secuenciaOporEsperando(id){
+  try{
+    if(typeof dodgeFrenado !== 'undefined' && dodgeFrenado.has(id)) return true;
+    if(typeof oporPorMover !== 'undefined'){ const e = oporPorMover.get(String(id)); if(e === 'esperando' || e === 'si') return true; }   // (js/17)
+  }catch(e){}
+  return false;
+}
 
 /* ---------- La secuencia ----------
    o = {yo (quien la lanza: {ref, tipo, nombre}), casteador ({…, uid, tokenId}), hab (la de la habilidad, con `tormenta` o `meteoro`), centro {col, fila},
@@ -103,6 +130,9 @@ async function secuenciaArea(o){
       const id = ronda[i], t = tokens.get(id);
       if(!t || !secuenciaAdentro(area, id)) continue;   // ya salió (lo movieron) o cayó
       await secuenciaPausa(i ? 900 : 300);
+      // ⚖ Con los No2 ya en negativo no hay dodge roll (dueño, 2026-11-14): no se le ofrece «Sí, esquiva»; el aviso, y se queda en el área.
+      const neg = dodgeNo2Negativos(t);
+      if(neg !== null){ dodgeSinNo2Avisar(t, id, nombre, neg, meteoro); await secuenciaPausa(1500); continue; }
       const habE = {nombre, objetivo: 'area', radio, tira: null, contra: [], efectos: [], dano: null, soloDodge: true, esquiva: true, ...(meteoro ? {meteoro: true} : {tormenta: hab.tormenta || {}})};
       let dId = null;
       try{
@@ -112,6 +142,7 @@ async function secuenciaArea(o){
       if(!dId){ mesaLinea(`🌩 ${nombre}: no se pudo preguntar a ${nombreDe(t)} si esquiva — resolvelo a mano con la mesa`, 'recordatorio'); continue; }
       // Si el token se movió y quedó quieto, se revisa desde acá también (por si la pantalla de quien esquivó no llegó a hacerlo: el movimiento quedó
       // esperando el ataque de oportunidad, recargó la página…).
+      if(typeof oporPorMover !== 'undefined') oporPorMover.delete(String(id));   // (lo de un movimiento anterior no cuenta)
       const desde = {col: t.col, fila: t.fila};
       let quieto = null, vigila = true;
       const reloj = setInterval(() => {
@@ -120,6 +151,7 @@ async function secuenciaArea(o){
         if(!x || (x.col === desde.col && x.fila === desde.fila)){ quieto = null; return; }
         const k = x.col + ',' + x.fila;
         if(!quieto || quieto.k !== k){ quieto = {k, t: Date.now()}; return; }
+        if(secuenciaOporEsperando(id)){ vigila = false; return; }   // 🏃 lo frenó un ataque de oportunidad (2026-11-14): el respaldo se apaga; lo revisa la pantalla de quien esquiva al terminar de moverse
         if(Date.now() - quieto.t > 2500){ vigila = false; Duelo.resolverDodge(dId, !secuenciaAdentro(area, id)).catch(err => console.error(`${nombre}: revisar el dodge roll`, err)); }
       }, 700);
       await secuenciaEsperar(dId);

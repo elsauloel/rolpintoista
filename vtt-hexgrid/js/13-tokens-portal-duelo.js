@@ -1430,17 +1430,24 @@ function dueloDodgeEmpieza(d){
   }
   // 🌩 El «¿Esquiva?» de a uno (js/118): el cuadro se queda abierto con la pregunta; recién con «Sí» se aparta y aparece el cartel (dueloDodgeSi).
   if(d.hab && d.hab.esquiva){ Duelo.abrir(d.id); return; }
+  // ⚖ Con los No2 ya en negativo no hay dodge roll (dueño, 2026-11-14; js/118 dodgeNo2Negativos): se queda en el área. Lo resuelve una sola pantalla (el GM).
+  { const t = tokens.get(d.defensor.tokenId), neg = dodgeNo2Negativos(t);
+    if(neg !== null){
+      if(soyGM) Duelo.resolverDodge(d.id, false).then(() => dodgeSinNo2Avisar(t, d.defensor.tokenId, (d.hab && d.hab.nombre) || 'el área', neg, !!(d.hab && d.hab.meteoro)))
+        .catch(err => console.error('No se pudo resolver el dodge roll sin No2:', err));
+      return;
+    } }
   Duelo.abrir(d.id);
   Duelo.minimizar();
   seleccionar(d.defensor.tokenId);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {}), ...(d.hab && d.hab.meteoro ? {meteoro: `${(d.hab.dano && d.hab.dano.formula) || '?'} físico${d.hab.dano && d.hab.dano.extra ? ` + ${d.hab.dano.extra.formula} de ${d.hab.dano.extra.tipo}` : ''}`} : {})};   // (la Tormenta arcana: sin tirada · ☄ el Meteoro)
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, atacanteId: (d.atacante && d.atacante.tokenId) || '', ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {}), ...(d.hab && d.hab.meteoro ? {meteoro: `${(d.hab.dano && d.hab.dano.formula) || '?'} físico${d.hab.dano && d.hab.dano.extra ? ` + ${d.hab.dano.extra.formula} de ${d.hab.dano.extra.tipo}` : ''}`} : {})};   // (la Tormenta arcana: sin tirada · ☄ el Meteoro)
   renderDodgeBanner();
 }
 // 🌩 «Sí, esquiva» (comun/duelo.js, el cuadro ya se apartó): el token seleccionado y el cartel para arrastrarlo.
 function dueloDodgeSi(d){
   if(!d || !d.defensor) return;
   seleccionar(d.defensor.tokenId);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, esquiva: true};
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, esquiva: true, atacanteId: (d.atacante && d.atacante.tokenId) || ''};
   renderDodgeBanner();
 }
 function dueloDodgeTermina(d){
@@ -1448,8 +1455,8 @@ function dueloDodgeTermina(d){
   if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) Duelo.abrir(d.id);
 }
 /* 🪵 Tronco de huída (2026-10-10): esquivó un golpe directo con el Flash que da dodge roll → en la pantalla de quien esquivó, el mismo cartel
-   del dodge roll (`libre`): puede moverse hasta 2 casilleros pagando sus No2 (aunque no le alcancen, como cualquier dodge) y sin que lo frene un
-   ataque de oportunidad; «Me quedo» lo cierra, y se cierra solo al moverse. Estando Expuesto no puede moverse (no reacciona con No2). */
+   del dodge roll (`libre`): puede moverse hasta 2 casilleros pagando sus No2 (aunque no le alcancen, como cualquier dodge); quien lo atacó no tiene
+   ataque de oportunidad, otro rival pegado sí (dodgeOporDe, 2026-11-14); «Me quedo» lo cierra, y se cierra solo al moverse. Estando Expuesto no puede moverse (no reacciona con No2). */
 function dueloDodgeLibre(d){
   const t = d.defensor && tokens.get(d.defensor.tokenId);
   if(!t) return;
@@ -1457,16 +1464,30 @@ function dueloDodgeLibre(d){
   seleccionar(d.defensor.tokenId);
   // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll es obligatorio para contraatacar: 1 casillero más lejos del atacante, pagando sus No2.
   const arco = !!(d.contacto && d.contacto.dodgeArco);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true, motivo: 'un dodge roll que no da ataque de oportunidad', ...(arco ? {arco: true, atacanteId: d.atacante.tokenId} : {})};
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true, esDodge: true, motivo: 'un dodge roll', atacanteId: (d.atacante && d.atacante.tokenId) || '', ...(arco ? {arco: true} : {})};
   renderDodgeBanner();
 }
 const dodgeLibreDe = id => !!(dodgeBanner && dodgeBanner.libre && dodgeBanner.tokenId === id);
+/* 🏃 El dodge roll y el ataque de oportunidad (dueño, 2026-11-14: «si el dodge roll primero requiere una tirada de Evasión exitosa, eso ya implica que no
+   hay ataque de oportunidad contra la persona que estás esquivando. Pero si tenés dos rivales adyacentes, uno te ataca, tirás dodge roll, el otro tiene
+   ataque de oportunidad»): al que originó lo que se esquiva (el que atacó, o quien lanzó el área) no le da oportunidad; a los demás rivales pegados, sí.
+   Lo usan oportunidadCorte (js/17) y oportunidadEvaluarRuta (js/02). → null (no está en ningún movimiento especial), {todos: true} (un movimiento libre
+   que no es un dodge roll y no le da oportunidad a nadie: Hit and run, Disparo y repliegue, Bomba de humo, la huida del robo) o {excluir: tokenId}. */
+function dodgeOporDe(id){
+  if(!dodgeBanner || dodgeBanner.tokenId !== id) return null;
+  if(dodgeBanner.libre && !dodgeBanner.esDodge) return {todos: true};
+  return {excluir: String(dodgeBanner.atacanteId || '')};
+}
+/* 🏃 Un dodge roll frenado por un ataque de oportunidad (2026-11-14): mientras el rival decide, el token quedó a mitad de camino; no se revisa todavía si
+   salió del área (antes se resolvía «sigue adentro» al llegar a la casilla donde se frenó, aunque después siguiera su camino). Lo marca js/06 al frenarse
+   y lo saca js/17 al seguir (o si lo atacaron: ahí el cartel del dodge roll sigue, para volver a arrastrar el token). */
+const dodgeFrenado = new Set();
 function renderDodgeBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!dodgeBanner){ AvisoCombate.cartel('dodge', null); return; }
   if(dodgeBanner.libre && dodgeBanner.arco){
     AvisoCombate.cartel('dodge', {icono: '🏹', titulo: `${dodgeBanner.nombre}: dodge roll para contraatacar`, posicion: 'abajo',
-      texto: 'Con el arco, para contraatacar: arrastrá el token 1 o 2 casilleros, más lejos del atacante (tienen que alcanzarte los No2; sin ataque de oportunidad).',
+      texto: 'Con el arco, para contraatacar: arrastrá el token 1 o 2 casilleros, más lejos del atacante (tienen que alcanzarte los No2; quien te atacó no tiene ataque de oportunidad, otro rival pegado sí).',
       botones: [{texto: '✋ No contraataco', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
@@ -1493,7 +1514,7 @@ function renderDodgeBanner(){
   }
   if(dodgeBanner.libre){
     AvisoCombate.cartel('dodge', {icono: '🪵', titulo: `${dodgeBanner.nombre} esquivó: dodge roll`, posicion: 'abajo',
-      texto: 'Arrastrá el token hasta 2 casilleros (paga sus No2; sin ataque de oportunidad).',
+      texto: 'Arrastrá el token hasta 2 casilleros (paga sus No2; quien te atacó no tiene ataque de oportunidad, otro rival pegado sí).',
       botones: [{texto: '✋ Me quedo', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
@@ -1511,8 +1532,8 @@ function renderDodgeBanner(){
 // 🏃 Al soltar el movimiento del que hace el dodge roll de un área, se revisa solo si salió (2026-10-26, dueño: antes había que abrir el duelo
 // y tocar «Ya se movió: revisar», y el cartel seguía diciendo «Arrastrá…» con «No me quiero mover»).
 function dodgeTrasMover(id){
-  if(!dodgeBanner || dodgeBanner.libre || dodgeBanner.tokenId !== id) return;
-  setTimeout(() => { if(dodgeBanner && !dodgeBanner.libre && dodgeBanner.tokenId === id) dodgeDeclinar(); }, 400);
+  if(!dodgeBanner || dodgeBanner.libre || dodgeBanner.tokenId !== id || dodgeFrenado.has(id)) return;
+  setTimeout(() => { if(dodgeBanner && !dodgeBanner.libre && dodgeBanner.tokenId === id && !dodgeFrenado.has(id)) dodgeDeclinar(); }, 400);
 }
 async function dodgeDeclinar(){
   if(!dodgeBanner) return;

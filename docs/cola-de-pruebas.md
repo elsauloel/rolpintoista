@@ -36,10 +36,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   algo (el dodge roll, el ataque de oportunidad del GM…) van por encima del cuadro del duelo (comun/aviso-combate.js). Video: `tormenta-ronda-y-lluvia-*.mp4`.
 - **⬜ en cola (la próxima) — 🩸 Sanguijuela: muerde de nuevo al empezar el turno, y la animación de toda transferencia de vida** (dueño, 2026-11-14).
   1. **La regla:** al empezar el turno de quien la tiene pegada, la sanguijuela le hace **1d6** de daño y quien la lanzó se cura **la mitad de lo
-     que entró, para arriba**. Lo tira **quien lanzó la sanguijuela** con su botón, en el cuadro del duelo (el GM por un creep). Supuestos (propuestos
-     al dueño, sin respuesta todavía; si dice otra cosa, se ajusta): daño siniestro, lo frenan la Def.Esp y la Res. siniestro, como la mordida de
-     entrada; **primero** el intento de arrancarla (Fuerza contra el Ef.Esp) y, si no se la arranca, la mordida. Vale para creeps y para el
-     Debuffer de clase (la misma habilidad).
+     que entró, para arriba**. Lo tira **quien lanzó la sanguijuela** con su botón, en el cuadro del duelo (el GM por un creep). Definido por el dueño
+     (2026-11-14): **daño directo** (no lo frena la Def.Esp), **sí lo frena la Res. siniestro**; **primero la mordida y después** el intento de
+     arrancarla (Fuerza contra el Ef.Esp); vale también para la Sanguijuela del Debuffer de clase (la misma habilidad).
   2. **Cómo se comunica** (el dueño lo describió así): empieza el turno del afectado → aviso «tenés una sanguijuela» → quien la lanzó tira el
      1d6 → el daño → la cura que se lleva. Y si al afectado lo iba a curar algo (su **Regeneración**, una poción…), se le avisa claro que esa
      cura **no lo curó a él, se la llevó su rival** (cuánto y a quién).

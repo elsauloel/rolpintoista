@@ -926,8 +926,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     tiene un poco más de sentido»); + Casco de cuero endurecido y Guantes de duelista de taberna; Desarmar; Guardia firme. Vida 50, No2 7, Defensa 5,
     PdG 7, Dmg 7, Parry 8, Bloqueo 8. **Cargado (2026-11-14).**
   - **Nivel 3 aprobado (dueño, 2026-11-14: «va»)**: atrib [11, 8, 7, 8, 4]; la Maza de guerra (Buena: Demora 50 %, Pajaritos 25 %) en lugar del
-    Mazo de carnicero; Puño de roca. Vida 55, No2 7, Defensa 5, PdG 8, daño 1d10 + 8, Parry 9, Bloqueo 9. **Cargado (2026-11-14).** Al cargarlo, revisar si la
-    Demora del Puño de roca y la de la maza en el mismo golpe se suman (2 lugares) o quedan en uno.
+    Mazo de carnicero; Puño de roca. Vida 55, No2 7, Defensa 5, PdG 8, daño 1d10 + 8, Parry 9, Bloqueo 9. **Cargado (2026-11-14).** Revisado al cargarlo: la
+    Demora del Puño de roca y la de la maza en el mismo golpe **se suman** (baja 2 lugares) — **queda así** (dueño, 2026-11-14).
   - **Nivel 4 aprobado (dueño, 2026-11-14: «va así»)**: atrib [12, 9, 8, 8, 4]; la Media armadura de escudero (Buena) en lugar del Peto de hierro;
     Arrastrar; Marcar el ritmo. Vida 65, No2 8, Defensa 7, PdG 8, daño 1d10 + 9, Parry 9, Bloqueo 11, Evasión 8. **Cargado (2026-11-14).**
   - **Nivel 5 aprobado (dueño, 2026-11-14: «va así»)**: atrib [13, 10, 8, 9, 4]; el Capacete de hierro (Buena) en lugar del Casco de cuero

@@ -115,6 +115,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Armadura rota doble del Golpe demoledor sobre un personaje sin armadura (el Derribar entra igual): encontrar qué escritura rechaza Firebase y
   arreglarla; (2) el texto de **Abrojos** dice «la Destreza del pícaro» aunque la ponga el Armero → «de quien los puso» (revisar las otras trampas
   con el mismo texto).
+- **⬜ en cola — 💀 A alguien en 0 de vida no se lo ataca** (dueño, 2026-11-14: «corregirlo como sugerís»). Un token en 0 de vida (caído) no se
+  puede elegir como objetivo de un ataque ni de una habilidad dirigida contra un rival: si se intenta, aviso «está caído» y no se abre el duelo (sin
+  «Elegí cómo te defendés»). Tampoco da ni recibe ataques de oportunidad (ni cuando alguien lo arrastra al lado de rivales). Curas y lo que lo levanta
+  (revivir, Ankh, Pacto…) siguen funcionando. Probar en el mapa con las dos cuentas.
 - **⬜ en cola — 🎲 Carteles de chance: de dónde sale el número** (dueño, 2026-11-13, con la captura de Reflejos: «¿el valor
   de "5 o más" de dónde sale?»). En los carteles de chance de una pieza de equipo (Reflejos de mangosta, Retirada limpia, Recuperarse rápido…) mostrar
   qué pieza la da, su porcentaje y qué número hace falta: «Reflejos de mangosta (Botas de zapador, 33 %) · 1d6 = 5 (sale con 5 o 6)». Solo texto.

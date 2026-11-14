@@ -44,6 +44,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      cura **no lo curó a él, se la llevó su rival** (cuánto y a quién).
   3. **La animación:** cuando se cierran los carteles, la misma animación de la **Transfusión sanguínea** (la vida viaja del afectado al que
      lanzó la sanguijuela). **Regla general nueva:** toda cura o transferencia de vida de un personaje a otro usa esa animación.
+     **Incluye explícitamente** (dueño, 2026-11-14): la **Varita chupasangre** (ex Varita sanguijuela: el drenaje de su ataque) y, en general,
+     todo lo que drena vida (`drena` del duelo, Drenar vida, la Sanguijuela al pegar). Probarla también.
   3b. **La sanguijuela dibujada** (dueño, 2026-11-14: «una animación de la sanguijuela, como la vaquita de San Antonio: una especie de gusano
      con una pulsación, como que está chupando sangre»). Propuesta: mientras está pegada, un gusanito sobre el token del afectado que late
      despacio (se hincha y se deshincha, un poco de rojo que pasa por el cuerpo); en cada mordida, un latido más fuerte y recién después la

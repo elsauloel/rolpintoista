@@ -537,7 +537,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 5 aprobado (dueño, 2026-11-14: «vamos con la trampa de abrojos y el yelmo de bronce con runas»)**: atrib [14, 11, 8, 8, 4]; el Yelmo
     de bronce con runas (Buena) en lugar de la Cofia; **Abrojos** en lugar de Señalar la presa (con Especial 4 no entraba nunca). Vida 70, No2 8,
     Defensa 9, Def.Esp 3, PdG 8, daño 1d10 + 12, Parry 10, Bloqueo 12, Evasión 8, Res.Esp 15.
-  - **Niveles 2 a 5: falta cargarlos** en `comun/creeps-esenciales.js` (con su prueba en `comun/pruebas.html`), cuando no haya un ayudante tocando esos archivos.
+  - **Niveles 2 a 5 cargados (2026-11-14)** en `comun/creeps-esenciales.js`, con su prueba en `comun/pruebas.html`.
 
 - **W2 · Berserker · Warrior** (boceto aprobado 2026-11-03; dueño: «me cierra como ruta», con Fue −2 y Des +2, espadas en vez del hacha y la
   poción de regeneración chica). Estrategia: cuanto más herido, más peligroso; espadachín de dos armas que busca el crítico. Atributos
@@ -601,15 +601,15 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 2 aprobado (dueño, 2026-11-14: «va así»)**: atrib [9, 2, 7, 4, 14] (con, fue, agi, des, esp); + Polainas de cuero remendado y
     Escarpines de piel de cururú; Sanguijuela; Puntería arcana. Vida 45, No2 7, SP 44 (7 por turno), Defensa 3, Def.Esp 2, PdG.Esp 16, Ef.Esp 14.
     Pedido junto (dueño): **la Sanguijuela muerde de nuevo al empezar el turno del afectado** (1d6, cura la mitad de lo que entró, para arriba) —
-    detalle en la cola de programación. **Falta cargarlo** en `comun/creeps-esenciales.js`.
+    detalle en la cola de programación. **Cargado (2026-11-14)** en `comun/creeps-esenciales.js`.
   - **Nivel 3 aprobado (dueño, 2026-11-14: «el resto para ladrón de fuerza está bien»)**: atrib [9, 2, 8, 5, 15]; la varita de Buena: la
     **Varita sanguijuela, que pasa a llamarse «Varita chupasangre»** (dueño, mismo día; mismo id, renombrarla en `comun/catalogo.js` y donde se
     nombre) en lugar de la Varita arcana; Mal de ojo (Flash, 5 SP; 10 en turno ajeno). Vida 45, No2 8, SP 47 (7), Defensa 3, Def.Esp 2, PdG.Esp 17,
-    Ef.Esp 15, Evasión 8. **Falta cargarlo** (y el cambio de nombre).
+    Ef.Esp 15, Evasión 8. **Cargado (2026-11-14)** (y el cambio de nombre).
   - **Nivel 4 aprobado (dueño, 2026-11-14: «va»)**: atrib [10, 2, 8, 5, 17]; el Sombrero humectante bordado (Buena) en lugar de la Vincha;
-    Disipar; Largo alcance arcano. Vida 50, No2 8, SP 53 (9), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 19, Ef.Esp 17. **Falta cargarlo.**
+    Disipar; Largo alcance arcano. Vida 50, No2 8, SP 53 (9), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 19, Ef.Esp 17. **Cargado (2026-11-14).**
   - **Nivel 5 aprobado (dueño, 2026-11-14: «va así»)**: atrib [10, 2, 9, 6, 18]; el Muñeco vudú (Buena) en lugar del Grimorio gastado;
-    Maldición tormentosa. Vida 50, No2 9, SP 54 (10), Rango 7, Defensa 3, Def.Esp 2, PdG.Esp 20, Ef.Esp 18. **Falta cargarlo.** Línea D3 completa.
+    Maldición tormentosa. Vida 50, No2 9, SP 54 (10), Rango 7, Defensa 3, Def.Esp 2, PdG.Esp 20, Ef.Esp 18. **Cargado (2026-11-14).** Línea D3 completa.
 
 - **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
   va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):
@@ -924,14 +924,14 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-05: «lo probamos así»; sin el texto «⚙ Automatizado» en el Takle: «vamos a confiar en que lo está»).
   - **Nivel 2 aprobado (dueño, 2026-11-14)**: atrib [10, 7, 7, 7, 4] (con, fue, agi, des, esp; el punto de Fuerza pasó a Destreza: «así el parry
     tiene un poco más de sentido»); + Casco de cuero endurecido y Guantes de duelista de taberna; Desarmar; Guardia firme. Vida 50, No2 7, Defensa 5,
-    PdG 7, Dmg 7, Parry 8, Bloqueo 8. **Falta cargarlo.**
+    PdG 7, Dmg 7, Parry 8, Bloqueo 8. **Cargado (2026-11-14).**
   - **Nivel 3 aprobado (dueño, 2026-11-14: «va»)**: atrib [11, 8, 7, 8, 4]; la Maza de guerra (Buena: Demora 50 %, Pajaritos 25 %) en lugar del
-    Mazo de carnicero; Puño de roca. Vida 55, No2 7, Defensa 5, PdG 8, daño 1d10 + 8, Parry 9, Bloqueo 9. **Falta cargarlo.** Al cargarlo, revisar si la
+    Mazo de carnicero; Puño de roca. Vida 55, No2 7, Defensa 5, PdG 8, daño 1d10 + 8, Parry 9, Bloqueo 9. **Cargado (2026-11-14).** Al cargarlo, revisar si la
     Demora del Puño de roca y la de la maza en el mismo golpe se suman (2 lugares) o quedan en uno.
   - **Nivel 4 aprobado (dueño, 2026-11-14: «va así»)**: atrib [12, 9, 8, 8, 4]; la Media armadura de escudero (Buena) en lugar del Peto de hierro;
-    Arrastrar; Marcar el ritmo. Vida 65, No2 8, Defensa 7, PdG 8, daño 1d10 + 9, Parry 9, Bloqueo 11, Evasión 8. **Falta cargarlo.**
+    Arrastrar; Marcar el ritmo. Vida 65, No2 8, Defensa 7, PdG 8, daño 1d10 + 9, Parry 9, Bloqueo 11, Evasión 8. **Cargado (2026-11-14).**
   - **Nivel 5 aprobado (dueño, 2026-11-14: «va así»)**: atrib [13, 10, 8, 9, 4]; el Capacete de hierro (Buena) en lugar del Casco de cuero
-    endurecido; Barrido. Vida 70, No2 8, Defensa 9, PdG 9, daño 1d10 + 10, Parry 10, Bloqueo 12, Evasión 8. **Falta cargarlo.** Línea T4 completa.
+    endurecido; Barrido. Vida 70, No2 8, Defensa 9, PdG 9, daño 1d10 + 10, Parry 10, Bloqueo 12, Evasión 8. **Cargado (2026-11-14).** Línea T4 completa.
 - **W4 · Verdugo · Warrior** (2026-11-05): avisa a quién va a ejecutar y lo remata. **Ruta aprobada** (dueño: «me cierra la ruta»): **nv1 El que avisa no traiciona · Golpe fuerte** (dueño: «vamos con avisa y golpe fuerte»); **nv2 Remate** + pasiva **Sed de sangre**;
   nv3 Furia (Hacha del verdugo de la capital, Buena); nv4 Golpe demoledor + **Robustez** (Guantes del verdugo, Buena); nv5 Golpe brutal. Nivel 1
   propuesto: Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2 → vida 40, 6 No2 (dueño: «le bajaría un punto en constitución y le subiría uno en destreza, a
@@ -940,13 +940,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   probabilidad de golpe»). Turnos de espera (Esp 2). **Nivel 1 aprobado** (2026-11-05).
   - **Nivel 2 aprobado (dueño, 2026-11-14)**: atrib [9, 11, 6, 8, 2] (con, fue, agi, des, esp); + Guantes de agarre y Polainas de cuero remendado;
     Remate; pasiva **Ojo de carancho** en lugar de Sed de sangre (dueño: «los creeps no deberían matar jugadores con frecuencia», así que una pasiva
-    que se dispara al matar casi no se usa; vale igual para Sed de batalla). Vida 45, No2 6, Defensa 5, PdG 9, Dmg 11, Parry 8, Bloqueo 11. **Falta cargarlo.**
+    que se dispara al matar casi no se usa; vale igual para Sed de batalla). Vida 45, No2 6, Defensa 5, PdG 9, Dmg 11, Parry 8, Bloqueo 11. **Cargado (2026-11-14).**
   - **Nivel 3 aprobado (dueño, 2026-11-14: «lo dejamos así»)**: atrib [10, 12, 7, 8, 2]; el Hacha del verdugo de la capital (Buena, 2 dados) en
-    lugar de la de pueblo; Furia. Vida 50, No2 7, Defensa 5, PdG 9, daño 2d8 + 12, Parry 8, Bloqueo 12, Evasión 7. **Falta cargarlo.**
+    lugar de la de pueblo; Furia. Vida 50, No2 7, Defensa 5, PdG 9, daño 2d8 + 12, Parry 8, Bloqueo 12, Evasión 7. **Cargado (2026-11-14).**
   - **Nivel 4 aprobado (dueño, 2026-11-14: «el verdugo ok»)**: atrib [11, 13, 7, 9, 2]; los Guantes del verdugo (Buena: Crítico potente +5, Def +1,
-    Parry +1) en lugar de los de agarre; Golpe demoledor; Robustez. Vida 60, No2 7, Defensa 6, PdG 9, daño 2d8 + 13, Parry 10, Bloqueo 13. **Falta cargarlo.**
+    Parry +1) en lugar de los de agarre; Golpe demoledor; Robustez. Vida 60, No2 7, Defensa 6, PdG 9, daño 2d8 + 13, Parry 10, Bloqueo 13. **Cargado (2026-11-14).**
   - **Nivel 5 aprobado (dueño, 2026-11-14: «va»)**: atrib [12, 14, 8, 9, 2]; la Coraza de láminas (Buena) en lugar del Peto de hierro; Golpe brutal.
-    Vida 75, No2 8, Defensa 8, PdG 9, daño 2d8 + 14, Parry 10, Bloqueo 14, Evasión 8. **Falta cargarlo.** Línea W4 completa.
+    Vida 75, No2 8, Defensa 8, PdG 9, daño 2d8 + 14, Parry 10, Bloqueo 14, Evasión 8. **Cargado (2026-11-14).** Línea W4 completa.
 - **R4 · Hunter · Rango** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): trampas y marcar a la presa; prepara el terreno y deja que el grupo
   cace. Ruta: nv1 **Disparo señalador** (rápida) · **Cepo del cazador** (lenta); nv2 Tiro que derriba + **Percepción aumentada**; nv3 Mina del
   cazador (el arco, de Buena); nv4 Cebo + **Puntería**; nv5 Abanico. **Nivel 1 aprobado**: Des 10 · Con 8 · Agi 7 · Fue 6 · Esp 2 → vida 40, 7 No2,
@@ -1309,10 +1309,10 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L6 | ✅ (2026-11-05, cargado) | | | | |
 | R3 | ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
-| S3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-13), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
-| D3 | ✅ (2026-11-03) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
-| W4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
-| T4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar |
+| S3 | ✅ (2026-11-03) | ✅ (2026-11-13, cargado 2026-11-14) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
+| D3 | ✅ (2026-11-03) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
+| W4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
+| T4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | H4 | ✅ (2026-11-05, cargado) | | | | |
 | L7 | ✅ (2026-11-05, cargado) | | | | |
 | L8 | ✅ (2026-11-05, cargado) | | | | |

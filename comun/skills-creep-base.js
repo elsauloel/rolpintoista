@@ -437,7 +437,7 @@
   // 🐛 Auditada (dueño, 2026-10-26; el Mago, de las varitas: «la sanguijuela funciona así»; corregido el mismo día: «la probabilidad de golpe especial
   // contra la evasión»): tira su Probabilidad de Golpe especial contra la Evasión para
   // lanzarle una sanguijuela al cuerpo; si pega, 2d6 de daño siniestro (la identidad: Herida sombría) y se cura la mitad de lo que entró (`drena`, como la
-  // Varita sanguijuela); queda la Sanguijuela pegada 4 turnos (no se cura mientras esté) y se la arranca al empezar su turno con Fuerza contra el Ef.Esp
+  // Varita chupasangre (ex Varita sanguijuela)); queda la Sanguijuela pegada 4 turnos (no se cura mientras esté) y se la arranca al empezar su turno con Fuerza contra el Ef.Esp
   // del mago (el `soltar` de la Red). Costo de Claude: 2 No2 y 3 SP, o cooldown 3.
   // (Pasó del Mago al Debuffer el mismo día, dueño: «movemos la sanguijuela al debuffer».)
   // 🪱 (2026-11-03, dueño: «no es que no se puede curar. Toda curación a alguien con una sanguijuela le va al debuffer. Y si tiene full vida, le va como

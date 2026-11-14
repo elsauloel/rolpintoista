@@ -18,7 +18,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita de raíces | En la casilla que elijas: 1d4 arcano directo y 33 % de Inmovilizado. Dodge roll. · 1 · 80 |
 | Varita de la grieta | 1d6 arcano directo y −2 Defensa por 2 turnos. · 3 · 110 |
 | Varita del eclipse | 1d6 arcano directo y 25 % de **Ceguera** (1 turno: ve solo 1 casilla y −2 PdG). · 1 · 80 |
-| Varita sanguijuela | 1d6 arcano directo y te curás la mitad de lo que hizo. · 2 · 80 |
+| Varita chupasangre (ex sanguijuela) | 1d6 arcano directo y te curás la mitad de lo que hizo. · 2 · 80 |
 | Varita de la cosecha | 1d6 arcano directo y lo marca 3 turnos; si muere marcado, recuperás 2 SP y 2 de vida. · 3 · 120 |
 | Varita de cura mayor | Cura 2d8 a un aliado. · 3 · 110 |
 | Varita de la purga | A un aliado: le saca el estado malo más reciente. Arranca en **2 No2** (dueño). · 3 · 80 |

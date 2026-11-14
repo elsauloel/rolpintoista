@@ -867,7 +867,7 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   quien se cura la mitad; después, el «¿se suelta?» de siempre. Sin lanzador en el mapa (o caído), no muerde. (2) El gusanito sobre el token mientras
   está pegada (`sanguijuelaDibujarToken`, desde js/05): late; chupa fuerte cuando sale una Transfusión de ese token; al irse se suelta y cae (cuando no lo
   tapa el cuadro ni un aviso). (3) **Toda transferencia de vida usa la animación de la Transfusión** (js/92): `dueloDrenar` (js/13) la publica del
-  golpeado a quien pegó (habilidades y armas que drenan, la Varita sanguijuela; no la Luz sanadora), y `EstadosAplicar.curaRobadaEnviar` (envuelta acá,
+  golpeado a quien pegó (habilidades y armas que drenan, la Varita chupasangre (ex Varita sanguijuela); no la Luz sanadora), y `EstadosAplicar.curaRobadaEnviar` (envuelta acá,
   con `fuente` opcional) del que tiene la sanguijuela al que la lanzó, más el aviso «la cura no fue para vos» a quien lo maneja. La animación espera a que
   esa pantalla no tenga el cuadro del duelo ni un aviso al centro (máx. 25 s).
 - **🎲 Las tiradas las hace el involucrado, en el cuadro del duelo de siempre** (2026-11-10, dueño: «no quiero que las tiradas las haga sola el

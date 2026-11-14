@@ -401,10 +401,23 @@
   esencial({...S2, nivel: 5, atrib: [14, 9, 8, 9, 5],   // (aprobado 2026-11-10: Estandarte de guerra; la lanza, de Buena: la Lanza del abanderado, creada porque no había lanza Buena de una mano)
     equipo: ['Lanza del abanderado', 'Estandarte de la vanguardia', 'Peto de cuero de oficial', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
     habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma', 'Redoble de tambores', 'Arenga', 'Estandarte de guerra'], pasivas: ['Marcar el ritmo', 'Voluntad de hierro']});
-  esencial({linea: 'S3', nombre: 'Armero', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 8, 6, 6, 3],
+  const S3 = {linea: 'S3', nombre: 'Armero', rol: 'support', rolTxt: 'apoyo', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Support. El herrero del grupo: les mejora las armas a los suyos (bendición, elemento) y pelea al lado.'};
+  esencial({...S3, nivel: 1, atrib: [10, 8, 6, 6, 3],
     equipo: ['Hacha del herrero de pueblo', 'Chaleco de cuero', 'Cofia de anillas sueltas'],
-    habilidades: ['Bendecir el arma', 'Arma elemental'], consumibles: ['Pergamino grupal de Furia de Combate'],
-    estrategia: 'Support. El herrero del grupo: les mejora las armas a los suyos (bendición, elemento) y pelea al lado.'});
+    habilidades: ['Bendecir el arma', 'Arma elemental']});
+  esencial({...S3, nivel: 2, atrib: [11, 9, 6, 7, 3],   // (aprobado 2026-11-13: Armas perforantes, Piel curtida; + Botas de caña alta de estanciero y Guantes de cuero grueso)
+    equipo: ['Hacha del herrero de pueblo', 'Chaleco de cuero', 'Cofia de anillas sueltas', 'Botas de caña alta de estanciero', 'Guantes de cuero grueso'],
+    habilidades: ['Bendecir el arma', 'Arma elemental', 'Armas perforantes'], pasivas: ['Piel curtida']});
+  esencial({...S3, nivel: 3, atrib: [12, 9, 7, 7, 4],   // (aprobado 2026-11-14: Ojo certero; el Martillo de herrero, Buena, en lugar del hacha)
+    equipo: ['Martillo de herrero', 'Chaleco de cuero', 'Cofia de anillas sueltas', 'Botas de caña alta de estanciero', 'Guantes de cuero grueso'],
+    habilidades: ['Bendecir el arma', 'Arma elemental', 'Armas perforantes', 'Ojo certero'], pasivas: ['Piel curtida']});
+  esencial({...S3, nivel: 4, atrib: [13, 10, 7, 8, 4],   // (aprobado 2026-11-14: Potencia, Desvío hábil; la Coraza de hierro batido, Buena, en lugar del Chaleco de cuero)
+    equipo: ['Martillo de herrero', 'Coraza de hierro batido', 'Cofia de anillas sueltas', 'Botas de caña alta de estanciero', 'Guantes de cuero grueso'],
+    habilidades: ['Bendecir el arma', 'Arma elemental', 'Armas perforantes', 'Ojo certero', 'Potencia'], pasivas: ['Piel curtida', 'Desvío hábil']});
+  esencial({...S3, nivel: 5, atrib: [14, 11, 8, 8, 4],   // (aprobado 2026-11-14: Abrojos en lugar de Señalar la presa —con Especial 4 no entraba—; el Yelmo de bronce con runas, Buena, en lugar de la Cofia)
+    equipo: ['Martillo de herrero', 'Coraza de hierro batido', 'Yelmo de bronce con runas', 'Botas de caña alta de estanciero', 'Guantes de cuero grueso'],
+    habilidades: ['Bendecir el arma', 'Arma elemental', 'Armas perforantes', 'Ojo certero', 'Potencia', 'Abrojos'], pasivas: ['Piel curtida', 'Desvío hábil']});
   esencial({linea: 'S4', nombre: 'Protector', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [9, 2, 6, 4, 12],
     equipo: ['Varita de los pilares', 'Escudo de madera forrado en lienzo', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
     habilidades: ['Potencia', 'Arrojo'], consumibles: ['Poción de HP'],
@@ -426,10 +439,23 @@
   esencial({...D2, nivel: 5, atrib: [10, 2, 8, 7, 18],   // (aprobado 2026-11-10: Polen somnífero; Orbe de eco (Buena) en lugar de la Piedra bezoar. Con SP. Línea D2 completa)
     equipo: ['Varita de la ponzoña', 'Orbe de eco', 'Chaleco de kevlar', 'Escarpines de piel de cururú', 'Polainas de cuero remendado', 'Casco de cuero endurecido'],
     habilidades: ['Espina tóxica', 'Nube tóxica', 'Corroer', 'Maldición de la sequía', 'Maldición tormentosa', 'Polen somnífero'], pasivas: ['Puntería arcana', 'Potencia especial']});
-  esencial({linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 7, 4, 12],
+  const D3 = {linea: 'D3', nombre: 'Ladrón de fuerzas', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Gas adormecedor'],
+    estrategia: 'Debuffer. Le saca al rival lo que necesita para pelear (nitros, puntería) y se queda con parte.'};
+  esencial({...D3, nivel: 1, atrib: [8, 2, 7, 4, 12],
     equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima'],
-    habilidades: ['Escalofrío', 'Robar el aliento'], consumibles: ['Gas adormecedor'],
-    estrategia: 'Debuffer. Le saca al rival lo que necesita para pelear (nitros, puntería) y se queda con parte.'});
+    habilidades: ['Escalofrío', 'Robar el aliento']});
+  esencial({...D3, nivel: 2, atrib: [9, 2, 7, 4, 14],   // (aprobado 2026-11-14: Sanguijuela, Puntería arcana; + Polainas de cuero remendado y Escarpines de piel de cururú. Con SP)
+    equipo: ['Varita arcana', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Escalofrío', 'Robar el aliento', 'Sanguijuela'], pasivas: ['Puntería arcana']});
+  esencial({...D3, nivel: 3, atrib: [9, 2, 8, 5, 15],   // (aprobado 2026-11-14: Mal de ojo; la Varita chupasangre, Buena, en lugar de la arcana)
+    equipo: ['Varita chupasangre', 'Grimorio gastado', 'Chaleco de cuero', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Escalofrío', 'Robar el aliento', 'Sanguijuela', 'Mal de ojo'], pasivas: ['Puntería arcana']});
+  esencial({...D3, nivel: 4, atrib: [10, 2, 8, 5, 17],   // (aprobado 2026-11-14: Disipar, Largo alcance arcano; el Sombrero humectante bordado, Buena, en lugar de la Vincha)
+    equipo: ['Varita chupasangre', 'Grimorio gastado', 'Chaleco de cuero', 'Sombrero humectante bordado', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Escalofrío', 'Robar el aliento', 'Sanguijuela', 'Mal de ojo', 'Disipar'], pasivas: ['Puntería arcana', 'Largo alcance arcano']});
+  esencial({...D3, nivel: 5, atrib: [10, 2, 9, 6, 18],   // (aprobado 2026-11-14: Maldición tormentosa; el Muñeco vudú, Buena, en lugar del Grimorio gastado)
+    equipo: ['Varita chupasangre', 'Muñeco vudú', 'Chaleco de cuero', 'Sombrero humectante bordado', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Escalofrío', 'Robar el aliento', 'Sanguijuela', 'Mal de ojo', 'Disipar', 'Maldición tormentosa'], pasivas: ['Puntería arcana', 'Largo alcance arcano']});
   esencial({linea: 'D4', nombre: 'Control mental y ceguera', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [9, 2, 6, 4, 12],
     equipo: ['Varita del destello', 'Botella con un diablito', 'Chaleco de cuero', 'Capucha de lana del culto'],
     habilidades: ['Punzada mental', 'Cegar'], consumibles: ['Polvo de adormidera'],
@@ -554,14 +580,40 @@
   esencial({...L6, nivel: 5, atrib: [10, 10, 10, 13, 2],   // (aprobado 2026-11-11: Ráfaga de cortes; + Capellina de hierro en la cabeza)
     equipo: ['Facón de plata', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Guantes de agarre', 'Capellina de hierro'],
     habilidades: ['Finta', 'Patotear', 'Hit and run', 'Tajo de carnicero', 'Golpe a la rodilla', 'Ráfaga de cortes'], pasivas: ['Pies ligeros', 'Ojo crítico']});
-  esencial({linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
+  const T4 = {linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Grasa de carpincho'],
+    estrategia: 'Tanque. Empuja, tira y demora: no aguanta como el Escudero, desordena al grupo rival y le corta los turnos.'};
+  esencial({...T4, nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
     equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca'],
-    habilidades: ['Takle', 'Pisotón'], consumibles: ['Grasa de carpincho'],
-    estrategia: 'Tanque. Empuja, tira y demora: no aguanta como el Escudero, desordena al grupo rival y le corta los turnos.'});
-  esencial({linea: 'W4', nombre: 'Verdugo', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (dueño: «vamos con avisa y golpe fuerte»)
+    habilidades: ['Takle', 'Pisotón']});
+  esencial({...T4, nivel: 2, atrib: [10, 7, 7, 7, 4],   // (aprobado 2026-11-14: Desarmar, Guardia firme; el punto de Fuerza a Destreza, por el Parry; + Casco de cuero endurecido y Guantes de duelista de taberna)
+    equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Takle', 'Pisotón', 'Desarmar'], pasivas: ['Guardia firme']});
+  esencial({...T4, nivel: 3, atrib: [11, 8, 7, 8, 4],   // (aprobado 2026-11-14: Puño de roca; la Maza de guerra, Buena, en lugar del Mazo de carnicero)
+    equipo: ['Maza de guerra', 'Peto de hierro', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Takle', 'Pisotón', 'Desarmar', 'Puño de roca'], pasivas: ['Guardia firme']});
+  esencial({...T4, nivel: 4, atrib: [12, 9, 8, 8, 4],   // (aprobado 2026-11-14: Arrastrar, Marcar el ritmo; la Media armadura de escudero, Buena, en lugar del Peto de hierro)
+    equipo: ['Maza de guerra', 'Media armadura de escudero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Takle', 'Pisotón', 'Desarmar', 'Puño de roca', 'Arrastrar'], pasivas: ['Guardia firme', 'Marcar el ritmo']});
+  esencial({...T4, nivel: 5, atrib: [13, 10, 8, 9, 4],   // (aprobado 2026-11-14: Barrido; el Capacete de hierro, Buena, en lugar del Casco de cuero endurecido)
+    equipo: ['Maza de guerra', 'Media armadura de escudero', 'Botas de cuero de vaca', 'Capacete de hierro', 'Guantes de duelista de taberna'],
+    habilidades: ['Takle', 'Pisotón', 'Desarmar', 'Puño de roca', 'Arrastrar', 'Barrido'], pasivas: ['Guardia firme', 'Marcar el ritmo']});
+  const W4 = {linea: 'W4', nombre: 'Verdugo', rol: 'warrior', rolTxt: 'melee', consumibles: ['Poción de Puntería Certera'],
+    estrategia: 'Warrior. Anuncia a quién va a ejecutar y descarga un golpe enorme que no se para; elige a su víctima y la termina.'};
+  esencial({...W4, nivel: 1, atrib: [8, 10, 6, 7, 2],   // (dueño: «vamos con avisa y golpe fuerte»)
     equipo: ['Hacha de verdugo de pueblo', 'Peto de hierro', 'Casco de cuero endurecido'],
-    habilidades: ['El que avisa no traiciona', 'Pegar fuerte'], consumibles: ['Poción de Puntería Certera'],
-    estrategia: 'Warrior. Anuncia a quién va a ejecutar y descarga un golpe enorme que no se para; elige a su víctima y la termina.'});
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte']});
+  esencial({...W4, nivel: 2, atrib: [9, 11, 6, 8, 2],   // (aprobado 2026-11-14: Remate; Ojo de carancho en lugar de Sed de sangre —los creeps no deberían matar seguido—; + Guantes de agarre y Polainas de cuero remendado)
+    equipo: ['Hacha de verdugo de pueblo', 'Peto de hierro', 'Casco de cuero endurecido', 'Guantes de agarre', 'Polainas de cuero remendado'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte', 'Remate'], pasivas: ['Ojo de carancho']});
+  esencial({...W4, nivel: 3, atrib: [10, 12, 7, 8, 2],   // (aprobado 2026-11-14: Furia; el Hacha del verdugo de la capital, Buena, en lugar de la de pueblo)
+    equipo: ['Hacha del verdugo de la capital', 'Peto de hierro', 'Casco de cuero endurecido', 'Guantes de agarre', 'Polainas de cuero remendado'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte', 'Remate', 'Furia'], pasivas: ['Ojo de carancho']});
+  esencial({...W4, nivel: 4, atrib: [11, 13, 7, 9, 2],   // (aprobado 2026-11-14: Golpe demoledor, Robustez; los Guantes del verdugo, Buena, en lugar de los de agarre)
+    equipo: ['Hacha del verdugo de la capital', 'Peto de hierro', 'Casco de cuero endurecido', 'Guantes del verdugo', 'Polainas de cuero remendado'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte', 'Remate', 'Furia', 'Golpe demoledor'], pasivas: ['Ojo de carancho', 'Robustez']});
+  esencial({...W4, nivel: 5, atrib: [12, 14, 8, 9, 2],   // (aprobado 2026-11-14: Golpe brutal; la Coraza de láminas, Buena, en lugar del Peto de hierro)
+    equipo: ['Hacha del verdugo de la capital', 'Coraza de láminas', 'Casco de cuero endurecido', 'Guantes del verdugo', 'Polainas de cuero remendado'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte', 'Remate', 'Furia', 'Golpe demoledor', 'Golpe brutal'], pasivas: ['Ojo de carancho', 'Robustez']});
   esencial({linea: 'R4', nombre: 'Hunter', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 7, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
     equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],
     habilidades: ['Disparo señalador', 'Cepo del cazador'], consumibles: ['Trampa de oso'],

@@ -44,6 +44,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      cura **no lo curó a él, se la llevó su rival** (cuánto y a quién).
   3. **La animación:** cuando se cierran los carteles, la misma animación de la **Transfusión sanguínea** (la vida viaja del afectado al que
      lanzó la sanguijuela). **Regla general nueva:** toda cura o transferencia de vida de un personaje a otro usa esa animación.
+  3b. **La sanguijuela dibujada** (dueño, 2026-11-14: «una animación de la sanguijuela, como la vaquita de San Antonio: una especie de gusano
+     con una pulsación, como que está chupando sangre»). Propuesta: mientras está pegada, un gusanito sobre el token del afectado que late
+     despacio (se hincha y se deshincha, un poco de rojo que pasa por el cuerpo); en cada mordida, un latido más fuerte y recién después la
+     animación de la Transfusión hacia quien la lanzó. Al arrancarla o vencerse, se suelta y cae. Mismo estilo que la vaquita (js de la vaquita).
   4. **La prueba:** en «Claude · pruebas», con **Rockardo (copia)** como objetivo (tiene Regeneración como pasiva) y un Ladrón de fuerzas que le
      pone la sanguijuela; las dos cuentas (GM y jugador), capturas de las dos pantallas y videos mp4 de la animación. Respaldo de Rockardo (copia)
      antes y restaurarlo después. Reporte al dueño con capturas y videos.

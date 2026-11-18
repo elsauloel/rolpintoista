@@ -46,7 +46,11 @@ const Duelo = (() => {
   const MAPA_PRINCIPAL = '_principal';
   const VIGENCIA_MS = 30 * 60 * 1000;      // un duelo sin resolver deja de avisar a los 30 minutos
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
-  const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
+  // 🏁 (2026-11-18, dueño: «que una vez que un duelo esté terminado, a los 10 segundos se cierre solo… siempre que se pueda reabrir desde la Mesa»):
+  // la tira de un duelo terminado se va a los 10 s, y el cuadro terminado se cierra solo a los 10 s (AUTOCIERRE_MS) salvo que lo toquen.
+  const RESUELTO_VISIBLE_MS = 10 * 1000;
+  const AUTOCIERRE_MS = 10 * 1000;
+  let autoCierre = null;   // {id, hasta, quieto, timer, tic} — la cuenta del cuadro terminado que está a la vista
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos', 'rerollUsado', 'resumido'];
 
@@ -394,6 +398,7 @@ const Duelo = (() => {
   function avisarPagina(){ window.dispatchEvent(new Event('ep-cerrado')); }   // la Botonera/Acciones del mapa se fijan si quedó algo abierto
 
   function cerrar(){
+    if(autoCierre && (!actual || autoCierre.id === actual.id)) autoCierreParar();
     const otroToken = actual && actual.otroToken;
     if(actual){
       descartados.add(actual.id);
@@ -3204,6 +3209,34 @@ const Duelo = (() => {
     tMax = setTimeout(fin, 7000);
   }
 
+  /* 🏁 La cuenta del cierre solo (2026-11-18). Arranca únicamente si el duelo terminó mientras esta pantalla lo miraba (hace menos de 15 s): uno viejo
+     reabierto desde la Mesa («🔍 Ver detalle del duelo») para revisarlo no se cierra solo. Tocar el cuadro lo deja abierto; minimizado, igual se cierra. */
+  function autoCierreArmar(d, terminado){
+    if(!terminado){ if(autoCierre && autoCierre.id === d.id) autoCierreParar(); return; }
+    if(autoCierre && autoCierre.id === d.id) return;
+    if(autoCierre) autoCierreParar();
+    const desde = resueltoDesde.get(d.id);
+    if(d.estado === 'resuelto' && !(desde && Date.now() - desde < 15000)) return;
+    const a = {id: d.id, hasta: Date.now() + AUTOCIERRE_MS, quieto: false};
+    a.timer = setTimeout(() => { if(autoCierre === a && !a.quieto){ autoCierreParar(); if(actual && actual.id === a.id) cerrar(); } }, AUTOCIERRE_MS);
+    a.tic = setInterval(() => {
+      const el = document.querySelector('#duelo-fondo [data-autocierre]');
+      if(el && autoCierre === a && !a.quieto) el.textContent = autoCierreTxt(a);
+    }, 500);
+    autoCierre = a;
+  }
+  function autoCierreParar(){ if(!autoCierre) return; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic); autoCierre = null; }
+  function autoCierreQuieto(){
+    if(!autoCierre || autoCierre.quieto) return;
+    autoCierre.quieto = true; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic);
+    const el = document.querySelector('#duelo-fondo [data-autocierre]');
+    if(el) el.textContent = 'Queda abierto: cerralo cuando quieras.';
+  }
+  const autoCierreTxt = a => `Se cierra solo en ${Math.max(0, Math.ceil((a.hasta - Date.now()) / 1000))} s · tocá el cuadro para dejarlo abierto (se vuelve a abrir desde la Mesa)`;
+  function autoCierreHtml(d){
+    if(!autoCierre || autoCierre.id !== d.id) return '';
+    return `<div class="chico" data-autocierre style="margin:10px 0 0">${_esc(autoCierre.quieto ? 'Queda abierto: cerralo cuando quieras.' : autoCierreTxt(autoCierre))}</div>`;
+  }
   function dibujar(){
     const d = actual && actual.dato;
     const f = document.getElementById('duelo-fondo');
@@ -3242,9 +3275,12 @@ const Duelo = (() => {
     const esperaContra = /data-contra[ >]|está decidiendo…/.test(cierre || '');
     const nuevoFin = d.estado === 'resuelto' && !desarmando && !esperaContra && !revelado[d.id + ':fin'];
     if(d.estado === 'resuelto' && !desarmando && !esperaContra) revelado[d.id + ':fin'] = true;
+    const terminado = (d.estado === 'resuelto' && !desarmando && !esperaContra) || d.estado === 'cancelado';
+    autoCierreArmar(d, terminado);
+    const cuentaHtml = autoCierreHtml(d);
     const finHtml = d.estado === 'resuelto' && !desarmando && !esperaContra
-      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button></div>`
-      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.resultado === 'a-mano' ? 'TERMINADO A MANO' : d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
+      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button>${cuentaHtml}</div>`
+      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.resultado === 'a-mano' ? 'TERMINADO A MANO' : d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button>${cuentaHtml}</div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
@@ -3461,6 +3497,7 @@ const Duelo = (() => {
       setTimeout(() => { if(actual && actual.dato) dibujar(); }, 4000);
     });
     const bfin = f.querySelector('[data-fin-duelo]');
+    { const caja = f.querySelector('.duelo-caja'); if(caja && autoCierre && autoCierre.id === d.id && !autoCierre.quieto) caja.addEventListener('pointerdown', ev => { if(!ev.target.closest('[data-fin-duelo]')) autoCierreQuieto(); }, {once: true}); }
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
@@ -3760,6 +3797,7 @@ const Duelo = (() => {
     return c;
   }
 
+  let chipsTimer = null;
   function dibujarChips(){
     const mostrar = new Map();
     const ahora = Date.now();
@@ -3775,6 +3813,11 @@ const Duelo = (() => {
     });
     if(actual && actual.min && actual.dato && !mostrar.has(actual.id)) mostrar.set(actual.id, actual.dato);
     [...chips.keys()].forEach(id => { if(!mostrar.has(id)){ chips.get(id).remove(); chips.delete(id); } });
+    { // 🏁 una tira de un duelo terminado se va sola: volver a mirar cuando le toque irse (2026-11-18)
+      let prox = Infinity;
+      mostrar.forEach(d => { if(d.estado === 'resuelto' && resueltoDesde.has(d.id)) prox = Math.min(prox, resueltoDesde.get(d.id) + RESUELTO_VISIBLE_MS - ahora); });
+      if(prox < Infinity){ clearTimeout(chipsTimer); chipsTimer = setTimeout(dibujarChips, Math.max(200, prox + 150)); }
+    }
     const RES = {pego: '⚔ Pegó', fallo: '🛡 Falló', bloqueado: '🛡 Bloqueó', mitad: '⚠ Pasó la mitad'};
     const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico;
     mostrar.forEach((d, id) => {

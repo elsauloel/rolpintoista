@@ -948,39 +948,9 @@ function dueloElegirObjetivoMapa(msg){
   // msg.saltoHecho y msg.objetivoFijo. El Takle (`corre`) sigue como siempre.
   { const cs = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
     if(cs && !cs.corre && !msg.saltoHecho && typeof saltoElegirCasilla === 'function'){ saltoElegirCasilla(msg, yo, ataque, cs); return; } }
-  // Un objetivo ya elegido (2026-10-12, 🐈‍⬛ Enyetar: se eligió en su menú): el duelo se abre directo contra él.
-  if(msg.objetivoFijo && tokens.get(msg.objetivoFijo)){
-    const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio), t = tokens.get(msg.objetivoFijo);
-    if(!mio0){ toast(`${(ataque && ataque.habNombre) || 'Habilidad'}: no encontré tu token en este mapa`); return; }
-    { const obj0 = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';   // 💀 un caído no se ataca (salvo lo que es para un aliado)
-      if(obj0 !== 'aliado' && !habEsCura(ataque && ataque.hab) && typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(msg.objetivoFijo)){
-        toast(`💀 ${nombreDe(t)} está caído: no se lo puede atacar.`); if(msg.alCancelar) msg.alCancelar(); return; } }
-    (async () => {
-      // 💥 La carrera del Takle (2026-10-26, visto en el mapa: con el botón ✨ el objetivo viene elegido y se salteaba): corre hasta quedar pegado.
-      const conSalto0 = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
-      if(conSalto0 && !msg.saltoHecho && typeof saltoHab === 'function'){
-        let r = null;
-        try{ r = await saltoHab(mio0, {...t, id: msg.objetivoFijo}, conSalto0, yo); }catch(err){ console.error('No se pudo correr:', err); r = true; }
-        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
-      }
-      // 🗡🩸 La puñalada y el Corte en la arteria también con el objetivo ya elegido (2026-11-18, probando el L7: con el objetivo fijo se salteaban
-      // y el golpe salía sin el bono de la espalda ni el +2 de frecuente contra uno que ya sangra).
-      let atqF = ataque;
-      const tF = {...t, id: msg.objetivoFijo};
-      if(atqF && atqF.punalada && typeof punaladaBonos === 'function'){
-        let r = null; try{ r = await punaladaBonos(mio0, tF, atqF, yo); }catch(err){ console.error('No se pudo ver la puñalada:', err); r = atqF; }
-        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
-        atqF = r;
-      }
-      if(atqF && atqF.arteria && typeof arteriaBonos === 'function'){
-        let r = null; try{ r = await arteriaBonos(mio0, tF, atqF, yo); }catch(err){ console.error('No se pudo ver la arteria:', err); r = atqF; }
-        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
-        atqF = r;
-      }
-      await Duelo.crear({yo, ataque: atqF}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id);
-    })().catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
-    return;
-  }
+  // Un objetivo ya elegido (2026-10-12, 🐈‍⬛ Enyetar: se eligió en su menú; el ✨ con el objetivo elegido): desde el 2026-11-18 pasa por el MISMO camino
+  // que el clic (abajo, en `pedir`, como el Barrido): antes iba por un atajo propio que se salteaba los bonos de la puñalada, el Corte en la arteria, el
+  // Remate, la Sal en la herida, la espalda, el Ojo de carancho, la Presa, el miedo, el estandarte… (visto probando el L7 Degollador).
   // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → brillan los rivales; objetivo
   // "aliado" → brillan los del mismo bando (2026-09-27, pedido del dueño). Es solo una ayuda visual: se puede
   // clickear cualquiera igual, pero si no es del bando esperado se pide confirmar antes de abrir el duelo
@@ -1192,6 +1162,12 @@ function dueloElegirObjetivoMapa(msg){
       if(autoUsado || !tt){ if(msg.alSaltear) msg.alSaltear(); return; }
       autoUsado = true;
       alElegir({col: tt.col, fila: tt.fila}).catch(err => { console.error('Barrido: no se pudo atacar a ese rival', err); if(msg.alSaltear) msg.alSaltear(); });
+      return;
+    }
+    if(msg.objetivoFijo && !autoUsado && tokens.get(msg.objetivoFijo)){   // el objetivo ya elegido: el mismo camino que el clic (si después pide «elegir otro», se elige a mano)
+      const tt = tokens.get(msg.objetivoFijo);
+      autoUsado = true;
+      alElegir({col: tt.col, fila: tt.fila}).catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
       return;
     }
     elegirDestino(alElegir, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);

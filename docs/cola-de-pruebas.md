@@ -12,6 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🔧 Dos restos del daño de elemento separado** (2026-11-18, del ayudante, commit cd6ab2ff): (1) el botón del primer paso todavía
+  dice «Tirar el daño · … + 🔥 +1d6 fuego» (lo arma la página del atacante): que diga solo el daño del arma, porque el elemento ya se tira aparte;
+  (2) con un arma eléctrica (Arma eléctrica) el duelo no llegó al cierre en la prueba, probablemente por el salto al más cercano: revisar y probar
+  con un segundo blanco cerca. Probar en «Claude · pruebas 2».
+
 - **✅ hecho (2026-11-18) — 🔥❄⚡ El daño de elemento de un arma, en su propia tirada y con dados de su elemento** (dueño, 2026-11-18: «sí», a separar como el
   Meteoro). Hoy el daño elemental de un arma o una flecha (Arma elemental, flechas con fuego, varitas con daño físico + elemental, lo que use el
   extra de elemento) sale junto con el daño del arma en una sola tirada. Que sean dos pasos: primero «🎲 Tirar el daño (…)» del arma y después

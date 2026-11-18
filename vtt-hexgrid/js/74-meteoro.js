@@ -40,9 +40,42 @@ function marcarMeteoro(sc, h){
     const txt = `Una sombra cubre el suelo (${Combatiente.areaTxt(radio)}): algo cae del cielo. Cae al empezar el próximo turno de ${sc.nombre}`;
     try{ mesaLinea(`☄ ${sc.nombre}: ${txt}.`, 'recordatorio'); }catch(err){}
     try{ momentoAbrir({tipo: 'meteoro', icono: '☄', titulo: `${sc.nombre} llama a un meteoro`, resultado: `${txt}: los que sigan adentro, de a uno, eligen si esquivan (dodge roll).`, estado: 'listo', datos: {centro: true}}); }catch(err){}
+    meteoroAvisarSombra({col: c.col, fila: c.fila}, radio).catch(err => console.error('El aviso de la sombra:', err));
   }, `<b>☄ ${esc(h.nombre || 'Meteoro')}: marcá dónde cae</b> <span>el centro, dentro de su Rango (${rng} casilla${rng === 1 ? '' : 's'}) · ${Combatiente.areaTxt(radio)} · Esc o clic derecho cancelan</span>`, true);
   const pedir1 = () => { pedir0(); if(typeof areaPrevia === 'function') areaPrevia(radio, '#ff9650'); };   // 👁 la sombra sigue al mouse (js/118)
   pedir1();
+}
+
+/* ☄ El aviso de la sombra (dueño, 2026-11-18: «al seleccionar el área, a las personas dentro del área les aparezca una notificación que diga "Una
+   sombra cubre el suelo: algo cae del cielo." Nada más»). Al marcar el centro, un momento `meteoro-sombra` (sin tarjeta en la Crónica) con a quién le
+   toca: el que maneja cada personaje o invocación de adentro (su jugador, o quien tiene 🎮 el control) y el GM si hay creeps adentro. Cada pantalla
+   a la que le toca muestra el cartel una sola vez. */
+const METEORO_SOMBRA_TXT = 'Una sombra cubre el suelo: algo cae del cielo.';
+async function meteoroAvisarSombra(centro, radio){
+  const uids = new Set();
+  let gm = false;
+  tokens.forEach(t => {
+    if(!t || distanciaHex({col: t.col, fila: t.fila}, centro) > radio) return;
+    if(t.tipo === 'creep'){ gm = true; return; }
+    if(!t.fichaId) return;
+    const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
+    const uid = (f && f.resumen && f.resumen.control) || t.duenoUid || (f && f.duenoUid) || '';
+    if(uid) uids.add(uid); else gm = true;
+  });
+  if(!uids.size && !gm) return;
+  await momentoAbrir({tipo: 'meteoro-sombra', icono: '☄', titulo: METEORO_SOMBRA_TXT, estado: 'listo', datos: {paraUids: [...uids], paraGM: gm}});
+}
+const meteoroSombraVistos = new Set();
+function meteoroSombraMomento(id, d){   // (js/16) → true: no va a la Crónica
+  if(meteoroSombraVistos.has(id)) return true;
+  meteoroSombraVistos.add(id);
+  const dt = d.datos || {}, ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - ms > 60000) return true;   // uno viejo, al abrir el mapa, no
+  const mio = (fbUsuario && (dt.paraUids || []).includes(fbUsuario.uid)) || (soyGM && dt.paraGM);
+  if(!mio) return true;
+  const clave = 'meteoro-sombra:' + id;
+  AvisoCombate.cartel(clave, {icono: '☄', titulo: METEORO_SOMBRA_TXT, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cartel(clave, null)}]});
+  return true;
 }
 
 // Hacerlo caer (la pantalla del GM): la explosión, el anuncio y el área con dodge roll.

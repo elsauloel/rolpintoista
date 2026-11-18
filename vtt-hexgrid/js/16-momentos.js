@@ -106,6 +106,7 @@ function rodilloMomento(id, d){
 }
 const caosHechos = new Set();
 function momentoRecibido(id, d){
+  if(d.tipo === 'meteoro-sombra'){ momentosFeed.delete(id); renderMomentosFeed(); if(typeof meteoroSombraMomento === 'function') meteoroSombraMomento(id, d); return; }   // ☄ el aviso de la sombra, sin tarjeta (js/74)
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
   if(d.tipo === 'robo-huida'){ if(typeof roboHuidaMomento === 'function') roboHuidaMomento(id, d); return; }   // 🫳 la huida de un personaje que robó (js/47, 2026-11-03)
   if(d.tipo === 'estallido' && d.datos && d.datos.explota && typeof explosionEmpezar === 'function') explosionEmpezar(d.datos.explota);

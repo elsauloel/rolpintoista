@@ -618,10 +618,23 @@
     equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],
     habilidades: ['Disparo señalador', 'Cepo del cazador'], consumibles: ['Trampa de oso'],
     estrategia: 'Rango. Prepara el terreno: pone trampas donde va a pasar el rival, marca a la presa y deja que el grupo la cace.'});
-  esencial({linea: 'H4', nombre: 'Bruto que aguanta', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 9, 6, 6, 2],   // (dueño: «me copan»)
+  const H4 = {linea: 'H4', nombre: 'Bruto que aguanta', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Sales aromáticas'],
+    estrategia: 'Híbrido. Se la banca y devuelve: busca que le peguen, contesta cada vez que para un golpe y descarga lo que juntó.'};
+  esencial({...H4, nivel: 1, atrib: [10, 9, 6, 6, 2],   // (dueño: «me copan»)
     equipo: ['Hachuela de camping', 'Pechera de hierro', 'Botas de cuero de vaca'],
-    habilidades: ['Aguante', 'Contraataque'], consumibles: ['Sales aromáticas'],
-    estrategia: 'Híbrido. Se la banca y devuelve: busca que le peguen, contesta cada vez que para un golpe y descarga lo que juntó.'});
+    habilidades: ['Aguante', 'Contraataque']});
+  esencial({...H4, nivel: 2, atrib: [11, 10, 6, 7, 2],   // (aprobado 2026-11-14: Golpe desesperado, Robustez; + Casco de cuero endurecido y Guantes de duelista de taberna)
+    equipo: ['Hachuela de camping', 'Pechera de hierro', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Aguante', 'Contraataque', 'Golpe desesperado'], pasivas: ['Robustez']});
+  esencial({...H4, nivel: 3, atrib: [12, 10, 7, 8, 3],   // (aprobado 2026-11-14: ¡Tu vieeeeja! 😜 —el Provocar de los creeps— con +1 de Especial «de regalo»; el Hacha de la furia roja, Buena, en lugar de la hachuela)
+    equipo: ['Hacha de la furia roja', 'Pechera de hierro', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Aguante', 'Contraataque', 'Golpe desesperado', '¡Tu vieeeeja! 😜'], pasivas: ['Robustez']});
+  esencial({...H4, nivel: 4, atrib: [13, 11, 7, 8, 3],   // (aprobado 2026-11-15: Furia, Mañas de sobreviviente; la Coraza de pinchos, Buena, en lugar de la Pechera)
+    equipo: ['Hacha de la furia roja', 'Coraza de pinchos', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de duelista de taberna'],
+    habilidades: ['Aguante', 'Contraataque', 'Golpe desesperado', '¡Tu vieeeeja! 😜', 'Furia'], pasivas: ['Robustez', 'Mañas de sobreviviente']});
+  esencial({...H4, nivel: 5, atrib: [14, 12, 8, 8, 3],   // (aprobado 2026-11-18: Piel de hierro —pasó del nv3 al 5, en lugar de Golpe brutal—; el Casco de bandas remachadas, Buena)
+    equipo: ['Hacha de la furia roja', 'Coraza de pinchos', 'Botas de cuero de vaca', 'Casco de bandas remachadas', 'Guantes de duelista de taberna'],
+    habilidades: ['Aguante', 'Contraataque', 'Golpe desesperado', '¡Tu vieeeeja! 😜', 'Furia', 'Piel de hierro'], pasivas: ['Robustez', 'Mañas de sobreviviente']});
   esencial({linea: 'L7', nombre: 'Degollador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
     equipo: ['Facón de paisano', 'Chaleco de cuero', 'Calzas de cuero flexible'],
     habilidades: ['Golpe que sangra', 'Remate'], consumibles: ['Aceite del punto débil'],

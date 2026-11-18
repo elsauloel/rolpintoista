@@ -967,7 +967,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 4 aprobado (dueño, 2026-11-15: «ok»)**: atrib [13, 11, 7, 8, 3]; la Coraza de pinchos (Buena: Def +5, Vida +10, Espinas) en lugar de la
     Pechera de hierro; Furia; Mañas de sobreviviente. Vida 80, No2 7, Defensa 7, PdG 8, daño 2d8 + 11, Parry 9, Bloqueo 12. **Falta cargarlo.**
   - **Nivel 5 aprobado (dueño, 2026-11-18: «el bruto va así»)**: atrib [14, 12, 8, 8, 3]; el Casco de bandas remachadas (Buena) en lugar del Casco
-    de cuero endurecido; Piel de hierro. Vida 90, No2 8, Defensa 8, PdG 8, daño 2d8 + 12, Parry 9, Bloqueo 13, Evasión 8. **Falta cargarlo.** Línea H4 completa.
+    de cuero endurecido; Piel de hierro. Vida 90, No2 8, Defensa 8, PdG 8, daño 2d8 + 12, Parry 9, Bloqueo 13, Evasión 8. Línea H4 completa. **Cargado el 2026-11-18** (niveles 2 a 5).
 - **L7 · Degollador · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): abre la herida y la termina; va por el más golpeado.
   Ruta: nv1 **Golpe que sangra** (rápida) · **Remate**; nv2 Ojo de asesino + **Ojo crítico**; nv3 Corte profundo (el arma, de Buena); nv4 Degollar +
   **Sed de sangre**; nv5 Puñalada trapera. **Nivel 1 aprobado**: Des 10 · Agi 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 9 No2, turnos de espera; **Facón de

@@ -371,7 +371,8 @@
   jugador reviviendo una invocación suya, y el GM con un creep y una invocación (el código del GM no cambió, solo se pasó a la pieza común).
   · **2026-11-05**: ✔ Prueba Dos revivió a su invocación desde el ✚; ✔ el GM, un creep (ver arriba).
 
-- [ ] **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
+- [x] ✔ (2026-11-18, Claude: visto en cada daño de la tanda de noche —el Meteoro sobre el Martillero y el Sanador, el contraataque—: «🧮 La cuenta del
+  daño» con la Defensa, el fuego y el total, arriba del 💔 Aplicar) **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
   aplicar uno ya debe saber cuánto va a ser»)**: en el paso 5 del duelo, la pantalla que puede aplicar (el defensor o el GM) muestra la cuenta completa
   (Defensa, escudos, Vida extra, Armadura arcana, Miti-Miti, el elemental del arma) y el total que va a entrar, antes del 💔 Aplicar; al aplicarlo tiene que
   dar lo mismo. (`dueloAplicarDano(d, {simular: true})` + `danioPj/Creep/Inv` con `o.simular`; `cfgEscuchar.previa` en comun/duelo.js.) Ver un golpe a un
@@ -407,7 +408,8 @@
   La góndola del generador de tiendas **no se rearmó** al reabrirlo (pueblito y tienda de inicio): no se pudo reproducir, no se cambió nada.
 - [ ] **Tanda i, no llegué**: Arma elemental en una invocación; 💔 vida en 0 con pacto y con el dueño desconectado.
 
-- [ ] **💔 Vida en 0 desde el mapa (2026-11-04, dueño: «Bizzante quedó en 0 HP —se puso −N en HP directo— y no se murió, ni se activó su pacto»)**:
+- [x] ✔ (2026-11-18, Claude: Rockardo (copia) con el 😇 Pacto, el J1 conectado, «HP directo» a 0 → a los segundos volvió con 10 de 40 —un cuarto—,
+  Invulnerable (Titilando), y la Mesa: «😇 zafó de morir: lo salvó el pacto». Falta: con el dueño desconectado.) **💔 Vida en 0 desde el mapa (2026-11-04, dueño: «Bizzante quedó en 0 HP —se puso −N en HP directo— y no se murió, ni se activó su pacto»)**:
   `vtt-hexgrid/js/98-vida-en-cero.js`. Con un personaje con 😇 Pacto, bajarle la vida a 0 con **2 · HP directo** → a los ~2 s revive con un cuarto de
   la vida, Titilando, y el 😇 queda gris (Aviso, Crónica y Mesa). Sin pacto (ni Fénix ni Ankh en el cinturón) → queda inconsciente (pantalla roja,
   5 turnos, ✚ Revivir). Lo mismo con «Recibe daño» sin pacto (antes tampoco quedaba inconsciente). Lo hace la pantalla del dueño (o la del GM con 🎮 el
@@ -1696,10 +1698,12 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   ¿contraatacás…? (Contraataque) · Sí / No»; con «Sí» se abre el duelo «⚔ Contraataque» del goblin con su Martillo. **Falló y se arregló**: la lupa
   mostraba el +2 pero la tirada que paga el creep salía sin él (1d8, mod 0); ahora el +2 entra en la tirada real (creeps e invocaciones, `?v=20261105c2`).
   Capturas p3-contra-1-eva.png, p3-contra-2-duelo-nuevo.png.
-- [ ] **⚔ Contraataque**: falta ver de nuevo la tirada con el +2 en una partida (ya arreglado), ganar el **Parry** perdiendo el Bloqueo, y un personaje
-  (no creep) con la habilidad.
-- [ ] **⚔ Devolver gentileza**: con la pasiva, ganar el Parry **y** el Bloqueo → «¿Contraatacás? (Devolver gentileza)», sin bonus; **sin** la pasiva ni la
-  habilidad, ganar el Parry y el Bloqueo **ya no ofrece** contraatacar.
+- [x] ✔ (2026-11-18, Claude, de noche: el Bruto nv5 contra Rockardo (copia) del J1, las dos pantallas) **⚔ Contraataque**: el Bruto ganó el Parry (a mano, 20) y
+  **antes del Bloqueo** apareció «¿Contraatacar?» → Sí → sin Bloqueo, se abrió el duelo del contraataque con el **+2** en la tirada (1d12+1 ÷2 con Pajaritos).
+  Falta: un personaje (no creep) con la habilidad.
+- [x] ✔ (2026-11-18, Claude: el Escudero nv4 contra Rockardo (copia)) **⚔ Devolver gentileza**: ganó el Parry y el Bloqueo (a mano, 20 y 20) → «Ganaste el Parry y
+  el Bloqueo: ¿contraatacás…? (Devolver gentileza)» → Sí → el contraataque **sin bonus** (1d8 = su PdG 8). Detalle: en ese mismo cuadro, debajo de la
+  pregunta, ya se veía «🏁 FIN DEL DUELO · Ya no queda ninguna reacción por resolver» (confunde un poco). No probé el caso **sin** la pasiva.
 - [ ] **🌑 Mala sombra** (ex Mufa): ejecutarla desde la Botonera de un Debuffer; el estado se ve con el nombre nuevo y el ícono 🌑; al empezar la ronda la
   Mesa dice «Mala sombra de …». Probado sin mapa: las pruebas automáticas y el texto (captura u-render.png).
 - [x] ✅ **Sin Tipo 12** en las Acciones de un creep (render de la Botonera del creep: Tipo 4/6/8/10). Falta mirarlo en la Botonera de un personaje y en

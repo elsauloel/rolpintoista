@@ -3768,7 +3768,7 @@ const Duelo = (() => {
     mostrar.forEach((d, id) => {
       const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
       const txt = d.estado === 'resuelto'
-        ? (d.hab && d.hab.soloTirada && d.dano ? `🌩 ${d.hab.nombre}: ${_fmt(d.dano.crudo)} ${String(d.hab.soloTirada.etq || '').toLowerCase()} · ver`
+        ? (d.hab && d.hab.soloTirada && d.dano ? `${d.hab.meteoro ? '☄' : '🌩'} ${d.hab.nombre}: ${_fmt(d.dano.crudo)} ${String(d.hab.soloTirada.etq || '').toLowerCase()} · ver`
           : d.contacto && d.contacto.caido ? `💀 ${d.defensor.nombre}: caído, el área no lo alcanza · ver`
           : d.hab && d.hab.esquiva ? `${d.resultado === 'fallo' ? '🏃' : '🌩'} ${d.defensor.nombre}: ${d.resultado === 'fallo' ? 'salió del área' : 'sigue adentro'} · ver`
           : d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)

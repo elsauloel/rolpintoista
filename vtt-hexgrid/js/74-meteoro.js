@@ -91,10 +91,15 @@ function meteoroDibujar(z){
     const R = (m.radio + 0.8) * Math.sqrt(3) * HEX * (0.96 + 0.04 * Math.sin(t0 * 1.6));
     ctx.save();
     const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, R);
-    g.addColorStop(0, 'rgba(0,0,0,.5)'); g.addColorStop(0.65, 'rgba(10,4,0,.32)'); g.addColorStop(1, 'rgba(10,4,0,0)');
+    // (2026-11-18, dueño: «la sombra del meteoro debería verse un poco más»: sobre una imagen de fondo se perdía) más oscura, las casillas
+    // teñidas de un rojo brasa que late, y un borde grueso con contraste (negro abajo, naranja encima) que se ve sobre cualquier fondo.
+    g.addColorStop(0, 'rgba(0,0,0,.72)'); g.addColorStop(0.65, 'rgba(14,4,0,.52)'); g.addColorStop(1, 'rgba(14,4,0,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, Math.PI * 2); ctx.fill();
+    const late = 0.5 + 0.5 * Math.sin(t0 * 2.4);
+    ctx.fillStyle = `rgba(160,40,0,${0.14 + 0.1 * late})`;
+    celdas.forEach(k => { const h = hexCentro(k.col, k.fila); ctx.beginPath(); ESQUINAS.forEach(([dx, dy], i) => i ? ctx.lineTo(h.x + dx, h.y + dy) : ctx.moveTo(h.x + dx, h.y + dy)); ctx.closePath(); ctx.fill(); });
     ctx.restore();
-    bordeHexPunteado(celdas, z, 'rgba(255,150,70,.55)');
+    bordeHexPunteado(celdas, z, `rgba(255,${130 + Math.round(50 * late)},50,${0.85 + 0.15 * late})`, {solido: true, ancho: 3, contraste: 'rgba(0,0,0,.75)'});
     ctx.save();
     const brillo = 0.55 + 0.45 * Math.sin(t0 * 5);
     ctx.shadowColor = 'rgba(255,140,40,.9)'; ctx.shadowBlur = 14 / z;

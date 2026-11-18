@@ -289,7 +289,7 @@ function aguaOndasDibujar(z){
    hexágonos donde el efecto sucede; me gusta que las rayitas se desplacen; está bueno el efecto orgánico por fuera de la grilla, pero que esté la línea de
    puntos que aclare cualquier ambigüedad»): cada lado de una casilla que no toca otra del grupo, con las rayitas corriendo; debajo, una sombra para que se
    lea sobre cualquier fondo. La usan el fuego (abajo) y las zonas y auras de curación (js/70). */
-function bordeHexPunteado(celdas, z, color){
+function bordeHexPunteado(celdas, z, color, o){   // o (2026-11-18, la sombra del Meteoro): {solido, ancho, contraste} para un borde que se vea sobre cualquier fondo
   if(!celdas || !celdas.length) return;
   const set = new Set(celdas.map(c => c.col + ',' + c.fila)), t = performance.now() / 1000;
   ctx.save();
@@ -305,9 +305,10 @@ function bordeHexPunteado(celdas, z, color){
     });
   });
   ctx.lineCap = 'round';
-  ctx.setLineDash([7 / z, 6 / z]); ctx.lineDashOffset = -t * 14 / z;
-  ctx.strokeStyle = 'rgba(0,0,0,.22)'; ctx.lineWidth = 3 / z; ctx.stroke();
-  ctx.strokeStyle = color; ctx.lineWidth = 1.4 / z; ctx.stroke();
+  o = o || {};
+  if(!o.solido){ ctx.setLineDash([7 / z, 6 / z]); ctx.lineDashOffset = -t * 14 / z; }
+  ctx.strokeStyle = o.contraste || 'rgba(0,0,0,.22)'; ctx.lineWidth = (o.ancho ? o.ancho * 2.2 : 3) / z; ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = (o.ancho || 1.4) / z; ctx.stroke();
   ctx.restore();
 }
 // ⚡ El manchón borroso del fuego (2026-11-06, rendimiento): el desenfoque se hace UNA vez por forma y zoom, en un lienzo aparte, y después se pega

@@ -12,6 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — ☄ El aviso de la sombra del Meteoro** (dueño, 2026-11-18: «cuando alguien castea el meteoro, al seleccionar el área, a las personas
+  dentro del área les aparezca una notificación que diga "Una sombra cubre el suelo: algo cae del cielo." Nada más»). Al marcar el centro, a quien
+  maneja cada token que quedó adentro (su jugador; el GM por los creeps) le sale ese aviso, con ese texto exacto y nada más (sin nombrar al mago ni
+  el daño). Una vez por token. Probar en «Claude · pruebas 2» con las dos cuentas.
+
 - **✅ hecho (2026-11-18) — ⚡ El salto del rayo, solo a rivales** (dueño, 2026-11-18: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
   rivales»; el ayudante vio que el salto del Arma eléctrica le pegó al propio atacante por ser el más cercano). Todo salto de rayo (Arma eléctrica,
   Varita de chispa, Varita del relámpago, Cadena de rayos, el Escudo elemental eléctrico…) elige solo entre los rivales de quien lo lanzó: nunca él

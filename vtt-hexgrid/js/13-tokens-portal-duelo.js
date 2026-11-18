@@ -963,7 +963,21 @@ function dueloElegirObjetivoMapa(msg){
         try{ r = await saltoHab(mio0, {...t, id: msg.objetivoFijo}, conSalto0, yo); }catch(err){ console.error('No se pudo correr:', err); r = true; }
         if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
       }
-      await Duelo.crear({yo, ataque}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id);
+      // 🗡🩸 La puñalada y el Corte en la arteria también con el objetivo ya elegido (2026-11-18, probando el L7: con el objetivo fijo se salteaban
+      // y el golpe salía sin el bono de la espalda ni el +2 de frecuente contra uno que ya sangra).
+      let atqF = ataque;
+      const tF = {...t, id: msg.objetivoFijo};
+      if(atqF && atqF.punalada && typeof punaladaBonos === 'function'){
+        let r = null; try{ r = await punaladaBonos(mio0, tF, atqF, yo); }catch(err){ console.error('No se pudo ver la puñalada:', err); r = atqF; }
+        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
+        atqF = r;
+      }
+      if(atqF && atqF.arteria && typeof arteriaBonos === 'function'){
+        let r = null; try{ r = await arteriaBonos(mio0, tF, atqF, yo); }catch(err){ console.error('No se pudo ver la arteria:', err); r = atqF; }
+        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
+        atqF = r;
+      }
+      await Duelo.crear({yo, ataque: atqF}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id);
     })().catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
     return;
   }

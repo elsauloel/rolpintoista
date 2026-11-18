@@ -467,7 +467,18 @@ function creepDesdeIA(data){
   return creep;
 }
 
+// El error de «Generar creep con IA», a la vista en la ventana (antes: «revisá la consola»), con el botón para cambiar la clave.
+function iaMostrarError(motivo, deClave){
+  const btn = $('#ia-generar');
+  if(!btn) { toast(motivo); return; }
+  let caja = document.getElementById('ia-error');
+  if(!caja){ caja = document.createElement('div'); caja.id = 'ia-error'; caja.style.cssText = 'margin-top:10px;padding:8px 10px;border:1px solid #a5485a;border-radius:8px;background:rgba(165,72,90,.15);font-size:13px;line-height:1.4'; btn.parentNode.insertBefore(caja, btn.nextSibling); }
+  caja.innerHTML = `No se pudo generar el creep.<br><small style="opacity:.85">${esc(motivo)}</small><br>` +
+    '<button type="button" class="btn ghost" id="ia-error-clave" style="margin-top:6px">🔑 Cambiar la clave de OpenRouter</button>' + (deClave ? '' : ' <small style="opacity:.75">o probá con otro modelo</small>');
+  caja.querySelector('#ia-error-clave').onclick = async () => { localStorage.removeItem('openrouter-key'); const k = await orKey(true); if(k){ caja.textContent = 'Clave nueva guardada: tocá Generar de nuevo.'; } };
+}
 async function generarCreepIA(promptUsuario){
+  { const c = document.getElementById('ia-error'); if(c) c.remove(); }
   if(!promptUsuario){ toast('Describí el creep antes de generar'); return; }
   const key = await orKey(false);
   if(!key){ toast('Sin clave de OpenRouter no se puede generar'); return; }
@@ -480,34 +491,33 @@ async function generarCreepIA(promptUsuario){
   btn.classList.add('ia-loading');
   toast('Generando creep con IA…');
   try{
-    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // (2026-11-18, el dueño: «No se pudo generar el creep»): los modelos gratis a veces no aceptan el formato estricto (`json_schema` +
+    // `require_parameters` → 400/404 «no endpoints…»): si pasa, se pide de nuevo sin él y se saca el JSON del texto.
+    const pedir = estricto => fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + key,
-        'Content-Type': 'application/json',
-      },
+      headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
       body: JSON.stringify({
         model: modelo,
-        response_format: {
-          type: 'json_schema',
-          json_schema: {name: 'creep', strict: true, schema: CREEP_SCHEMA},
-        },
-        provider: {require_parameters: true},
-        messages: [
-          {role: 'system', content: IA_SISTEMA},
-          {role: 'user', content: promptUsuario},
-        ],
+        ...(estricto ? {response_format: {type: 'json_schema', json_schema: {name: 'creep', strict: true, schema: CREEP_SCHEMA}}, provider: {require_parameters: true}} : {}),
+        messages: [{role: 'system', content: IA_SISTEMA}, {role: 'user', content: promptUsuario}],
       }),
     });
+    let resp = await pedir(true);
+    if(resp.status === 400 || resp.status === 404) resp = await pedir(false);
     if(resp.status === 401){
       localStorage.removeItem('openrouter-key');
-      toast('La clave de OpenRouter no sirve o venció — tocá Generar de nuevo para pegar otra');
+      iaMostrarError('La clave de OpenRouter no sirve o venció.', true);
       return;
     }
-    if(!resp.ok) throw new Error(`OpenRouter respondió ${resp.status}: ${await resp.text()}`);
+    if(!resp.ok){
+      const cuerpo = await resp.text();
+      let msg = cuerpo; try{ const j = JSON.parse(cuerpo); msg = (j.error && (j.error.message || j.error.code)) || cuerpo; }catch(e){}
+      throw new Error(`OpenRouter respondió ${resp.status}${resp.status === 429 ? ' (el modelo gratis está saturado: probá de nuevo en un rato o con otro modelo)' : ''}: ${msg}`);
+    }
     const data = await resp.json();
-    const texto = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-    if(!texto) throw new Error('Respuesta vacía del modelo');
+    let texto = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if(!texto) throw new Error('El modelo no devolvió nada: probá de nuevo o con otro modelo.');
+    { const a = texto.indexOf('{'), b = texto.lastIndexOf('}'); if(a >= 0 && b > a) texto = texto.slice(a, b + 1); }
     const obj = JSON.parse(texto);
     const creep = creepDesdeIA(obj);
     if(!creep.mapa && typeof mapaParaNuevo === 'function') creep.mapa = mapaParaNuevo();
@@ -518,7 +528,7 @@ async function generarCreepIA(promptUsuario){
     toast(`Creep generado: ${creep.nombre} ✓ — revisalo antes de usarlo`);
   }catch(err){
     console.error('Error generando creep con IA:', err);
-    toast('No se pudo generar el creep — revisá la consola');
+    iaMostrarError(String((err && err.message) || err || '').replace(/Bearer\s+\S+/g, 'Bearer …').slice(0, 300), false);
   }finally{
     btn.disabled = false;
     btn.textContent = textoOriginal;

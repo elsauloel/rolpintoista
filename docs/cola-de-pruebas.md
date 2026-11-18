@@ -12,6 +12,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — ☄🔥 Meteoro: dos tiradas bien claras (físico y fuego), con dados de fuego** (dueño, 2026-11-18, con captura: «tirar todo junto el
+  daño físico y el de fuego no me gusta. Deberían ser dos tiradas bien claras. Y si a los dados del daño de fuego le pudieras sumar algún efecto ígneo
+  en su animación 3D, mejor»). Hoy un solo botón tira 4d6 y 2d6 juntos. Que sean **dos pasos**: «🎲 Tirar el daño físico (4d6)» y, después,
+  «🔥 Tirar el daño de fuego (2d6)», cada uno con su recuadro y su resultado (los dos una sola vez para todos, como ahora). En los dados 3D del
+  fuego, un estilo ígneo (color brasa/llamas, brillo o chispas). Revisar si los demás daños con un extra de elemento (`dano.extra`) usan el mismo
+  camino y contarlo (no cambiarlos sin preguntar). Video corto de los dados de fuego. Probar en «Claude · pruebas 2» (el dueño trabaja en
+  «Claude · pruebas»).
+
 - **✅ hecho (2026-11-18) — 🏁 Los duelos terminados se cierran solos** (dueño, 2026-11-18, al abrir la compu después de las pruebas de la noche: el mapa
   lleno de tiras de duelos ya terminados —«Pegó: Bruto → Rockardo · ver», «Meteoro · el daño: 25 · ver», «Sanador: sigue adentro · ver»…— y un
   cuadro con «🏁 LISTO · Listo, cerrar»). Pedido: **un duelo terminado se cierra solo a los 10 segundos** (como si se tocara «Listo, cerrar»), y su

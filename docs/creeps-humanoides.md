@@ -990,6 +990,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   +1 de daño, frecuente +1) · **Chaleco de cuero** (Def +2) · **Escarpines de fieltro** (Eva +1). Consumible: **Mate cebado**. Sin programar.
   - **Nivel 2 aprobado (dueño, 2026-11-18)**: atrib [8, 5, 11, 10, 2] (con, fue, agi, des, esp); + Guantes de duelista de taberna y Cofia de anillas
     sueltas; Dash; Pies ligeros. Vida 40, No2 11, Defensa 3, Def.Esp 1, PdG 10, Parry 11, Evasión 13. **Falta cargarlo.**
+  - **Nivel 3 aprobado (dueño, 2026-11-18: «va así»)**: atrib [9, 6, 11, 11, 2]; la Espada del timbero (Buena: +2 de daño, Crítico frecuente +2,
+    Perfora 1) en lugar del Sable del tahúr; Ráfaga de cortes. Vida 45, No2 11, Defensa 3, PdG 11, daño 1d6 + 8, Parry 12, Evasión 13. **Falta cargarlo.**
   **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
 ## ▶ Ronda de niveles 2 a 5 (2026-11-05, dueño)

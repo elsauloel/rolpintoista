@@ -958,6 +958,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     contra el Marcado, Matabestias) en lugar del Arco del rastreador; Mina del cazador. Vida 50, No2 8, Rango 16, Defensa 4, PdG 12, Evasión 8. **Falta cargarlo.**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [11, 7, 8, 13, 2]; la Capa del explorador (Buena) en lugar del Chaleco de cuero; Cebo;
     Puntería. Vida 60, No2 8, Rango 17, Percepción 15, Defensa 2, Def.Esp 3, PdG 14, Evasión 9. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-18: «va así»)**: atrib [12, 7, 9, 14, 2]; el Yelmo de vigía (Buena) en lugar de la Cofia; Abanico. Vida 65,
+    No2 9, Rango 18, Percepción 17, Defensa 3, Def.Esp 2, PdG 15, Evasión 10. **Falta cargarlo.** Línea R4 completa.
 - **H4 · Bruto que aguanta · Híbrido** (2026-11-05, dueño: «tanto la ruta como el nivel 1 me copan»): se la banca y devuelve; busca que le peguen.
   Ruta: nv1 **Aguante** (lenta) · **Contraataque** (Flash); nv2 Golpe desesperado + **Robustez**; nv3 Piel de hierro (el arma, de Buena); nv4 Furia +
   **Mañas de sobreviviente**; nv5 Golpe brutal. **Nivel 1 aprobado**: Con 10 · Fue 9 · Des 6 · Agi 6 · Esp 2 → vida 50, 6 No2, turnos de espera;
@@ -1352,7 +1354,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
 | L7 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| R4 | ✅ (2026-11-05, cargado) | | | | |
+| R4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
 | M4 | ✅ (2026-11-03) | | | | |
 | S4 | ✅ (2026-11-03) | | | | |
 | D4 | ✅ (2026-11-03) | | | | |

@@ -988,6 +988,7 @@ const Duelo = (() => {
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
       ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}), ...(h.empateGana ? {empateGana: true} : {}),   // empate: gana quien la usa (Tolerar un efecto: hay que superarlo, 2026-11-10)   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
       ...(h.tiraCadaUno ? {tiraCadaUno: true} : {}), ...(h.zonaId ? {zonaId: txtCorto(h.zonaId, 40)} : {}),   // 💨 una zona con duelo por token (js/112): quien la creó tira de nuevo contra cada uno
+      ...(h.dadosEstilo && /^[a-z_]{1,20}$/.test(String(h.dadosEstilo)) ? {dadosEstilo: String(h.dadosEstilo)} : {}),   // 🔥 los dados 3D de esta tirada con un estilo fijo (el fuego del Meteoro: 'fire', 2026-11-18)
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       // 🌩 La ronda de a uno (2026-11-13, dueño; vtt-hexgrid/js/118): `soloTirada` = una tirada de quien la usa que no es daño (los proyectiles de la
       // Tormenta: «🎲 Tirar los proyectiles · 1d20»; queda en `dano.crudo` y el duelo termina ahí, sin aplicar nada); `esquiva` = el «¿Esquiva?» de un
@@ -2733,7 +2734,7 @@ const Duelo = (() => {
     else if(d.hab && d.hab.esquiva) caja = d.resultado === 'fallo' ? `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🏃 SALIÓ DEL ÁREA</div><div class="chico">${_esc(d.defensor.nombre)} esquivó: ${_esc(d.hab.nombre)} no le llega</div></div>`
       : `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} SIGUE ADENTRO</div><div class="chico">${_esc(d.defensor.nombre)} queda en el área de ${_esc(d.hab.nombre)}</div></div>`;
     else if(d.hab && d.hab.soloTirada && !d.dano) caja = '';
-    else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
+    else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.dadosEstilo === 'fire' ? '🔥' : d.hab.meteoro ? '☄' : '🌩'} ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
     else if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego' && d.contacto && d.contacto.resistioEstado) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚡ EL DAÑO ENTRA</div><div class="chico">${_esc(d.defensor.nombre)} resistió los estados de ${_esc(d.hab.nombre)} (${_esc(etqContra(d))}), pero no se esquiva: el daño pasa igual</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;
@@ -2903,7 +2904,7 @@ const Duelo = (() => {
       const etq = d.hab.soloTirada.etq || 'Tirada', f = d.hab.dano ? d.hab.dano.formula : '';
       let cuerpo;
       if(dn) cuerpo = `<div class="duelo-danobox"><div class="duelo-danonum">${_fmt(dn.crudo)}</div><div class="duelo-danosub">${_esc(etq)}${f ? ` (${_esc(f)}${(dn.rolls || []).length ? ': ' + (dn.rolls || []).map(_fmt).join(' + ') : ''})` : ''}</div></div>`;
-      else if(esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar ${_esc(etq.toLowerCase())} · ${_esc(f)}</button></div>${manualHtml(d, 'dano')}`;
+      else if(esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>${d.hab.dadosEstilo === 'fire' ? '🔥' : '🎲'} Tirar ${_esc(etq.toLowerCase())} · ${_esc(f)}</button></div>${manualHtml(d, 'dano')}`;
       else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>
         <div class="duelo-man"><input type="number" min="0" data-manual="dano" placeholder="${_esc(etq.toLowerCase())}" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>`;
@@ -3709,6 +3710,7 @@ const Duelo = (() => {
     const r = f && typeof tirarDados === 'function' ? tirarDados(f) : null;
     if(!r){ esperaTiro = null; retener(false); _toast('La fórmula de daño de la habilidad no es válida: ' + f); return; }
     const reg = (h && h.registrarTirada) || (typeof registrarTirada === 'function' ? registrarTirada : null);
+    if(d.hab.dadosEstilo) r.estiloDados = JSON.stringify({c: d.hab.dadosEstilo});   // 🔥 dados de fuego (el Meteoro)
     if(reg) reg(`Daño · ${d.hab.nombre}`, r, d);
     else{ esperaTiro = null; retener(false); _toast('Esta pantalla no sabe publicar el daño de la habilidad: tiralo a mano'); }   // nunca callado
   }

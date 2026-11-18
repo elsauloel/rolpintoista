@@ -86,7 +86,8 @@ async function mesaPublicar(origen, r){
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
   // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
-  const estilo = typeof dadosEstiloTxt === 'function' ? dadosEstiloTxt() : '';
+  // r.estiloDados (2026-11-18, el Meteoro: «a los dados del daño de fuego, algún efecto ígneo»): un estilo fijo para esta tirada ({c:'fire'}…), en vez del de quien tira.
+  const estilo = r.estiloDados ? String(r.estiloDados).slice(0, 300) : (typeof dadosEstiloTxt === 'function' ? dadosEstiloTxt() : '');
   // Estados que afectaron esta tirada (r.estados = [{n, p:'buff'|'debuff'}], lo arma cada herramienta al tirar):
   // se pintan en la Mesa, verde los buffs y rojo los debuffs (mesaFilaContenido).
   const estados = Array.isArray(r.estados) && r.estados.length

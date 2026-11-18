@@ -185,17 +185,25 @@ async function secuenciaArea(o){
     const vivos = adentro.filter(id => tokens.get(id) && !iniciativaFueraDeJuego(id));
     if(meteoro && vivos.length){
       const fis = String(hab.meteoroFisico || (hab.dano && hab.dano.formula) || '4d6'), ext = hab.dano && hab.dano.extra && hab.dano.extra.formula ? hab.dano.extra : null;
-      const habT = {nombre: `${nombre} · el daño`, objetivo: 'uno mismo', tira: null, contra: [], efectos: [], soloTirada: {etq: 'de daño'}, meteoro: true,
-        dano: {formula: ext ? `${fis}+${ext.formula}` : fis, tipo: 'físico', ignoraDef: false},
-        detalle: `Una sola tirada para todos: ${fis} físico${ext ? ` + ${ext.formula} de ${ext.tipo}` : ''}. A cada uno le entra con su Defensa${ext ? ` y su resistencia al ${ext.tipo}` : ''}.`};
-      const c = await contiendaDuelo({yo: yoDuelo, deTokenId: casteador.tokenId, aTokenId: casteador.tokenId, hab: habT, esperar: true, extra: {secundario: true, danoSuelto: true}});
-      if(!c.falla && !c.cancelado && !c.tiempo && c.d && c.d.dano){
-        const rolls = (c.d.dano.rolls || []).map(num), pd = typeof parseDados === 'function' ? parseDados(fis) : null;
-        const nFis = pd && pd.dados ? pd.dados.reduce((a, x) => a + num(x.n), 0) : rolls.length;
-        const rf = rolls.slice(0, nFis), rx = rolls.slice(nFis);
-        const tf = rf.reduce((a, v) => a + v, 0) + (pd ? num(pd.mod) : 0), tx = ext ? rx.reduce((a, v) => a + v, 0) : 0;
-        yaTirado = {crudo: Math.max(0, tf), formula: `${fis} (una tirada para todos)`, rolls: rf, ...(ext ? {extra: {total: Math.max(0, tx), formula: ext.formula, rolls: rx}} : {})};
-        mesaLinea(`☄ ${nombre} de ${casteador.nombre}: ${fis} = ${yaTirado.crudo} físico${ext ? ` + ${ext.formula} = ${tx} de ${ext.tipo}` : ''} — el mismo para todos los que quedaron adentro`, 'recordatorio');
+      // ☄🔥 Dos tiradas bien claras (dueño, 2026-11-18: «tirar todo junto el daño físico y el de fuego no me gusta»): primero el físico y después el
+      // fuego, cada una en su cuadro y con su número; los dados del fuego, con el estilo de fuego de los dados 3D.
+      const tirar1 = async (etq, formula, detalle, extra) => {
+        const habT = {nombre: `${nombre} · ${etq}`, objetivo: 'uno mismo', tira: null, contra: [], efectos: [], soloTirada: {etq}, meteoro: true,
+          dano: {formula, tipo: 'físico', ignoraDef: false}, detalle, ...(extra || {})};
+        const c = await contiendaDuelo({yo: yoDuelo, deTokenId: casteador.tokenId, aTokenId: casteador.tokenId, hab: habT, esperar: true, extra: {secundario: true, danoSuelto: true}});
+        if(c.falla || c.cancelado || c.tiempo || !c.d || !c.d.dano) return null;
+        await secuenciaPausa(2800);   // que el resultado se vea (los dados quietos y el número) antes de pasar a lo siguiente
+        return {total: Math.max(0, Math.round(num(c.d.dano.crudo))), rolls: (c.d.dano.rolls || []).map(num)};
+      };
+      const f1 = await tirar1('daño físico', fis, `Una sola tirada para todos: ${fis} de daño físico (a cada uno lo frena su Defensa).${ext ? ` Después, el fuego (${ext.formula}).` : ''}`);
+      let f2 = null;
+      if(f1 && ext){
+        f2 = await tirar1(`daño de ${ext.tipo}`, ext.formula, `Una sola tirada para todos: ${ext.formula} de daño de ${ext.tipo}, directo a la vida (lo frena su resistencia al ${ext.tipo}).`,
+          String(ext.tipo || 'fuego') === 'fuego' ? {dadosEstilo: 'fire'} : {});
+      }
+      if(f1 && (!ext || f2)){
+        yaTirado = {crudo: f1.total, formula: `${fis} (una tirada para todos)`, rolls: f1.rolls, ...(ext ? {extra: {total: f2.total, formula: ext.formula, rolls: f2.rolls}} : {})};
+        mesaLinea(`☄ ${nombre} de ${casteador.nombre}: ${fis} = ${yaTirado.crudo} físico${ext ? ` · ${ext.formula} = ${f2.total} de ${ext.tipo}` : ''} — el mismo para todos los que quedaron adentro`, 'recordatorio');
       }else mesaLinea(`☄ ${nombre}: no se tiró el daño — cada uno lo tira aparte`, 'recordatorio');
     }
     let n = 0;

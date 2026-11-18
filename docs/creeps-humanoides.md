@@ -992,6 +992,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     sueltas; Dash; Pies ligeros. Vida 40, No2 11, Defensa 3, Def.Esp 1, PdG 10, Parry 11, Evasión 13. **Falta cargarlo.**
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va así»)**: atrib [9, 6, 11, 11, 2]; la Espada del timbero (Buena: +2 de daño, Crítico frecuente +2,
     Perfora 1) en lugar del Sable del tahúr; Ráfaga de cortes. Vida 45, No2 11, Defensa 3, PdG 11, daño 1d6 + 8, Parry 12, Evasión 13. **Falta cargarlo.**
+  - **Nivel 4 aprobado (dueño, 2026-11-18: «va con la del acróbata»)**: atrib [10, 6, 12, 12, 2]; la Chaqueta del acróbata (Buena: Eva +2, Def.Esp +3)
+    en lugar del Chaleco de cuero; Hit and run; Paso ligero. Vida 50, No2 12, Defensa 1, Def.Esp 4, PdG 12, Parry 13, **Evasión 16**. **Falta cargarlo.**
   **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
 ## ▶ Ronda de niveles 2 a 5 (2026-11-05, dueño)

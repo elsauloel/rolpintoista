@@ -981,6 +981,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     daño 2d4 + 6, Parry 12, Evasión 11. **Falta cargarlo.**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [10, 6, 11, 13, 2]; el Jubón de cuero tachonado (Buena) en lugar del Chaleco; Degollar;
     **Ojo de carancho** en lugar de Sed de sangre. Vida 60, No2 11, Defensa 3, Def.Esp 3, PdG 14, Parry 13, Evasión 12. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-18)**: atrib [11, 7, 11, 14, 2]; las Calzas de cuero de ciervo (Buena: Eva +1, Sigilo +1) en lugar de las de
+    cuero flexible; Puñalada trapera; pasiva **Paso ligero** (dueño: «para poder llegar por la espalda sin necesidad de tener sigilo»). Vida 65, No2 11,
+    Defensa 3, Def.Esp 3, PdG 15, daño 2d4 + 7, Parry 14, Evasión 12. **Falta cargarlo.** Línea L7 completa.
 - **L8 · Acróbata · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): se mueve y corta; nunca se queda quieto. Ruta: nv1 **Salto**
   (rápida) · **Tajo veloz**; nv2 Dash + **Pies ligeros**; nv3 Ráfaga de cortes (el arma, de Buena); nv4 Hit and run + **Paso ligero**; nv5 Puñalada por
   la espalda. **Nivel 1 aprobado**: Agi 10 · Des 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 10 No2, turnos de espera; **Sable del tahúr** (Común, Tipo 6,
@@ -1333,7 +1336,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | W4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | T4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
-| L7 | ✅ (2026-11-05, cargado) | | | | |
+| L7 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
 | L8 | ✅ (2026-11-05, cargado) | | | | |
 | R4 | ✅ (2026-11-05, cargado) | | | | |
 | M4 | ✅ (2026-11-03) | | | | |

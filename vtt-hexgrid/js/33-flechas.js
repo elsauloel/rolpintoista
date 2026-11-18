@@ -86,7 +86,8 @@ async function flechaSalto(d, totalMag){
   // Con daño (regla general del 2026-10-13): salta con la mitad de lo que entró, restando la Res. eléctrica de cada uno, todas las veces que pueda
   // (`totalMag` = lo que le entró al primero). Sin daño (la relámpago): sus `saltos`.
   const conDano = !!s.dano && num(totalMag) > 1;
-  const cadena0 = conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0})).slice(0, 1 + n);
+  const lz = {lanzador: d.atacante && d.atacante.tokenId};   // ⚡ solo a rivales de quien disparó (2026-11-18)
+  const cadena0 = conDano ? rayoCadena(id, num(totalMag), 0, lz) : rayoCadena(id, Math.pow(2, n + 1), 0, lz).map(c => ({...c, dano: 0})).slice(0, 1 + n);
   const cadena = conDano && cadena0.length > 1 ? [cadena0[0], ...(await rayoCadenaAplicar(cadena0, {callado: true}))] : cadena0;
   if(cadena.length < 2){ mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
   const partes = [], estadosDe = {}, lista = [];

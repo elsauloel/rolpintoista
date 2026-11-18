@@ -12,11 +12,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — ⚡ El salto del rayo, solo a rivales** (dueño, 2026-11-18: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
+- **✅ hecho (2026-11-18) — ⚡ El salto del rayo, solo a rivales** (dueño, 2026-11-18: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
   rivales»; el ayudante vio que el salto del Arma eléctrica le pegó al propio atacante por ser el más cercano). Todo salto de rayo (Arma eléctrica,
   Varita de chispa, Varita del relámpago, Cadena de rayos, el Escudo elemental eléctrico…) elige solo entre los rivales de quien lo lanzó: nunca él
   mismo ni sus aliados. Ojo: hay una regla vieja del agua («el salto del rayo por un charco llega a todos», js/106 y js/50): no tocarla sin
   preguntar; contar cómo queda. Probar en «Claude · pruebas 2».
+  *Resultado:* regla pura `Combatiente.rayoSaltaA` (con prueba automática: 869 en verde) y `rayoCadena` (js/10) recibe `lanzador`: nunca salta a quien
+  lo lanzó ni a sus aliados, solo a sus rivales. Cubre todo lo que pasa por `dueloCadena` (js/13: Arma eléctrica y el elemento de un arma, varitas y
+  habilidades con `cadena` —Varita de chispa, del relámpago, Cadena de rayos— y el Escudo elemental eléctrico, donde «lanzador» es el portador del
+  escudo) y las flechas que saltan (js/33). **El agua no cambió**: en un charco el salto sigue llegando a todos los que están parados en él (también a
+  quien lo lanzó y sus aliados), y el rayo que corre por el agua (js/50, `soloAgua`) tampoco. Probado en «Claude · pruebas 2»: Rata A (Arma eléctrica)
+  le pega a Rata B, con Rata A y Rata C (aliada) pegadas y un blanco personaje a 2 → el salto fue al personaje (antes iba a Rata A).
 
 - **✅ hecho (2026-11-18) — 🔧 Dos restos del daño de elemento separado** (2026-11-18, del ayudante, commit cd6ab2ff): (1) el botón del primer paso todavía
   dice «Tirar el daño · … + 🔥 +1d6 fuego» (lo arma la página del atacante): que diga solo el daño del arma, porque el elemento ya se tira aparte;

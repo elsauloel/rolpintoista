@@ -2280,7 +2280,7 @@ async function dueloPorDano(d, entro, p0){
 async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el Escudo elemental de rayo: los del anillo)
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
-  const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0, {excluir: (o && o.excluir) || []});   // 💍 el Anillo de tormenta
+  const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0, {excluir: (o && o.excluir) || [], lanzador: d.atacante && d.atacante.tokenId});   // 💍 el Anillo de tormenta · ⚡ solo a rivales de quien lo lanzó
   if(cadena0.length < 2) return null;
   const hubo = await rayoCadenaAplicar(cadena0, {callado: true});   // el aviso lo da el reporte (js/110)
   if(!hubo.length) return null;

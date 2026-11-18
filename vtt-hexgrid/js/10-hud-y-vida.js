@@ -723,6 +723,9 @@ function rayoCadena(idInicial, dano, mas, o){
   const charco = x => mojado(x) && typeof charcoCeldas === 'function' ? charcoCeldas(x) : null;
   const multAgua = typeof AGUA_MULT_RAYO !== 'undefined' ? AGUA_MULT_RAYO : 1.5;
   const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
+  // ⚡ (2026-11-18, dueño: «solo salta a rivales»): `o.lanzador` (id del token de quien lo lanzó): nunca a él ni a sus aliados (Combatiente.rayoSaltaA).
+  // El agua no cambia: en un charco el salto sigue llegando a todos los que están parados en él.
+  const tL = o.lanzador ? tokens.get(String(o.lanzador)) : null;
   // `o.excluir` (2026-11-09, dueño: el Escudo elemental de rayo): ids a los que el salto NO puede ir (los que ya recibieron el golpe del anillo).
   const usados = new Set([idInicial, ...((o.excluir || []).map(String))]);
   let actual = t0, d = cadena[0].dano;
@@ -733,7 +736,7 @@ function rayoCadena(idInicial, dano, mas, o){
       if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x) || iniciativaFueraDeJuego(id)) return;   // 🕳 bajo tierra / 👁 etéreo / 💀 caído (P225): no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
       const delCharco = !!(ch && ch.has(x.col + ',' + x.fila) && mojado(x));
-      if(!delCharco && x.tipo !== t0.tipo) return;   // el salto, al mismo bando; el agua conduce a todos los que estén parados en ella
+      if(!delCharco && !Combatiente.rayoSaltaA({tipoCandidato: x.tipo, tipoGolpeado: t0.tipo, tipoLanzador: tL ? tL.tipo : '', esLanzador: !!(tL && String(id) === String(o.lanzador))})) return;   // solo rivales de quien lo lanzó; el agua conduce a todos
       if(o.soloAgua && !delCharco) return;
       if(!delCharco && dist > RAYO_SALTO_MAX + Math.max(0, Math.round(num(mas)))) return;
       if(delCharco && !mejorAgua){ mejor = {id, x}; mejorDist = dist; mejorAgua = true; return; }   // los del charco, primero

@@ -549,6 +549,16 @@ const Combatiente = (() => {
     if(nums.length <= 3) return `sale con ${nums.slice(0, -1).join(', ')} o ${nums[nums.length - 1]}`;
     return `sale con ${nums[0]} a ${nums[nums.length - 1]}`;
   }
+  // ⚡ ¿El salto del rayo puede ir a este token? (2026-11-18, dueño: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
+  // rivales»). tipos: 'creep' | 'pj' (las invocaciones cuentan como 'pj'). Con quien lo lanzó conocido: nunca a él y solo a los del bando contrario
+  // al suyo. Sin lanzador (un rayo sin dueño), la regla vieja: al mismo bando que el primer golpeado. El agua (un charco) va aparte, en el mapa.
+  function rayoSaltaA(o){
+    o = o || {};
+    const bando = t => t === 'creep' ? 'creep' : 'pj';
+    if(o.esLanzador) return false;
+    if(o.tipoLanzador) return bando(o.tipoCandidato) !== bando(o.tipoLanzador);
+    return bando(o.tipoCandidato) === bando(o.tipoGolpeado);
+  }
   function chanceEtiqueta(nombre, fuente, v){
     const pct = chancePct(v), f = String(fuente || '').trim();
     return `${nombre} (${f ? f + ', ' : ''}${pct >= 100 ? 'siempre' : pct + ' %'})`;
@@ -3180,5 +3190,5 @@ const Combatiente = (() => {
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
     porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto, devuelveElGolpe, esGiro, GIROS,
-    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta};
+    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta, rayoSaltaA};
 })();

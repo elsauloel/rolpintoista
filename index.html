@@ -909,7 +909,7 @@ async function borrarPersonajeGM(id, boton){
   if(!await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
   const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
   if(escrito === null) return;
-  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
+  if(escrito.replace(/\s+/g, ' ').trim().toLowerCase() !== nombre.replace(/\s+/g, ' ').trim().toLowerCase()){   // (2026-11-18: un nombre con dos espacios seguidos no se podía escribir igual: la pantalla los muestra como uno)
     $('#gestion-error').textContent = 'El nombre no coincide — no se borró nada';
     return;
   }

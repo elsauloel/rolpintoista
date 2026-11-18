@@ -33,10 +33,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   naranja encima: `bordeHexPunteado` acepta `{solido, ancho, contraste}`, js/50; js/74). Probada sobre la imagen de fondo del mapa del dueño (copiada a
   un mapa propio): se ve clara. (2) El 🖼 Fondo, antes de cargar, dice además que después se puede cambiar el ancho en casillas y moverla con el
   mouse (js/09). De paso, la tira minimizada del daño del Meteoro lleva ☄ en lugar de 🌩.
-- **⬜ en cola — 🧌 Cargar al H4 Bruto que aguanta (nv2–5) y probarlo en el mapa** (dueño, 2026-11-18: «cuando termines de cargar al bruto, probalo»).
+- **✅ hecho (2026-11-18) — 🧌 Cargar al H4 Bruto que aguanta (nv2–5) y probarlo en el mapa** (dueño, 2026-11-18: «cuando termines de cargar al bruto, probalo»).
   Lo aprobado en `docs/creeps-humanoides.md` (con ¡Tu vieeeeja! 😜 en el nv3, la Coraza de pinchos, Piel de hierro en el nv5), su prueba de números en
   `comun/pruebas.html`, y en el mapa: ¡Tu vieeeeja!, Aguante (contar golpes y el ataque con dados de más), Contraataque, Golpe desesperado, Furia,
   Piel de hierro, las Espinas de la Coraza de pinchos y Mañas de sobreviviente.
+  *Resultado:* cargado (niveles 2 a 5, los números del documento dan igual en `comun/pruebas.html`). En el mapa (mapa propio, el Bruto nv5 contra
+  Rockardo (copia) del J1, las dos pantallas): **Piel de hierro** + **Aguante** → Defensa 18 y Def.Esp 10 (más el Desafiante después: 20 / 12);
+  **¡Tu vieeeeja! 😜** → PdG.Esp 8 contra Res.Mt 2 → Rockardo Provocado y el Bruto Desafiante; Rockardo le pegó con el Mazo del juez (14 − Defensa 20 =
+  0): **Aguante contó el golpe** aunque la armadura frenó todo, y **las Espinas de la Coraza de pinchos** le devolvieron 4 a Rockardo (27 → 23); el
+  Pajaritos del mazo entró; **Furia** → Enfurecido (PdG 11); **Golpe desesperado** avisó «más de la mitad de la vida: +1 frecuente, +2 potente, +1
+  al daño» (Rockardo esquivó). No se vio el Contraataque (el Parry del Bruto perdió por empate) ni Mañas de sobreviviente (no bajó de la mitad).
 
 - **✅ hecho (2026-11-14) — 😜 Provocar de los creeps pasa a llamarse «¡Tu vieeeeja! 😜»** (dueño, 2026-11-14: «dejar provocar y le vamos a cambiar el nombre
   en la versión para creeps»). Solo la habilidad de creep (`comun/skills-creep-base.js`); el **Taunt** de la clase Tanque de los jugadores no cambia.
@@ -258,7 +264,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-28. [ ] (las reglas ya están pegadas, 2026-11-18: lista para hacer) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
+28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

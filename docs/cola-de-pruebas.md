@@ -12,6 +12,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 💥 Todas las áreas: una sola tirada de daño para todos** (dueño, 2026-11-18: «sí», a la pregunta de pasar las demás áreas a una
+  tirada como el Meteoro). Bola de fuego, ondas, conos, varitas de área y cualquier hechizo/habilidad de área con un daño común: quien la lanza tira el
+  daño UNA vez y a cada afectado se le aplica ese resultado con lo suyo (Defensa / Def.Esp / resistencia al elemento), de a uno con su cuenta, como
+  el Meteoro (js/118, commit a7a6694f). La Tormenta queda como está (cada uno su Nd4). Ojo con los daños que dependen del objetivo (la diferencia de
+  tiradas, «la mitad si resiste», críticos): contarlo y no inventar. Probar en el mapa con capturas.
+- **⬜ en cola — 🏁 Devolver gentileza: sin el «FIN DEL DUELO» mientras se pregunta** (dueño, 2026-11-18: «sacalo»). En el cuadro del duelo, debajo de
+  «¿Contraatacás? (Devolver gentileza)», ya aparece «🏁 FIN DEL DUELO · Ya no queda ninguna reacción por resolver»: que no aparezca hasta que se
+  conteste (revisar lo mismo con la pregunta del Contraataque). Captura en `scratchpad/noche/h4/m04-GM.png`.
+
 - **✅ hecho (2026-11-18) — ☄ El daño del Meteoro, una sola tirada** (dueño, 2026-11-18, probándolo: «me pide que tire el daño una vez por cada objetivo
   afectado. La tirada de daño debería ser una sola, y después se calcula cuánto daño le pasó a cada afectado de acuerdo a sus resistencias»).
   Quien lo lanzó tira **una vez** (4d6 físico + 2d6 de fuego) y a cada uno que quedó adentro se le aplica ese mismo resultado con lo suyo (la Defensa

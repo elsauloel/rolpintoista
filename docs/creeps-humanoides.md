@@ -994,6 +994,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     Perfora 1) en lugar del Sable del tahúr; Ráfaga de cortes. Vida 45, No2 11, Defensa 3, PdG 11, daño 1d6 + 8, Parry 12, Evasión 13. **Falta cargarlo.**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va con la del acróbata»)**: atrib [10, 6, 12, 12, 2]; la Chaqueta del acróbata (Buena: Eva +2, Def.Esp +3)
     en lugar del Chaleco de cuero; Hit and run; Paso ligero. Vida 50, No2 12, Defensa 1, Def.Esp 4, PdG 12, Parry 13, **Evasión 16**. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-18: «va así»)**: atrib [11, 7, 12, 13, 2]; la Vincha del corredor (Buena) en lugar de la Cofia; Puñalada por la
+    espalda. Vida 55, No2 12, Defensa 2, Def.Esp 3, PdG 13, daño 1d6 + 9, Parry 14, Evasión 16, Iniciativa 13. **Falta cargarlo.** Línea L8 completa.
   **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
 ## ▶ Ronda de niveles 2 a 5 (2026-11-05, dueño)
@@ -1343,7 +1345,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
 | L7 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
-| L8 | ✅ (2026-11-05, cargado) | | | | |
+| L8 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
 | R4 | ✅ (2026-11-05, cargado) | | | | |
 | M4 | ✅ (2026-11-03) | | | | |
 | S4 | ✅ (2026-11-03) | | | | |

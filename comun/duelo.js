@@ -1589,9 +1589,10 @@ const Duelo = (() => {
         // multiplicador del crítico (regla del dueño). Lo aplica el mapa junto con el daño.
         const magicos = crudos.filter(e => e && e.danoMagico && e.dado);
         if(magicos.length && typeof tirarDados === 'function'){
-          const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
-          if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
-            formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
+          // 🔥❄⚡ En su propia tirada (dueño, 2026-11-18: «sí», como el Meteoro): acá ya NO se tira; queda pendiente (`magicoPend`) y quien atacó la
+          // tira aparte, con su botón y los dados de su elemento (tirarMagico/guardarMagico). Hasta entonces el daño no se aplica.
+          const forms = magicos.map(e => String(e.dado || '').trim()).filter(f => typeof parseDados !== 'function' || parseDados(f));
+          if(forms.length) m.dano.magico = {tipo: magicos.map(e => String(e.nombre || 'mágico').slice(0, 20)).join(' y '), total: 0, formula: forms.join('+').slice(0, 60), rolls: [], pend: true};
           const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena || _num(e.identidadTurnos) > 0 || _num(e.luzSanadora) > 0);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
           if(ex){
             if(_num(ex.mult) > 1) m.dano.magico.mult = Math.min(3, _num(ex.mult));
@@ -1618,8 +1619,51 @@ const Duelo = (() => {
       // (La regla «un golpe crítico no rompe armadura» se sacó el 2026-10-23, dueño: «eso se borra». Un crítico rompe armadura como cualquier golpe.)
       // 🔮 El Orbe salvaje se tira CON el daño (2026-11-04, dueño: que la cuenta se vea antes de aplicarlo): solo con daño especial (el de una habilidad
       // que ignora la Defensa, o el elemental del arma); el mapa dice si quien ataca lo lleva (cfgEscuchar.orbeSalvaje) y lo usa al aplicar.
-      const especial = (m.hab && m.hab.dano && m.hab.dano.ignoraDef && m.resultado === 'pego') || (m.dano.magico && _num(m.dano.magico.total) > 0);
+      const especial = (m.hab && m.hab.dano && m.hab.dano.ignoraDef && m.resultado === 'pego') || (m.dano.magico && !m.dano.magico.pend && _num(m.dano.magico.total) > 0);
       if(especial && typeof cfgEscuchar.orbeSalvaje === 'function'){
+        try{ const sv = cfgEscuchar.orbeSalvaje(m); if(sv){ m.dano.salvaje = {d: _num(sv.d), mult: _num(sv.mult) || 1, propio: !!sv.propio, nombre: String(sv.nombre || 'Orbe salvaje').slice(0, 40)}; salvajeTirado = m.dano.salvaje; } }
+        catch(err){ console.error('Duelo: el Orbe salvaje', err); }
+      }
+      mFinal = m;
+      tx.update(ref, cambiosDe(m));
+    });
+    if(salvajeTirado && mFinal && typeof cfgEscuchar.orbeSalvajeAnunciar === 'function') cfgEscuchar.orbeSalvajeAnunciar(mFinal, salvajeTirado);
+  }
+
+  /* 🔥❄⚡ El daño de elemento de un arma, en su propia tirada (dueño, 2026-11-18): quien atacó (o el GM por él) toca «🔥 Tirar el daño de fuego (1d6)»;
+     se tira con los dados 3D del color del elemento (MAGICO_DADOS: los juegos de la librería), va a la Mesa en su línea y, con los dados quietos, queda
+     en `dano.magico` (sin `pend`). Recién ahí se aplica el daño (aceptar / reclamar / la vista previa esperan: `magPend`). El Orbe salvaje, que depende
+     de que haya daño especial, se tira en este momento. */
+  const MAGICO_DADOS = {fuego: 'fire', hielo: 'ice', rayo: 'lightning', acido: 'acid', toxico: 'poison', luz: 'radiant', siniestro: 'necrotic'};
+  const magPend = dn => !!(dn && dn.magico && dn.magico.pend);
+  const magEstilo = tipo => MAGICO_DADOS[typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(tipo) : ''] || 'force';
+  let magicoTirando = '';
+  async function tirarMagico(d){
+    if(!d || !magPend(d.dano) || magicoTirando === d.id) return;
+    const mg = d.dano.magico, r = typeof tirarDados === 'function' ? tirarDados(mg.formula) : null;
+    if(!r){ _toast('La fórmula del daño de ' + mg.tipo + ' no es válida: ' + mg.formula); return; }
+    magicoTirando = d.id;
+    try{
+      window.DUELO_RETENER = false;
+      if(typeof mesaPublicar === 'function') await mesaPublicar(`${d.atacante.nombre} · ${magTitulo(mg.tipo)}`, {...r, quien: d.atacante.nombre, estiloDados: JSON.stringify({c: magEstilo(mg.tipo)}),
+        ...(d.atacante.tipo === 'creep' ? {desde: 'gm'} : {})}).catch(() => {});
+      await new Promise(res => esperarDados(res));
+      await guardarMagico(d.id, r);
+    }catch(err){ console.error('Duelo: el daño de elemento', err); _toast('No se pudo anotar el daño de ' + mg.tipo); }
+    finally{ magicoTirando = ''; }
+  }
+  async function guardarMagico(id, r){
+    const ref = col().doc(id);
+    let salvajeTirado = null, mFinal = null;
+    await fbDb.runTransaction(async tx => {
+      salvajeTirado = null;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || !magPend(m.dano)) return;
+      const {pend, ...resto} = m.dano.magico;
+      m.dano = {...m.dano, magico: {...resto, total: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || resto.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 12).map(_num)}};
+      if(_num(m.dano.magico.total) > 0 && !m.dano.salvaje && typeof cfgEscuchar.orbeSalvaje === 'function'){
         try{ const sv = cfgEscuchar.orbeSalvaje(m); if(sv){ m.dano.salvaje = {d: _num(sv.d), mult: _num(sv.mult) || 1, propio: !!sv.propio, nombre: String(sv.nombre || 'Orbe salvaje').slice(0, 40)}; salvajeTirado = m.dano.salvaje; } }
         catch(err){ console.error('Duelo: el Orbe salvaje', err); }
       }
@@ -1799,7 +1843,7 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.aceptado) return;
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.aceptado || magPend(m.dano)) return;
       m.dano = {...m.dano, aceptado: yo(), ...(valor !== undefined && valor !== null ? {aMano: {valor: Math.max(0, Math.round(_num(valor))), sugerido: Math.max(0, Math.round(_num(sugerido)))}} : {})};
       tx.update(ref, cambiosDe(m));
     });
@@ -1813,7 +1857,7 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || tomado(m.dano)) return;
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || tomado(m.dano) || magPend(m.dano)) return;
       if(pideAceptar(m) && !m.dano.aceptado) return;   // 💔 espera el OK de quien lo recibe
       m.dano = {...m.dano, reclamado: yo()};
       tx.update(ref, cambiosDe(m));
@@ -2926,6 +2970,16 @@ const Duelo = (() => {
       const dados = (dn.rolls || []).map(r => `<span class="duelo-dadito">${_esc(String(r))}</span>`).join('')
         + (_num(dn.mod) ? `<span class="duelo-dadito mod">${_num(dn.mod) > 0 ? '+' : '−'}${_fmt(Math.abs(_num(dn.mod)))}</span>` : '');
       const tiro = `<div class="duelo-danotiro"><span class="t">🎲 Daño${arma}${defMan}</span><span class="n">${_fmt(dn.crudo)}</span>${dados ? `<span class="dados">${dados}</span>` : ''}<span class="f">${_esc(dn.formula || '')}</span></div>`;
+      // 🔥❄⚡ El daño de elemento, pendiente: su propio paso, con el botón de quien atacó (o del GM por él) — el resto espera (2026-11-18).
+      if(magPend(dn) && !dn.aplicado){
+        const mg = dn.magico, ic = magIcono(mg.tipo), tit = magTitulo(mg.tipo);
+        const puede = (esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) || puedoAMano(d.atacante);
+        const porOtro = !esMio(d.atacante) && puedoAMano(d.atacante) ? ` por ${_esc(d.atacante.nombre)}` : '';
+        const boton = puede ? `<div style="text-align:center;margin-top:10px"><button type="button" data-dano-tirar data-magico-tirar>${ic} Tirar el ${_esc(tit.toLowerCase())}${porOtro} · ${_esc(mg.formula)}</button></div>`
+          : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el ${_esc(tit.toLowerCase())}…</div>`;
+        cuerpo = tiro + `<div class="duelo-danotiro" style="border-color:#e3a85a"><span class="t">${ic} ${_esc(tit)}${mg.mult ? ` ×${_fmt(mg.mult)}` : ''}</span><span class="f">${_esc(mg.formula)} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</span></div>` + boton;
+        return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;
+      }
       // ☄ El segundo daño (el fuego del Meteoro, o el elemental de un arma), a la vista también antes de aplicarlo (2026-10-24: no se veía hasta el final).
       const mgAntes = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</div>` : '';
       const svTxt = dn.salvaje ? `<div class="duelo-mini" style="color:#c9b8ff">🔮 ${_esc(dn.salvaje.nombre)} (1d6 → ${_fmt(dn.salvaje.d)}): ${_num(dn.salvaje.mult) > 1 ? `el daño especial sale ${_num(dn.salvaje.mult) === 3 ? 'triple' : 'doble'}` : dn.salvaje.propio ? `lo que le entre a ${_esc(d.defensor.nombre)} le entra también a ${_esc(d.atacante.nombre)}` : 'no pasa nada'}</div>` : '';
@@ -3468,7 +3522,9 @@ const Duelo = (() => {
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
     const bft = f.querySelector('[data-ef-terminar]');
     if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));
-    const bdt = f.querySelector('[data-dano-tirar]');
+    const bmg = f.querySelector('[data-magico-tirar]');
+    if(bmg) bmg.onclick = () => { bmg.disabled = true; bmg.textContent = 'Tirando…'; tirarMagico(d).finally(() => { if(bmg.isConnected) bmg.disabled = false; }); };
+    const bdt = bmg ? null : f.querySelector('[data-dano-tirar]');
     if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano', flash: flashSel[d.id + ':dano'] || ''}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
     const bac = f.querySelector('[data-dano-aceptar]');
     if(bac) bac.onclick = () => { bac.disabled = true; bac.textContent = 'Aplicando…'; aceptarDano(d.id).catch(err => { console.error(err); _toast('No se pudo aplicar el daño'); bac.disabled = false; }); };
@@ -4152,7 +4208,7 @@ const Duelo = (() => {
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
       if(cfgEscuchar.aplicar && soyGM()){
         listaDuelos.forEach(d => {
-          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || tomado(d.dano) || aplicando.has(d.id)) return;
+          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || tomado(d.dano) || magPend(d.dano) || aplicando.has(d.id)) return;
           if(pideAceptar(d) && !d.dano.aceptado) return;   // 💔 el personaje que lo recibe todavía no tocó «Aplicar el daño»
           // 👀 (2026-11-05, segunda tanda de pruebas) una pantalla del GM en OTRO mapa tampoco reclama el daño: lo dejaba «el token ya no está en el mapa».
           if(cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) return;
@@ -4217,5 +4273,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

@@ -6587,7 +6587,7 @@ prueba('firmas de arma: costos (primer ataque −N, oportunidad gratis), sin Par
     EstadosAplicar.componer({nombre: 'Sangrado', stacks: 3}).stacks, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma)],
     [1, 0, 2, 3, 0, {sinParry: true}, {nombre: 'Rengo'}, {nombre: 'Sangrado', stacks: 3, turnos: 2}, 3, 1, 'Tipo 4 · 1 dado · No se puede parrear · Oportunidad sin No2 · Primer ataque −1 No2 · +1 d20 en el crítico']);
 });
-prueba('daño mágico de un arma: se tira al guardar el daño, aparte, y no queda como efecto al golpear', () => { const pp = fbFalsoCola.then(async () => {
+prueba('daño mágico de un arma: queda pendiente al guardar el daño (su propia tirada, 2026-11-18), se anota aparte y no queda como efecto al golpear', () => { const pp = fbFalsoCola.then(async () => {
   const docs = {};
   const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
   const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
@@ -6595,10 +6595,12 @@ prueba('daño mágico de un arma: se tira al guardar el daño, aparte, y no qued
   try{
     docs.x = {estado: 'esperando', fase: 'dano', dano: null, atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, ataque: {}, crit: null};
     await Duelo.guardarDano('x', {total: 5, formula: '3d4', rolls: [5]}, [{nombre: 'Rayo', caras: 1, exitos: 1, dado: '1d4', danoMagico: true}, {nombre: 'Lisiado', caras: 2, exitos: 1}]);
+    const pend = {...docs.x.dano.magico};
+    await Duelo.guardarMagico('x', {total: 3, formula: '1d4', rolls: [3]});
     const mg = docs.x.dano.magico;
-    igual([docs.x.efectos.map(e => e.nombre), mg.tipo, mg.total >= 1 && mg.total <= 4, docs.x.dano.crudo,
+    igual([pend.pend, pend.total, pend.formula, mg.pend, docs.x.efectos.map(e => e.nombre), mg.tipo, mg.total >= 1 && mg.total <= 4, docs.x.dano.crudo,
       ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 3, efectosGolpe: [{nombre: 'Rayo', caras: 1, exitos: 1, dado: '1d4', danoMagico: true}]})],
-      [['Lisiado'], 'Rayo', true, 5, 'Tipo 4 · 2 manos · 3 dados · +1d4 eléctrico']);
+      [true, 0, '1d4', undefined, ['Lisiado'], 'Rayo', true, 5, 'Tipo 4 · 2 manos · 3 dados · +1d4 eléctrico']);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
 

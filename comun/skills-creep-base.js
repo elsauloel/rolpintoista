@@ -385,10 +385,11 @@
     duelo: {objetivo: 'cono', ondaDodge: true, tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
   // ✨ Auditada (dueño, 2026-10-25; el Mago, «daño concentrado», Andanada arcana: «sale» a la propuesta de Claude): los misiles de la Varita de misiles
   // (`reparte`: de a uno, cada uno con su duelo; el próximo, a quien elija), 3 de 1d6 arcano + ¼ de su Ef.Esp cada uno. Suma el Ef.Esp → su Especial
-  // en SP (P216), 3 No2, o cooldown 3.
-  H('Andanada arcana', 'D', 'ega', 'g', 3, {detalle: 'Tres misiles arcanos, de a uno, a rivales dentro de su Rango: cada uno tira su Probabilidad de Golpe especial contra la Evasión del objetivo y, si pega, hace 1d6 más un cuarto de su Efecto especial de daño arcano (lo frena la Defensa especial). Cuando termina un misil, elige a quién va el siguiente (puede ser el mismo).',
-    no2: 3, spCosto: 'esp', auditada: true, ataqueTxt: '3 misiles, de a uno: su PdG.Esp contra la Evasión de cada objetivo; 1d6 + ¼ de su Ef.Esp arcano cada uno',
-    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '3d6', danoSumaEsp: 0.25, tipoDano: 'arcano', reparte: {cada: '1d6', total: 3}, efectos: []}});
+  // en SP (P216), 3 No2, o cooldown 3. ⚖ Recosteada (dueño, 2026-11-18: «si el daño es fijo, el sp debería ser fijo… los skills de clase como referencia»):
+  // daño fijo, 1d6 + 4 cada misil, y 9 SP fijos (3 Chispazos = 3 SP; los +4 × 3 = 12 de daño, a 2 por SP como el Rayo mágico = 6 SP).
+  H('Andanada arcana', 'D', 'ega', 'g', 3, {detalle: 'Tres misiles arcanos, de a uno, a rivales dentro de su Rango: cada uno tira su Probabilidad de Golpe especial contra la Evasión del objetivo y, si pega, hace 1d6 + 4 de daño arcano (lo frena la Defensa especial). Cuando termina un misil, elige a quién va el siguiente (puede ser el mismo).',
+    no2: 3, spCosto: 9, auditada: true, ataqueTxt: '3 misiles, de a uno: su PdG.Esp contra la Evasión de cada objetivo; 1d6 + 4 arcano cada uno',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '3d6+12', tipoDano: 'arcano', reparte: {cada: '1d6+4', total: 3}, efectos: []}});
   // 🌨 Auditada (dueño, 2026-10-25; el Mago, «una lluvia de escarcha que haga daño de hielo y que deje el piso congelado durante 2 turnos y después deje el
   // charco por tiempo indeterminado»; comparada con la Varita de la ventisca, que el mismo día pasó a 2d4): el área de la Bola de fuego, de diámetro 5
   // (radio 2), con el suelo congelado de la varita (`zonaQueda` con `superficie: 'hielo'`, vtt-hexgrid/js/50: al irse queda el charco, que no vence).

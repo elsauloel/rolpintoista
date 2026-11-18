@@ -12,6 +12,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — ✨ Andanada arcana recosteada** (dueño, 2026-11-18: «pasa eso a la cola»): ya cambiada en `comun/skills-creep-base.js` (9 SP
+  fijos, 3 misiles de 1d6 + 4 fijo, ya no suma el Ef.Esp; pruebas en verde). Falta verla en el mapa: que cobre 9 SP (no su Especial), que cada misil
+  tire 1d6 + 4 y que se pueda repartir o repetir blanco. Con un creep que la tenga (el M4 nivel 4 cuando se cargue, o un Mago en «Claude · pruebas 2»).
 - **⬜ en cola — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
   probado»). Cada una se tacha acá (✔ con fecha y el resultado en una línea) y en `docs/pruebas-en-el-mapa.md` apenas queda probada:
   - [ ] 🌑 Mala sombra desde la Botonera de un Debuffer.

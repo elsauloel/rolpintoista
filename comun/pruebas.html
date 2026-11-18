@@ -1731,7 +1731,7 @@ prueba('🏹 Flecha que atraviesa (Rango, 2026-10-25): un ataque con +2 al daño
   const h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.duelo.modo, h.duelo.arma.fijo, !!h.duelo.perforante, h.nitrosCosto, h.cd], ['arma', 2, true, 'ATAQUE', 3]);
 });
-prueba('✨ Andanada arcana (Mago, 2026-10-25): 3 misiles de 1d6 + ¼ Ef.Esp arcano, de a uno', () => {
+prueba('✨ Andanada arcana (Mago, 2026-10-25; recosteada 2026-11-18): 3 misiles de 1d6 + 4 arcano, de a uno, 9 SP fijos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Andanada arcana');
   const h = armarHabilidadDeCreep(e.datos, 2);
   const ej = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 8 : 5}) || {};
@@ -1739,7 +1739,7 @@ prueba('✨ Andanada arcana (Mago, 2026-10-25): 3 misiles de 1d6 + ¼ Ef.Esp arc
   // La Varita de misiles sigue igual (no suma el Ef.Esp).
   const S = FichaGuardado.normalizar({}).S, vm = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-misiles')), equipado: true};
   const hv = FichaAcciones.habDeArmaEspecial(S, vm), ev = Combatiente.habEjecucion(hv, hv.duelo, {stat: s => s === 'dmgesp' ? 8 : 5}) || {};
-  igual([ej.reparte.cada, ej.reparte.total, (n.reparte || {}).cada, (n.reparte || {}).total, (ej.dano || {}).tipo, ev.reparte.cada, h.spCosto, h.cd], ['1d6+2', 3, '1d6+2', 3, 'arcano', '1d4', 'esp', 3]);
+  igual([ej.reparte.cada, ej.reparte.total, (n.reparte || {}).cada, (n.reparte || {}).total, (ej.dano || {}).tipo, ev.reparte.cada, h.spCosto, h.cd], ['1d6+4', 3, '1d6+4', 3, 'arcano', '1d4', 9, 3]);
 });
 prueba('🔥 Frenesí inducido (Support, 2026-10-25): cura 4 por turno y Frenético 2 turnos (+3 PdG, +5 daño, −2 Eva, −2 Def)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Frenesí inducido');

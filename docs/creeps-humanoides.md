@@ -664,6 +664,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     que ya es del M3 nv5 → proponer otra.
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 7, 6, 15]; la Cabeza reducida de jíbaro (Buena: Ef.Esp +1, Res.Mt +2, Maldito con el
     primer daño especial) en lugar de la Brújula; Portal trampa (3 SP). Vida 45, No2 7, SP 45, Rango 7, PdG.Esp 15, Ef.Esp 16. **Falta cargarlo.**
+  - **Nivel 4 aprobado (dueño, 2026-11-18: «me parece bien», con la Andanada recosteada)**: atrib [10, 2, 7, 6, 17]; la Túnica del archivista (Buena:
+    SP +3, Def.Esp +2, Res.Mt +2, Res.Esp +1, Percepción +2) en lugar del Chaleco de cuero; **Andanada arcana: 9 SP fijos, 3 No2, 3 misiles de 1d6 + 4
+    fijo** (dueño: «si el daño es fijo, el sp debería ser fijo»; 3 Chispazos = 3 SP + 12 de daño a 2 por SP como el Rayo mágico = 6 SP); Puntería arcana.
+    Vida 50, No2 7, SP 54 (8), Rango 7, Defensa 1, Def.Esp 4, PdG.Esp 18, Ef.Esp 18, Eva 8. **Falta cargarlo.**
 
 - **H2 · Saltador · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: cae en el medio y barre: salta por encima de
   la primera línea, se planta entre los de atrás y le pega a todos los que lo rodean. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/7/6/2 →

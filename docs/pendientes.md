@@ -182,7 +182,7 @@
 >   Variables: `ROL_GM_EMAIL`/`ROL_GM_CLAVE`, `ROL_J1_EMAIL`/`ROL_J1_CLAVE`, `ROL_J2_EMAIL`/`ROL_J2_CLAVE` (la de GM reemplaza a `ROL_EMAIL`). Con eso, desde la
 >   nube: leer las partidas (ej. confirmar que Ricardo tiene Prisa) y abrir el mapa en un navegador sin pantalla con capturas (cubre buena parte
 >   del «☁🧪» de abajo). Regla propuesta: en las partidas reales solo mirar salvo pedido; las pruebas, en «Claude · pruebas».
-> - [ ] **📋 Pegar las reglas de Firestore (2026-11-03): ⭐ co-GM** (un GM le da o le saca `gm` a otro miembro; el dueño no se puede sacar; solo el
+> - [x] (2026-11-18: pegadas por el dueño) **📋 Pegar las reglas de Firestore (2026-11-03): ⭐ co-GM** (un GM le da o le saca `gm` a otro miembro; el dueño no se puede sacar; solo el
 >   dueño borra la partida y ofrece el traspaso). Después: index.html → El origen → Jugadores → «⭐ Hacer co-GM» en la cuenta de Claude (la que es GM de «Claude · pruebas»).
 > - [ ] **⚖ Revisar en la compu el balance del Encuentro 2 de El origen (dueño, 2026-11-03: «dejá anotada la revisión del combate para cuando esté en
 >   la compu»).** Detalle en `docs/reporte-simulacion-encuentro2-2026-11-03.md` (simulaciones con el grupo a nivel 3 y los creeps reales). Tal como

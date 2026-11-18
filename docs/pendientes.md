@@ -139,6 +139,12 @@
 >   al GM; frenado a mitad de camino y dejado pasar → salió (antes: «sigue adentro»); con 0 No2 → esquivó y quedó en −2; con −1 → el aviso en las dos
 >   pantallas y le cayó el meteoro. **Para ver vos en la compu:** lo mismo con Larry en una mesa real.
 >   (Visto de paso, sin tocar: un personaje en 0 de vida, inconsciente, igual pudo arrastrar su token para terminar el dodge roll.)
+> - [x] **🧹 Auditoría de los mapas de «Claude · pruebas» (dueño, 2026-11-18: «buscando tokens obsoletos que no tengan respaldo, y limpialos… tomá
+>   las decisiones vos»).** Hecha por Claude por la API: 3 mapas vivos (Mapa 1, Prueba · Trampas en flor, Prueba · Tormenta y Meteoro), 29 tokens.
+>   Borrado 1 token sin respaldo (un creep «asd» de Mapa 1 sin creep detrás). 32 creeps seguían anotados en 7 mapas ya borrados (sin token): 6 de
+>   prueba descartables borrados (Rata de carteles 1 y 2 y 4 «(refuerzo)» de la Plaga) y los otros 26 pasados a la 🎒 Reserva (no se pierde nada:
+>   goblins del culto, Basilio, el Escudero, magos…). Los creeps de prueba con token en Mapa 1 (Goblins de prueba, Warrior (prueba)…) tienen
+>   respaldo: quedaron.
 > - [x] **😵 Un caído no esquiva (decidido por el dueño, 2026-11-14: «al personaje caído no le tienen que aparecer ni siquiera notificaciones de
 >   esquivar ni nada»).** Pasó a la cola de programación (`docs/cola-de-pruebas.md`).
 > - [ ] **🌩☄ Ver en el mapa la Tormenta arcana y el Meteoro de a uno (dueño, 2026-11-13: «cuando esté en la compu, ver el resultado de la tormenta

@@ -12,12 +12,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🏹✨ Lo que quedó sin ver en el mapa del Hunter (R4 nv2–5) y el Arcano (M4 nv2–3)** (cargados el 2026-11-18; dueño: anotar
-  habilidad por habilidad lo que no se llegó a probar). Probar en «Claude · pruebas 2», mapa «Prueba · R4 M4» (los seis creeps ya están ahí):
-  - [ ] ✨ Lanza arcana atravesando a varios en la misma línea (dos rivales y un aliado del Arcano: los tres tiran Evasión, el aliado también entra).
-  - [ ] 🏹 Abanico con un aliado del Hunter dentro del cono (no tiene que recibir nada) y con dos rivales a la vez.
-  - [ ] 📏 Largo alcance arcano en el alcance real: el Arcano 2 llegando con la Lanza o el gancho a un blanco a 6 casillas (sin la pasiva serían 5).
-  - [ ] 🎯 Puntería por separado (se vio sumada en el PdG del Abanico, 1d6+1d8+1 = 15, pero no comparada contra el Hunter 3, que no la tiene).
+- **✅ hecho (2026-11-18) — 🏹✨ Lo que quedó sin ver en el mapa del Hunter (R4 nv2–5) y el Arcano (M4 nv2–3)** («Claude · pruebas 2», mapa
+  «Prueba · R4 M4», GM + Jugador 1; Jugador 1 tiene ahora un segundo personaje, «Blanco J1 b», para tener dos rivales):
+  - [x] ✨ Lanza arcana atravesando a varios: Arcano 2 en línea recta con Blanco J1, el Blanco creep (su aliado) y Blanco J1 b: un solo PdG.Esp y un
+    solo daño (8, «el mismo para todos»), los tres tiraron Evasión, el aliado también entró, y los tres quedaron Deslumbrados.
+  - [x] 🏹 Abanico (Hunter 5) con el Hunter 4 (aliado) adentro del cono y dos rivales: el área tomó solo a Blanco J1 y Blanco J1 b (el aliado, nada);
+    un PdG para los dos (1d6+1d8+1) y el mismo daño (11).
+  - [x] 📏 Largo alcance arcano: la Lanza del Arcano 2 llegó a Blanco J1 b a 6 casillas (sin la pasiva, el Rango es 5).
+  - [x] 🎯 Puntería: el PdG del Hunter 4 es 14 con Destreza 13 (el Hunter 3, sin la pasiva, 12 con Destreza 12). **Arreglado de paso:** la 🔍 decía
+    «Sin modificadores» (la cuenta sí la sumaba); ahora dice «Puntería (pasiva · PdG) +1» (`CreepCalculo.aportesMod` suma las pasivas).
 - **✅ hecho (2026-11-18) — 🏹✨ Hunter (R4) niveles 2 a 5 y Arcano (M4) niveles 2 y 3, cargados y vistos en el mapa** («Claude · pruebas 2», mapa
   «Prueba · R4 M4», GM + Jugador 1 con clics en las dos pantallas). 871 pruebas en verde.
   - [x] Tiro que derriba (Hunter 2): pegó, «Empujón» 1 casilla y Sentado en el personaje.

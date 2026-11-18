@@ -318,6 +318,8 @@ const CreepCalculo = (() => {
       const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
       if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v, tipo: 'estado alterado'});
     });
+    // Las pasivas (2026-11-18: la 🔍 del PdG del Hunter 4 decía «Sin modificadores» con la Puntería sumada; modTotal ya las cuenta).
+    (sc.pasivas||[]).forEach(p => { const v = (p.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0) * pasivaComprasCreep(p); if(v) out.push({nombre: p.nombre || '(sin nombre)', val: v, tipo: 'pasiva'}); });
     return out;
   }
   // Nombres de los estados activos que aportan un mod a ese stat, para

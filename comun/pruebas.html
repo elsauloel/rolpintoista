@@ -49,7 +49,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261118ia"></script>
-<script src="creep-calculo.js?v=20261110lluvia"></script>
+<script src="creep-calculo.js?v=20261118pas"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
 <script src="creep-duelo.js"></script>
@@ -7280,6 +7280,8 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     m45.hpMax, C.nitrosMax(m45), C.statValor(m45, 'rng'), C.defensaEfectiva(m45), C.armadmgEfectiva(m45), C.statValor(m45, 'pdgmg'), C.statValor(m45, 'dmgesp'), C.statValor(m45, 'eva'), C.statValor(m45, 'ini'), m45.equipo[3].nombre, m45.habilidades.map(h => h.nombre).join()],
     [50, 7, true, 7, 1, 4, 18, 18, 8, 'Túnica del archivista', 'Largo alcance arcano,Puntería arcana', 'Parpadeo:4,Nova arcana:3,Lanza arcana:4,Portal trampa:3,Andanada arcana:9',
       50, 8, 8, 1, 3, 19, 19, 8, 8, 'Botas de mensajero', 'Parpadeo,Nova arcana,Lanza arcana,Portal trampa,Andanada arcana,Intercambio arcano']);
+  const ap = CreepCalculo.aportesMod(d('Hunter', 4), 'pdg');   // 🔍 la Puntería sale en «De dónde sale» (2026-11-18: decía «Sin modificadores»)
+  igual([ap.map(a => a.nombre + ':' + a.val + ':' + a.tipo).join(), CreepCalculo.aportesMod(d('Hunter', 3), 'pdg').length, C.statValor(d('Hunter', 4), 'pdg') - d('Hunter', 4).des], ['Puntería:1:pasiva', 0, 1]);
   const w35 = d('Martillero', 5);   // (W3 nv5, 2026-11-10: Golpe demoledor; Coraza de bronce con runas)
   igual([w35.hpMax, C.nitrosMax(w35), C.defensaEfectiva(w35), C.armadmgEfectiva(w35), C.statValor(w35, 'dmg'), C.statValor(w35, 'bloqueo'), C.statValor(w35, 'parry'), C.statValor(w35, 'rescc'), w35.habilidades.length, w35.equipo.length],
     [75, 8, 8, 4, 14, 15, 10, 15, 6, 6]);

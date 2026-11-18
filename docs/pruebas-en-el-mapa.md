@@ -2803,3 +2803,11 @@ Mapa «Prueba · R4 M4», con el Arcano 4 y el Arcano 5 sumados (creeps y tokens
   y uno al Blanco creep (reparte).
 - ⬜ en cola: un aliado Inamovible con el Intercambio arcano (decisión pendiente, P243).
 
+## 2026-11-18 · 🏹✨ Lo que faltaba del Hunter y el Arcano («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+Jugador 1 tiene un segundo personaje, «Blanco J1 b» (copia de Blanco J1), para tener dos rivales.
+- ✔ **Lanza arcana atravesando a varios** (Arcano 2): Blanco J1, el Blanco creep (aliado del Arcano) y Blanco J1 b en la misma línea: un PdG.Esp, un daño
+  para todos (8), cada uno su Evasión, los tres con Deslumbrado.
+- ✔ **Largo alcance arcano**: la Lanza llegó a Blanco J1 b a 6 casillas.
+- ✔ **Abanico con un aliado en el cono** (Hunter 5): el Hunter 4 adentro no entró; Blanco J1 y Blanco J1 b sí (un PdG, un daño: 11).
+- ✔ **Puntería**: Hunter 4 PdG 14 (Destreza 13 + 1), Hunter 3 PdG 12 (Destreza 12). Arreglado: la 🔍 ahora muestra la pasiva.
+

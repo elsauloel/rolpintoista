@@ -635,14 +635,40 @@
   esencial({...H4, nivel: 5, atrib: [14, 12, 8, 8, 3],   // (aprobado 2026-11-18: Piel de hierro —pasó del nv3 al 5, en lugar de Golpe brutal—; el Casco de bandas remachadas, Buena)
     equipo: ['Hacha de la furia roja', 'Coraza de pinchos', 'Botas de cuero de vaca', 'Casco de bandas remachadas', 'Guantes de duelista de taberna'],
     habilidades: ['Aguante', 'Contraataque', 'Golpe desesperado', '¡Tu vieeeeja! 😜', 'Furia', 'Piel de hierro'], pasivas: ['Robustez', 'Mañas de sobreviviente']});
-  esencial({linea: 'L7', nombre: 'Degollador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+  const L7 = {linea: 'L7', nombre: 'Degollador', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Aceite del punto débil'],
+    estrategia: 'Choque liviano. Abre la herida y la termina: va siempre por el más golpeado.'};
+  esencial({...L7, nivel: 1, atrib: [7, 5, 9, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
     equipo: ['Facón de paisano', 'Chaleco de cuero', 'Calzas de cuero flexible'],
-    habilidades: ['Golpe que sangra', 'Remate'], consumibles: ['Aceite del punto débil'],
-    estrategia: 'Choque liviano. Abre la herida y la termina: va siempre por el más golpeado.'});
-  esencial({linea: 'L8', nombre: 'Acróbata', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 10, 9, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    habilidades: ['Golpe que sangra', 'Remate']});
+  esencial({...L7, nivel: 2, atrib: [8, 5, 10, 11, 2],   // (aprobado 2026-11-18: Ojo de asesino, Ojo crítico; + Guantes de agarre y Cofia de anillas sueltas)
+    equipo: ['Facón de paisano', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Remate', 'Ojo de asesino'], pasivas: ['Ojo crítico']});
+  esencial({...L7, nivel: 3, atrib: [9, 6, 10, 12, 2],   // (aprobado 2026-11-18: Corte en la arteria —la ruta decía Corte profundo, que salió del pool—; la Daga del sacrificio, Buena)
+    equipo: ['Daga del sacrificio', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Remate', 'Ojo de asesino', 'Corte en la arteria'], pasivas: ['Ojo crítico']});
+  esencial({...L7, nivel: 4, atrib: [10, 6, 11, 13, 2],   // (aprobado 2026-11-18: Degollar; Ojo de carancho en lugar de Sed de sangre —los creeps casi no matan—; el Jubón de cuero tachonado, Buena)
+    equipo: ['Daga del sacrificio', 'Jubón de cuero tachonado', 'Calzas de cuero flexible', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Remate', 'Ojo de asesino', 'Corte en la arteria', 'Degollar'], pasivas: ['Ojo crítico', 'Ojo de carancho']});
+  esencial({...L7, nivel: 5, atrib: [11, 7, 11, 14, 2],   // (aprobado 2026-11-18: Puñalada trapera; Paso ligero —llegar a la espalda sin sigilo—; las Calzas de cuero de ciervo, Buena)
+    equipo: ['Daga del sacrificio', 'Jubón de cuero tachonado', 'Calzas de cuero de ciervo', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Remate', 'Ojo de asesino', 'Corte en la arteria', 'Degollar', 'Puñalada trapera'], pasivas: ['Ojo crítico', 'Ojo de carancho', 'Paso ligero']});
+  const L8 = {linea: 'L8', nombre: 'Acróbata', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Mate cebado'],
+    estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'};
+  esencial({...L8, nivel: 1, atrib: [7, 5, 10, 9, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
     equipo: ['Sable del tahúr', 'Chaleco de cuero', 'Escarpines de fieltro'],
-    habilidades: ['Salto', 'Tajo veloz'], consumibles: ['Mate cebado'],
-    estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'});
+    habilidades: ['Salto', 'Tajo veloz']});
+  esencial({...L8, nivel: 2, atrib: [8, 5, 11, 10, 2],   // (aprobado 2026-11-18: Dash, Pies ligeros; + Guantes de duelista de taberna y Cofia de anillas sueltas)
+    equipo: ['Sable del tahúr', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de duelista de taberna', 'Cofia de anillas sueltas'],
+    habilidades: ['Salto', 'Tajo veloz', 'Dash'], pasivas: ['Pies ligeros']});
+  esencial({...L8, nivel: 3, atrib: [9, 6, 11, 11, 2],   // (aprobado 2026-11-18: Ráfaga de cortes; la Espada del timbero, Buena)
+    equipo: ['Espada del timbero', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de duelista de taberna', 'Cofia de anillas sueltas'],
+    habilidades: ['Salto', 'Tajo veloz', 'Dash', 'Ráfaga de cortes'], pasivas: ['Pies ligeros']});
+  esencial({...L8, nivel: 4, atrib: [10, 6, 12, 12, 2],   // (aprobado 2026-11-18: Hit and run, Paso ligero; la Chaqueta del acróbata, Buena —Evasión 16, a propósito—)
+    equipo: ['Espada del timbero', 'Chaqueta del acróbata', 'Escarpines de fieltro', 'Guantes de duelista de taberna', 'Cofia de anillas sueltas'],
+    habilidades: ['Salto', 'Tajo veloz', 'Dash', 'Ráfaga de cortes', 'Hit and run'], pasivas: ['Pies ligeros', 'Paso ligero']});
+  esencial({...L8, nivel: 5, atrib: [11, 7, 12, 13, 2],   // (aprobado 2026-11-18: Puñalada por la espalda; la Vincha del corredor, Buena)
+    equipo: ['Espada del timbero', 'Chaqueta del acróbata', 'Escarpines de fieltro', 'Guantes de duelista de taberna', 'Vincha del corredor'],
+    habilidades: ['Salto', 'Tajo veloz', 'Dash', 'Ráfaga de cortes', 'Hit and run', 'Puñalada por la espalda'], pasivas: ['Pies ligeros', 'Paso ligero']});
 
   // ---- Niveles 2 a 5 (la ronda del 2026-11-05: uno por rol, nivel por nivel; detalle y números en docs/creeps-humanoides.md) ----
   // W1 Hachero (ruta final aprobada 2026-11-05; Arte de la guerra en lugar de «Partir en dos»). En el nivel 4, Piel curtida (+1 Defensa) en lugar

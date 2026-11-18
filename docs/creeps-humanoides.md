@@ -976,28 +976,28 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   paisano** (Común, Tipo 4, Sangrado 50 %) · **Chaleco de cuero** (Def +2) · **Calzas de cuero flexible** (Eva +1). Consumible: **Aceite del punto
   débil** (Buena). Sin programar.
   - **Nivel 2 aprobado (dueño, 2026-11-18: «va así»)**: atrib [8, 5, 10, 11, 2] (con, fue, agi, des, esp); + Guantes de agarre y Cofia de anillas
-    sueltas; Ojo de asesino; Ojo crítico. Vida 40, No2 10, Defensa 3, Def.Esp 1, PdG 12, Dmg 5, Parry 11, Evasión 11. **Falta cargarlo.** Ojo: el
+    sueltas; Ojo de asesino; Ojo crítico. Vida 40, No2 10, Defensa 3, Def.Esp 1, PdG 12, Dmg 5, Parry 11, Evasión 11. **Cargado (2026-11-18).** Ojo: el
     nv4 traía Sed de sangre → cambiarla (regla del dueño: los creeps casi no matan).
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 6, 10, 12, 2]; la Daga del sacrificio (Buena: 2 dados, Sangrado 50 %, Perfora 2) en
     lugar del Facón; **Corte en la arteria** (la ruta decía Corte profundo, que salió del pool el 2026-11-07). Vida 45, No2 10, Defensa 3, PdG 13,
-    daño 2d4 + 6, Parry 12, Evasión 11. **Falta cargarlo.**
+    daño 2d4 + 6, Parry 12, Evasión 11. **Cargado (2026-11-18).**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [10, 6, 11, 13, 2]; el Jubón de cuero tachonado (Buena) en lugar del Chaleco; Degollar;
-    **Ojo de carancho** en lugar de Sed de sangre. Vida 60, No2 11, Defensa 3, Def.Esp 3, PdG 14, Parry 13, Evasión 12. **Falta cargarlo.**
+    **Ojo de carancho** en lugar de Sed de sangre. Vida 60, No2 11, Defensa 3, Def.Esp 3, PdG 14, Parry 13, Evasión 12. **Cargado (2026-11-18).**
   - **Nivel 5 aprobado (dueño, 2026-11-18)**: atrib [11, 7, 11, 14, 2]; las Calzas de cuero de ciervo (Buena: Eva +1, Sigilo +1) en lugar de las de
     cuero flexible; Puñalada trapera; pasiva **Paso ligero** (dueño: «para poder llegar por la espalda sin necesidad de tener sigilo»). Vida 65, No2 11,
-    Defensa 3, Def.Esp 3, PdG 15, daño 2d4 + 7, Parry 14, Evasión 12. **Falta cargarlo.** Línea L7 completa.
+    Defensa 3, Def.Esp 3, PdG 15, daño 2d4 + 7, Parry 14, Evasión 12. **Cargado (2026-11-18).** Línea L7 completa.
 - **L8 · Acróbata · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): se mueve y corta; nunca se queda quieto. Ruta: nv1 **Salto**
   (rápida) · **Tajo veloz**; nv2 Dash + **Pies ligeros**; nv3 Ráfaga de cortes (el arma, de Buena); nv4 Hit and run + **Paso ligero**; nv5 Puñalada por
   la espalda. **Nivel 1 aprobado**: Agi 10 · Des 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 10 No2, turnos de espera; **Sable del tahúr** (Común, Tipo 6,
   +1 de daño, frecuente +1) · **Chaleco de cuero** (Def +2) · **Escarpines de fieltro** (Eva +1). Consumible: **Mate cebado**. Sin programar.
   - **Nivel 2 aprobado (dueño, 2026-11-18)**: atrib [8, 5, 11, 10, 2] (con, fue, agi, des, esp); + Guantes de duelista de taberna y Cofia de anillas
-    sueltas; Dash; Pies ligeros. Vida 40, No2 11, Defensa 3, Def.Esp 1, PdG 10, Parry 11, Evasión 13. **Falta cargarlo.**
+    sueltas; Dash; Pies ligeros. Vida 40, No2 11, Defensa 3, Def.Esp 1, PdG 10, Parry 11, Evasión 13. **Cargado (2026-11-18).**
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va así»)**: atrib [9, 6, 11, 11, 2]; la Espada del timbero (Buena: +2 de daño, Crítico frecuente +2,
-    Perfora 1) en lugar del Sable del tahúr; Ráfaga de cortes. Vida 45, No2 11, Defensa 3, PdG 11, daño 1d6 + 8, Parry 12, Evasión 13. **Falta cargarlo.**
+    Perfora 1) en lugar del Sable del tahúr; Ráfaga de cortes. Vida 45, No2 11, Defensa 3, PdG 11, daño 1d6 + 8, Parry 12, Evasión 13. **Cargado (2026-11-18).**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va con la del acróbata»)**: atrib [10, 6, 12, 12, 2]; la Chaqueta del acróbata (Buena: Eva +2, Def.Esp +3)
-    en lugar del Chaleco de cuero; Hit and run; Paso ligero. Vida 50, No2 12, Defensa 1, Def.Esp 4, PdG 12, Parry 13, **Evasión 16**. **Falta cargarlo.**
+    en lugar del Chaleco de cuero; Hit and run; Paso ligero. Vida 50, No2 12, Defensa 1, Def.Esp 4, PdG 12, Parry 13, **Evasión 16**. **Cargado (2026-11-18).**
   - **Nivel 5 aprobado (dueño, 2026-11-18: «va así»)**: atrib [11, 7, 12, 13, 2]; la Vincha del corredor (Buena) en lugar de la Cofia; Puñalada por la
-    espalda. Vida 55, No2 12, Defensa 2, Def.Esp 3, PdG 13, daño 1d6 + 9, Parry 14, Evasión 16, Iniciativa 13. **Falta cargarlo.** Línea L8 completa.
+    espalda. Vida 55, No2 12, Defensa 1 (al presentarlo se dijo 2: la Vincha da Def +1, la misma que la Cofia que reemplaza), Def.Esp 3, PdG 13, daño 1d6 + 9, Parry 14, Evasión 16, Iniciativa 13. **Cargado (2026-11-18).** Línea L8 completa.
   **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
 ## ▶ Ronda de niveles 2 a 5 (2026-11-05, dueño)
@@ -1346,8 +1346,8 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | W4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | T4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
-| L7 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
-| L8 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
+| L7 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
+| L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | R4 | ✅ (2026-11-05, cargado) | | | | |
 | M4 | ✅ (2026-11-03) | | | | |
 | S4 | ✅ (2026-11-03) | | | | |

@@ -116,6 +116,9 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **🏹 Ver el Abanico en el mapa (dueño, 2026-11-18: «anotar probar el abanico en el mapa, en la lista de cosas para hacer en la computadora»).**
+>   El Hunter de nivel 5 (R4) suelta el Abanico (cono al frente, 16 casillas): una tirada de PdG contra la Evasión de cada rival del cono y, a los que
+>   les gana, el daño del arco (una sola tirada para todos). Ver que agarre a los del cono, que no toque a sus aliados y que el daño se aplique bien.
 > - [ ] **🏃 El dodge roll de un área: revisado y arreglado (2026-11-14); queda verlo en la compu.** El dueño pidió: «fijate si el problema es que el cartel
 >   quedara tapado… valete de la cuenta de jugador y la de GM» y la regla de los No2. Un ayudante lo volvió a probar con las dos cuentas a la vez
 >   (capturas de las dos pantallas en cada paso), arrastrando bien el token. **Qué fallaba (tres cosas, las tres arregladas):**

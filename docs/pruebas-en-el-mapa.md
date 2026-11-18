@@ -333,9 +333,13 @@
 - **Invocaciones (dueño, 2026-11-05):** cuando una invocación muere desaparece del mapa, eso está bien; quien la invocó la puede volver a invocar.
   No es un error a arreglar (el GM no necesita revivirla desde el anillo).
 
-- [ ] **🎯 Punto débil deja la resistencia a crítico en negativo (2026-11-05, dueño: «Punto débil, me parece bien lo que propones»).** Con la Aguja
+- [x] **🎯 Punto débil deja la resistencia a crítico en negativo (2026-11-05, dueño: «Punto débil, me parece bien lo que propones»).** Con la Aguja
   siniestra (o el Arma siniestra) dejar Punto débil a un rival **sin** resistencia y pegarle con un arma Tipo 4: en el cuadro del crítico del duelo la
   fila del rango tiene que mostrar un cuadradito violeta «P» y el rango en 3 (una diferencia de 3 ya es crítico). Probado solo en `comun/pruebas.html`.
+  ✔ **Probado en el mapa (2026-11-18, «Claude · pruebas 2»)**: Maldito 1 le clavó la Aguja siniestra al Blanco creep (Punto débil 2 turnos) y el
+  Acróbata 5 le pegó con Ráfaga de cortes (Espada del timbero, Tipo 6): el cuadro dice «Tipo 6 − Crítico frecuente 2 − 💢 Punto débil 1 = 3», con el
+  cuadradito violeta 💢 (no una «P»: se cambió por el ícono del estado), y la diferencia 3 fue crítico. Con la Daga (Tipo 4) no se vio porque el Escudero
+  tiene Resistencia a crítico 1 contra el Tipo 4: el Punto débil se la deja en 0 (bien).
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
@@ -2760,3 +2764,20 @@ activo) y las dos nubes borradas.
   distancia (sí su Defensa 7 a distancia en los números).
 - 📷 `cola-40-1-ficha-nv5` (ficha lite del nivel 5).
 
+## 2026-11-18 · 🗡 Degollador (L7) y 🤸 Acróbata (L8) nivel 5 en el mapa («Claude · pruebas 2», GM + Jugador 1)
+Mapa «Prueba · L7 L8» con Degollador 5, Acróbata 5, Maldito 1, un Blanco creep (Escudero 1) y el personaje de prueba de Jugador 1. Duelos con clics en
+las dos pantallas; capturas en el scratchpad de la sesión.
+- 🐞 **Arreglado (0fd9fe0f)**: con el objetivo ya elegido (`objetivoFijo`, el que manda la Botonera o las Acciones), el duelo salteaba los bonos que
+  el mapa suma al elegir con el clic: Corte en la arteria, Remate, Puñalada, por la espalda, Ojo de carancho, presa, miedo, estandarte… Ahora el
+  objetivo ya elegido va por el mismo camino que el clic (`alElegir`), con el aviso de «está caído» incluido.
+- ✔ **Degollador**: Golpe que sangra (con crítico, Sangrado ∞) · Corte en la arteria contra uno que ya sangra (Crítico frecuente +2 y el aviso) ·
+  Remate contra uno con la mitad de la vida (+2 dados y el aviso) · Ojo de asesino (+1 PdG, +2 daño, frecuente +1, potente +3) · Degollar (+4 PdG,
+  +7 daño, potente +3; queda Expuesto) · Puñalada trapera por la espalda (+1 dado, frecuente +1, ×4; la Evasión la tiró Jugador 1 en su pantalla) ·
+  Ojo de carancho contra el personaje con Sangrado (+1) · Paso ligero: por la espalda +2 PdG y, al acercarse por la espalda en combate, el personaje
+  NO recibe «Pasos a tu espalda» (el Blanco creep, sin Paso ligero, sí).
+- ✔ **Acróbata**: Salto con ataque (cae al lado, «Sí, atacar», +1 PdG y frecuente +1) · Dash atravesando al personaje (queda del otro lado, +2 PdG
+  y +1 Fuerza del golpe) · Ráfaga de cortes (+2 dados) · Tajo veloz (+2 PdG, +2 daño, frecuente +1) · Hit and run: después del duelo, el cartel «se
+  aleja»; arrastrado 2 casilleros no se frena y a Jugador 1 le llega «se alejó de vos con Hit and run: no permite ataque de oportunidad» (el mismo
+  arrastre sin el cartel sí se frena y ofrece la oportunidad) · Puñalada por la espalda (+1 dado, frecuente +1).
+- Para saber: el personaje de prueba se guardó sin nombre («Sin nombre» en la Mesa) y con 5 de vida, así que cae con cada golpe; quedó con estados
+  de las pruebas. Los creeps y el mapa «Prueba · L7 L8» quedaron en «Claude · pruebas 2», curados y en su lugar, por si sirven para la próxima.

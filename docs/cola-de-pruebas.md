@@ -15,13 +15,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
   probado»). Cada una se tacha acá (✔ con fecha y el resultado en una línea) y en `docs/pruebas-en-el-mapa.md` apenas queda probada:
   - [ ] 🌑 Mala sombra desde la Botonera de un Debuffer.
-  - [ ] 🎯 Punto débil dejando la resistencia a crítico en negativo.
+  - [x] ✔ 2026-11-18 🎯 Punto débil dejando la resistencia a crítico en negativo — Aguja siniestra (Maldito 1) a un creep sin resistencia y
+    Ráfaga de cortes (Tipo 6): el cuadro muestra «Tipo 6 − Crítico frecuente 2 − 💢 Punto débil 1 = 3», el cuadradito violeta 💢 y una diferencia de 3 ya es crítico.
   - [ ] 🫨 Arrastrar → Desequilibrado.
   - [ ] 🌀 El Remolino con dos rivales.
   - [ ] 🔥🐝 El Arma elemental en una invocación.
   - [ ] 🦶 Inamovible con el cartel de chance nuevo (la pieza y el %).
   - [ ] ⏱ Recuperarse rápido con el cartel de chance nuevo.
   Probar en «Claude · pruebas 2» mientras el dueño use «Claude · pruebas».
+  (2026-11-18, Claude: las otras seis no llegué; Mala sombra pide un personaje con la habilidad de clase, el Remolino dos personajes rivales y el Arma
+  elemental una invocación, que «Claude · pruebas 2» no tiene todavía.)
 
 - **✅ hecho (2026-11-18) — ❤ La Vida extra como vida también en la ficha, GM Tools y los Tableros** (dueño, 2026-11-18: «sí», a que la ficha también
   muestre 100/35). *Resultado:* `Combatiente.vidaExtraDe(estados)` (ficha, creep y resumen público). La ficha muestra en la caja de vida el total

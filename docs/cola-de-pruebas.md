@@ -12,6 +12,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🏁 Los duelos terminados se cierran solos** (dueño, 2026-11-18, al abrir la compu después de las pruebas de la noche: el mapa
+  lleno de tiras de duelos ya terminados —«Pegó: Bruto → Rockardo · ver», «Meteoro · el daño: 25 · ver», «Sanador: sigue adentro · ver»…— y un
+  cuadro con «🏁 LISTO · Listo, cerrar»). Pedido: **un duelo terminado se cierra solo a los 10 segundos** (como si se tocara «Listo, cerrar»), y su
+  tira minimizada también desaparece sola; **siempre que se pueda volver a abrir desde la Mesa** («🔍 Ver detalle del duelo» en su línea; revisar que
+  todo duelo terminado —también los de área, Tormenta, Meteoro, trampas, chances— tenga esa línea con su botón). Mientras corre la cuenta, que se
+  vea («se cierra en 10 s», y si se toca el cuadro, se queda abierto). Un duelo que todavía espera algo NO se cierra.
+  Al probar: NO en «Claude · pruebas» mientras el dueño la use (comparte la cuenta del GM): en otra partida de prueba o cuando el dueño lo diga.
+
 - **✅ hecho (2026-11-18) — 💥 Todas las áreas: una sola tirada de daño para todos** (dueño, 2026-11-18: «sí», a la pregunta de pasar las demás áreas a una
   tirada como el Meteoro). Bola de fuego, ondas, conos, varitas de área y cualquier hechizo/habilidad de área con un daño común: quien la lanza tira el
   daño UNA vez y a cada afectado se le aplica ese resultado con lo suyo (Defensa / Def.Esp / resistencia al elemento), de a uno con su cuenta, como

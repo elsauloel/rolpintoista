@@ -12,6 +12,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — ⚡ El salto del rayo, solo a rivales** (dueño, 2026-11-18: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
+  rivales»; el ayudante vio que el salto del Arma eléctrica le pegó al propio atacante por ser el más cercano). Todo salto de rayo (Arma eléctrica,
+  Varita de chispa, Varita del relámpago, Cadena de rayos, el Escudo elemental eléctrico…) elige solo entre los rivales de quien lo lanzó: nunca él
+  mismo ni sus aliados. Ojo: hay una regla vieja del agua («el salto del rayo por un charco llega a todos», js/106 y js/50): no tocarla sin
+  preguntar; contar cómo queda. Probar en «Claude · pruebas 2».
+
 - **✅ hecho (2026-11-18) — 🔧 Dos restos del daño de elemento separado** (2026-11-18, del ayudante, commit cd6ab2ff): (1) el botón del primer paso todavía
   dice «Tirar el daño · … + 🔥 +1d6 fuego» (lo arma la página del atacante): que diga solo el daño del arma, porque el elemento ya se tira aparte;
   (2) con un arma eléctrica (Arma eléctrica) el duelo no llegó al cierre en la prueba, probablemente por el salto al más cercano: revisar y probar

@@ -19,6 +19,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   todos (Bola de fuego, ondas, conos, varitas de área) tiran una vez o por objetivo, y contarlo (la Tormenta es distinta: cada uno su Nd4).
   Probar en el mapa cuando el dueño no lo esté usando.
 
+- **⬜ en cola — ☄🖼 La sombra del Meteoro más visible, y el texto del fondo del mapa** (dueño, 2026-11-18): (1) la sombra que deja el Meteoro
+  hasta que cae se ve poco sobre una imagen de fondo: que se note más (más oscura o con borde, que se vea sobre cualquier fondo); (2) en 🗺 Mapas →
+  🖼 Fondo, antes de cargar la imagen dice solo «La imagen se achica sola…»: que avise que después se puede cambiar el ancho en casillas y moverla
+  con el mouse para acomodarla a la grilla.
+- **⬜ en cola — 🧌 Cargar al H4 Bruto que aguanta (nv2–5) y probarlo en el mapa** (dueño, 2026-11-18: «cuando termines de cargar al bruto, probalo»).
+  Lo aprobado en `docs/creeps-humanoides.md` (con ¡Tu vieeeeja! 😜 en el nv3, la Coraza de pinchos, Piel de hierro en el nv5), su prueba de números en
+  `comun/pruebas.html`, y en el mapa: ¡Tu vieeeeja!, Aguante (contar golpes y el ataque con dados de más), Contraataque, Golpe desesperado, Furia,
+  Piel de hierro, las Espinas de la Coraza de pinchos y Mañas de sobreviviente.
+
 - **✅ hecho (2026-11-14) — 😜 Provocar de los creeps pasa a llamarse «¡Tu vieeeeja! 😜»** (dueño, 2026-11-14: «dejar provocar y le vamos a cambiar el nombre
   en la versión para creeps»). Solo la habilidad de creep (`comun/skills-creep-base.js`); el **Taunt** de la clase Tanque de los jugadores no cambia.
   Mismo funcionamiento (PdG.Esp + nivel contra la Res.Mt, Provocado 2 turnos, Desafiante). Renombrar en todos los creeps que la usan

@@ -254,6 +254,15 @@
     equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],
     estrategia: 'Mago de control y movilidad. Decide dónde está cada uno: aparece, empuja con la Nova, atrae con el gancho y se va.'});
+  // M4 Arcano (niveles 2 en adelante, de a uno desde el 2026-11-18; en modo SP).
+  const M4 = {linea: 'M4', nombre: 'Arcano', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de control y movilidad. Decide dónde está cada uno: aparece, empuja con la Nova, atrae con el gancho y se va.'};
+  esencial({...M4, nivel: 2, atrib: [9, 2, 6, 5, 14],   // (aprobado 2026-11-18: Lanza arcana, Largo alcance arcano; + Vincha de cuero de mula ánima y Polainas de cuero remendado)
+    equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado'],
+    habilidades: ['Parpadeo', 'Nova arcana', 'Lanza arcana'], pasivas: ['Largo alcance arcano']});
+  esencial({...M4, nivel: 3, atrib: [9, 2, 7, 6, 15],   // (aprobado 2026-11-18: Portal trampa; la Cabeza reducida de jíbaro, Buena, en lugar de la Brújula)
+    equipo: ['Varita del gancho', 'Cabeza reducida de jíbaro', 'Chaleco de cuero', 'Zapatillas de lona', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado'],
+    habilidades: ['Parpadeo', 'Nova arcana', 'Lanza arcana', 'Portal trampa'], pasivas: ['Largo alcance arcano']});
   esencial({linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 7, 7, 7, 2],   // (2026-11-09, dueño: «bajale la fuerza»: Fue −1, Agi +1 → 7 No2, ataca y corre 3)
     equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma'],
     habilidades: ['Carga que derriba', 'Takle'], consumibles: ['Pergamino grupal de Paso Fantasma'],
@@ -618,6 +627,21 @@
     equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],
     habilidades: ['Disparo señalador', 'Cepo del cazador'], consumibles: ['Trampa de oso'],
     estrategia: 'Rango. Prepara el terreno: pone trampas donde va a pasar el rival, marca a la presa y deja que el grupo la cace.'});
+  // R4 Hunter (niveles 2 en adelante, aprobados de a uno el 2026-11-18).
+  const R4 = {linea: 'R4', nombre: 'Hunter', rol: 'rango', rolTxt: 'rango', consumibles: ['Trampa de oso'],
+    estrategia: 'Rango. Prepara el terreno: pone trampas donde va a pasar el rival, marca a la presa y deja que el grupo la cace.'};
+  esencial({...R4, nivel: 2, atrib: [9, 6, 7, 11, 2],   // (aprobado 2026-11-18: Tiro que derriba, Percepción aumentada; + Polainas de cuero remendado y Cofia de anillas sueltas)
+    equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano', 'Polainas de cuero remendado', 'Cofia de anillas sueltas'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador', 'Tiro que derriba'], pasivas: ['Percepción aumentada']});
+  esencial({...R4, nivel: 3, atrib: [10, 6, 8, 12, 2],   // (aprobado 2026-11-18: Mina del cazador; el Arco del rastreador de bestias, Buena)
+    equipo: ['Arco del rastreador de bestias', 'Chaleco de cuero', 'Sandalias de baqueano', 'Polainas de cuero remendado', 'Cofia de anillas sueltas'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador', 'Tiro que derriba', 'Mina del cazador'], pasivas: ['Percepción aumentada']});
+  esencial({...R4, nivel: 4, atrib: [11, 7, 8, 13, 2],   // (aprobado 2026-11-18: Cebo, Puntería; la Capa del explorador, Buena, en lugar del Chaleco de cuero)
+    equipo: ['Arco del rastreador de bestias', 'Capa del explorador', 'Sandalias de baqueano', 'Polainas de cuero remendado', 'Cofia de anillas sueltas'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador', 'Tiro que derriba', 'Mina del cazador', 'Cebo'], pasivas: ['Percepción aumentada', 'Puntería']});
+  esencial({...R4, nivel: 5, atrib: [12, 7, 9, 14, 2],   // (aprobado 2026-11-18: Abanico; el Yelmo de vigía, Buena, en lugar de la Cofia)
+    equipo: ['Arco del rastreador de bestias', 'Capa del explorador', 'Sandalias de baqueano', 'Polainas de cuero remendado', 'Yelmo de vigía'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador', 'Tiro que derriba', 'Mina del cazador', 'Cebo', 'Abanico'], pasivas: ['Percepción aumentada', 'Puntería']});
   const H4 = {linea: 'H4', nombre: 'Bruto que aguanta', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Sales aromáticas'],
     estrategia: 'Híbrido. Se la banca y devuelve: busca que le peguen, contesta cada vez que para un golpe y descarga lo que juntó.'};
   esencial({...H4, nivel: 1, atrib: [10, 9, 6, 6, 2],   // (dueño: «me copan»)

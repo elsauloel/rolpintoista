@@ -2781,3 +2781,15 @@ las dos pantallas; capturas en el scratchpad de la sesión.
   arrastre sin el cartel sí se frena y ofrece la oportunidad) · Puñalada por la espalda (+1 dado, frecuente +1).
 - Para saber: el personaje de prueba se guardó sin nombre («Sin nombre» en la Mesa) y con 5 de vida, así que cae con cada golpe; quedó con estados
   de las pruebas. Los creeps y el mapa «Prueba · L7 L8» quedaron en «Claude · pruebas 2», curados y en su lugar, por si sirven para la próxima.
+
+## 2026-11-18 · 🏹 Hunter (R4) nv2–5 y ✨ Arcano (M4) nv2–3 en el mapa («Claude · pruebas 2», GM + Jugador 1)
+Mapa «Prueba · R4 M4» con Hunter 2 a 5, Arcano 2 y 3, un Blanco creep (Escudero 1) y el personaje de prueba de Jugador 1 (arreglado antes: ahora
+se llama «Blanco J1», Constitución 10, 50/50 de vida y sin estados). Duelos con clics en las dos pantallas.
+- ✔ **Hunter**: Tiro que derriba (empujón 1 y Sentado) · Mina del cazador (aviso de cono de visión; 2d6+2 directo y Pajaritos con Res.CC contra 12) ·
+  Cebo (Res.Mt contra 13, caminó al brillo y lo dio vuelta) · Abanico (PdG una vez contra la Evasión, el daño del arco) · Percepción aumentada (el
+  personaje en Sigilo por la espalda le pidió Percepción al GM).
+- ✔ **Arcano**: Lanza arcana (línea, 3d6 arcano y Deslumbrado) · Portal trampa (oculto; Res.Esp 8 contra 16, lo llevó y llegó Expuesto).
+- **Sin probar** (a la cola): la Lanza atravesando a varios, el Abanico con un aliado en el cono, Largo alcance arcano en el alcance real y Puntería
+  comparada (las dos pasivas sí están en los números de la prueba automática).
+- Para saber: el mapa y los seis creeps quedaron en «Claude · pruebas 2», curados y en su lugar; las trampas, borradas.
+

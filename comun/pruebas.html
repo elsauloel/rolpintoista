@@ -7137,7 +7137,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,M32,M33,M34,M35,H12,H13,H14,H15,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,S32,S33,S34,S35,D22,D23,D24,D25,D32,D33,D34,D35,T32,T33,T34,T35,L52,L53,L54,L55,W32,W33,W34,W35,R32,R33,R34,R35,H32,H33,H34,H35,L62,L63,L64,L65,T42,T43,T44,T45,W42,W43,W44,W45,H42,H43,H44,H45,L72,L73,L74,L75,L82,L83,L84,L85,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,M22,M23,M24,M25,M32,M33,M34,M35,M42,M43,H12,H13,H14,H15,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,R22,R23,R24,R25,S22,S23,S24,S25,S32,S33,S34,S35,D22,D23,D24,D25,D32,D33,D34,D35,T32,T33,T34,T35,L52,L53,L54,L55,W32,W33,W34,W35,R32,R33,R34,R35,H32,H33,H34,H35,L62,L63,L64,L65,T42,T43,T44,T45,W42,W43,W44,W45,R42,R43,R44,R45,H42,H43,H44,H45,L72,L73,L74,L75,L82,L83,L84,L85,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -7255,6 +7255,17 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     [40, 11, 13, 11, 45, 11, 12, 'Espada del timbero', 50, 12, 1, 4, 16]);
   igual([l85.hpMax, C.defensaEfectiva(l85), C.armadmgEfectiva(l85), C.statValor(l85, 'pdg'), C.statValor(l85, 'parry'), C.statValor(l85, 'eva'), C.statValor(l85, 'ini'), l85.habilidades.map(h => h.nombre).join()],
     [55, 1, 3, 13, 14, 16, 13, 'Salto,Tajo veloz,Dash,Ráfaga de cortes,Hit and run,Puñalada por la espalda']);
+  const r42 = d('Hunter', 2), r43 = d('Hunter', 3), r44 = d('Hunter', 4), r45 = d('Hunter', 5);   // (R4 nv2–5, aprobados y cargados 2026-11-18)
+  igual([r42.hpMax, C.nitrosMax(r42), C.statValor(r42, 'rng'), C.defensaEfectiva(r42), C.armadmgEfectiva(r42), C.statValor(r42, 'pdg'), C.statValor(r42, 'eva'), r42.pasivas.map(p => p.nombre).join(),
+    r43.hpMax, C.nitrosMax(r43), C.statValor(r43, 'rng'), C.defensaEfectiva(r43), C.statValor(r43, 'pdg'), C.statValor(r43, 'eva'), r43.equipo[0].nombre, r43.habilidades.map(h => h.nombre).join()],
+    [45, 7, 14, 4, 1, 11, 7, 'Percepción aumentada', 50, 8, 16, 4, 12, 8, 'Arco del rastreador de bestias', 'Disparo señalador,Cepo del cazador,Tiro que derriba,Mina del cazador']);
+  igual([r44.hpMax, C.nitrosMax(r44), C.statValor(r44, 'rng'), C.statValor(r44, 'percepcion'), C.defensaEfectiva(r44), C.armadmgEfectiva(r44), C.statValor(r44, 'pdg'), C.statValor(r44, 'eva'), r44.pasivas.map(p => p.nombre).join(),
+    r45.hpMax, C.nitrosMax(r45), C.statValor(r45, 'rng'), C.statValor(r45, 'percepcion'), C.defensaEfectiva(r45), C.armadmgEfectiva(r45), C.statValor(r45, 'pdg'), C.statValor(r45, 'eva'), r45.habilidades.map(h => h.nombre).join()],
+    [60, 8, 17, 15, 2, 3, 14, 9, 'Percepción aumentada,Puntería', 65, 9, 18, 17, 3, 2, 15, 10, 'Disparo señalador,Cepo del cazador,Tiro que derriba,Mina del cazador,Cebo,Abanico']);
+  const m42 = d('Arcano', 2), m43 = d('Arcano', 3);   // (M4 nv2–3, aprobados y cargados 2026-11-18)
+  igual([m42.hpMax, C.nitrosMax(m42), CreepCalculo.modoSP(m42), C.statValor(m42, 'rng'), C.defensaEfectiva(m42), C.armadmgEfectiva(m42), C.statValor(m42, 'pdgmg'), m42.pasivas.map(p => p.nombre).join(), m42.habilidades.map(h => h.nombre).join(),
+    m43.hpMax, C.nitrosMax(m43), C.statValor(m43, 'rng'), C.statValor(m43, 'pdgmg'), C.statValor(m43, 'dmgesp'), m43.equipo[1].nombre, m43.habilidades.map(h => h.nombre + ':' + h.spCosto).join()],
+    [45, 6, true, 6, 3, 2, 14, 'Largo alcance arcano', 'Parpadeo,Nova arcana,Lanza arcana', 45, 7, 7, 15, 16, 'Cabeza reducida de jíbaro', 'Parpadeo:4,Nova arcana:3,Lanza arcana:4,Portal trampa:3']);
   const w35 = d('Martillero', 5);   // (W3 nv5, 2026-11-10: Golpe demoledor; Coraza de bronce con runas)
   igual([w35.hpMax, C.nitrosMax(w35), C.defensaEfectiva(w35), C.armadmgEfectiva(w35), C.statValor(w35, 'dmg'), C.statValor(w35, 'bloqueo'), C.statValor(w35, 'parry'), C.statValor(w35, 'rescc'), w35.habilidades.length, w35.equipo.length],
     [75, 8, 8, 4, 14, 15, 10, 15, 6, 6]);

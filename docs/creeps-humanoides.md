@@ -660,10 +660,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Poción de SP menor. Dos maneras de jugarlo, sin cambiar nada: «entra, explota y sale» (Parpadeo + Nova + Parpadeo, 11 SP) o «gancho al que
   está lejos» (lo trae y Nova). Sin cargar hasta que el dueño diga.
   - **Nivel 2 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 6, 5, 14]; + Vincha de cuero de mula ánima y Polainas de cuero remendado; Lanza arcana;
-    Largo alcance arcano. Vida 45, No2 6, SP 42 (7), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 14. **Falta cargarlo.** Ojo: el nv5 traía Tormenta arcana,
+    Largo alcance arcano. Vida 45, No2 6, SP 42 (7), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 14. **Cargado (2026-11-18).** Ojo: el nv5 traía Tormenta arcana,
     que ya es del M3 nv5 → proponer otra.
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 7, 6, 15]; la Cabeza reducida de jíbaro (Buena: Ef.Esp +1, Res.Mt +2, Maldito con el
-    primer daño especial) en lugar de la Brújula; Portal trampa (3 SP). Vida 45, No2 7, SP 45, Rango 7, PdG.Esp 15, Ef.Esp 16. **Falta cargarlo.**
+    primer daño especial) en lugar de la Brújula; Portal trampa (3 SP). Vida 45, No2 7, SP 45, Rango 7, PdG.Esp 15, Ef.Esp 16. **Cargado (2026-11-18).**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «me parece bien», con la Andanada recosteada)**: atrib [10, 2, 7, 6, 17]; la Túnica del archivista (Buena:
     SP +3, Def.Esp +2, Res.Mt +2, Res.Esp +1, Percepción +2) en lugar del Chaleco de cuero; **Andanada arcana: 9 SP fijos, 3 No2, 3 misiles de 1d6 + 4
     fijo** (dueño: «si el daño es fijo, el sp debería ser fijo»; 3 Chispazos = 3 SP + 12 de daño a 2 por SP como el Rayo mágico = 6 SP); Puntería arcana.
@@ -967,13 +967,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   turnos de espera; **Arco del rastreador** (Común, Tipo 4, Rango +3, 1d4 + 1 amplificado) · **Chaleco de cuero** (Def +2) · **Sandalias de baqueano**
   (Pisada atenta, Res.CC +1). Consumible: **Trampa de oso**. Sin programar.
   - **Nivel 2 aprobado (dueño, 2026-11-18: «va así»)**: atrib [9, 6, 7, 11, 2] (con, fue, agi, des, esp); + Polainas de cuero remendado y Cofia de
-    anillas sueltas; Tiro que derriba; Percepción aumentada. Vida 45, No2 7, Rango 14, Defensa 4, Def.Esp 1, PdG 11, Evasión 7. **Falta cargarlo.**
+    anillas sueltas; Tiro que derriba; Percepción aumentada. Vida 45, No2 7, Rango 14, Defensa 4, Def.Esp 1, PdG 11, Evasión 7. **Cargado (2026-11-18).**
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va así»)**: atrib [10, 6, 8, 12, 2]; el Arco del rastreador de bestias (Buena: 2 dados, Rango +4, +2 PdG
-    contra el Marcado, Matabestias) en lugar del Arco del rastreador; Mina del cazador. Vida 50, No2 8, Rango 16, Defensa 4, PdG 12, Evasión 8. **Falta cargarlo.**
+    contra el Marcado, Matabestias) en lugar del Arco del rastreador; Mina del cazador. Vida 50, No2 8, Rango 16, Defensa 4, PdG 12, Evasión 8. **Cargado (2026-11-18).**
   - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [11, 7, 8, 13, 2]; la Capa del explorador (Buena) en lugar del Chaleco de cuero; Cebo;
-    Puntería. Vida 60, No2 8, Rango 17, Percepción 15, Defensa 2, Def.Esp 3, PdG 14, Evasión 9. **Falta cargarlo.**
+    Puntería. Vida 60, No2 8, Rango 17, Percepción 15, Defensa 2, Def.Esp 3, PdG 14, Evasión 9. **Cargado (2026-11-18).**
   - **Nivel 5 aprobado (dueño, 2026-11-18: «va así»)**: atrib [12, 7, 9, 14, 2]; el Yelmo de vigía (Buena) en lugar de la Cofia; Abanico. Vida 65,
-    No2 9, Rango 18, Percepción 17, Defensa 3, Def.Esp 2, PdG 15, Evasión 10. **Falta cargarlo.** Línea R4 completa.
+    No2 9, Rango 18, Percepción 17, Defensa 3, Def.Esp 2, PdG 15, Evasión 10. **Cargado (2026-11-18).** Línea R4 completa.
 - **H4 · Bruto que aguanta · Híbrido** (2026-11-05, dueño: «tanto la ruta como el nivel 1 me copan»): se la banca y devuelve; busca que le peguen.
   Ruta: nv1 **Aguante** (lenta) · **Contraataque** (Flash); nv2 Golpe desesperado + **Robustez**; nv3 Piel de hierro (el arma, de Buena); nv4 Furia +
   **Mañas de sobreviviente**; nv5 Golpe brutal. **Nivel 1 aprobado**: Con 10 · Fue 9 · Des 6 · Agi 6 · Esp 2 → vida 50, 6 No2, turnos de espera;
@@ -1368,8 +1368,8 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
 | L7 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| R4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
-| M4 | ✅ (2026-11-03) | | | | |
+| R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
+| M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ aprobado (2026-11-18), a cargar | ✅ aprobado (2026-11-18), a cargar |
 | S4 | ✅ (2026-11-03) | | | | |
 | D4 | ✅ (2026-11-03) | | | | |
 

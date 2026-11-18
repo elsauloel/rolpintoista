@@ -12,6 +12,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🏹✨ Lo que quedó sin ver en el mapa del Hunter (R4 nv2–5) y el Arcano (M4 nv2–3)** (cargados el 2026-11-18; dueño: anotar
+  habilidad por habilidad lo que no se llegó a probar). Probar en «Claude · pruebas 2», mapa «Prueba · R4 M4» (los seis creeps ya están ahí):
+  - [ ] ✨ Lanza arcana atravesando a varios en la misma línea (dos rivales y un aliado del Arcano: los tres tiran Evasión, el aliado también entra).
+  - [ ] 🏹 Abanico con un aliado del Hunter dentro del cono (no tiene que recibir nada) y con dos rivales a la vez.
+  - [ ] 📏 Largo alcance arcano en el alcance real: el Arcano 2 llegando con la Lanza o el gancho a un blanco a 6 casillas (sin la pasiva serían 5).
+  - [ ] 🎯 Puntería por separado (se vio sumada en el PdG del Abanico, 1d6+1d8+1 = 15, pero no comparada contra el Hunter 3, que no la tiene).
+- **✅ hecho (2026-11-18) — 🏹✨ Hunter (R4) niveles 2 a 5 y Arcano (M4) niveles 2 y 3, cargados y vistos en el mapa** («Claude · pruebas 2», mapa
+  «Prueba · R4 M4», GM + Jugador 1 con clics en las dos pantallas). 871 pruebas en verde.
+  - [x] Tiro que derriba (Hunter 2): pegó, «Empujón» 1 casilla y Sentado en el personaje.
+  - [x] Mina del cazador (Hunter 3): el aviso «trampa a la vista de un rival» si la pone en su cono; Jugador 1 pisó el centro: 2d6+2 = 9 directo a
+    la vida y Res.CC 2 contra 12 (la Destreza del Hunter 3) → Pajaritos 2 turnos.
+  - [x] Cebo (Hunter 4): «Algo brilla…»; Res.Mt contra 13 (su Destreza), perdió, caminó 2 hacia el brillo y lo dio vuelta («puto el que lee»).
+  - [x] Abanico (Hunter 5, mirando al personaje): PdG 1d6+1d8+1 contra la Evasión, el daño de su arma (2d4 + 4).
+  - [x] Percepción aumentada (Hunter 2): el personaje, en Sigilo, se acercó por la espalda y el GM recibió «Hunter 2 tiene la sensación de que lo
+    observan… Tirá la Percepción» (sin la pasiva, la espalda es punto ciego).
+  - [x] Lanza arcana (Arcano 2): la línea hasta el personaje, PdG.Esp contra Evasión, 3d6 arcano y Deslumbrado 2 turnos.
+  - [x] Portal trampa (Arcano 3): Jugador 1 no lo veía; al pisarlo, Res.Esp 8 contra 16 (su Ef.Esp) → «Atravesar el portal», llegó a la casilla
+    marcada (4 más allá) y Expuesto 1 turno.
+
 - **⬜ en cola — 🔀 Intercambio arcano (programar) y cargar el Arcano niveles 4 y 5** (dueño, 2026-11-18: «me gusta esta. habría que programarla»):
   habilidad de creep nueva (Mago, auditada): elige un token en su Rango y cambian de lugar; a un aliado sin tirada, a un rival PdG.Esp contra Res.Esp
   (si gana el rival, no pasa nada); nadie da ni recibe ataques de oportunidad por el cambio; 5 SP fijos y 2 No2 (o su cooldown). Aprovechar el cambio

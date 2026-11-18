@@ -12,6 +12,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
+  probado»). Cada una se tacha acá (✔ con fecha y el resultado en una línea) y en `docs/pruebas-en-el-mapa.md` apenas queda probada:
+  - [ ] 🌑 Mala sombra desde la Botonera de un Debuffer.
+  - [ ] 🎯 Punto débil dejando la resistencia a crítico en negativo.
+  - [ ] 🫨 Arrastrar → Desequilibrado.
+  - [ ] 🌀 El Remolino con dos rivales.
+  - [ ] 🔥🐝 El Arma elemental en una invocación.
+  - [ ] 🦶 Inamovible con el cartel de chance nuevo (la pieza y el %).
+  - [ ] ⏱ Recuperarse rápido con el cartel de chance nuevo.
+  Probar en «Claude · pruebas 2» mientras el dueño use «Claude · pruebas».
+
 - **✅ hecho (2026-11-18) — ❤ La Vida extra como vida también en la ficha, GM Tools y los Tableros** (dueño, 2026-11-18: «sí», a que la ficha también
   muestre 100/35). *Resultado:* `Combatiente.vidaExtraDe(estados)` (ficha, creep y resumen público). La ficha muestra en la caja de vida el total
   (vida + Vida extra) sobre el máximo real, con un detalle chico «(❤+65 de Vida extra)»; al entrar a escribir, la caja muestra la vida sola (lo que se

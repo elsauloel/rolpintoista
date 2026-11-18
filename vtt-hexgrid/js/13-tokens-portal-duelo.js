@@ -1348,7 +1348,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // la primera vez quien la creó (su jugador, o el GM por un creep) tira con su botón (si no está, el GM con «🎲 Tirar a mano») y vale para todos;
     // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
     const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId) : null;
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
       carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
@@ -1366,6 +1366,15 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
   }catch(err){ console.error('No se pudo anotar el sub-duelo en el área:', err); }
 }
 
+// 💥 ¿El daño de esta área se tira una sola vez para todos? Sí, salvo lo que depende de cada uno: «la diferencia» (Drenar), los misiles repartidos,
+// la Tormenta y el Meteoro (su propia secuencia, js/118) y las zonas con duelo (se vuelven a tirar contra cada uno, js/112).
+function areaDanoCompartible(h){
+  return !!(h && h.dano && !h.dano.diferencia && !h.reparte && !h.tormenta && !h.meteoro && !h.tiraCadaUno && !h.zonaId && !h.soloTirada);
+}
+function areaHabConDano(h, a){
+  const dc = a && a.hab && a.hab.danoCompartido;   // (va adentro de `hab`: las reglas de `areas` no aceptan campos sueltos nuevos)
+  return dc && areaDanoCompartible(h) ? {...h, dano: {...h.dano, yaTirado: dc}} : h;
+}
 // comun/duelo.js avisa (hook grupoCancelado, solo al GM) cuando se cancela el duelo de un área (2026-10-25, dueño: «arreglá lo del duelo cancelado y la
 // marca en el mapa»): se cancela lo que faltaba del área — la marca se va y los objetivos que seguían no reciben su duelo (lo ya resuelto queda).
 function dueloGrupoCancelado(d){
@@ -1396,7 +1405,16 @@ function dueloGrupoResuelto(d){
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
     const cambios = siguiente >= total ? (quedan > 0 ? {estado: AREA_ELIGIENDO, indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
     if(a.hab && a.hab.zonaId && d.pdg && typeof zonaDueloTiradaAnotar === 'function') zonaDueloTiradaAnotar(a.hab.zonaId, a.pdgCompartido || d.pdg);   // 💨 la de la zona, para las tandas de después
-    if(!a.pdgCompartido && d.pdg && !reparte && !(a.hab && a.hab.tiraCadaUno)) cambios.pdgCompartido = d.pdg;   // (💨 una zona con duelo: tira de nuevo contra cada uno, js/112)   // (cada misil, con su propia tirada)
+    if(!a.pdgCompartido && d.pdg && !reparte && !(a.hab && a.hab.tiraCadaUno)) cambios.pdgCompartido = d.pdg;
+    // 💥 El daño, una sola tirada para todos (dueño, 2026-11-18, «sí» a pasar todas las áreas a una tirada como el Meteoro): lo que tiró quien la
+    // lanzó contra el primero al que le pegó queda en el área (sin lo de ese objetivo: la Presa, el miedo…), y los siguientes lo reciben ya tirado.
+    if(!(a.hab && a.hab.danoCompartido) && areaDanoCompartible(a.hab) && d.dano && d.dano.tiroBase && !d.dano.compartido){
+      const tb = d.dano.tiroBase, mg = d.dano.magico;
+      const dc = {crudo: Math.max(0, Math.round(num(tb.total))), formula: `${String(tb.formula || '').slice(0, 40)} (una tirada para todos)`, rolls: (tb.rolls || []).map(num),
+        ...(mg && a.hab.dano && a.hab.dano.extra ? {extra: {total: Math.max(0, Math.round(num(mg.total))), formula: String(mg.formula || ''), rolls: (mg.rolls || []).map(num)}} : {})};
+      cambios['hab.danoCompartido'] = dc;
+      if(siguiente < total) try{ mesaLinea(`💥 ${(a.hab && a.hab.nombre) || 'El área'}: el daño (${dc.crudo}${dc.extra ? ` + ${dc.extra.total} de ${a.hab.dano.extra.tipo}` : ''}) es el mismo para todos los que alcanza`, 'recordatorio'); }catch(e){}
+    }   // (💨 una zona con duelo: tira de nuevo contra cada uno, js/112)   // (cada misil, con su propia tirada)
     return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
 }

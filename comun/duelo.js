@@ -1050,6 +1050,9 @@ const Duelo = (() => {
       const y = m.hab.dano.yaTirado;
       m.dano = {crudo: Math.max(0, Math.round(_num(y.crudo))), formula: String(y.formula || '').slice(0, 60), rolls: (y.rolls || []).map(_num), mod: 0, reclamado: LIBRE, aplicado: false, compartido: true};
       if(y.extra && m.hab.dano.extra) m.dano.magico = {tipo: String(m.hab.dano.extra.tipo || 'fuego').slice(0, 20), total: Math.max(0, Math.round(_num(y.extra.total))), formula: String(y.extra.formula || '').slice(0, 60), rolls: (y.extra.rolls || []).map(_num)};
+      sumarModsDelObjetivo(m);   // 💥 la tirada es la misma para todos; lo de cada objetivo (la Presa, el miedo…) se suma acá
+      if(m.contacto && m.contacto.resistioEstado) m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos)).map(ef => ({...ef, omitido: true, motivo: `lo resistió (${etqContra(m)})`}));
+      else
       m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
       entrarDano(m);
       return;
@@ -1531,6 +1534,22 @@ const Duelo = (() => {
     });
   }
 
+  // Lo que el daño suma o resta según ESTE objetivo y ESTE ataque (por la espalda, Primera sangre, miedo, la Presa, el estandarte, la distancia del tiro).
+  // Va sobre m.dano ya tirado; lo usan guardarDano y el daño compartido de un área (💥 2026-11-18).
+  function sumarModsDelObjetivo(m){
+    const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
+    if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
+    const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
+    if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
+    const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −N al daño
+    if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} ${m.ataque.malviaje ? 'malviaje' : 'miedo'}`.slice(0, 60)};
+    const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
+    if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};
+    const esdd = m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.dano) : 0;   // 🚩 bajo el estandarte: +5 al daño
+    if(esdd > 0) m.dano = {...m.dano, crudo: m.dano.crudo + esdd, mod: m.dano.mod + esdd, formula: `${m.dano.formula} +${esdd} estandarte`.slice(0, 60)};
+    const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
+    if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
+  }
   // El atacante tiró el daño de su arma.
   async function guardarDano(id, r, efectos, o){
     const ref = col().doc(id);
@@ -1544,18 +1563,8 @@ const Duelo = (() => {
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: LIBRE, aplicado: false};
       if(m.hab && m.hab.soloTirada){ m.dano.aplicado = true; m.dano.cuenta = true; m.resultado = 'pego'; m.fase = 'fin'; m.estado = 'resuelto'; mFinal = m; tx.update(ref, cambiosDe(m)); return; }   // 🌩 no es daño: es la cuenta (js/118)
       if(o && o.defensaManual !== undefined && o.defensaManual !== null) m.dano.defensaManual = o.defensaManual === 'no' ? 'no' : Math.max(0, Math.round(_num(o.defensaManual)));   // ✍ (2026-10-15)
-      const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
-      if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
-      const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
-      if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
-      const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −N al daño
-      if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} ${m.ataque.malviaje ? 'malviaje' : 'miedo'}`.slice(0, 60)};
-      const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
-      if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};
-      const esdd = m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.dano) : 0;   // 🚩 bajo el estandarte: +5 al daño
-      if(esdd > 0) m.dano = {...m.dano, crudo: m.dano.crudo + esdd, mod: m.dano.mod + esdd, formula: `${m.dano.formula} +${esdd} estandarte`.slice(0, 60)};
-      const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
-      if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
+      m.dano.tiroBase = {total: m.dano.crudo, formula: m.dano.formula, rolls: m.dano.rolls, mod: m.dano.mod};   // 💥 lo tirado, sin lo de este objetivo (para compartirlo en un área)
+      sumarModsDelObjetivo(m);
       const td = m.ataque && m.ataque.tiro && m.ataque.tiro.dado && typeof tirarDados === 'function' ? tirarDados(m.ataque.tiro.dado) : null;   // el primer disparo del combate: +1 dado
       if(td) m.dano = {...m.dano, crudo: m.dano.crudo + _num(td.total), rolls: [...m.dano.rolls, ...(td.rolls || []).map(_num)].slice(0, 20), formula: `${m.dano.formula} +${m.ataque.tiro.dado} (${_num(td.total)})`.slice(0, 60)};
       if(m.ataque && m.ataque.flecha && m.ataque.flecha.sinDano) m.dano = {...m.dano, crudo: 0, formula: `${m.ataque.flecha.nombre}: sin daño`.slice(0, 60)};   // el virote de red (2026-10-11)
@@ -3228,9 +3237,12 @@ const Duelo = (() => {
     // Fin: cuando ya no queda ninguna reacción, un cartel claro y un botón para cerrarlo. «Duelo» es solo para el
     // combate cuerpo a cuerpo de siempre (PdG contra Evasión) — una habilidad (d.hab) usa un texto genérico, para
     // no llamarle "duelo" a un buff sobre uno mismo o un aliado (2026-09-29, pedido del dueño).
-    const nuevoFin = d.estado === 'resuelto' && !desarmando && !revelado[d.id + ':fin'];
-    if(d.estado === 'resuelto' && !desarmando) revelado[d.id + ':fin'] = true;
-    const finHtml = d.estado === 'resuelto' && !desarmando
+    // 🏁 Mientras se pregunta «¿Contraatacás?» (el Contraataque o Devolver gentileza), todavía queda una reacción: sin el cartel de fin (dueño,
+    // 2026-11-18: «sacalo»; confundía ver «FIN DEL DUELO · Ya no queda ninguna reacción» debajo de la pregunta).
+    const esperaContra = /data-contra[ >]|está decidiendo…/.test(cierre || '');
+    const nuevoFin = d.estado === 'resuelto' && !desarmando && !esperaContra && !revelado[d.id + ':fin'];
+    if(d.estado === 'resuelto' && !desarmando && !esperaContra) revelado[d.id + ':fin'] = true;
+    const finHtml = d.estado === 'resuelto' && !desarmando && !esperaContra
       ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button></div>`
       : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.resultado === 'a-mano' ? 'TERMINADO A MANO' : d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());

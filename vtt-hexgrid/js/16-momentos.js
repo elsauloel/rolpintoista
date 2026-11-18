@@ -89,6 +89,7 @@ function rayoMomento(id, d){
   rayosVistos.add(id);
   const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
   if(Date.now() - t > 20000 || typeof rayoSaltoEfecto !== 'function') return;
+  if(d.datos.apartar) try{ const ab = Duelo.abiertoId && Duelo.abiertoId(); if(ab) Duelo.apartar(ab); }catch(e){}   // ⚡ la cadena de a uno (js/13): el cuadro se aparta para ver los saltos
   if((d.datos.flotan || d.datos.reporte) && typeof rayoFxReproducir === 'function'){ rayoFxReproducir(d.datos); return; }   // 🔢 el «−X», los estados y el reporte (js/110)
   d.datos.saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
 }

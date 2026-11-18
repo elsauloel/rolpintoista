@@ -2049,7 +2049,7 @@ async function dueloAplicarDano(d, o){
       const porDano = inv || !entro ? null : d.hab && d.hab.dano && d.hab.dano.porDano ? await dueloPorDano(d, entro).catch(() => null)
         : !d.hab && dn.magico && dn.magico.porDano ? await dueloPorDano(d, entro, dn.magico.porDano).catch(() => null) : null;
       if(idHab && idHab.estado && entro > 0 && !(d.contacto && d.contacto.resistioEstado)) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));
-      if(entro > 1 && ((d.hab && d.hab.cadena) || (!d.hab && dn.magico && dn.magico.cadena))) await dueloCadena(d, entro, {golpe: {id: d.defensor.tokenId, entro: entro, antes: num(res.previo), despues: num(res.nuevo)}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+      if(N > 1 && ((d.hab && d.hab.cadena) || (!d.hab && dn.magico && dn.magico.cadena))) await dueloCadena(d, N, {golpe: {id: d.defensor.tokenId, entro: entro, antes: num(res.previo), despues: num(res.nuevo)}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
       if(!suelto && num(res.previo) > 0 && num(res.nuevo) <= 0 && typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
       const cuenta = [{s: '', txt: 'El duelo sugería', v: sug}, inv ? {s: '', txt: 'Invulnerable: el golpe no hace nada'} : {s: '=', txt: '✍ se aplicó a mano: entra a la vida', v: entro, f: 1}];
       return {...base, cuenta, aMano: {valor: N, sugerido: sug}, defensa: 0, recibido: entro, absorbido: 0, invulnerable: inv, hpAntes: num(res.previo), hpDespues: num(res.nuevo),
@@ -2236,9 +2236,9 @@ async function dueloAplicarDano(d, o){
       : !d.hab && magico && dn.magico.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(magico.recibido), dn.magico.porDano).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;   // ❄🧪☠ Arma elemental (2026-10-21)
     if(idHab && idHab.estado && num(res.r.recibido) > 0 && !res.r.invulnerable && !(d.contacto && d.contacto.resistioEstado)) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));   // ☀ Marcado · 🌑 Herida sombría
     // ⚡ Arma eléctrica (2026-10-21): el daño eléctrico del arma salta como el rayo (la mitad de lo que entró).
-    if(!d.hab && magico && dn.magico.cadena && num(magico.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(magico.recibido), {golpe: {id: d.defensor.tokenId, entro: num(magico.recibido), antes: magico.hpAntes, despues: magico.hpDespues}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+    if(!d.hab && magico && dn.magico.cadena && num(magico.total) > 1) await dueloCadena(d, num(magico.total), {golpe: {id: d.defensor.tokenId, entro: num(magico.recibido), antes: magico.hpAntes, despues: magico.hpDespues}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
-    if(d.hab && d.hab.cadena && num(res.r.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(res.r.recibido), {golpe: {id: d.defensor.tokenId, entro: num(res.r.recibido), antes: num(res.previo), despues: num(res.nuevo)}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));   // la mitad de lo que entró (2026-10-13)
+    if(d.hab && d.hab.cadena && num(aplicar) > 1) await dueloCadena(d, num(aplicar), {golpe: {id: d.defensor.tokenId, entro: num(res.r.recibido), antes: num(res.previo), despues: num(res.nuevo)}}).catch(err => console.error('No se pudo hacer saltar el rayo:', err));   // la mitad de lo que entró (2026-10-13)
     // ⚡ La flecha que salta (relámpago, tormenta: js/33): pase o no el daño, salta igual (el golpe entró).
     if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, magico ? num(magico.recibido) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
     // 🏹 El virote que hace algo en el mapa al pegar (2026-10-10): humo, luz, explota, clava (js/33).
@@ -2282,6 +2282,9 @@ async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el
   if(!id || !tokens.get(id)) return;
   const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0, {excluir: (o && o.excluir) || [], lanzador: d.atacante && d.atacante.tokenId});   // 💍 el Anillo de tormenta · ⚡ solo a rivales de quien lo lanzó
   if(cadena0.length < 2) return null;
+  // ⚡ (2026-11-18, dueño): la secuencia de a uno — el duelo termina, se ve la animación de TODOS los saltos y después el «Aplicar el daño» de cada
+  // alcanzado (con su Parálisis, si corresponde), en el cuadro del duelo de siempre. El Escudo elemental (o.sinPublicar) sigue como antes.
+  if(!(o && o.sinPublicar)){ dueloCadenaSecuencia(d, cadena0, c).catch(err => console.error('El salto del rayo, de a uno:', err)); return null; }
   const hubo = await rayoCadenaAplicar(cadena0, {callado: true});   // el aviso lo da el reporte (js/110)
   if(!hubo.length) return null;
   const cadena = [cadena0[0], ...hubo];
@@ -2319,7 +2322,7 @@ async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el
   // 🔢 (2026-11-09, dueño: «quiero que se aplique a cualquier fuente de daño eléctrico con salto») lo que se ve lo arma js/110 (rayoFxPublicar):
   // el «−X» rojo sobre cada uno cuando le llega el rayo, «¡Parálisis!», el reporte al terminar y la línea de la Mesa. o.golpe: el primer golpeado
   // ({id, entro, antes, despues, estados, etiqueta}); o.sinPublicar: lo devuelve sin publicar (el Escudo elemental lo publica junto con su golpe).
-  const saltosFx = cadena.slice(1).map((s, i) => ({id: s.id, desde: cadena[i].id, dano: s.dano, entro: s.entro, antes: s.antes, despues: s.despues, estados: estadosDe[s.id] || []}));
+  const saltosFx = cadena.slice(1).map((s, i) => ({id: s.id, desde: cadena[i].id, dano: s.dano, entro: s.entro, antes: s.antes, despues: s.despues, estados: estadosDe[s.id] || [], ...(s.nota ? {nota: s.nota} : {})}));
   const titulo = o && o.titulo ? o.titulo : `${d.hab ? d.hab.nombre : `El arma de ${d.atacante.nombre}`}: el rayo salta`;
   const extraFx = extra.filter(x => !/→ no$/.test(x));
   if(!(o && o.sinPublicar) && typeof rayoFxPublicar === 'function'){
@@ -2328,6 +2331,66 @@ async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el
   }else if(!(o && o.sinPublicar)) momentoAbrir({tipo: 'rayo', icono: '⚡', titulo, estado: 'listo', datos: {saltos},
     resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''})`).join(' → ') + (extra.length ? ` · ${extra.join(' · ')}` : '')});
   return {saltos: saltosFx, extra: extraFx};
+}
+
+/* ⚡ La cadena de a uno (2026-11-18, dueño: «caster tira rayo, elige objetivo, se despliega el menú del duelo, PdG, tiradas pertinentes de daño… recién
+   ahí, si fuera a suceder el salto, se minimiza el menú del duelo, se ve la animación de todos los saltos que vayan a suceder, y después se abre el
+   menú de "aplicar daño" a cada uno de los afectados por el salto, y la tirada de parálisis si viniera al caso»).
+   Corre en la pantalla que aplicó el golpe (la del GM, en general), aparte, sin frenar al duelo: (1) espera a que el duelo del golpe termine;
+   (2) publica la animación de todos los saltos (un momento «rayo» solo con los saltos, que todas las pantallas ven; cada una aparta el cuadro que
+   tenga abierto); (3) por cada alcanzado, un duelo sin oposición directo en «Aplicar el daño» (el daño del salto ya calculado: `hab.dano.yaTirado`,
+   como el Meteoro), con su Parálisis en los efectos si corresponde. El daño de cada salto es la mitad de lo que LLEGABA al anterior (rayoCadena). */
+async function dueloCadenaSecuencia(d, cadena0, c){
+  const espera = (ms) => new Promise(r => setTimeout(r, ms));
+  // (1) Que termine el duelo del golpe (máx. 10 min).
+  for(let i = 0; i < 600; i++){
+    try{
+      const s = await fbDb.collection(fbRutaCampana('duelos')).doc(d.id).get();
+      const x = s.exists ? s.data() : null;
+      if(!x || x.estado === 'resuelto' || x.estado === 'cancelado') break;
+    }catch(e){ break; }
+    await espera(1000);
+  }
+  await espera(1200);
+  const nombre = d.hab ? d.hab.nombre : `El arma de ${d.atacante.nombre}`;
+  const tipo = (d.hab && d.hab.dano && d.hab.dano.tipo) || 'rayo';
+  const saltos = cadena0.slice(1).map((s, i) => ({desde: cadena0[i].id, hacia: s.id}));
+  // (2) La animación de todos los saltos, en todas las pantallas.
+  const resumen = cadena0.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano})`).join(' → ');
+  try{
+    const mid = await momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${nombre}: el rayo salta`, estado: 'listo', datos: {saltos, apartar: true},
+      resultado: `Salta a ${resumen}. Cada uno aplica su daño en el cuadro del duelo.`});
+    if(!mid && typeof rayoSaltoEfecto === 'function') saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
+  }catch(e){}
+  try{ mesaLinea(`⚡ ${nombre}: el rayo salta — ${resumen} (la mitad de lo que llegaba al anterior; cada uno resta su Res. eléctrica)`, 'recordatorio'); }catch(e){}
+  await espera(saltos.length * 450 + 1200);
+  // (3) El daño de cada salto, de a uno, con su Parálisis.
+  const pctSalto = Array.isArray(c.paralisis) ? c.paralisis : null;
+  const yo = yoDeDuelo(d);
+  for(const [i, s] of cadena0.slice(1).entries()){
+    const t = tokens.get(s.id);
+    if(!t) continue;
+    const mojado = typeof enAgua === 'function' && enAgua(t), efs = [];
+    const pct = pctSalto ? num(pctSalto[i]) : 0;
+    if(pct > 0){
+      const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1};
+      efs.push({nombre: 'Parálisis', caras: dd.caras, exitos: mojado ? Math.min(dd.caras, dd.exitos * 2) : dd.exitos, dado: '',
+        detalle: `Parálisis 1 turno (el salto del rayo)${mojado ? ' · 💧 en el agua: el doble de chance' : ''}.`, spec: {nombre: 'Parálisis', turnos: 1}});
+    }
+    if(c.efectos || mojado){
+      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis') && !(pctSalto && e.nombre === 'Parálisis'))){
+        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
+        efs.push({nombre: ef.nombre, caras, exitos: ef.nombre === 'Parálisis' && mojado ? Math.min(caras, exitos0 * 2) : exitos0, dado: '', detalle: ef.detalle || '', spec: Duelo.specDeEfecto(ef)});
+      }
+    }
+    if(t.oculto){ try{ mesaLinea(`⚡ ${nombre}: a alguien que no se ve le llegan ${s.dano} del salto${efs.length ? ` y ${efs.map(e => e.nombre).join(', ')}` : ''} — resolvelo a mano`, 'recordatorio'); }catch(e){} continue; }
+    await contiendaPausa();
+    const hab = {nombre: `${nombre} · salto ${i + 1}`.slice(0, 60), objetivo: 'enemigo', tira: null, contra: [], efectos: efs,
+      dano: {formula: String(s.dano), tipo, ignoraDef: true, directo: true, yaTirado: {crudo: s.dano, formula: `${s.dano} (salto ${i + 1})`, rolls: []}},
+      detalle: `El rayo salta desde ${s.t && cadena0[i].t && cadena0[i].t.oculto ? 'alguien' : nombreDe(cadena0[i].t)}: le llegan ${s.dano} (la mitad de lo que llegaba al anterior), directo a la vida, menos su Res. eléctrica.`};
+    const r = await contiendaDuelo({yo, deTokenId: d.atacante.tokenId, aTokenId: s.id, hab, esperar: true, extra: {secundario: true, danoSuelto: true}});
+    if(r && r.falla) try{ mesaLinea(`⚡ ${nombre}: a ${nombreDe(t)} le llegan ${s.dano} del salto — aplicalo a mano`, 'recordatorio'); }catch(e){}
+  }
 }
 
 /* El gancho (2026-10-05, Varita del gancho): si pegó, el objetivo tira su Fuerza contra el Ef.Esp de quien la usó (el valor de cuando la usó); si

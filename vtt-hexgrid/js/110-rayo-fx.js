@@ -35,11 +35,11 @@ function rayoFxArmar(g){
   }
   saltos.forEach((s, i) => {
     const nom = rayoFxNombre(s.id), est = (s.estados || []).filter(Boolean), llega = base + i * RAYO_FX_SALTO_MS + RAYO_FX_LLEGA_MS;
-    flotan.push({a: s.id, texto: `−${fmt(s.entro)}`, retraso: llega, dur: RAYO_FX_NUM_MS});
+    flotan.push({a: s.id, texto: num(s.entro) === 0 && s.nota ? `🛡 ${fmt(s.dano)}` : `−${fmt(s.entro)}`, retraso: llega, dur: RAYO_FX_NUM_MS});
     est.forEach((e, k) => flotan.push({a: s.id, texto: `¡${e}!`, retraso: llega + 350 + k * 250, dur: RAYO_FX_NUM_MS, fila: 1 + k}));
-    pasos.push({titulo: `⚡ Salto ${i + 1}: ${rayoFxNombre(s.desde)} → ${nom}`, texto: [`Le llegan ${fmt(s.dano)}${num(s.entro) !== num(s.dano) ? `; con su resistencia, le entraron ${fmt(s.entro)}` : ''}${rayoFxVida(s)}.`,
+    pasos.push({titulo: `⚡ Salto ${i + 1}: ${rayoFxNombre(s.desde)} → ${nom}`, texto: [`Le llegan ${fmt(s.dano)}${num(s.entro) !== num(s.dano) ? `; ${s.nota ? s.nota + ', ' : 'con su resistencia, '}le entraron ${fmt(s.entro)}` : ''}${rayoFxVida(s)}.`,
       ...(est.length ? [`Estado: ${est.join(', ')}.`] : [])].join('\n')});
-    mesa.push(`${nom} −${fmt(s.entro)} (salto)`);
+    mesa.push(s.nota && num(s.entro) < num(s.dano) ? `${nom} ${fmt(s.dano)} (salto; ${s.nota}${num(s.entro) ? `, entraron ${fmt(s.entro)}` : ''})` : `${nom} −${fmt(s.entro)} (salto)`);
     if(est.length) estadosMesa.push(`${nom}: ${est.join(', ')}`);
   });
   (g.extra || []).filter(Boolean).forEach(x => pasos.push({titulo: 'Además', texto: String(x)}));

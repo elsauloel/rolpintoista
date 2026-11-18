@@ -706,7 +706,7 @@ function hudHpPrevia(t, d, texto){
    daño del anterior, redondeada hacia abajo (dueño, 2026-10-07: «salta tantas veces como le permita el número»: 8 → 4 → 2 → 1; el salto que
    llega con 1 es el último). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
    creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida.
-   Regla general del salto eléctrico (dueño, 2026-10-13): 4 casillas; cada salto es la MITAD DEL DAÑO QUE ENTRÓ al anterior (no del tirado) y
+   Regla general del salto eléctrico (dueño, 2026-10-13; corregido el 2026-11-18): 4 casillas; cada salto es la MITAD DE LO QUE LLEGABA al anterior (antes: de lo que entró) y
    resta la Res. eléctrica de quien lo recibe; salta todas las veces que pueda, sin tope, hasta llegar a 1. `rayoCadena` arma el camino (los
    más cercanos, con el daño que tendría sin resistencias); `rayoCadenaAplicar` lo recorre de verdad y corta cuando el daño no llega a 1. */
 const RAYO_SALTO_MAX = 4;
@@ -733,7 +733,7 @@ function rayoCadena(idInicial, dano, mas, o){
     let mejor = null, mejorDist = Infinity, mejorAgua = false;
     const ch = charco(actual);
     tokens.forEach((x, id) => {
-      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x) || iniciativaFueraDeJuego(id)) return;   // 🕳 bajo tierra / 👁 etéreo / 💀 caído (P225): no le llega
+      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x) || iniciativaFueraDeJuego(id) || rayoInvulnerable(x)) return;   // 🛡 Invulnerable (2026-11-18, dueño): no lo elige, salta al siguiente · 🕳 bajo tierra / 👁 etéreo / 💀 caído (P225): no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
       const delCharco = !!(ch && ch.has(x.col + ',' + x.fila) && mojado(x));
       if(!delCharco && !Combatiente.rayoSaltaA({tipoCandidato: x.tipo, tipoGolpeado: t0.tipo, tipoLanzador: tL ? tL.tipo : '', esLanzador: !!(tL && String(id) === String(o.lanzador))})) return;   // solo rivales de quien lo lanzó; el agua conduce a todos
@@ -754,6 +754,15 @@ function rayoCadena(idInicial, dano, mas, o){
 // Aplica los saltos que este cliente puede (el GM, todos; un jugador, los suyos) y avisa en la Mesa lo demás para hacerlo a mano. Cada salto: la
 // mitad de lo que le entró al anterior (cadena[0].dano = lo que le entró al primero), menos la Res. eléctrica de quien lo recibe. Devuelve los
 // saltos que hubo de verdad ({id, t, dano, entro}), para el momento de la Crónica y lo que se aplica a cada uno (la Parálisis de la flecha…).
+// ¿El token es Invulnerable? (2026-11-18, dueño: «un Invulnerable no puede ser elegido como blanco del salto»).
+function rayoInvulnerable(x){
+  try{ return (confusionEstadosDe(x) || []).some(e => e && e.activo !== false && (e.invulnerable || /^invulnerable/i.test(String(e.nombre || '').trim()))); }catch(e){ return false; }
+}
+// Cuánta Vida extra tiene el token (null si no tiene), para la línea del salto: «se lo comió la Vida extra 69 → 65».
+function rayoVidaExtraDe(x){
+  try{ const e = (confusionEstadosDe(x) || []).find(e => e && e.activo !== false && (e.excedente || e.excedenteVida || /^vida extra/i.test(String(e.nombre || ''))));
+    return e ? num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico) : null; }catch(e){ return null; }
+}
 async function rayoCadenaAplicar(cadena, o){
   o = o || {};
   const hubo = [], hechos = [], manual = [];
@@ -763,22 +772,26 @@ async function rayoCadenaAplicar(cadena, o){
     if(dano0 < 1) break;
     const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-    let ok = false, entro = dano, resTxt = '', antes = null, despues = null;
+    let ok = false, entro = dano, resTxt = '', antes = null, despues = null, nota = '';
     try{
       const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
       const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
       if(puede){
         const res = (await resistenciasDe(s.t, 'rayo')).res;
+        const vxAntes = rayoVidaExtraDe(s.t);
         if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
         const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
         entro = r && r.r ? num(r.r.recibido) : Math.max(0, dano - res);
+        // (2026-11-18, el caso de Bizzante: «−0 (salto)» sin decir por qué): lo que se lo comió, a la vista.
+        if(r && r.r){ const vx = num(r.r.vida), esc = Math.max(0, num(r.r.absorbido) - num(r.r.arcano) - vx), arc = num(r.r.arcano);
+          nota = r.r.invulnerable ? 'Invulnerable: no le hizo nada' : [vx ? `se lo comió la Vida extra${vxAntes !== null ? ` ${fmt(vxAntes)} → ${fmt(Math.max(0, vxAntes - vx))}` : ` (${fmt(vx)})`}` : '', esc ? `lo frenó el escudo (${fmt(esc)})` : '', arc ? `la Armadura arcana se comió ${fmt(arc)}` : ''].filter(Boolean).join(', '); }
         if(r && r.previo !== undefined){ antes = num(r.previo); despues = num(r.nuevo); }   // la vida antes y después (el reporte del rayo, js/110)
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
-    hubo.push({id: s.id, t: s.t, dano, entro, antes, despues});
-    (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}`);
-    prev = entro;
+    hubo.push({id: s.id, t: s.t, dano, entro, antes, despues, ...(nota ? {nota} : {})});
+    (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}${nota ? ` (${nota})` : ''}`);
+    prev = dano;   // ⚡ (2026-11-18, dueño: «debería haber saltado a Bizzante y a Larry»): el salto que sigue es la mitad de lo que LLEGABA, no de lo que entró (un invulnerable o una resistencia no cortan la cadena)
   }
   if(hubo.length && !o.callado) alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${hubo.length} más (la mitad de lo que le entró al anterior, para abajo; cada uno resta su Res. eléctrica). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
   return hubo;

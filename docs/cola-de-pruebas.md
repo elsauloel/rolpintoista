@@ -12,7 +12,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — ⚡ La cadena de rayos: no cortarse en un invulnerable, y la secuencia de a uno** (dueño, 2026-11-18, probando Cadena de rayos del
+- **✅ hecho (2026-11-18) — ⚡ La cadena de rayos: no cortarse en un invulnerable, y la secuencia de a uno** (dueño, 2026-11-18, probando Cadena de rayos del
   Mago del rayo nv5 sobre Rockardo en «Prueba · Tormenta y Meteoro»: «debería haber saltado a Bizzante y a Larry»).
   **Lo que pasó** (visto en los datos): el golpe a Rockardo hizo 8; saltó a Bizzante, que estaba Titilando (invulnerable, recién salvado por el
   Pacto) → «Bizzante −0 (salto)»; y la cadena se cortó ahí, porque cada salto es la mitad de lo que ENTRÓ (0), así que no siguió a Larry.
@@ -21,6 +21,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   a saltar: el cuadro se minimiza, se ve la animación de TODOS los saltos que van a pasar (uno tras otro) y después se abre, de a uno, el
   «Aplicar el daño» de cada alcanzado por el salto, y su tirada de Parálisis si corresponde (Varita de chispa, Arma eléctrica…). Vale para toda
   cadena de rayo (Cadena de rayos, varitas, Arma eléctrica, Escudo elemental). Video de la animación. Probar en «Claude · pruebas 2».
+  **Regla del dueño (2026-11-18, con el caso real: Bizzante tenía Vida extra 69, no era invulnerable):** la Vida extra cuenta como vida (si baja, el
+  daño entró y la cadena sigue); si lo frena un escudo, el salto sigue igual; un **Invulnerable no se elige como blanco**: el rayo salta al siguiente
+  rival elegible. Cada salto, la mitad de lo que llegaba; la línea dice qué pasó («se lo comió la Vida extra 69 → 65», «lo frenó el escudo (4)»).
+  *Resultado:* `rayoCadena` (js/10) ya no elige Invulnerables (`rayoInvulnerable`) y la mitad sale de lo que llegaba; `rayoCadenaAplicar` (lo usa el
+  Escudo elemental) sigue con lo que llegaba y anota la nota de cada salto (`rayoVidaExtraDe`), que muestran el reporte y la Mesa (js/110). La
+  secuencia (`dueloCadenaSecuencia`, js/13; la llaman la Cadena de rayos, el arma con rayo en cadena y el «a mano»): espera que el duelo del golpe
+  termine → momento `rayo` (todas las pantallas: aparta el cuadro abierto y anima todos los saltos, js/16) → línea en la Mesa → de a uno, un duelo
+  por salto directo en «💔 Aplicar el daño» con el daño ya puesto (`hab.dano.yaTirado`), que aplica el afectado (su jugador, el GM por los creeps), y
+  la Parálisis en los efectos de ese mismo cuadro si corresponde. Probado en «Claude · pruebas 2» (GM + J1): saltos 8 → 4 (personaje de J1: aplicó él,
+  5 → 1, y tiró la Parálisis) → 2 (Rata C con Vida extra: «la Vida extra se llevó 2», 30 → 30); `rayoCadenaAplicar` con Vida extra 10 en el medio
+  (10 → 6 y siguió con 2); `rayoCadena` real con una rata Invulnerable pegada (no la eligió, saltó a la otra) y Escudo especial («lo frenó el escudo
+  (4)»). Pendiente de verlo el dueño en una sesión real: las varitas y el Escudo elemental con la cadena entera.
 
 - **✅ hecho (2026-11-18) — ☄ El aviso de la sombra del Meteoro** (dueño, 2026-11-18: «cuando alguien castea el meteoro, al seleccionar el área, a las personas
   dentro del área les aparezca una notificación que diga "Una sombra cubre el suelo: algo cae del cielo." Nada más»). Al marcar el centro, a quien

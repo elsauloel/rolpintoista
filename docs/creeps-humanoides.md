@@ -659,6 +659,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Zapatillas de lona (Eva +1, Def.Esp +1, Ini −1): Def 2, Def.Esp 1, Eva +1, Ini +1. Parpadeo (4 SP) y Nova arcana (2 No2, 3 SP). Consumible:
   Poción de SP menor. Dos maneras de jugarlo, sin cambiar nada: «entra, explota y sale» (Parpadeo + Nova + Parpadeo, 11 SP) o «gancho al que
   está lejos» (lo trae y Nova). Sin cargar hasta que el dueño diga.
+  - **Nivel 2 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 6, 5, 14]; + Vincha de cuero de mula ánima y Polainas de cuero remendado; Lanza arcana;
+    Largo alcance arcano. Vida 45, No2 6, SP 42 (7), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 14. **Falta cargarlo.** Ojo: el nv5 traía Tormenta arcana,
+    que ya es del M3 nv5 → proponer otra.
 
 - **H2 · Saltador · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: cae en el medio y barre: salta por encima de
   la primera línea, se planta entre los de atrás y le pega a todos los que lo rodean. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/7/6/2 →

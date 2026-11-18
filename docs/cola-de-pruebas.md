@@ -12,6 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🔀 Intercambio arcano (programar) y cargar el Arcano niveles 4 y 5** (dueño, 2026-11-18: «me gusta esta. habría que programarla»):
+  habilidad de creep nueva (Mago, auditada): elige un token en su Rango y cambian de lugar; a un aliado sin tirada, a un rival PdG.Esp contra Res.Esp
+  (si gana el rival, no pasa nada); nadie da ni recibe ataques de oportunidad por el cambio; 5 SP fijos y 2 No2 (o su cooldown). Aprovechar el cambio
+  de lugar que ya existe («Cambiar de lugar»). Después cargar M4 nv4 y nv5 como están en `creeps-humanoides.md` y probarlos en «Claude · pruebas 2»
+  (junto con la Andanada recosteada, la tarea de abajo).
 - **⬜ en cola — ✨ Andanada arcana recosteada** (dueño, 2026-11-18: «pasa eso a la cola»): ya cambiada en `comun/skills-creep-base.js` (9 SP
   fijos, 3 misiles de 1d6 + 4 fijo, ya no suma el Ef.Esp; pruebas en verde). Falta verla en el mapa: que cobre 9 SP (no su Especial), que cada misil
   tire 1d6 + 4 y que se pueda repartir o repetir blanco. Con un creep que la tenga (el M4 nivel 4 cuando se cargue, o un Mago en «Claude · pruebas 2»).

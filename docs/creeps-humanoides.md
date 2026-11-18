@@ -668,6 +668,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     SP +3, Def.Esp +2, Res.Mt +2, Res.Esp +1, Percepción +2) en lugar del Chaleco de cuero; **Andanada arcana: 9 SP fijos, 3 No2, 3 misiles de 1d6 + 4
     fijo** (dueño: «si el daño es fijo, el sp debería ser fijo»; 3 Chispazos = 3 SP + 12 de daño a 2 por SP como el Rayo mágico = 6 SP); Puntería arcana.
     Vida 50, No2 7, SP 54 (8), Rango 7, Defensa 1, Def.Esp 4, PdG.Esp 18, Ef.Esp 18, Eva 8. **Falta cargarlo.**
+  - **Nivel 5 aprobado (dueño, 2026-11-18: «me gusta esta. habría que programarla»)**: atrib [10, 2, 8, 7, 18]; las **Botas de mensajero** (Buena: Eva contra
+    oportunidad +2, Percepción +1, Levitar 2) en lugar de las Zapatillas de lona; habilidad nueva **Intercambio arcano** (reemplaza a la Tormenta arcana,
+    que es del M3): elige un token en su Rango y cambian de lugar; a un aliado sin tirada, a un rival con su PdG.Esp contra la Res.Esp; nadie da ataques
+    de oportunidad por el cambio; **5 SP fijos y 2 No2** (sin daño → costo fijo). Sin pasiva nueva. Vida 50, No2 8, SP 57 (9), Rango 8, Defensa 1,
+    Def.Esp 3, PdG.Esp 19, Ef.Esp 19, Eva 8, Ini 8. **Falta programar el Intercambio arcano y cargarlo.**
 
 - **H2 · Saltador · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: cae en el medio y barre: salta por encima de
   la primera línea, se planta entre los de atrás y le pega a todos los que lo rodean. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/7/6/2 →

@@ -662,6 +662,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 2 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 6, 5, 14]; + Vincha de cuero de mula ánima y Polainas de cuero remendado; Lanza arcana;
     Largo alcance arcano. Vida 45, No2 6, SP 42 (7), Rango 6, Defensa 3, Def.Esp 2, PdG.Esp 14. **Falta cargarlo.** Ojo: el nv5 traía Tormenta arcana,
     que ya es del M3 nv5 → proponer otra.
+  - **Nivel 3 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 2, 7, 6, 15]; la Cabeza reducida de jíbaro (Buena: Ef.Esp +1, Res.Mt +2, Maldito con el
+    primer daño especial) en lugar de la Brújula; Portal trampa (3 SP). Vida 45, No2 7, SP 45, Rango 7, PdG.Esp 15, Ef.Esp 16. **Falta cargarlo.**
 
 - **H2 · Saltador · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: cae en el medio y barre: salta por encima de
   la primera línea, se planta entre los de atrás y le pega a todos los que lo rodean. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/7/6/2 →

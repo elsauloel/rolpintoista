@@ -956,6 +956,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     anillas sueltas; Tiro que derriba; Percepción aumentada. Vida 45, No2 7, Rango 14, Defensa 4, Def.Esp 1, PdG 11, Evasión 7. **Falta cargarlo.**
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va así»)**: atrib [10, 6, 8, 12, 2]; el Arco del rastreador de bestias (Buena: 2 dados, Rango +4, +2 PdG
     contra el Marcado, Matabestias) en lugar del Arco del rastreador; Mina del cazador. Vida 50, No2 8, Rango 16, Defensa 4, PdG 12, Evasión 8. **Falta cargarlo.**
+  - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [11, 7, 8, 13, 2]; la Capa del explorador (Buena) en lugar del Chaleco de cuero; Cebo;
+    Puntería. Vida 60, No2 8, Rango 17, Percepción 15, Defensa 2, Def.Esp 3, PdG 14, Evasión 9. **Falta cargarlo.**
 - **H4 · Bruto que aguanta · Híbrido** (2026-11-05, dueño: «tanto la ruta como el nivel 1 me copan»): se la banca y devuelve; busca que le peguen.
   Ruta: nv1 **Aguante** (lenta) · **Contraataque** (Flash); nv2 Golpe desesperado + **Robustez**; nv3 Piel de hierro (el arma, de Buena); nv4 Furia +
   **Mañas de sobreviviente**; nv5 Golpe brutal. **Nivel 1 aprobado**: Con 10 · Fue 9 · Des 6 · Agi 6 · Esp 2 → vida 50, 6 No2, turnos de espera;

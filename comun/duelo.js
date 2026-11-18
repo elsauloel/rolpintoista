@@ -934,6 +934,13 @@ const Duelo = (() => {
     const k = Number(mm[1]) || 0;
     return {...p, total: p.total - k, mod: _num(p.mod) - k, formula: String(p.formula).replace(mm[0], '')};
   }
+  // ☄ Un daño ya tirado (una sola vez para todos los de un área: el Meteoro, dueño 2026-11-18: «la tirada de daño debería ser una sola, y después se
+  // calcula cuánto daño le pasó a cada afectado de acuerdo a sus resistencias»): {crudo, formula, rolls, extra?: {total, formula, rolls}}.
+  function limpiarYaTirado(y){
+    const n = v => Math.max(0, Math.min(999, Math.round(_num(v)))), rs = a => (Array.isArray(a) ? a : []).slice(0, 20).map(_num);
+    const ex = y.extra && typeof y.extra === 'object' ? {total: n(y.extra.total), formula: txtCorto(y.extra.formula || '', 40), rolls: rs(y.extra.rolls)} : null;
+    return {crudo: n(y.crudo), formula: txtCorto(y.formula || '', 60), rolls: rs(y.rolls), ...(ex ? {extra: ex} : {})};
+  }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;
     // Tirada personalizada (2026-09-27): la fórmula ya viene resuelta (X sustituida) desde quien la crea.
@@ -951,6 +958,7 @@ const Duelo = (() => {
       ...(_num(h.dano.luzSanadora) > 0 ? {luzSanadora: Math.min(100, Math.round(_num(h.dano.luzSanadora)))} : {}),   // ☀ Luz sanadora (2026-10-31)
       ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
       ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)
+      ...(h.dano.yaTirado && typeof h.dano.yaTirado === 'object' ? {yaTirado: limpiarYaTirado(h.dano.yaTirado)} : {}),   // ☄ el daño ya tirado UNA vez para todos (el Meteoro, 2026-11-18)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)
@@ -1033,6 +1041,15 @@ const Duelo = (() => {
     if(m.hab && m.hab.dano && m.hab.dano.diferencia){
       const dif = Math.max(0, Math.round(_num(m.contacto && m.contacto.dif)));
       m.dano = {crudo: dif, formula: 'la diferencia', rolls: [], mod: 0, reclamado: LIBRE, aplicado: false};
+      m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
+      entrarDano(m);
+      return;
+    }
+    // ☄ El daño ya tirado una vez para todos (el Meteoro): queda listo para aplicar, con lo de cada uno (Defensa, resistencias) al aplicarlo.
+    if(m.hab && m.hab.dano && m.hab.dano.yaTirado){
+      const y = m.hab.dano.yaTirado;
+      m.dano = {crudo: Math.max(0, Math.round(_num(y.crudo))), formula: String(y.formula || '').slice(0, 60), rolls: (y.rolls || []).map(_num), mod: 0, reclamado: LIBRE, aplicado: false, compartido: true};
+      if(y.extra && m.hab.dano.extra) m.dano.magico = {tipo: String(m.hab.dano.extra.tipo || 'fuego').slice(0, 20), total: Math.max(0, Math.round(_num(y.extra.total))), formula: String(y.extra.formula || '').slice(0, 60), rolls: (y.extra.rolls || []).map(_num)};
       m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
       entrarDano(m);
       return;
@@ -2702,7 +2719,7 @@ const Duelo = (() => {
     else if(d.hab && d.hab.esquiva) caja = d.resultado === 'fallo' ? `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🏃 SALIÓ DEL ÁREA</div><div class="chico">${_esc(d.defensor.nombre)} esquivó: ${_esc(d.hab.nombre)} no le llega</div></div>`
       : `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} SIGUE ADENTRO</div><div class="chico">${_esc(d.defensor.nombre)} queda en el área de ${_esc(d.hab.nombre)}</div></div>`;
     else if(d.hab && d.hab.soloTirada && !d.dano) caja = '';
-    else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">🌩 ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
+    else if(d.hab && d.hab.soloTirada) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">${d.hab.meteoro ? '☄' : '🌩'} ${_fmt(d.dano.crudo)} ${_esc(String(d.hab.soloTirada.etq || '').toUpperCase())}</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)}</div></div>`;
     else if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego' && d.contacto && d.contacto.resistioEstado) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚡ EL DAÑO ENTRA</div><div class="chico">${_esc(d.defensor.nombre)} resistió los estados de ${_esc(d.hab.nombre)} (${_esc(etqContra(d))}), pero no se esquiva: el daño pasa igual</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;

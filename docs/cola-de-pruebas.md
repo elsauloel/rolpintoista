@@ -12,12 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — ☄ El daño del Meteoro, una sola tirada** (dueño, 2026-11-18, probándolo: «me pide que tire el daño una vez por cada objetivo
+- **✅ hecho (2026-11-18) — ☄ El daño del Meteoro, una sola tirada** (dueño, 2026-11-18, probándolo: «me pide que tire el daño una vez por cada objetivo
   afectado. La tirada de daño debería ser una sola, y después se calcula cuánto daño le pasó a cada afectado de acuerdo a sus resistencias»).
   Quien lo lanzó tira **una vez** (4d6 físico + 2d6 de fuego) y a cada uno que quedó adentro se le aplica ese mismo resultado con lo suyo (la Defensa
   al físico, la Res. fuego al fuego), de a uno como ahora («Aplicar el daño» con la cuenta de cada uno). Revisar si las demás áreas con un daño para
   todos (Bola de fuego, ondas, conos, varitas de área) tiran una vez o por objetivo, y contarlo (la Tormenta es distinta: cada uno su Nd4).
   Probar en el mapa cuando el dueño no lo esté usando.
+  *Resultado:* después de la ronda de «¿Esquiva?», quien lo lanzó tira **una sola vez** «🎲 Tirar de daño · 4d6+2d6» (un cuadro de una tirada, como
+  los proyectiles de la Tormenta; la Mesa dice «4d6 = 16 físico + 2d6 = 9 de fuego — el mismo para todos») y a cada uno le llega ese resultado ya
+  tirado (`hab.dano.yaTirado`, comun/duelo.js; js/118): solo queda «Aplicar el daño» con su cuenta. Probado en un mapa propio con un Martillero
+  (Defensa 8) y un Sanador (Defensa 2) bajo el mismo meteoro: 16 físico + 9 de fuego → 17 y 23 a la vida (la diferencia es la Defensa).
+  **Las otras áreas** (Bola de fuego, ondas, conos, varitas de área): comparten la tirada de ataque (PdG / PdG.Esp) pero cada objetivo tira su
+  propio daño en su cuadro. No lo cambié: queda como pregunta para el dueño.
 
 - **⬜ en cola — ☄🖼 La sombra del Meteoro más visible, y el texto del fondo del mapa** (dueño, 2026-11-18): (1) la sombra que deja el Meteoro
   hasta que cae se ve poco sobre una imagen de fondo: que se note más (más oscura o con borde, que se vea sobre cualquier fondo); (2) en 🗺 Mapas →

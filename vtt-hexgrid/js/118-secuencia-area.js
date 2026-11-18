@@ -178,6 +178,26 @@ async function secuenciaArea(o){
     // 5) El daño, de a uno: lo tira quien la lanzó; lo aplica el afectado (o el GM por él).
     const cada = String((hab.tormenta && hab.tormenta.cada) || '1d4');
     const m = cada.match(/(\d*)d(\d+)(?:\s*\+\s*(\d+))?/i);
+    // ☄ El Meteoro tira el daño UNA sola vez para todos (dueño, 2026-11-18: «la tirada de daño debería ser una sola, y después se calcula cuánto daño le
+    // pasó a cada afectado de acuerdo a sus resistencias»): quien lo lanzó tira «4d6 físico + 2d6 de fuego» con su botón (un cuadro de una sola tirada,
+    // como los proyectiles de la Tormenta) y a cada uno le llega ese mismo resultado, ya tirado, para aplicarlo con su Defensa y su Res. fuego.
+    let yaTirado = null;
+    const vivos = adentro.filter(id => tokens.get(id) && !iniciativaFueraDeJuego(id));
+    if(meteoro && vivos.length){
+      const fis = String(hab.meteoroFisico || (hab.dano && hab.dano.formula) || '4d6'), ext = hab.dano && hab.dano.extra && hab.dano.extra.formula ? hab.dano.extra : null;
+      const habT = {nombre: `${nombre} · el daño`, objetivo: 'uno mismo', tira: null, contra: [], efectos: [], soloTirada: {etq: 'de daño'}, meteoro: true,
+        dano: {formula: ext ? `${fis}+${ext.formula}` : fis, tipo: 'físico', ignoraDef: false},
+        detalle: `Una sola tirada para todos: ${fis} físico${ext ? ` + ${ext.formula} de ${ext.tipo}` : ''}. A cada uno le entra con su Defensa${ext ? ` y su resistencia al ${ext.tipo}` : ''}.`};
+      const c = await contiendaDuelo({yo: yoDuelo, deTokenId: casteador.tokenId, aTokenId: casteador.tokenId, hab: habT, esperar: true, extra: {secundario: true, danoSuelto: true}});
+      if(!c.falla && !c.cancelado && !c.tiempo && c.d && c.d.dano){
+        const rolls = (c.d.dano.rolls || []).map(num), pd = typeof parseDados === 'function' ? parseDados(fis) : null;
+        const nFis = pd && pd.dados ? pd.dados.reduce((a, x) => a + num(x.n), 0) : rolls.length;
+        const rf = rolls.slice(0, nFis), rx = rolls.slice(nFis);
+        const tf = rf.reduce((a, v) => a + v, 0) + (pd ? num(pd.mod) : 0), tx = ext ? rx.reduce((a, v) => a + v, 0) : 0;
+        yaTirado = {crudo: Math.max(0, tf), formula: `${fis} (una tirada para todos)`, rolls: rf, ...(ext ? {extra: {total: Math.max(0, tx), formula: ext.formula, rolls: rx}} : {})};
+        mesaLinea(`☄ ${nombre} de ${casteador.nombre}: ${fis} = ${yaTirado.crudo} físico${ext ? ` + ${ext.formula} = ${tx} de ${ext.tipo}` : ''} — el mismo para todos los que quedaron adentro`, 'recordatorio');
+      }else mesaLinea(`☄ ${nombre}: no se tiró el daño — cada uno lo tira aparte`, 'recordatorio');
+    }
     let n = 0;
     for(const id of adentro){
       const t = tokens.get(id);
@@ -186,10 +206,10 @@ async function secuenciaArea(o){
       if(!k) continue;
       await secuenciaPausa(n++ ? 900 : 300);
       // La versión de los creeps (1d4+1): Nd4+1, el +1 una sola vez (dueño, 2026-11-13: «en realidad sería "nd4+1"»).
-      const dano = meteoro ? {formula: String(hab.meteoroFisico || (hab.dano && hab.dano.formula) || '4d6'), tipo: 'físico', ignoraDef: false, ...(hab.dano && hab.dano.extra ? {extra: hab.dano.extra} : {})}
+      const dano = meteoro ? {formula: String(hab.meteoroFisico || (hab.dano && hab.dano.formula) || '4d6'), tipo: 'físico', ignoraDef: false, ...(hab.dano && hab.dano.extra ? {extra: hab.dano.extra} : {}), ...(yaTirado ? {yaTirado} : {})}
         : {formula: m ? `${k * (num(m[1]) || 1)}d${m[2]}${m[3] ? '+' + num(m[3]) : ''}` : `${k}d4`, tipo: 'arcano', ignoraDef: true, directo: true};
       const habD = {nombre: meteoro ? nombre : `${nombre} · ${k} proyectil${k === 1 ? '' : 'es'}`, objetivo: 'enemigo', tira: null, contra: [], efectos: [], dano,
-        detalle: meteoro ? `Cae el meteoro: ${dano.formula} físico (lo frena la Defensa)${dano.extra ? ` y ${dano.extra.formula} de ${dano.extra.tipo} (directo, menos su resistencia)` : ''}.` : `Le cayeron ${k} proyectil${k === 1 ? '' : 'es'}: ${dano.formula} de daño arcano, directo a la vida (ni Defensa ni Defensa especial).`};
+        detalle: meteoro && yaTirado ? `Cae el meteoro: ${yaTirado.crudo} físico (lo frena la Defensa)${yaTirado.extra ? ` y ${yaTirado.extra.total} de ${dano.extra ? dano.extra.tipo : 'fuego'} (directo, menos su resistencia)` : ''} — la tirada de ${casteador.nombre}, la misma para todos.` : meteoro ? `Cae el meteoro: ${dano.formula} físico (lo frena la Defensa)${dano.extra ? ` y ${dano.extra.formula} de ${dano.extra.tipo} (directo, menos su resistencia)` : ''}.` : `Le cayeron ${k} proyectil${k === 1 ? '' : 'es'}: ${dano.formula} de daño arcano, directo a la vida (ni Defensa ni Defensa especial).`};
       const c = await contiendaDuelo({yo: yoDuelo, deTokenId: casteador.tokenId, aTokenId: id, hab: habD, esperar: true, extra: {secundario: true, danoSuelto: true}});
       if(c.falla) mesaLinea(`${meteoro ? '☄' : '🌩'} ${nombre}: a ${nombreDe(t)} le toca ${dano.formula} — aplicalo a mano`, 'recordatorio');
     }

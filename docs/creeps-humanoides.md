@@ -1324,7 +1324,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | D3 | ✅ (2026-11-03) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | W4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
 | T4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) | ✅ (2026-11-14, cargado) |
-| H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-14), a cargar | ✅ aprobado (2026-11-15), a cargar | ✅ aprobado (2026-11-18), a cargar |
+| H4 | ✅ (2026-11-05, cargado) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-14), cargado (2026-11-18) | ✅ aprobado (2026-11-15), cargado (2026-11-18) | ✅ aprobado (2026-11-18), cargado (2026-11-18) |
 | L7 | ✅ (2026-11-05, cargado) | | | | |
 | L8 | ✅ (2026-11-05, cargado) | | | | |
 | R4 | ✅ (2026-11-05, cargado) | | | | |

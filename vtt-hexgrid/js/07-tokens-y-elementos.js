@@ -86,7 +86,7 @@ function tableroCardHtml(nombre, imagen, nivel, r, tipo, id){
     </div>
     <div class="tablero-hp-fila">
       <div class="tablero-hp-barra"><div class="tablero-hp-fill" style="width:${pct}%"></div></div>
-      ${conNumeros ? `<span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
+      ${conNumeros ? `<span class="tablero-hp-txt" title="${Combatiente.vidaExtraDe(r.estados) > 0 ? `Vida ${fmt(Math.max(0, hp))} + Vida extra ${fmt(Combatiente.vidaExtraDe(r.estados))}` : ''}">${fmt(Math.max(0, hp) + Combatiente.vidaExtraDe(r.estados))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
     </div>
     ${tipo === 'pj' && spMax > 0 ? `<div class="tablero-hp-fila">
       <div class="tablero-hp-barra"><div class="tablero-hp-fill sp" style="width:${spPct}%"></div></div>

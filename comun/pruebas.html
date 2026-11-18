@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261118vx"></script>
+<script src="combatiente.js?v=20261118vxf"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -8033,6 +8033,12 @@ prueba('❤ La Vida extra se muestra como vida: «104/35 → 100/35» (2026-11-1
   igual([C.vidaConExtra(35, 65, 35), C.vidaConExtra(20, 0, 20), C.vidaConExtra(7, 3), C.vidaCambioTxt(35, 35, {extraAntes: 69, extraDespues: 65, max: 35}),
     C.vidaCambioTxt(10, 6, {max: 20}), C.danoAVida({recibido: 0, vida: 4}), C.danoAVida({recibido: 3}), cv.texto, cv.final],
     ['100/35', '20/20', '10', '104/35 → 100/35', '10/20 → 6/20', 4, 3, '4 de daño (ignora la Defensa) = 4 a la vida', 4]);
+});
+prueba('❤ La Vida extra que tiene encima, de la ficha, de un creep y del resumen público (2026-11-18, Combatiente.vidaExtraDe)', () => {
+  const X = Combatiente.vidaExtraDe;
+  igual([X([{nombre: 'Vida extra', escudoMagico: 69}]), X([{nombre: 'Excedente de vida', excedenteVida: true, escudoMagico: 10, escudoMagicoActual: 6}]),
+    X([{nombre: 'Vida extra', excedente: true, escudo: 65}, {nombre: 'Escudo especial', escudo: 8}]), X([{nombre: 'Vida extra', escudoMagico: 5, activo: false}]), X(null)],
+    [69, 6, 65, 0, 0]);
 });
 prueba('⚡ El salto del rayo, solo a rivales de quien lo lanzó (2026-11-18, Combatiente.rayoSaltaA)', () => {
   const R = Combatiente.rayoSaltaA;

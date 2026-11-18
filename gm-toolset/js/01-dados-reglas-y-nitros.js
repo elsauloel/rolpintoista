@@ -431,7 +431,7 @@ function actualizarVitalesEnDOM(sc, card){
   if(!card) return;
   const inHp = card.querySelector('[data-f="hp"]');
   const inHpMax = card.querySelector('[data-f="hpMax"]');
-  if(inHp) inHp.value = fmt(sc.hp);
+  if(inHp){ inHp.dataset.hpbase = fmt(num(sc.hp)); if(document.activeElement !== inHp) inHp.value = fmt(typeof hpConExtraCreep === 'function' ? hpConExtraCreep(sc) : sc.hp); }   // ❤ con la Vida extra (2026-11-18)
   if(inHpMax) inHpMax.value = fmt(sc.hpMax);
 }
 

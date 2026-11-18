@@ -136,8 +136,10 @@ function resolverCajaDelta(t){
 }
 
 document.addEventListener('focusin', e => {
+  if(e.target.id === 'f-hp') e.target.value = fmt(Math.max(0, num(S.hp)));   // ❤ al escribir, la vida sin la Vida extra (afuera se ve el total)
   if(CAJAS_DELTA.includes(e.target.id)){ cajaDeltaBase[e.target.id] = num(e.target.value); e.target.select(); }
 });
+document.addEventListener('focusout', e => { if(e.target.id === 'f-hp') setTimeout(() => { if(document.activeElement !== e.target) renderVitals(); }, 0); });
 document.addEventListener('keydown', e => {
   if((e.key === 'Enter' || e.keyCode === 13) && CAJAS_DELTA.includes(e.target.id)){
     e.preventDefault();

@@ -189,7 +189,7 @@ const CreepLupa = (() => {
       <div class="view-info">
         <div class="view-title">${esc(sc.nombre)} <span class="vc-nivel">Lv ${fmt(num(sc.nivel))}</span></div>
         <div class="vc-cajas vc-2">
-          ${caja('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`)}
+          ${caja('HP', `${fmt(num(sc.hp) + (typeof Combatiente !== 'undefined' && Combatiente.vidaExtraDe ? Combatiente.vidaExtraDe(sc.estados) : 0))} / ${fmt(num(sc.hpMax))}`)}
           ${caja('No2', `${fmt(num(sc.nitros))} / ${fmt(K.nitrosMax(sc))}`)}
         </div>
         <div class="sect-label" style="margin-top:12px">Estados alterados</div>

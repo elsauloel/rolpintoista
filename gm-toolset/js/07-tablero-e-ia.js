@@ -219,7 +219,7 @@ function tableroCardHtml(x, tipo){
     </div>
     <div class="tablero-hp-fila">
       <div class="tablero-hp-barra"><div class="tablero-hp-fill" style="width:${pct}%"></div></div>
-      ${conNumeros ? `<span class="tablero-hp-txt">${fmt(Math.max(0, hp))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
+      ${conNumeros ? `<span class="tablero-hp-txt" title="${Combatiente.vidaExtraDe(x.estados) > 0 ? `Vida ${fmt(Math.max(0, hp))} + Vida extra ${fmt(Combatiente.vidaExtraDe(x.estados))}` : ''}">${fmt(Math.max(0, hp) + Combatiente.vidaExtraDe(x.estados))}${hpMax ? `/${fmt(hpMax)}` : ''}</span>` : ''}
     </div>
     ${spMax > 0 ? `<div class="tablero-hp-fila">
       <div class="tablero-hp-barra"><div class="tablero-hp-fill sp" style="width:${spPct}%"></div></div>

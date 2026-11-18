@@ -104,7 +104,7 @@ function cardHtml(sc){
       <div class="vitalbar">
         <div class="vital-mini hp">
           <div class="vl">HP</div>
-          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" data-hpbase="${sc.hp}" value="${hpConExtraCreep(sc)}" title="${hpTituloCreep(sc)}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
@@ -265,7 +265,7 @@ function cardCompactoHtml(sc){
       <div class="vitalbar">
         <div class="vital-mini hp">
           <div class="vl">HP</div>
-          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" value="${sc.hp}" title="Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
+          <div class="vn"><input type="text" inputmode="decimal" data-f="hp" data-id="${sc.id}" data-hpbase="${sc.hp}" value="${hpConExtraCreep(sc)}" title="${hpTituloCreep(sc)}"><span class="vmax">/ </span><input type="number" data-f="hpMax" data-id="${sc.id}" value="${sc.hpMax}"></div>
           <div class="dano-entrante">
             <label>Daño</label>
             <input type="text" inputmode="decimal" data-danocreep="${sc.id}" placeholder="0" title="Escribí el daño del golpe y apretá Enter: se le resta la Defensa del creep y el resto sale del HP">
@@ -559,3 +559,13 @@ window.avisoJefe = async function(info){
   renderAll();
   toast(`🛡 ${sc.nombre}: ${info.estado.nombre} ${unTurno ? 'completo' : 'igual'} (sin la Protección de jefe)`);
 };
+
+// ❤ La Vida extra se muestra como vida (dueño, 2026-11-18: «100/35»): la caja de HP del creep muestra vida + Vida extra; al entrar a escribir, la vida
+// sola (lo que se escribe o suma es la vida, como siempre).
+function hpConExtraCreep(sc){ return num(sc.hp) + Combatiente.vidaExtraDe(sc.estados); }
+function hpTituloCreep(sc){
+  const x = Combatiente.vidaExtraDe(sc.estados);
+  return x > 0 ? `Vida ${fmt(num(sc.hp))} + Vida extra ${fmt(x)} = ${fmt(num(sc.hp) + x)}. Al escribir, cambiás la vida (sin la Vida extra): un número la fija, +10 / -5 suma o resta.`
+    : 'Escribí un número para fijarlo, o +10 / -5 para sumar o restar al valor actual, y apretá Enter';
+}
+document.addEventListener('focusin', e => { const t = e.target; if(t && t.matches && t.matches('input[data-f="hp"][data-hpbase]')){ t.value = t.dataset.hpbase; t.select(); } }, true);

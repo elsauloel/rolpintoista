@@ -12,6 +12,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **✅ hecho (2026-11-18) — ❤ La Vida extra como vida también en la ficha, GM Tools y los Tableros** (dueño, 2026-11-18: «sí», a que la ficha también
+  muestre 100/35). *Resultado:* `Combatiente.vidaExtraDe(estados)` (ficha, creep y resumen público). La ficha muestra en la caja de vida el total
+  (vida + Vida extra) sobre el máximo real, con un detalle chico «(❤+65 de Vida extra)»; al entrar a escribir, la caja muestra la vida sola (lo que se
+  escribe o suma es la vida, como siempre) y al salir vuelve al total. Igual en la caja de HP de la tarjeta del creep en GM Tools, el Tablero (GM Tools
+  y mapa) y el Ver del creep. Probado en «Claude · pruebas 2»: ficha de J1 con Vida extra 65 → «100 / 35 (❤+65 de Vida extra)» (al enfocar 35, al
+  salir 100); creep con Vida extra 20 → «50 / 30» (al enfocar 30). 871 pruebas en verde.
+
 - **✅ hecho (2026-11-18) — ❤ La Vida extra se muestra como vida** (dueño, 2026-11-18, con captura del salto a Bizzante: «0 de daño le va a entrar a la vida»
   con «− Vida extra 4»: «está comunicado raro. La vida extra es como si tuvieras un valor de vida por encima de tu máximo… tiene que decir que entró
   4 de daño, tu vida pasó de X a Y, y el resultado final Y/(tu máximo real); como quedó hoy Bizzante debería mostrar 100/35»).

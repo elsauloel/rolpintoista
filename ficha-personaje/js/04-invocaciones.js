@@ -1098,6 +1098,7 @@ function estadoSobrepeso(){ return FichaResumen.estadoSobrepeso(S); }
 const estadosTodos = () => FichaResumen.estadosTodos(S);
 
 function renderList(key){
+  if(key === 'efectos' && typeof renderVitals === 'function') setTimeout(renderVitals, 0);   // ❤ la Vida extra cambia la vida que se ve (2026-11-18)
   const el = $('#list-'+key);
   if(!el) return;
   let arr;

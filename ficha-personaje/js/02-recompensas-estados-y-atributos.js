@@ -248,7 +248,15 @@ function renderVitals(){
   $('#v-hpmax').textContent = fmt(hpmax);
   // El HP puede quedar en negativo internamente (overkill), pero en el
   // contador de la cabecera nunca se muestra por debajo de 0.
-  if(document.activeElement !== $('#f-hp')) $('#f-hp').value = fmt(Math.max(0, num(S.hp)));
+  // ❤ La Vida extra se muestra como vida (dueño, 2026-11-18: «100/35»): sin tocar la caja, vida + Vida extra; al entrar a escribir, la vida sola
+  // (lo que se escribe o suma es la vida, como siempre) y un detalle chico al lado del máximo.
+  const extra = Combatiente.vidaExtraDe(S.efectos);
+  if(document.activeElement !== $('#f-hp')) $('#f-hp').value = fmt(Math.max(0, num(S.hp)) + extra);
+  $('#f-hp').title = extra > 0 ? `Vida ${fmt(Math.max(0, num(S.hp)))} + Vida extra ${fmt(extra)} = ${fmt(Math.max(0, num(S.hp)) + extra)}. Al escribir, cambiás la vida (sin la Vida extra): un número la fija, +50 / -35 suma o resta.`
+    : 'Escribí un número para fijarlo, o +50 / -35 para sumar o restar al valor actual y apretá Enter';
+  { let d = document.getElementById('v-hp-extra');
+    if(!d && extra > 0){ d = document.createElement('span'); d.id = 'v-hp-extra'; d.style.cssText = 'font-size:11px;opacity:.75;margin-left:6px;white-space:nowrap'; $('#v-hpmax').parentNode.appendChild(d); }
+    if(d) d.textContent = extra > 0 ? `(❤+${fmt(extra)} de Vida extra)` : ''; }
   $('#bar-hp').style.width = pct(S.hp, hpmax);
 
   // capacidad

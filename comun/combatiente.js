@@ -560,6 +560,12 @@ const Combatiente = (() => {
     const total = Math.max(0, (Number(hp) || 0) + Math.max(0, Number(extra) || 0));
     return Number(max) > 0 ? `${n(total)}/${n(max)}` : n(total);
   }
+  // ❤ La Vida extra que tiene encima, sumada de sus estados (2026-11-18: la ficha, GM Tools y los Tableros muestran vida + Vida extra / máximo):
+  // los de la ficha y los creeps (`excedenteVida`, con `escudoMagicoActual`/`escudoMagico`) y los del resumen público (`excedente`, con `escudo`).
+  function vidaExtraDe(estados){
+    return (estados || []).filter(e => e && e.activo !== false && (e.excedenteVida || e.excedente || /^(vida extra|excedente de vida)$/i.test(String(e.nombre || '').trim())))
+      .reduce((t, e) => t + Math.max(0, Number(e.escudoMagicoActual ?? e.escudoMagico ?? e.escudo) || 0), 0);
+  }
   // «104/35 → 100/35», con lo que devuelve resolverGolpe (`r.extraAntes`, `r.extraDespues`, `r.max`) y la vida de antes y después.
   function vidaCambioTxt(previo, nuevo, r){
     const x = r || {};
@@ -3205,5 +3211,5 @@ const Combatiente = (() => {
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
     porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto, devuelveElGolpe, esGiro, GIROS,
-    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta, rayoSaltaA, vidaConExtra, vidaCambioTxt, danoAVida};
+    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta, rayoSaltaA, vidaConExtra, vidaCambioTxt, danoAVida, vidaExtraDe};
 })();

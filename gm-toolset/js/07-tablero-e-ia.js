@@ -330,12 +330,36 @@ const OR_MODELS = [
   {id:'nvidia/nemotron-nano-9b-v2:free', label:'Nemotron Nano (rápido y liviano)'},
 ];
 
+// 🔄 Los modelos gratis de OpenRouter cambian seguido (2026-11-18: el Nemotron 3 Super y el GPT-OSS 20B dejaron de ser gratis de un día para el
+// otro): la lista se pide en vivo a OpenRouter (la de modelos es pública, sin clave) y se quedan los gratis; OR_MODELS queda de respaldo.
+let orModelosVivos = null, orModelosHora = 0;
+async function orModelosGratis(){
+  if(orModelosVivos && Date.now() - orModelosHora < 10 * 60 * 1000) return orModelosVivos;
+  try{
+    const r = await fetch('https://openrouter.ai/api/v1/models');
+    if(!r.ok) throw new Error('modelos ' + r.status);
+    const d = await r.json();
+    const gratis = (d.data || []).filter(m => m && m.id && (String(m.id).endsWith(':free') ||
+      (m.pricing && Number(m.pricing.prompt) === 0 && Number(m.pricing.completion) === 0)));
+    // Primero los que aceptan el formato estricto (salen mejor), después los más grandes por contexto.
+    const pts = m => ((m.supported_parameters || []).includes('response_format') ? 2e9 : 0) + num(m.context_length);
+    gratis.sort((a, b) => pts(b) - pts(a));
+    orModelosVivos = gratis.slice(0, 12).map((m, i) => ({id: m.id, label: (m.name || m.id).replace(/\s*\(free\)\s*$/i, '') + (i === 0 ? ' — recomendado' : '')}));
+    orModelosHora = Date.now();
+    if(!orModelosVivos.length) orModelosVivos = null;
+  }catch(err){ console.warn('No se pudo leer la lista de modelos de OpenRouter:', err); orModelosVivos = null; }
+  return orModelosVivos || OR_MODELS;
+}
 function poblarSelectorModelos(){
   const sel = $('#ia-modelo');
-  if(sel.options.length) return; // ya poblado
-  const guardado = localStorage.getItem('openrouter-modelo');
-  sel.innerHTML = OR_MODELS.map(m => `<option value="${m.id}">${esc(m.label)}</option>`).join('');
-  if(guardado && OR_MODELS.some(m => m.id === guardado)) sel.value = guardado;
+  const poner = lista => {
+    const guardado = localStorage.getItem('openrouter-modelo'), antes = sel.value;
+    sel.innerHTML = lista.map(m => `<option value="${esc(m.id)}">${esc(m.label)}</option>`).join('');
+    const quiero = antes || guardado;
+    if(quiero && lista.some(m => m.id === quiero)) sel.value = quiero;
+  };
+  if(!sel.options.length) poner(OR_MODELS);
+  orModelosGratis().then(poner).catch(() => {});
 }
 
 /* La clave de OpenRouter (2026-10-13, dueño: «intenté usar la ia y me pide esto, pero ni idea de dónde sale»): si falta, una ventana con
@@ -482,7 +506,7 @@ async function generarCreepIA(promptUsuario){
   if(!promptUsuario){ toast('Describí el creep antes de generar'); return; }
   const key = await orKey(false);
   if(!key){ toast('Sin clave de OpenRouter no se puede generar'); return; }
-  const modelo = $('#ia-modelo').value || OR_MODELS[0].id;
+  let modelo = $('#ia-modelo').value || OR_MODELS[0].id;
   localStorage.setItem('openrouter-modelo', modelo);
   const btn = $('#ia-generar');
   const textoOriginal = btn.textContent;
@@ -502,8 +526,17 @@ async function generarCreepIA(promptUsuario){
         messages: [{role: 'system', content: IA_SISTEMA}, {role: 'user', content: promptUsuario}],
       }),
     });
-    let resp = await pedir(true);
-    if(resp.status === 400 || resp.status === 404) resp = await pedir(false);
+    // Si el modelo elegido dejó de ser gratis o no está («unavailable for free», «No endpoints»), se prueban solos los siguientes de la lista.
+    const lista = [modelo, ...(await orModelosGratis()).map(m => m.id).filter(id => id !== modelo)].slice(0, 5);
+    let resp = null;
+    for(const id of lista){
+      modelo = id;
+      resp = await pedir(true);
+      if(resp.status === 400 || resp.status === 404) resp = await pedir(false);
+      if(resp.status !== 404 && resp.status !== 400) break;
+      toast(`El modelo ${id} no está disponible gratis: pruebo con otro…`);
+    }
+    if(modelo !== lista[0]){ localStorage.setItem('openrouter-modelo', modelo); const sel = $('#ia-modelo'); if(sel && [...sel.options].some(o => o.value === modelo)) sel.value = modelo; }
     if(resp.status === 401){
       localStorage.removeItem('openrouter-key');
       iaMostrarError('La clave de OpenRouter no sirve o venció.', true);
@@ -682,7 +715,8 @@ async function escaneoPedirIA(){
   const key = await orKey(false);
   if(!key){ toast('Sin clave de OpenRouter no se puede pedir la propuesta'); return; }
   const f = escaneoVentana(), caja = f.querySelector('#escaneo-ia'), btn = f.querySelector('[data-esc="ia"]');
-  const modelo = localStorage.getItem('openrouter-modelo') || OR_MODELS[0].id;
+  const vivos = await orModelosGratis(), guardadoM = localStorage.getItem('openrouter-modelo');
+  const modelo = (guardadoM && vivos.some(m => m.id === guardadoM)) ? guardadoM : vivos[0].id;   // (2026-11-18: el guardado puede haber dejado de ser gratis)
   btn.disabled = true; btn.textContent = 'Pensando…';
   caja.textContent = '🤖 La IA está mirando el escaneo…';
   try{

@@ -12,6 +12,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🔥❄⚡ El daño de elemento de un arma, en su propia tirada y con dados de su elemento** (dueño, 2026-11-18: «sí», a separar como el
+  Meteoro). Hoy el daño elemental de un arma o una flecha (Arma elemental, flechas con fuego, varitas con daño físico + elemental, lo que use el
+  extra de elemento) sale junto con el daño del arma en una sola tirada. Que sean dos pasos: primero «🎲 Tirar el daño (…)» del arma y después
+  «🔥/❄/⚡/🧪/☠/☀/🌑 Tirar el daño de <elemento> (…)», cada uno con su recuadro, su número y su línea en la Mesa; los dados 3D del elemento con un
+  estilo de su color (fuego ya existe, del Meteoro, commit 8a91a02c; buscar o armar los otros: hielo, rayo, ácido, tóxico, luz, siniestro). La cuenta
+  de cada uno como siempre (lo físico con la Defensa; el elemento con su resistencia). Ojo con el crítico: el multiplicador hoy alcanza a todo el
+  daño: no cambiarlo, solo mostrarlo bien en los dos. Video corto de los dados de 2–3 elementos. Probar en «Claude · pruebas 2».
+
 - **✅ hecho (2026-11-18) — ☄🔥 Meteoro: dos tiradas bien claras (físico y fuego), con dados de fuego** (dueño, 2026-11-18, con captura: «tirar todo junto el
   daño físico y el de fuego no me gusta. Deberían ser dos tiradas bien claras. Y si a los dados del daño de fuego le pudieras sumar algún efecto ígneo
   en su animación 3D, mejor»). Hoy un solo botón tira 4d6 y 2d6 juntos. Que sean **dos pasos**: «🎲 Tirar el daño físico (4d6)» y, después,

@@ -979,6 +979,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Nivel 3 aprobado (dueño, 2026-11-18: «va»)**: atrib [9, 6, 10, 12, 2]; la Daga del sacrificio (Buena: 2 dados, Sangrado 50 %, Perfora 2) en
     lugar del Facón; **Corte en la arteria** (la ruta decía Corte profundo, que salió del pool el 2026-11-07). Vida 45, No2 10, Defensa 3, PdG 13,
     daño 2d4 + 6, Parry 12, Evasión 11. **Falta cargarlo.**
+  - **Nivel 4 aprobado (dueño, 2026-11-18: «va así»)**: atrib [10, 6, 11, 13, 2]; el Jubón de cuero tachonado (Buena) en lugar del Chaleco; Degollar;
+    **Ojo de carancho** en lugar de Sed de sangre. Vida 60, No2 11, Defensa 3, Def.Esp 3, PdG 14, Parry 13, Evasión 12. **Falta cargarlo.**
 - **L8 · Acróbata · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): se mueve y corta; nunca se queda quieto. Ruta: nv1 **Salto**
   (rápida) · **Tajo veloz**; nv2 Dash + **Pies ligeros**; nv3 Ráfaga de cortes (el arma, de Buena); nv4 Hit and run + **Paso ligero**; nv5 Puñalada por
   la espalda. **Nivel 1 aprobado**: Agi 10 · Des 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 10 No2, turnos de espera; **Sable del tahúr** (Común, Tipo 6,

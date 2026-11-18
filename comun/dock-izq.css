@@ -1,7 +1,7 @@
 /* El menú de botones de la izquierda (2026-10-12, dueño: «gm tools debería tener a la izquierda una línea de botones en este mismo estilo,
    para mantener la coherencia»). Lo usan la ficha y GM Tools: <aside class="dock-izq"> con botones .dock-btn (.dock-ico + .dock-txt); se
    abre al pasar el mouse. Usa las variables de color de cada página (--panel, --panel2, --line, --paper, --copper, --brass). */
-.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px} /* por debajo del menú del sitio (z 49, ver más abajo): si no, el menú abierto queda tapado por el dock (bug real, 2026-09-29) */
+.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px;padding:8px 8px 8px 0;background:var(--paper);border:2px solid var(--copper);border-left:0;border-radius:0 12px 12px 0;box-shadow:0 6px 22px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.35)} /* 🖼 enmarcado en claro (2026-11-18, dueño: «el botón del mapa se pierde con tanto estímulo visual… enmarcaría esa botonera con un fondo claro, o algún borde») */ /* por debajo del menú del sitio (z 49, ver más abajo): si no, el menú abierto queda tapado por el dock (bug real, 2026-09-29) */
 .dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:40px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
   background:var(--panel);border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;color:var(--paper);text-decoration:none;
   cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;

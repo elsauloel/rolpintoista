@@ -494,11 +494,11 @@ function trampaCuentaTexto(monto, r, ignoraDef){
   if(!partes.length) t += ignoraDef ? ' (ignora la Defensa)' : ` − Defensa ${n(r ? r.defensa : 0)}`;
   partes.forEach(p => { t += ` − ${p.txt} ${n(p.v)}`; });
   if(r && num(r.perfora) > 0) t += ` (pasa${num(r.perfora) > 1 ? 'n' : ''} ${n(r.perfora)} por la Perfora)`;
-  const hay = r && (num(r.arcano) || (r.capas || []).length);
+  const hay = r && (num(r.arcano) || (r.capas || []).some(c => !c.vida));
   if(hay) t += ` = ${n(r.llega)}`;
   if(r && num(r.arcano)) t += ` − Armadura arcana ${n(r.arcano)}`;
-  ((r && r.capas) || []).forEach(c => { t += ` − ${c.nombre}${c.vida ? ' (Vida extra)' : ' (escudo)'} ${n(c.v)}`; });
-  const final = r ? num(r.recibido) : num(monto);   // lo que entra a la vida (lo que se lleva la Vida extra ya está restado arriba)
+  ((r && r.capas) || []).filter(c => !c.vida).forEach(c => { t += ` − ${c.nombre} (escudo) ${n(c.v)}`; });
+  const final = r ? num(r.recibido) + num(r.vida) : num(monto);   // lo que entra a la vida — la Vida extra ES vida (dueño, 2026-11-18): no se resta
   return {texto: `${t} = ${n(final)} a la vida`, final};
 }
 // 🪤 ¿Este token pisó una trampa que todavía no terminó? (función pura: `lista` = [[id, momento]…], `ahora` en ms) → el momento o null.
@@ -843,12 +843,12 @@ async function trampaPasoDanoAplicar(id, dt, mano){
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
-      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${g.perfora ? ` (pasa${g.perfora > 1 ? 'n' : ''} ${fmt(g.perfora)} por la Perfora)` : ''}${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño`) + (num(g.absorbido) - num(g.vida) > 0 ? ` (el escudo absorbió ${fmt(num(g.absorbido) - num(g.vida))})` : '') + (num(g.vida) > 0 ? ` (la Vida extra se llevó ${fmt(g.vida)})` : '');
-    if(!g.invulnerable) texto += ` · ✔ ya se descontó de la vida${x && x.tipo !== 'creep' && Number.isFinite(Number(res.previo)) && Number.isFinite(Number(res.nuevo)) ? ` (${fmt(num(res.previo))} → ${fmt(num(res.nuevo))})` : ''}`;
+      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${g.perfora ? ` (pasa${g.perfora > 1 ? 'n' : ''} ${fmt(g.perfora)} por la Perfora)` : ''}${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño`) + (num(g.absorbido) - num(g.vida) > 0 ? ` (el escudo absorbió ${fmt(num(g.absorbido) - num(g.vida))})` : '');
+    if(!g.invulnerable) texto += ` · ✔ ya se descontó de la vida${x && x.tipo !== 'creep' && Number.isFinite(Number(res.previo)) && Number.isFinite(Number(res.nuevo)) ? ` (vida ${Combatiente.vidaCambioTxt(res.previo, res.nuevo, res.r)})` : ''}`;
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
-  const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
-  // ¿Lo lastimó? (P227, 2026-10-27): la vida, más lo que se llevó su Vida extra (es vida); lo que se comió un escudo no cuenta.
-  const lastimo = entro + (res ? num(res.r.vida) : 0);
+  const entro = monto <= 0 ? 0 : res ? Combatiente.danoAVida(res.r) : monto;   // lo que llegó a la vida, con la Vida extra (es vida; sin poder aplicarlo, se da por hecho)
+  // ¿Lo lastimó? (P227, 2026-10-27): la vida y la Vida extra; lo que se comió un escudo no cuenta.
+  const lastimo = entro;
   const sinHerida = dt.requiereDano && lastimo <= 0;
   if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(dt.tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), dt.nombreT ? `🪤 ${dt.nombreT}` : 'La trampa').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03, 2026-11-01)
   if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';

@@ -17,7 +17,8 @@
 //      saltos: [{id, desde, dano, entro, antes, despues, estados: [txt…]}], extra: [txt…], resultado (texto de la Crónica, opcional), mesa: true}
 const RAYO_FX_SALTO_MS = 450, RAYO_FX_LLEGA_MS = 350, RAYO_FX_NUM_MS = 2600;
 function rayoFxNombre(id){ const t = tokens.get(id); return !t ? '¿?' : t.oculto ? 'Alguien' : nombreDe(t); }
-function rayoFxVida(x){ return x && x.antes !== undefined && x.antes !== null && x.despues !== undefined && x.despues !== null ? ` (${fmt(x.antes)} → ${fmt(x.despues)} de vida)` : ''; }
+function rayoFxVida(x){ if(x && x.vidaTxt) return ` (vida ${x.vidaTxt})`;   // ❤ con la Vida extra: «104/35 → 100/35» (2026-11-18)
+  return x && x.antes !== undefined && x.antes !== null && x.despues !== undefined && x.despues !== null ? ` (${fmt(x.antes)} → ${fmt(x.despues)} de vida)` : ''; }
 function rayoFxArmar(g){
   const flotan = [], pasos = [], mesa = [], estadosMesa = [];
   const icono = g.icono || '⚡';

@@ -12,13 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — ❤ La Vida extra se muestra como vida** (dueño, 2026-11-18, con captura del salto a Bizzante: «0 de daño le va a entrar a la vida»
+- **✅ hecho (2026-11-18) — ❤ La Vida extra se muestra como vida** (dueño, 2026-11-18, con captura del salto a Bizzante: «0 de daño le va a entrar a la vida»
   con «− Vida extra 4»: «está comunicado raro. La vida extra es como si tuvieras un valor de vida por encima de tu máximo… tiene que decir que entró
   4 de daño, tu vida pasó de X a Y, y el resultado final Y/(tu máximo real); como quedó hoy Bizzante debería mostrar 100/35»).
   La vida que se muestra = vida + Vida extra, sobre el máximo real (35 + 65 = **100/35**). En la cuenta del daño: «4 de daño entra a la vida ·
   104/35 → 100/35» (sin el renglón «− Vida extra … se la lleva a ella»), y el número grande dice 4, no 0. Lo mismo en todo lo que muestra la vida
   después de un golpe: el cuadro del duelo, las trampas y zonas, la Mesa, el aviso del salto del rayo, el círculo de vida del token, la ficha lite,
   la Botonera y la ficha (revisar dónde se ve la vida). Lo demás no cambia (la Vida extra se gasta primero, como hoy). Probar en «Claude · pruebas 2».
+  *Resultado:* `Combatiente.vidaConExtra / vidaCambioTxt / danoAVida` (comun/combatiente.js) y `resolverGolpe` (js/10) devuelve la Vida extra de antes
+  y después (+ el máximo). El cuadro del duelo (vista previa y resultado), la Mesa, la cuenta (sin el renglón «− Vida extra»), las trampas (js/19), el
+  salto del rayo (js/10, js/110) y el toast del golpe muestran «N de daño · vida 104/35 → 100/35». El círculo del token ya sumaba la Vida extra
+  (2026-11-09). Probado en «Claude · pruebas 2»: personaje de J1 con Vida extra 10 (vida 15/5 → 11/5, «4 de daño») y Rata C con 65 (95/30 → 93/30).
+  Sin tocar: la ficha (sus números de vida y el ❤+N aparte).
 
 - **✅ hecho (2026-11-18) — ⚡ La cadena de rayos: no cortarse en un invulnerable, y la secuencia de a uno** (dueño, 2026-11-18, probando Cadena de rayos del
   Mago del rayo nv5 sobre Rockardo en «Prueba · Tormenta y Meteoro»: «debería haber saltado a Bizzante y a Larry»).

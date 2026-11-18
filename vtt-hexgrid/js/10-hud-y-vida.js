@@ -159,9 +159,13 @@ function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 // con eso, uno `soloFisico` (el Escudo del sereno) tampoco.
 function resolverGolpe(golpe, defensa, efectos, o){
   const activos = (efectos || []).filter(e => e && e.activo !== false);
-  if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
+  // ❤ La Vida extra de antes y de después (2026-11-18, dueño: se muestra como vida: «104/35 → 100/35»; Combatiente.vidaCambioTxt).
+  const vExtra = activos.filter(e => e.excedenteVida || e.excedente);
+  const extraDe = () => vExtra.reduce((t, e) => t + Math.max(0, num(e.escudoMagicoActual ?? e.escudoMagico ?? e.escudo)), 0);
+  const extraAntes = extraDe(), conExtra = r0 => vExtra.length ? {...r0, extraAntes, extraDespues: extraDe()} : r0;
+  if(activos.some(e => e.invulnerable)) return conExtra({recibido: 0, invulnerable: true, defensa, absorbido: 0});
   // ✍ `o.directoVida` (2026-11-06, el «Otro valor» del duelo): el número ya es lo que entra a la vida — sin Defensa, Armadura arcana ni escudos.
-  if(o && o.directoVida){ const v = Math.max(0, golpe); return {recibido: v, absorbido: 0, defensa: 0, llega: v}; }
+  if(o && o.directoVida){ const v = Math.max(0, golpe); return conExtra({recibido: v, absorbido: 0, defensa: 0, llega: v}); }
   let recibido = Math.max(0, golpe - defensa);
   // 🗡 Perfora N (`o.perfora`, 2026-10-27: las trampas que perforan, la Aguja): N puntos pasan siempre la Defensa (Combatiente.perforaPasa).
   const perfora = o && num(o.perfora) > 0 ? Combatiente.perforaPasa(golpe, defensa, Math.min(num(o.perfora), golpe)) : 0;
@@ -184,8 +188,8 @@ function resolverGolpe(golpe, defensa, efectos, o){
   });
   // 🛡 El escudo que llegó a 0 se va de la lista ahí mismo (dueño, 2026-11-09; Combatiente.quitarEscudosGastados).
   const escudosFuera = Array.isArray(efectos) ? Combatiente.quitarEscudosGastados(efectos) : [];
-  return {recibido, absorbido, defensa, llega, ...(escudosFuera.length ? {escudosFuera} : {}), ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
-    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})};
+  return conExtra({recibido, absorbido, defensa, llega, ...(escudosFuera.length ? {escudosFuera} : {}), ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
+    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})});
 }
 
 function leerGolpe(texto){
@@ -199,12 +203,12 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (${r.mitiMitiTxt || 'Miti-Miti'})`);
   if(num(r.perfora) > 0) extra.push(`pasa${num(r.perfora) > 1 ? 'n' : ''} ${fmt(r.perfora)} por la Perfora`);
   if(num(r.absorbido) - num(r.arcano) - num(r.vida) > 0) extra.push(`el escudo absorbió ${fmt(num(r.absorbido) - num(r.arcano) - num(r.vida))}`);   // 🛡 (P227: el escudo y la Vida extra, aparte)
-  if(num(r.vida) > 0) extra.push(`la Vida extra se llevó ${fmt(r.vida)}`);
+
   if(Array.isArray(r.escudosFuera) && r.escudosFuera.length) extra.push(`se gastó ${r.escudosFuera.join(', ')}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
-  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(num(r.recibido) + num(r.vida))} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;   // la Vida extra cuenta como daño (P227)
+  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(Combatiente.danoAVida(r))} de daño (vida ${Combatiente.vidaCambioTxt(previo, nuevo, r)})${suf}`;   // la Vida extra cuenta como vida (P227; dueño, 2026-11-18: «104/35 → 100/35»)
 }
 
 // ignoraDef: daño directo (un crítico, una trampa que ignora la Defensa, casteo…):
@@ -299,6 +303,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro, estoico});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
+    r.max = num(sc.hpMax);   // ❤ para mostrar la vida «X/máx» (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     // 🛡 Interpuesto (2026-10-27): el +2 a la Defensa era para este golpe; se va con él.
     if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !(e && e.unGolpe));
@@ -470,6 +475,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro, estoico});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
+    r.max = num(rs.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
     if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true, sim: {efectos, hp: Math.max(0, previo - r.recibido)}};   // 🧮 la vista previa: sin escribir (2026-11-04)
@@ -579,6 +585,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro, estoico});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
+    r.max = num(inv.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
     if(o && o.simular){ inv.hp = Math.max(0, previo - r.recibido); return {r, previo, nuevo: inv.hp, simulado: true, sim: inv}; }   // 🧮 la vista previa: sin escribir (2026-11-04)
@@ -772,7 +779,7 @@ async function rayoCadenaAplicar(cadena, o){
     if(dano0 < 1) break;
     const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-    let ok = false, entro = dano, resTxt = '', antes = null, despues = null, nota = '';
+    let ok = false, entro = dano, resTxt = '', antes = null, despues = null, nota = '', vidaTxt = '';
     try{
       const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
       const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
@@ -781,15 +788,15 @@ async function rayoCadenaAplicar(cadena, o){
         const vxAntes = rayoVidaExtraDe(s.t);
         if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
         const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
-        entro = r && r.r ? num(r.r.recibido) : Math.max(0, dano - res);
+        entro = r && r.r ? Combatiente.danoAVida(r.r) : Math.max(0, dano - res);   // ❤ la Vida extra es vida (2026-11-18)
         // (2026-11-18, el caso de Bizzante: «−0 (salto)» sin decir por qué): lo que se lo comió, a la vista.
         if(r && r.r){ const vx = num(r.r.vida), esc = Math.max(0, num(r.r.absorbido) - num(r.r.arcano) - vx), arc = num(r.r.arcano);
-          nota = r.r.invulnerable ? 'Invulnerable: no le hizo nada' : [vx ? `se lo comió la Vida extra${vxAntes !== null ? ` ${fmt(vxAntes)} → ${fmt(Math.max(0, vxAntes - vx))}` : ` (${fmt(vx)})`}` : '', esc ? `lo frenó el escudo (${fmt(esc)})` : '', arc ? `la Armadura arcana se comió ${fmt(arc)}` : ''].filter(Boolean).join(', '); }
-        if(r && r.previo !== undefined){ antes = num(r.previo); despues = num(r.nuevo); }   // la vida antes y después (el reporte del rayo, js/110)
+          nota = r.r.invulnerable ? 'Invulnerable: no le hizo nada' : [esc ? `lo frenó el escudo (${fmt(esc)})` : '', arc ? `la Armadura arcana se comió ${fmt(arc)}` : ''].filter(Boolean).join(', '); }
+        if(r && r.previo !== undefined){ antes = num(r.previo) + num(r.r && r.r.extraAntes); despues = num(r.nuevo) + num(r.r && r.r.extraDespues); vidaTxt = Combatiente.vidaCambioTxt(r.previo, r.nuevo, r.r); }   // la vida antes y después (el reporte del rayo, js/110)
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
-    hubo.push({id: s.id, t: s.t, dano, entro, antes, despues, ...(nota ? {nota} : {})});
+    hubo.push({id: s.id, t: s.t, dano, entro, antes, despues, ...(vidaTxt ? {vidaTxt} : {}), ...(nota ? {nota} : {})});
     (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}${nota ? ` (${nota})` : ''}`);
     prev = dano;   // ⚡ (2026-11-18, dueño: «debería haber saltado a Bizzante y a Larry»): el salto que sigue es la mitad de lo que LLEGABA, no de lo que entró (un invulnerable o una resistencia no cortan la cadena)
   }

@@ -552,6 +552,21 @@ const Combatiente = (() => {
   // ⚡ ¿El salto del rayo puede ir a este token? (2026-11-18, dueño: «el rayo no salta al propio caster ni siquiera salta a aliados, solo salta a
   // rivales»). tipos: 'creep' | 'pj' (las invocaciones cuentan como 'pj'). Con quien lo lanzó conocido: nunca a él y solo a los del bando contrario
   // al suyo. Sin lanzador (un rayo sin dueño), la regla vieja: al mismo bando que el primer golpeado. El agua (un charco) va aparte, en el mapa.
+  /* ❤ La Vida extra se muestra como vida (dueño, 2026-11-18: «la vida extra es como si tuvieras un valor de vida por encima de tu máximo… tiene que decir
+     que entró 4 de daño, tu vida pasó de X a Y, y el resultado final Y/(tu máximo real); como quedó hoy Bizzante debería mostrar 100/35»).
+     vidaConExtra(35, 65, 35) → «100/35»; sin máximo, solo el número. La regla no cambia: la Vida extra se gasta primero (resolverGolpe). */
+  function vidaConExtra(hp, extra, max){
+    const n = v => String(Math.round(Number(v) || 0));
+    const total = Math.max(0, (Number(hp) || 0) + Math.max(0, Number(extra) || 0));
+    return Number(max) > 0 ? `${n(total)}/${n(max)}` : n(total);
+  }
+  // «104/35 → 100/35», con lo que devuelve resolverGolpe (`r.extraAntes`, `r.extraDespues`, `r.max`) y la vida de antes y después.
+  function vidaCambioTxt(previo, nuevo, r){
+    const x = r || {};
+    return `${vidaConExtra(previo, x.extraAntes, x.max)} → ${vidaConExtra(nuevo, x.extraDespues, x.max)}`;
+  }
+  // Lo que entró a la vida, contando la Vida extra (lo que se lleva un escudo no cuenta, P227).
+  const danoAVida = r => Math.max(0, (Number(r && r.recibido) || 0) + (Number(r && r.vida) || 0));
   function rayoSaltaA(o){
     o = o || {};
     const bando = t => t === 'creep' ? 'creep' : 'pj';
@@ -3190,5 +3205,5 @@ const Combatiente = (() => {
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
     porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto, devuelveElGolpe, esGiro, GIROS,
-    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta, rayoSaltaA};
+    VAQUITA_NOMBRE, esVaquita, vaquitaEspanta, rayoSaltaA, vidaConExtra, vidaCambioTxt, danoAVida};
 })();

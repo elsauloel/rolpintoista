@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261118rayo"></script>
+<script src="combatiente.js?v=20261118vx"></script>
 <script src="creep-calculo.js?v=20261110lluvia"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261112firme"></script>
+<script src="duelo.js?v=20261118vx"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -8023,6 +8023,16 @@ prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/j
   igual([c0.texto, c0.final, c4.texto, c4.final, cd.texto, ce.texto, ce.final, ci.final],
     ['9 de daño − Defensa 0 = 9 a la vida', 9, '9 de daño − Defensa 4 = 5 a la vida', 5, '9 de daño (ignora la Defensa) = 9 a la vida',
      '9 de daño − Defensa 2 = 7 − Escudo especial (escudo) 5 = 2 a la vida', 2, 0]);
+});
+prueba('❤ La Vida extra se muestra como vida: «104/35 → 100/35» (2026-11-18, Combatiente.vidaConExtra / vidaCambioTxt / danoAVida)', async () => {
+  const C = Combatiente;
+  const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();
+  const trozo = src.slice(src.indexOf('/* PURAS-INICIO'), src.indexOf('/* PURAS-FIN */'));
+  const f = new Function('num', trozo + '\nreturn {trampaCuentaTexto};')(v => Number(v) || 0);
+  const cv = f.trampaCuentaTexto(4, {recibido: 0, vida: 4, defensa: 0, llega: 4, absorbido: 4, defPartes: [], capas: [{nombre: 'Vida extra', v: 4, vida: true}]}, true);
+  igual([C.vidaConExtra(35, 65, 35), C.vidaConExtra(20, 0, 20), C.vidaConExtra(7, 3), C.vidaCambioTxt(35, 35, {extraAntes: 69, extraDespues: 65, max: 35}),
+    C.vidaCambioTxt(10, 6, {max: 20}), C.danoAVida({recibido: 0, vida: 4}), C.danoAVida({recibido: 3}), cv.texto, cv.final],
+    ['100/35', '20/20', '10', '104/35 → 100/35', '10/20 → 6/20', 4, 3, '4 de daño (ignora la Defensa) = 4 a la vida', 4]);
 });
 prueba('⚡ El salto del rayo, solo a rivales de quien lo lanzó (2026-11-18, Combatiente.rayoSaltaA)', () => {
   const R = Combatiente.rayoSaltaA;

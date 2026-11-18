@@ -83,6 +83,8 @@ const Duelo = (() => {
   let disparoPrimera = true;
   const contactoAvisado = new Set();   // 🔄 contactoGanado (2026-11-07)
   let contactoPrimera = true;
+  const intercambioAvisado = new Set();   // 🔀 intercambioListo (Intercambio arcano, 2026-11-18)
+  let intercambioPrimera = true;
   const pdgEspAvisado = new Set();   // 🔮 el Orbe del custodio (2026-10-18)
   let pdgEspPrimera = true;
   const resistidaAvisada = new Set();   // 🔮 el Contrahechizo (2026-10-18)
@@ -983,6 +985,7 @@ const Duelo = (() => {
       ...(objetivo === 'onda' && h.giro ? {giro: true} : {}),   // 🌀 el Barrido: un giro con el arma, sí devuelve Espinas (dueño, 2026-11-08)   // la luz: solo a los que ve (los sólidos la tapan)
       ...((objetivo === 'aliado' || objetivo === 'cualquiera') && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11; «cualquiera»: el Escudo elemental, 2026-11-09)
       ...(objetivo === 'cualquiera' && h.aliadoDirecto ? {aliadoDirecto: true} : {}),   // 🐈‍⬛ a un aliado le entra directo; un rival se resiste (Echar la mufa, 2026-11-05)
+      ...(h.intercambia && ['enemigo', 'aliado', 'cualquiera'].includes(objetivo) ? {intercambia: true} : {}),   // 🔀 Intercambio arcano (2026-11-18): si entra, el mapa del GM los cambia de lugar
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
         ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
         ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),
@@ -4188,6 +4191,14 @@ const Duelo = (() => {
           if(!contactoPrimera) try{ cfgEscuchar.contactoGanado(d); }catch(err){ console.error('Duelo: contactoGanado', err); }
         });
         contactoPrimera = false;
+      }
+      if(cfgEscuchar.intercambioListo && soyGM()){   // 🔀 una habilidad que cambia de lugar (Intercambio arcano, 2026-11-18): entró (a un aliado, sin tirada; a un rival, ganó la contienda) → la pantalla del GM los cambia
+        listaDuelos.forEach(d => {
+          if(!d.hab || !d.hab.intercambia || d.resultado !== 'pego' || d.estado === 'cancelado' || intercambioAvisado.has(d.id)) return;
+          intercambioAvisado.add(d.id);
+          if(!intercambioPrimera) try{ cfgEscuchar.intercambioListo(d); }catch(err){ console.error('Duelo: intercambioListo', err); }
+        });
+        intercambioPrimera = false;
       }
       if(cfgEscuchar.remachadoraErro && soyGM()){   // 🎯 la Remachadora (2026-10-11): errar o que la bloqueen vuelve la cuenta a 0
         listaDuelos.forEach(d => {

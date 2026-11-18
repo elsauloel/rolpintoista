@@ -127,17 +127,20 @@ function pasoElegirCasilla(tid, modo, quien){
 // ---------- 🔄 Cambiar de lugar ----------
 const cambioHecho = new Set();
 async function cambiarLugarResuelto(d){
-  if(!d || !d.ataque || !d.ataque.cambiaLugar || cambioHecho.has(d.id)) return;
+  const hab = d && d.hab && d.hab.intercambia;   // 🔀 Intercambio arcano (2026-11-18): una habilidad que entró (a un aliado, sin tirada; a un rival, ganó la contienda)
+  if(!d || (!hab && !(d.ataque && d.ataque.cambiaLugar)) || cambioHecho.has(d.id)) return;
   // Apenas gana el contacto (contactoGanado, antes del daño: el duelo se aparta, se cruzan y el duelo vuelve para el daño) o, si eso no llegó, al terminar.
-  if(!(d.contacto && d.contacto.gana === 'atacante' && d.estado !== 'resuelto') && d.resultado !== 'pego' && d.resultado !== 'mitad') return;
+  if(hab ? d.resultado !== 'pego' : !(d.contacto && d.contacto.gana === 'atacante' && d.estado !== 'resuelto') && d.resultado !== 'pego' && d.resultado !== 'mitad') return;
   if(!soyGM){ return; }   // mueve el token del rival: lo hace la pantalla del GM
   cambioHecho.add(d.id);
   const ida = d.atacante && d.atacante.tokenId, idd = d.defensor && d.defensor.tokenId;
   const ta = ida && tokens.get(ida), td = idd && tokens.get(idd);
-  const hab = d.ataque.habNombre || 'Cambiar de lugar';
-  if(!ta || !td){ toast(`${hab}: uno de los dos ya no está en el mapa, cambialos a mano`); return; }
-  const na = nombreDe(ta), nd = nombreDe(td), titulo = `${hab}: ${na} y ${nd}`;
-  const im = typeof chanceDe === 'function' ? chanceDe(td, 'inamovible') : 0;
+  const nomHab = hab ? (d.hab.nombre || 'Intercambio arcano') : (d.ataque.habNombre || 'Cambiar de lugar');
+  if(!ta || !td){ toast(`${nomHab}: uno de los dos ya no está en el mapa, cambialos a mano`); return; }
+  const na = nombreDe(ta), nd = nombreDe(td), titulo = `${nomHab}: ${na} y ${nd}`;
+  // Un Inamovible tira su chance; un aliado del Intercambio arcano acepta el cambio (no la tira: Claude, 2026-11-18, docs/preguntas-abiertas.md).
+  const aliado = hab && typeof dueloEsRival === 'function' && !dueloEsRival({tipo: ta.tipo === 'creep' ? 'creep' : 'pj'}, td);
+  const im = !aliado && typeof chanceDe === 'function' ? chanceDe(td, 'inamovible') : 0;
   if(im && await inamovibleSale(td, im, titulo)){   // el cartel con el d6 (js/21)
     const txt = `${nd} es Inamovible (${im} %): no se mueve nadie.`;
     mesaLinea(`🔄 ${titulo} — ${txt}`, 'recordatorio');

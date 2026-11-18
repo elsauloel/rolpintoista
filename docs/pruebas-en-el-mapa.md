@@ -2793,3 +2793,13 @@ se llama «Blanco J1», Constitución 10, 50/50 de vida y sin estados). Duelos c
   comparada (las dos pasivas sí están en los números de la prueba automática).
 - Para saber: el mapa y los seis creeps quedaron en «Claude · pruebas 2», curados y en su lugar; las trampas, borradas.
 
+## 2026-11-18 · 🔀 Intercambio arcano y ✨ Andanada arcana recosteada (Arcano nv4–5, «Claude · pruebas 2», GM + Jugador 1)
+Mapa «Prueba · R4 M4», con el Arcano 4 y el Arcano 5 sumados (creeps y tokens).
+- ✔ **Intercambio arcano a un aliado** (Arcano 5 → Blanco creep): sin tirada, se cruzaron con la animación de Cambiar de lugar; la Mesa y la Crónica
+  «cambian de lugar (sin ataques de oportunidad)».
+- ✔ **Intercambio arcano a un rival** (Arcano 5 → Blanco J1): PdG.Esp 8 contra la Res.Esp 5 de J1 (la tiró J1 con su botón) → «¡Funcionó!» y cambiaron.
+  Con la Res.Esp en 30 (✍ Elegir manualmente) → «lo resistió» y nadie se movió.
+- ✔ **Andanada arcana** (Arcano 4): 9 SP fijos (45 → 36), tres misiles de 1d6 + 4 (cada uno con su PdG.Esp contra la Evasión); dos a Blanco J1 (repite)
+  y uno al Blanco creep (reparte).
+- ⬜ en cola: un aliado Inamovible con el Intercambio arcano (decisión pendiente, P243).
+

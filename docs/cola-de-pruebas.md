@@ -31,14 +31,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   - [x] Portal trampa (Arcano 3): Jugador 1 no lo veía; al pisarlo, Res.Esp 8 contra 16 (su Ef.Esp) → «Atravesar el portal», llegó a la casilla
     marcada (4 más allá) y Expuesto 1 turno.
 
-- **⬜ en cola — 🔀 Intercambio arcano (programar) y cargar el Arcano niveles 4 y 5** (dueño, 2026-11-18: «me gusta esta. habría que programarla»):
-  habilidad de creep nueva (Mago, auditada): elige un token en su Rango y cambian de lugar; a un aliado sin tirada, a un rival PdG.Esp contra Res.Esp
-  (si gana el rival, no pasa nada); nadie da ni recibe ataques de oportunidad por el cambio; 5 SP fijos y 2 No2 (o su cooldown). Aprovechar el cambio
-  de lugar que ya existe («Cambiar de lugar»). Después cargar M4 nv4 y nv5 como están en `creeps-humanoides.md` y probarlos en «Claude · pruebas 2»
-  (junto con la Andanada recosteada, la tarea de abajo).
-- **⬜ en cola — ✨ Andanada arcana recosteada** (dueño, 2026-11-18: «pasa eso a la cola»): ya cambiada en `comun/skills-creep-base.js` (9 SP
-  fijos, 3 misiles de 1d6 + 4 fijo, ya no suma el Ef.Esp; pruebas en verde). Falta verla en el mapa: que cobre 9 SP (no su Especial), que cada misil
-  tire 1d6 + 4 y que se pueda repartir o repetir blanco. Con un creep que la tenga (el M4 nivel 4 cuando se cargue, o un Mago en «Claude · pruebas 2»).
+- **✅ hecho (2026-11-18) — 🔀 Intercambio arcano programado y el Arcano niveles 4 y 5 cargados** (dueño, 2026-11-18: «me gusta esta. habría que
+  programarla»). *Resultado:* la habilidad está en `comun/skills-creep-base.js` (Mago, auditada): a cualquiera en su Rango; a un aliado le entra directo
+  (como la Mala sombra), a un rival su PdG.Esp contra la Res.Esp; si entra, el mapa del GM los cambia de lugar con el mismo mecanismo y la misma
+  animación que «Cambiar de lugar» (sin ataques de oportunidad). 5 SP fijos y 2 No2, o cooldown 3. M4 nv4 y nv5 cargados como en `creeps-humanoides.md`
+  (los números del diseño, en la prueba automática). Probado en «Claude · pruebas 2» (GM + Jugador 1): a un aliado (el Blanco creep) cambiaron de lugar
+  sin tirada; a Blanco J1, 8 contra 5 → cambiaron; con la Res.Esp de J1 en 30 (✍ Elegir manualmente) → «lo resistió» y no se movió nadie. 872 pruebas
+  en verde. **Duda anotada** (P243): un aliado Inamovible no tira su chance (sí un rival, como en Cambiar de lugar).
+- **✅ hecho (2026-11-18) — ✨ Andanada arcana recosteada, vista en el mapa** (con el Arcano nv4, en «Claude · pruebas 2»): cobró 9 SP fijos (45 → 36),
+  cada misil tiró su PdG.Esp y 1d6 + 4 de daño (7, 7, …); el segundo misil repitió blanco (Blanco J1) y el tercero fue a otro (el Blanco creep), con el
+  «misil N de 3 — ¿a quién?» después de cada uno. Ojo (para mirar, no es error): el cartel «¿a quién?» sale mientras el cuadro del misil anterior
+  sigue abierto unos segundos y queda medio tapado.
 - **⬜ en cola — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
   probado»). Cada una se tacha acá (✔ con fecha y el resultado en una línea) y en `docs/pruebas-en-el-mapa.md` apenas queda probada:
   - [ ] 🌑 Mala sombra desde la Botonera de un Debuffer.

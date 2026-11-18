@@ -263,6 +263,12 @@
   esencial({...M4, nivel: 3, atrib: [9, 2, 7, 6, 15],   // (aprobado 2026-11-18: Portal trampa; la Cabeza reducida de jíbaro, Buena, en lugar de la Brújula)
     equipo: ['Varita del gancho', 'Cabeza reducida de jíbaro', 'Chaleco de cuero', 'Zapatillas de lona', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado'],
     habilidades: ['Parpadeo', 'Nova arcana', 'Lanza arcana', 'Portal trampa'], pasivas: ['Largo alcance arcano']});
+  esencial({...M4, nivel: 4, atrib: [10, 2, 7, 6, 17],   // (aprobado 2026-11-18: Andanada arcana recosteada, 9 SP fijos; Puntería arcana; la Túnica del archivista, Buena, en lugar del Chaleco de cuero)
+    equipo: ['Varita del gancho', 'Cabeza reducida de jíbaro', 'Túnica del archivista', 'Zapatillas de lona', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado'],
+    habilidades: ['Parpadeo', 'Nova arcana', 'Lanza arcana', 'Portal trampa', 'Andanada arcana'], pasivas: ['Largo alcance arcano', 'Puntería arcana']});
+  esencial({...M4, nivel: 5, atrib: [10, 2, 8, 7, 18],   // (aprobado 2026-11-18: Intercambio arcano, en lugar de la Tormenta arcana del M3; las Botas de mensajero, Buenas, en lugar de las Zapatillas de lona; M4 completa)
+    equipo: ['Varita del gancho', 'Cabeza reducida de jíbaro', 'Túnica del archivista', 'Botas de mensajero', 'Vincha de cuero de mula ánima', 'Polainas de cuero remendado'],
+    habilidades: ['Parpadeo', 'Nova arcana', 'Lanza arcana', 'Portal trampa', 'Andanada arcana', 'Intercambio arcano'], pasivas: ['Largo alcance arcano', 'Puntería arcana']});
   esencial({linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 7, 7, 7, 2],   // (2026-11-09, dueño: «bajale la fuerza»: Fue −1, Agi +1 → 7 No2, ataca y corre 3)
     equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma'],
     habilidades: ['Carga que derriba', 'Takle'], consumibles: ['Pergamino grupal de Paso Fantasma'],

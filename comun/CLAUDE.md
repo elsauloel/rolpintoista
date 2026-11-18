@@ -1983,3 +1983,7 @@ versión parecida en más de una, es candidato a juntar.
   `InvHabilidades.ponerEstado(inv, d, {deAfuera: true})` (lo recibido, `recibidos.js`). El editor, el «+ Estado» a mano y lo que se pone uno mismo
   (habilidades, consumibles, Guardia baja) no la gastan. Avisa con `window.avisoVaquita(info)` si la pantalla lo define (el mapa: Mesa + Crónica,
   js/25) o con una línea en la Mesa; el mapa la dibuja revoloteando (más sinuosa y pausada que la Polilla) y volándose cuando el estado se va (js/05).
+- **🔀 `intercambia` en una habilidad del duelo** (2026-11-18, el Intercambio arcano del M4 Arcano): `limpiarHab` lo conserva (`objetivo` enemigo, aliado
+  o cualquiera) y `Duelo.escuchar` avisa, solo en la pantalla del GM, `cfgEscuchar.intercambioListo(d)` cuando ese duelo queda `resultado: 'pego'` (un
+  aliado con `aliadoDirecto`, sin tirada; un rival que perdió la contienda). El mapa lo resuelve con `cambiarLugarResuelto` (vtt-hexgrid/js/107), el
+  mismo cambio y la misma animación que Cambiar de lugar; un aliado no tira Inamovible (P243).

@@ -1553,3 +1553,9 @@ clase con `cura`) y las que se hace él mismo (el Segundo aliento, la cura sobre
 Regeneración, Bálsamo, el Círculo de sanación y el Aura sanadora (cada pulso), ni a la Transfusión (no es una cura: pasa vida) ni a las pociones.
 **Pregunta para el dueño:** ¿las curas por turno también deberían llevar el +5 (en cada pulso, o solo en el primero)? Hoy, con +5 en cada pulso,
 un Aura sanadora de 4 pulsos daría +20 por aliado.
+
+### P243 — 🔀 Intercambio arcano: ¿un aliado Inamovible tira su chance? (2026-11-18, Claude)
+El Intercambio arcano (M4 Arcano nivel 5) reusa el cambio de lugar de «Cambiar de lugar», donde un rival **Inamovible** (las Botas de estibador,
+por ejemplo) tira su chance y, si le sale, no se mueve nadie. La skill aprobada no dice qué pasa con un aliado Inamovible. **Elegido lo más simple
+mientras tanto**: a un rival, el Inamovible tira su chance como en Cambiar de lugar; a un aliado, no (el aliado acepta el cambio, igual que le entra
+sin tirada). **Pregunta para el dueño:** ¿está bien así, o el Inamovible también frena el cambio con un aliado?

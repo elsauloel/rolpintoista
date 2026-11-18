@@ -12,10 +12,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🔧 Dos restos del daño de elemento separado** (2026-11-18, del ayudante, commit cd6ab2ff): (1) el botón del primer paso todavía
+- **✅ hecho (2026-11-18) — 🔧 Dos restos del daño de elemento separado** (2026-11-18, del ayudante, commit cd6ab2ff): (1) el botón del primer paso todavía
   dice «Tirar el daño · … + 🔥 +1d6 fuego» (lo arma la página del atacante): que diga solo el daño del arma, porque el elemento ya se tira aparte;
   (2) con un arma eléctrica (Arma eléctrica) el duelo no llegó al cierre en la prueba, probablemente por el salto al más cercano: revisar y probar
   con un segundo blanco cerca. Probar en «Claude · pruebas 2».
+  *Resultado:* (1) el botón del primer paso ya dice solo el daño del arma («🎲 Tirar el daño · Dientes de rata · 1d4 + 6»): se sacó el «+ ⚡1d6…»
+  de la vista previa en `comun/ficha-duelo.js` y `comun/creep-duelo.js`. (2) No era un error del arma eléctrica: la prueba anterior se cortaba porque
+  el script no tocaba «🎲 Tirar el efecto (1d10)» (la Parálisis 20 %) ni el «Entendido» del cartel del salto. Probado en «Claude · pruebas 2» con
+  tres ratas: PdG → Evasión → daño del arma → «⚡ Tirar el daño eléctrico · 1d6» → Aplicar → efecto → salto → resumen del duelo en la Mesa. Duda:
+  el salto del rayo le pegó también al propio atacante (Rata A −1/−2) por ser el más cercano: ¿el rayo puede saltar a quien lo lanzó?
 
 - **✅ hecho (2026-11-18) — 🔥❄⚡ El daño de elemento de un arma, en su propia tirada y con dados de su elemento** (dueño, 2026-11-18: «sí», a separar como el
   Meteoro). Hoy el daño elemental de un arma o una flecha (Arma elemental, flechas con fuego, varitas con daño físico + elemental, lo que use el

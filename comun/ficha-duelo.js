@@ -146,7 +146,7 @@ const FichaDuelo = (() => {
         if(campo === 'dano'){
           const a = arma || (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
           const ae = Combatiente.armaElementalDelGolpe(S.efectos, d.id, a ? {id: a.id, nombre: a.nombre} : null);   // 🔥 (2026-11-04): que se vea antes de tirar
-          return {formula: formulaDano(d, a) + (ae ? ` + ${ae.txt}` : ''), ...(a ? L('danio:' + a.id) : {titulo: 'Daño sin arma', html: ''})};
+          return {formula: formulaDano(d, a), ...(a ? L('danio:' + a.id) : {titulo: 'Daño sin arma', html: ''})};
         }
         return null;
       },

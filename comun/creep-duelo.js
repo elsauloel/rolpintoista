@@ -135,7 +135,7 @@ const CreepDuelo = (() => {
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc, d.defensa && d.defensa.itemNombre || '') + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
-        if(campo === 'dano'){ const ae = Combatiente.armaElementalDelGolpe(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)); return {formula: formulaDano(sc, d) + (ae ? ` + ${ae.txt}` : ''), ...L('danio|')}; }   // 🔥 (2026-11-04)
+        if(campo === 'dano'){ const ae = Combatiente.armaElementalDelGolpe(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)); return {formula: formulaDano(sc, d), ...L('danio|')}; }   // 🔥 (2026-11-04)
         return null;
       },
       // El daño de una habilidad dirigida (duelo.js, tirarDanoHab) se publica a nombre del creep (2026-10-05: en el mapa no había cómo y se quedaba callado).

@@ -325,8 +325,8 @@ async function ghSubir(ruta, contenidoB64, token, mensaje){
    ========================================================= */
 
 const OR_MODELS = [
-  {id:'nvidia/nemotron-3-super-120b-a12b:free', label:'Nemotron 3 Super (NVIDIA) — recomendado'},
-  {id:'openai/gpt-oss-20b:free', label:'GPT-OSS 20B (OpenAI)'},
+  // (2026-11-18: OpenRouter dejó de dar gratis el Nemotron 3 Super: «This model is unavailable for free» → se sacó de la lista)
+  {id:'openai/gpt-oss-20b:free', label:'GPT-OSS 20B (OpenAI) — recomendado'},
   {id:'nvidia/nemotron-nano-9b-v2:free', label:'Nemotron Nano (rápido y liviano)'},
 ];
 

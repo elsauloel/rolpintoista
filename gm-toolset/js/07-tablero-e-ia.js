@@ -687,7 +687,12 @@ async function escaneoPedirIA(){
     caja.textContent = texto ? String(texto).trim() : 'La IA no devolvió nada: probá de nuevo o con otro modelo.';
   }catch(err){
     console.error('No se pudo pedir la propuesta a la IA:', err);
-    caja.textContent = 'No se pudo hablar con la IA — mirá la consola.';
+    // (2026-11-18, dueño: «cuando dice "mirá la consola" no sé dónde mirar; quiero poner otro key»): el motivo a la vista y el botón para cambiar la clave.
+    const motivo = String((err && err.message) || err || '').replace(/Bearer\s+\S+/g, 'Bearer …').slice(0, 300);
+    caja.innerHTML = `No se pudo hablar con la IA.<br><small style="opacity:.8">${esc(motivo)}</small><br>Si la clave está mal, cambiala: ` +
+      '<button type="button" class="btn ghost" id="escaneo-cambiar-clave" style="margin-top:6px">🔑 Cambiar la clave de OpenRouter</button>';
+    const bc = caja.querySelector('#escaneo-cambiar-clave');
+    if(bc) bc.onclick = async () => { localStorage.removeItem('openrouter-key'); const k = await orKey(true); if(k) caja.textContent = 'Clave nueva guardada: tocá «🤖 Proponer creeps» de nuevo.'; };
   }finally{ btn.disabled = false; btn.textContent = '🤖 Proponer creeps'; }
 }
 if(document.getElementById('btn-escaneo')) document.getElementById('btn-escaneo').onclick = abrirEscaneo;

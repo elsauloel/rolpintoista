@@ -2884,8 +2884,8 @@ Sumados al mapa Protector 2, 3, 4 y 5 (creeps y tokens; el 3 pegado al Blanco cr
   en su propio cuadro del duelo, como siempre.
 - ✔ **⚡ El salto del rayo por el agua**: un charco bajo el Blanco creep y el Protector 3; la Varita de la flor de chispas al Protector 3: al GM, «A Blanco
   creep le entraron 3 de daño por el salto del rayo» y, al cerrarlo, el reporte del rayo (antes el reporte tapaba el aviso: ahora espera).
-- ⬜ **🔮 El Orbe salvaje con 1** (a quien atacó le entra lo mismo que al rival): no se probó, el d6 sale al azar. Usa el mismo aviso que el Espejito. Para
-  probarlo: un personaje con el Orbe salvaje pegando con una varita hasta que salga un 1.
+- ✔ **🔮 El Orbe salvaje con 1** (a quien atacó le entra lo mismo que al rival): probado el 2026-11-19 eligiendo el 1 a mano (ver «El d6 del Orbe
+  salvaje, a la vista», abajo).
 Capturas `cola8/`.
 
 ## 2026-11-19 · 📺 El blink marca las casillas («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
@@ -2923,3 +2923,14 @@ Los cuatro en el mapa como «Control mental 2…5» (quedan ahí, como los Prote
   llegó el cambio). Fue un doble clic del script; para una persona es raro, queda anotado.
 Capturas `cola9/3-*`. La partida quedó prolija (vida llena, sin estados, sin la varita de prueba, sin el tótem, mapa en narrativo, orden vacío).
 
+## 2026-11-19 · 🔮 El d6 del Orbe salvaje, a la vista («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+Con la Varita arcana y los orbes prestados (después devueltos), eligiendo el d6 a mano («✍ Elegir manualmente»; el dado rueda igual y cae ahí):
+- ✔ **Blanco J1 (Jugador 1 tira) con el Orbe salvaje común**: tirado el daño (6), en el paso Daño el recuadro «🔮 Orbe salvaje» y el botón
+  «🔮 Orbe salvaje · 🎲 Tirar 1d6» (al GM, «por Blanco J1»); 6 → la cuenta «🔮 Orbe salvaje ×2: 6 → 12», el creep 60 → 48. Con 1: 5 al creep y a Jugador 1
+  «Te entraron 5 de daño por el Orbe salvaje, que salió con 1 (directo a la vida)», 50 → 45.
+- ✔ **Blanco J1 con el domado**: 6 → «×3: 6 → 18»; 1 → el mismo aviso («…por el Orbe salvaje domado…»).
+- ✔ **Blanco creep (tira el GM)**: con el común, 1 → al GM «A Blanco creep le entró 1 de daño por el Orbe salvaje…» y 6 → «×2: 1 → 2»; con el domado, 6 → «×3: 5 → 15»
+  (Blanco J1 39 → 24) y 1 → su aviso al GM.
+- La Mesa: «🔮 Orbe salvaje (manual) 1d6 (manual) [6]» y «🔮 Orbe salvaje de Blanco J1 (1d6 → 6, a mano): ¡el daño especial sale doble!». El «Aplicar el
+  daño» no aparece hasta que el d6 está tirado.
+Capturas y videos en `cola10/`.

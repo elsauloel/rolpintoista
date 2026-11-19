@@ -82,12 +82,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   … se termina el silencio»; se le bajó la vida a 6 antes, para no pegarle cuatro veces); el Polen somnífero lo durmió y lo despertaron el sacudón de
   Blanco J1 b (1 No2) y, otra vez, la Punzada mental; el Espejo del Poncho le devolvió 1 a Blanco J1 de una varita de chispa. **Arreglado**: el tótem recién
   clavado le daba a Blanco J1 b «👂 Pasos a tu espalda» (un objeto no camina; duda chica en P247). 875 pruebas en verde.
-- **⬜ en cola — 🔮 El d6 del Orbe salvaje, a la vista y con «Elegir manualmente»** (dueño, 2026-11-19: «la solución sería que esta tirada no fuera
+- **✅ hecho (2026-11-19) — 🔮 El d6 del Orbe salvaje, a la vista y con «Elegir manualmente»** (dueño, 2026-11-19: «la solución sería que esta tirada no fuera
   automática»). Hoy el d6 se tira por atrás junto con el daño (`talSalvajeRodar`, vtt-hexgrid/js/53, desde el gancho `orbeSalvaje` de comun/duelo.js) y
   el «Elegir manualmente» del daño no lo toca. Que sea su propio paso en el cuadro del duelo, como las otras chances (`chanceDuelo` de js/78): después
   de tirar el daño, si quien atacó lleva el Orbe (común o domado), «🔮 Orbe salvaje · 🎲 Tirar 1d6» para quien maneja al atacante (el GM por un creep o
   por quien no está), con su «✍ Elegir manualmente», el dado rodando y el resultado (6: ×2, el domado ×3; 1: le entra también a quien atacó; 2–5:
   nada); recién ahí se aplica el daño. Probarlo en el mapa eligiendo a mano el 1 y el 6, con el común y con el domado (el aviso del 1 ya existe).
+  *Resultado:* al tirar el daño especial, en el paso Daño del mismo cuadro aparece el recuadro «🔮 Orbe salvaje» (qué hace cada número) y el botón
+  violeta «🔮 Orbe salvaje · 🎲 Tirar 1d6» para quien maneja al atacante (al GM, «por Blanco J1»; con un creep, solo el GM), con «✍ Elegir manualmente»
+  (un número del 1 al 6: el dado rueda igual y cae ahí). El d6 rueda en todas las pantallas, queda en la Mesa, y recién después sale la cuenta y
+  «💔 Aplicar el daño» («🔮 Orbe salvaje ×2: 6 → 12»). Mismo camino que el daño de elemento pendiente (`comun/duelo.js`, `tirarSalvaje`). Probado en
+  «Claude · pruebas 2» con GM y Jugador 1, a mano, con la Varita arcana: Blanco J1 con el común (6: 6 → 12; 1: 5 al creep y «Te entraron 5…» a Blanco
+  J1) y el domado (6: 6 → 18; 1: lo mismo), y el Blanco creep (tira el GM) con el común (1: «A Blanco creep le entró 1…»; 6: 1 → 2) y el domado (6: 5 → 15;
+  1). Orbes y varita devueltos. 875 pruebas en verde.
 - **✅ hecho (2026-11-19) — 🎲 El daño de las zonas sin tirada de quien la creó lo tira el dueño de quien la creó** (dueño, 2026-11-19, bloque 4 de
   `auditoria-tiradas.md`, #9: «prefiero que lo tire el propietario de quien creó la zona»). Hoy, en el cartel de las zonas sin tirada de quien la creó
   (las del GM, de trampas con número fijo, el hielo por pasos, la que solo se «Aplica»), si el que entra no resiste, el dado del daño sale solo. Que lo

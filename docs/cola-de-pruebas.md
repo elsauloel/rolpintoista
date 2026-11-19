@@ -45,19 +45,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cada misil tiró su PdG.Esp y 1d6 + 4 de daño (7, 7, …); el segundo misil repitió blanco (Blanco J1) y el tercero fue a otro (el Blanco creep), con el
   «misil N de 3 — ¿a quién?» después de cada uno. Ojo (para mirar, no es error): el cartel «¿a quién?» sale mientras el cuadro del misil anterior
   sigue abierto unos segundos y queda medio tapado.
-- **⬜ en cola — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
+- **✅ hecho (2026-11-19) — 🧪 Pruebas en el mapa que quedaron sin hacer** (dueño, 2026-11-18: «ponelo en la cola y una vez que lo pruebes, marcalo como
   probado»). Cada una se tacha acá (✔ con fecha y el resultado en una línea) y en `docs/pruebas-en-el-mapa.md` apenas queda probada:
-  - [ ] 🌑 Mala sombra desde la Botonera de un Debuffer.
+  - [x] ✔ 2026-11-19 🌑 Mala sombra desde la Botonera (Blanco J1 con la habilidad de clase): a un rival (Arcano 5) PdG.Esp 3 contra Res.Mt 8 → «lo resistió»; a un aliado (Blanco J1 b) entró directo, sin tirada → «Mala sombra (2)».
   - [x] ✔ 2026-11-18 🎯 Punto débil dejando la resistencia a crítico en negativo — Aguja siniestra (Maldito 1) a un creep sin resistencia y
     Ráfaga de cortes (Tipo 6): el cuadro muestra «Tipo 6 − Crítico frecuente 2 − 💢 Punto débil 1 = 3», el cuadradito violeta 💢 y una diferencia de 3 ya es crítico.
-  - [ ] 🫨 Arrastrar → Desequilibrado.
-  - [ ] 🌀 El Remolino con dos rivales.
-  - [ ] 🔥🐝 El Arma elemental en una invocación.
-  - [ ] 🦶 Inamovible con el cartel de chance nuevo (la pieza y el %).
-  - [ ] ⏱ Recuperarse rápido con el cartel de chance nuevo.
+  - [x] ✔ 2026-11-19 🫨 Arrastrar → Desequilibrado: el Peleador de control 5 enganchó a Blanco J1 b (un personaje), lo trajo 2 casilleros y quedó Desequilibrado (−2 Evasión); con su turno en el orden, el ▶ Siguiente del GM se lo sacó. Ojo: quién quedó Desequilibrado lo recuerda el navegador del GM; abriendo el mapa en otro navegador no se va solo (se probó: quedó puesto).
+  - [x] ✔ 2026-11-19 🌀 El Remolino con dos rivales (Blanco J1 entre el Arcano 4 y el Arcano 5): «¿te movés en el giro?» → su casilla → «elegí al primero» → un duelo por cada uno, de a uno (al Arcano 5, crítico ×2).
+  - [x] ✔ 2026-11-19 🔥🐝 El Arma elemental en una invocación: **había un error y se arregló**: a la invocación le llegaba «🔥 Arma ígnea» como un estado sin su golpe (las invocaciones no publican sus armas, el nombre lleva el ícono y no se encontraba el preset) y no sumaba nada. Ahora (`FichaAcciones.estadoDeSpec` busca por el nombre de base, como con los creeps): la Abeja de prueba pegó con el Cuchillo, «🔥 Tirar el daño de fuego · 1d6» y «+ 3 de fuego directo = 10 en total».
+  - [x] ✔ 2026-11-19 🦶 Inamovible con el cartel nuevo: Intercambio arcano del Arcano 5 a Blanco J1 (Botas de estibador): «Blanco J1 es Inamovible (Botas de estibador, 33 %): sale con 5 o 6 en 1d6» → salió 1 → los cambió.
+  - [x] ✔ 2026-11-19 ⏱ Recuperarse rápido: a Blanco J1 b (Tobilleras de vendaje) le llegó Inmovilizado 2 turnos → a Jugador 1 «🎲 Tirar 1d6» → «Recuperarse rápido (Tobilleras de vendaje, 50 %)» salió 4 → Inmovilizado 1 turno. (Sentado sin turnos no lo dispara, a propósito: solo lo que tiene turnos.)
   Probar en «Claude · pruebas 2» mientras el dueño use «Claude · pruebas».
-  (2026-11-18, Claude: las otras seis no llegué; Mala sombra pide un personaje con la habilidad de clase, el Remolino dos personajes rivales y el Arma
-  elemental una invocación, que «Claude · pruebas 2» no tiene todavía.)
+  (2026-11-19, Claude: en «Claude · pruebas 2» quedaron armados para eso: Blanco J1 con Mala sombra, Remolino, Arma elemental, las Botas de estibador
+  y la invocación «Abeja de prueba»; Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 en el mapa «Prueba · R4 M4».)
 
 - **✅ hecho (2026-11-18) — ❤ La Vida extra como vida también en la ficha, GM Tools y los Tableros** (dueño, 2026-11-18: «sí», a que la ficha también
   muestre 100/35). *Resultado:* `Combatiente.vidaExtraDe(estados)` (ficha, creep y resumen público). La ficha muestra en la caja de vida el total

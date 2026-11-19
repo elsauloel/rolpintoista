@@ -1138,7 +1138,10 @@ const FichaAcciones = (() => {
   // el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
   function estadoDeSpec(spec, presets){
     // 🔥 «🔥 Arma ígnea: Lanza corta» (2026-11-04): el preset por el nombre de base, y el estado conserva su nombre con el arma.
-    const preset = FichaHabilidades.presetPorNombre(presets, spec.nombre) || (spec.armaDe ? FichaHabilidades.presetPorNombre(presets, Combatiente.baseNombreEstado(spec.nombre)) : null);
+    // Sin arma elegida (una invocación, que no publica sus armas: «🔥 Arma ígnea» a secas) también se busca por el nombre de base, como EstadosAplicar con
+    // los creeps (2026-11-18: a la Abeja de prueba le llegaba un estado sin `golpe` y no sumaba el +1d6).
+    const conIcono = spec.armaDe || (spec.nombre && /: |^[^A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(String(spec.nombre)));
+    const preset = FichaHabilidades.presetPorNombre(presets, spec.nombre) || (conIcono ? FichaHabilidades.presetPorNombre(presets, Combatiente.baseNombreEstado(spec.nombre)) : null);
     let draft;
     if(preset){
       const {nombre, ...resto} = preset;
@@ -1166,7 +1169,8 @@ const FichaAcciones = (() => {
     if(spec.chupaDe){ draft.chupaDe = spec.chupaDe; draft.chupaUid = spec.chupaUid || ''; draft.chupaNombre = spec.chupaNombre || ''; }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
-    if(spec.armaDe){ draft.armaDe = {...spec.armaDe}; draft.nombre = spec.nombre; }   // 🔥 el Arma elemental de un arma (2026-11-04)
+    if(spec.armaDe){ draft.armaDe = {...spec.armaDe}; draft.nombre = spec.nombre; }
+    else if(preset && preset.armaElemental && spec.nombre && spec.nombre !== preset.nombre) draft.nombre = String(spec.nombre).slice(0, 40);   // «🔥 Arma ígnea» (sin arma)   // 🔥 el Arma elemental de un arma (2026-11-04)
     return draft;
   }
   // `o.propio` (2026-11-10): un efecto de tu propia Ejecución sobre vos no gasta la 🐞 Vaquita de San Antonio (lo que te pone otro, sí).

@@ -325,7 +325,7 @@
   **Grasa de carpincho** y **Ungüento del herrero** desde la Botonera: el estado y la resistencia suben, y el Ungüento repara 1 de Armadura rota del
   peto (×2 → ×1, durabilidad 5 → 6); ahora también lo dice la Mesa. Un **creep** (picapiedras) usando el Ungüento desde ⚡ Acciones → cinturón:
   Armadura rota 2 → 1, −1 No2.
-- [ ] **🌀 Remolino con dos rivales (2026-11-05, segunda tanda)**: se vio la espadita y la flor violeta, pero el área terminaba sin duelos: las áreas
+- [x] (probado 2026-11-19: ver «Las pruebas que habían quedado sin hacer», al final) **🌀 Remolino con dos rivales (2026-11-05, segunda tanda)**: se vio la espadita y la flor violeta, pero el área terminaba sin duelos: las áreas
   son de toda la partida y una pestaña del GM en **otro mapa** salteaba a los objetivos que no veía. Arreglado (c625f261: el área guarda su mapa en
   `centro.mapa` y solo la lleva el GM de ese mapa; sin huecos en `duelos`). **Falta volver a probarlo** con dos rivales al lado: pulso → cuadro que se
   despliega → se pliega → pulso → siguiente rival. Hay que recargar las pestañas del mapa.
@@ -418,7 +418,7 @@
   la vida, Titilando, y el 😇 queda gris (Aviso, Crónica y Mesa). Sin pacto (ni Fénix ni Ankh en el cinturón) → queda inconsciente (pantalla roja,
   5 turnos, ✚ Revivir). Lo mismo con «Recibe daño» sin pacto (antes tampoco quedaba inconsciente). Lo hace la pantalla del dueño (o la del GM con 🎮 el
   control): probar con el dueño conectado y con el dueño desconectado (tiene que pasar recién cuando entra).
-- [ ] **🔥🐝 Arma elemental en una invocación (2026-11-04, dueño: «al aplicarle Bizzante el arma elemental a sus abejas, no se cargaba sola»)**: en la
+- [x] (probado 2026-11-19: ver «Las pruebas que habían quedado sin hacer», al final) **🔥🐝 Arma elemental en una invocación (2026-11-04, dueño: «al aplicarle Bizzante el arma elemental a sus abejas, no se cargaba sola»)**: en la
   partida, la de las 03:00 (ácido, a Bizzante mismo, con la versión vieja que abría un duelo) quedó «a mano»; la de las 03:56 a la Abeja Diestra sí
   llegó sola, pero la abeja no volvió a pegar con ella. Probar: Arma elemental a una invocación → el estado aparece en la invocación → la invocación
   ataca y pega → «+1d6» en el daño y en «🧮 La cuenta del daño».
@@ -1670,7 +1670,7 @@ de la sesión (`prueba-*.png`).
   contra su Constitución 11: lo trae y le pega», «lo trae 2 casilleros» y se abre el duelo «sin arma · Tipo 4 · +2 PdG». «Cancelar duelo → No
   cuenta» devuelve 4 No2 y 2 SP. Restaurado (ficha y posición). Falta: el golpe entero (pagar y tirar), con trampas en el camino, y un creep que
   arrastra con la PdG nueva.
-- [ ] **🫨 Arrastrar → Desequilibrado (2026-11-05, dueño: «le da −2 a la Evasión a la persona arrastrada… hasta el final del turno de la persona que
+- [x] (probado 2026-11-19: ver «Las pruebas que habían quedado sin hacer», al final) **🫨 Arrastrar → Desequilibrado (2026-11-05, dueño: «le da −2 a la Evasión a la persona arrastrada… hasta el final del turno de la persona que
   ejecutó arrastrar»; reemplaza el +2 PdG).** Probado en «Claude · pruebas» desde la pantalla del GM, llamando a lo que corre al terminar el arrastre
   (`desequilibradoPoner`, js/78) con Rockardo y el Goblin picapiedras: el «−2 EVA» flota sobre el token (capturas en el scratchpad de la sesión), el creep
   queda con «Desequilibrado(1)» y su Evasión pasa de +1 a −1; `desequilibradosFinTurno(Rockardo)` se lo saca («recupera el equilibrio») y deja sus otros
@@ -2810,4 +2810,16 @@ Jugador 1 tiene un segundo personaje, «Blanco J1 b» (copia de Blanco J1), para
 - ✔ **Largo alcance arcano**: la Lanza llegó a Blanco J1 b a 6 casillas.
 - ✔ **Abanico con un aliado en el cono** (Hunter 5): el Hunter 4 adentro no entró; Blanco J1 y Blanco J1 b sí (un PdG, un daño: 11).
 - ✔ **Puntería**: Hunter 4 PdG 14 (Destreza 13 + 1), Hunter 3 PdG 12 (Destreza 12). Arreglado: la 🔍 ahora muestra la pasiva.
+
+## 2026-11-19 · 🧪 Las pruebas que habían quedado sin hacer («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+Armado: Blanco J1 (Jugador 1) con Mala sombra, Remolino y Arma elemental de clase, Botas de estibador, un Cuchillo y la invocación «Abeja de prueba»;
+Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al mapa.
+- ✔ **🌑 Mala sombra desde la Botonera**: a un rival, PdG.Esp contra Res.Mt (lo resistió); a un aliado, directo («Mala sombra (2)»).
+- ✔ **🫨 Arrastrar → Desequilibrado**: enganchó y trajo a un personaje, «−2 Evasión», y el ▶ Siguiente del GM al terminar el turno del Peleador lo sacó.
+  Para saber: quién quedó Desequilibrado lo guarda el navegador del GM; si el GM sigue en otro navegador, se saca a mano.
+- ✔ **🌀 Remolino con dos rivales**: el giro (sin moverse), «elegí al primero» y un duelo por cada uno, de a uno.
+- ✔ **🔥🐝 Arma elemental en una invocación** — **arreglado**: el estado le llegaba a la invocación sin su golpe; ahora la Abeja sumó «+ 3 de fuego directo».
+  Para mirar: el «🔥 Tirar el daño de fuego» lo tocaron casi a la vez Jugador 1 y el GM («por él») y salieron dos tiradas en la Mesa (vale la última).
+- ✔ **🦶 Inamovible con el cartel nuevo**: «Inamovible (Botas de estibador, 33 %): sale con 5 o 6 en 1d6».
+- ✔ **⏱ Recuperarse rápido**: «Recuperarse rápido (Tobilleras de vendaje, 50 %)», salió 4, Inmovilizado 2 → 1.
 

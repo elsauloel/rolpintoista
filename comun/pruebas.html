@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261111saque"></script>
+<script src="ficha-acciones.js?v=20261118ae"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -7079,6 +7079,14 @@ prueba('🔄 Cambiar de lugar (2026-11-07): un ataque con su arma que lleva la m
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cambiar de lugar'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([a.cambiaLugar, h.spCosto, h.cd, /Inamovible/.test(h.detalle), e.etiquetas.includes('auditada'), e.etiquetas.includes('reposicionar')], [true, 2, 3, true, true, true]);
+});
+prueba('🔥🐝 Arma elemental a una invocación (2026-11-18): «🔥 Arma ígnea» sin arma elegida llega con su golpe (+1d6) y suma al atacar', () => {
+  const P = estadosPresetFicha();
+  const e = FichaAcciones.estadoDeSpec({nombre: Combatiente.nombreArmaElemental('Arma ígnea')}, P);
+  const e2 = FichaAcciones.estadoDeSpec({nombre: Combatiente.nombreArmaElemental('Arma ígnea', 'Lanza corta'), armaDe: {id: 'x', nombre: 'Lanza corta'}}, P);
+  const est = [{...e, activo: true}], g = Combatiente.gastarCarga(est, 'duelo-1', {id: 'cu', nombre: 'Cuchillo'});
+  igual([e.nombre, e.armaElemental, !!(e.golpe && e.golpe.efectos && e.golpe.efectos[0].danoMagico), e2.nombre, !!e2.golpe, !!(g.carga), (Combatiente.cargaDeDuelo(est, 'duelo-1') || {efectos: []}).efectos.length],
+    ['🔥 Arma ígnea', 'fuego', true, '🔥 Arma ígnea: Lanza corta', true, true, 1]);
 });
 prueba('🔀 Intercambio arcano (Mago, 2026-11-18): a cualquiera en su Rango; un aliado directo, un rival PdG.Esp contra Res.Esp; si entra, cambian de lugar; 5 SP fijos, 2 No2, cooldown 3', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Intercambio arcano'), h = armarHabilidadDeCreep(e.datos, 5);

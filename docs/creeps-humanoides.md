@@ -728,6 +728,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   nv1 + **Sombrero humectante** (SP Regen +1) y **Polainas de cuero remendado** (Def +1, Res.CC +1): Def 4, Def.Esp 2, PdG.Esp 13, Ef.Esp 13, Eva 6,
   Parry 5, Res.CC 11 / Res.Esp 10 / Res.Mt 13. Habilidad nueva: **Coraza de púas** (2 SP, 1 No2: Espinas 3 turnos a un aliado en su Rango; no es
   Flash). Pasiva: **Largo alcance arcano** (Rango 4 → 6). Costos (turno propio / ajeno): Potencia 2/4, Arrojo 3/6. Falta cargarlo.
+  **Nivel 3 aprobado** (dueño, 2026-11-19: «va así»): Esp 15 · Con 10 · Agi 7 · Des 5 · Fue 2, vida 50, 7 No2, 45 SP (recupera 8). Equipo: el escudo
+  pasa a **Escudo de la guardia** (Buena: Defensa +2, Bloqueo +1, Guardián +1 —los aliados al lado tuyo, +1 Defensa—); el resto como nv2: Def 5,
+  Def.Esp 1, PdG.Esp 15, Ef.Esp 15, Eva 7, Parry 5, Bloqueo 3, Ini 7, Mov 7, Rango 6, Res.CC 11 / Res.Esp 10 / Res.Mt 15. Habilidad nueva: **Velo
+  espejado** (2 SP, 1 No2: Espejo 3 turnos a un aliado en su Rango; no es Flash). Sin pasiva nueva. Falta cargarlo.
 
 - **L4 · Hostigador con trampas · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta, después lo vamos a ir viendo en detalle
   uno a uno»). Estrategia: pica, se va y te hace pisar algo: deja una trampa en el camino, pega y se aleja por arriba de ella; el que lo persigue
@@ -1374,7 +1378,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | | | |
+| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | | |
 | D4 | ✅ (2026-11-03) | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

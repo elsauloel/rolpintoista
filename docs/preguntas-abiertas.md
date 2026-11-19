@@ -1567,3 +1567,12 @@ Al programar «Renovar el Pacto» (cola de programación, 2026-11-19) quedaron t
 cuando la historia lo da. ¿Lo cambiás igual?» sale solo al pasarlo de «No» a «Sí» y solo al jugador (si lo marca el GM, se renueva sin preguntar y la
 línea dice «El GM le renovó el Pacto a…»); (3) pasarlo a mano de «Sí» a «No» no pregunta ni deja línea en la Mesa (como antes). **Pregunta para el
 dueño:** ¿está bien así, o querés el botón también con el Pacto activo, o una línea en la Mesa cuando alguien lo saca a mano?
+
+### P245 — 🎲 El daño de una zona que tira el dueño de quien la creó: los casos raros (2026-11-19, Claude)
+Al programar que el daño de las zonas con cartel lo tire, en el cuadro del duelo, quien maneja a quien creó la zona (#9 de `auditoria-tiradas.md`),
+quedaron casos que el pedido no decía. **Elegido mientras tanto**: (1) si el que entra está **oculto** (el GM lo escondió), el cuadro del duelo lo
+delataría: el daño sigue saliendo solo, como antes (igual que las chances con un token oculto); (2) una zona que un jugador puso **a mano** (sin un
+personaje detrás) la tira él, a nombre de su primer personaje; (3) un daño **sin dados** (un número fijo, o «la diferencia» sola) no se tira: se
+aplica directo, como antes; (4) lo aplica el camino de siempre del cuadro del duelo («💔 Aplicar el daño» del que lo recibe), con la Defensa, la
+Defensa especial (solo en las zonas de habilidad o con elemento, como antes), las resistencias y la Suela gruesa de lo que se pisa. **Pregunta para el
+dueño:** ¿está bien así, o preferís otra cosa en alguno de estos casos?

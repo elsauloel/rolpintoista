@@ -660,6 +660,35 @@ async function zonaChanceAVista(el, t, spec, ch, quienTxt){
   await new Promise(ok => setTimeout(ok, ZONA_CHANCE_VER_MS));
   return sale;
 }
+/* 🎲 El daño de una zona sin tirada de quien la creó, lo tira el dueño de quien la creó (#9 de docs/auditoria-tiradas.md; dueño, 2026-11-19: «prefiero
+   que lo tire el propietario de quien creó la zona»). Las zonas que siguen con su cartel (las del GM, de trampas con número fijo, el hielo por pasos, la
+   que solo se «Aplica»): si el que entra no resiste, el daño se abre en el cuadro del duelo de siempre (`danoDuelo`, js/78), como los otros daños
+   sueltos, y lo tira con su botón quien maneja a quien creó la zona: el GM si la creó él, un creep o una trampa del GM; el jugador (o quien tenga 🎮 el
+   control) si la creó su personaje o la trampa de su personaje. Si no está, el GM tira por él, como en cualquier duelo. Lo aplica el camino de siempre
+   (Defensa, Defensa especial, resistencias, escudos, Invulnerable), con la Suela gruesa de lo que se pisa. → {yo, deTokenId}. */
+function zonaDanoQuien(el){
+  let gmUid = ''; for(const [uid, m] of miembros) if(m && m.gm){ gmUid = uid; break; }
+  const tokenDe = (ref, tipo) => { for(const [id, x] of tokens) if(String(x.fichaId || '') === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo) return id; return ''; };
+  const c = colocadorDe(el);
+  if(c && c.ref){
+    const idT = tokenDe(c.ref, c.tipo), tk = idT ? tokens.get(idT) : null;
+    if(c.tipo === 'creep') return {yo: {ref: c.ref, tipo: 'creep', nombre: tk ? nombreDe(tk) : ((creepsPub.get(c.ref) || {}).nombre || 'Creep'), uid: (tk && tk.duenoUid) || gmUid}, deTokenId: idT};
+    const f = fichasPub.get(c.ref.split(SEP_INVOCACION)[0]) || {};
+    return {yo: {ref: c.ref, tipo: 'pj', nombre: tk ? nombreDe(tk) : (f.nombre || 'Personaje'), uid: f.duenoUid || (tk && tk.duenoUid) || el.duenoUid || ''}, deTokenId: idT};
+  }
+  // Sin quien la creó guardado: la puso a mano su dueño. Un jugador (no el GM): su personaje.
+  const dueno = miembros.get(el.duenoUid);
+  if(el.duenoUid && !(dueno && dueno.gm) && el.zonaCasteadorTipo !== 'creep')
+    for(const [fid, f] of fichasPub) if(f && f.duenoUid === el.duenoUid) return {yo: {ref: fid, tipo: 'pj', nombre: f.nombre || 'Personaje', uid: el.duenoUid}, deTokenId: tokenDe(fid, 'pj')};
+  return {yo: {ref: '', tipo: 'creep', nombre: 'GM', uid: gmUid || el.duenoUid || ''}, deTokenId: ''};
+}
+/* Lo que el duelo le pide al GM cuando la zona es suya, sin un creep detrás (el lado con `ref` vacío): solo publicar su tirada de daño (la Mesa y
+   'tirada-registrada', de donde la recoge el duelo). Va en `hooksLocal` del mapa (js/14), en la pantalla del GM. */
+function zonaGmHooksDuelo(lado){
+  if(!lado || lado.tipo !== 'creep' || lado.ref || !soyGM) return null;
+  return {soy: l => !!(l && l.tipo === 'creep' && !l.ref && soyGM),
+    registrarTirada: (origen, r) => { mesaPublicar(origen, {...r, quien: 'GM', desde: 'gm'}); window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}})); }};
+}
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
@@ -755,7 +784,11 @@ async function zonaResolverBanner(){
   let danoHecho = 0;
   if(!resistio && (el.zonaDano || el.zonaDanoDif)){
     let monto = null;
-    if(el.zonaDanoDif){ monto = diferencia; if(monto > 0 && el.zonaDano){ const r = tirarDados(el.zonaDano); if(r) monto += r.total; } }   // la diferencia (+ lo que se le suma: el 1d4 del miasma, si la diferencia entró)
+    // 🎲 Con dados para tirar (y quien entra a la vista: a uno oculto el cuadro lo delataría), el daño va al cuadro del duelo (zonaDanoQuien).
+    const formulaD = el.zonaDano ? (el.zonaDanoDif ? (num(diferencia) > 0 ? `${el.zonaDano}+${Math.round(num(diferencia))}` : '') : String(el.zonaDano)) : '';
+    const porDuelo = !!formulaD && /d/i.test(formulaD) && !t.oculto && typeof danoDuelo === 'function';
+    if(porDuelo) monto = -1;   // (lo resuelve el duelo, más abajo)
+    else if(el.zonaDanoDif){ monto = diferencia; if(monto > 0 && el.zonaDano){ const r = tirarDados(el.zonaDano); if(r) monto += r.total; } }   // la diferencia (+ lo que se le suma: el 1d4 del miasma, si la diferencia entró)
     else{ const r = tirarDados(el.zonaDano); if(r) monto = r.total; }
     const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
     // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Defensa especial de quien lo recibe, como en el
@@ -763,7 +796,27 @@ async function zonaResolverBanner(){
     // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Defensa especial.
     let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
-    const rz = await resistenciasDe(t, elZ);
+    if(porDuelo){
+      const q = zonaDanoQuien(el), suela = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+      // La Defensa especial, como acá abajo: solo la de una zona de habilidad o con elemento (las del GM y de trampas sin elemento, no: «directo»).
+      const directo = !!el.zonaIgnoraDef && (!!el.zonaDirecto || !(el.zonaCasteadorRef || elZ));
+      const sinId = !!(specZ && ['Marcado', 'Herida sombría'].includes(String(specZ.nombre || '')));   // (si la zona ya deja ese estado, no dos veces)
+      AvisoCombate.cartel('zona', null);   // (el cartel no tapa el cuadro del duelo: vuelve con el resultado)
+      if(zonaBanner && zonaBanner.momentoP) zonaBanner.momentoP.then(mid => mid && momentoActualizar(mid, {resultado: `🎲 El daño (${formulaD}) lo tira ${q.yo.nombre}…`})).catch(() => {});
+      let rd = null;
+      try{
+        rd = await danoDuelo({yo: q.yo, deTokenId: q.deTokenId, aTokenId: tokenId, nombre: `${el.zonaNombre || 'Zona'}: el daño`, formula: formulaD,
+          tipo: elZ || (el.zonaIgnoraDef ? 'arcano' : 'físico'), fisico: !el.zonaIgnoraDef, directo, esperar: true,
+          danoExtra: {...(suela ? {suela} : {}), ...(sinId ? {sinIdentidad: true} : {})}});
+      }catch(err){ console.error('El daño de la zona en el cuadro del duelo:', err); rd = {falla: true}; }
+      const dn = rd && rd.d && rd.d.dano;
+      if(dn && dn.crudo !== undefined){
+        danoHecho = num(dn.recibido);
+        partes.push(`${fmt(num(dn.crudo))} de daño${tipoTxt} (lo tiró ${q.yo.nombre}; entraron ${fmt(danoHecho)})`);
+        if(danoHecho > 0 && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, danoHecho, el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03)
+      }else partes.push(`${formulaD} de daño${tipoTxt}: ${rd && rd.aMano ? 'se resolvió a mano' : 'no se tiró'} (en el cuadro del duelo)`);
+    }
+    const rz = porDuelo ? {res: 0, armadmg: 0} : await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
     const idZ = elZ ? Combatiente.identidadElemento(elZ, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 la luz ×1,5 a lo oscuro; lo siniestro, nada (2026-10-26)

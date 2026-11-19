@@ -2842,3 +2842,9 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   Jugador 1, pasar «😇 Pacto» de No a Sí abre «El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?»: Cancelar lo deja en No; «Sí,
   cambiarlo» lo activa y deja la línea en la Mesa.
 
+- ✔ **🎲 El daño de una zona lo tira el dueño de quien la creó** (#9 de `auditoria-tiradas.md`): (1) una zona del GM, «Brasas del GM» (1d6 de fuego,
+  sin resistencia), apareció bajo Blanco J1: a Jugador 1 le salió «Aplicar» y, al tocarlo, se abrió el cuadro del duelo «Brasas del GM: el daño»: al
+  GM, «🎲 Tirar el daño · 1d6»; a Jugador 1, esperando. Rodó el d6 en 3D (4), Jugador 1 vio la cuenta (4 − Defensa 1 = 3, vida 50 → 47) y tocó «💔
+  Aplicar el daño»; el cartel de la zona volvió con «4 de daño de fuego (lo tiró GM; entraron 3)». (2) Una zona de Blanco J1, «Fuego de Blanco J1», sobre
+  el Blanco creep: al GM le salió «Aplicar» (y «🎲 Tirar a mano», por si el jugador no está); a Jugador 1, «🎲 Tirar el daño · 1d6»: tiró 5, 5 −
+  Defensa 5 = 0. Videos del dado rodando para el dueño.

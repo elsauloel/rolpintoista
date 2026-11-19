@@ -833,7 +833,7 @@ function arrancarEnVivo(){
   // mapa —se perdían Armaduras rotas—. El marco se sigue cargando cuando hace falta: bnAlMarco, dueloRelayMapa, abrirAcciones.)
   Duelo.escuchar({curaExtra: (d, spec) => curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, dueloEsArea(d) || !spec.cura),   // 💚 Manos de curandero: el botón ya lo dice
     stacksExtra: (d, spec) => /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0,   // el envenenador (js/13)
-    relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+    relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado) || zonaGmHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';

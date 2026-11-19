@@ -12,12 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🎲 El daño de las zonas sin tirada de quien la creó lo tira el dueño de quien la creó** (dueño, 2026-11-19, bloque 4 de
+- **✅ hecho (2026-11-19) — 🎲 El daño de las zonas sin tirada de quien la creó lo tira el dueño de quien la creó** (dueño, 2026-11-19, bloque 4 de
   `auditoria-tiradas.md`, #9: «prefiero que lo tire el propietario de quien creó la zona»). Hoy, en el cartel de las zonas sin tirada de quien la creó
   (las del GM, de trampas con número fijo, el hielo por pasos, la que solo se «Aplica»), si el que entra no resiste, el dado del daño sale solo. Que lo
   tire, con su botón y los dados a la vista, quien maneja a quien creó la zona: el GM si la creó él, un creep o una trampa del GM; el jugador (o quien
   tenga 🎮 el control) si la creó su personaje o la trampa de su personaje. Si no está conectado, el GM puede tirar por él (como en el resto de las
   tiradas). Probar en el mapa con una zona del GM y con una de un personaje.
+  *Resultado:* si el que entra no resiste (o toca «Aplicar»), el daño se abre en el cuadro del duelo de siempre (`danoDuelo`): «🎲 Tirar el daño ·
+  1d6» le sale a quien maneja a quien creó la zona (el GM por las suyas, sus creeps y sus trampas; el jugador, o quien tenga 🎮 el control, por su
+  personaje o su trampa), con los dados 3D en todas las pantallas; el GM puede «Tirar a mano» por el ausente, y el que lo recibe toca «💔 Aplicar el
+  daño» con la cuenta a la vista. El cartel de la zona vuelve con «4 de daño de fuego (lo tiró GM; entraron 3)» (`zonaDanoQuien`, `vtt-hexgrid/js/08`).
+  Se mantiene la Suela gruesa (ahora también en el duelo). Probado en «Claude · pruebas 2» con GM y Jugador 1: una zona del GM sobre Blanco J1 (tiró el
+  GM) y una de Blanco J1 sobre el Blanco creep (tiró Jugador 1). Videos del dado rodando. Casos raros en P245. 874 pruebas en verde.
 - **✅ hecho (2026-11-19) — 🎲 La chance del estado de una zona, a la vista** (dueño, 2026-11-19, bloque 4 de `auditoria-tiradas.md`, #19: «aunque se
   tire sola, debe aparecer la instancia de chance de que salga, se debe ver el dado rodando y el resultado, en el menú que sea»). *Resultado:* sigue saliendo
   sola, pero ahora en el cartel de la zona: «Chance de que entre Veneno · 50 %: sale con 4, 5 o 6 en 1d6», «El dado: rodando…» mientras ruedan los dados

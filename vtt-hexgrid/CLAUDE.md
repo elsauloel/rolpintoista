@@ -903,6 +903,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `pct` pasa por `zonaChanceAVista`: «Chance de que entre X · N %: sale con … en 1dN», el dado rodando (la tirada va a la Mesa: los dados 3D en todas las
   pantallas; espera a `dados-quietos`, máx. 7 s) y el veredicto «¡Entra X!» / «No entra» ~1,6 s; la Crónica (el momento de la zona) lo cuenta. Sigue
   saliendo sola (la tira la pantalla que resuelve la zona).
+- **🎲 El daño de una zona lo tira el dueño de quien la creó** (2026-11-19, #9 de `docs/auditoria-tiradas.md`; dueño: «prefiero que lo tire el
+  propietario de quien creó la zona»): en el cartel de la zona (js/08), si no resiste y el daño tiene dados, va a `danoDuelo` (js/78) con `yo` =
+  `zonaDanoQuien(el)` (quien la colocó, `colocadorDe`; si no, el GM o el primer personaje del jugador que la puso). El GM sin creep detrás es un lado
+  `{tipo: 'creep', ref: ''}` que contesta `zonaGmHooksDuelo` (en `hooksLocal`, js/14). `hab.dano.suela` resta la Suela gruesa en `dueloAplicarDano`
+  (js/13). A un token oculto, sin dados o sin `danoDuelo`, como antes. Casos raros: P245.
 
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa

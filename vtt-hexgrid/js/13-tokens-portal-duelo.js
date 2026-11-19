@@ -2086,10 +2086,13 @@ async function dueloAplicarDano(d, o){
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
   const frenaAm = magico && !directo && !trueDmg && Combatiente.frenaArmaduraMagica(elDano);   // la Defensa especial frena todo el daño especial (también el tóxico, 2026-10-07)
   let restaIgnorando = frenaAm ? armadmg : 0;
-  const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
+  // 👢 Suela gruesa (2026-11-19, el daño de una zona del piso tirado en el cuadro del duelo, #9 de docs/auditoria-tiradas.md): lo que pisás hace
+  // menos, como en el cartel de la zona (js/08). `hab.dano.suela` = cuánto; se resta junto con la resistencia elemental.
+  const suelaD = d.hab && d.hab.dano ? Math.max(0, Math.round(num(d.hab.dano.suela))) : 0;
+  const resElem = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0, resEl = resElem + suelaD;
+  let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resElem ? [Combatiente.resElementalTxt(elDano, resElem)] : []), ...(suelaD ? [`Suela gruesa ${suelaD}`] : [])].join(' − ');
   if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
-  if(!simular && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resEl || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resEl, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
+  if(!simular && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resElem || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resElem, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
@@ -2161,7 +2164,7 @@ async function dueloAplicarDano(d, o){
     return cuenta;
   };
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: `${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resEl < 0 ? ' (vulnerable)' : ''}`} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: [...(resElem ? [`${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     if(simular) oD.simular = true;
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);

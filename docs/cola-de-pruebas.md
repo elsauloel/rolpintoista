@@ -12,9 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🪧 Andanada arcana: el cartel «¿a quién va el siguiente misil?» queda tapado** (dueño, 2026-11-19: «habría que corregirlo»). Sale
-  mientras el cuadro del misil anterior sigue abierto unos segundos: que no quede tapado (que espere a que el cuadro se cierre, o que vaya por encima).
-  Probar en el mapa con el Arcano 4 y sus tres misiles.
+- **✅ hecho (2026-11-19) — 🪧 Andanada arcana: el cartel «¿a quién va el siguiente misil?» queda tapado** (dueño, 2026-11-19: «habría que
+  corregirlo»). *Resultado:* el cartel ahora espera a que el cuadro del misil anterior se cierre (solo a los 10 s, con «Listo, cerrar» o
+  minimizándolo) y recién ahí sale, con el mapa a la vista (`misilSiguiente`, `vtt-hexgrid/js/13-tokens-portal-duelo.js`; vale también para las
+  Varitas de misiles). Probado en «Claude · pruebas 2» con el Arcano 4: tres misiles (dos a Blanco J1, uno al Blanco creep), los carteles «misil 2 de
+  3» y «misil 3 de 3» salieron limpios. 873 pruebas en verde.
 - **⬜ en cola — 🦶 Intercambio arcano contra un rival Inamovible: el recordatorio** (dueño, 2026-11-19, P243 ✅: «con un rival debe aparecer el
   recordatorio de que el rival es inamovible (no debería poder moverlo)»). Con un aliado no cambia nada (acepta sin tirar). Con un rival Inamovible
   tiene que salir el recordatorio de que es Inamovible, y si su Inamovible aguanta, no se mueve nadie. Revisar qué sale hoy y probarlo en el mapa.

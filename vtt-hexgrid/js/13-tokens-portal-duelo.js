@@ -1197,13 +1197,25 @@ async function dueloMisiles(yo, ataque, t1, mio){
   }catch(err){ console.error('No se pudieron lanzar los misiles:', err); toast('No se pudieron lanzar los misiles — revisá la consola'); }
 }
 const misilesEligiendo = new Set();
+/* 🪧 (2026-11-19, dueño: «habría que corregirlo») El «misil N de M — ¿a quién?» salía mientras el cuadro del misil anterior seguía abierto (se cierra
+   solo a los 10 s) y quedaba tapado detrás, con el mapa oscurecido. Ahora espera a que ese cuadro se cierre (solo, con «Listo, cerrar» o minimizado). */
+const dueloCuadroAbierto = () => { const f = document.getElementById('duelo-fondo'); return !!f && !f.classList.contains('min'); };
 function misilSiguiente(id, a){
   if(!fbUsuario || !a.casteador || a.casteador.uid !== fbUsuario.uid || misilesEligiendo.has(id)) return;
   misilesEligiendo.add(id);
+  const esperar = () => {
+    const ahora = areasActivas.get(id);
+    if(!ahora || !areaEligiendo(ahora)){ misilesEligiendo.delete(id); return; }   // mientras tanto se cerró o ya se eligió en otra pestaña
+    if(dueloCuadroAbierto()){ setTimeout(esperar, 400); return; }
+    misilElegir(id, ahora);
+  };
+  setTimeout(esperar, 600);   // el cuadro del misil que acaba de terminar puede tardar un instante en mostrar el final
+}
+function misilElegir(id, a){
   const n = (a.objetivos || []).length + 1, total = num(a.hab && a.hab.reparte && a.hab.reparte.total) || 2;
   elegirDestino(async h => {
     const t = [...tokens.entries()].map(([k, x]) => ({...x, id: k})).find(x => x.col === h.col && x.fila === h.fila && x.id !== a.casteador.tokenId && (!x.oculto || soyGM) && !x.bajoTierra && !tapadoPorNiebla(x));
-    if(!t){ toast('Ahí no hay nadie: hacé clic sobre un rival'); misilesEligiendo.delete(id); misilSiguiente(id, a); return; }
+    if(!t){ toast('Ahí no hay nadie: hacé clic sobre un rival'); misilElegir(id, a); return; }
     try{
       await coleccionAreas().doc(id).update({objetivos: [...(a.objetivos || []), t.id], estado: AREA_EN_CURSO,
         centro: {...a.centro, linea: [...((a.centro && a.centro.linea) || []), nbPack(t.col, t.fila)]}});

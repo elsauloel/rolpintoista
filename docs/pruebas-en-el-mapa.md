@@ -2823,3 +2823,6 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
 - ✔ **🦶 Inamovible con el cartel nuevo**: «Inamovible (Botas de estibador, 33 %): sale con 5 o 6 en 1d6».
 - ✔ **⏱ Recuperarse rápido**: «Recuperarse rápido (Tobilleras de vendaje, 50 %)», salió 4, Inmovilizado 2 → 1.
 
+## 2026-11-19 · 🛠 Cola de programación: Andanada, Intercambio y animaciones («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+- ✔ **🪧 Andanada arcana, el cartel del siguiente misil** (Arcano 4, tres misiles: Blanco J1, Blanco J1 y el Blanco creep): el «misil 2 de 3 — ¿a
+  quién?» ya no sale tapado por el cuadro del misil anterior: espera a que se cierre y aparece arriba del mapa, a la vista.

@@ -12,6 +12,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
+  en `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección D4), con su prueba de números en `comun/pruebas.html`, y cambiar
+  sus «Falta cargarlo» por «Cargado». En el mapa ver: Confusión (PdG.Esp contra Res.Mt, el 1d4 al actuar), el combo Punzada mental → Confusión con la
+  Res.Mt bajada, la Varita del eclipse (25 % de Ceguera), el Grito espeluznante (onda de 3, Pánico), el Tótem de silencio (los rivales a 3 sin
+  habilidades de SP; romperlo), el Polen somnífero (Sueño; se despierta con daño o si lo sacuden) y el Espejo del Poncho de espejitos.
 - **✅ hecho (2026-11-19) — 📣 El daño fijo de una zona (sin dados) se aplica directo, pero con aviso al afectado** (dueño, 2026-11-19, P245 ✅: «igual tiene que
   comunicarse, sobre todo la persona afectada. Si te entra un daño directo, te tiene que aparecer una notificación que diga, te ingresó tanto de daño
   por tal razón»). En las zonas con cartel cuyo daño es un número fijo (lo dejó así el #9, `vtt-hexgrid/js/08`): al afectado (quien lo maneja: su

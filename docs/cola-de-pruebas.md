@@ -30,20 +30,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Intercambio: «Cambiar de lugar» sigue con su cruce en arco). Sin estela (no caminan); si el cuadro del duelo está abierto, se repliega mientras dura y
   vuelve. Probado en «Claude · pruebas 2» (GM + Jugador 1): a un aliado (el Blanco creep) y a un rival (Blanco J1 b). Video para el dueño. 873 pruebas
   en verde.
-- **⬜ en cola — ✨ Animación de la Lanza arcana** (dueño, 2026-11-19: «me gusta así»): carga (brillo violeta en el Arcano, medio segundo), una lanza de
-  luz que recorre la línea hasta el final del alcance con estela, un estallido de chispas violetas en cada token que atraviesa sin frenarse, y a los
-  que no la esquivaron un destello blanco de un segundo (Deslumbrado); al que esquivó le pasa de largo. En todas las pantallas. Video para el dueño.
-- **⬜ en cola — 🎲 La chance del estado de una zona, a la vista** (dueño, 2026-11-19, bloque 4 de `auditoria-tiradas.md`, #19: «aunque se tire
-  sola, debe aparecer la instancia de chance de que salga, se debe ver el dado rodando y el resultado, en el menú que sea»). Hoy, en el cartel de las
-  zonas (las que no tienen tirada de quien la creó: del GM, de trampas con número fijo…), la chance del estado (ej. Veneno 50 % de la Varita de miasma,
-  `vtt-hexgrid/js/08` l. ~777) sale sola y no se ve. Que siga pudiendo salir sola, pero que se vea: el momento «chance de que entre el estado (50 %:
-  sale con …)», los dados 3D rodando y el resultado, en el cartel de la zona o donde quede mejor. Probar en el mapa con una zona del GM con chance.
-- **⬜ en cola — 😇 Renovar el Pacto desde el mapa** (dueño, 2026-11-19: decidido quién lo cambia). Lo renueva la historia (lo marca el GM), pero
-  las herramientas avisan en vez de prohibir: (1) un botón **«😇 Renovar el Pacto»** en el menú del token de un personaje en el mapa, para el GM **y
-  también para el jugador dueño de ese personaje** (dueño: «me gustaría que el jugador también pueda reactivar su pacto desde el mismo botón del mapa»);
-  al renovarlo queda una línea en la Mesa («Fulano renovó su Pacto» / «El GM le renovó el Pacto a Fulano») y al jugador le llega el aviso «Una entidad
-  espiritual te brindó un nuevo Pacto». (2) En la ficha, si el jugador cambia el campo «😇 Pacto» a mano, un cartel «El Pacto lo renueva el GM cuando
-  la historia lo da. ¿Lo cambiás igual?» y, si sigue, la misma línea en la Mesa. Gastarlo sigue automático. Probar en el mapa con GM y Jugador 1.
+- **✅ hecho (2026-11-19) — ✨ Animación de la Lanza arcana** (dueño, 2026-11-19: «me gusta así»). *Resultado:* `vtt-hexgrid/js/120-lanza-fx.js`, en todas
+  las pantallas: la carga (brillo violeta que crece en el Arcano, medio segundo), la lanza de luz que recorre la línea hasta el final del alcance con su
+  estela que se apaga, y un estallido de chispas violetas en cada token que atraviesa (sin frenarse); la cascada de duelos arranca cuando ya se vio. Al
+  que no la esquivó, un destello blanco de un segundo (Deslumbrado; si el cuadro del duelo está abierto, se aparta mientras dura); al que la esquivó,
+  nada. Probado en «Claude · pruebas 2» con el Arcano 2 y en la línea Blanco J1, el Blanco creep (su aliado) y Blanco J1 b: los dos primeros no la
+  esquivaron (destello y Deslumbrado); Blanco J1 b ganó la Evasión, se corrió de la línea y no tuvo destello. Video para el dueño. 873 pruebas en verde.
 - **✅ hecho (2026-11-18) — 🏹✨ Lo que quedó sin ver en el mapa del Hunter (R4 nv2–5) y el Arcano (M4 nv2–3)** («Claude · pruebas 2», mapa
   «Prueba · R4 M4», GM + Jugador 1; Jugador 1 tiene ahora un segundo personaje, «Blanco J1 b», para tener dos rivales):
   - [x] ✨ Lanza arcana atravesando a varios: Arcano 2 en línea recta con Blanco J1, el Blanco creep (su aliado) y Blanco J1 b: un solo PdG.Esp y un

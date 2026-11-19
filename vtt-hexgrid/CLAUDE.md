@@ -891,6 +891,13 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Parálisis del Escudo eléctrico (js/106, después del duelo de resistencia), los saltos del rayo (`dueloCadena` js/13, el agua js/50, la flecha js/33)
   y Romper armadura contra el escudo (`dueloRompeEscudo` js/26: el `item` del escudo viaja en el spec del duelo, comun/duelo.js `limpiarSpec`).
 
+- **✨ La animación de la Lanza arcana** (2026-11-19, dueño: «me gusta así»; `js/120-lanza-fx.js`): `dueloElegirAreaMapa` (js/13), con una línea y
+  `lanzaFxEs(hab)` (la Lanza arcana, o `hab.fxLanza`), publica el momento `lanza-fx` ({de, desde, celdas, atraviesa, semilla}) y espera `LANZA_DUR` antes de
+  crear la cascada: la carga violeta, la lanza con su estela hasta el final de la línea y las chispas en cada uno. `dueloGrupoResuelto` (el GM) publica
+  `lanza-golpe` ({a}) a quien no la esquivó: el destello blanco de ~1 s (aparta el cuadro del duelo abierto mientras dura). Sin tarjeta (js/16); dibuja
+  desde js/05 (`dibujarEfectosLanza`). **📺 El Intercambio arcano** (2026-11-19) usa el televisor del Parpadeo con los dos tokens a la vez
+  (`blinkTvPublicarVarios`, js/111, un solo momento `blink-tv` con `mas`), desde `cambiarLugarResuelto` (js/107); «Cambiar de lugar» sigue con su arco.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

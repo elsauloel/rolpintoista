@@ -1316,6 +1316,7 @@ function dibujarLienzo(){
   if(typeof areaPreviaDibujar === 'function') areaPreviaDibujar(z);   // 👁 el área siguiendo al mouse mientras se marca el centro (js/118)   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosGancho === 'function' && dibujarEfectosGancho(z)) animando = true;
   if(typeof dibujarEfectosBlinkTv === 'function' && dibujarEfectosBlinkTv(z)) animando = true;   // 📺 el Parpadeo como un televisor viejo (js/111)
+  if(typeof dibujarEfectosLanza === 'function' && dibujarEfectosLanza(z)) animando = true;   // ✨ la Lanza arcana (js/120, 2026-11-19)
   if(typeof dibujarEfectosCambio === 'function' && dibujarEfectosCambio(z)) animando = true;   // 🔄 Cambiar de lugar (js/107)   // 🪝 la cadena y el gancho de Arrastrar (js/96)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;
   if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;

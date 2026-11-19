@@ -2830,3 +2830,5 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   «Inamovible 33 % · 5–6 · Tirar el efecto (1d6)»; si aguanta, «¡Inamovible! No lo mueven» y nadie se mueve. Ya andaba así: sin cambios.
 - ✔ **📺 La animación del Intercambio arcano** (Arcano 5 con el Blanco creep y con Blanco J1 b): los dos se apagan como un televisor viejo y se prenden en
   la casilla del otro, en las dos pantallas; con un rival, el cuadro del duelo se aparta mientras dura y vuelve. Falta que la vea el dueño (🖥).
+- ✔ **✨ La animación de la Lanza arcana** (Arcano 2 → Blanco J1, el Blanco creep y Blanco J1 b en línea): carga, lanza con estela y chispas en los tres,
+  en las dos pantallas; destello blanco en Blanco J1 y el Blanco creep (Deslumbrado), nada en Blanco J1 b (esquivó con el dodge). Falta que la vea el dueño (🖥).

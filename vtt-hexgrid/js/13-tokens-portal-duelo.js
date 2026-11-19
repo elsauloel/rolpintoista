@@ -1402,6 +1402,9 @@ function dueloGrupoResuelto(d){
     // 💫 El Shockwave: sobre quien no la resistió, el golpe y los pajaritos; sobre quien sí, un destello chico (js/94, 2026-11-03).
     if(a.hab && (a.hab.objetivo === 'onda' || a.hab.objetivo === 'cono') && typeof ondaFxVariante === 'function' && ondaFxVariante(a.hab) && d.defensor && d.defensor.tokenId)
       ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad', ondaFxVariante(a.hab), (a.casteador && a.casteador.tokenId) || (d.atacante && d.atacante.tokenId) || '');
+    // ✨ La Lanza arcana: a quien no la esquivó, el destello blanco (Deslumbrado); al que la esquivó, nada: le pasó de largo (js/120, 2026-11-19).
+    if(typeof lanzaFxEs === 'function' && lanzaFxEs(a.hab) && d.defensor && d.defensor.tokenId && (d.resultado === 'pego' || d.resultado === 'mitad'))
+      lanzaGolpePublicar(d.defensor.tokenId);
     if(!areaEnCurso(a) || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
@@ -1783,6 +1786,11 @@ function dueloElegirAreaMapa(msg){
       if(h.cono && enCono && enCono.size){ const C = hexCentro(mio.col, mio.fila); ang = FxOnda.anguloHacia(C, [...enCono].map(k => { const q = nbUnpack(k); return hexCentro(q.col, q.fila); })); }
       try{ ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`, {variante: ondaVar, ang}); }catch(err){ console.error('No se pudo publicar la onda:', err); }
       await new Promise(r => setTimeout(r, ((window.FxOnda && FxOnda.DURACION) || 1700) + 400));
+    }
+    // ✨ La Lanza arcana (js/120, 2026-11-19): la carga, la lanza que recorre la línea y las chispas en cada uno; el duelo, cuando ya se vio.
+    if(h.linea && mio && typeof lanzaFxEs === 'function' && lanzaFxEs(hab)){
+      try{ await lanzaFxPublicar(mio.id, {col: mio.col, fila: mio.fila}, h.linea, objetivos); }catch(err){ console.error('No se pudo publicar la Lanza:', err); }
+      await new Promise(r => setTimeout(r, LANZA_DUR + 350));
     }
     try{
       await coleccionAreas().add({

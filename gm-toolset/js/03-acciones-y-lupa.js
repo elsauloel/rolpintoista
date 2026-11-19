@@ -190,13 +190,13 @@ function cardHtml(sc){
       ${recompensasHtml(sc)}
       ${cinturonEditorHtml(sc)}
 
-      <div class="editar-separador"><span>Habilidades</span></div>
+      <!-- ＋ Habilidad en el encabezado, a la vista (dueño, 2026-11-19: «gris y al final, lo hace quedar medio desapercibido»). -->
+      <div class="editar-separador"><span>Habilidades</span><button type="button" class="hab-ejecutar sep-boton" data-addhab="${sc.id}">＋ Habilidad</button></div>
 
       <div>
         <div class="hab-list" style="margin-top:4px">
           ${sc.habilidades.map(h => habHtml(sc, h)).join('')}
         </div>
-        <button class="addhab" data-addhab="${sc.id}" style="margin-top:6px">+ Habilidad</button>
       </div>
 
       <div>

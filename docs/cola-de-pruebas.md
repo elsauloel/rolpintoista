@@ -12,12 +12,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 📣 El daño fijo de una zona (sin dados) se aplica directo, pero con aviso al afectado** (dueño, 2026-11-19, P245 ✅: «igual tiene que
+- **✅ hecho (2026-11-19) — 📣 El daño fijo de una zona (sin dados) se aplica directo, pero con aviso al afectado** (dueño, 2026-11-19, P245 ✅: «igual tiene que
   comunicarse, sobre todo la persona afectada. Si te entra un daño directo, te tiene que aparecer una notificación que diga, te ingresó tanto de daño
   por tal razón»). En las zonas con cartel cuyo daño es un número fijo (lo dejó así el #9, `vtt-hexgrid/js/08`): al afectado (quien lo maneja: su
   jugador, o el GM para un creep) le aparece el aviso «Te entraron N de daño por <nombre de la zona>» (con la cuenta si la Defensa frenó algo), y queda
   en la Mesa y la Crónica. Revisar de paso si hay otros daños fijos o directos que entren sin aviso al afectado (anotarlos en el resultado, sin
   cambiarlos todos sin preguntar). Probar en el mapa con una zona del GM de daño fijo sobre un personaje de Jugador 1.
+  *Resultado:* lo que el cartel de la zona aplica solo (el número fijo, «la diferencia» sola o el daño de un token oculto) ahora se avisa a quien maneja
+  al que lo recibe: si lo resolvió su propia pantalla, en el mismo cartel de la zona, un recuadro rojo «💔 −3 · Te entraron 3 de daño por Brasas del GM
+  (4 − Defensa 1 = 3)»; si lo resolvió otra (el GM con 🎮 el control del personaje), al jugador le sale al centro el Aviso con lo mismo y «Entendido».
+  A un creep, al GM: «A Blanco creep le entraron 3…». Queda en la Mesa («💔 Blanco J1 · Brasas del GM: le entraron 3 de daño (4 − Defensa 1 = 3)») y en
+  la Crónica (`zonaDanoCuenta` / `zonaDanoAvisar`, `vtt-hexgrid/js/08`). Probado en «Claude · pruebas 2» con GM y Jugador 1: zona fija del GM sobre
+  Blanco J1 (la resolvió Jugador 1), lo mismo con el GM con el control, y sobre el Blanco creep. Otros daños directos sin aviso al afectado: P246 (sin
+  tocar). 874 pruebas en verde.
 - **⬜ en cola — 🛡 Cargar el Protector (S4) niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar en
   `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección S4: atributos, equipo, habilidades, pasivas, modo SP), con su prueba
   de números en `comun/pruebas.html`, y cambiar sus «Falta cargarlo» por «Cargado». En el mapa ver: Coraza de púas (Espinas a un aliado), Velo espejado

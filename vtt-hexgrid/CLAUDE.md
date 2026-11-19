@@ -908,6 +908,10 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `zonaDanoQuien(el)` (quien la colocó, `colocadorDe`; si no, el GM o el primer personaje del jugador que la puso). El GM sin creep detrás es un lado
   `{tipo: 'creep', ref: ''}` que contesta `zonaGmHooksDuelo` (en `hooksLocal`, js/14). `hab.dano.suela` resta la Suela gruesa en `dueloAplicarDano`
   (js/13). A un token oculto, sin dados o sin `danoDuelo`, como antes. Casos raros: P245.
+  **📣 Con aviso al afectado** (2026-11-19, P245 ✅): lo que el cartel aplica solo (número fijo, la diferencia sola, un token oculto) lo cuenta
+  `zonaDanoCuenta` («4 − Defensa 1 = 3») y lo avisa `zonaDanoAvisar`: a quien maneja al que lo recibe (el jugador del personaje aunque el GM tenga 🎮
+  el control; un creep, el GM) en el veredicto del cartel de la zona si lo resolvió su pantalla, o un momento `zona-dano` con `aviso` al centro; línea
+  en la Mesa (no si está oculto). Otros daños directos sin aviso: P246.
 
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa

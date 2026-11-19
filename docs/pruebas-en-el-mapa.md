@@ -2848,3 +2848,9 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   Aplicar el daño»; el cartel de la zona volvió con «4 de daño de fuego (lo tiró GM; entraron 3)». (2) Una zona de Blanco J1, «Fuego de Blanco J1», sobre
   el Blanco creep: al GM le salió «Aplicar» (y «🎲 Tirar a mano», por si el jugador no está); a Jugador 1, «🎲 Tirar el daño · 1d6»: tiró 5, 5 −
   Defensa 5 = 0. Videos del dado rodando para el dueño.
+- ✔ **📣 El daño fijo de una zona, con aviso al afectado** (P245): una zona del GM de 4 de daño fijo («Brasas del GM», sin dados ni resistencia) apareció
+  bajo Blanco J1: Jugador 1 tocó «Aplicar» y el cartel volvió con «4 de daño (4 − Defensa 1 = 3): entraron 3» y el recuadro rojo «💔 −3 · Te entraron 3
+  de daño por Brasas del GM (4 − Defensa 1 = 3)»; vida 50 → 47; la Mesa: «💔 Blanco J1 · Brasas del GM: le entraron 3 de daño (4 − Defensa 1 = 3)».
+  Con el GM con 🎮 el control de Blanco J1 (lo resolvió el GM), a Jugador 1 le salió al centro el Aviso «Brasas del GM · Te entraron 3 de daño…» con
+  «💔 −3» y «Entendido». Sobre el Blanco creep (zona de 8, con fuego amigo), al GM: «A Blanco creep le entraron 3 de daño por Púas del GM (8 − Defensa
+  5 = 3)». Capturas `cola6/`.

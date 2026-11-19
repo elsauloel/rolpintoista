@@ -1577,3 +1577,13 @@ personaje detrás) la tira él, a nombre de su primer personaje; (3) un daño **
 aplica directo, como antes; (4) lo aplica el camino de siempre del cuadro del duelo («💔 Aplicar el daño» del que lo recibe), con la Defensa, la
 Defensa especial (solo en las zonas de habilidad o con elemento, como antes), las resistencias y la Suela gruesa de lo que se pisa. **Pregunta para el
 dueño:** ¿está bien así, o preferís otra cosa en alguno de estos casos?
+
+### P246 — 📣 Otros daños directos que entran sin aviso al afectado (2026-11-19, Claude)
+Al sumar el aviso del daño fijo de una zona (P245) se revisaron los otros daños que el mapa aplica solo. **No se tocaron**; hoy se cuentan solo en la
+Mesa (a veces en rojo) y un toast en la pantalla que los aplica, sin el Aviso al centro para quien maneja al que lo recibe: (1) 🔥 **Terreno incendiado**
+al entrar y en cada Mantenimiento (`fuegoEntrada` / `fuegoMantenimiento`, js/08); (2) ⛈ **Maldición tormentosa** al moverse (`tormentaAlMoverse`,
+js/08); (3) 🦵 **Tendón cortado** al caminar sangrando (`tendonAlMoverse`, js/107); (4) 🛡 **Miti-Miti / Escudo humano**: lo que se lleva quien protege
+(`mitiMitiCobrar`, js/10); (5) ⚡ los saltos del **Relámpago en cadena** (`rayoCadenaAplicar`, js/10: Mesa y Crónica); (6) 🪞🔮 el **Espejito** y el
+**Orbe salvaje** con 1, que le pegan a quien atacó (js/53). Las Espinas y el Espejo se ven en el cuadro del duelo; las trampas y el Escudo elemental ya
+tienen su cartel para la víctima. En los tres primeros, casi siempre los aplica la pantalla de quien maneja al que lo recibe (la que lo movió), salvo
+con el GM con 🎮 el control. **Pregunta para el dueño:** ¿les sumamos el mismo aviso («Te entraron N de daño por…») a todos, a algunos, o así está bien?

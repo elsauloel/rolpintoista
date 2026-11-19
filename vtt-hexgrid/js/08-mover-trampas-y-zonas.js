@@ -689,6 +689,40 @@ function zonaGmHooksDuelo(lado){
   return {soy: l => !!(l && l.tipo === 'creep' && !l.ref && soyGM),
     registrarTirada: (origen, r) => { mesaPublicar(origen, {...r, quien: 'GM', desde: 'gm'}); window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}})); }};
 }
+/* 📣 El daño directo de una zona, avisado a quien lo recibe (dueño, 2026-11-19, P245: «si te entra un daño directo, te tiene que aparecer una
+   notificación que diga, te ingresó tanto de daño por tal razón»). Lo que el cartel aplica solo —el número fijo (sin dados), la diferencia sola o el
+   daño de un token oculto— le llega a quien maneja al que lo recibe (su jugador; el GM, un creep) como «Te entraron N de daño por <zona>», con la
+   cuenta si la Defensa (o la Defensa especial, la resistencia, la Suela gruesa o un escudo) frenó algo. Si lo resolvió esa misma pantalla, va en el
+   cartel de la zona (el veredicto); si no, un Aviso al centro (el momento, con `aviso`). Y queda en la Mesa y en la Crónica. */
+function zonaDanoCuenta(monto, r, o){
+  if(r.invulnerable) return {entro: 0, cuenta: 'Invulnerable: no entró nada', frenoAlgo: true};
+  const entro = Combatiente.danoAVida(r), resta = [];
+  const defBase = num(r.defensa) - num(o.resElem) - num(o.suela) - (o.ignoraDef ? num(o.armadmg) : 0);
+  if(!o.ignoraDef && defBase > 0) resta.push(`Defensa ${fmt(defBase)}`);
+  if(o.ignoraDef && num(o.armadmg) > 0) resta.push(`Defensa especial ${fmt(o.armadmg)}`);
+  if(num(o.resElem) && o.elZ) resta.push(Combatiente.resElementalTxt(o.elZ, num(o.resElem)));
+  if(num(o.suela) > 0) resta.push(`Suela gruesa ${fmt(o.suela)}`);
+  if(num(r.arcano) > 0) resta.push(`Armadura arcana ${fmt(r.arcano)}`);
+  if(num(r.mitiMiti) > 0) resta.push(`${r.mitiMitiNombre || 'otro'} se llevó ${fmt(r.mitiMiti)}`);
+  const esc = num(r.absorbido) - num(r.arcano) - num(r.vida);
+  if(esc > 0) resta.push(`escudo ${fmt(esc)}`);
+  return {entro, frenoAlgo: resta.length > 0, cuenta: resta.length ? `${fmt(monto)} − ${resta.join(' − ')} = ${fmt(entro)}` : (o.ignoraDef ? 'directo a la vida' : 'nada lo frenó')};
+}
+async function zonaDanoAvisar(t, el, monto, cz, tipoTxt){
+  const nombreZ = el.zonaNombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t);
+  const cuantos = `${cz.entro === 1 ? 'entró 1' : `entraron ${fmt(cz.entro)}`} de daño${tipoTxt}`;
+  const texto = `${t.tipo === 'creep' ? `A ${quien} le` : 'Te'} ${cuantos} por ${nombreZ} (${cz.cuenta}).`;   // (un creep: el GM lo lee en tercera persona)
+  const veredicto = {tono: cz.entro > 0 ? 'malo' : 'neutro', grande: cz.entro > 0 ? `💔 −${fmt(cz.entro)}` : '🛡 0', chico: texto};
+  // Quien maneja al que lo recibe: el jugador del personaje (aunque el GM tenga 🎮 el control); un creep, las pantallas del GM.
+  const gms = []; for(const [uid, m] of miembros) if(m && m.gm) gms.push(uid);
+  const para = t.tipo === 'creep' ? gms : [zonaVenenoJugador(t)].filter(Boolean);
+  if(para.includes(fbUsuario.uid) && zonaBanner) zonaBanner.veredicto = veredicto;   // lo resolvió acá: en el cartel de la zona
+  if(!t.oculto) try{ await mesaLinea(`💔 ${quien} · ${nombreZ}: le ${cuantos} (${cz.cuenta})`, 'recordatorio'); }catch(err){}   // (a uno oculto, la Mesa —la ven todos— no lo nombra)
+  const otros = para.filter(u => u !== fbUsuario.uid);
+  if(otros.length)
+    momentoAbrir({tipo: 'zona-dano', icono: '💔', titulo: `${quien} · ${nombreZ}`, estado: 'listo', resultado: `Le ${cuantos} (${cz.cuenta}).`,
+      datos: {paraUids: otros, aviso: true, tituloAviso: nombreZ, textoAviso: texto, veredicto: {...veredicto, chico: cz.cuenta}, ...(t.oculto && t.tipo === 'creep' ? {soloGM: true} : {})}});
+}
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
@@ -701,7 +735,7 @@ function renderZonaBanner(){
   const nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
   const stat = el.zonaResistStat ? (ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat) : '';
   if(zonaBanner.resultado){
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado,
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado, veredicto: zonaBanner.veredicto || null,
       botones: [{texto: 'Listo', id: 'zona-banner-ok', alClic: () => { zonaBanner = null; zonaMostrarSiguiente(); }}]});
   }else if(stat){
     // Qué se resiste, a la vista antes de tirar (dueño, 2026-10-04, norma general). Resistir una zona evita todo: el daño y lo que deja.
@@ -829,9 +863,13 @@ async function zonaResolverBanner(){
         const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef))};   // el Orbe de absorción (js/26)
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
-        const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
-        partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
+        const suelaZ = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+        const cz = res && res.r ? zonaDanoCuenta(monto, res.r, {ignoraDef: !!el.zonaIgnoraDef, armadmg, resElem: resEl - suelaZ, suela: suelaZ, elZ}) : null;
+        if(cz) partes.push(`${monto} de daño${tipoTxt} (${cz.cuenta}): entraron ${fmt(cz.entro)}`);
+        else{ const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
+          partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`); }
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
+        if(cz) await zonaDanoAvisar(t, el, monto, cz, tipoTxt).catch(err => console.error('El aviso del daño de la zona:', err));   // 📣 (P245)
         if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03, 2026-11-01)
         // (si la zona ya deja ese mismo estado —Destello revelador, antes Luz para los suyos: Marcado—, no se pone dos veces; 2026-10-26, visto en el mapa)
         if(idZ && idZ.estado && danoHecho > 0 && !(res && res.r && res.r.invulnerable) && !(specZ && String(specZ.nombre || '') === idZ.estado.nombre)){   // ☀ Marcado · 🌑 Herida sombría

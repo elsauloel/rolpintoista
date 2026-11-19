@@ -433,10 +433,24 @@
   esencial({...S3, nivel: 5, atrib: [14, 11, 8, 8, 4],   // (aprobado 2026-11-14: Abrojos en lugar de Señalar la presa —con Especial 4 no entraba—; el Yelmo de bronce con runas, Buena, en lugar de la Cofia)
     equipo: ['Martillo de herrero', 'Coraza de hierro batido', 'Yelmo de bronce con runas', 'Botas de caña alta de estanciero', 'Guantes de cuero grueso'],
     habilidades: ['Bendecir el arma', 'Arma elemental', 'Armas perforantes', 'Ojo certero', 'Potencia', 'Abrojos'], pasivas: ['Piel curtida', 'Desvío hábil']});
-  esencial({linea: 'S4', nombre: 'Protector', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [9, 2, 6, 4, 12],
+  const S4 = {linea: 'S4', nombre: 'Protector', rol: 'support', rolTxt: 'apoyo', consumibles: ['Poción de HP'],
+    estrategia: 'Support. Juega en el turno de los demás: escudo y +3 a la defensa en el momento justo; con los pilares tapa al que dispara.'};
+  esencial({...S4, nivel: 1, atrib: [9, 2, 6, 4, 12],
     equipo: ['Varita de los pilares', 'Escudo de madera forrado en lienzo', 'Chaleco de cuero', 'Escarpines de piel de cururú'],
-    habilidades: ['Potencia', 'Arrojo'], consumibles: ['Poción de HP'],
-    estrategia: 'Support. Juega en el turno de los demás: escudo y +3 a la defensa en el momento justo; con los pilares tapa al que dispara.'});
+    habilidades: ['Potencia', 'Arrojo']});
+  // S4 Protector (niveles 2 en adelante, aprobados de a uno el 2026-11-19; en modo SP).
+  esencial({...S4, nivel: 2, atrib: [10, 2, 6, 5, 13],   // (aprobado 2026-11-19: Coraza de púas, Largo alcance arcano; + Sombrero humectante y Polainas de cuero remendado)
+    equipo: ['Varita de los pilares', 'Escudo de madera forrado en lienzo', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Sombrero humectante', 'Polainas de cuero remendado'],
+    habilidades: ['Potencia', 'Arrojo', 'Coraza de púas'], pasivas: ['Largo alcance arcano']});
+  esencial({...S4, nivel: 3, atrib: [10, 2, 7, 5, 15],   // (aprobado 2026-11-19: Velo espejado; el Escudo de la guardia, Buena, en lugar del Escudo de madera)
+    equipo: ['Varita de los pilares', 'Escudo de la guardia', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Sombrero humectante', 'Polainas de cuero remendado'],
+    habilidades: ['Potencia', 'Arrojo', 'Coraza de púas', 'Velo espejado'], pasivas: ['Largo alcance arcano']});
+  esencial({...S4, nivel: 4, atrib: [11, 2, 7, 6, 16],   // (aprobado 2026-11-19: Purificar, Recuperación mental; el Sombrero humectante bordado, Buena, en lugar del Sombrero)
+    equipo: ['Varita de los pilares', 'Escudo de la guardia', 'Chaleco de cuero', 'Escarpines de piel de cururú', 'Sombrero humectante bordado', 'Polainas de cuero remendado'],
+    habilidades: ['Potencia', 'Arrojo', 'Coraza de púas', 'Velo espejado', 'Purificar'], pasivas: ['Largo alcance arcano', 'Recuperación mental']});
+  esencial({...S4, nivel: 5, atrib: [11, 2, 8, 6, 18],   // (aprobado 2026-11-19: Tirar la bronca; el Jubón de cuero tachonado, Buena, en lugar del Chaleco de cuero; S4 completa)
+    equipo: ['Varita de los pilares', 'Escudo de la guardia', 'Jubón de cuero tachonado', 'Escarpines de piel de cururú', 'Sombrero humectante bordado', 'Polainas de cuero remendado'],
+    habilidades: ['Potencia', 'Arrojo', 'Coraza de púas', 'Velo espejado', 'Purificar', 'Tirar la bronca'], pasivas: ['Largo alcance arcano', 'Recuperación mental']});
   const D2 = {linea: 'D2', nombre: 'Tóxico', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Polvo de adormidera'],
     estrategia: 'Debuffer. Envenena el aire: el grupo se tiene que mover o se pudre adentro.'};
   esencial({...D2, nivel: 1, atrib: [8, 2, 6, 5, 12],

@@ -791,20 +791,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   nv1 + **Polainas de cuero remendado** (Def +1, Res.CC +1) y **Escarpines de piel de cururú** (Def.Esp +1, Res. tóxico +1): Def 3, Def.Esp 2, PdG.Esp
   15, Ef.Esp 14, Eva 7, Parry 4, Ini 7, Mov 7, Rango 4, Res.CC 10 / Res.Esp 10 / Res.Mt 14. Habilidad nueva: **Confusión** (lenta, 3 SP, 2 No2: su
   PdG.Esp contra la Res.Mt, Confundido 1 turno). Pasiva: **Puntería arcana** (+1 PdG.Esp). Costos: Punzada mental 1 SP / 1 No2, Cegar 3 SP / 2 No2.
-  Falta cargarlo.
+  Cargado (2026-11-19).
   **Nivel 3 aprobado** (dueño, 2026-11-19: «va así»): Esp 15 · Con 10 · Agi 7 · Des 5 · Fue 2, vida 50, 7 No2, 45 SP (recupera 7). Equipo: la Varita del
   destello pasa a **Varita del eclipse** (Buena: 1d6 arcano directo y 25 % de Ceguera 1 turno, un blanco, 1 SP; el área ahora la da el Grito); el resto
   como nv2: Def 3, Def.Esp 2, PdG.Esp 16, Ef.Esp 15, Eva 7, Parry 5, Rango 5, Res.CC 11 / Res.Esp 11 / Res.Mt 15. Habilidad nueva: **Grito espeluznante**
-  (4 SP, 2 No2: onda de 3 a sus rivales, su PdG.Esp contra la Res.Mt de cada uno; 1d6 arcano y Pánico). Sin pasiva nueva. Falta cargarlo.
+  (4 SP, 2 No2: onda de 3 a sus rivales, su PdG.Esp contra la Res.Mt de cada uno; 1d6 arcano y Pánico). Sin pasiva nueva. Cargado (2026-11-19).
   **Nivel 4 aprobado** (dueño, 2026-11-19: «va así»): Esp 17 · Con 10 · Agi 8 · Des 5 · Fue 2, vida 50, 8 No2, 51 SP (recupera 8). Equipo: la Capucha de
   lana del culto pasa a **Corona de laureles dorada** (Buena: Res.Mt +2, Def.Esp +1, Res.Esp +1, Percepción +1); el resto como nv3: Def 3, Def.Esp 2,
   PdG.Esp 18, Ef.Esp 18, Eva 8, Parry 5, Ini 8, Mov 8, Rango 5, Percepción 6, Res.CC 11 / Res.Esp 11 / Res.Mt 19. Habilidad nueva: **Tótem de silencio**
-  (4 SP, 2 No2; disponible desde el inicio; 40 de vida a nivel 4). Pasiva: **Potencia especial** (+1 Ef.Esp: la usa el Polen somnífero). Falta cargarlo.
+  (4 SP, 2 No2; disponible desde el inicio; 40 de vida a nivel 4). Pasiva: **Potencia especial** (+1 Ef.Esp: la usa el Polen somnífero). Cargado (2026-11-19).
   **Nivel 5 aprobado** (dueño, 2026-11-19: «va»): Esp 18 · Con 11 · Agi 8 · Des 6 · Fue 2, vida 65 (55 + 10 del Poncho), 8 No2, 54 SP (recupera 9).
   Equipo: el Chaleco de cuero pasa a **Poncho de espejitos** (Buena: Def +1, Def.Esp +2, Vida +10, Res. rayo +1, Espejo mientras lo lleva); el resto como
   nv4: Def 2, Def.Esp 4, PdG.Esp 19, Ef.Esp 19, Eva 8, Parry 6, Rango 6, Percepción 7, Res.CC 12 / Res.Esp 12 / Res.Mt 20. Habilidad nueva: **Polen
   somnífero** (4 SP, 2 No2: flor de 7 casillas en su Rango, su Ef.Esp contra la Res.Mt de cada rival; Sueño 2 turnos, sin daño). Sin pasiva nueva.
-  Falta cargarlo.
+  Cargado (2026-11-19).
 
 - **T3 · Guardaespaldas · Tanque** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como ruta»; «me gusta, sí»). Estrategia: cuida a los
   suyos: marca a un protegido (mago, jefe, Sanador) y se come la mitad de lo que le pegan, salta a interponerse, provoca y voltea con el escudo.
@@ -1408,7 +1408,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | S4 | ✅ (2026-11-03) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) |
-| D4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) |
+| D4 | ✅ (2026-11-03) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) |
 
 ## Los creeps (cada uno se completa al diseñarlo)
 

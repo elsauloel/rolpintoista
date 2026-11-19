@@ -485,10 +485,25 @@
   esencial({...D3, nivel: 5, atrib: [10, 2, 9, 6, 18],   // (aprobado 2026-11-14: Maldición tormentosa; el Muñeco vudú, Buena, en lugar del Grimorio gastado)
     equipo: ['Varita chupasangre', 'Muñeco vudú', 'Chaleco de cuero', 'Sombrero humectante bordado', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
     habilidades: ['Escalofrío', 'Robar el aliento', 'Sanguijuela', 'Mal de ojo', 'Disipar', 'Maldición tormentosa'], pasivas: ['Puntería arcana', 'Largo alcance arcano']});
-  esencial({linea: 'D4', nombre: 'Control mental y ceguera', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [9, 2, 6, 4, 12],
+  const D4 = {linea: 'D4', nombre: 'Control mental y ceguera', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Polvo de adormidera'],
+    estrategia: 'Debuffer. Te saca el control: te ciega, te abre la mente y te confunde. Con daño, para que no lo ignoren.'};
+  esencial({...D4, nivel: 1, atrib: [9, 2, 6, 4, 12],
     equipo: ['Varita del destello', 'Botella con un diablito', 'Chaleco de cuero', 'Capucha de lana del culto'],
-    habilidades: ['Punzada mental', 'Cegar'], consumibles: ['Polvo de adormidera'],
-    estrategia: 'Debuffer. Te saca el control: te ciega, te abre la mente y te confunde. Con daño, para que no lo ignoren.'});
+    habilidades: ['Punzada mental', 'Cegar']});
+  // D4 Control mental y ceguera (niveles 2 en adelante, aprobados de a uno el 2026-11-19; en modo SP). El Grito espeluznante, con su nombre de Combatiente.
+  const GRITO = typeof Combatiente !== 'undefined' && Combatiente.GRITO_ESPELUZNANTE ? Combatiente.GRITO_ESPELUZNANTE.nombre : 'Grito espeluznante';
+  esencial({...D4, nivel: 2, atrib: [9, 2, 7, 4, 14],   // (aprobado 2026-11-19: Confusión, Puntería arcana; + Polainas de cuero remendado y Escarpines de piel de cururú)
+    equipo: ['Varita del destello', 'Botella con un diablito', 'Chaleco de cuero', 'Capucha de lana del culto', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Punzada mental', 'Cegar', 'Confusión'], pasivas: ['Puntería arcana']});
+  esencial({...D4, nivel: 3, atrib: [10, 2, 7, 5, 15],   // (aprobado 2026-11-19: Grito espeluznante; la Varita del eclipse, Buena, en lugar de la del destello)
+    equipo: ['Varita del eclipse', 'Botella con un diablito', 'Chaleco de cuero', 'Capucha de lana del culto', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Punzada mental', 'Cegar', 'Confusión', GRITO], pasivas: ['Puntería arcana']});
+  esencial({...D4, nivel: 4, atrib: [10, 2, 8, 5, 17],   // (aprobado 2026-11-19: Tótem de silencio, Potencia especial; la Corona de laureles dorada, Buena, en lugar de la Capucha)
+    equipo: ['Varita del eclipse', 'Botella con un diablito', 'Chaleco de cuero', 'Corona de laureles dorada', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Punzada mental', 'Cegar', 'Confusión', GRITO, 'Tótem de silencio'], pasivas: ['Puntería arcana', 'Potencia especial']});
+  esencial({...D4, nivel: 5, atrib: [11, 2, 8, 6, 18],   // (aprobado 2026-11-19: Polen somnífero; el Poncho de espejitos, Buena, en lugar del Chaleco de cuero; D4 completa)
+    equipo: ['Varita del eclipse', 'Botella con un diablito', 'Poncho de espejitos', 'Corona de laureles dorada', 'Polainas de cuero remendado', 'Escarpines de piel de cururú'],
+    habilidades: ['Punzada mental', 'Cegar', 'Confusión', GRITO, 'Tótem de silencio', 'Polen somnífero'], pasivas: ['Puntería arcana', 'Potencia especial']});
 
   esencial({linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 6, 7, 3],   // (2026-11-03, dueño: «me gusta, sí»)
     equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto'],

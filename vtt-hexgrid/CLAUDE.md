@@ -890,6 +890,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `chancesEnSecuencia(d, [{tokenId, efectos}], nombre)` hace uno por token, de a uno, sin frenar a quien la llama (un token oculto: a mano). Lo usan la
   Parálisis del Escudo eléctrico (js/106, después del duelo de resistencia), los saltos del rayo (`dueloCadena` js/13, el agua js/50, la flecha js/33)
   y Romper armadura contra el escudo (`dueloRompeEscudo` js/26: el `item` del escudo viaja en el spec del duelo, comun/duelo.js `limpiarSpec`).
+  **🔮 El d6 del Orbe salvaje, a la vista** (2026-11-19, dueño: «la solución sería que esta tirada no fuera automática»; #21): ya no sale solo con el daño.
+  Al tirar el daño especial, `comun/duelo.js` pregunta con el gancho `orbeSalvajeTipo` (js/14 → `talSalvajeTipo`, js/53) si quien atacó lo lleva y deja
+  `dano.salvaje.pend`; en el paso Daño del mismo cuadro sale «🔮 Orbe salvaje · 🎲 Tirar 1d6» (con «✍ Elegir manualmente») para quien maneja al atacante
+  (el GM por un creep o «por» quien no está), el d6 rueda en la Mesa y recién después se aplica el daño (como el daño de elemento `magico.pend`;
+  `tirarSalvaje`, `salvPend`). El 1 sigue con `talSalvajePropio` y su aviso. El d6 automático al aplicar queda solo para un daño tirado fuera del mapa.
 
 - **✨ La animación de la Lanza arcana** (2026-11-19, dueño: «me gusta así»; `js/120-lanza-fx.js`): `dueloElegirAreaMapa` (js/13), con una línea y
   `lanzaFxEs(hab)` (la Lanza arcana, o `hab.fxLanza`), publica el momento `lanza-fx` ({de, desde, celdas, atraviesa, semilla}) y espera `LANZA_DUR` antes de

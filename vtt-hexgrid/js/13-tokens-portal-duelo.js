@@ -2036,7 +2036,7 @@ async function dueloAplicarDano(d, o){
   const multCarga = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
   let multHab = multCarga;
   // 🔮 El Orbe salvaje (js/53): con daño especial, una tirada de 1d6 (6: ×2 o ×3; 1: el mismo daño a quien atacó, después).
-  const salvaje = dn.salvaje ? {...dn.salvaje} : !simular && !suelto && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
+  const salvaje = dn.salvaje ? (dn.salvaje.pend ? null : {...dn.salvaje}) : !simular && !suelto && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
   if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   // 🔮 La Botella con un diablito (js/53): +N a todo tu daño especial (si hay el de la habilidad, ahí; si no, al del arma).
   const botella = !suelto && typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;

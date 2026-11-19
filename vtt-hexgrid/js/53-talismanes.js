@@ -5,7 +5,8 @@
    · Cabeza reducida y Muñeco vudú (`alDanoEspecial` = {nombre, turnos}; 2026-10-18, dueño: con el daño especial, no solo la varita): la primera
      vez en cada turno (ronda) que quien la lleva le hace daño especial a alguien, ese estado (`talAlDanoEspecial`).
    · Orbe salvaje (`orbeSalvaje`: true o 'domado'; 2026-10-18, dueño): con cualquier daño especial, 1d6 — con 6, ×2 (el domado ×3); con 1, el
-     mismo daño que entró le entra también a quien atacó (`talSalvajeTirar` antes del daño, `talSalvajePropio` después).
+     mismo daño que entró le entra también a quien atacó (el d6, su propio paso en el cuadro del duelo desde el 2026-11-19: `talSalvajeTipo`
+     dice si lo lleva y comun/duelo.js `tirarSalvaje` lo tira; `talSalvajePropio` después del daño).
    · Orbe del custodio (`orbeCustodio`; 2026-10-18, dueño): cada vez que quien lo lleva gana una tirada de PdG.Esp, Vida extra N a un aliado al
      lado (`talCustodio`, desde el hook `pdgEspGanado` del duelo, en la pantalla de quien tiró; js/26 orbeCustodioMapa).
    · Botella con un diablito (`botella` = N; 2026-10-18, dueño): +N a todo tu daño especial; si en los dados de ese daño sale algún 1, el diablito
@@ -103,16 +104,18 @@ function talSalvajeRodar(d){
   return {mult: x.mult, propio: x.propio, d: dado, nombre: t.nombre};
 }
 // La Mesa: el d6 y qué pasa.
-async function talSalvajeAnunciar(d, sv){
+// `o.sinDados`: el d6 ya rodó en el cuadro del duelo (comun/duelo.js, tirarSalvaje, 2026-11-19): solo la línea que dice qué pasa.
+async function talSalvajeAnunciar(d, sv, o){
   if(!sv) return;
   const ta = tokens.get(d.atacante && d.atacante.tokenId);
   const txt = sv.mult > 1 ? `¡el daño especial sale ${sv.mult === 3 ? 'triple' : 'doble'}!` : sv.propio ? `el mismo daño que le entre a ${d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
-  try{ await mesaPublicar(`${d.atacante.nombre} · ${sv.nombre}`, {formula: '1d6', rolls: [sv.d], mod: 0, total: sv.d, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
-  try{ mesaLinea(`🔮 ${sv.nombre} de ${d.atacante.nombre} (1d6 → ${sv.d}): ${txt}`, 'recordatorio'); }catch(err){}
+  if(!(o && o.sinDados)) try{ await mesaPublicar(`${d.atacante.nombre} · ${sv.nombre}`, {formula: '1d6', rolls: [sv.d], mod: 0, total: sv.d, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
+  try{ mesaLinea(`🔮 ${sv.nombre} de ${d.atacante.nombre} (1d6 → ${sv.d}${sv.manual ? ', a mano' : ''}): ${txt}`, 'recordatorio'); }catch(err){}
 }
-/* 🔮 (2026-11-04, dueño, para que la cuenta del daño se vea bien ANTES de aplicarlo) El d6 se tira con la tirada de daño (comun/duelo.js, guardarDano,
-   con el gancho `orbeSalvaje` de Duelo.escuchar) y queda en `dano.salvaje`; al aplicar se usa ese. Si el daño se tiró en una pantalla sin el mapa, se tira
-   acá, al aplicar, como antes. */
+/* 🔮 (2026-11-19, dueño: «la solución sería que esta tirada no fuera automática») El d6 es su propio paso en el cuadro del duelo: al tirar el daño,
+   comun/duelo.js pregunta si quien ataca lo lleva (gancho `orbeSalvajeTipo` → talSalvajeTipo) y deja `dano.salvaje.pend`; quien maneja al atacante (o
+   el GM por él) tira el 1d6 o lo elige a mano (tirarSalvaje) y recién ahí se aplica el daño, con ese `dano.salvaje`. Si el daño se tiró en una pantalla
+   sin el mapa, se tira acá, al aplicar, como antes (el respaldo raro). */
 async function talSalvajeTirar(d){
   const sv = talSalvajeRodar(d);
   await talSalvajeAnunciar(d, sv);

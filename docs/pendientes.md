@@ -160,7 +160,7 @@
 >   (1) el token que no se mueve en el dodge roll: ver el punto de arriba; (2) los carteles que piden algo ahora van encima del cuadro del duelo, en todo
 >   el mapa; (3) el dodge roll de un área sigue dando ataque de oportunidad al alejarse de un rival (dueño, 2026-11-14: queda así); (4) antes de tirar el daño aparece el
 >   cartel genérico «no hay nada que resistir: se aplica».
-> - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Soltarse (dueño, 2026-11-13).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
+> - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Confusión (dueño, 2026-11-13; Soltarse → queda con su cartel, dueño 2026-11-19).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
 >   Escudo elemental y el Malviaje → quedan como están; Inamovible → al cuadro del duelo (hecho). Quedó preguntado Soltarse (¿queda con su cartel, o al
 >   cuadro del duelo? con ayuda se suman varias tiradas de un lado). Después: Confusión, la tirada extra de las zonas y las zonas una por una.
 > - [ ] **👀 Pruebas que tiene que ver el dueño (2026-10-30, dueño: «lo que tengo que ver yo, anotalo en pendiente para cuando esté en la compu»)** —

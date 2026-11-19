@@ -2870,3 +2870,20 @@ Sumados al mapa Protector 2, 3, 4 y 5 (creeps y tokens; el 3 pegado al Blanco cr
   quedó Provocado (2) por el Blanco creep; al empezar su turno, a Jugador 1: «😤 Estás provocado por Blanco creep…». Blanco J1 b (a 4) no tiró.
   Capturas `cola7/`.
 
+## 2026-11-19 · 📣 El mismo aviso para los otros daños directos (P246; «Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+- ✔ **🔥 Terreno incendiado**: un fuego de 3 (flor de 7 casillas). Jugador 1 arrastró a Blanco J1 adentro: en su pantalla, «🔥 Terreno incendiado · Te
+  entraron 3 de daño de fuego por el Terreno incendiado (directo a la vida)» con «💔 −3» y «Entendido»; la Mesa: «🔥 Blanco J1 · el Terreno incendiado:
+  le entraron 3 de daño de fuego (directo a la vida) · al entrar». El GM metió al Blanco creep: «A Blanco creep le entraron 3…». ⟳ Pasar de ronda con
+  los dos adentro: a cada uno su aviso («· Mantenimiento: sigue adentro» en la Mesa).
+- ✔ **⛈ Maldición tormentosa**: en combate, Blanco J1 Atormentado caminó 2 casillas: «Te entró 1 de daño por la Maldición tormentosa, al caminar 2 casillas».
+- ✔ **🦵 Tendón cortado**: el Blanco creep con Tendón cortado y Sangrado caminó 2: al GM, «A Blanco creep le entraron 2 de daño por el Tendón cortado, al
+  caminar 2 casillas sangrando».
+- ✔ **🛡 Escudo humano y 🪞 Espejito**: Blanco J1 le pegó al Blanco creep con la Varita de chispa eléctrica (6): el Protector 3 (con Escudo humano sobre el
+  Blanco creep) se llevó 3 (al GM: «A Protector 3 le entraron 3 de daño por el Escudo humano, la mitad del golpe a Blanco creep»; Mesa con «50 → 47 HP»), y
+  el Espejito del Blanco creep le devolvió 1 a Blanco J1 (a Jugador 1: «Te entró 1 de daño por el Espejito de Blanco creep»). El salto al Protector 3 fue
+  en su propio cuadro del duelo, como siempre.
+- ✔ **⚡ El salto del rayo por el agua**: un charco bajo el Blanco creep y el Protector 3; la Varita de la flor de chispas al Protector 3: al GM, «A Blanco
+  creep le entraron 3 de daño por el salto del rayo» y, al cerrarlo, el reporte del rayo (antes el reporte tapaba el aviso: ahora espera).
+- ⬜ **🔮 El Orbe salvaje con 1** (a quien atacó le entra lo mismo que al rival): no se probó, el d6 sale al azar. Usa el mismo aviso que el Espejito. Para
+  probarlo: un personaje con el Orbe salvaje pegando con una varita hasta que salga un 1.
+Capturas `cola8/`.

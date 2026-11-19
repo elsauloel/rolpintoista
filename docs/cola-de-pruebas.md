@@ -25,12 +25,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la Crónica (`zonaDanoCuenta` / `zonaDanoAvisar`, `vtt-hexgrid/js/08`). Probado en «Claude · pruebas 2» con GM y Jugador 1: zona fija del GM sobre
   Blanco J1 (la resolvió Jugador 1), lo mismo con el GM con el control, y sobre el Blanco creep. Otros daños directos sin aviso al afectado: P246 (sin
   tocar). 874 pruebas en verde.
-- **⬜ en cola — 📣 El mismo aviso al afectado para los otros daños directos** (dueño, 2026-11-19, P246 ✅: «ponele a todos el mismo aviso»). Los seis
+- **✅ hecho (2026-11-19) — 📣 El mismo aviso al afectado para los otros daños directos** (dueño, 2026-11-19, P246 ✅: «ponele a todos el mismo aviso»). Los seis
   que encontró la tarea del daño fijo de las zonas (ver P246 en `preguntas-abiertas.md`): 🔥 Terreno incendiado (al entrar y en cada Mantenimiento),
   ⛈ Maldición tormentosa (al moverse), 🦵 Tendón cortado (al caminar sangrando), 🛡 Miti-Miti / Escudo humano (lo que se lleva quien protege), ⚡ los
   saltos del Relámpago en cadena, y 🪞🔮 el Espejito y el Orbe salvaje con 1 (le pegan a quien atacó). Mismo aviso que el del daño fijo de una zona
   (`vtt-hexgrid/js/08`): al afectado (su jugador, o el GM para un creep) «Te entraron N de daño por <qué>» con la cuenta, y la línea en la Mesa y la
   Crónica. Reusar esa misma función, no armar otra. Probar en el mapa los que se puedan.
+  *Resultado:* una sola función para todos (`danoDirectoAvisar`, la del daño fijo de las zonas, js/08): a quien maneja al afectado, el Aviso al centro
+  con la cuenta y «Entendido» (al GM en tercera persona para un creep), la línea en la Mesa y la Crónica. Si llegan dos avisos juntos, el segundo espera
+  al primero (también el reporte del rayo). Probado en «Claude · pruebas 2» con GM y Jugador 1: 🔥 al entrar Blanco J1 («Te entraron 3 de daño de fuego
+  por el Terreno incendiado (directo a la vida)») y el Blanco creep (al GM), y en el Mantenimiento los dos; ⛈ Blanco J1 al caminar 2 casillas
+  Atormentado; 🦵 el Blanco creep caminando 2 con el tendón cortado y sangrando; 🛡 el Escudo humano del Protector 3 (−3) y 🪞 el Espejito del Blanco
+  creep (−1 a Blanco J1) en un golpe de varita; ⚡ el salto por el agua al Blanco creep. **Sin probar en el mapa**: el Orbe salvaje con 1 (el d6 sale al
+  azar), anotado en `pruebas-en-el-mapa.md`. Los saltos de una varita o del Relámpago van cada uno en su cuadro del duelo (ya se veían). 874 pruebas en verde.
 - **✅ hecho (2026-11-19) — 🛡 Cargar el Protector (S4) niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar en
   `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección S4: atributos, equipo, habilidades, pasivas, modo SP), con su prueba
   de números en `comun/pruebas.html`, y cambiar sus «Falta cargarlo» por «Cargado». En el mapa ver: Coraza de púas (Espinas a un aliado), Velo espejado

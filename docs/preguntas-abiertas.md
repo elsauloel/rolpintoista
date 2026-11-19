@@ -1578,7 +1578,8 @@ aplica directo, como antes; (4) lo aplica el camino de siempre del cuadro del du
 Defensa especial (solo en las zonas de habilidad o con elemento, como antes), las resistencias y la Suela gruesa de lo que se pisa. **Pregunta para el
 dueño:** ¿está bien así, o preferís otra cosa en alguno de estos casos?
 
-### P246 — 📣 Otros daños directos que entran sin aviso al afectado (2026-11-19, Claude)
+### ✅ P246 — 📣 Otros daños directos que entran sin aviso al afectado (2026-11-19, Claude)
+**✅ Decidido (dueño, 2026-11-19: «ponele a todos el mismo aviso»)**: los seis daños directos de la lista llevan el mismo aviso al afectado que el daño fijo de las zonas («Te entraron N de daño por …»). A la cola.
 Al sumar el aviso del daño fijo de una zona (P245) se revisaron los otros daños que el mapa aplica solo. **No se tocaron**; hoy se cuentan solo en la
 Mesa (a veces en rojo) y un toast en la pantalla que los aplica, sin el Aviso al centro para quien maneja al que lo recibe: (1) 🔥 **Terreno incendiado**
 al entrar y en cada Mantenimiento (`fuegoEntrada` / `fuegoMantenimiento`, js/08); (2) ⛈ **Maldición tormentosa** al moverse (`tormentaAlMoverse`,

@@ -787,6 +787,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Polen somnífero** | — | + otra Buena |
   **Nivel 1:** Esp 12 · Con 9 · Agi 6 · Des 4 · Fue 2, vida 45, 6 No2, 36 SP (recupera 6); Def 2, Def.Esp 1; todo su daño especial +2 (la
   Botella; si sale un 1 en los dados, se quema 2). Consumible: Polvo de adormidera. Sin cargar hasta que el dueño diga.
+  **Nivel 2 aprobado** (dueño, 2026-11-19: «el d4 va así»): Esp 14 · Con 9 · Agi 7 · Des 4 · Fue 2, vida 45, 7 No2, 42 SP (recupera 7). Equipo: el de
+  nv1 + **Polainas de cuero remendado** (Def +1, Res.CC +1) y **Escarpines de piel de cururú** (Def.Esp +1, Res. tóxico +1): Def 3, Def.Esp 2, PdG.Esp
+  15, Ef.Esp 14, Eva 7, Parry 4, Ini 7, Mov 7, Rango 4, Res.CC 10 / Res.Esp 10 / Res.Mt 14. Habilidad nueva: **Confusión** (lenta, 3 SP, 2 No2: su
+  PdG.Esp contra la Res.Mt, Confundido 1 turno). Pasiva: **Puntería arcana** (+1 PdG.Esp). Costos: Punzada mental 1 SP / 1 No2, Cegar 3 SP / 2 No2.
+  Falta cargarlo.
 
 - **T3 · Guardaespaldas · Tanque** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como ruta»; «me gusta, sí»). Estrategia: cuida a los
   suyos: marca a un protegido (mago, jefe, Sanador) y se come la mitad de lo que le pegan, salta a interponerse, provoca y voltea con el escudo.
@@ -1390,7 +1395,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | S4 | ✅ (2026-11-03) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) | ✅ (2026-11-19, cargado) |
-| D4 | ✅ (2026-11-03) | | | | |
+| D4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)
 

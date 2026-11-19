@@ -17,9 +17,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   minimizándolo) y recién ahí sale, con el mapa a la vista (`misilSiguiente`, `vtt-hexgrid/js/13-tokens-portal-duelo.js`; vale también para las
   Varitas de misiles). Probado en «Claude · pruebas 2» con el Arcano 4: tres misiles (dos a Blanco J1, uno al Blanco creep), los carteles «misil 2 de
   3» y «misil 3 de 3» salieron limpios. 873 pruebas en verde.
-- **⬜ en cola — 🦶 Intercambio arcano contra un rival Inamovible: el recordatorio** (dueño, 2026-11-19, P243 ✅: «con un rival debe aparecer el
-  recordatorio de que el rival es inamovible (no debería poder moverlo)»). Con un aliado no cambia nada (acepta sin tirar). Con un rival Inamovible
-  tiene que salir el recordatorio de que es Inamovible, y si su Inamovible aguanta, no se mueve nadie. Revisar qué sale hoy y probarlo en el mapa.
+- **✅ hecho (2026-11-19) — 🦶 Intercambio arcano contra un rival Inamovible: el recordatorio** (dueño, 2026-11-19, P243 ✅: «con un rival debe
+  aparecer el recordatorio de que el rival es inamovible (no debería poder moverlo)»). *Resultado:* **ya cumplía, sin cambios de código.** Arcano 5 →
+  Blanco J1 (Botas de estibador): ganó el PdG.Esp (3 contra la Res.Esp 1, a mano) y a Jugador 1 le salió el cuadro «Inamovible: Intercambio arcano:
+  Arcano 5 y Blanco J1» con «Inamovible 33 % · funciona con 5–6 · 🎲 Tirar el efecto (1d6)». Con el Inamovible que aguanta (✍ «Funcionó»): «¡Inamovible!
+  No lo mueven» y «Blanco J1 es Inamovible (33 %): no se mueve nadie» en la Mesa y la Crónica; los dos quedaron en su casilla. Con un 1 (prueba del
+  2026-11-19) los cambió. Con un aliado no se tira (como antes). Para mirar (no es de esta tarea): el cartel verde grande del cuadro dice «no hay nada
+  que resistir: se aplica» antes de tirar la chance, y puede confundir.
 - **⬜ en cola — 📺 Animación del Intercambio arcano** (dueño, 2026-11-19: «me gustaría la animación en ambos tokens de old time tv turn on/off»):
   los dos tokens se apagan como un televisor viejo y se prenden en la casilla del otro (como el Parpadeo, `vtt-hexgrid/js/111-parpadeo-tv.js`), en
   todas las pantallas. Video para el dueño.

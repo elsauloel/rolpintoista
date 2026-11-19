@@ -2826,3 +2826,5 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
 ## 2026-11-19 · 🛠 Cola de programación: Andanada, Intercambio y animaciones («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
 - ✔ **🪧 Andanada arcana, el cartel del siguiente misil** (Arcano 4, tres misiles: Blanco J1, Blanco J1 y el Blanco creep): el «misil 2 de 3 — ¿a
   quién?» ya no sale tapado por el cuadro del misil anterior: espera a que se cierre y aparece arriba del mapa, a la vista.
+- ✔ **🦶 Intercambio arcano contra un rival Inamovible** (Arcano 5 → Blanco J1 con Botas de estibador; P243): a Jugador 1 le sale el recordatorio
+  «Inamovible 33 % · 5–6 · Tirar el efecto (1d6)»; si aguanta, «¡Inamovible! No lo mueven» y nadie se mueve. Ya andaba así: sin cambios.

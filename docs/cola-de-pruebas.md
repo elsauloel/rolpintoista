@@ -12,6 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **✅ hecho (2026-11-19) — 🎲 La chance del estado de una zona, a la vista** (dueño, 2026-11-19, bloque 4 de `auditoria-tiradas.md`, #19: «aunque se
+  tire sola, debe aparecer la instancia de chance de que salga, se debe ver el dado rodando y el resultado, en el menú que sea»). *Resultado:* sigue saliendo
+  sola, pero ahora en el cartel de la zona: «Chance de que entre Veneno · 50 %: sale con 4, 5 o 6 en 1d6», «El dado: rodando…» mientras ruedan los dados
+  3D (en todas las pantallas, por la Mesa), y cuando quedan quietos «Salió 4 → ¡Entra Veneno!» o «No entra» (`zonaChanceAVista`, `vtt-hexgrid/js/08`). La
+  Crónica de los demás lo cuenta («Veneno 50 %: salió 1 → no entra»). El daño de esas zonas no se tocó (#9, espera respuesta). Probado en «Claude · pruebas
+  2» con una zona del GM (Veneno 50 %) y Blanco J1 entrando: salió y no salió. Video para el dueño. 873 pruebas en verde.
+- **⬜ en cola — 😇 Renovar el Pacto desde el mapa** (dueño, 2026-11-19: decidido quién lo cambia). Lo renueva la historia (lo marca el GM), pero
+  las herramientas avisan en vez de prohibir: (1) un botón **«😇 Renovar el Pacto»** en el menú del token de un personaje en el mapa, para el GM **y
+  también para el jugador dueño de ese personaje** (dueño: «me gustaría que el jugador también pueda reactivar su pacto desde el mismo botón del mapa»);
+  al renovarlo queda una línea en la Mesa («Fulano renovó su Pacto» / «El GM le renovó el Pacto a Fulano») y al jugador le llega el aviso «Una entidad
+  espiritual te brindó un nuevo Pacto». (2) En la ficha, si el jugador cambia el campo «😇 Pacto» a mano, un cartel «El Pacto lo renueva el GM cuando
+  la historia lo da. ¿Lo cambiás igual?» y, si sigue, la misma línea en la Mesa. Gastarlo sigue automático. Probar en el mapa con GM y Jugador 1.
 - **✅ hecho (2026-11-19) — 🪧 Andanada arcana: el cartel «¿a quién va el siguiente misil?» queda tapado** (dueño, 2026-11-19: «habría que
   corregirlo»). *Resultado:* el cartel ahora espera a que el cuadro del misil anterior se cierre (solo a los 10 s, con «Listo, cerrar» o
   minimizándolo) y recién ahí sale, con el mapa a la vista (`misilSiguiente`, `vtt-hexgrid/js/13-tokens-portal-duelo.js`; vale también para las

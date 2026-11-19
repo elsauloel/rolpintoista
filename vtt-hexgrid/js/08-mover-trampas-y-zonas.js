@@ -624,6 +624,42 @@ function zonaInmediataRevisar(elId){
     zonaEncolar(el, t);
   });
 }
+/* 🎲 La chance del estado de una zona, a la vista (#19 de docs/auditoria-tiradas.md; dueño, 2026-11-19: «aunque se tire sola, debe aparecer la
+   instancia de chance de que salga, se debe ver el dado rodando y el resultado, en el menú que sea»). Sigue saliendo sola (la tira la pantalla que
+   resuelve la zona), pero en el cartel de la zona: primero «Chance de que entre Veneno: 50 % · sale con 4, 5 o 6 en 1d6», después los dados 3D
+   rodando (la tirada va a la Mesa, que los hace rodar en todas las pantallas) y, cuando quedan quietos, el resultado («salió 5 → entra»). Los demás
+   lo ven en la Crónica (el momento de la zona) y con los dados. → true si sale. */
+const ZONA_CHANCE_VER_MS = 1600;   // cuánto queda a la vista el resultado antes de seguir
+function zonaChanceEsperarDados(){
+  return new Promise(ok => {
+    let empezo = typeof dados !== 'undefined' && dados.rodando > 0, hecho = false, tMax, tMin;
+    const fin = () => { if(hecho) return; hecho = true; window.removeEventListener('dados-inicio', ini); window.removeEventListener('dados-quietos', quietos); clearTimeout(tMax); clearTimeout(tMin); setTimeout(ok, 400); };
+    const ini = () => { empezo = true; };
+    const quietos = () => { if(empezo) fin(); };
+    window.addEventListener('dados-inicio', ini);
+    window.addEventListener('dados-quietos', quietos);
+    tMin = setTimeout(() => { if(!empezo) fin(); }, 2200);   // sin animación (apagada, sin internet): no se espera más
+    tMax = setTimeout(fin, 7000);
+  });
+}
+async function zonaChanceAVista(el, t, spec, ch, quienTxt){
+  const pct = num(spec.pct), icono = '🎲', nombreZ = el.zonaNombre || 'Zona';
+  const queSale = `${Combatiente.chanceSale(pct)} en 1d${ch.caras}`;
+  const paso1 = {titulo: `Chance de que entre ${spec.nombre}`, texto: `${Combatiente.chancePct(pct)} %: ${queSale}. Se tira sola.`};
+  const mid = zonaBanner && zonaBanner.momentoP ? await zonaBanner.momentoP.catch(() => null) : null;
+  AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${quienTxt}`, pasos: [paso1, {titulo: 'El dado', texto: `🎲 Rodando el 1d${ch.caras}…`}]});
+  if(mid) momentoActualizar(mid, {resultado: `🎲 Chance de ${spec.nombre} (${Combatiente.chancePct(pct)} %: ${queSale})…`});
+  const r = tirarDados('1d' + ch.caras), sale = !!r && r.total > ch.caras - ch.exitos;
+  const espera = zonaChanceEsperarDados();
+  try{ await mesaPublicar(`${quienTxt} · ${nombreZ}: chance de ${spec.nombre} (${Combatiente.chancePct(pct)} %, ${queSale})`, {formula: '1d' + ch.caras, rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+  await espera;
+  const salio = r ? `Salió ${r.total}` : 'No se pudo tirar';
+  AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${quienTxt}`, pasos: [paso1, {titulo: 'El dado', texto: `${salio} en 1d${ch.caras} (${queSale}).`}],
+    veredicto: sale ? {tono: 'malo', grande: `¡Entra ${spec.nombre}!`, chico: `${quienTxt} queda con ${spec.nombre}.`} : {tono: 'bueno', grande: 'No entra', chico: `${spec.nombre} no salió en el dado.`}});
+  if(mid) momentoActualizar(mid, {resultado: `🎲 ${spec.nombre} ${Combatiente.chancePct(pct)} %: ${salio.toLowerCase()} → ${sale ? 'entra' : 'no entra'}`});
+  await new Promise(ok => setTimeout(ok, ZONA_CHANCE_VER_MS));
+  return sale;
+}
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
@@ -772,11 +808,13 @@ async function zonaResolverBanner(){
   if(el.zonaEstado && !resistio){
     let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}
     // Un estado con chance (2026-10-07, Varita de miasma: 50 % de Veneno): se tira a la vista; si no sale, no entra.
+    // 🎲 A la vista (#19 de docs/auditoria-tiradas.md, dueño, 2026-11-19: «aunque se tire sola, debe aparecer la instancia de chance de que salga, se
+    // debe ver el dado rodando y el resultado»): sigue saliendo sola, pero con su momento en el cartel (zonaChanceAVista).
     const ch = spec && spec.nombre ? Combatiente.chanceDado(num(spec.pct)) : null;
     if(ch){
-      const r = tirarDados('1d' + ch.caras), sale = !!r && r.total > ch.caras - ch.exitos;
-      try{ mesaPublicar(`${quienTxt} · ${spec.nombre} ${Combatiente.chanceTexto(num(spec.pct))}`, {formula: '1d' + ch.caras, rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
-      if(!sale){ partes.push(`${spec.nombre}: no salió (${Combatiente.chanceTexto(num(spec.pct))})`); spec = null; }
+      const sale = await zonaChanceAVista(el, t, spec, ch, quienTxt);
+      partes.push(`${spec.nombre} ${Combatiente.chanceTexto(num(spec.pct))}: ${sale ? 'salió' : 'no salió'}`);
+      if(!sale) spec = null;
     }
     // ☠ El Veneno, con su cartel «Aplicar» / «Resolver a mano» (2026-10-31, dueño; ver zonaVenenoPreguntar).
     const rv = spec && spec.nombre && zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, true) : null;

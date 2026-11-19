@@ -898,6 +898,12 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   desde js/05 (`dibujarEfectosLanza`). **📺 El Intercambio arcano** (2026-11-19) usa el televisor del Parpadeo con los dos tokens a la vez
   (`blinkTvPublicarVarios`, js/111, un solo momento `blink-tv` con `mas`), desde `cambiarLugarResuelto` (js/107); «Cambiar de lugar» sigue con su arco.
 
+- **🎲 La chance del estado de una zona, a la vista** (2026-11-19, #19 de `docs/auditoria-tiradas.md`; dueño: «aunque se tire sola, debe aparecer la
+  instancia de chance de que salga, se debe ver el dado rodando y el resultado»): en el cartel de la zona (js/08, `zonaResolverBanner`), un estado con
+  `pct` pasa por `zonaChanceAVista`: «Chance de que entre X · N %: sale con … en 1dN», el dado rodando (la tirada va a la Mesa: los dados 3D en todas las
+  pantallas; espera a `dados-quietos`, máx. 7 s) y el veredicto «¡Entra X!» / «No entra» ~1,6 s; la Crónica (el momento de la zona) lo cuenta. Sigue
+  saliendo sola (la tira la pantalla que resuelve la zona).
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

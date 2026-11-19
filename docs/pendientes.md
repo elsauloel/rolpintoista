@@ -192,7 +192,7 @@
 >   grieta y Grimorio), 🏹 Virote marcador desde el carcaj con la Ballesta de mano («¿Qué virote?», Marcado 2 turnos, carcaj 2 → 1) y la tienda
 >   cerrada en la ficha suelta (el cartel «🔒 Cerrada», sin carrito ni Vender; al reabrirla, «El GM abrió la tienda»). Detalle en
 >   `docs/pruebas-en-el-mapa.md`. Todo restaurado.
-> - [ ] **🤖 Escanear grupo → Proponer creeps (2026-10-30, dueño: «anotalo para cuando esté en la compu»)**: probar la respuesta de la IA (usa la
+> - [x] ✅ (2026-11-19, dueño: «esto marcalo como hecho») **🤖 Escanear grupo → Proponer creeps (2026-10-30, dueño: «anotalo para cuando esté en la compu»)**: probar la respuesta de la IA (usa la
 >   clave de OpenRouter del dueño).
 > - [x] **✊ Ver el desempate del duelo — hecho por el dueño el 2026-10-30 (gana juan con piedra, papel o tijera). (2026-10-30, dueño: «creá una situación de duelo que llegue a tener que tirar un desempate, dejá el duelo ahí y
 >   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
@@ -299,24 +299,6 @@
 >   de flechitas verdes que suben (buff) o rojas que bajan (debuff) sobre el token, en el dibujo del mapa (js/05, como el aura del estandarte). Así la
 >   ven todos y vale para todo lo que pone estados (habilidades, trampas, zonas, a mano), sin tocar cada uno. Cuidados: no animar al cargar el mapa
 >   (solo los cambios), ni delatar tokens ocultos o en la niebla, ni los estados derivados (los del equipo o las pasivas).
-> - [ ] **⚙ Revisar el «auto mode setup»** (2026-10-25, dueño: «cuando te pida los pendientes en la compu, me decís que quedamos en revisar lo
->   del auto mode setup y me volvés a enviar toda esta explicación porque hay muchos términos que no entendí»). **Al pedir los pendientes en la
->   compu: decirle que quedó esto y mandarle de nuevo la explicación de abajo, tal cual, para profundizar término por término.**
->   Explicación que se le dio (2026-10-25):
->   - Esas preguntas no las hizo Claude: las hizo el asistente de configuración de `/auto-mode-setup`, que corre solo en la terminal. Claude no
->     puede volver a lanzarlo; hay que escribir `/auto-mode-setup` de nuevo para que repita las preguntas.
->   - Lo que respondió y lo que salió:
->     - **Postura → mixta** (`posture=mixed`): un punto medio entre «preguntame todo» y «hacé todo sin preguntar».
->     - **Alcance → solo este proyecto** (`scope=project`): las reglas valen únicamente para la carpeta `rol-nueva-version`.
->     - **Profundidad → shell** (`depth=shell`): para armar la propuesta, revisó con comandos de la terminal y las conversaciones de este proyecto.
->   - **Lo que propuso** (salió como propuesta, con `--propose`; no se sabe si después la aceptó): dejar las reglas de seguridad por defecto y sumar un
->     solo cuidado: **pedir permiso antes de subir a la rama `main`** (a `main` no se sube nunca; se trabaja en `nueva-version`). Lo demás quedó en
->     blanco porque el proyecto no tiene nada de eso: nube, dominios internos, servidores de producción.
->   - **Lo que no cambia:** sigue igual la regla de subir a `nueva-version` apenas algo queda probado, sin preguntar. Esa rama es la que se publica en
->     el sitio, y la propuesta no la toca.
->   - **Si duda de algo:** la propuesta dice que no pudo comprobar si el repositorio en GitHub es público o privado, así que lo trata como si pudiera ser
->     público. Se confirma en la página del repositorio en GitHub.
->   - Para volver a hacerlo: escribir `/auto-mode-setup`; si alguna pregunta no se entiende, pegársela a Claude y la explica antes de contestar.
 > - [x] (2026-10-25, dueño: «se ve bien, se irá viendo con el uso») **📖 Ver los globos del glosario** (2026-10-25, dueño: «anotá lo de los globos del glosario para ver en la compu»): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados, mecánicas de armas, bonos) subrayados con su globo al pasar el mouse; está también en `docs/pruebas-en-el-mapa.md` («El glosario con globos», 2026-10-09).
 > - [x] (2026-10-25, dueño: «esto ya está ok», con la costura del Tótem) **🚩 Ver la animación de las banderitas del Estandarte de guerra** (2026-10-24, dueño: «anotá para ver en la compu la animación de las banderitas»):
 >   en «Claude · pruebas» quedó clavado el estandarte del Escarabajo (casilla 11,−1), y al lado el Tótem de silencio de la Bruja (5,−1, con su costura violeta). Mirar el aura en movimiento —los banderines carmesí y dorado que

@@ -2914,7 +2914,7 @@ Los cuatro en el mapa como «Control mental 2…5» (quedan ahí, como los Prote
 - ✔ **Tótem de silencio** (nv4): clavado en una casilla libre a 1; 40 de vida; a Blanco J1 (a 1) «Silencio · Estás dentro del aura… ¿Usar Arma elemental
   igual?»; un cuchillazo de 8 lo rompió (se le había bajado la vida a 6) → «Rompieron Tótem de silencio…: se termina el silencio». **Error encontrado y
   arreglado:** al clavarlo detrás de Blanco J1 b, le salía «👂 Pasos a tu espalda… ¡Flanqueado!» (js/49: un objeto inerte ya no da pasos; la duda de si
-  cuenta para el flanco, P247).
+  cuenta para el flanco, P247). Re-probado con el arreglo: el mismo tótem en el mismo lugar, sin aviso.
 - ✔ **Polen somnífero** (nv5): flor de 7 sobre Blanco J1, Ef.Esp contra Res.Mt → Sueño (2). Blanco J1 b, pegado, con el 💤 de su token: «💤 Blanco J1 se
   despertó: lo sacudió Blanco J1 b (1 No2)». Dormido otra vez, la Punzada mental lo despertó («se despertó: recibió daño»).
 - ✔ **Espejo del Poncho de espejitos** (nv5): Blanco J1 le pegó con una Varita de chispa eléctrica de prueba (2 − Res. eléctrica 1): «Espejo: Blanco J1

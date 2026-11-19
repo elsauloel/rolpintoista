@@ -12,6 +12,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 📣 El daño fijo de una zona (sin dados) se aplica directo, pero con aviso al afectado** (dueño, 2026-11-19, P245 ✅: «igual tiene que
+  comunicarse, sobre todo la persona afectada. Si te entra un daño directo, te tiene que aparecer una notificación que diga, te ingresó tanto de daño
+  por tal razón»). En las zonas con cartel cuyo daño es un número fijo (lo dejó así el #9, `vtt-hexgrid/js/08`): al afectado (quien lo maneja: su
+  jugador, o el GM para un creep) le aparece el aviso «Te entraron N de daño por <nombre de la zona>» (con la cuenta si la Defensa frenó algo), y queda
+  en la Mesa y la Crónica. Revisar de paso si hay otros daños fijos o directos que entren sin aviso al afectado (anotarlos en el resultado, sin
+  cambiarlos todos sin preguntar). Probar en el mapa con una zona del GM de daño fijo sobre un personaje de Jugador 1.
 - **✅ hecho (2026-11-19) — 🎲 El daño de las zonas sin tirada de quien la creó lo tira el dueño de quien la creó** (dueño, 2026-11-19, bloque 4 de
   `auditoria-tiradas.md`, #9: «prefiero que lo tire el propietario de quien creó la zona»). Hoy, en el cartel de las zonas sin tirada de quien la creó
   (las del GM, de trampas con número fijo, el hielo por pasos, la que solo se «Aplica»), si el que entra no resiste, el dado del daño sale solo. Que lo

@@ -717,7 +717,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 1 | **Potencia** (Flash; la ex «Empuje», renombrada por el dueño: el Empower) · **Arrojo** (Flash) | — | una varita + escudo Común · 2 Comunes |
   | 2 | **Coraza de púas** (también la Muralla T2) | **Largo alcance arcano** | + 2 Comunes |
   | 3 | **Velo espejado** (también la Muralla T2) | — | el escudo, de Buena |
-  | 4 | **Purificar** (Flash) | **Potencia especial** | + una Buena |
+  | 4 | **Purificar** (Flash) | **Recuperación mental** (era Potencia especial, cambiada 2026-11-19) | + una Buena |
   | 5 | **Tirar la bronca** | — | + otra Buena |
   Consumible: Poción de HP. **Sin Transfusión sanguínea** (dueño eligió la opción A, 2026-11-03); la Transfusión quedó en el pool de creep del
   Support y del Debuffer para otros.
@@ -732,6 +732,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   pasa a **Escudo de la guardia** (Buena: Defensa +2, Bloqueo +1, Guardián +1 —los aliados al lado tuyo, +1 Defensa—); el resto como nv2: Def 5,
   Def.Esp 1, PdG.Esp 15, Ef.Esp 15, Eva 7, Parry 5, Bloqueo 3, Ini 7, Mov 7, Rango 6, Res.CC 11 / Res.Esp 10 / Res.Mt 15. Habilidad nueva: **Velo
   espejado** (2 SP, 1 No2: Espejo 3 turnos a un aliado en su Rango; no es Flash). Sin pasiva nueva. Falta cargarlo.
+  **Nivel 4 aprobado** (dueño, 2026-11-19: «vamos con recuperación mental»): Esp 16 · Con 11 · Agi 7 · Des 6 · Fue 2, vida 55, 7 No2, 48 SP (recupera
+  10). Equipo: el Sombrero humectante pasa a **Sombrero humectante bordado** (Buena: SP Regen +1, Def.Esp +1, Percepción +1); el resto como nv3: Def 5,
+  Def.Esp 2, PdG.Esp 16, Ef.Esp 16, Eva 7, Parry 6, Bloqueo 3, Rango 7, Percepción 7, Res.CC 12 / Res.Esp 11 / Res.Mt 16. Habilidad nueva: **Purificar**
+  (Flash, 2 SP / 4 en turno ajeno: le saca el estado malo más reciente a un aliado en su Rango y lo cura 5). Pasiva: **Recuperación mental** (+1 SP por
+  turno) **en lugar de Potencia especial** (dueño: «cambiemos la pasiva por algo que le sirva más»: ninguna habilidad suya usa el Ef.Esp; Manos de
+  curandero se descartó para no parecerse al Sanador S1). Falta cargarlo.
 
 - **L4 · Hostigador con trampas · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta, después lo vamos a ir viendo en detalle
   uno a uno»). Estrategia: pica, se va y te hace pisar algo: deja una trampa en el camino, pega y se aleja por arriba de ella; el que lo persigue
@@ -1378,7 +1384,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | | |
+| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | |
 | D4 | ✅ (2026-11-03) | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

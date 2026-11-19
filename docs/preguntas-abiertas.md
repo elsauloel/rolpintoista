@@ -1568,7 +1568,8 @@ cuando la historia lo da. ¿Lo cambiás igual?» sale solo al pasarlo de «No» 
 línea dice «El GM le renovó el Pacto a…»); (3) pasarlo a mano de «Sí» a «No» no pregunta ni deja línea en la Mesa (como antes). **Pregunta para el
 dueño:** ¿está bien así, o querés el botón también con el Pacto activo, o una línea en la Mesa cuando alguien lo saca a mano?
 
-### P245 — 🎲 El daño de una zona que tira el dueño de quien la creó: los casos raros (2026-11-19, Claude)
+### ✅ P245 — 🎲 El daño de una zona que tira el dueño de quien la creó: los casos raros (2026-11-19, Claude)
+**✅ Decidido (dueño, 2026-11-19: «me parece bien, con una salvedad… un daño fijo sin dados… igual tiene que comunicarse, sobre todo la persona afectada. Si te entra un daño directo, te tiene que aparecer una notificación que diga, te ingresó tanto de daño por tal razón»)**: lo oculto sale solo y la zona puesta a mano la tira el jugador, como quedó; el daño fijo se aplica directo pero con un aviso al afectado («Te entraron N de daño por <zona>»). A la cola.
 Al programar que el daño de las zonas con cartel lo tire, en el cuadro del duelo, quien maneja a quien creó la zona (#9 de `auditoria-tiradas.md`),
 quedaron casos que el pedido no decía. **Elegido mientras tanto**: (1) si el que entra está **oculto** (el GM lo escondió), el cuadro del duelo lo
 delataría: el daño sigue saliendo solo, como antes (igual que las chances con un token oculto); (2) una zona que un jugador puso **a mano** (sin un

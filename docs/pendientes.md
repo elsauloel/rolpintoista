@@ -116,6 +116,12 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **😇 Ver los tres detalles del Pacto (P244) (dueño, 2026-11-19: «lo del pacto tengo que verlo bien en la compu»).** Lo que quedó mientras tanto:
+>   el 😇 del token sale solo con el Pacto gastado; si el que lo marca en la ficha es el GM, no se le pregunta nada; pasarlo a mano de Sí a No no pregunta
+>   ni deja línea en la Mesa. Va junto con el punto de abajo (dónde va el botón).
+> - [ ] **🪧 La espera entre misiles de la Andanada (dueño, 2026-11-19: «lo de la andanada también… para ver en la compu»).** El cartel del misil
+>   siguiente espera a que se cierre el cuadro del anterior, que se cierra solo a los 10 segundos (o antes con «Listo, cerrar»): puede haber hasta 10
+>   segundos entre misil y misil. ¿Se acorta (por ejemplo a 4)?
 > - [ ] **😇 Revisar dónde va el botón de renovar el Pacto (dueño, 2026-11-19: «yo pensaba que fuera más con el botón que está fijado en la barra
 >   superior, pero déjalo como está y después lo reviso en la compu»).** Hoy está en el menú «⋯» del token de un personaje (aparece con el Pacto gastado;
 >   lo usan el GM y el jugador dueño). El dueño pensaba en el 😇 fijo de la barra de arriba (el halo del Pacto, `comun/flotantes.js`). Verlo juntos.

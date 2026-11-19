@@ -2854,3 +2854,19 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   Con el GM con 🎮 el control de Blanco J1 (lo resolvió el GM), a Jugador 1 le salió al centro el Aviso «Brasas del GM · Te entraron 3 de daño…» con
   «💔 −3» y «Entendido». Sobre el Blanco creep (zona de 8, con fuego amigo), al GM: «A Blanco creep le entraron 3 de daño por Púas del GM (8 − Defensa
   5 = 3)». Capturas `cola6/`.
+
+## 2026-11-19 · 🛡 Protector (S4) nv2–5 en el mapa («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+Sumados al mapa Protector 2, 3, 4 y 5 (creeps y tokens; el 3 pegado al Blanco creep). Sus números en la ficha lite, como en el diseño.
+- ✔ **🌵 Coraza de púas** (Protector 2 → Blanco creep): 2 SP y 1 No2 (39 → 37, 6 → 5), «✔ Aplicar Espinas (3 turnos)» y el Blanco creep con Espinas (3).
+  Después Blanco J1 le pegó con el Cuchillo: «Espinas: Blanco J1 recibe 3 de daño devuelto (1/4 del golpe)», vida 50 → 47.
+- ✔ **🛡 Guardián +1 del Escudo de la guardia**: en ese mismo golpe, la cuenta del daño «10 − Defensa 5 − Guardián: Protector 3 al lado 1 = 4» y en la
+  Crónica «Protector 3 protege a Blanco creep: +1 Defensa contra el golpe».
+- ✔ **🪞 Velo espejado** (Protector 3 → Blanco creep): Espejo (3); Blanco J1, a 3 casillas, le tiró con una Varita arcana (prestada para la prueba y
+  sacada después): 6 de daño y «Espejo: Blanco J1 recibe 2 de daño devuelto (1/4 del daño especial)».
+- ✔ **✨ Purificar como Flash en turno ajeno** (Protector 4, en el turno de Blanco J1; el Blanco creep herido con Veneno y Rengo): la Mesa «Purificar en
+  turno ajeno (Flash) — cuesta más (4 SP, el doble)», SP 48 → 44; le sacó Rengo (el más reciente) y lo curó 5 (50 → 55). **Arreglado**: la línea del
+  duelo decía «Quedó con Purga, Curación»; ahora «Le sacó Rengo. Lo curó +5 HP (50 → 55).»
+- ✔ **😤 Tirar la bronca** (Protector 5 sobre el Blanco creep): 4 SP y 2 No2; Blanco J1 (a 3) tiró su Res.Mt contra el Ef.Esp del Protector, perdió y
+  quedó Provocado (2) por el Blanco creep; al empezar su turno, a Jugador 1: «😤 Estás provocado por Blanco creep…». Blanco J1 b (a 4) no tiró.
+  Capturas `cola7/`.
+

@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261118ia"></script>
+<script src="duelo.js?v=20261119pur"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -1089,6 +1089,10 @@ prueba('⚔ El final del duelo en una frase (2026-10-28): lo que pasó, el daño
   igual([pego, esquivo, paro, cayo, tumbo, justo], ['Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 5 de vida. Quedó con Rengo.', 'Fulano le hizo Tiro a la rodilla a Mengano. Mengano esquivó.',
     'Fulano atacó a Mengano con Hacha. Mengano lo paró con Escudo.', 'Fulano le hizo Tiro a la rodilla a Mengano. ¡Crítico ×2! No le hizo daño (lo frenaron la armadura o el escudo).',
     'Fulano le hizo Tiro a la rodilla a Mengano. Le hizo 18 de daño y Mengano cayó.', 'Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 6 de vida. Mengano cayó.']);
+  // ✨ La purga y la cura no son estados (2026-11-19, Purificar: decía «Quedó con Purga, Curación»)
+  const puri = Duelo.fraseResumen({atacante: {nombre: 'Protector 4'}, defensor: {nombre: 'Blanco'}, hab: {nombre: 'Purificar'}, ataque: {tipo: 'habilidad', habNombre: 'Purificar'}, resultado: 'pego',
+    efectos: [{nombre: 'Purga', purga: true, aplicado: true, nota: 'le sacó Rengo'}, {nombre: 'Curación', cura: 5, aplicado: true, nota: '+5 HP (50 → 55)'}, {nombre: 'Espinas', aplicado: true}]});
+  igual(puri, 'Protector 4 le hizo Purificar a Blanco. Quedó con Espinas. Le sacó Rengo. Lo curó +5 HP (50 → 55).');
 });
 prueba('Duelo cancelado que no cuenta (2026-10-15): el conteo de ataques y los No2 vuelven a como estaban (personaje y creep)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

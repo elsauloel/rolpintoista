@@ -1775,8 +1775,15 @@ const Duelo = (() => {
       if((d.efectos || []).some(ef => ef && ef.firme && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('¡Inamovible! No lo mueven.');   // 🦶 (2026-11-12)
       // (2026-11-09, cola de pruebas 9: el efecto que frenó el Invulnerable —nota «no entró: …»— no cuenta como que «quedó con»: se dice aparte)
       const noEntro = ef => /^no entró/i.test(String(ef.nota || ''));
-      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !noEntro(ef) && !(_num(ef.trae) > 0) && !ef.firme).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
+      // ✨ La purga y la cura no son estados (2026-11-19, Purificar del Protector: decía «Quedó con Purga, Curación»): se cuenta lo que hicieron.
+      const esPurga = ef => !!(ef && (ef.purga || (ef.spec && ef.spec.purga))), esCura = ef => !!(ef && (_num(ef.cura) > 0 || (ef.spec && ef.spec.cura))), noEstado = ef => esPurga(ef) || esCura(ef);
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !noEntro(ef) && !(_num(ef.trae) > 0) && !ef.firme && !noEstado(ef)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);
+      (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && noEstado(ef)).forEach(ef => {
+        const nota = String(ef.nota || '').trim();
+        if(esPurga(ef)) partes.push(nota ? `${nota.charAt(0).toUpperCase()}${nota.slice(1)}.` : 'Le sacó el estado malo más reciente.');
+        else partes.push(/^\+/.test(nota) ? `Lo curó ${nota}.` : nota ? `Curación: ${nota}.` : `Lo curó ${_fmt(_num(ef.cura) || _num(ef.spec && ef.spec.cura))}.`);
+      });
       const frenados = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && noEntro(ef)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);
       if(frenados.length) partes.push(`No le entró ${frenados.join(', ')} (${String((d.efectos.find(ef => ef && noEntro(ef)) || {}).nota).replace(/^no entró:\s*/i, '').replace(/\s*\(.*$/, '')}).`);
       // 🎲 Una chance que no salió (tanda 3 de docs/auditoria-tiradas.md, 2026-11-10: el duelo de chances decía «Funcionó» aunque el dado fallara)

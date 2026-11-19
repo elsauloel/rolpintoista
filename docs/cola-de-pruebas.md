@@ -31,11 +31,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   saltos del Relámpago en cadena, y 🪞🔮 el Espejito y el Orbe salvaje con 1 (le pegan a quien atacó). Mismo aviso que el del daño fijo de una zona
   (`vtt-hexgrid/js/08`): al afectado (su jugador, o el GM para un creep) «Te entraron N de daño por <qué>» con la cuenta, y la línea en la Mesa y la
   Crónica. Reusar esa misma función, no armar otra. Probar en el mapa los que se puedan.
-- **⬜ en cola — 🛡 Cargar el Protector (S4) niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar en
+- **✅ hecho (2026-11-19) — 🛡 Cargar el Protector (S4) niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar en
   `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección S4: atributos, equipo, habilidades, pasivas, modo SP), con su prueba
   de números en `comun/pruebas.html`, y cambiar sus «Falta cargarlo» por «Cargado». En el mapa ver: Coraza de púas (Espinas a un aliado), Velo espejado
   (Espejo), el Guardián +1 del Escudo de la guardia a un aliado al lado, Purificar como Flash en turno ajeno (4 SP), y Tirar la bronca (Res.Mt contra su
   Ef.Esp, Provocados por el aliado).
+  *Resultado:* cargados los cuatro (`const S4` en `comun/creeps-esenciales.js`) con su prueba de números: todos coinciden con el diseño (vida, No2, SP y
+  lo que recupera, Def, Def.Esp, PdG.Esp, Ef.Esp, Eva, Parry, Bloqueo, Ini, Mov, Rango, Percepción, resistencias, Guardián). En «Claude · pruebas 2» con
+  GM y Jugador 1: la Coraza de púas le devolvió 3 a Blanco J1 al pegarle al Blanco creep, y en ese golpe el Guardián del Protector 3 restó 1; el Velo
+  espejado devolvió 2 de una varita; Purificar en el turno de Blanco J1 costó 4 SP, sacó Rengo y curó 5; Tirar la bronca dejó a Blanco J1 Provocado por
+  el Blanco creep, con su aviso al empezar el turno. **Arreglado**: la línea del duelo de Purificar decía «Quedó con Purga, Curación» (ahora «Le sacó
+  Rengo. Lo curó +5 HP»). 874 pruebas en verde.
 - **⬜ en cola — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
   en `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección D4), con su prueba de números en `comun/pruebas.html`, y cambiar
   sus «Falta cargarlo» por «Cargado». En el mapa ver: Confusión (PdG.Esp contra Res.Mt, el 1d4 al actuar), el combo Punzada mental → Confusión con la

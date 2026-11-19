@@ -42,6 +42,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   espejado devolvió 2 de una varita; Purificar en el turno de Blanco J1 costó 4 SP, sacó Rengo y curó 5; Tirar la bronca dejó a Blanco J1 Provocado por
   el Blanco creep, con su aviso al empezar el turno. **Arreglado**: la línea del duelo de Purificar decía «Quedó con Purga, Curación» (ahora «Le sacó
   Rengo. Lo curó +5 HP»). 874 pruebas en verde.
+- **⬜ en cola — 😇 Quitar el Pacto desde el menú del token** (dueño, 2026-11-19, en la compu, P244 ✅: «renovarlo desde el token como gm me gustó cómo
+  quedó. Técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»). En el menú «⋯» del token de un personaje, con el Pacto
+  **activo**, un botón para quitarlo (con el Pacto gastado sigue el 😇 de renovar). Lo pueden usar los mismos que renovarlo (el GM y el jugador dueño),
+  pide confirmar, deja la línea en la Mesa («😇 El GM le quitó el Pacto a Fulano» / «Fulano dejó su Pacto») y al jugador le avisa. Probar en el mapa.
 - **⬜ en cola — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
   en `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección D4), con su prueba de números en `comun/pruebas.html`, y cambiar
   sus «Falta cargarlo» por «Cargado». En el mapa ver: Confusión (PdG.Esp contra Res.Mt, el 1d4 al actuar), el combo Punzada mental → Confusión con la

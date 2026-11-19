@@ -1561,7 +1561,8 @@ por ejemplo) tira su chance y, si le sale, no se mueve nadie. La skill aprobada 
 mientras tanto**: a un rival, el Inamovible tira su chance como en Cambiar de lugar; a un aliado, no (el aliado acepta el cambio, igual que le entra
 sin tirada). **Pregunta para el dueño:** ¿está bien así, o el Inamovible también frena el cambio con un aliado?
 
-### P244 — 😇 Renovar el Pacto: los detalles chicos (2026-11-19, Claude)
+### ✅ P244 — 😇 Renovar el Pacto: los detalles chicos (2026-11-19, Claude)
+**✅ Decidido (dueño, 2026-11-19, en la compu: «bien, renovarlo desde el token como gm me gustó cómo quedó. Técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»)**: los tres detalles quedan como están; el botón sigue en el menú «⋯» del token; se suma **quitar el Pacto** desde el mismo menú. A la cola.
 Al programar «Renovar el Pacto» (cola de programación, 2026-11-19) quedaron tres cosas que el pedido no decía. **Elegido mientras tanto**: (1) el botón
 😇 del menú del token sale **solo con el Pacto gastado** (con el Pacto activo no hay nada que renovar); (2) en la ficha, el cartel «El Pacto lo renueva el GM
 cuando la historia lo da. ¿Lo cambiás igual?» sale solo al pasarlo de «No» a «Sí» y solo al jugador (si lo marca el GM, se renueva sin preguntar y la

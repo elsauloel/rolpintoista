@@ -2902,3 +2902,24 @@ Capturas `cola9/1-*`.
 - ✔ **Jugador 1** (dueño): renovó el suyo («Blanco J1 renovó su Pacto») y lo dejó con el 🕊 («😇 Blanco J1 dejó su Pacto»).
 Capturas `cola9/2-*`. Blanco J1 quedó sin Pacto, como estaba.
 
+## 2026-11-19 · 👁 D4 Control mental y ceguera nv2–5 en el mapa («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+Los cuatro en el mapa como «Control mental 2…5» (quedan ahí, como los Protectores).
+- ✔ **Confusión** (nv2 → Blanco J1): PdG.Esp contra Res.Mt, perdió → Confusión (1). En combate, en su turno, al arrastrar el token: «😵 Blanco J1 está
+  confundido · Estás confundido: tirá antes» → «🎲 Tirar 1d4» → 1, «El GM decide» (con «Seguir (lo indicó el GM)» después).
+- ✔ **Punzada mental → Confusión**: la Punzada le sacó 5 (3 + la Botella 2, directo) y lo dejó con Mente abierta; en la Confusión siguiente su Res.Mt
+  se tiró con 1d6 en lugar de 1d8 (−2).
+- ✔ **Varita del eclipse** (nv3): 1d6 + la Botella, directo; el «Tirar el efecto (1d4)» del 25 %: la primera vez 2 (no funcionó), la segunda 4 → Ceguera (1).
+- ✔ **Grito espeluznante** (nv3): onda de 3 alrededor suyo, una contienda por rival; Blanco J1 resistió, Blanco J1 b y la Abeja de prueba perdieron:
+  1d6 arcano + la Botella y Pánico (1). La Botella también quemó al Control mental 3 con un 1 en los dados.
+- ✔ **Tótem de silencio** (nv4): clavado en una casilla libre a 1; 40 de vida; a Blanco J1 (a 1) «Silencio · Estás dentro del aura… ¿Usar Arma elemental
+  igual?»; un cuchillazo de 8 lo rompió (se le había bajado la vida a 6) → «Rompieron Tótem de silencio…: se termina el silencio». **Error encontrado y
+  arreglado:** al clavarlo detrás de Blanco J1 b, le salía «👂 Pasos a tu espalda… ¡Flanqueado!» (js/49: un objeto inerte ya no da pasos; la duda de si
+  cuenta para el flanco, P247).
+- ✔ **Polen somnífero** (nv5): flor de 7 sobre Blanco J1, Ef.Esp contra Res.Mt → Sueño (2). Blanco J1 b, pegado, con el 💤 de su token: «💤 Blanco J1 se
+  despertó: lo sacudió Blanco J1 b (1 No2)». Dormido otra vez, la Punzada mental lo despertó («se despertó: recibió daño»).
+- ✔ **Espejo del Poncho de espejitos** (nv5): Blanco J1 le pegó con una Varita de chispa eléctrica de prueba (2 − Res. eléctrica 1): «Espejo: Blanco J1
+  recibe 1 de daño devuelto… 50 → 49 HP».
+- Nota: en la prueba, un segundo clic rápido en el 💤 le cobró otro No2 a Blanco J1 b (el primero ya lo había despertado, pero el botón seguía hasta que
+  llegó el cambio). Fue un doble clic del script; para una persona es raro, queda anotado.
+Capturas `cola9/3-*`. La partida quedó prolija (vida llena, sin estados, sin la varita de prueba, sin el tótem, mapa en narrativo, orden vacío).
+

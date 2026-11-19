@@ -27,6 +27,7 @@ function vueltaOidos(t){
   const solidos = solidosSet(), paredes = hayParedes(), res = new Set();
   tokens.forEach((r, rid) => {
     if(!dueloEsRival(t, r) || !vueltaRivalPresente(rid, r) || pasosSilenciosos(r)) return;
+    if(typeof esInerte === 'function' && esInerte(r)) return;   // 🪵 un tótem o un estandarte que aparece clavado no camina: no da «Pasos a tu espalda» (2026-11-19, visto con el Tótem de silencio)
     if(distanciaHex({col: t.col, fila: t.fila}, {col: r.col, fila: r.fila}) > OIDO_RADIO || !enCunaCiega(r, t)) return;
     if((solidos.size || paredes) && !lineaLibre({col: t.col, fila: t.fila}, {col: r.col, fila: r.fila}, solidos, !paredes)) return;
     res.add(rid);

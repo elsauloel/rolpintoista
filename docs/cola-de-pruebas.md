@@ -68,11 +68,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   deja la línea en la Mesa («😇 El GM le quitó el Pacto a Blanco J1» / «😇 Blanco J1 dejó su Pacto») y a Jugador 1 le sale «🕊 Sin el Pacto · El GM te
   quitó el Pacto: si tu vida llega a 0, no revivís solo» (`pactoQuitar`, `vtt-hexgrid/js/83`). Probado en «Claude · pruebas 2» con GM y Jugador 1: el GM
   renovó y quitó, Jugador 1 renovó y dejó el suyo, y Cancelar no cambia nada. Blanco J1 quedó sin Pacto, como estaba. 875 pruebas en verde.
-- **⬜ en cola — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
+- **✅ hecho (2026-11-19) — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
   en `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección D4), con su prueba de números en `comun/pruebas.html`, y cambiar
   sus «Falta cargarlo» por «Cargado». En el mapa ver: Confusión (PdG.Esp contra Res.Mt, el 1d4 al actuar), el combo Punzada mental → Confusión con la
   Res.Mt bajada, la Varita del eclipse (25 % de Ceguera), el Grito espeluznante (onda de 3, Pánico), el Tótem de silencio (los rivales a 3 sin
   habilidades de SP; romperlo), el Polen somnífero (Sueño; se despierta con daño o si lo sacuden) y el Espejo del Poncho de espejitos.
+  *Resultado:* cargados los cuatro (`const D4` en `comun/creeps-esenciales.js`; el Grito con `Combatiente.GRITO_ESPELUZNANTE.nombre`) con su prueba de
+  números: **todos coinciden con el diseño** (vida, No2, SP y lo que recupera, Def, Def.Esp, PdG.Esp, Ef.Esp, Eva, Parry, Ini, Mov, Rango, Percepción,
+  Res.CC / Res.Esp / Res.Mt y los costos). En «Claude · pruebas 2» con GM y Jugador 1: Confusión (PdG.Esp contra Res.Mt) dejó a Blanco J1 Confundido y en
+  su turno, al moverse, «Estás confundido: tirá antes» → 1d4 = 1, decide el GM; Punzada mental (−5, Mente abierta) y después Confusión: su Res.Mt bajó de
+  1d8 a 1d6; la Varita del eclipse a la segunda le dejó Ceguera (salió 4 en el d4); el Grito espeluznante dejó con Pánico a Blanco J1 b y a la Abeja de
+  prueba; el Tótem de silencio (40 de vida a nivel 4) frenó «Arma elemental» de Blanco J1 («Usarla igual / Cancelar») y se rompió de un cuchillazo («Rompieron
+  … se termina el silencio»; se le bajó la vida a 6 antes, para no pegarle cuatro veces); el Polen somnífero lo durmió y lo despertaron el sacudón de
+  Blanco J1 b (1 No2) y, otra vez, la Punzada mental; el Espejo del Poncho le devolvió 1 a Blanco J1 de una varita de chispa. **Arreglado**: el tótem recién
+  clavado le daba a Blanco J1 b «👂 Pasos a tu espalda» (un objeto no camina; duda chica en P247). 875 pruebas en verde.
 - **⬜ en cola — 🔮 El d6 del Orbe salvaje, a la vista y con «Elegir manualmente»** (dueño, 2026-11-19: «la solución sería que esta tirada no fuera
   automática»). Hoy el d6 se tira por atrás junto con el daño (`talSalvajeRodar`, vtt-hexgrid/js/53, desde el gancho `orbeSalvaje` de comun/duelo.js) y
   el «Elegir manualmente» del daño no lo toca. Que sea su propio paso en el cuadro del duelo, como las otras chances (`chanceDuelo` de js/78): después

@@ -1589,3 +1589,11 @@ js/08); (3) 🦵 **Tendón cortado** al caminar sangrando (`tendonAlMoverse`, js
 **Orbe salvaje** con 1, que le pegan a quien atacó (js/53). Las Espinas y el Espejo se ven en el cuadro del duelo; las trampas y el Escudo elemental ya
 tienen su cartel para la víctima. En los tres primeros, casi siempre los aplica la pantalla de quien maneja al que lo recibe (la que lo movió), salvo
 con el GM con 🎮 el control. **Pregunta para el dueño:** ¿les sumamos el mismo aviso («Te entraron N de daño por…») a todos, a algunos, o así está bien?
+
+### P247 — 🪵 Un tótem o un estandarte, ¿cuenta para «Flanqueado» y para «Pasos a tu espalda»? (2026-11-19, Claude)
+Probando el Tótem de silencio del D4 en «Claude · pruebas 2»: al clavarlo detrás de Blanco J1 b, a Jugador 1 le salió «👂 Pasos a tu espalda · Blanco J1 b
+oye a Tótem de silencio de Control mental 4 acercarse por la espalda… ¡Flanqueado!» (`vtt-hexgrid/js/49-darse-vuelta.js`). **Arreglado** lo evidente: un
+objeto inerte (tótem, estandarte: `esInerte`, js/73) no camina, así que ya no da «Pasos a tu espalda». **Queda la duda:** un tótem o un estandarte
+**pegado** a alguien, ¿cuenta como «está enfrentando a un rival» (`vueltaFlanco`)? Hoy sí: con un tótem pegado de frente, si otro rival se le acerca por
+atrás no se le ofrece darse vuelta (sale «Flanqueado»). Propuesta de Claude: que no cuente (un objeto no lo tiene ocupado); sin tocar hasta que decida el dueño.
+

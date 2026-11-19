@@ -738,6 +738,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   (Flash, 2 SP / 4 en turno ajeno: le saca el estado malo más reciente a un aliado en su Rango y lo cura 5). Pasiva: **Recuperación mental** (+1 SP por
   turno) **en lugar de Potencia especial** (dueño: «cambiemos la pasiva por algo que le sirva más»: ninguna habilidad suya usa el Ef.Esp; Manos de
   curandero se descartó para no parecerse al Sanador S1). Falta cargarlo.
+  **Nivel 5 aprobado** (dueño, 2026-11-19: «va»): Esp 18 · Con 11 · Agi 8 · Des 6 · Fue 2, vida 65 (55 + 10 del Jubón), 8 No2, 54 SP (recupera 11).
+  Equipo: el Chaleco de cuero pasa a **Jubón de cuero tachonado** (Buena: Def +2, Def.Esp +2, Res. crítico Tipo 4 +2, Vida +10); el resto como nv4:
+  Def 5, Def.Esp 4, PdG.Esp 18, Ef.Esp 18, Eva 8, Parry 6, Bloqueo 3, Ini 8, Mov 8, Rango 7, Res.CC 12 / Res.Esp 11 / Res.Mt 18. Habilidad nueva:
+  **Tirar la bronca** (4 SP, 2 No2: los rivales a 3 de un aliado tiran Res.Mt contra su Ef.Esp; Provocados por ese aliado 2 turnos). Sin pasiva nueva.
+  Falta cargarlo.
 
 - **L4 · Hostigador con trampas · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta, después lo vamos a ir viendo en detalle
   uno a uno»). Estrategia: pica, se va y te hace pisar algo: deja una trampa en el camino, pega y se aleja por arriba de ella; el que lo persigue
@@ -1384,7 +1389,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | |
+| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) | ✅ aprobado (2026-11-19) |
 | D4 | ✅ (2026-11-03) | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

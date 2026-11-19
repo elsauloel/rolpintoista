@@ -116,6 +116,9 @@
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.
 > - [x] (2026-11-03: pegadas; probado el «👁 Ver completa» desde un jugador) **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 >   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **😇 Revisar dónde va el botón de renovar el Pacto (dueño, 2026-11-19: «yo pensaba que fuera más con el botón que está fijado en la barra
+>   superior, pero déjalo como está y después lo reviso en la compu»).** Hoy está en el menú «⋯» del token de un personaje (aparece con el Pacto gastado;
+>   lo usan el GM y el jugador dueño). El dueño pensaba en el 😇 fijo de la barra de arriba (el halo del Pacto, `comun/flotantes.js`). Verlo juntos.
 > - [ ] **🔀 Ver el Intercambio arcano y el Arcano niveles 4 y 5 (dueño, 2026-11-19: «anota esto para ver en la compu»).** Programado y probado
 >   desde la nube (2026-11-18/19, «Claude · pruebas 2»). Con el Arcano 4 o 5 (M4): a un aliado lo cambia de lugar sin tirada; a un rival, su PdG.Esp
 >   contra la Res.Esp (si gana, se cambian de lugar con la animación de televisor viejo, ver abajo; si no, nadie se mueve). 5 SP fijos y 2 No2. Ver también los números

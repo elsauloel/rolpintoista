@@ -642,7 +642,10 @@ function valoresNo2(t){
   if(t.tipo === 'creep'){
     const sc = creepPrivadoDe(t.fichaId);
     if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
-    return {valor: num(sc.nitros), max: Math.max(num(sc.nitros), num(sc.nitrosMax) || num(sc.agl) || 0)};
+    // El máximo de verdad, aunque el GM le haya cargado de más (dueño, 2026-11-19: «le cargué nitros de más a un creep… debería mostrar 98/7: su
+    // máximo standard de No2 sigue siendo el mismo»). La barra se llena entera (entre01) si pasa el máximo.
+    const max = typeof CreepCalculo !== 'undefined' && CreepCalculo.nitrosMax ? num(CreepCalculo.nitrosMax(sc)) : (num(sc.nitrosMax) || num(sc.agl) || 0);
+    return {valor: num(sc.nitros), max: max > 0 ? max : num(sc.nitros)};
   }
   if(t.fichaId && t.fichaId.includes(SEP_INVOCACION)){
     // Invocación: sale del resumen de la ficha de su dueño, junto con el resto.

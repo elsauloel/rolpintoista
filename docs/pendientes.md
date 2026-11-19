@@ -160,7 +160,7 @@
 >   (1) el token que no se mueve en el dodge roll: ver el punto de arriba; (2) los carteles que piden algo ahora van encima del cuadro del duelo, en todo
 >   el mapa; (3) el dodge roll de un área sigue dando ataque de oportunidad al alejarse de un rival (dueño, 2026-11-14: queda así); (4) antes de tirar el daño aparece el
 >   cartel genérico «no hay nada que resistir: se aplica».
-> - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en Confusión (dueño, 2026-11-13; Soltarse → queda con su cartel, dueño 2026-11-19).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
+> - [ ] **🎲 Bloque 4 de la auditoría de tiradas: seguir en la tirada extra de una zona (dueño, 2026-11-13; Soltarse y Confusión → quedan con su cartel, dueño 2026-11-19).** Decididos: Retirada, Recuperarse, Reflejos, el 1d6 del
 >   Escudo elemental y el Malviaje → quedan como están; Inamovible → al cuadro del duelo (hecho). Quedó preguntado Soltarse (¿queda con su cartel, o al
 >   cuadro del duelo? con ayuda se suman varias tiradas de un lado). Después: Confusión, la tirada extra de las zonas y las zonas una por una.
 > - [ ] **👀 Pruebas que tiene que ver el dueño (2026-10-30, dueño: «lo que tengo que ver yo, anotalo en pendiente para cuando esté en la compu»)** —
@@ -207,7 +207,7 @@
 > - [ ] **⏬ Ver la Demora animada en un duelo real (dueño, 2026-11-04: «anotá lo de ver la demora en pendientes cuando esté en la compu»).**
 >   Con un duelo abierto, aplicar una Demora y mirarlo desde dos pantallas (GM y un jugador): el duelo se achica hacia su token, la lista de turnos
 >   se despliega y los nombres se deslizan al orden nuevo (el demorado en rojo), y a los ~3 s el duelo vuelve a abrirse (commit 2439fc7a).
-> - [ ] **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
+> - [x] ✅ (2026-11-19, decidido: a la cola de programación) **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
 >   Hoy el campo «😇 Pacto» (ficha, datos de identidad) lo cambia el jugador en su ficha y el GM con «✎ Editar como GM», aunque la ayuda dice que lo
 >   marca el GM. Pregunta: ¿solo el GM lo puede cambiar?
 > - [x] **🚩 Estandartes: ver qué hacen y sus áreas como estados (2026-11-05, dueño; después de la tanda de pruebas del mapa).** Nombres: **«objetos

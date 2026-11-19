@@ -211,10 +211,29 @@ function blinkDeHabilidad(msg){
   if(!$('#botonera-capa').hidden) escapeABotonera();
   // 🎯 ¡Al frente! (2026-10-26, el Support): la casilla de llegada tiene que estar pegada a un rival del que va.
   const pegadaARival = (h, t) => vecinosDeCasilla(h).some(c => [...tokens.values()].some(x => x !== t && x.col === c.col && x.fila === c.fila && !x.oculto && !x.bajoTierra && dueloEsRival(t, x)));
-  const adonde = (id, t) => elegirDestino(async h => {
+  // 📺 Las casillas adonde puede saltar, pintadas mientras se elige (dueño, 2026-11-19: «cuando apretás "ejecutar", te debería marcar el area de
+  // casilleros disponibles»): el mismo dibujo del Salto (saltoCasillas, js/105), con las mismas reglas que el clic (a `dist` o menos, sin Sólido ni
+  // token; con ¡Al frente!, pegadas a un rival). Un token que esta pantalla no ve (oculto, en la niebla) no se descuenta: no se delata su casilla.
+  const seVe = x => soyGM || (!x.oculto && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x)));
+  const marcar = t => {
+    if(typeof saltoCasillas === 'undefined') return;
+    const c0 = hexACubo(t), libres = new Set();
+    for(let dq = -dist; dq <= dist; dq++) for(let dr = Math.max(-dist, -dq - dist); dr <= Math.min(dist, -dq + dist); dr++){
+      const c = {col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)};
+      if(c.col === t.col && c.fila === t.fila) continue;
+      if(elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(x => x !== t && x.col === c.col && x.fila === c.fila && seVe(x))) continue;
+      if(msg.alFrente && !pegadaARival(c, t)) continue;
+      libres.add(c.col + ',' + c.fila);
+    }
+    saltoCasillas = {libres, conRival: new Set(libres), t0: performance.now()};   // todas marcadas fuerte: todas son destino
+    pedirDibujo();
+  };
+  const desmarcar = () => { if(typeof saltoCasillas !== 'undefined' && saltoCasillas){ saltoCasillas = null; pedirDibujo(); } };
+  const adonde = (id, t) => { marcar(t); elegirDestino(async h => {
     if(distanciaHex(h, t) > dist){ toast(`Tiene que ser a ${dist} casillas o menos`); adonde(id, t); return; }
     if(elementoSolidoEn(h.col, h.fila) || [...tokens.values()].some(x => x !== t && x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre: elegí otra'); adonde(id, t); return; }
     if(msg.alFrente && !pegadaARival(h, t)){ toast('Tiene que ser una casilla pegada a un rival'); adonde(id, t); return; }
+    desmarcar();
     const desde = {col: t.col, fila: t.fila};
     try{
       // 📺 Primero la animación (js/111), así nadie ve el token en la casilla nueva antes de que se apague en la vieja.
@@ -228,7 +247,7 @@ function blinkDeHabilidad(msg){
       console.error('No se pudo hacer el blink:', err);
       toast(err && err.code === 'permission-denied' ? `No podés mover a ${nombreDe(t)}: que lo mueva su jugador o el GM (✋ a mano)` : 'No se pudo hacer el blink — revisá la consola');
     }
-  }, `<b>✨ ${nom}¿adónde ${msg.alFrente ? 'va' : 'salta'} ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos${msg.alFrente ? ', pegada a un rival' : ''} · Esc o clic derecho cancelan</span>`, true, cancelar);
+  }, `<b>✨ ${nom}¿adónde ${msg.alFrente ? 'va' : 'salta'} ${esc(nombreDe(t))}?</b> <span>clic en una de las casillas marcadas (libres, a ${dist} o menos${msg.alFrente ? ', pegadas a un rival' : ''}) · Esc o clic derecho cancelan</span>`, true, () => { desmarcar(); cancelar(); }); };
   if(msg.soloYo){ adonde(yo[0], yo[1]); return; }
   elegirDestino(h => {
     const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && !x.oculto);

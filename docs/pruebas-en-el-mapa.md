@@ -2887,3 +2887,12 @@ Sumados al mapa Protector 2, 3, 4 y 5 (creeps y tokens; el 3 pegado al Blanco cr
 - ⬜ **🔮 El Orbe salvaje con 1** (a quien atacó le entra lo mismo que al rival): no se probó, el d6 sale al azar. Usa el mismo aviso que el Espejito. Para
   probarlo: un personaje con el Orbe salvaje pegando con una varita hasta que salga un 1.
 Capturas `cola8/`.
+
+## 2026-11-19 · 📺 El blink marca las casillas («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+- ✔ **✨ Parpadeo de un creep** (Arcano 4, GM): al tocar Ejecutar, el cartel «¿adónde salta Arcano 4? clic en una de las casillas marcadas» y las 31
+  casillas libres a 3 pintadas de celeste (en la pantalla de Jugador 1, nada). Clic en la casilla de Arcano 5: «Esa casilla no está libre», siguen
+  marcadas. Esc: se borran y la Mesa dice «canceló Parpadeo — se le devolvió 4 SP». Otra vez, clic a 2 casillas: saltó y se borraron.
+- ✔ **✨ Varita del blink de un personaje** (Blanco J1, Jugador 1, con una varita de prueba que después se sacó): a sí mismo, 30 casillas marcadas
+  alrededor de él, saltó a la elegida; a un aliado (Blanco J1 b), marcadas alrededor del aliado; Esc las borra.
+Capturas `cola9/1-*`.
+

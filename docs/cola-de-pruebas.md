@@ -49,11 +49,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   espejado devolvió 2 de una varita; Purificar en el turno de Blanco J1 costó 4 SP, sacó Rengo y curó 5; Tirar la bronca dejó a Blanco J1 Provocado por
   el Blanco creep, con su aviso al empezar el turno. **Arreglado**: la línea del duelo de Purificar decía «Quedó con Purga, Curación» (ahora «Le sacó
   Rengo. Lo curó +5 HP»). 874 pruebas en verde.
-- **⬜ en cola — 📺 El Parpadeo marca las casillas a las que puede saltar** (dueño, 2026-11-19, en la compu, después de probarlo: «me gusta como
+- **✅ hecho (2026-11-19) — 📺 El Parpadeo marca las casillas a las que puede saltar** (dueño, 2026-11-19, en la compu, después de probarlo: «me gusta como
   funciona, sólo le agregaría un detalle. cuando apretás "ejecutar", te debería marcar el area de casilleros disponibles para el efecto»). Al ejecutar
   un blink (todo lo que pasa por `blinkDeHabilidad`, js/13: el Parpadeo de los creeps, la Varita del blink, el blink de una habilidad de personaje o de
   invocación, ¡Al frente!), mientras se elige el destino se pintan las casillas válidas (libres y a su alcance), como el Salto (`saltoCasillaDibujar`,
   js/105: reusar ese dibujo, no armar otro). Probar en el mapa con el Parpadeo de un creep y con la Varita del blink de un personaje.
+  *Resultado:* al llegar a «¿adónde salta?», quedan pintadas (con el dibujo del Salto, todas en celeste fuerte) las casillas libres a su alcance; con
+  ¡Al frente!, solo las pegadas a un rival. Se borran al saltar o al cancelar (Esc). Solo las ve quien elige; un token que esa pantalla no ve (oculto,
+  en la niebla) no se descuenta, para no delatarlo (si se hace clic ahí, «Esa casilla no está libre»). Probado en «Claude · pruebas 2»: el Parpadeo del
+  Arcano 4 (31 casillas; clic en una ocupada → «no está libre» y siguen marcadas; Esc → se borran y se le devolvieron los 4 SP; después saltó a 3), y la
+  Varita del blink de Blanco J1 desde Jugador 1 (a sí mismo, 30 casillas, saltó; a Blanco J1 b, marcadas alrededor de él). 874 pruebas en verde.
 - **⬜ en cola — 😇 Quitar el Pacto desde el menú del token** (dueño, 2026-11-19, en la compu, P244 ✅: «renovarlo desde el token como gm me gustó cómo
   quedó. Técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»). En el menú «⋯» del token de un personaje, con el Pacto
   **activo**, un botón para quitarlo (con el Pacto gastado sigue el 😇 de renovar). Lo pueden usar los mismos que renovarlo (el GM y el jugador dueño),

@@ -120,7 +120,7 @@
 >   desde la nube (2026-11-18/19, «Claude · pruebas 2»). Con el Arcano 4 o 5 (M4): a un aliado lo cambia de lugar sin tirada; a un rival, su PdG.Esp
 >   contra la Res.Esp (si gana, se cruzan con la animación de «Cambiar de lugar»; si no, nadie se mueve). 5 SP fijos y 2 No2. Ver también los números
 >   de los dos niveles (nv4: vida 50, No2 7, SP 54, Rango 7; nv5: vida 50, No2 8, SP 57, Rango 8) y la Andanada con sus 9 SP fijos.
-> - [ ] **🏹 Ver el Abanico en el mapa (dueño, 2026-11-18: «anotar probar el abanico en el mapa, en la lista de cosas para hacer en la computadora»).**
+> - [ ] **🏹 Ver el Abanico en el mapa (dueño, 2026-11-18: «anotar probar el abanico en el mapa, en la lista de cosas para hacer en la computadora»).** (2026-11-19, dueño: «esto también amerita un test desde la pc»: en la nube ya se vio que un aliado dentro del cono no recibe nada; verlo vos.)
 >   El Hunter de nivel 5 (R4) suelta el Abanico (cono al frente, 16 casillas): una tirada de PdG contra la Evasión de cada rival del cono y, a los que
 >   les gana, el daño del arco (una sola tirada para todos). Ver que agarre a los del cono, que no toque a sus aliados y que el daño se aplique bien.
 > - [ ] **🏃 El dodge roll de un área: revisado y arreglado (2026-11-14); queda verlo en la compu.** El dueño pidió: «fijate si el problema es que el cartel

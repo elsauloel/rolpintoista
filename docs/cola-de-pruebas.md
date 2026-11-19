@@ -12,6 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🪧 Andanada arcana: el cartel «¿a quién va el siguiente misil?» queda tapado** (dueño, 2026-11-19: «habría que corregirlo»). Sale
+  mientras el cuadro del misil anterior sigue abierto unos segundos: que no quede tapado (que espere a que el cuadro se cierre, o que vaya por encima).
+  Probar en el mapa con el Arcano 4 y sus tres misiles.
+- **⬜ en cola — 🦶 Intercambio arcano contra un rival Inamovible: el recordatorio** (dueño, 2026-11-19, P243 ✅: «con un rival debe aparecer el
+  recordatorio de que el rival es inamovible (no debería poder moverlo)»). Con un aliado no cambia nada (acepta sin tirar). Con un rival Inamovible
+  tiene que salir el recordatorio de que es Inamovible, y si su Inamovible aguanta, no se mueve nadie. Revisar qué sale hoy y probarlo en el mapa.
+- **⬜ en cola — 📺 Animación del Intercambio arcano** (dueño, 2026-11-19: «me gustaría la animación en ambos tokens de old time tv turn on/off»):
+  los dos tokens se apagan como un televisor viejo y se prenden en la casilla del otro (como el Parpadeo, `vtt-hexgrid/js/111-parpadeo-tv.js`), en
+  todas las pantallas. Video para el dueño.
+- **⬜ en cola — ✨ Animación de la Lanza arcana** (dueño, 2026-11-19: «me gusta así»): carga (brillo violeta en el Arcano, medio segundo), una lanza de
+  luz que recorre la línea hasta el final del alcance con estela, un estallido de chispas violetas en cada token que atraviesa sin frenarse, y a los
+  que no la esquivaron un destello blanco de un segundo (Deslumbrado); al que esquivó le pasa de largo. En todas las pantallas. Video para el dueño.
 - **✅ hecho (2026-11-18) — 🏹✨ Lo que quedó sin ver en el mapa del Hunter (R4 nv2–5) y el Arcano (M4 nv2–3)** («Claude · pruebas 2», mapa
   «Prueba · R4 M4», GM + Jugador 1; Jugador 1 tiene ahora un segundo personaje, «Blanco J1 b», para tener dos rivales):
   - [x] ✨ Lanza arcana atravesando a varios: Arcano 2 en línea recta con Blanco J1, el Blanco creep (su aliado) y Blanco J1 b: un solo PdG.Esp y un

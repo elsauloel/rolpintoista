@@ -724,6 +724,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-03: «vamos así»): Esp 12 · Con 9 · Agi 6 · Des 4 · Fue 2, vida 45, 6 No2, 36 SP (recupera 6); Varita de
   los pilares + Escudo de madera forrado en lienzo · Chaleco de cuero · Escarpines de piel de cururú: Def 3, Def.Esp 2. Potencia (Flash, 2 SP) y
   Arrojo (Flash, 3 SP). Consumible: Poción de HP. Sin cargar hasta que el dueño diga.
+  **Nivel 2 aprobado** (dueño, 2026-11-19: «si, va así»): Esp 13 · Con 10 · Agi 6 · Des 5 · Fue 2, vida 50, 6 No2, 39 SP (recupera 7). Equipo: el de
+  nv1 + **Sombrero humectante** (SP Regen +1) y **Polainas de cuero remendado** (Def +1, Res.CC +1): Def 4, Def.Esp 2, PdG.Esp 13, Ef.Esp 13, Eva 6,
+  Parry 5, Res.CC 11 / Res.Esp 10 / Res.Mt 13. Habilidad nueva: **Coraza de púas** (2 SP, 1 No2: Espinas 3 turnos a un aliado en su Rango; no es
+  Flash). Pasiva: **Largo alcance arcano** (Rango 4 → 6). Costos (turno propio / ajeno): Potencia 2/4, Arrojo 3/6. Falta cargarlo.
 
 - **L4 · Hostigador con trampas · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta, después lo vamos a ir viendo en detalle
   uno a uno»). Estrategia: pica, se va y te hace pisar algo: deja una trampa en el camino, pega y se aleja por arriba de ella; el que lo persigue
@@ -1370,7 +1374,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | R4 | ✅ (2026-11-05, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
 | M4 | ✅ (2026-11-03) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) | ✅ (2026-11-18, cargado) |
-| S4 | ✅ (2026-11-03) | | | | |
+| S4 | ✅ (2026-11-03) | ✅ aprobado (2026-11-19) | | | |
 | D4 | ✅ (2026-11-03) | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

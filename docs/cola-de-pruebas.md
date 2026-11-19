@@ -30,6 +30,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — ✨ Animación de la Lanza arcana** (dueño, 2026-11-19: «me gusta así»): carga (brillo violeta en el Arcano, medio segundo), una lanza de
   luz que recorre la línea hasta el final del alcance con estela, un estallido de chispas violetas en cada token que atraviesa sin frenarse, y a los
   que no la esquivaron un destello blanco de un segundo (Deslumbrado); al que esquivó le pasa de largo. En todas las pantallas. Video para el dueño.
+- **⬜ en cola — 🎲 La chance del estado de una zona, a la vista** (dueño, 2026-11-19, bloque 4 de `auditoria-tiradas.md`, #19: «aunque se tire
+  sola, debe aparecer la instancia de chance de que salga, se debe ver el dado rodando y el resultado, en el menú que sea»). Hoy, en el cartel de las
+  zonas (las que no tienen tirada de quien la creó: del GM, de trampas con número fijo…), la chance del estado (ej. Veneno 50 % de la Varita de miasma,
+  `vtt-hexgrid/js/08` l. ~777) sale sola y no se ve. Que siga pudiendo salir sola, pero que se vea: el momento «chance de que entre el estado (50 %:
+  sale con …)», los dados 3D rodando y el resultado, en el cartel de la zona o donde quede mejor. Probar en el mapa con una zona del GM con chance.
 - **⬜ en cola — 😇 Renovar el Pacto desde el mapa** (dueño, 2026-11-19: decidido quién lo cambia). Lo renueva la historia (lo marca el GM), pero
   las herramientas avisan en vez de prohibir: (1) un botón **«😇 Renovar el Pacto»** en el menú del token de un personaje en el mapa, para el GM **y
   también para el jugador dueño de ese personaje** (dueño: «me gustaría que el jugador también pueda reactivar su pacto desde el mismo botón del mapa»);

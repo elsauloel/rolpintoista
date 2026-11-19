@@ -24,9 +24,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   No lo mueven» y «Blanco J1 es Inamovible (33 %): no se mueve nadie» en la Mesa y la Crónica; los dos quedaron en su casilla. Con un 1 (prueba del
   2026-11-19) los cambió. Con un aliado no se tira (como antes). Para mirar (no es de esta tarea): el cartel verde grande del cuadro dice «no hay nada
   que resistir: se aplica» antes de tirar la chance, y puede confundir.
-- **⬜ en cola — 📺 Animación del Intercambio arcano** (dueño, 2026-11-19: «me gustaría la animación en ambos tokens de old time tv turn on/off»):
-  los dos tokens se apagan como un televisor viejo y se prenden en la casilla del otro (como el Parpadeo, `vtt-hexgrid/js/111-parpadeo-tv.js`), en
-  todas las pantallas. Video para el dueño.
+- **✅ hecho (2026-11-19) — 📺 Animación del Intercambio arcano** (dueño, 2026-11-19: «me gustaría la animación en ambos tokens de old time tv turn
+  on/off»). *Resultado:* los dos tokens se apagan como un televisor viejo y se prenden cada uno en la casilla del otro, a la vez y en todas las pantallas
+  (un solo momento con los dos: `blinkTvPublicarVarios`, `vtt-hexgrid/js/111-parpadeo-tv.js`; lo usa `cambiarLugarResuelto` de js/107 solo para el
+  Intercambio: «Cambiar de lugar» sigue con su cruce en arco). Sin estela (no caminan); si el cuadro del duelo está abierto, se repliega mientras dura y
+  vuelve. Probado en «Claude · pruebas 2» (GM + Jugador 1): a un aliado (el Blanco creep) y a un rival (Blanco J1 b). Video para el dueño. 873 pruebas
+  en verde.
 - **⬜ en cola — ✨ Animación de la Lanza arcana** (dueño, 2026-11-19: «me gusta así»): carga (brillo violeta en el Arcano, medio segundo), una lanza de
   luz que recorre la línea hasta el final del alcance con estela, un estallido de chispas violetas en cada token que atraviesa sin frenarse, y a los
   que no la esquivaron un destello blanco de un segundo (Deslumbrado); al que esquivó le pasa de largo. En todas las pantallas. Video para el dueño.

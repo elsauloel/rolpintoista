@@ -2828,3 +2828,5 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   quién?» ya no sale tapado por el cuadro del misil anterior: espera a que se cierre y aparece arriba del mapa, a la vista.
 - ✔ **🦶 Intercambio arcano contra un rival Inamovible** (Arcano 5 → Blanco J1 con Botas de estibador; P243): a Jugador 1 le sale el recordatorio
   «Inamovible 33 % · 5–6 · Tirar el efecto (1d6)»; si aguanta, «¡Inamovible! No lo mueven» y nadie se mueve. Ya andaba así: sin cambios.
+- ✔ **📺 La animación del Intercambio arcano** (Arcano 5 con el Blanco creep y con Blanco J1 b): los dos se apagan como un televisor viejo y se prenden en
+  la casilla del otro, en las dos pantallas; con un rival, el cuadro del duelo se aparta mientras dura y vuelve. Falta que la vea el dueño (🖥).

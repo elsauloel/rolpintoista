@@ -25,6 +25,19 @@ async function blinkTvPublicar(id, de, a){
   catch(err){ console.error('Parpadeo: no se pudo publicar la animación', err); }
   if(!mid) blinkTvEmpezar(datos);
 }
+// 🔀 Varios tokens a la vez, en UN momento (el Intercambio arcano, 2026-11-19, dueño: «la animación en ambos tokens de old time tv turn on/off»):
+// `lista` = [{id, de, a}, …]; el primero va como siempre y los demás en `mas` (una pantalla con el archivo viejo anima solo al primero).
+// `dueloId`: el cuadro de ese duelo se aparta mientras dura (Duelo.apartar) y vuelve solo.
+async function blinkTvPublicarVarios(lista, dueloId){
+  const cas = c => ({col: Math.round(num(c.col)), fila: Math.round(num(c.fila))});
+  const xs = (lista || []).filter(x => x && x.id && x.de && x.a).map(x => ({id: String(x.id), de: cas(x.de), a: cas(x.a)}));
+  if(!xs.length) return;
+  const datos = {...xs[0], ...(xs.length > 1 ? {mas: xs.slice(1)} : {}), ...(dueloId ? {duelo: String(dueloId)} : {})};
+  let mid = null;
+  try{ mid = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'blink-tv', icono: '', titulo: '', estado: 'listo', datos}) : null; }
+  catch(err){ console.error('Parpadeo: no se pudo publicar la animación', err); }
+  if(!mid) blinkTvEmpezar(datos);
+}
 // Llega a cada pantalla (js/16). Una sola vez, y solo si es de recién.
 function blinkTvRecibido(id, d){
   if(!d || !d.datos || blinkTvVistos.has(id)) return;
@@ -34,9 +47,17 @@ function blinkTvRecibido(id, d){
   blinkTvEmpezar(d.datos);
 }
 function blinkTvEmpezar(dt){
-  if(!dt || !dt.id || !tokens.get(dt.id) || blinkTvPoco()) return;
-  for(let i = BLINK_TV.length - 1; i >= 0; i--) if(BLINK_TV[i].id === dt.id) BLINK_TV.splice(i, 1);
-  BLINK_TV.push({id: dt.id, de: hexCentro(dt.de.col, dt.de.fila), a: hexCentro(dt.a.col, dt.a.fila), t0: performance.now()});
+  if(!dt || !dt.id || blinkTvPoco()) return;
+  const todos = [dt, ...(Array.isArray(dt.mas) ? dt.mas : [])].filter(x => x && x.id && x.de && x.a && tokens.get(x.id));
+  if(!todos.length) return;
+  // El cuadro del duelo (si lo hay y está abierto en esta pantalla) se repliega a su token y vuelve al terminar; la animación arranca cuando ya se fue.
+  let espera = 0;
+  if(dt.duelo && typeof Duelo !== 'undefined' && Duelo.apartar){ try{ espera = num(Duelo.apartar(dt.duelo, 380 + BLINK_TV_DUR + 450)) > 0 ? 380 : 0; }catch(e){} }
+  const t0 = performance.now() + espera;
+  todos.forEach(x => {
+    for(let i = BLINK_TV.length - 1; i >= 0; i--) if(BLINK_TV[i].id === x.id) BLINK_TV.splice(i, 1);
+    BLINK_TV.push({id: x.id, de: hexCentro(x.de.col, x.de.fila), a: hexCentro(x.a.col, x.a.fila), t0});
+  });
   pedirDibujo();
 }
 // En qué parte de la animación va: {fase: 'sale'|'llega', x, y, sx, sy, linea (0–1: cuánto brilla la raya), punto (0–1), escaneo (0–1)}.
@@ -68,6 +89,7 @@ function blinkTvPosToken(id){
   if(!fx) return null;
   const ms = performance.now() - fx.t0;
   if(ms >= BLINK_TV_DUR) return null;
+  if(ms < 0) return {x: fx.de.x, y: fx.de.y, sx: 1, sy: 1};   // (esperando que se aparte el cuadro: quieto en su casilla de antes)
   const e = blinkTvEstado(fx, ms);
   return {x: e.x, y: e.y, sx: e.sx, sy: e.sy};
 }
@@ -78,6 +100,7 @@ function dibujarEfectosBlinkTv(z){
   for(let i = BLINK_TV.length - 1; i >= 0; i--){
     const fx = BLINK_TV[i], ms = ahora - fx.t0;
     if(ms >= BLINK_TV_DUR + 40){ BLINK_TV.splice(i, 1); continue; }
+    if(ms < 0) continue;
     if(typeof disposicion !== 'undefined' && Array.isArray(disposicion) && !disposicion.some(d => d.id === fx.id)) continue;   // no lo veo: nada
     const e = blinkTvEstado(fx, ms), R = HEX * 0.68;
     ctx.save();

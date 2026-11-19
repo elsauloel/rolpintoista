@@ -148,6 +148,17 @@ async function cambiarLugarResuelto(d){
     return;
   }
   const a0 = {col: ta.col, fila: ta.fila}, d0 = {col: td.col, fila: td.fila};
+  // 📺 El Intercambio arcano (dueño, 2026-11-19: «la animación en ambos tokens de old time tv turn on/off»): los dos se apagan como un televisor viejo
+  // y se prenden cada uno en la casilla del otro (la del Parpadeo, js/111), en todas las pantallas. Sin estela: no caminan.
+  if(hab && typeof blinkTvPublicarVarios === 'function'){
+    await blinkTvPublicarVarios([{id: ida, de: a0, a: d0}, {id: idd, de: d0, a: a0}], d.id).catch(err => console.error('Intercambio arcano: la animación', err));
+    await moverToken(idd, a0.col, a0.fila, [a0]);
+    await moverToken(ida, d0.col, d0.fila, [d0]);
+    const txt = `${na} y ${nd} cambian de lugar (sin ataques de oportunidad).`;
+    mesaLinea(`🔀 ${txt}`, 'recordatorio');
+    try{ momentoAbrir({tipo: 'cambio', icono: '🔀', titulo, resultado: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
+    return;
+  }
   // 🎞 La animación (dueño, 2026-11-07): el duelo se aparta, los dos se deslizan cruzándose en arco, y el duelo vuelve solo.
   cambioFxPublicar(ida, idd, a0, d0, d.id).catch(err => console.error('Cambiar de lugar: la animación', err));
   await new Promise(r => setTimeout(r, 150));   // (que la animación arranque antes de que lleguen las casillas nuevas: así no salta)

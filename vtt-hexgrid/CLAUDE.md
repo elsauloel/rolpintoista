@@ -924,6 +924,9 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa
   «Renovando…»), línea en la Mesa (`Combatiente.pactoRenovadoTxt`) y un momento `pacto` con el Aviso al jugador (`Combatiente.PACTO_AVISO`). La ficha
   pregunta si el jugador lo pasa a «Sí» a mano (`pactoCambioAMano`, ficha js/06). Dudas chicas: P244.
+  **🕊 Quitarlo** (2026-11-19, dueño, P244 ✅): con el Pacto activo, el 🕊 en el mismo ⋯ para los mismos (`pactoPuedeQuitar` / `pactoQuitar`, js/83):
+  confirma, apaga `S.meta.pacto`, línea en la Mesa (`Combatiente.pactoQuitadoTxt`: «El GM le quitó el Pacto a…» / «… dejó su Pacto») y el Aviso al jugador
+  (`Combatiente.pactoQuitadoAviso`).
 
 ## Pendiente (más adelante)
 

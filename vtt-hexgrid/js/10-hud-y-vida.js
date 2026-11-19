@@ -106,6 +106,8 @@ function hudHtml(t){
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     // 😇 Renovar el Pacto (2026-11-19, dueño): el GM o el jugador dueño, con el Pacto gastado (js/83).
     (!pausaSoloMirar() && typeof pactoPuedeRenovar === 'function' && pactoPuedeRenovar(t) ? icono('pacto', '😇', 'Renovar el Pacto (se gastó): lo da la historia') : '') +
+    // 🕊 Quitar el Pacto (2026-11-19, dueño): los mismos, con el Pacto activo (js/83).
+    (!pausaSoloMirar() && typeof pactoPuedeQuitar === 'function' && pactoPuedeQuitar(t) ? icono('pacto-quitar', '🕊', 'Quitar el Pacto (está activo)') : '') +
     '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
@@ -1292,6 +1294,7 @@ function hudConectar(t){
     if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }
     if(clave === 'revivir'){ if(typeof revivirToken === 'function') revivirToken(t); return; }   // ✚ (js/98)
     if(clave === 'pacto'){ if(typeof pactoRenovar === 'function') pactoRenovar(t); return; }   // 😇 (js/83)
+    if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';

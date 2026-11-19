@@ -59,10 +59,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en la niebla) no se descuenta, para no delatarlo (si se hace clic ahí, «Esa casilla no está libre»). Probado en «Claude · pruebas 2»: el Parpadeo del
   Arcano 4 (31 casillas; clic en una ocupada → «no está libre» y siguen marcadas; Esc → se borran y se le devolvieron los 4 SP; después saltó a 3), y la
   Varita del blink de Blanco J1 desde Jugador 1 (a sí mismo, 30 casillas, saltó; a Blanco J1 b, marcadas alrededor de él). 874 pruebas en verde.
-- **⬜ en cola — 😇 Quitar el Pacto desde el menú del token** (dueño, 2026-11-19, en la compu, P244 ✅: «renovarlo desde el token como gm me gustó cómo
+- **✅ hecho (2026-11-19) — 😇 Quitar el Pacto desde el menú del token** (dueño, 2026-11-19, en la compu, P244 ✅: «renovarlo desde el token como gm me gustó cómo
   quedó. Técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»). En el menú «⋯» del token de un personaje, con el Pacto
   **activo**, un botón para quitarlo (con el Pacto gastado sigue el 😇 de renovar). Lo pueden usar los mismos que renovarlo (el GM y el jugador dueño),
   pide confirmar, deja la línea en la Mesa («😇 El GM le quitó el Pacto a Fulano» / «Fulano dejó su Pacto») y al jugador le avisa. Probar en el mapa.
+  *Resultado:* en el «⋯» del token de un personaje con el Pacto activo aparece 🕊 «Quitar el Pacto» (con el Pacto gastado sigue el 😇 de renovar, nunca
+  los dos). Pide confirmar («¿Le quitás el Pacto a Blanco J1? Sin el Pacto, si su vida llega a 0 no revive solo…»; el jugador: «¿Dejás el Pacto…?»),
+  deja la línea en la Mesa («😇 El GM le quitó el Pacto a Blanco J1» / «😇 Blanco J1 dejó su Pacto») y a Jugador 1 le sale «🕊 Sin el Pacto · El GM te
+  quitó el Pacto: si tu vida llega a 0, no revivís solo» (`pactoQuitar`, `vtt-hexgrid/js/83`). Probado en «Claude · pruebas 2» con GM y Jugador 1: el GM
+  renovó y quitó, Jugador 1 renovó y dejó el suyo, y Cancelar no cambia nada. Blanco J1 quedó sin Pacto, como estaba. 875 pruebas en verde.
 - **⬜ en cola — 👁 Cargar el D4 Control mental y ceguera niveles 2 a 5 y verlos en el mapa** (dueño, 2026-11-19: los cuatro aprobados, «va»). Cargar
   en `comun/creeps-esenciales.js` tal como están en `docs/creeps-humanoides.md` (sección D4), con su prueba de números en `comun/pruebas.html`, y cambiar
   sus «Falta cargarlo» por «Cargado». En el mapa ver: Confusión (PdG.Esp contra Res.Mt, el 1d4 al actuar), el combo Punzada mental → Confusión con la

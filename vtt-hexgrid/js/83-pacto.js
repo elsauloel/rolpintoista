@@ -20,12 +20,15 @@ setInterval(() => { try{ renderPactoBoton(); }catch(e){} }, 1500);
    Pacto gastado, «😇 Renovar el Pacto» para el GM y para el jugador dueño. Pide confirmar, marca `S.meta.pacto` en su ficha (editarPersonajeMapa, js/11),
    deja la línea en la Mesa (quién lo renovó, Combatiente.pactoRenovadoTxt) y al jugador le llega el Aviso «Una entidad espiritual te brindó un nuevo
    Pacto». Gastarlo sigue automático (danioPj, js/10). */
-function pactoPuedeRenovar(t){
+// ¿Esta pantalla puede tocar el Pacto de ese token? El GM o el jugador dueño, en un personaje (no una invocación). `activo`: el que tiene que tener ahora.
+function pactoPuedeCambiar(t, activo){
   if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return false;
   const f = fichasPub.get(t.fichaId);
-  if(!f || !f.resumen || f.resumen.pacto === true) return false;
+  if(!f || !f.resumen || (f.resumen.pacto === true) !== activo) return false;
   return !!soyGM || f.duenoUid === fbUsuario.uid;
 }
+function pactoPuedeRenovar(t){ return pactoPuedeCambiar(t, false); }
+function pactoPuedeQuitar(t){ return pactoPuedeCambiar(t, true); }
 async function pactoRenovar(t){
   if(!pactoPuedeRenovar(t)) return;
   const f = fichasPub.get(t.fichaId), nombre = nombreDe(t), porGM = !!soyGM && f.duenoUid !== fbUsuario.uid;
@@ -44,5 +47,29 @@ async function pactoRenovar(t){
   try{ await mesaLinea(linea, 'recordatorio'); }catch(e){}
   try{ momentoAbrir({tipo: 'pacto', icono: '😇', titulo: linea.replace(/^😇 /, ''), resultado: 'Si su vida llega a 0, revive solo y queda Titilando hasta su próximo turno.', estado: 'listo',
     datos: {...(f.duenoUid ? {paraUid: f.duenoUid} : {}), aviso: true, tituloAviso: 'Un nuevo Pacto', textoAviso: `${Combatiente.PACTO_AVISO} Si tu vida llega a 0, revivís solo y quedás Titilando hasta tu próximo turno.`}}); }catch(e){}
+  hudPonerNivel('vital');
+}
+
+/* 🕊 Quitar el Pacto desde el mapa (dueño, 2026-11-19, P244 ✅: «técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»): en
+   el mismo menú del token, con el Pacto activo, para los mismos que lo renuevan (el GM y el jugador dueño). Pide confirmar, apaga `S.meta.pacto`, deja la
+   línea en la Mesa (Combatiente.pactoQuitadoTxt) y al jugador le llega el Aviso. */
+async function pactoQuitar(t){
+  if(!pactoPuedeQuitar(t)) return;
+  const f = fichasPub.get(t.fichaId), nombre = nombreDe(t), porGM = !!soyGM && f.duenoUid !== fbUsuario.uid;
+  const ok = await Confirmar.preguntar(porGM
+    ? `¿Le quitás el Pacto a ${nombre}?\n\nSin el Pacto, si su vida llega a 0 no revive solo. Se le puede volver a dar con el 😇 del mismo menú.`
+    : `¿Dejás el Pacto de ${nombre}?\n\nSin el Pacto, si tu vida llega a 0 no revivís solo. El Pacto lo da la historia: hablalo con el GM.`,
+    {titulo: 'Quitar el Pacto', icono: '🕊', si: porGM ? '🕊 Quitar el Pacto' : '🕊 Dejar el Pacto', no: 'Cancelar'});
+  if(!ok) return;
+  toast(`🕊 Quitando el Pacto de ${nombre}…`);
+  let hubo = null;
+  try{ hubo = await editarPersonajeMapa(t.fichaId, S => { S.meta = S.meta || {}; if(!S.meta.pacto) return false; S.meta.pacto = false; return true; }); }
+  catch(err){ console.error('Quitar el Pacto:', err); }
+  if(hubo === false){ toast(`😇 ${nombre} ya no tenía el Pacto`); return; }
+  if(!hubo){ toast(`😇 No se pudo quitar el Pacto de ${nombre}: cambialo en su ficha (😇 Pacto: no)`); return; }
+  const linea = Combatiente.pactoQuitadoTxt(nombre, porGM);
+  try{ await mesaLinea(linea, 'recordatorio'); }catch(e){}
+  try{ momentoAbrir({tipo: 'pacto', icono: '🕊', titulo: linea.replace(/^😇 /, ''), resultado: 'Sin el Pacto: si su vida llega a 0, no revive solo.', estado: 'listo',
+    datos: {...(f.duenoUid ? {paraUid: f.duenoUid} : {}), aviso: true, tituloAviso: 'Sin el Pacto', textoAviso: Combatiente.pactoQuitadoAviso(porGM)}}); }catch(e){}
   hudPonerNivel('vital');
 }

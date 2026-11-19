@@ -2896,3 +2896,9 @@ Capturas `cola8/`.
   alrededor de él, saltó a la elegida; a un aliado (Blanco J1 b), marcadas alrededor del aliado; Esc las borra.
 Capturas `cola9/1-*`.
 
+## 2026-11-19 · 🕊 Quitar el Pacto desde el token («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+- ✔ **GM**: en el ⋯ de Blanco J1 (sin Pacto) solo el 😇; lo renovó → ahora solo el 🕊; «Quitar el Pacto» con su confirmación → la Mesa «😇 El GM le quitó
+  el Pacto a Blanco J1» y a Jugador 1 el Aviso «🕊 Sin el Pacto · El GM te quitó el Pacto: si tu vida llega a 0, no revivís solo». Cancelar: sigue activo.
+- ✔ **Jugador 1** (dueño): renovó el suyo («Blanco J1 renovó su Pacto») y lo dejó con el 🕊 («😇 Blanco J1 dejó su Pacto»).
+Capturas `cola9/2-*`. Blanco J1 quedó sin Pacto, como estaba.
+

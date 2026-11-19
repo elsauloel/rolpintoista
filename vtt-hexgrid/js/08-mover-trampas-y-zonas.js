@@ -287,11 +287,13 @@ function fuegoCeldas(){
   return m;
 }
 async function fuegoAplicarA(t, dano, cuando){
-  let hecho = false;
+  let hecho = false, res = null;
   try{
-    if(t.tipo === 'creep' && t.fichaId && soyGM){ await danioCreep(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
-    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ await danioPj(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
+    if(t.tipo === 'creep' && t.fichaId && soyGM){ res = await danioCreep(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
+    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ res = await danioPj(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
   }catch(err){ console.error('No se pudo aplicar el daño de fuego:', err); }
+  // 📣 El aviso a quien lo recibe, con la cuenta (P246): la línea en la Mesa, el Aviso al centro y la Crónica.
+  if(hecho && res && res.r) danoDirectoCuentaYAviso(t, dano, res, {nombre: 'el Terreno incendiado', titulo: 'Terreno incendiado', icono: '🔥', tipoTxt: ' de fuego', estilo: 'alerta-roja', detalle: cuando || ''});
   return hecho;
 }
 // Al soltar un movimiento: cada casilla del recorrido que es fuego y viene de una que no lo es cuenta como una entrada.
@@ -306,8 +308,8 @@ async function fuegoEntrada(id, celdas){
     if(fuego.has(k) && !fuego.has(previa)){ total += fuego.get(k); entradas++; }
   }
   if(!total) return;
-  const hecho = await fuegoAplicarA(t, total);
-  alertaRojaAnonima(`🔥 Terreno incendiado`, `${t.oculto ? 'Alguien' : nombreDe(t)} entró en el fuego${entradas > 1 ? ` (${entradas} veces)` : ''}: ${total} de daño de fuego (directo a la vida) — ${hecho ? 'aplicado solo' : 'aplicalo a mano'}`);
+  const hecho = await fuegoAplicarA(t, total, entradas > 1 ? `entró ${entradas} veces` : 'al entrar');
+  if(!hecho || t.oculto) alertaRojaAnonima(`🔥 Terreno incendiado`, `${t.oculto ? 'Alguien' : nombreDe(t)} entró en el fuego${entradas > 1 ? ` (${entradas} veces)` : ''}: ${total} de daño de fuego (directo a la vida) — ${hecho ? 'aplicado solo' : 'aplicalo a mano'}`);
 }
 // Al pasar el turno (⟳ Mantenimiento): todo el que siga en el fuego lo recibe de nuevo. Los fuegos que se apagan justo ahora no cuentan.
 async function fuegoMantenimiento(numero){
@@ -326,7 +328,7 @@ async function fuegoMantenimiento(numero){
     (mio ? propios : ajenos).push({t, d});
   });
   const hechos = [];
-  for(const {t, d} of propios){ if(await fuegoAplicarA(t, d)) hechos.push(`${t.oculto ? 'Alguien' : nombreDe(t)}: ${d}`); }
+  for(const {t, d} of propios){ if(await fuegoAplicarA(t, d, 'Mantenimiento: sigue adentro') && t.oculto) hechos.push(`Alguien: ${d}`); }   // (cada uno, con su aviso; el oculto, anónimo)
   if(hechos.length) alertaRojaAnonima('🔥 Terreno incendiado (Mantenimiento)', `${hechos.join(' · ')} de daño de fuego, directo a la vida (aplicado solo)`);
   if(soyGM){   // el GM avisa lo que no se pudo aplicar solo (invocaciones o personajes que no están conectados no se detectan: revisar el mapa)
     const manual = ajenos.filter(({t}) => t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION));
@@ -708,20 +710,38 @@ function zonaDanoCuenta(monto, r, o){
   if(esc > 0) resta.push(`escudo ${fmt(esc)}`);
   return {entro, frenoAlgo: resta.length > 0, cuenta: resta.length ? `${fmt(monto)} − ${resta.join(' − ')} = ${fmt(entro)}` : (o.ignoraDef ? 'directo a la vida' : 'nada lo frenó')};
 }
-async function zonaDanoAvisar(t, el, monto, cz, tipoTxt){
-  const nombreZ = el.zonaNombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t);
-  const cuantos = `${cz.entro === 1 ? 'entró 1' : `entraron ${fmt(cz.entro)}`} de daño${tipoTxt}`;
+/* 📣 El mismo aviso para todo daño directo que el mapa aplica solo (dueño, 2026-11-19, P246: «ponele a todos el mismo aviso»): el daño fijo de una
+   zona, el Terreno incendiado, la Maldición tormentosa, el Tendón cortado, lo que se lleva quien protege (Miti-Miti / Escudo humano), los saltos del
+   rayo, el Espejito y el Orbe salvaje con 1. o = {nombre (por qué: «la Nube tóxica», «el Terreno incendiado»…), icono, cz (zonaDanoCuenta),
+   tipoTxt (« de fuego»), enCartel (solo la zona: si lo resolvió esta pantalla, va en el veredicto del cartel), mesa (false: la línea ya la escribe
+   quien llama), estilo (de la línea de la Mesa), detalle (algo más para la Mesa)}. A quien maneja al que lo recibe (el jugador del personaje aunque
+   el GM tenga 🎮 el control; un creep, las pantallas del GM): el Aviso al centro con «Entendido» (también si es esta misma pantalla, salvo el cartel
+   de la zona); la línea en la Mesa (no si está oculto) y la Crónica. */
+async function danoDirectoAvisar(t, o){
+  if(!t || !o || !o.cz || !fbUsuario) return;
+  const cz = o.cz, nombreZ = o.nombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t), icono = o.icono || '💔';
+  const cuantos = `${cz.entro === 1 ? 'entró 1' : `entraron ${fmt(cz.entro)}`} de daño${o.tipoTxt || ''}`;
   const texto = `${t.tipo === 'creep' ? `A ${quien} le` : 'Te'} ${cuantos} por ${nombreZ} (${cz.cuenta}).`;   // (un creep: el GM lo lee en tercera persona)
   const veredicto = {tono: cz.entro > 0 ? 'malo' : 'neutro', grande: cz.entro > 0 ? `💔 −${fmt(cz.entro)}` : '🛡 0', chico: texto};
-  // Quien maneja al que lo recibe: el jugador del personaje (aunque el GM tenga 🎮 el control); un creep, las pantallas del GM.
   const gms = []; for(const [uid, m] of miembros) if(m && m.gm) gms.push(uid);
   const para = t.tipo === 'creep' ? gms : [zonaVenenoJugador(t)].filter(Boolean);
-  if(para.includes(fbUsuario.uid) && zonaBanner) zonaBanner.veredicto = veredicto;   // lo resolvió acá: en el cartel de la zona
-  if(!t.oculto) try{ await mesaLinea(`💔 ${quien} · ${nombreZ}: le ${cuantos} (${cz.cuenta})`, 'recordatorio'); }catch(err){}   // (a uno oculto, la Mesa —la ven todos— no lo nombra)
-  const otros = para.filter(u => u !== fbUsuario.uid);
+  let otros = para;
+  if(o.enCartel && para.includes(fbUsuario.uid) && zonaBanner){ zonaBanner.veredicto = veredicto; otros = para.filter(u => u !== fbUsuario.uid); }   // lo resolvió acá: en el cartel de la zona
+  if(o.mesa !== false && !t.oculto) try{ await mesaLinea(`${icono} ${quien} · ${nombreZ}: le ${cuantos} (${cz.cuenta})${o.detalle ? ` · ${o.detalle}` : ''}`, o.estilo || 'recordatorio'); }catch(err){}   // (a uno oculto, la Mesa —la ven todos— no lo nombra)
   if(otros.length)
-    momentoAbrir({tipo: 'zona-dano', icono: '💔', titulo: `${quien} · ${nombreZ}`, estado: 'listo', resultado: `Le ${cuantos} (${cz.cuenta}).`,
-      datos: {paraUids: otros, aviso: true, tituloAviso: nombreZ, textoAviso: texto, veredicto: {...veredicto, chico: cz.cuenta}, ...(t.oculto && t.tipo === 'creep' ? {soloGM: true} : {})}});
+    momentoAbrir({tipo: 'zona-dano', icono, titulo: `${quien} · ${nombreZ}`, estado: 'listo', resultado: `Le ${cuantos} (${cz.cuenta}).`,
+      datos: {paraUids: otros, aviso: true, tituloAviso: o.titulo || nombreZ.replace(/^(el|la|los|las|tu|su) /i, '').replace(/^./, c => c.toUpperCase()), textoAviso: texto, veredicto: {...veredicto, chico: cz.cuenta}, ...(t.oculto && t.tipo === 'creep' ? {soloGM: true} : {})}});
+}
+// El daño fijo de una zona (P245): el mismo aviso, en el cartel de la zona si lo resolvió esta pantalla.
+function zonaDanoAvisar(t, el, monto, cz, tipoTxt){
+  return danoDirectoAvisar(t, {nombre: el.zonaNombre || 'la zona', titulo: el.zonaNombre || 'la zona', cz, tipoTxt, enCartel: true});
+}
+// Atajo para los daños directos: la cuenta (con lo que lo frenó) y el aviso. res = lo que devuelve danioPj/danioCreep/danioInv.
+function danoDirectoCuentaYAviso(t, monto, res, o){
+  if(!res || !res.r) return null;
+  const cz = zonaDanoCuenta(monto, res.r, {ignoraDef: o.ignoraDef !== false, armadmg: 0, resElem: num(o.resElem), elZ: o.elZ || '', suela: 0});
+  danoDirectoAvisar(t, {...o, cz}).catch(err => console.error('El aviso del daño directo:', err));
+  return cz;
 }
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
@@ -1225,7 +1245,9 @@ async function tormentaAlMoverse(t, pasos, stacks){
     const f = t.tipo === 'creep' ? danioCreep : String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj;
     const res = await f(t, String(d), true, 0, 0, {});
     const r = res && res.r ? {dano: d, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable} : {dano: d, recibido: d, absorbido: 0};
-    mesaLinea(Combatiente.tormentaTxt(nombreDe(t), r, `moverse ${pasos} casilla${pasos === 1 ? '' : 's'}`), 'alerta-roja', nombreDe(t));
+    // 📣 (P246) la cuenta y el aviso a quien lo recibe; si no hay cuenta, la línea de siempre.
+    if(!danoDirectoCuentaYAviso(t, d, res, {nombre: `la Maldición tormentosa, al caminar ${pasos} casilla${pasos === 1 ? '' : 's'}`, titulo: 'Maldición tormentosa', icono: '⛈', estilo: 'alerta-roja'}))
+      mesaLinea(Combatiente.tormentaTxt(nombreDe(t), r, `moverse ${pasos} casilla${pasos === 1 ? '' : 's'}`), 'alerta-roja', nombreDe(t));
   }catch(err){
     console.error('No se pudo cobrar la Maldición tormentosa al moverse:', err);
     toast(`⛈ ${nombreDe(t)} se movió Atormentado: −${d} de vida, aplicalo a mano`);

@@ -33,7 +33,9 @@ async function talEspejito(d, entro){
     const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(monto), true)
       : ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
     const txt = `🪞 El Espejito de ${d.defensor.nombre} le devuelve ${monto} a ${d.atacante.nombre} (el ${pct} % del daño especial que le entró)`;
-    try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+    // 📣 (P246) el aviso a quien atacó, con la cuenta, y la línea en la Mesa (js/08); si no hay cuenta, la línea de siempre.
+    if(!danoDirectoCuentaYAviso(ta, monto, res, {nombre: `el Espejito de ${d.defensor.nombre}`, titulo: 'Espejito', icono: '🪞', detalle: `el ${pct} % del daño especial que le entró a ${d.defensor.nombre}`}))
+      try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
     return {monto, recibido: num(res.r.recibido)};
   }catch(err){ console.error('El Espejito:', err); try{ mesaLinea(`🪞 El Espejito de ${d.defensor.nombre}: ${monto} a ${d.atacante.nombre}, a mano`, 'recordatorio'); }catch(e){} return null; }
 }
@@ -123,7 +125,9 @@ async function talSalvajePropio(d, entro, sal){
   if(!ta || !n) return;
   const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(n), true)
     : ta.tipo === 'creep' ? await danioCreep(ta, String(n), true) : await danioPj(ta, String(n), true);
-  try{ mesaLinea(`🔮 ${sal.nombre}: a ${d.atacante.nombre} también le entran ${fmt(num(res.r.recibido))} de daño`, 'recordatorio'); }catch(err){}
+  // 📣 (P246) el aviso a quien atacó, con la cuenta (js/08); si no hay cuenta, la línea de siempre.
+  if(!danoDirectoCuentaYAviso(ta, n, res, {nombre: `el ${sal.nombre}, que salió con 1`, titulo: sal.nombre, icono: '🔮'}))
+    try{ mesaLinea(`🔮 ${sal.nombre}: a ${d.atacante.nombre} también le entran ${fmt(num(res.r.recibido))} de daño`, 'recordatorio'); }catch(err){}
 }
 // El Orbe del custodio: ganó una tirada de PdG.Esp (en la pantalla de quien tiró).
 function talCustodio(d){

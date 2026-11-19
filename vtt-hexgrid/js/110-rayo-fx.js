@@ -76,7 +76,9 @@ function rayoFxMeToca(rep){
   const uid = typeof fbUsuario !== 'undefined' && fbUsuario ? fbUsuario.uid : '';
   return !!uid && (rep.ids || []).some(id => { const t = tokens.get(id); return t && t.tipo !== 'creep' && (t.duenoUid === uid || (typeof puedoMover === 'function' && puedoMover(t))); });
 }
-function rayoFxReporte(rep){
+function rayoFxReporte(rep, espera){
   if(typeof AvisoCombate === 'undefined' || !AvisoCombate.mostrar) return;
+  // 📣 Si hay un aviso abierto (el «Te entraron N de daño por el salto del rayo» de quien lo recibió, P246), el reporte espera a que se cierre.
+  if(AvisoCombate.abierto && AvisoCombate.abierto() && (Number(espera) || 0) < 85){ setTimeout(() => rayoFxReporte(rep, (Number(espera) || 0) + 1), 700); return; }
   try{ AvisoCombate.mostrar({icono: rep.icono || '⚡', titulo: rep.titulo, pasos: rep.pasos, veredicto: rep.veredicto}); }catch(err){ console.error('El reporte del rayo:', err); }
 }

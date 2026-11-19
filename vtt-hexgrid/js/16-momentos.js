@@ -492,7 +492,17 @@ async function deteccionGMResolver(){
 /* ---------- Un aviso al centro para quien le toca (P146) ----------
    Sin nada que tirar: solo el momento y «Entendido». Lo usa el cambio de control (el GM toma o devuelve el personaje de un jugador). */
 let avisoCentro = null;   // {id, d}
-function momentoAvisoCentro(id, d){
+const avisosDanoVistos = new Set();   // 📣 los avisos de daño directo ya mostrados (P246)
+function momentoAvisoCentro(id, d, espera){
+  // 📣 El aviso de un daño directo (P246, js/08) no tapa otro aviso abierto: espera a que se cierre (hasta 1 minuto), así dos que llegan juntos
+  // (el Espejito y el salto del rayo, por ejemplo) se leen uno detrás del otro.
+  // (Una sola vez por aviso: el mismo momento vuelve a llegar cuando el servidor le pone la hora.)
+  if(d && d.tipo === 'zona-dano'){
+    if(!espera && avisosDanoVistos.has(id)) return;
+    avisosDanoVistos.add(id);
+    if(typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto() && num(espera) < 85){
+      setTimeout(() => momentoAvisoCentro(id, d, num(espera) + 1), 700); return; }
+  }
   avisoCentro = {id, d};
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los pop-ups de efectos de combate): comun/aviso-combate.js.
   const dt = d.datos || {};

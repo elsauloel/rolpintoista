@@ -397,7 +397,10 @@ async function mitiMitiCobrar(t, prot, res){
   try{
     const m = num(res.r.mitiMiti);
     const rp = prot.tipo === 'creep' ? await danioCreep(prot, String(m), true, 0, 0) : await danioPj(prot, String(m), true, 0, 0);   // 🛡 el Escudo humano de un creep (2026-10-27)
-    mesaLinea(`🛡 ${prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti'}: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
+    // 📣 (P246) el aviso a quien protege, con la cuenta (js/08); la línea de la Mesa lleva además su vida antes y después.
+    const que = prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti';
+    if(!danoDirectoCuentaYAviso(prot, m, rp, {nombre: `el ${que}, la mitad del golpe a ${t.oculto ? 'alguien' : nombreDe(t)}`, titulo: que, icono: '🛡', detalle: `${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP`}))
+      mesaLinea(`🛡 ${que}: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
     if(typeof escudoHumanoGolpePublicar === 'function') escudoHumanoGolpePublicar(t, prot, num(res.r.recibido) + m, m).catch(err => console.error('Escudo humano (animación):', err));   // 🛡 (js/95, 2026-11-03)
   }catch(err){ console.error('No se pudo cobrar el Miti-Miti:', err); mesaLinea(`🛡 Miti-Miti: a ${nombreDe(prot)} le tocan ${fmt(num(res.r.mitiMiti))} de daño (✋ a mano: no se pudo aplicar solo)`); }
 }
@@ -781,7 +784,7 @@ async function rayoCadenaAplicar(cadena, o){
     if(dano0 < 1) break;
     const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-    let ok = false, entro = dano, resTxt = '', antes = null, despues = null, nota = '', vidaTxt = '';
+    let ok = false, entro = dano, resTxt = '', antes = null, despues = null, nota = '', vidaTxt = '', r0 = null, res0 = 0;
     try{
       const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
       const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
@@ -790,6 +793,7 @@ async function rayoCadenaAplicar(cadena, o){
         const vxAntes = rayoVidaExtraDe(s.t);
         if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
         const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
+        r0 = r; res0 = res;
         entro = r && r.r ? Combatiente.danoAVida(r.r) : Math.max(0, dano - res);   // ❤ la Vida extra es vida (2026-11-18)
         // (2026-11-18, el caso de Bizzante: «−0 (salto)» sin decir por qué): lo que se lo comió, a la vista.
         if(r && r.r){ const vx = num(r.r.vida), esc = Math.max(0, num(r.r.absorbido) - num(r.r.arcano) - vx), arc = num(r.r.arcano);
@@ -798,6 +802,8 @@ async function rayoCadenaAplicar(cadena, o){
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
+    // 📣 (P246) a quien recibe el salto, el mismo aviso (js/08); la línea de la Mesa ya la deja el reporte del rayo (js/110) o el aviso de abajo.
+    if(ok && r0) danoDirectoCuentaYAviso(s.t, dano, r0, {nombre: 'el salto del rayo', titulo: 'El salto del rayo', icono: '⚡', resElem: res0, elZ: 'rayo', mesa: false});
     hubo.push({id: s.id, t: s.t, dano, entro, antes, despues, ...(vidaTxt ? {vidaTxt} : {}), ...(nota ? {nota} : {})});
     (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}${nota ? ` (${nota})` : ''}`);
     prev = dano;   // ⚡ (2026-11-18, dueño: «debería haber saltado a Bizzante y a Larry»): el salto que sigue es la mitad de lo que LLEGABA, no de lo que entró (un invulnerable o una resistencia no cortan la cadena)

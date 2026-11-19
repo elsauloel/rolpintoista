@@ -24,6 +24,8 @@ async function tendonAlMoverse(t, pasos){
     const f = t.tipo === 'creep' ? danioCreep : String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj;
     const res = await f(t, String(d), true, 0, 0, {});
     const recibido = res && res.r ? num(res.r.recibido) : d;
+    // 📣 (P246) la cuenta y el aviso a quien lo recibe (js/08); si no hay cuenta, la línea de siempre.
+    if(!danoDirectoCuentaYAviso(t, d, res, {nombre: `el Tendón cortado, al caminar ${n} casilla${n === 1 ? '' : 's'} sangrando`, titulo: 'Tendón cortado', icono: '🦵', estilo: 'alerta-roja'}))
     mesaLinea(`🦵 ${quien} camina con el tendón cortado y sangrando: ${n} casilla${n === 1 ? '' : 's'}, −${fmt(recibido)} de vida (daño directo)`, 'alerta-roja', quien);
   }catch(err){
     console.error('Tendón cortado: no se pudo cobrar la vida', err);

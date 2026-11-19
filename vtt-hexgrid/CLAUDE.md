@@ -912,6 +912,13 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `zonaDanoCuenta` («4 − Defensa 1 = 3») y lo avisa `zonaDanoAvisar`: a quien maneja al que lo recibe (el jugador del personaje aunque el GM tenga 🎮
   el control; un creep, el GM) en el veredicto del cartel de la zona si lo resolvió su pantalla, o un momento `zona-dano` con `aviso` al centro; línea
   en la Mesa (no si está oculto). Otros daños directos sin aviso: P246.
+  **📣 El mismo aviso para los otros daños directos** (2026-11-19, P246 ✅: «ponele a todos el mismo aviso»): la función es `danoDirectoAvisar(t, o)`
+  (js/08; `zonaDanoAvisar` la llama con `enCartel`) y el atajo `danoDirectoCuentaYAviso(t, monto, res, o)` (la cuenta con `zonaDanoCuenta` + el aviso).
+  La usan 🔥 `fuegoAplicarA` (al entrar y en el Mantenimiento), ⛈ `tormentaAlMoverse`, 🦵 `tendonAlMoverse` (js/107), 🛡 `mitiMitiCobrar` (js/10, a quien
+  protege), ⚡ `rayoCadenaAplicar` (js/10: el rayo por el agua y la flecha que salta; `mesa: false`, la línea la deja el reporte del rayo) y 🪞🔮
+  `talEspejito` / `talSalvajePropio` (js/53). Sin cartel de zona, el Aviso al centro sale también en la misma pantalla que lo aplicó. Los saltos de una
+  varita o del Relámpago van por `dueloCadena` (un duelo por salto, con su cuadro): esos ya se ven. En js/16, un aviso `zona-dano` espera a que se
+  cierre el aviso que haya abierto y sale una sola vez (`avisosDanoVistos`); el reporte del rayo (js/110, `rayoFxReporte`) también espera.
 
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa

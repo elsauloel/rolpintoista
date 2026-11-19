@@ -1560,3 +1560,10 @@ El Intercambio arcano (M4 Arcano nivel 5) reusa el cambio de lugar de «Cambiar 
 por ejemplo) tira su chance y, si le sale, no se mueve nadie. La skill aprobada no dice qué pasa con un aliado Inamovible. **Elegido lo más simple
 mientras tanto**: a un rival, el Inamovible tira su chance como en Cambiar de lugar; a un aliado, no (el aliado acepta el cambio, igual que le entra
 sin tirada). **Pregunta para el dueño:** ¿está bien así, o el Inamovible también frena el cambio con un aliado?
+
+### P244 — 😇 Renovar el Pacto: los detalles chicos (2026-11-19, Claude)
+Al programar «Renovar el Pacto» (cola de programación, 2026-11-19) quedaron tres cosas que el pedido no decía. **Elegido mientras tanto**: (1) el botón
+😇 del menú del token sale **solo con el Pacto gastado** (con el Pacto activo no hay nada que renovar); (2) en la ficha, el cartel «El Pacto lo renueva el GM
+cuando la historia lo da. ¿Lo cambiás igual?» sale solo al pasarlo de «No» a «Sí» y solo al jugador (si lo marca el GM, se renueva sin preguntar y la
+línea dice «El GM le renovó el Pacto a…»); (3) pasarlo a mano de «Sí» a «No» no pregunta ni deja línea en la Mesa (como antes). **Pregunta para el
+dueño:** ¿está bien así, o querés el botón también con el Pacto activo, o una línea en la Mesa cuando alguien lo saca a mano?

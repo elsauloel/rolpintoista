@@ -31,6 +31,19 @@ document.addEventListener('change', e => {
   renderInvocaciones();
 });
 
+/* 😇 Renovar el Pacto a mano (dueño, 2026-11-19): lo renueva el GM cuando la historia lo da, pero la ficha avisa en vez de prohibir. Si el jugador lo pasa
+   de «No» a «Sí», el cartel «El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?»; si sigue, queda activo y la línea en la Mesa
+   («Fulano renovó su Pacto»; si lo marca el GM, «El GM le renovó el Pacto a Fulano», sin preguntar). Pasarlo a «No» o gastarlo, como siempre. */
+async function pactoCambioAMano(sel){
+  const quiere = sel.value === 'si';
+  if(!quiere || S.meta.pacto){ S.meta.pacto = quiere; return; }
+  const gm = !!(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm);
+  sel.value = 'no';
+  if(!gm && !(await Confirmar.preguntar(Combatiente.PACTO_A_MANO, {titulo: 'Renovar el Pacto', icono: '😇', si: 'Sí, cambiarlo', no: 'Cancelar'}))) return;
+  S.meta.pacto = true; sel.value = 'si';
+  try{ mesaLinea(Combatiente.pactoRenovadoTxt(S.meta.nombre, gm), 'recordatorio'); }catch(e){}
+}
+
 document.addEventListener('input', e => {
   const t = e.target;
   if(t.id === 'f-nombre'){ S.meta.nombre = t.value; return; }
@@ -45,7 +58,7 @@ document.addEventListener('input', e => {
     S.loot[t.id.replace('f-loot-','')] = num(t.value); return;
   }
   if(t.id === 'f-wildcards'){ S.meta.wildcards = num(t.value); return; }
-  if(t.id === 'f-pacto'){ S.meta.pacto = t.value === 'si'; return; }   // 😇 el Pacto (2026-10-28)
+  if(t.id === 'f-pacto'){ pactoCambioAMano(t); return; }   // 😇 el Pacto (2026-10-28; renovarlo a mano avisa, 2026-11-19)
   if(t.id === 'f-wildcardsMax'){ S.meta.wildcardsMax = num(t.value); return; }
   if(t.dataset.lootEsp !== undefined){
     const row = (S.loot.especial||[]).find(l => l.id === t.dataset.lootEsp);

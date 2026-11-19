@@ -904,6 +904,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   pantallas; espera a `dados-quietos`, máx. 7 s) y el veredicto «¡Entra X!» / «No entra» ~1,6 s; la Crónica (el momento de la zona) lo cuenta. Sigue
   saliendo sola (la tira la pantalla que resuelve la zona).
 
+- **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
+  el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa
+  «Renovando…»), línea en la Mesa (`Combatiente.pactoRenovadoTxt`) y un momento `pacto` con el Aviso al jugador (`Combatiente.PACTO_AVISO`). La ficha
+  pregunta si el jugador lo pasa a «Sí» a mano (`pactoCambioAMano`, ficha js/06). Dudas chicas: P244.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261118ia"></script>
+<script src="combatiente.js?v=20261119pacto"></script>
 <script src="creep-calculo.js?v=20261118pas"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -2564,6 +2564,10 @@ prueba('😇 El Pacto (2026-10-28): con la vida en 0 revive solo con un cuarto, 
   const r2 = FichaAcciones.revisarAnkh(S);   // sin pacto: ahora sí el Ankh
   igual([r, vida === Math.max(1, Math.floor(hpmax / 4)), tit, sigue, ankh, r2, FichaResumen.resumen({...S, meta: {...S.meta, pacto: true}}).pacto, Combatiente.pactoVida(30), Combatiente.pactoVida(2)],
     ['El Pacto', true, true, false, 1, 'Ankh de Reencarnación', true, 7, 1]);
+});
+prueba('😇 Renovar el Pacto (2026-11-19): la línea de la Mesa dice quién lo renovó, el aviso al jugador y la pregunta de la ficha', () => {
+  igual([Combatiente.pactoRenovadoTxt('Bizzante', true), Combatiente.pactoRenovadoTxt('Bizzante', false), Combatiente.PACTO_AVISO, Combatiente.PACTO_A_MANO],
+    ['😇 El GM le renovó el Pacto a Bizzante', '😇 Bizzante renovó su Pacto', 'Una entidad espiritual te brindó un nuevo Pacto.', 'El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?']);
 });
 prueba('Poción de SP menor (2026-10-20): un tercio del SP máximo, para arriba', () => {
   const it = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');

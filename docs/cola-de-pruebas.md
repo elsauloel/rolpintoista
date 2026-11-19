@@ -18,12 +18,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   3D (en todas las pantallas, por la Mesa), y cuando quedan quietos «Salió 4 → ¡Entra Veneno!» o «No entra» (`zonaChanceAVista`, `vtt-hexgrid/js/08`). La
   Crónica de los demás lo cuenta («Veneno 50 %: salió 1 → no entra»). El daño de esas zonas no se tocó (#9, espera respuesta). Probado en «Claude · pruebas
   2» con una zona del GM (Veneno 50 %) y Blanco J1 entrando: salió y no salió. Video para el dueño. 873 pruebas en verde.
-- **⬜ en cola — 😇 Renovar el Pacto desde el mapa** (dueño, 2026-11-19: decidido quién lo cambia). Lo renueva la historia (lo marca el GM), pero
-  las herramientas avisan en vez de prohibir: (1) un botón **«😇 Renovar el Pacto»** en el menú del token de un personaje en el mapa, para el GM **y
-  también para el jugador dueño de ese personaje** (dueño: «me gustaría que el jugador también pueda reactivar su pacto desde el mismo botón del mapa»);
-  al renovarlo queda una línea en la Mesa («Fulano renovó su Pacto» / «El GM le renovó el Pacto a Fulano») y al jugador le llega el aviso «Una entidad
-  espiritual te brindó un nuevo Pacto». (2) En la ficha, si el jugador cambia el campo «😇 Pacto» a mano, un cartel «El Pacto lo renueva el GM cuando
-  la historia lo da. ¿Lo cambiás igual?» y, si sigue, la misma línea en la Mesa. Gastarlo sigue automático. Probar en el mapa con GM y Jugador 1.
+- **✅ hecho (2026-11-19) — 😇 Renovar el Pacto desde el mapa** (dueño, 2026-11-19: «me gustaría que el jugador también pueda reactivar su pacto desde el
+  mismo botón del mapa»). *Resultado:* (1) en el menú del token de un personaje (el ⋯), con el Pacto gastado, un 😇 «Renovar el Pacto» para el GM y para el
+  jugador dueño: pide confirmar, marca el Pacto en su ficha, deja la línea en la Mesa («😇 El GM le renovó el Pacto a Blanco J1» / «😇 Blanco J1 renovó su
+  Pacto») y al jugador le sale al centro «Un nuevo Pacto: Una entidad espiritual te brindó un nuevo Pacto…» (`pactoRenovar`, `vtt-hexgrid/js/83-pacto.js`).
+  (2) En la ficha, pasar «😇 Pacto» de No a Sí abre «El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?»; Cancelar lo deja en No, «Sí,
+  cambiarlo» lo activa con la misma línea en la Mesa (`pactoCambioAMano`, `ficha-personaje/js/06`). Gastarlo sigue automático. Los textos, en
+  `Combatiente` (`pactoRenovadoTxt`, `PACTO_AVISO`, `PACTO_A_MANO`). Probado en «Claude · pruebas 2» con GM y Jugador 1 (las dos renovaciones desde el
+  mapa y el cartel de la ficha). Dudas chicas en P244. 874 pruebas en verde.
 - **✅ hecho (2026-11-19) — 🪧 Andanada arcana: el cartel «¿a quién va el siguiente misil?» queda tapado** (dueño, 2026-11-19: «habría que
   corregirlo»). *Resultado:* el cartel ahora espera a que el cuadro del misil anterior se cierre (solo a los 10 s, con «Listo, cerrar» o
   minimizándolo) y recién ahí sale, con el mapa a la vista (`misilSiguiente`, `vtt-hexgrid/js/13-tokens-portal-duelo.js`; vale también para las

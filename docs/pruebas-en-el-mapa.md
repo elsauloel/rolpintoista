@@ -2836,3 +2836,9 @@ Blanco J1 b con las Tobilleras de vendaje; el Peleador de control 5 sumado al ma
   50 %): Blanco J1 (Jugador 1) entró caminando, tiró su Res.Esp y no la resistió; el cartel de la zona pasó a «Chance de que entre Veneno: 50 %, sale con
   4, 5 o 6 en 1d6 · El dado: rodando…», rodó el d6 en 3D (en las dos pantallas) y después «Salió 4 → ¡Entra Veneno!» (y el «✔ Aplicar» del Veneno) o
   «Salió 1 / 3 → No entra». El GM lo vio en la Crónica («Veneno 50 %: salió 1 → no entra») y la tirada en la Mesa. Video para el dueño.
+- ✔ **😇 Renovar el Pacto** (Blanco J1, con el Pacto gastado): el GM, desde el ⋯ del token, «😇» → «¿Le renovás el Pacto a Blanco J1?» → Renovar: la Mesa
+  dice «😇 El GM le renovó el Pacto a Blanco J1» y a Jugador 1 le sale al centro «Un nuevo Pacto · Una entidad espiritual te brindó un nuevo Pacto…»; con
+  el Pacto activo el 😇 ya no está. Jugador 1 desde su token: «😇 Renovando el Pacto…», «😇 Blanco J1 renovó su Pacto» y el mismo aviso. En la ficha de
+  Jugador 1, pasar «😇 Pacto» de No a Sí abre «El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?»: Cancelar lo deja en No; «Sí,
+  cambiarlo» lo activa y deja la línea en la Mesa.
+

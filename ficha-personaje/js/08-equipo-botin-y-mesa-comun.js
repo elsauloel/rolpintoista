@@ -166,6 +166,12 @@ const intercambioHost = {
 };
 function intercambioIniciar(){ Intercambio.iniciar(intercambioHost); }
 $('#btn-pasar').onclick = () => { if(fichaVivo) Intercambio.abrirDar(fichaVivo.id); else toast('Abrí tu personaje primero'); };
+// El mismo «Pasar», desde la ventanita «💰 DDE y despojos» del menú de la izquierda (dueño, 2026-11-20): abre la misma ventana y cierra la ventanita.
+$('#btn-pasar-dde').onclick = () => {
+  if(!fichaVivo){ toast('Abrí tu personaje primero'); return; }
+  document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; });
+  Intercambio.abrirDar(fichaVivo.id);
+};
 $('#tienda-baul').onclick = () => { if(fichaVivo) Intercambio.abrirBaul(fichaVivo.id); };
 
 let equipoVolverABotin = false;   // la mochila abierta desde el botín: al cerrarla se vuelve al botín (dueño, 2026-10-22)

@@ -12,10 +12,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
-  botón para poder pasarle a un aliado»). En la ventanita «DDE y despojos» de la ficha, un botón 🤝 «Pasar a un aliado» que deja elegir a quién, qué
-  (DDE, despojos normales, mágicos o especiales) y cuánto, usando el mismo mecanismo de intercambio que ya pasa ítems (`comun/intercambio.js`); que el
-  que recibe se entere (aviso / línea en la Mesa). Si en combate pasar un ítem cuesta No2, usar el mismo criterio que ya existe; no inventar otro.
+- **✅ hecho (2026-11-20) — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
+  botón para poder pasarle a un aliado»). La ventanita «💰 DDE y despojos» de la ficha tiene abajo el botón **🤝 Pasar a un aliado**: cierra la ventanita y abre
+  la misma ventana de siempre («Pasarle algo a otro personaje», la del 🤝 Pasar de la Mochila; `comun/intercambio.js`, sin tocar): a quién, cuántos DDE, qué
+  despojos y cuántos. Las reglas son las que ya había: lo ofrecido queda apartado hasta que el otro acepta, al otro le sale «Te ofrecen algo — Aceptar /
+  Rechazar», queda la línea en la Mesa, y en combate esa ventana solo deja pasar ítems (con sus No2). Esa ventanita existe solo en la ficha (el mapa y la
+  ficha lite no la tienen; ahí se pasa con el 🤝 de arriba de la Mochila). Probado con clics en «Claude · pruebas 2»: Blanco J1 le pasó 20 DDE y 2 despojos
+  normales a Blanco J1 b (50 → 30 y 3 → 1 en uno; 0 → 20 y 0 → 2 en el otro), y todo volvió a 0 al terminar. Aceptó la misma cuenta del Jugador 1 con su otro
+  personaje: el Jugador 2 no es parte de esa partida. Pruebas automáticas 893/893. Sin ver: el botón con el mapa en Combate (`docs/pruebas-en-el-mapa.md`).
 - **⬜ en cola — 🏁 Al terminar «Finalizar combate», el mapa vuelve solo a modo narrativo** (dueño, 2026-11-20: «al poner finalizar combate y terminar
   con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»). Cuando el proceso termina de verdad (se cierra el botín y se
   reparten XP y oro; o al publicar si no hay ítems), el mapa publicado pasa de Combate a Narrativo, con lo mismo que hace el interruptor a mano.

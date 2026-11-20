@@ -219,7 +219,7 @@ $('#btn-mantenimiento').onclick = async () => {
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
 
-let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: [], libre: null, empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}};
+let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: [], libre: null, empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}, movidos: {}};
 /* Turno libre (`libre: {id, vuelve}`, dueño 2026-10-15): el GM le dio el turno a alguien «de manera libre, sin contabilizar el paso del turno»
    (clic derecho en su nombre → Turno libre). Mientras dura, el turno es suyo (esSuTurno), pero no recargó ni bajó nada; con ▶ Siguiente el
    turno vuelve a `vuelve` (quien lo tenía), también sin recargar ni bajar nada. Ver iniciativaDarTurno. */
@@ -271,6 +271,8 @@ function escucharIniciativa(){
       ordenPendientes: Array.isArray(d.ordenPendientes) ? d.ordenPendientes.filter(x => x && typeof x === 'object').slice(0, 30) : [],
       ordenUsados: d.ordenUsados && typeof d.ordenUsados === 'object' ? {ronda: Math.round(num(d.ordenUsados.ronda)), ids: Array.isArray(d.ordenUsados.ids) ? d.ordenUsados.ids.map(String) : []} : null,
       mufas: d.mufas && typeof d.mufas === 'object' ? d.mufas : {},
+      // 💍 Quién se movió en cada ronda (2026-11-20, comun/quieto.js + js/126): {tokenId: [rondas]}. Lo anota la pantalla que mueve al token.
+      movidos: d.movidos && typeof d.movidos === 'object' ? d.movidos : {},
       // ▶ Iniciar combate (2026-11-20, comun/orden-turnos.js): se ordenó y falta empezar / ya empezó.
       porIniciar: d.porIniciar === true, iniciado: d.iniciado === true ? true : d.iniciado === false ? false : null,   // (null: un orden de antes de este botón)
     };
@@ -307,6 +309,8 @@ async function guardarIniciativa(cambios){
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
+  // 💍 Quién se movió (js/126): se conserva lo de esta ronda y la anterior (con lo que esta pantalla anotó recién); sin orden de turnos, nada.
+  if(typeof Quieto !== 'undefined') datos.movidos = Quieto.podar(cambios && cambios.movidos ? cambios.movidos : (typeof quietoMovidos === 'function' ? quietoMovidos() : iniciativa.movidos), datos.ronda, (datos.orden || []).length > 0);
   if(!datos.libre) delete datos.libre;
   if(!datos.repite) delete datos.repite;
   if(!datos.porIniciar) delete datos.porIniciar;
@@ -640,7 +644,7 @@ async function iniciativaIniciarCombate(){
     if(fallas.length) toast(`No se pudieron llenar los No2 de: ${fallas.join(', ')} — hacelo a mano`);
     const orden = iniciativa.orden, k = OrdenTurnos.primero(orden, iniciativaFueraDeJuego), sig = orden[k];
     const paso = Math.round(num(iniciativa.paso)) + 1, mapa = mapaMostrado;
-    if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false}))) return;
+    if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false, movidos: {}}))) return;
     const tSig = tokens.get(sig.id);
     const publico = !!tSig && !tSig.oculto && !sig.oculto && (tSig.tipo === 'creep' ? creepConocido(tSig) : !enSigilo(tSig));
     const nomSig = publico ? nombreDe(tSig) : '';
@@ -1433,6 +1437,7 @@ function marcarMovido(id, si){
   if(si === false) movidosTurno.delete(k); else movidosTurno.add(k);
   const ahora = Math.round(num(mantenimientoNumero));   // se guardan este turno y el anterior (la Apuntada firme mira los dos)
   try{ localStorage.setItem('movidos-turno', JSON.stringify([...movidosTurno].filter(x => x.endsWith('@' + ahora) || x.endsWith('@' + (ahora - 1))))); }catch(e){}
+  if(typeof quietoMarcar === 'function') quietoMarcar(id, si);   // 💍 y en la partida, para los anillos de «no te moviste» (js/126, 2026-11-20)
 }
 window.mapaSeMovio = tokenId => seMovioEsteTurno(tokenId);
 // 🔮 La ronda de combate (2026-10-18, la Estatuilla del Gauchito Gil: una vez por ronda): el número de Mantenimiento de esta partida, que sube al

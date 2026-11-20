@@ -58,8 +58,10 @@ async function interponerseUsar(c, objetivoId){
       EstadosAplicar.aplicarACreep(sc, {nombre: 'Interpuesto'});
       return {};
     });
-    if(dest.col !== c.t.col || dest.fila !== c.t.fila)
+    if(dest.col !== c.t.col || dest.fila !== c.t.fila){
+      if(typeof quietoMarcar === 'function') quietoMarcar(c.id);   // 💍 interponerse es moverse (js/126)
       await coleccionTokens().doc(c.id).update({col: dest.col, fila: dest.fila, rotacion: rotacionDePaso(hexCentro(dest.col, dest.fila), hexCentro(o.t.col, o.t.fila)), ruta: firebase.firestore.FieldValue.delete()});
+    }
     // El duelo sigue igual, pero ahora defiende él (las opciones de defensa se vuelven a calcular).
     await fbDb.collection(fbRutaCampana('duelos')).doc(o.dueloId).update({defensor: {ref: String(c.t.fichaId), tipo: 'creep', nombre: String(nom).slice(0, 40), uid: String(c.t.duenoUid || ''), tokenId: c.id,
       interpuesto: {aliado: String(aliado).slice(0, 40), aliadoTokenId: o.id}}});   // 🛡 adentro de `defensor` (las reglas de Firestore no aceptan campos nuevos en el duelo): el cuadro lo muestra («Ahora le pega a…») y anima el cambio (comun/duelo.js)

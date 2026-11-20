@@ -131,6 +131,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261120a"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
+<script src="quieto.js?v=20261120quieto"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -8936,6 +8937,109 @@ grupo('Tokens con otro nombre que su ficha');
     const n = await TokensAuto.nombresPonerAlDia({fichaId: 'fx', nombre: 'Nuevo', ...con});
     const otra = await TokensAuto.nombresPonerAlDia({fichaId: 'fx', nombre: 'Nuevo', ...con});
     igual([n, otra, escritos, leidos.length], [2, 0, [['c/tokens', 'a', 'Nuevo'], ['c/mapas/m1/tokens', 'b', 'Nuevo']], 3]);
+  });
+})();
+
+/* ---------- 💍 «Quieto»: Puntería certera y Foco (comun/quieto.js + vtt-hexgrid/js/126, 2026-11-20) ---------- */
+grupo('Anillos de «no te moviste»: Puntería certera y Foco');
+(() => {
+  prueba('los dos anillos del catálogo existen con su stat (pulso +2 a PdG, foco +2 a PdG.Esp)', () => {
+    const a = CATALOGO_BASE.find(i => i.id === 'new-anillo-de-punteria-certera'), b = CATALOGO_BASE.find(i => i.id === 'new-anillo-de-foco-arcano');
+    igual([a.mods, b.mods], [[{stat: 'pulso', val: 2}], [{stat: 'foco', val: 2}]]);
+    igual(Quieto.bonos({pulso: 2, foco: 0}).map(x => [x.stat, x.val, x.a]), [['pulso', 2, 'PdG']]);
+    igual(Quieto.bonos({pulso: 0, foco: 3}).map(x => [x.nombre, x.a]), [['Foco', 'PdG.Esp']]);
+    igual(Quieto.bonos({}), []);
+  });
+  prueba('el bono: ni en esta ronda ni en la anterior; moverse en cualquiera de las dos lo apaga', () => {
+    igual([Quieto.activo({}, 'a', 3), Quieto.activo({a: [3]}, 'a', 3), Quieto.activo({a: [2]}, 'a', 3), Quieto.activo({a: [1]}, 'a', 3), Quieto.activo({b: [2, 3]}, 'a', 3)],
+      [true, false, false, true, true]);
+  });
+  prueba('en la ronda 1 no hay bono (no hubo una ronda anterior quieta): recién desde la 2', () => {
+    igual([Quieto.activo({}, 'a', 1), Quieto.activo({}, 'a', 2), Quieto.activo({a: [1]}, 'a', 2), Quieto.activo(null, 'a', 0)], [false, true, false, false]);
+  });
+  prueba('anotar un movimiento guarda esta ronda y la anterior; al pasar de ronda se poda; sin orden de turnos no queda nada', () => {
+    igual([Quieto.marcar([], 4), Quieto.marcar([3], 4), Quieto.marcar([1, 2, 3], 4), Quieto.marcar([4], 4)], [[4], [3, 4], [3, 4], [4]]);
+    igual(Quieto.podar({a: [1, 2, 3], b: [1], c: [3, 4, 9]}, 4, true), {a: [3], c: [3, 4]});
+    igual([Quieto.podar({a: [3]}, 4, false), Quieto.podar(null, 4, true)], [{}, {}]);
+    igual(Quieto.unir({a: [2], b: [1]}, {a: [3, 2], c: [3]}), {a: [2, 3], b: [1], c: [3]});
+  });
+  prueba('el cartel y el aviso: «🎯 Puntería certera», «🔮 Foco» y «Si te movés, la perdés»', () => {
+    const p = Quieto.bonos({pulso: 2}), dos = Quieto.bonos({pulso: 2, foco: 2});
+    igual([Quieto.cartel(p[0]), Quieto.cartel(dos[1])], ['🎯 Puntería certera', '🔮 Foco']);
+    igual(Quieto.aviso(p, 'Bizzante', true), 'Tenés Puntería certera activa (+2 a PdG). Si te movés, la perdés.');
+    igual(Quieto.aviso(p, 'Bizzante', false), 'Bizzante tiene Puntería certera activa (+2 a PdG). Si lo movés, la pierde.');
+    cierto(Quieto.aviso(dos, 'X', true).includes('Foco activa (+2 a PdG.Esp)') && Quieto.aviso(dos, 'X', true).endsWith('las perdés.'));
+  });
+  // El archivo del mapa (js/126) con un tablero armado a mano: dos pantallas que comparten lo anotado en la partida.
+  const mundo = async (o) => {
+    const src = await (await fetch('../vtt-hexgrid/js/126-quieto.js', {cache: 'no-store'})).text();
+    const carteles = [], preguntas = [], escritos = [];
+    const FV = {arrayUnion: r => ({mas: r}), arrayRemove: r => ({menos: r})};
+    const fbDb = {doc: () => ({update: async x => { escritos.push(x); if(o.sinPermiso) throw {code: 'permission-denied'}; Object.keys(x).forEach(k => { const id = k.slice(8), l = (o.ini.movidos[id] = o.ini.movidos[id] || []); if(x[k].mas !== undefined){ if(!l.includes(x[k].mas)) l.push(x[k].mas); } else o.ini.movidos[id] = l.filter(r => r !== x[k].menos); }); }})};
+    const f = new Function('iniciativa', 'tokens', 'modoMapa', 'soyGM', 'fbUsuario', 'fbDb', 'firebase', 'fbRutaCampana', 'rutaMapaEstado', 'num', 'statPiesDe', 'seMovioEsteTurno', 'seMovioTurnoAnterior',
+      'manejoEsteToken', 'iniciativaFueraDeJuego', 'ganchoEvaEmpezar', 'AvisoCombate', 'nombreDe', 'SEP_INVOCACION', 'mapaMostrado', 'setInterval', 'window', 'Quieto', 'enDodge',
+      src + '\nreturn {quietoMovio, quietoActivo, quietoMarcar, quietoRevisar, quietoAvisoAntes, quietoMovidos, modo: m => { modoMapa = m; }};');
+    const api = f(o.ini, o.tokens, o.modo || 'combate', !!o.gm, {uid: o.uid || 'yo'}, fbDb, {firestore: {FieldValue: FV}}, r => r, r => r, v => Number(v) || 0,
+      (t, st) => Number(t[st]) || 0, id => !!(o.movLocal || {})[id + '@0'], id => !!(o.movLocal || {})[id + '@1'],
+      t => t.duenoUid === (o.uid || 'yo'), () => false, d => carteles.push(d.texto), {preguntar: async (txt, op) => { preguntas.push([txt, op.si, op.no]); return !!o.responde; }},
+      t => t.nombre, '~', 'm1', () => 0, {}, Quieto, id => !!o.dodge);
+    return {...api, carteles, preguntas, escritos};
+  };
+  prueba('en el mapa (js/126): lo que anota la pantalla que mueve lo ve la otra (el jugador se mueve, el GM con el control ataca sin bono)', async () => {
+    const ini = {orden: [{id: 'biz'}, {id: 'rata'}], ronda: 3, movidos: {}};
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2}], ['rata', {tipo: 'creep', fichaId: 'c1', nombre: 'Rata'}]]);
+    const jugador = await mundo({ini, tokens}), gm = await mundo({ini, tokens, gm: true, uid: 'gm'});
+    igual([jugador.quietoActivo('biz'), gm.quietoActivo('biz')], [true, true]);
+    jugador.quietoMarcar('biz');
+    await new Promise(r => setTimeout(r, 10));
+    igual([jugador.quietoActivo('biz'), gm.quietoActivo('biz'), ini.movidos, jugador.escritos.length], [false, false, {biz: [3]}, 1]);
+    // La ronda siguiente tampoco (se movió en la anterior); la otra, sí.
+    ini.ronda = 4; igual([gm.quietoActivo('biz'), gm.quietoMovio('biz', 1), gm.quietoMovio('biz', 0)], [false, true, false]);
+    ini.ronda = 5; igual(gm.quietoActivo('biz'), true);
+  });
+  prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
+    const ini = {orden: [{id: 'biz'}], ronda: 4, movidos: {}};
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2}]]);
+    const m = await mundo({ini, tokens});
+    m.quietoMarcar('biz'); await new Promise(r => setTimeout(r, 10));
+    m.quietoMarcar('biz', false); await new Promise(r => setTimeout(r, 10));
+    igual([ini.movidos.biz, m.quietoActivo('biz')], [[], true]);
+    ini.movidos.biz = [4];   // otra pantalla ya lo había anotado
+    m.quietoMarcar('biz'); m.quietoMarcar('biz', false); await new Promise(r => setTimeout(r, 10));
+    igual([ini.movidos.biz, m.quietoActivo('biz')], [[4], false]);
+  });
+  prueba('en el mapa (js/126): si no se puede anotar en la partida, vale la memoria de esta pantalla; sin orden de turnos, como antes', async () => {
+    const ini = {orden: [{id: 'biz'}], ronda: 4, movidos: {}};
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2}]]);
+    const m = await mundo({ini, tokens, sinPermiso: true});
+    m.quietoMarcar('biz'); await new Promise(r => setTimeout(r, 10));
+    igual([ini.movidos, m.quietoActivo('biz')], [{}, false]);
+    const sin = await mundo({ini: {orden: [], ronda: 1, movidos: {}}, tokens, movLocal: {'biz@1': true}});
+    igual([sin.quietoActivo('biz'), sin.quietoMovio('biz', 1), sin.quietoMovio('biz', 0)], [false, true, false]);
+    sin.quietoMarcar('biz'); igual(sin.escritos.length, 0);
+  });
+  prueba('en el mapa (js/126): el cartel flotante sale cuando el bono pasa a activo (no al entrar), solo a quien lo maneja y al GM, y solo en combate', async () => {
+    const ini = {orden: [{id: 'biz'}, {id: 'mago'}], ronda: 2, movidos: {biz: [1], mago: [1]}};
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2}], ['mago', {tipo: 'pj', fichaId: 'f2', duenoUid: 'otro', nombre: 'Mago', foco: 2}]]);
+    const yo = await mundo({ini, tokens}), gm = await mundo({ini, tokens, gm: true, uid: 'gm'}), ya = await mundo({ini: {...ini, ronda: 3}, tokens});
+    yo.quietoRevisar(); gm.quietoRevisar(); ya.quietoRevisar();
+    ini.ronda = 3; yo.quietoRevisar(); gm.quietoRevisar(); ya.quietoRevisar();
+    igual([yo.carteles, gm.carteles, ya.carteles], [['🎯 Puntería certera'], ['🎯 Puntería certera', '🔮 Foco'], []]);
+    yo.quietoRevisar(); igual(yo.carteles.length, 1);   // no se repite mientras sigue activo
+    const narr = await mundo({ini: {orden: [{id: 'biz'}], ronda: 2, movidos: {biz: [1]}}, tokens, modo: 'narrativo'});
+    narr.quietoRevisar(); igual(narr.carteles, []);
+  });
+  prueba('en el mapa (js/126): el aviso antes de moverse sale solo con el bono activo y en combate; Cancelar no mueve; el dodge roll no pregunta', async () => {
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2}], ['rata', {tipo: 'creep', fichaId: 'c1', nombre: 'Rata'}]]);
+    const ini = {orden: [{id: 'biz'}, {id: 'rata'}], ronda: 3, movidos: {}};
+    const no = await mundo({ini, tokens, responde: false}), si = await mundo({ini, tokens, responde: true}), gm = await mundo({ini, tokens, gm: true, uid: 'gm', responde: true});
+    igual([await no.quietoAvisoAntes('biz'), await si.quietoAvisoAntes('biz'), await gm.quietoAvisoAntes('biz')], [false, true, true]);
+    igual(no.preguntas, [['Tenés Puntería certera activa (+2 a PdG). Si te movés, la perdés.', 'Moverme igual', 'Cancelar']]);
+    igual(gm.preguntas[0][0], 'Bizzante tiene Puntería certera activa (+2 a PdG). Si lo movés, la pierde.');
+    igual([await no.quietoAvisoAntes('rata'), no.preguntas.length], [true, 1]);   // sin anillo no pregunta
+    const movido = await mundo({ini: {...ini, movidos: {biz: [2]}}, tokens}), r1 = await mundo({ini: {...ini, ronda: 1}, tokens}), narr = await mundo({ini, tokens, modo: 'narrativo'}), dodge = await mundo({ini, tokens, dodge: true});
+    igual([await movido.quietoAvisoAntes('biz'), await r1.quietoAvisoAntes('biz'), await narr.quietoAvisoAntes('biz'), await dodge.quietoAvisoAntes('biz')], [true, true, true, true]);
+    igual([movido.preguntas.length, r1.preguntas.length, narr.preguntas.length, dodge.preguntas.length], [0, 0, 0, 0]);
   });
 })();
 

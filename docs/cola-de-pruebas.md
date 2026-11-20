@@ -338,7 +338,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     clon como GM, J1 y J2 (mapa, GM Tools y fichas). De paso: al abrir el mapa como GM la consola dice «No se pudo poner al día el nombre
     del token» (el mapa quiere igualar el nombre de un token de personaje al de su ficha y los permisos no dejan al GM cambiar eso); no
     rompe nada, queda anotado sin arreglar.
-- **⬜ en cola — 💍 Anillo de Puntería Certera: el +2 aparece aunque te hayas movido; y que avise cuando se activa y cuando lo vas a perder**
+- **✅ hecho (2026-11-20) — 💍 Anillo de Puntería Certera: el +2 aparece aunque te hayas movido; y que avise cuando se activa y cuando lo vas a perder**
   (dueño, 2026-11-20, El origen, lo lleva Bizzante: «le aparecía el bono a la probabilidad de golpe independientemente de si se había cumplido la
   condición o no… correr los testeos pertinentes para que funcione bien. Y estaría bueno que cuando se active el bono aparezca algún tipo de cartel
   flotante que diga "Puntería certera", y que una vez que la tenés activada, si te vas a mover, te aparezca una notificación: tenés Puntería certera,
@@ -354,6 +354,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (definir y contar si lo ven todos). (3) **Aviso antes de moverse** con el bono activo, en combate: «Tenés Puntería certera activa (+2 a PdG). Si
   te movés, la perdés. [Moverme igual] [Cancelar]»; Cancelar deja el token donde estaba. Solo al jugador dueño (o al GM si lo mueve él), una vez
   por activación. No inventar reglas: qué cuenta como «moverse» y cualquier duda, a preguntas-abiertas.
+  **Resultado (2026-11-20).** *Qué pasaba* (visto con clics en «El origen · CLON de pruebas»): «quién se movió» lo recordaba solo la pantalla
+  que había movido al token. Si Bizzante se movía en la pantalla de su jugador y el ataque salía de otra (el GM con 🎮 el control, otra compu u
+  otro navegador), esa no sabía nada y sumaba el +2. Además el bono salía ya en la ronda 1 del combate, sin ninguna ronda quieta antes. En la
+  misma pantalla, moverse y atacar ya daba bien (sin bono). La lupa y la ficha no muestran el bono: solo el cuadro del duelo.
+  *Qué se arregló:* con orden de turnos, cada movimiento se anota en la partida (al lado del orden de turnos), así lo ven todas las pantallas y
+  no se pierde al recargar; el bono se activa recién desde la ronda 2; y ahora también cuentan el Dash, el Parpadeo e interponerse (antes solo
+  caminar, el Salto, la Carga y el Takle). El Anillo de Foco Arcano usa lo mismo. Sin reglas nuevas de Firestore.
+  *Lo nuevo:* el cartel dorado «🎯 Puntería certera» (o «🔮 Foco») que sale del token cuando el bono queda activo (lo ven quien lo maneja y el
+  GM), y el aviso antes de caminar con el bono activo: «Tenés Puntería certera activa (+2 a PdG). Si te movés, la perdés.» [Moverme igual]
+  [Cancelar] (al GM que lo mueve, «Bizzante tiene…»). Cancelar deja el token donde estaba.
+  *Probado con clics* (Jugador 1 y GM): ronda 1 sin bono; moverse y atacar, sin bono en las dos pantallas; la ronda siguiente, sin bono (también
+  desde el GM con el control); dos rondas quieto, +2 y el cartel; recargar la página no lo cambia; el aviso con Cancelar y con Moverme igual; el
+  aviso al GM; Ctrl+Z devuelve el bono; 🦶 Mover libre no lo saca. 10 pruebas automáticas nuevas. *Sin probar con clics:* el Foco, el Dash y
+  demás (nadie los tiene en el clon): `docs/pruebas-en-el-mapa.md`. Lo elegido «mientras tanto» (la ronda 1, qué cuenta como moverse, quién ve
+  el cartel): **P258**. Archivos: `comun/quieto.js`, `vtt-hexgrid/js/126-quieto.js`.
 - **⬜ en cola — 🐝 Las abejas de Bizzante aparecen con menos vida que su máximo (~75 %)** (dueño, 2026-11-20, El origen: «al invocar sus abejas,
   aparecían con menos HP que el máximo. Algo así como el 75 %… copialo a la partida de pruebas para hacer el testeo»). (1) Leer a Bizzante de El
   origen en SOLO LECTURA (la página con las escrituras a Firestore bloqueadas de scratchpad/simfin/; nunca abrir ahí el mapa, la ficha ni GM Tools) y

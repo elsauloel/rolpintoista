@@ -1741,3 +1741,25 @@ El botón del orden de turnos (dueño, 2026-11-20). Dudas chicas, con lo elegido
 - (e) **Los caídos:** también quedan con los No2 llenos; el primero que juega es el primero de la lista que no está caído.
 - (f) **La ronda:** al iniciar vuelve a «Ronda 1» aunque el orden viniera con otra cuenta de un combate anterior.
 
+
+### P258 — 💍 Puntería certera y Foco: qué cuenta como «moverse» y qué pasa en la ronda 1 (2026-11-20, Claude)
+
+El ítem dice «si no te moviste ni en esta ronda ni en la anterior». Al arreglar que el bono saliera de más (ahora «quién se movió» se anota en la
+partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto no dice. Quedó así, «mientras tanto» (se cambia fácil):
+- (a) **La ronda 1 del combate no da el bono.** Como no hubo una ronda anterior, se tomó «dos rondas quieto» al pie de la letra: lo más temprano
+  que se activa es al empezar la ronda 2 (si no se movió en la 1). Antes lo daba desde el primer ataque del combate. ¿Está bien, o en la ronda 1
+  vale con no haberse movido desde que empezó el combate?
+- (b) **Cuenta como moverse** lo que el personaje hace por su cuenta: caminar (también el dodge roll), la Carga, el Takle, el Salto, el Dash, el
+  Parpadeo / teletransporte propio, interponerse.
+- (c) **No cuenta que lo muevan:** un empujón, que lo arrastren (el gancho, Atraer), tropezar en una trampa, el Cebo; ni el 🦶 Mover libre (la
+  salida «sin reglas», que también usa el GM para acomodar). ¿Un empujón debería hacerle perder la puntería? ¿Y pasar por un portal?
+- (d) **La «ronda»** es la del orden de turnos (la misma para todos), no «de tu turno a tu turno». Con eso, el que juega último y se mueve en su
+  turno recupera el bono antes (en rondas) que el que juega primero. ¿Lo preferís contado por turno propio?
+- (e) **El cartel «🎯 Puntería certera» / «🔮 Foco»** lo ven quien maneja al personaje y el GM (no el resto de la mesa, para no llenar la pantalla
+  de carteles ajenos). ¿Lo ven todos?
+- (f) **El aviso antes de moverse** («Si te movés, la perdés») sale cada vez que vas a caminar con el bono activo (si cancelás y volvés a
+  arrastrar, pregunta de nuevo; después de «Moverme igual» ya no hay bono que perder). Solo al caminar: el Salto, el Dash, la Carga y el Parpadeo
+  no preguntan (son habilidades que ya elegiste usar). El dodge roll tampoco. ¿Alguno de esos debería preguntar?
+- (g) **Sin orden de turnos** (narrativo, o combate sin lista) sigue como antes: lo recuerda solo la pantalla que movió, sin cartel ni aviso.
+- (h) La **Apuntada** y la **Apuntada firme** de las ballestas («si no te moviste…») siguen con la memoria de una sola pantalla: tienen el mismo
+  problema que tenía el anillo. ¿Las paso al mismo mecanismo?

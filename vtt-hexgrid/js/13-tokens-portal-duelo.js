@@ -239,6 +239,7 @@ function blinkDeHabilidad(msg){
       // 📺 Primero la animación (js/111), así nadie ve el token en la casilla nueva antes de que se apague en la vieja.
       if(typeof blinkTvPublicar === 'function') await blinkTvPublicar(id, desde, h);
       await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
+      if(typeof quietoMarcar === 'function') quietoMarcar(id);   // 💍 teletransportarse es moverse (js/126)
       if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, id, [desde, {col: h.col, fila: h.fila}], msg.nombre || 'Parpadeo');   // 💨 sin oportunidad: el aviso (js/17)
       fin();
       if(msg.alFrente){ await blinkAlFrente(id, t, msg, desde, h); return; }
@@ -1671,13 +1672,17 @@ const embestidaUsadas = new Set();
 /* Anillos Comunes (2026-10-06): **Pulso quieto** (PdG) y **Foco** (PdG.Esp, en una habilidad que tira PdG.Esp): si quien ataca no se movió en este
    turno. **Primera sangre**: daño extra en su primer ataque del combate (se gasta al atacar; se libera al volver a narrativo, js/25). */
 function quietoDe(atq, ataque){
-  if(!atq || !atq.id || seMovioEsteTurno(atq.id)) return 0;
+  // 💍 (2026-11-20) «No se movió ni en esta ronda ni en la anterior» ya no es memoria de esta pantalla: con orden de turnos sale de lo anotado
+  // en la partida (js/126 `quietoActivo`, comun/quieto.js), y recién desde la ronda 2. Sin orden de turnos, como antes.
+  if(!atq || !atq.id) return 0;
+  const activo = typeof quietoActivo === 'function' ? quietoActivo(atq.id) : (!seMovioEsteTurno(atq.id) && !seMovioTurnoAnterior(atq.id));
+  if(!activo) return 0;
   const hab = ataque && ataque.hab;
-  if(!hab) return seMovioTurnoAnterior(atq.id) ? 0 : Math.max(0, Math.round(statPiesDe(atq, 'pulso')));   // el Pulso quieto, como el Foco (dueño, 2026-10-19)
+  if(!hab) return Math.max(0, Math.round(statPiesDe(atq, 'pulso')));   // el Pulso quieto, como el Foco (dueño, 2026-10-19)
   const tira = hab.tira && (hab.tira.stat || hab.tira);
   if(tira !== 'pdgmg') return 0;
   // 💍 El Foco (dueño, 2026-10-19): si no se movió ni en esta ronda ni en la anterior (el Pulso quieto, igual).
-  return seMovioTurnoAnterior(atq.id) ? 0 : Math.max(0, Math.round(statPiesDe(atq, 'foco')));
+  return Math.max(0, Math.round(statPiesDe(atq, 'foco')));
 }
 const primeraSangreUsadas = new Set();
 function primeraSangreDe(atq, ataque){

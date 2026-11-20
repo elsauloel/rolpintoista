@@ -87,20 +87,22 @@ function ganchoEvaRecibido(id, d){
   ganchoEvaEmpezar(d.datos);
 }
 // Los colores del texto que flota: el rojo de siempre y el azul-plateado de lo que no entra por una inmunidad (dueño, 2026-11-20).
-const GANCHO_EVA_COLOR = {inmune: {arriba: '#f4f9ff', abajo: '#8fb4dc', borde: 'rgba(10,22,40,.95)', brillo: 'rgba(150,200,255,.9)', chico: 0.8}};
+const GANCHO_EVA_COLOR = {inmune: {arriba: '#f4f9ff', abajo: '#8fb4dc', borde: 'rgba(10,22,40,.95)', brillo: 'rgba(150,200,255,.9)', chico: 0.8},
+  // 💍 «🎯 Puntería certera» / «🔮 Foco» (2026-11-20, js/126): dorado. No se publica: cada pantalla lo arranca sola.
+  quieto: {arriba: '#fffbe0', abajo: '#f2b632', borde: 'rgba(40,24,4,.95)', brillo: 'rgba(255,214,90,.95)', chico: 0.8}};
 function ganchoEvaEmpezar(dt){
   if(!dt) return;
   // `ref` (2026-11-20): quien publica no siempre sabe el token (la ficha suelta, sin el mapa): va de quién es («fichaId» o «fichaId~invId») y
   // cada mapa busca su token.
   if(!dt.a && dt.ref){ const par = [...tokens.entries()].find(([, t]) => t && t.tipo !== 'creep' && String(t.fichaId || '') === String(dt.ref)); if(par) dt = {...dt, a: par[0]}; }
   if(!tokens.get(dt.a)) return;
-  if(dt.color === 'inmune'){
+  if(dt.color === 'inmune' || dt.color === 'quieto'){
     // 🛡 El cartel de inmunidad espera a que esta pantalla no tenga el cuadro del duelo ni un aviso al centro tapando el mapa (como la Transfusión,
     // js/92; como mucho 25 s, después sale igual). Si ya flota el mismo sobre ese token, no se repite; si flota otro distinto, va arriba.
     const desde = dt.desde || Date.now();
     const tapado = (typeof Duelo !== 'undefined' && Duelo.abiertoId && Duelo.abiertoId()) || (typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto());
     if(tapado && Date.now() - desde < 25000){ setTimeout(() => ganchoEvaEmpezar({...dt, desde}), 400); return; }
-    const ahora = performance.now(), otros = GANCHO_EVA.filter(f => f.a === dt.a && f.color === 'inmune' && ahora - f.t0 < f.dur * 0.8);
+    const ahora = performance.now(), otros = GANCHO_EVA.filter(f => f.a === dt.a && f.color === dt.color && ahora - f.t0 < f.dur * 0.8);
     if(otros.some(f => f.texto === String(dt.texto))) return;
     dt = {...dt, fila: otros.length ? Math.max(...otros.map(f => f.fila)) + 1 : 0};
   }

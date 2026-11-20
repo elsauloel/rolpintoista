@@ -282,6 +282,12 @@
 
 ## Pendientes
 
+- [ ] **💍 Puntería certera y Foco (2026-11-20, `vtt-hexgrid/js/126-quieto.js`): lo que quedó sin ver en el mapa** — el **Anillo de Foco Arcano**
+  (nadie lo tiene en el clon: el bono a PdG.Esp en una habilidad, su cartel «🔮 Foco» y su aviso; usa el mismo camino, cubierto por las pruebas
+  automáticas); que el **Dash, el Salto, la Carga, el Takle, el Parpadeo e interponerse** apaguen el bono (Bizzante no tiene ninguno); un **creep**
+  o una **invocación** con el anillo; el cartel con **el cuadro del duelo abierto** (tiene que esperar a que se cierre); un **empujón** (no tiene
+  que apagarlo, P258); y el caso **sin orden de turnos**. Probado con clics: caminar (jugador y GM con 🎮), recargar la página, Ctrl+Z, 🦶 Mover libre.
+
 - [ ] **✨ Animaciones de resurrección (2026-11-20, `vtt-hexgrid/js/125-resurreccion-fx.js`): lo que quedó sin ver en el mapa** — una
   **invocación** que revive con el ✚; la **Llama de Fénix de un creep**; volver (Pacto o Fénix) por un golpe **con el cuadro del duelo abierto**
   (el cuadro se tiene que apartar y volver solo); un token **oculto o en la niebla** para un jugador (no tiene que ver nada); y el Revive usado

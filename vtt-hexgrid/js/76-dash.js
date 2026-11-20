@@ -27,6 +27,7 @@ function dashCamino(origen, dir, casillas, tYo){
   return {celdas, rival, antes, fin};
 }
 function dashMover(id, c){
+  if(typeof quietoMarcar === 'function') quietoMarcar(id);   // 💍 el Dash es moverse (js/126)
   return coleccionTokens().doc(id).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
 }
 // o = {nombre, casillas, atacar(rivalId) → Promise<bool> (lanzó el duelo), alTerminar() (sin ataque o cancelado: reabrir la ventana)}. Pide la dirección con un clic.

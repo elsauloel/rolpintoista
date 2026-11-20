@@ -343,6 +343,10 @@ escribir las fichas, así que cada una aplica su propio `mantenimiento()`
   podía quedar con la ficha o gm-tools de antes de la última actualización
   mientras dura la sesión.
 
+- **`movidos` en el documento de la iniciativa** (2026-11-20, `mapa/iniciativa` y `mapas/{id}/estado/iniciativa`): `{tokenId: [rondas]}`, en qué
+  rondas se movió cada token (esta y la anterior). Lo anota la pantalla que mueve al token (cualquier miembro: no cambia `turno`, `ronda` ni la
+  cantidad de filas) y lo usan los anillos de Puntería certera y Foco (`comun/quieto.js`, `vtt-hexgrid/js/126-quieto.js`). Sin reglas nuevas.
+
 ## Respaldo de la partida
 
 Firebase gratis no hace copias de seguridad. Cualquiera baja un respaldo:

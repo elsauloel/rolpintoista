@@ -2414,3 +2414,18 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   todavía no, falla en silencio. Las invocaciones (`fichaId` con `~`) guardan su propio nombre. La ficha hace lo mismo al abrirse y al guardar un
   nombre nuevo (ficha js/12, `FichaSesion.guardar`). Probado en «El origen · CLON de pruebas» (los seis tokens de Rockardo).
 
+
+- **💍 «Quieto»: Puntería certera y Foco, con lo anotado en la partida** (2026-11-20, dueño: «le aparecía el bono… independientemente de si se
+  había cumplido la condición»; `js/126-quieto.js` + las cuentas en `comun/quieto.js`). **Quién se movió en cada ronda** ya no es memoria de una
+  pantalla: con orden de turnos se anota en el documento del orden, `iniciativa.movidos` = {tokenId: [rondas]} (js/04 lo lee en
+  `escucharIniciativa` y `guardarIniciativa` lo vuelve a guardar podado a esta ronda y la anterior; «Iniciar combate» lo vacía). Lo escribe la
+  pantalla que mueve (`quietoMarcar(id, si)`, con `arrayUnion` / `arrayRemove`; sin reglas nuevas: cualquier miembro ya puede tocar ese documento
+  si no cambia turno, ronda ni la cantidad de filas). `marcarMovido` (js/04: caminar, Salto, Carga, Takle, y el deshacer) lo llama; además el Dash
+  (`dashMover`, js/76), el Parpadeo (`blinkDeHabilidad`, js/13) e interponerse (js/78). **No** lo llaman los empujones, arrastres, trampas, el
+  Cebo ni el 🦶 Mover libre. `quietoActivo(id)` = no se movió en esta ronda ni en la anterior **y la ronda es la 2 o más**; `quietoDe` (js/13) lo
+  usa para `ataque.quieto`. Sin orden de turnos: como antes (`seMovioEsteTurno` / `seMovioTurnoAnterior`, por Mantenimiento, en esa pantalla).
+  **El cartel**: `quietoRevisar` (cada 700 ms) mira los tokens que maneja la pantalla (el GM, todos) y, cuando el bono pasa de apagado a activo
+  en combate, arranca el texto flotante de js/96 con `color: 'quieto'` (dorado): «🎯 Puntería certera» / «🔮 Foco». No se publica (cada pantalla lo
+  deduce); la primera mirada solo toma nota (al entrar no salta). **El aviso**: `quietoAvisoAntes(id)` desde `confirmarRuta` (js/08), con
+  `AvisoCombate.preguntar` → «Moverme igual» / «Cancelar» (Cancelar = `cancelarRuta`); al GM que mueve a otro, en tercera persona. Lo elegido
+  «mientras tanto»: P258. Probado con clics en «El origen · CLON de pruebas» (Jugador 1 y GM, con y sin 🎮 el control).

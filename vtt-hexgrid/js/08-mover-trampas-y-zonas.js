@@ -1270,6 +1270,8 @@ async function confirmarRuta(){
     cancelarRuta();
     return;
   }
+  // 💍 Con «Puntería certera» / «Foco» activos, en combate: avisa que al moverse los pierde (js/126). Cancelar deja el token donde estaba.
+  if(typeof quietoAvisoAntes === 'function' && !(await quietoAvisoAntes(p.id, {dodge: !!p.dodge}))){ cancelarRuta(); return; }
   const origen = p.celdas[0], seq0 = nieblaSeq, pend0 = new Set(nieblaPendientes), rotAntes = num(t.rotacion || 0);
   try{
     const esCreep = t.tipo === 'creep';

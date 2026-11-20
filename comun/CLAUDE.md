@@ -2090,3 +2090,9 @@ versión parecida en más de una, es candidato a juntar.
   y los renombra; una vez por nombre y por pantalla; si no puede, calla). Lo llama la pantalla del jugador dueño: el mapa (js/09), la ficha al
   abrirse (js/12) y `FichaSesion.guardar` cuando guarda un nombre nuevo. Regla nueva: el GM puede cambiar solo el `nombre` de un token de personaje.
 
+
+- **`quieto.js`** (`Quieto`, 2026-11-20) — **las cuentas de los anillos de «no te moviste»** (Puntería certera = `pulso`, PdG; Foco arcano =
+  `foco`, PdG.Esp): `movio(movidos, id, ronda)`, `activo(movidos, id, ronda)` (ni en esta ronda ni en la anterior, y recién desde la ronda 2),
+  `marcar(lista, ronda)`, `podar(movidos, ronda, hayOrden)` (lo que se guarda: esta ronda y la anterior), `unir(a, b)`, `ANILLOS`, `bonos({pulso,
+  foco})`, `cartel(b)` («🎯 Puntería certera») y `aviso(lista, nombre, propio)` («Tenés … activa (+2 a PdG). Si te movés, la perdés.»). Sin pantalla
+  ni Firebase. Lo usa el mapa (`vtt-hexgrid/js/126-quieto.js`, js/04) y las pruebas automáticas.

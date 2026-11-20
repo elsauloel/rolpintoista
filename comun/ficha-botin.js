@@ -135,12 +135,24 @@ const FichaBotin = (() => {
       return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
         <div style="flex:1;min-width:0">
           <div style="font-weight:600"><span class="glo" tabindex="0" data-glo-txt="${esc(globo)}">${esc(p.nombre)}</span>${n > 1 ? ` <span style="color:var(--copper, #B87333)">×${n}</span>` : ''}${p.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
-          <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${info && info.ocupado ? ' · <b style="color:var(--bad, #E05A5A)">slot ocupado</b>' : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
+          <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
+          ${lugarHtml(p.item, info)}
         </div>
         <button type="button" class="mini" data-view="catalogo:${esc(p.item.id)}">Ver</button>
         ${comparar ? `<button type="button" class="btn" data-botin-comparar="${esc(p.item.id)}" style="border:1px solid var(--copper, #B87333);color:var(--copper, #B87333);background:rgba(184,115,51,.10);font-weight:700" title="Lo comparás con lo que tenés puesto en ese lugar">⚖ Comparar</button>` : ''}
         ${acciones(p)}
       </div>`;
+    }
+    /* 🧩 Dónde va y si ya lo tenés ocupado (dueño, 2026-11-20, mirando el botín como jugador: «que mostraran qué slot ocupan, y si ya está ocupado o no
+       en el personaje propio»): «Va en: Pies · libre» en verde, o «ocupado con Botas de minero» en rojo. Solo lo que se equipa. */
+    function lugarHtml(item, info){
+      const sd = (E().SLOT_DEFS || []).find(d => d.cats.includes(item && item.tipoItem));
+      if(!sd || !info) return '';
+      const con = (info.equipados || []).map(i => i.nombre).filter(Boolean);
+      const est = info.ocupado
+        ? `<b style="color:var(--bad, #E05A5A)">ocupado${con.length ? ' con ' + esc(con.join(' y ')) : ''}</b>`
+        : `<b style="color:var(--good, #4ec98a)">libre</b>${con.length ? ` <span>(tenés ${esc(con.join(' y '))})</span>` : ''}`;
+      return `<div class="hint">🧩 Va en: <b>${esc(sd.label)}</b> · ${est}</div>`;
     }
     function acciones(p){
       const off = puede ? '' : ' disabled', partes = [];

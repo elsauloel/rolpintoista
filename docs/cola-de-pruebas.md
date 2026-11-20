@@ -152,6 +152,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   · **Cuándo se dispara**: al entrar; al empezar el turno de quien está adentro; al empezar el turno de quien la creó; cada ronda… lo que diga el dato.
   · **De quién es** y con qué habilidad se puso; **cuánto le queda** (turnos / rondas, o «hasta que…»).
   · Si hay tirada para evitarla (qué tira cada uno).
+  **Orden (dueño, 2026-11-20: «siempre primero el detalle de cuánto daño hace y en qué contexto, y después todo lo demás»):** arriba de todo y
+  destacado, UNA frase con lo esencial: cuánto daño (o qué efecto), a quién y cuándo (ej. «🔥 2d6 de fuego a quien entra o empieza su turno adentro»).
+  Debajo, el resto: fuego amigo, de quién es, cuánto le queda, tirada para evitarla, descripción.
   Lo ven el GM y los jugadores que ven la zona (a un jugador no se le muestra lo que no debería saber: p. ej. el dueño si quien la puso está oculto,
   con el mismo criterio de la tarea del sigilo). Si algún dato no existe en la zona, decir «a mano» en vez de inventarlo.
 - **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que

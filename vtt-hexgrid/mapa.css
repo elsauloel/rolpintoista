@@ -601,6 +601,7 @@ aside{
 #hud .hud-estado:first-of-type{border-top:none}
 #hud .hud-estado .nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #hud .hud-estado .turnos{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);min-width:26px;text-align:right}
+#hud .hud-estado-hasta{font-size:11.5px;color:var(--muted);padding:0 0 5px 15px;line-height:1.3}   /* ⏳ «Dura hasta el fin del turno de…» (2026-11-20) */
 #hud .hud-mini{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);font-size:11px;padding:1px 6px;cursor:pointer}
 /* Tarjeta del creep (🪪): equipo en chips de solo lectura y nota con saltos de línea. */
 #hud .hud-tarjeta-equipo{display:flex;flex-wrap:wrap;gap:5px}

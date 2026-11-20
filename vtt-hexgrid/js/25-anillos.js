@@ -506,7 +506,7 @@ async function usarCurandero(){
   const a = curanderoActivo();
   if(!a) return;
   const v = await Confirmar.elegir(`${nombreDe(a.t)}: ¿qué estado te sacás? (te quedan ${a.quedan} hoy)`, {titulo: 'Anillo del curandero', icono: '🩹', no: 'Cancelar',
-    opciones: a.malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : ''}))});
+    opciones: a.malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : ''}))});
   if(!v) return;
   let sacado = '';
   try{

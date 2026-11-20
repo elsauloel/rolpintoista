@@ -53,7 +53,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Probado con clics** en «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1): con botín (1 ítem) y sin ítems, la franja sale en el cartel del GM
   y el renglón en el del jugador; con el mapa ya en narrativo, ninguno de los dos. La partida quedó como estaba (XP, creeps, sin combate abierto,
   narrativo). Pruebas automáticas 896/896. Sin ver: `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola — 🐞 Desequilibrado (Arrastrar) se muestra como si no tuviera fin** (dueño, 2026-11-20, jugando El origen: «el personaje arrastrado
+- **✅ hecho (2026-11-20) — 🐞 Desequilibrado (Arrastrar) se muestra como si no tuviera fin** (dueño, 2026-11-20, jugando El origen: «el personaje arrastrado
   apareció con el debuff Desequilibrado, y cuando me fijé cuánto duraba, parecía como que no tenía fin. Sin embargo, cuando pasó el tiempo
   correspondiente, se fue solo… quiero que pases una prueba en el mapa, corrobores esta información, y si es solamente un error de comunicación,
   simplemente corrijas eso»). Leído el código (Claude): es a propósito que se guarde `permanente: true` cuando quien arrastró está en el orden de
@@ -73,6 +73,32 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Arrastrar y después Atacar en el mismo turno; y atacar, cerrar el combate (Finalizar / pasar a narrativo), abrir otro y mirar el costo del
   primer ataque. Arreglar la causa que aparezca (si es la (b): que al empezar un combate —pasar a Combate / tirar iniciativa / Finalizar combate— la
   cuenta de ataques arranque en cero para todos, personajes, invocaciones y creeps). Si no se reproduce ninguna, decirlo tal cual.
+  **Hecho (Claude, 2026-11-20), las dos partes:**
+  **1 · Desequilibrado.** Confirmado con clics: era solo cómo se mostraba. Con orden de turnos, el arrastrado quedaba con «∞» en el globo de estados
+  y «no vence» al pasarle el mouse, y se iba solo cuando quien lo arrastró terminaba su turno. Ahora dice **«hasta el fin del turno de <quien
+  arrastró>»** en: el globo de estados del token (GM y jugadores, en un renglón «⏳ Dura hasta…»), el cartelito al pasar el mouse, la ficha lite,
+  el Tablero, la ficha (el chip y su 🔍), «Cómo quedó el grupo» («No vencen: Desequilibrado (se va solo: hasta…)»), y por código también en GM
+  Tools (chip, «Ver» del estado, Tablero), el registro del combate y las listas de Anular, Disipar y el Anillo del curandero. Cuándo se va no cambió. El dato es
+  genérico: cualquier estado «no vence» puede llevar `hasta: '…'` (`Combatiente.hastaTxt` / `hastaPub`; viaja en el spec por
+  `EstadosAplicar` y `FichaAcciones.estadoDeSpec` y en los resúmenes públicos). Sin orden de turnos sigue saliendo «1 turno», como antes.
+  Otros estados que se guardan «no vence» y se van solos (leído en el código, sin cambiar): Vigilancia y Aguante (al empezar su próximo turno);
+  Marcado / Marcando (cuando quien marcó ataca a otro); Mordido / Mordiendo y Agarrado / Agarrando (al soltarse); Sentado (al levantarse);
+  Desarmado (al recuperar el arma); Sigilo (cuando lo descubren); Toques de carga, los pergaminos «de todo el combate», la Sangre de dragón y la
+  Vida extra del Relicario (al Finalizar combate); Shield, Arrojo, Vida extra, Escudo especial y la Cáscara protectora (al gastarse); Empower,
+  Paso atrás, Enfocado, Apuntando, Carga arcana / Golpe anunciado, Arma envenenada y los Óleos (al usarlos); la Bronca; el Estandarte / Tótem y
+  las auras de talismán (mientras estén); el Veneno severo y el Sangrado sin turnos (por stacks o cura).
+  **2 · El primer ataque que figuraba como segundo.** La sospecha (a) **no se reprodujo**: después de un Arrastrar que engancha, Atacar sigue
+  diciendo «5 No2 · 1.º ataque» (Cachiporra, Tipo 10) y Arrastrar no anota ningún ataque. La (b) **sí**: Blanco J1 atacó (pasó a «10 No2»), el GM
+  pasó a narrativo, vació el orden, volvió a Combate, Traer tokens y Ordenar con J1 primero → en el primer turno del combate nuevo Atacar seguía
+  en «10 No2». La causa: esa cuenta la vacía el inicio del turno de cada uno, y al primero del orden de un combate nuevo nadie le empieza el
+  turno. **Arreglo:** al pasar el mapa a Combate, la pantalla del GM pone en cero la cuenta de ataques «de este turno» de los personajes (con sus
+  invocaciones) y los creeps con token en ese mapa (`ataquesACeroAlEmpezar`, vtt-hexgrid/js/04; `Combatiente.ataquesACeroPj / Inv / Creep`), junto
+  con las demás marcas «una vez por turno» que viven con ella (Parada fácil, el primer golpe, las armas especiales, el Saque rápido, «disparó el
+  turno pasado»). No toca No2, vida, SP, estados ni cooldowns. Probado con clics: con el arreglo, el mismo recorrido deja «5 No2 · 1.º ataque»
+  (los No2 siguieron en 15); y un creep que atacó (8 No2 el segundo) vuelve a «4 No2» en el combate nuevo, con su estado y sus No2 intactos.
+  **Para saber:** al primero del orden de un combate nuevo tampoco se le recargan los No2 ni se le cuentan los estados al empezar (nadie le
+  «empieza» ese turno): no se tocó, porque es otra cosa y lo decide el dueño.
+  Pruebas automáticas 898/898 (2 nuevas). «Claude · pruebas 2» («Prueba · R4 M4», GM, J1 y J2) quedó como estaba. Sin ver: `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 👥 En la partida de pruebas, un solo personaje por jugador** (dueño, 2026-11-20: «yo dejaría en la partida de pruebas que cada
   jugador tenga asignado un solo personaje para que sea más claro, porque rara vez un jugador va a tener más de un personaje en su control, salvo
   que sea una invocación… para las pruebas me gustaría mantenerlo así»). En «Claude · pruebas 2»: sacar a «Blanco J1 b» (el segundo personaje del

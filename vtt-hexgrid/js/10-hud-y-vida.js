@@ -914,7 +914,7 @@ function hudModsEstadoTxt(e, conTodo){
   if(num(e && e.hpturno)) partes.push(`${num(e.hpturno) > 0 ? '+' : ''}${fmt(num(e.hpturno))} de vida por turno`);
   if(!partes.length) return '';
   if(!conTodo) return partes.join(' · ');
-  const dura = e.permanente ? 'no vence' : num(e.turnos) ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
+  const dura = Combatiente.hastaTxt(e) || (e.permanente ? 'no vence' : num(e.turnos) ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '');
   return partes.join(' · ') + (dura ? ` (${dura})` : '');
 }
 function hudEstadosHtml(t, estados, puede){
@@ -924,7 +924,8 @@ function hudEstadosHtml(t, estados, puede){
     ? '<div class="hud-globo-acciones"><button type="button" class="hud-mini" data-hud-estado-nuevo="1">+ Estado</button></div>' : '';
   if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
   return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
-    const turnos = e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—");
+    const hasta = Combatiente.hastaTxt(e);   // ⏳ «hasta el fin del turno de…» (2026-11-20): se guarda «no vence» pero se va solo; va en un renglón propio, abajo
+    const turnos = hasta ? `<span title="Se va solo: ${esc(hasta)}">⏳</span>` : (e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—"));
     const det = hudDetalleEstado(e);
     return `<div class="hud-estado">
       <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
@@ -944,7 +945,7 @@ function hudEstadosHtml(t, estados, puede){
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
       (puede && !e.derivado && puedeAgregarEstado(t) ? `<button type="button" class="hud-mini" data-hud-estado-editar="${i}" title="Editar este estado">⚙</button>` : '') +
       (e.derivado ? (e.area ? '<span title="Viene de un área: se va solo al salir de ella" style="color:var(--muted)">⬡</span>' : '<span title="Viene de una pasiva: se saca quitando la pasiva" style="color:var(--muted)">✦</span>') : '') +
-    '</div>';
+    '</div>' + (hasta ? `<div class="hud-estado-hasta">⏳ Dura ${esc(hasta)}</div>` : '');
   }).join('') + agregar + '</div>';
 }
 
@@ -971,11 +972,12 @@ function hudTarjetaHtml(t, d){
     : '<span style="color:var(--muted)">Sin equipo.</span>';
   const estados = d.estados.length
     ? d.estados.map(e => {
-        const turnos = e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—');
+        const hasta = Combatiente.hastaTxt(e);   // ⏳ (2026-11-20)
+        const turnos = hasta ? '⏳' : (e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—'));
         return `<div class="hud-estado">
           <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
           <span class="nom">${esc(e.nombre)}</span><span class="turnos">${turnos}</span>
-        </div>`;
+        </div>${hasta ? `<div class="hud-estado-hasta">⏳ Dura ${esc(hasta)}</div>` : ''}`;
       }).join('')
     : '<span style="color:var(--muted)">Ninguno activo.</span>';
   const nota = String(d.notas || '').trim();
@@ -1791,7 +1793,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           if(!inv) throw new Error('La invocación ya no existe');
           inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
             ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
             ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)
@@ -1801,7 +1803,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         }else{
           datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
-            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
             ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
             ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)

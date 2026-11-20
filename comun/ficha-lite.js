@@ -97,7 +97,7 @@ const FichaLite = (() => {
       if(st > 1) datos.push('×' + st);
       const escudo = e.escudoMagicoActual ?? e.escudo;
       if(escudo !== undefined && escudo !== null && escudo !== '') datos.push('🛡' + fmt(num(escudo)));
-      datos.push(e.permanente || e.derivado ? '∞' : num(e.turnos) ? num(e.turnos) + 't' : '');
+      datos.push(Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente || e.derivado ? '∞' : num(e.turnos) ? num(e.turnos) + 't' : '');
       const lineas = [];
       if(e.detalle) lineas.push({txt: e.detalle});
       if(e.armaduraRota) lineas.push({txt: `Defensa −${st} (−1 por cada acumulación)`});
@@ -105,7 +105,7 @@ const FichaLite = (() => {
       if(mt) lineas.push({txt: mt + (st > 1 ? ` (por cada uno de los ${st})` : '')});
       const hp = num(e.hpturno ?? e.hpTurno);
       if(hp) lineas.push({txt: `${hp > 0 ? 'Cura' : 'Daña'} ${fmt(Math.abs(hp * st))} HP en cada Mantenimiento`});
-      lineas.push({txt: e.permanente || e.derivado ? 'No vence' : num(e.turnos) ? `Le quedan ${fmt(num(e.turnos))} turnos` : 'Termina en el próximo Mantenimiento'});
+      lineas.push({txt: Combatiente.hastaTxt(e) ? `Dura ${Combatiente.hastaTxt(e)} (se va solo)` : e.permanente || e.derivado ? 'No vence' : num(e.turnos) ? `Le quedan ${fmt(num(e.turnos))} turnos` : 'Termina en el próximo Mantenimiento'});
       return {nombre: e.nombre || '(sin nombre)', datos: datos.filter(Boolean).join(' '), pol: e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : '', lineas};
     });
   }

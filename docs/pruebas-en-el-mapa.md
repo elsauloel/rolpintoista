@@ -3128,3 +3128,18 @@ Capturas en `cola18/`.
   mapa cambiado con el interruptor del GM (se cambió por detrás, para no abrir sus carteles); «Realizar de cualquier modo» sin No2 suficientes.
 - [ ] **Falta que lo mire el dueño.**
 Capturas en `cola20/`.
+
+## ⏳ Desequilibrado «hasta el fin del turno de…» y la cuenta de ataques al empezar un combate (2026-11-20)
+
+- [x] **Visto con clics** en «Claude · pruebas 2» («Prueba · R4 M4», GM, J1 y J2): Arrastrar a un creep y a un personaje con orden de turnos →
+  «hasta el fin del turno de Blanco J1» en el globo de estados del token (GM y jugador), al pasar el mouse, en la ficha lite, el Tablero del mapa,
+  «Cómo quedó el grupo» y la ficha suelta del arrastrado; se va al terminar el turno de quien arrastró (botón «Terminar turno» del jugador).
+  Atacar después de Arrastrar sigue siendo el 1.º ataque. Atacar, pasar a narrativo, vaciar el orden y volver a Combate: el primer ataque del
+  combate nuevo vuelve a costar como primero (personaje y creep), sin tocar No2, vida ni estados.
+- [ ] **Sin ver en pantalla:** en **GM Tools**, el chip del creep, el «Ver» del estado y su Tablero (cambiados por código); la 🔍 del estado en la
+  ficha («Duración: Hasta… (se va solo)»); el registro del combate; las listas de Anular, Disipar y el Anillo del curandero con un Desequilibrado en la lista;
+  una **invocación** arrastrada (y la cuenta de ataques de una invocación al empezar el combate: solo en las pruebas automáticas); el camino
+  **Finalizar combate → Publicar** seguido de otro combate (se probó el cierre con el interruptor a narrativo); un creep que arrastra a un
+  personaje (se probó personaje → creep y personaje → personaje); una ballesta «que llega cargada» en el primer turno del combate nuevo.
+- [ ] **Falta que lo mire el dueño.**
+Capturas en `cola25/`.

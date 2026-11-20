@@ -95,7 +95,7 @@ function tableroCardHtml(nombre, imagen, nivel, r, tipo, id){
     ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
     ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
       const det = String(e.detalle || '').trim();
-      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
+      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${Combatiente.hastaTxt(e) ? ` ${esc(Combatiente.hastaTxt(e))}` : e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
     }).join('')}</div>` : ''}
   </div>`;
 }

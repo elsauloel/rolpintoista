@@ -27,7 +27,7 @@ function hoverEstadosHtml(t){
   const veEscudo = soyGM || t.tipo !== 'creep';
   const filas = lista.map(e => {
     const color = ESTADO_COLOR[e.polaridad] || ESTADO_COLOR[''];
-    const dura = e.derivado ? 'siempre' : e.permanente ? 'no vence' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
+    const dura = e.derivado ? 'siempre' : Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente ? 'no vence' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
     const extras = [
       e.stacks > 1 ? `×${fmt(num(e.stacks))}` : '',
       veEscudo && e.escudo !== undefined ? (e.excedente ? `❤+${fmt(num(e.escudo))}` : `🛡${fmt(num(e.escudo))}${e.escudoMax !== undefined ? '/' + fmt(num(e.escudoMax)) : ''}`) : '',

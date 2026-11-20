@@ -3015,7 +3015,7 @@ async function cargaAlGolpeAbierto(t, tokenId, nombre){
 // «Aplicar» (Duelo: cfgEscuchar.antesDeAplicar, js/14): {anulaElegido} para guardar en el efecto; {} si no hay nada que elegir (uno solo, o una
 // invocación); null si eligió «Ninguno» (no se pide la aplicación). Lee lo público del objetivo (estadoDe), que ven todas las pantallas.
 function anulaOpciones(lista){
-  const dur = e => (e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
+  const dur = e => (Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
     + (num(e.stacks) > 1 ? ` · ×${fmt(num(e.stacks))}` : '') + (e.escudo !== undefined ? ` · escudo ${fmt(num(e.escudo))}` : '');
   const vistos = new Set();
   return lista.filter(e => e && !vistos.has(e.nombre) && vistos.add(e.nombre))
@@ -3237,7 +3237,7 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.disipar){
     const buenos = (((vinculo(t) || {}).resumen || {}).estados || []).filter(e => e && e.polaridad === 'buff' && !e.derivado && e.activo !== false);
     if(!buenos.length) return {nota: 'no tenía ningún estado bueno para sacarle'};
-    const dur = e => (e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
+    const dur = e => (Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
       + (e.escudo !== undefined ? ` · escudo ${fmt(num(e.escudo))}` : '');
     const nom = await Confirmar.elegir(`${d.atacante.nombre} disipa: ¿qué estado bueno le saca a ${nombreDe(t)}?`, {titulo: 'Disipar', icono: '🧿', no: 'Ninguno',
       opciones: buenos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [dur(e), String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))});

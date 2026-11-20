@@ -156,7 +156,7 @@ function tableroCreepsLocales(){
     imagen: sc.imagen || '',
     hp: num(sc.hp),
     hpMax: num(sc.hpMax),
-    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}), detalle: es.detalle || ''})),
+    estados: (sc.estados || []).filter(es => es.activo !== false).map(es => ({nombre: es.nombre, turnos: num(es.turnos), permanente: !!es.permanente, ...Combatiente.hastaPub(es), ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}), detalle: es.detalle || ''})),
   }));
 }
 
@@ -228,7 +228,7 @@ function tableroCardHtml(x, tipo){
     ${caido ? `<div class="tablero-caido">${tipo === 'pj' ? 'Caído' : 'Derrotado'}</div>` : ''}
     ${estados.length ? `<div class="tablero-estados">${estados.map(e => {
       const det = (e.detalle || '').trim();
-      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
+      return `<span class="tablero-estado${det ? ' con-tip' : ''}"><b>${esc(e.nombre)}</b>${Combatiente.hastaTxt(e) ? ` ${esc(Combatiente.hastaTxt(e))}` : e.permanente ? '' : (num(e.turnos) ? ` ${fmt(num(e.turnos))}t` : '')}${det ? `<span class="tablero-estado-tip">${esc(det)}</span>` : ''}</span>`;
     }).join('')}</div>` : ''}
     ${desde ? `<div class="tablero-viejo">${esc(desde)}</div>` : ''}
   </div>`;

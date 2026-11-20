@@ -219,7 +219,7 @@ const FichaResumen = (() => {
         .map(e => ({
           nombre: String(e.nombre).slice(0, 60),
           turnos: num(e.turnos),
-          permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
+          permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}),
           ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {}),   // Armadura arcana (la vista previa del mapa)
           ...(e.expuesto ? {expuesto: true} : {}),   // Expuesto (Degollar): el mapa no le ofrece oportunidad ni dodge roll
           ...(e.nombre === Combatiente.APUNTANDO || e.id === 'armadura-rota' ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta · 🛡 la Armadura rota de las piezas: cuántos puntos
@@ -284,7 +284,7 @@ const FichaResumen = (() => {
             .map(e => ({
               nombre: String(e.nombre).slice(0, 60),
               turnos: num(e.turnos),
-              permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
+              permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}),
           ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {}),   // Armadura arcana (la vista previa del mapa)
           ...(e.expuesto ? {expuesto: true} : {}),   // Expuesto (Degollar): el mapa no le ofrece oportunidad ni dodge roll
           ...(e.nombre === Combatiente.APUNTANDO ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta

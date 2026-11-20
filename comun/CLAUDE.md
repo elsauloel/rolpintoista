@@ -2049,3 +2049,10 @@ versión parecida en más de una, es candidato a juntar.
   regla, `avisoJefe`). Para saber de quién es, `recibidos.js` pasa `{ref}` a `FichaAcciones.aplicarEstadoRecibido(S, spec, origen, ui, o)` y a
   `InvHabilidades.ponerEstado(inv, d, o)` (que lo llevan a `agregarEstado`); la Armadura rota frenada avisa igual. Lo dibuja el mapa
   (`vtt-hexgrid/js/121-cartel-inmune.js`); la ficha suelta publica el mismo momento para que lo dibujen los mapas abiertos (ficha `js/12-en-vivo.js`).
+- **⏳ `hasta` en un estado y ⚔ las cuentas por turno a cero** (2026-11-20, `combatiente.js`). `hastaTxt(e)` → 'hasta el fin del turno de Fulano' si el
+  estado es `permanente` y lleva `hasta` (si no, ''); `hastaPub(e)` → `{hasta}` para los resúmenes públicos (`ficha-resumen.js`, los del mapa y GM
+  Tools). Es para los estados que se guardan «no vence» pero el sistema saca solos (el Desequilibrado de Arrastrar): cada pantalla muestra eso en vez
+  de «∞ / no vence» (`ficha-lite.js`, `ficha-lupa.js`, la ficha, GM Tools, el mapa). El dato viaja en el spec: `EstadosAplicar.limpiarSpec / componer`
+  y `FichaAcciones.estadoDeSpec`. `ataquesACeroPj(S)` (con sus invocaciones), `ataquesACeroInv(inv)` y `ataquesACeroCreep(sc)`: vacían la cuenta de
+  ataques y las marcas «una vez por turno» que viven con ella (no No2, vida, estados, cooldowns ni `pagosDuelo`); devuelven si cambió algo. Las usa el
+  mapa al empezar un combate (`vtt-hexgrid/js/04`, `ataquesACeroAlEmpezar`).

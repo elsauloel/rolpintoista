@@ -2289,3 +2289,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   ese token y, si flota otro distinto, va una fila más arriba (`ganchoEvaEmpezar`). No llevan cartel: Marcado, la Vaquita, la Piedra bezoar, «no tiene
   armadura». Sin cubrir: el Veneno / Sangrado ya puesto que no hace daño en el Mantenimiento y la Maldición tormentosa sobre un invulnerable.
   Probado con clics en «Claude · pruebas 2» (GM y J1; ver `docs/cola-de-pruebas.md`).
+- **⏳ «Hasta el fin del turno de…» y ⚔ la cuenta de ataques al empezar un combate** (2026-11-20, dueño, jugando El origen). **(1)** El
+  Desequilibrado de Arrastrar se guarda «no vence» cuando quien arrastró está en el orden de turnos (lo saca `desequilibradosFinTurno`), y por eso se
+  leía «∞ / no vence». Ahora `desequilibradoPoner` (js/78) le pone además `hasta: 'el fin del turno de <quien arrastró>'`, y todo lugar que escribe la
+  duración de un estado pregunta primero `Combatiente.hastaTxt(e)`: el globo de estados y la tarjeta (js/10, renglón `.hud-estado-hasta`), el hover
+  (js/30), el Tablero (js/07), «Cómo quedó el grupo» (js/81), el registro (js/99), las listas de Anular / Disipar (js/13) y el Anillo del curandero (js/25).
+  Es solo lo que se muestra: no decide cuándo se va. Un estado nuevo de ese tipo (se guarda permanente, lo saca el sistema) lleva `hasta` en su spec y
+  listo. **(2)** `ataquesACeroAlEmpezar` (js/04): al pasar el mapa a Combate con el interruptor, la pantalla del GM pone en cero la cuenta de ataques
+  «de este turno» de los personajes (con sus invocaciones) y los creeps con token en el mapa (`Combatiente.ataquesACeroPj / ataquesACeroCreep`); solo
+  escribe a quien tenía algo anotado y no toca No2, vida, estados ni cooldowns. Antes, al primero del orden de un combate nuevo le quedaba la cuenta del
+  combate anterior (su primer ataque costaba como segundo), porque esa cuenta solo la vacía el inicio de turno y a él nadie se lo empieza.
+  Probado con clics en «Claude · pruebas 2» (ver `docs/cola-de-pruebas.md`).

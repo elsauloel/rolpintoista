@@ -51,6 +51,7 @@ const EstadosAplicar = (() => {
     if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
     if(s.protege){ out.protege = String(s.protege).slice(0, 80); out.protegeNombre = String(s.protegeNombre || '').slice(0, 40); }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
     if(s.permanente === true) out.permanente = true;   // «no vence» (Marcar, 2026-10-12: la marca dura hasta que ataque a otro)
+    if(s.permanente === true && s.hasta) out.hasta = String(s.hasta).slice(0, 80);   // ⏳ se va solo cuando pasa eso: es lo que se muestra en vez de «no vence» (Combatiente.hastaTxt, 2026-11-20)
     if(s.marcadoPor){ out.marcadoPor = String(s.marcadoPor).slice(0, 80); out.marcadoToken = String(s.marcadoToken || '').slice(0, 80); }   // Marcar (Shooter, 2026-10-12): quién lo marcó
     if(s.marca){ out.marca = String(s.marca).slice(0, 80); out.marcaNombre = String(s.marcaNombre || '').slice(0, 40); }   // y en quien marca, a quién
     if(s.miedoDe){ out.miedoDe = String(s.miedoDe).slice(0, 80); out.miedoDeNombre = String(s.miedoDeNombre || '').slice(0, 40); }
@@ -79,7 +80,7 @@ const EstadosAplicar = (() => {
     }
     return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {}),
       ...(s.protege ? {protege: s.protege, protegeNombre: s.protegeNombre} : {}),
-      ...(s.permanente ? {permanente: true} : {}), ...(s.marcadoPor ? {marcadoPor: s.marcadoPor, marcadoToken: s.marcadoToken} : {}), ...(s.marca ? {marca: s.marca, marcaNombre: s.marcaNombre} : {}),
+      ...(s.permanente ? {permanente: true, ...(s.hasta ? {hasta: s.hasta} : {})} : {}), ...(s.marcadoPor ? {marcadoPor: s.marcadoPor, marcadoToken: s.marcadoToken} : {}), ...(s.marca ? {marca: s.marca, marcaNombre: s.marcaNombre} : {}),
       ...(s.miedoDe ? {miedoDe: s.miedoDe, miedoDeNombre: s.miedoDeNombre} : {}),
       ...(s.provocaDe ? {provocaDe: s.provocaDe, provocaDeNombre: s.provocaDeNombre} : {}),
       ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {}),

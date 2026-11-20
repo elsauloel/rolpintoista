@@ -1234,12 +1234,37 @@ $('#modo-switch').onclick = async () => {
   try{
     await TokensAuto.ponerModo(mapaMostrado, nuevo);   // la misma escritura que usa el fin del combate para volver a narrativo (comun/tokens-auto.js)
     if(nuevo === 'combate' && typeof Registro !== 'undefined') await Registro.recordar().catch(err => console.error('Registro: el recordatorio', err));   // 🗂 ¿registro nuevo? (2026-11-04)
+    if(nuevo === 'combate') ataquesACeroAlEmpezar().catch(err => console.error('Las cuentas de ataques al empezar el combate:', err));   // ⚔ (abajo)
     if(nuevo === 'combate') abrirEstadoDelGrupo('combate');   // 🩺 los turnos de los estados que traen, para ajustarlos (js/81)
   }catch(err){
     console.error('No se pudo cambiar el modo:', err);
     toast('No se pudo cambiar el modo del mapa');
   }
 };
+
+/* ⚔ Empieza un combate: la cuenta de ataques «de este turno» arranca en cero para todos (dueño, 2026-11-20, jugando: «Rocardo empezó su turno, el primer
+   turno del combate… cuando quiso atacar le aparecía como que ya había atacado una vez, que le costaba 10 nitros. Pero él no había atacado»). Esa cuenta
+   la vacía el inicio del turno de cada uno, y al primero del orden de un combate nuevo nadie le empieza el turno: le quedaba la del combate anterior
+   (comprobado con clics: atacar, pasar a narrativo, volver a combate → el primer ataque costaba como el segundo). La pantalla del GM, al pasar el mapa a
+   Combate, se la vacía a los personajes (con sus invocaciones) y a los creeps con token en este mapa — Combatiente.ataquesACeroPj / ataquesACeroCreep:
+   solo las cuentas por turno; No2, vida, SP, estados y cooldowns quedan como estaban. Solo escribe a quien tenía algo anotado. */
+async function ataquesACeroAlEmpezar(){
+  if(!soyGM) return;
+  const hechos = new Set();
+  for(const t of [...tokens.values()]){
+    if(!t || !t.fichaId) continue;
+    const esCreep = t.tipo === 'creep', fichaId = esCreep ? t.fichaId : String(t.fichaId).split(SEP_INVOCACION)[0];
+    if(hechos.has(fichaId)) continue;
+    hechos.add(fichaId);
+    try{
+      if(esCreep){
+        const sc = creepPrivadoDe(fichaId);
+        if(sc && !Combatiente.ataquesACeroCreep(structuredClone(sc))) continue;   // no tenía nada anotado: no se escribe
+        await modificarCreep(fichaId, c => Combatiente.ataquesACeroCreep(c));
+      }else if(t.tipo === 'pj' && fichasPub.has(fichaId)) await editarPersonajeMapa(fichaId, S => Combatiente.ataquesACeroPj(S));
+    }catch(err){ console.error('No se pudo poner en cero la cuenta de ataques de', nombreDe(t), err); }
+  }
+}
 
 // Nitros que cuesta mover este token: los PJ vinculados a su ficha y los
 // creeps vinculados (no las invocaciones ni los NPC). null = se mueve sin

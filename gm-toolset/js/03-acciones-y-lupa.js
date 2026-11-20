@@ -237,7 +237,7 @@ function cardCompactoHtml(sc){
   const chips = sc.estados.filter(Combatiente.estadoVisible).map(es => {
     const clave = `${sc.id}:${es.id}`;
     const abierto = estadoChipAbierto === clave;
-    const dura = es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;
+    const dura = Combatiente.hastaTxt(es) ? esc(Combatiente.hastaTxt(es)) : es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;   // ⏳ (2026-11-20)
     const xRota = es.armaduraRota && num(es.stacks) > 1 ? ` ×${fmt(num(es.stacks))}` : '';
     return `<span class="chip-estado-wrap${abierto ? ' abierto' : ''}">
       <button type="button" class="chip-estado con-tip" data-toggleestado="${clave}" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')}${xRota} · ${dura}</button>

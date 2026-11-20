@@ -356,7 +356,7 @@ const FichaLupa = (() => {
     }
 
     if(key === 'efectos'){
-      L.push(linea('Duración', it.permanente ? 'Permanente' : (num(it.turnos)>0 ? `${fmt(num(it.turnos))} turno(s) restante(s)` : 'Sin duración fija')));
+      L.push(linea('Duración', Combatiente.hastaTxt(it) ? `${Combatiente.hastaTxt(it).replace(/^h/, 'H')} (se va solo)` : it.permanente ? 'Permanente' : (num(it.turnos)>0 ? `${fmt(num(it.turnos))} turno(s) restante(s)` : 'Sin duración fija')));
       if(num(it.stacks) > 1) L.push(linea('Stacks', fmt(num(it.stacks))));
       if(num(it.hpturno)) L.push(linea('HP por turno (por stack)', `${num(it.hpturno)>0?'+':''}${fmt(num(it.hpturno))}`));
       L.push(linea('Estado', it.activo !== false ? 'Activo' : 'Pausado'));

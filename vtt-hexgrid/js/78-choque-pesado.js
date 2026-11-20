@@ -296,7 +296,10 @@ async function desequilibradoPoner(atkId, defId, hab){
   // Con quien arrastró en el orden de turnos, no vence solo: lo saca el fin de SU turno (antes, con «1 turno», se iba en el Mantenimiento del arrastrado
   // —p. ej. al empezar la ronda— antes de que terminara el turno de quien arrastró; visto en Claude · pruebas, 2026-11-05). Sin orden: 1 turno.
   const enOrden = typeof iniciativa !== 'undefined' && iniciativa && Array.isArray(iniciativa.orden) && iniciativa.orden.some(o => o.id === atkId);
-  const spec = {nombre: 'Desequilibrado', ...(enOrden ? {permanente: true} : {turnos: 1}), polaridad: 'debuff', mods: [{stat: 'eva', val: -2}],
+  // ⏳ `hasta` (2026-11-20, dueño: «cuando me fijé cuánto duraba, parecía como que no tenía fin»): es lo que se muestra en vez de «no vence / ∞»
+  // (Combatiente.hastaTxt). No cambia cuándo se va.
+  const quienArrastra = nombreDe(tokens.get(atkId)) || 'quien lo arrastró';
+  const spec = {nombre: 'Desequilibrado', ...(enOrden ? {permanente: true, hasta: `el fin del turno de ${quienArrastra}`} : {turnos: 1}), polaridad: 'debuff', mods: [{stat: 'eva', val: -2}],
     detalle: `Lo arrastró ${nombreDe(tokens.get(atkId)) || 'alguien'} con ${hab || 'Arrastrar'}: −2 a la Evasión hasta el final de su turno.`};
   if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
   else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: hab || 'Arrastrar'});

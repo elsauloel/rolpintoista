@@ -31,7 +31,7 @@ function estadoGrupoHtml(){
           <span class="eg-turnos"><button type="button" data-eg-t="${esc(id)}|${i}|-1" data-eg-n="${esc(e.nombre)}" title="Un turno menos">−</button><b>${fmt(num(e.turnos))}</b> turno${num(e.turnos) === 1 ? '' : 's'}<button type="button" data-eg-t="${esc(id)}|${i}|1" data-eg-n="${esc(e.nombre)}" title="Un turno más">+</button></span>
           <button type="button" class="eg-x" data-eg-x="${esc(id)}|${i}" data-eg-n="${esc(e.nombre)}" title="Sacarle este estado">✕ Sacar</button></div>`).join('')
         : '<div class="eg-nada">Sin estados temporales.</div>'}
-      ${fijos.length ? `<div class="eg-fijos">No vencen: ${fijos.map(({e}) => esc(e.nombre)).join(' · ')}</div>` : ''}
+      ${fijos.length ? `<div class="eg-fijos">No vencen: ${fijos.map(({e}) => esc(e.nombre) + (Combatiente.hastaTxt(e) ? ` <i>(se va solo: ${esc(Combatiente.hastaTxt(e))})</i>` : '')).join(' · ')}</div>` : ''}
     </div>`;
   }).join('');
   const franja = eg && eg.narrativo && eg.motivo !== 'combate';

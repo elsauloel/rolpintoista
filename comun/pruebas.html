@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261120volverb"></script>
+<script src="combatiente.js?v=20261120hasta"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -56,7 +56,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-calculo.js?v=20261120enj"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261114sang"></script>
-<script src="estados-aplicar.js?v=20261114av"></script>
+<script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261120cola18"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261120volverb"></script>
+<script src="ficha-resumen.js?v=20261120hasta"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261120maestria"></script>
 <script src="inv-botonera.js?v=20261120maestria"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261120cola18"></script>
+<script src="ficha-acciones.js?v=20261120hasta"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -111,14 +111,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261120enj"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261120maestria"></script>
+<script src="ficha-lupa.js?v=20261120hasta"></script>
 <script src="ficha-editor.js"></script>
 <script src="creep-lupa.js?v=20261120maestria"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js"></script>
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
-<script src="ficha-lite.js?v=20261120maestria"></script>
+<script src="ficha-lite.js?v=20261120hasta"></script>
 <script src="pasivas.js?v=20261120enj"></script>
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
@@ -8192,6 +8192,45 @@ prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado,
   igual([!!p, p && p.polaridad, p && JSON.stringify(p.mods), p && p.turnos, r.ok, CreepCalculo.modTotal(sc, 'eva'), fin.quedan.length,
     !!hab && /Desequilibrado/.test(hab.detalle), !!hab && /\+2 a la Probabilidad de Golpe/.test(hab.detalle)],
     [true, 'debuff', '[{"stat":"eva","val":-2}]', 1, true, -2, 1, true, false]);
+});
+prueba('⏳ Desequilibrado «hasta el fin del turno de…» (dueño, 2026-11-20: «parecía como que no tenía fin»): el estado permanente lleva `hasta`, viaja al creep, al personaje y a la ficha lite, y sin `hasta` todo sigue como antes', () => {
+  const spec = {nombre: 'Desequilibrado', permanente: true, hasta: 'el fin del turno de Rocardo', polaridad: 'debuff', mods: [{stat: 'eva', val: -2}]};
+  const sc = {estados: []};
+  EstadosAplicar.aplicarACreep(sc, spec);
+  const ec = sc.estados[0];
+  const ep = FichaAcciones.estadoDeSpec(spec, ESTADOS_PRESET);
+  const sinHasta = FichaAcciones.estadoDeSpec({nombre: 'Desequilibrado', permanente: true}, ESTADOS_PRESET);
+  const conTurnos = {nombre: 'Desequilibrado', turnos: 1, hasta: 'el fin del turno de Rocardo'};   // sin orden de turnos vence por turnos: no se dice «hasta»
+  const lite = FichaLite.estadosLista([ec])[0], liteSin = FichaLite.estadosLista([{nombre: 'Sentado', permanente: true}])[0];
+  igual([ec.permanente, ec.hasta, Combatiente.hastaTxt(ec), ep.permanente, Combatiente.hastaTxt(ep), JSON.stringify(Combatiente.hastaPub(ec)),
+    Combatiente.hastaTxt(sinHasta), JSON.stringify(Combatiente.hastaPub(sinHasta)), Combatiente.hastaTxt(conTurnos), Combatiente.hastaTxt(null),
+    lite.datos, lite.lineas.some(l => /hasta el fin del turno de Rocardo/.test(l.txt)), lite.lineas.some(l => l.txt === 'No vence'), liteSin.datos, liteSin.lineas.some(l => l.txt === 'No vence'),
+    CreepCalculo.modTotal(sc, 'eva'), Combatiente.terminarTurnoEstados(sc.estados).quedan.length],
+    [true, 'el fin del turno de Rocardo', 'hasta el fin del turno de Rocardo', true, 'hasta el fin del turno de Rocardo', '{"hasta":"el fin del turno de Rocardo"}',
+    '', '{}', '', '',
+    'hasta el fin del turno de Rocardo', true, false, '∞', true,
+    -2, 1]);   // y no cambia cuándo se va: su propio fin de turno no lo saca
+});
+prueba('⚔ Al empezar un combate la cuenta de ataques arranca en cero (dueño, 2026-11-20: «le aparecía como que ya había atacado una vez, que le costaba 10 nitros»): personaje, invocación y creep; No2, vida, estados y cooldowns no se tocan', () => {
+  let arma = {id: 'a10', nombre: 'Cachiporra', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, equipado: true};
+  const S = fichaDePrueba({inventario: [arma]});
+  Object.assign(S, {efectos: [{id: 'e1', nombre: 'Sentado', permanente: true, activo: true}], nitros: 3, hp: 7, spGastado: 4, ataquesTurno: 0, ataquesArma: {}, descargadas: {}});
+  arma = S.inventario[0];
+  const primero = FichaCombate.costoAtaque(S, arma);
+  FichaCombate.registrarAtaque(S, arma);
+  const segundo = FichaCombate.costoAtaque(S, arma);
+  S.ataquesArma._parry = 1; S.ataquesArma['hab:x'] = 1; S.ataquesArma.pagosDuelo = {d1: 5}; S.descargadas = {a10: true};
+  S.invocaciones = [{id: 'i1', nombre: 'Abeja', ataquesTurno: 2, ataquesArma: {z: 2}, golpeTurno: 1, parryTurno: 1, descargada: true, armaActiva: 'z', nitros: 1, hp: 3, estados: [{nombre: 'Vuela'}]}];
+  const hubo = Combatiente.ataquesACeroPj(S), inv = S.invocaciones[0];
+  const otraVez = Combatiente.ataquesACeroPj(S);   // ya en cero: no hay nada que guardar
+  const sc = {ataquesTurno: 1, ataquesArma: {w: 1}, usosEspecial: {_golpe: 1}, saqueUsado: true, descargada: true, nitros: 2, hp: 9, estados: [{nombre: 'Stun', turnos: 1}], esperaEspecial: {v: 2}, habilidades: [{cooldownActual: 2}]};
+  const huboC = Combatiente.ataquesACeroCreep(sc), otraC = Combatiente.ataquesACeroCreep(sc);
+  igual([primero, segundo, hubo, otraVez, FichaCombate.costoAtaque(S, arma), S.ataquesTurno, JSON.stringify(S.ataquesArma), JSON.stringify(S.descargadas), S.nitros, S.hp, S.spGastado, S.efectos.length,
+    inv.ataquesTurno, JSON.stringify(inv.ataquesArma), inv.golpeTurno, inv.parryTurno, inv.descargada, inv.armaActiva, inv.nitros, inv.hp, inv.estados.length,
+    huboC, otraC, sc.ataquesTurno, JSON.stringify(sc.ataquesArma), JSON.stringify(sc.usosEspecial), sc.saqueUsado, sc.descargada, sc.nitros, sc.hp, sc.estados.length, sc.esperaEspecial.v, sc.habilidades[0].cooldownActual],
+    [5, 10, true, false, 5, 0, '{"pagosDuelo":{"d1":5}}', '{}', 3, 7, 4, 1,
+    0, '{}', 0, 0, false, 'z', 1, 3, 1,
+    true, false, 0, '{}', '{}', false, false, 2, 9, 1, 2, 2]);
 });
 prueba('🪢 Cordón oculto nuevo (2026-11-03): Agilidad contra la Destreza (con el mínimo de una comprada); si gana, cae parado; si pierde, Sentado + Tropezado, que no deja moverse y se va al terminar su turno', () => {
   const cor = Combatiente.trampaDeHab(trp('Cordón oculto', 1), st => ({des: 6})[st] || 0);

@@ -46,7 +46,7 @@ setInterval(() => { try{ regMovimientos(); }catch(err){ console.error('Registro:
 /* ---------- 📸 La foto al pausar ---------- */
 function regEstadosTxt(lista){
   const n = (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre && e.activo !== false && !e.derivado)
-    .map(e => `${e.nombre}${num(e.stacks) > 1 ? ` ×${fmt(num(e.stacks))}` : ''}${e.permanente ? '' : num(e.turnos) ? ` (${fmt(num(e.turnos))}t)` : ''}`);
+    .map(e => `${e.nombre}${num(e.stacks) > 1 ? ` ×${fmt(num(e.stacks))}` : ''}${Combatiente.hastaTxt(e) ? ` (${Combatiente.hastaTxt(e)})` : e.permanente ? '' : num(e.turnos) ? ` (${fmt(num(e.turnos))}t)` : ''}`);
   return n.length ? n.join(', ') : 'sin estados';
 }
 async function regFotoPausa(){

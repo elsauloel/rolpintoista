@@ -471,7 +471,7 @@ function abrirVerEstadoCreep(scId, esId){
   const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
   $('#verestado-nombre').textContent = es.nombre || 'Sin nombre';
   $('#verestado-body').innerHTML = [
-    linea('Turnos restantes', es.permanente ? 'No vence' : fmt(num(es.turnos))),
+    linea('Turnos restantes', Combatiente.hastaTxt(es) ? `Se va solo: ${Combatiente.hastaTxt(es)}` : es.permanente ? 'No vence' : fmt(num(es.turnos))),
     linea('Stacks', fmt(stacks)),
     linea('HP por turno', hpTotal ? `${hpTotal>=0?'+':''}${fmt(hpTotal)}` : ''),
     linea('Activo', es.activo === false ? 'No' : 'Sí'),

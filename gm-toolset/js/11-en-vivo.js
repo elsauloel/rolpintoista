@@ -100,7 +100,7 @@ function creepPublico(sc, orden){
         .map(es => ({
           nombre: String(es.nombre).slice(0, 60),
           turnos: num(es.turnos),
-          permanente: !!es.permanente, ...(es.invulnerable ? {invulnerable: true} : {}),
+          permanente: !!es.permanente, ...Combatiente.hastaPub(es), ...(es.invulnerable ? {invulnerable: true} : {}),
           ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
           ...(es.vigilancia ? {vigilancia: Math.max(1, Math.round(num(CreepCalculo.alcance(sc))))} : {}),   // 👁 Vigilancia: el alcance del disparo (el mapa, js/58)
           ...(es.escudoElemental ? {escudoElemental: String(es.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(es.escudoEsp) || 0), escudoDe: String(es.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (vtt-hexgrid/js/106)

@@ -261,7 +261,7 @@ function invEstadoChipHtml(inv, es){
   return `<div class="inv-hab" style="${activo?'':'opacity:.5'}">
     <div class="inv-habtop">
       <span class="inv-hn">${esc(es.nombre || 'Estado')}</span>
-      <span class="hint" style="flex:none">${es.permanente ? 'No vence' : (num(es.turnos) ? `${fmt(num(es.turnos))}t` : '')}</span>
+      <span class="hint" style="flex:none">${Combatiente.hastaTxt(es) ? esc(Combatiente.hastaTxt(es)) : es.permanente ? 'No vence' : (num(es.turnos) ? `${fmt(num(es.turnos))}t` : '')}</span>
       <button type="button" class="inv-rm" data-rmestadoinv="${inv.id}:${es.id}" title="Quitar">×</button>
     </div>
     ${es.detalle ? `<div class="hint">${esc(es.detalle)}</div>` : ''}
@@ -1063,7 +1063,7 @@ const LISTS = {
       const hp = num(i.hpturno)*st;
       const activo = i.activo !== false;
       const urgente = activo && !i.permanente && num(i.turnos) === 1;
-      const dur = i.permanente ? '∞' : (num(i.turnos) > 0 ? `${fmt(num(i.turnos))}t` : '');
+      const dur = Combatiente.hastaTxt(i) ? Combatiente.hastaTxt(i) : i.permanente ? '∞' : (num(i.turnos) > 0 ? `${fmt(num(i.turnos))}t` : '');
       const partes = [];
       if(st > 1) partes.push(`×${fmt(st)}`);
       if(dur) partes.push(dur);

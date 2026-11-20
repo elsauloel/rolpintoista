@@ -52,6 +52,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   misma forma de contar (del lado del mapa, al abrirse el duelo / al recibir el daño), pero contando rivales. Para jugadores y creeps. Se tiene que
   ver en el cuadro del duelo y en la 🔍. Mismas dudas que P249 (¿tope?, ¿cuentan tótems y objetos inertes?, ¿rivales escondidos?): resolver igual que
   en el enjambre y anotar lo provisorio en preguntas-abiertas. Nombre elegido por el dueño (2026-11-20): «Aguante de trinchera».
+- **⬜ en cola — 🎁 El GM le da un ítem (o DDE, o despojos) a un jugador, fácil, desde el mapa y desde GM Tools** (dueño, 2026-11-20: «me gustaría
+  que el GM pueda darle un ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa como desde GM Tools»; y «que sea directo a la mochila,
+  pero que sí le aparezca una notificación, que uno ponga aceptar, que no aparezca simplemente en la Mesa, porque eso pasa un poco desapercibido.
+  También doblones del espacio, despojos y ítems custom, ítems que uno puede crear en el momento»). UNA sola ventana común «🎁 Dar a un jugador»:
+  · **A quién**: los personajes de la partida, uno o varios (si se entró desde un token, ya marcado).
+  · **Qué**: ítem del catálogo (el buscador que ya usan las tiendas, con Ver; incluye lo subido por el grupo) y cuántos; **DDE**; **despojos**
+    (normales, mágicos, especiales); o un **ítem custom creado en el momento** con el asistente de ítems que ya existe (`comun/asistente-item.js`).
+  · **Puertas**: en el mapa, «🎁 Dar un ítem» en el menú «⋯» del token de un personaje; en GM Tools, un 🎁 en cada fila de 👥 Personajes y un
+    «🎁 Dar a un jugador» en el Ver de un ítem del catálogo.
+  · **Cómo llega**: entra **directo** a la mochila (o al DDE / despojos), sin poder rechazarlo, y al jugador le salta un **cartel al centro** «🎁 El GM
+    te dio: …» con un botón **Aceptar** que solo lo cierra (es un «enterado»). Además queda la línea en la Mesa. Si no entra por ranuras o peso, se da
+    igual y avisa (ADN: avisar, no bloquear). Tiene que funcionar con el jugador desconectado (lo recibe y ve el cartel al entrar) y aplicarse desde el
+    mapa o desde la ficha (como `comun/recibidos.js`). Reglas de Firebase: si hace falta una colección nueva, avisar que hay que pegarlas.
+  · Sin definir (anotar como pregunta): ¿una casilla «en secreto» para que la línea de la Mesa no la vean los demás?
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

@@ -172,6 +172,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   note que el combate no empezó (el botón pulsando; «Siguiente» avisa o lo ofrece). Ver cómo convive con lo que ya hace el paso a Combate (carteles
   «Registro del combate», etc.) y con Prisa / Ordenar. Si el mapa no está en Combate, ofrecer pasarlo. Dudas (¿los estados del primero pierden un
   turno al iniciar?, ¿cooldowns?) → resolver como un inicio de turno normal y anotarlas en preguntas-abiertas.
+  **Confirmado por el dueño (2026-11-20):** «al apretarlo le tiene que aparecer el cartelito clásico de "empieza tu turno": se regenera tal cosa,
+  pasa tal cosa, aceptar». O sea: al primero del orden le sale EL MISMO cartel de inicio de turno de siempre (con su detalle y su Aceptar/Aplicar),
+  en su pantalla si es de un jugador, o al GM si es un creep; no un aviso distinto.
 - **⬜ en cola — ⏳ Vigilancia y Aguante: que digan «se va al empezar tu próximo turno» en vez de ∞** (dueño, 2026-11-20: «en Vigilancia y Aguante
   estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno. El resto está bien porque se entiende que se van con acciones o
   situaciones específicas»). Con el dato genérico `hasta` que se agregó para Desequilibrado (commit 96edd265): al poner esos dos estados, `hasta:

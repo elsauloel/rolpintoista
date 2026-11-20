@@ -12,6 +12,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🏹 Carcaj incluido de 5 lugares con cualquier arco o ballesta** (dueño, 2026-11-20: «programá que cualquier jugador tenga por default un
+  carcaj de 5 slot para virotes/flechas especiales incluído, sin peso adicional, por cargar cualquier arco o ballesta»). Hoy las flechas y virotes
+  especiales solo se llevan en un carcaj equipado (`tipoItem: 'carcaj'`, `capFlechas`; `carcajDe`, `capCarcaj`, `flechasDelCarcaj` en
+  comun/ficha-equipo.js): sin carcaj, «Equipá un carcaj…». Cambio: un personaje con un arco o una ballesta equipados (un arma de rango que dispara
+  flechas o virotes) y SIN carcaj puesto tiene un **carcaj incluido** de 5 lugares, sin peso, sin ocupar el lugar de Carcaj ni la mochila: se le pueden
+  pasar flechas/virotes especiales, se disparan desde ahí y se ve en Equipo y en la Botonera como «Carcaj incluido (N / 5)». Con un carcaj de verdad
+  puesto, vale ese (su capacidad, como hoy; el `carcajExtra` de una ballesta sigue sumando como hoy). Decidir lo más simple para guardar las flechas
+  (que no se pierdan al equipar un carcaj de verdad, al sacarlo o al desequipar el arco: pasan al carcaj nuevo o vuelven a la mochila, avisando).
+  Solo personajes (los creeps llevan su munición aparte). Dudas → `preguntas-abiertas.md`.
 - **✅ hecho (2026-11-20) — 🐝 Pasiva nueva «Táctica de enjambre»** (dueño, 2026-11-20: «sumá una pasiva más: táctica de enjambre. tenés +1 a la pdg por cada
   aliado adyacente. cuesta 2 puntos de job»). En `comun/pasivas.js` (PASIVAS_BASE, jobCosto 2), para personajes, creeps e invocaciones. +1 a la
   Probabilidad de Golpe por cada aliado pegado a QUIEN ATACA (a 1 casilla de él), contado en el momento del ataque. Depende de la posición: lo suma el

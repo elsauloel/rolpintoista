@@ -1622,3 +1622,12 @@ y se ven en Equipo como «Carcaj incluido (sin arco ni ballesta)» con «→ Moc
 entre» y «Vaciar a la mochila»** cobran, en combate, una acción de equipar **por cada clase** de flecha que se mueve (la misma regla que pasarlas de
 a una); (e) al comprar un arco se sigue regalando el **Carcaj de cuero (10)** si no tenía ninguno, y su texto del catálogo («Viene con cada arco o
 ballesta que se compra») no se tocó. **Para el dueño:** ¿está bien así? ¿El Carcaj de cuero se sigue regalando con cada arco, ahora que hay uno incluido?
+
+### P251 — ☥ ¿Con qué volvés?: detalles que quedaron elegidos «mientras tanto» (2026-11-20, Claude)
+Con más de una forma de volver (Pacto, Ankh de Reencarnación en el cinturón, Llama de Fénix) ahora elige quien maneja al personaje. Quedó así,
+**mientras tanto**: (a) mientras no elige está **caído como cualquier caído**: los 5 turnos para morir corren igual (no se frenan por tener opciones);
+(b) un Ankh **en la mochila** no cuenta como opción (como siempre: solo el del cinturón se usa solo; el de la mochila, con su botón Consumir);
+(c) si mientras está caído se queda con **una sola** forma (por ejemplo le quitan el Pacto), esa se usa sola en la próxima revisión, como siempre con
+una sola; (d) al GM el cartel le sale solo únicamente si tiene 🎮 el control; si no, elige por el jugador con el ☥ del token cuando quiera (la Mesa le
+avisa que hay alguien eligiendo); (e) con una sola forma **no se pregunta** (ni «¿querés usar tu Ankh?»): automático. **Para el dueño:** ¿está bien así?
+¿Los turnos para morir tendrían que esperar mientras elige?

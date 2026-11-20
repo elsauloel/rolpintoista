@@ -536,7 +536,9 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}),
       ...(desperto ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
       ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
-      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
+      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {}),
+      // ☥ lo que usó sale de la lista de formas de volver del resumen (2026-11-20)
+      ...((fenix || pacto) && Array.isArray(rs.volver) ? {'resumen.volver': rs.volver.filter(f => f && f.id !== (fenix ? 'llama' : 'pacto'))} : {})});
     return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, elige, hpFenix: datos.hp, desperto};
   });
   if(res && res.simulado) return res;

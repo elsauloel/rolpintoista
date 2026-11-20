@@ -3004,3 +3004,24 @@ Capturas en `cola14/`.
   ballesta)»); una ballesta con Carcaj integrado (5 + N).
 - De paso: «¿Qué flecha?» decía «Los flechas comunes»; ahora «Las flechas comunes».
 - La partida quedó como estaba (sin lo prestado, vida y No2 llenos, narrativo, sin orden de turnos).
+
+## 2026-11-20 · ☥ ¿Con qué volvés? — Pacto activo y Ankh en el cinturón («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+
+- [x] **Jugador 1 elige el Ankh** (Blanco J1 con el Pacto y 2 Ankh de Reencarnación en el cinturón, 3 de vida; Blanco creep le pega en un duelo): quedó
+  en 0 sin revivir solo y a Jugador 1 le salió «☥ ¿Con qué volvés?» con «😇 El Pacto» y «☥ Ankh de Reencarnación», cada uno con lo que hace (un cuarto
+  de la vida, 12 HP; qué se gasta). Al GM no le salió; la Mesa: «💔 Blanco J1 quedó en 0 de vida: está en el piso y tiene más de una forma de volver…».
+  Eligió el Ankh: volvió con 12 de vida, Invulnerable (Titilando), 1 Ankh y **el Pacto sigue activo**; la Mesa: «☥ Blanco J1: ¡usa su Ankh de
+  Reencarnación y revive! (lo eligió)».
+- [x] **Jugador 1 cierra, recarga y elige el Pacto**: «Todavía no (sigo caído)» → sigue en 0, pantalla roja con «☥ ¿Con qué volvés? Elegí» arriba de
+  «✚ Revivir», y el ☥ en el anillo de su token; al recargar la página el cartel volvió a salir solo. Eligió el Pacto: 12 de vida, el Pacto gastado y
+  **el Ankh sigue en el cinturón**.
+- [x] **El GM con 🎮 el control**: el cartel «¿Con qué vuelve Blanco J1?» le salió al GM y no a Jugador 1; eligió el Ankh (quedó el Pacto); la Mesa
+  dice «(lo eligió el GM)». Se devolvió el control.
+- [x] **El jugador no está** (su pantalla cerrada; el GM tiró la Evasión por él): Blanco J1 quedó en 0, sin cartel solo para el GM; en el anillo del
+  token, el ☥ («Tiene más de una forma de volver…») al lado del ✚; el GM eligió el Pacto por él (quedó el Ankh).
+- [x] **Solo el Pacto** (sin Ankh): automático como siempre, sin preguntar («Zafaste de morir: te salvó el pacto»).
+- [x] La partida quedó como estaba (Blanco J1 sin Pacto y con el cinturón vacío, vida llena, sin estados; narrativo, sin orden de turnos).
+- [ ] **Sin probar con clics**: con la Llama de Fénix como tercera opción (cubierto por las pruebas automáticas); el cartel en la ficha suelta
+  (`ficha.html`, misma pieza); caer por otro camino que no sea un golpe (veneno al pasar el turno, «HP directo»): pasan por la misma revisión.
+- [ ] **Falta que lo mire el dueño.** Lo elegido «mientras tanto»: P251.
+Capturas en `cola16/`.

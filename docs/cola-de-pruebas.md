@@ -29,7 +29,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Claude · pruebas 2» con Blanco J1 (Jugador 1) y un Arco corto prestado: cargó 3 Flechas de fuego, disparó una (3 → 2, +1 No2), cargó virotes hasta
   llenar, se puso el Carcaj de cuero (pasaron las 5), vació, y al sacar el arco volvieron a la mochila. 2 pruebas automáticas nuevas (881 en verde).
   Detalles elegidos mientras tanto: P250. Capturas en `cola15/`.
-- **⬜ en cola — 😇☥ Pacto activo y Ankh en el cinturón: el jugador elige cuál usar** (dueño, 2026-11-20: «quisiera asegurarme de que si un jugador
+- **✅ hecho (2026-11-20) — 😇☥ Pacto activo y Ankh en el cinturón: el jugador elige cuál usar** (dueño, 2026-11-20: «quisiera asegurarme de que si un jugador
   tiene un pacto activo y un ankh en el cinturón, al jugador le debe aparecer la opción de qué usar»). Hoy NO pregunta: `FichaAcciones.revisarAnkh`
   (comun/ficha-acciones.js) usa solo, en orden fijo, la Llama de Fénix, después el Pacto y recién después el Ankh. Cambio: cuando la vida llega a 0 y
   hay más de una forma de volver (Pacto activo y Ankh de Reencarnación en el cinturón; también la Llama de Fénix si la tiene), al jugador le aparece
@@ -37,6 +37,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cuarto, se gasta uno; la Llama: toda la vida y el SP), y se usa solo la que elige. Con una sola, automática como hoy. Si quien resuelve no es el
   jugador (el GM con el control, o el jugador no está), el GM elige por él. Que no quede colgado: mientras no elige, el personaje está caído. Probar en
   el mapa con Jugador 1 (las dos elecciones) y con el GM manejándolo.
+  *Resultado:* con más de una forma de volver (Pacto, Ankh en el cinturón, Llama de Fénix) el personaje ya no revive solo: queda caído y a quien lo
+  maneja le sale «☥ ¿Con qué volvés?» con cada opción y lo que hace; se usa solo la elegida y las otras quedan. Si cierra el cartel sigue caído y lo
+  reabre con el botón «☥ ¿Con qué volvés? Elegí» de la pantalla roja o el ☥ de su token; si recarga, el cartel vuelve a salir. Con el GM en 🎮 control le
+  pregunta al GM (no al jugador), y si el jugador no está el GM elige por él con el ☥ del token. Con una sola forma, automático como siempre. Igual en la
+  ficha suelta. Probado en «Claude · pruebas 2» (Blanco J1 contra un golpe de Blanco creep en un duelo): Jugador 1 eligió el Ankh (quedó el Pacto), después
+  el Pacto (quedó el Ankh, cerrando y recargando antes), el GM con el control, el GM sin el jugador, y con solo el Pacto (automático). 884 pruebas en
+  verde. Lo que quedó elegido «mientras tanto»: P251. Capturas en `cola16/`.
 - **✅ hecho (2026-11-20) — 🐝 Pasiva nueva «Táctica de enjambre»** (dueño, 2026-11-20: «sumá una pasiva más: táctica de enjambre. tenés +1 a la pdg por cada
   aliado adyacente. cuesta 2 puntos de job»). En `comun/pasivas.js` (PASIVAS_BASE, jobCosto 2), para personajes, creeps e invocaciones. +1 a la
   Probabilidad de Golpe por cada aliado pegado a QUIEN ATACA (a 1 casilla de él), contado en el momento del ataque. Depende de la posición: lo suma el

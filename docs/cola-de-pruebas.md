@@ -65,6 +65,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Arrastrar y después Atacar en el mismo turno; y atacar, cerrar el combate (Finalizar / pasar a narrativo), abrir otro y mirar el costo del
   primer ataque. Arreglar la causa que aparezca (si es la (b): que al empezar un combate —pasar a Combate / tirar iniciativa / Finalizar combate— la
   cuenta de ataques arranque en cero para todos, personajes, invocaciones y creeps). Si no se reproduce ninguna, decirlo tal cual.
+- **⬜ en cola — 👁 Revelar a mano lo que está oculto (trampas y demás)** (dueño, 2026-11-20, El origen: «un personaje tiró para detectar una
+  trampa, pasó algo raro con las tiradas, el sistema entendió que la trampa no fue detectada, pero en realidad sí fue detectada… y yo como GM no
+  tenía una forma de revelar lo que estaba oculto, entonces eso también tendría que existir en las cosas que están ocultas. Tanto para GMs como para
+  jugadores, uno tiene que poder hacerles clic y revelarlas»). Primero relevar qué cosas pueden estar ocultas en el mapa (trampas, zonas, tokens
+  ocultos / en sigilo / bajo tierra, lo que haya) y qué formas de revelar ya existen para cada una. Después, que **cada cosa oculta tenga, al
+  hacerle clic, una opción «👁 Revelar»**: el **GM** con cualquiera (a todos, o —si ya existe la idea de «detectada por tal bando/personaje»—
+  eligiendo a quién); el **jugador** con las suyas (las que él puso o controla y por eso ve: su trampa, su token escondido). Interpretación de
+  Claude, a confirmar con el dueño (anotar en preguntas-abiertas): un jugador no puede revelar lo que no ve. Que quede línea en la Mesa («👁 El GM
+  reveló la trampa…») y, si aplica, la contraria («volver a ocultar») para el GM. De paso, mirar por qué la tirada de detectar pudo dar «no
+  detectada» por un malentendido: que el cuadro de detectar ofrezca al GM «Resolver a mano» (detectada / no detectada), como el resto de lo automático.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

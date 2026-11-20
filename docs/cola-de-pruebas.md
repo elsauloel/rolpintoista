@@ -34,6 +34,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en la partida de pruebas todas las opciones posibles»). Con la cuenta de pruebas del Jugador 2 («Unirme como jugador»), y crearle un personaje de
   pruebas («Blanco J2», en blanco como Blanco J1) con su token en «Prueba · R4 M4». Sirve para probar lo que necesita dos personas distintas
   (pasar cosas, aceptar ofertas, duelos entre jugadores). Anotar en docs/memoria-claude.md que la partida de pruebas ya tiene GM, J1 y J2.
+- **⬜ en cola — 🌿 El aviso «el mapa volvió a modo narrativo», dentro del cartel «🩺 Cómo quedó el grupo»** (dueño, 2026-11-20: «lo del cambio en
+  modo narrativo me gusta, pero quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito verde ese pasa bastante
+  desapercibido»). Cuando el fin del combate pasa el mapa a narrativo, el cartel «Cómo quedó el grupo» lo dice bien visible (arriba, destacado:
+  «🌿 Terminó el combate: el mapa volvió a modo narrativo»). Si ese cartel no llega a salir (p. ej. desde GM Tools), queda el cartelito de abajo.
 - **⬜ en cola — ⚔ Tres maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6) y hachas (Tipo 8)** (dueño, 2026-11-20, conversación de
   diseño; mismo molde que «Maestría en armas pesadas», `comun/pasivas.js`; valen para jugadores y para creeps). Cierra P248.
   · **Maestría en armas punzantes** (1 Job): con un arma de **Tipo 4 cuerpo a cuerpo** (NO las de rango / proyectiles: «vamos a hacer una distinción

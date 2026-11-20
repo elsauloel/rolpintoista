@@ -6,16 +6,36 @@
    aliados al lado, avisa y deja atacar igual, como un ataque común. */
 // Los aliados de quien ataca pegados al objetivo → [token].
 function patotaAliados(mio, t){
-  const out = [];
-  for(const [id, x] of tokens){
-    // (quien ataca y el objetivo llegan como copias con su `id`: se comparan por id, o por casilla)
-    const mismo = o => o && (o.id ? o.id === id : (o.col === x.col && o.fila === x.fila));
-    if(!x || mismo(mio) || mismo(t) || !x.fichaId || x.bajoTierra || x.tipo !== mio.tipo) continue;
-    if(distanciaHex({col: x.col, fila: x.fila}, {col: t.col, fila: t.fila}) !== 1) continue;
-    if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) continue;
-    out.push(x);
-  }
-  return out;
+  return aliadosAlLado(mio, t, [t]);
+}
+// Los aliados de `mio` pegados a `centro` (el criterio de siempre, la cuenta en Combatiente.aliadosPegados): del mismo bando, con ficha, en el
+// mapa, ni caídos ni bajo tierra; `mio` y los de `sin` no se cuentan (llegan como copias con su `id`: se comparan por id, o por casilla).
+function aliadosAlLado(mio, centro, sin){
+  return Combatiente.aliadosPegados(mio, centro, [...tokens.entries()].filter(([, x]) => x).map(([id, x]) => ({...x, id})), distanciaHex,
+    id => typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id), sin || []);
+}
+/* ---------- 🐝 Táctica de enjambre (2026-11-20, dueño: «tenés +1 a la pdg por cada aliado adyacente. cuesta 2 puntos de job») ----------
+   Pasiva (comun/pasivas.js, stat `enjambre`): +1 PdG por cada aliado pegado a QUIEN ATACA, sin tope, contado al crear el duelo. Lo llama
+   Duelo.crear (comun/duelo.js) con el token de quien ataca en todo ataque con arma (el normal, el de una habilidad «con tu arma», el contraataque
+   y el de oportunidad) → {pdg, n} o null. La pasiva: un personaje y una invocación la publican en su resumen; la de un creep la ve la pantalla
+   del GM en su ficha privada (que es la que arma sus ataques). */
+function enjambreValor(t){
+  if(!t || !t.fichaId) return 0;
+  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return sc ? num(CreepCalculo.modTotal(sc, 'enjambre')) : 0; }
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const f = fichasPub.get(fichaId), r = f && f.resumen;
+  if(!r) return 0;
+  if(!invId) return num(r.enjambre);
+  const inv = (r.invocaciones || []).find(i => i && i.id === invId);
+  return inv ? num(inv.enjambre) : 0;
+}
+function enjambreDeToken(tokenId){
+  const t = tokens.get(tokenId);
+  if(!t) return null;
+  const val = enjambreValor(t);
+  if(!(val > 0)) return null;
+  const mio = {...t, id: tokenId};
+  return Combatiente.enjambreBono(val, aliadosAlLado(mio, mio).length);
 }
 // El ataque con los dados de más, el mismo si no corresponde, o null si se eligió otro objetivo.
 async function patotaBonos(mio, t, ataque, yo){

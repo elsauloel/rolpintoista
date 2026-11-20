@@ -1603,3 +1603,12 @@ La pasiva nueva (dueño: «da +2 a pdg en armas de tipo 10, y además da +1 al p
 (confirmado por el dueño el mismo día). Para el Parry se sumó el stat `parryt10` («Parry con contundentes»): se suma solo al parar con un arma de Tipo 10,
 nunca con un escudo ni con otra arma, y el asistente de ítems lo ofrece como bono. La cuenta (`Combatiente.parryExtraArma`) ya sirve para `parryt4/6/8`,
 pero no se registraron (dueño: solo lo de Tipo 10 por ahora). **Para el dueño:** ¿querés las maestrías de las otras familias (Tipo 4, 6 y 8)?
+
+### P249 — 🐝 Táctica de enjambre: ¿también el PdG especial y los ataques con habilidad? (2026-11-20, Claude)
+La pasiva nueva (dueño: «tenés +1 a la pdg por cada aliado adyacente. cuesta 2 puntos de job», `comun/pasivas.js`, stat `enjambre`) quedó, **mientras
+tanto, con lo mínimo**: suma solo al **PdG común** y solo en los **ataques con arma** (el normal, el de una habilidad «con tu arma» como Pegar fuerte,
+el contraataque y el de oportunidad), +1 por cada aliado pegado a quien ataca, **sin tope**, contado al abrirse el duelo. No suma al PdG.Esp (hechizos),
+ni a las habilidades que no pegan con el arma, ni a los daños sueltos. Los aliados son los de la Patota (mismo bando, con ficha, en pie, no bajo
+tierra): cuentan también las invocaciones y los que están escondidos; un tótem o estandarte con ficha también cuenta. Si se compra dos veces, da +2 por
+aliado. No hay indicador sobre el token: se ve en el cuadro del duelo y en la tirada. **Para el dueño:** ¿la querés también para el PdG.Esp / los
+hechizos? ¿Con algún tope? ¿Los objetos inertes (tótem, estandarte) cuentan como aliado?

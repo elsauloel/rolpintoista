@@ -129,7 +129,7 @@ const FichaResumen = (() => {
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
       sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
       prisa: n(c.final.prisa),   // 💨
-      ritmo: n(c.final.ritmo), sedSangre: n(c.final.sedsangre), sedBatalla: n(c.final.sedbatalla), escurridizo: n(c.final.escurridizo), ojoCarancho: n(c.final.ojocarancho), curaMas: n(c.final.curamas), curaMasArea: n(c.final.curamasarea),   // 🥁🩸 orden de turnos (2026-11-05, vtt-hexgrid/js/102)
+      ritmo: n(c.final.ritmo), sedSangre: n(c.final.sedsangre), sedBatalla: n(c.final.sedbatalla), escurridizo: n(c.final.escurridizo), ojoCarancho: n(c.final.ojocarancho), enjambre: n(c.final.enjambre), curaMas: n(c.final.curamas), curaMasArea: n(c.final.curamasarea),   // 🥁🩸 orden de turnos (2026-11-05, vtt-hexgrid/js/102)
         // 💨 Prisa (2026-10-15): va primero en el orden de turnos
       pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
@@ -265,6 +265,7 @@ const FichaResumen = (() => {
           costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), tormenta: Combatiente.tormenta(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),
+          enjambre: num(invModTotal(inv, 'enjambre')),   // 🐝 Táctica de enjambre (2026-11-20): el mapa la suma al atacar (js/65)
           percepcionAumentada: (inv.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada')),   // 👁 sin punto ciego para el sigilo (2026-11-09)   // Guantes del envenenador (2026-10-05)
           ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), etereo: true, sinMareo: true, temporal: true} : {}),   // 👁 el Ojo de Kicillof: ve en flor, revela, invisible, sin mareo (2026-10-20)
           guardian: num(invModTotal(inv, 'guardian')),

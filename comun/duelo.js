@@ -778,6 +778,14 @@ const Duelo = (() => {
     }
     // Embestida (piernas, 2026-10-06): el mapa la calcula (`cfg.embestida`, PdG) y se suma al PdG al guardarlo, como por la espalda.
     if(_num(cfg.embestida) > 0 && !hab) inicial.ataque.embestida = Math.min(10, Math.round(_num(cfg.embestida)));
+    // 🐝 Táctica de enjambre (2026-11-20, dueño: «+1 a la pdg por cada aliado adyacente»): solo los ataques con arma (también el contraataque y el de
+    // oportunidad: todos nacen acá). Lo calcula el mapa (`enjambreDeToken`, vtt-hexgrid/js/65) con el token de quien ataca, en este momento; se suma al
+    // PdG al guardarlo, como la embestida. Con la tirada compartida (el tiro que sigue de largo) ya viene sumado. Fuera del mapa no hay función: no suma.
+    if(!hab && !cfg.pdgCompartido && !cfg.ataque.danoSuelto){
+      let enj = cfg.enjambre;
+      if(enj === undefined && miTokenId && typeof enjambreDeToken === 'function'){ try{ enj = enjambreDeToken(miTokenId); }catch(err){ console.error('No se pudo contar el enjambre:', err); } }
+      if(enj && _num(enj.pdg) > 0) inicial.ataque.enjambre = {pdg: Math.min(30, Math.round(_num(enj.pdg))), n: Math.min(30, Math.max(1, Math.round(_num(enj.n))))};
+    }
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
     if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
     if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
@@ -875,6 +883,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`${d.ataque.malviaje ? '🌺 malviajando' : '😱 con miedo'}: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
+    if(d.ataque && d.ataque.enjambre && _num(d.ataque.enjambre.pdg) > 0) t.push(typeof Combatiente !== 'undefined' && Combatiente.enjambreTxt ? Combatiente.enjambreTxt(d.ataque.enjambre) : `🐝 Táctica de enjambre +${_fmt(d.ataque.enjambre.pdg)}`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
@@ -1280,6 +1289,8 @@ const Duelo = (() => {
       if(cca > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + cca, mod: p0.mod + cca, formula: `${p0.formula} +${cca} Ojo de carancho`.slice(0, 90)}; }
       const emb = campo === 'pdg' && m.ataque ? _num(m.ataque.embestida) : 0;   // la Embestida de las piernas
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
+      const enj = campo === 'pdg' && m.ataque && m.ataque.enjambre ? _num(m.ataque.enjambre.pdg) : 0;   // 🐝 Táctica de enjambre: los aliados pegados a quien ataca
+      if(enj > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + enj, mod: p0.mod + enj, formula: `${p0.formula} +${enj} enjambre`.slice(0, 90)}; }
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
       if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
       const mie = campo === 'pdg' && m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor

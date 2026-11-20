@@ -48,12 +48,12 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261120maestria"></script>
+<script src="combatiente.js?v=20261120enj"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js?v=20261120maestria"></script>
+<script src="ficha-calculo.js?v=20261120enj"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261114sang"></script>
 <script src="estados-aplicar.js?v=20261114av"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261114cha"></script>
+<script src="ficha-resumen.js?v=20261120enj"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261120maestria"></script>
 <script src="inv-botonera.js?v=20261120maestria"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261119orb"></script>
+<script src="duelo.js?v=20261120enj"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261120maestria"></script>
@@ -119,7 +119,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261120maestria"></script>
-<script src="pasivas.js?v=20261120maestria"></script>
+<script src="pasivas.js?v=20261120enj"></script>
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
@@ -8286,6 +8286,33 @@ prueba('zonaEstado roto no rompe', () => {
 prueba('🕶 Aviso al escondido (2026-11-11): nombra a quien lo puede notar; «Alguien» solo si ese también está escondido', () => {
   igual([Combatiente.sigiloAvisoTitulo('Rata de prueba 1', true), Combatiente.sigiloAvisoTitulo('Rata de prueba 1', false), Combatiente.sigiloAvisoTitulo('', true)],
     ['Rata de prueba 1 podría haberte notado', 'Alguien podría haberte notado', 'Alguien podría haberte notado']);
+});
+
+prueba('🐝 Táctica de enjambre (dueño, 2026-11-20): +1 PdG por cada aliado pegado a quien ataca, sin tope; cuesta 2 de job; personaje, creep e invocación', () => {
+  const C = Combatiente, pas = PASIVAS_BASE.find(p => p.nombre === 'Táctica de enjambre');
+  const dist = (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(a.fila - b.fila));
+  const mio = {id: 'yo', col: 5, fila: 5, tipo: 'creep', fichaId: 'c0'};
+  const lista = [mio,
+    {id: 'a1', col: 6, fila: 5, tipo: 'creep', fichaId: 'c1'}, {id: 'a2', col: 4, fila: 5, tipo: 'creep', fichaId: 'c2'},   // dos aliados pegados
+    {id: 'lejos', col: 7, fila: 5, tipo: 'creep', fichaId: 'c3'},   // aliado a 2 casillas
+    {id: 'rival', col: 5, fila: 6, tipo: 'pj', fichaId: 'f1'},   // del otro bando
+    {id: 'suelto', col: 5, fila: 4, tipo: 'creep', fichaId: ''},   // sin ficha
+    {id: 'topo', col: 6, fila: 6, tipo: 'creep', fichaId: 'c4', bajoTierra: true},
+    {id: 'caido', col: 4, fila: 4, tipo: 'creep', fichaId: 'c5'}];
+  const fuera = id => id === 'caido';
+  const ids = l => l.map(x => x.id).join();
+  igual([!!pas, pas.jobCosto, pas.mods[0].stat, pas.mods[0].val, /Automatizado en el mapa/.test(pas.detalle), FichaCalculo.STAT_LABEL.enjambre], [true, 2, 'enjambre', 1, true, 'Táctica de enjambre']);
+  igual([ids(C.aliadosPegados(mio, mio, lista, dist, fuera)), ids(C.aliadosPegados(mio, mio, lista.slice(0, 2), dist, fuera)), ids(C.aliadosPegados(mio, mio, [mio], dist, fuera)),
+    ids(C.aliadosPegados(mio, lista[1], lista, dist, fuera, [lista[1]])),   // la Patota: los aliados pegados al objetivo, sin contarlo
+    ids(C.aliadosPegados({col: 5, fila: 5, tipo: 'pj', fichaId: 'f0~i1'}, {col: 5, fila: 5}, lista, dist, fuera))],   // una invocación (del bando de los personajes), sin id: por casilla
+    ['a1,a2', 'a1', '', 'lejos', 'rival']);
+  igual([C.enjambreBono(1, 0), C.enjambreBono(0, 3), C.enjambreBono(1, 1), C.enjambreBono(1, 2), C.enjambreBono(1, 6), C.enjambreBono(2, 3)],
+    [null, null, {pdg: 1, n: 1}, {pdg: 2, n: 2}, {pdg: 6, n: 6}, {pdg: 6, n: 3}]);
+  igual([C.enjambreTxt(C.enjambreBono(1, 2)), C.enjambreTxt(C.enjambreBono(1, 1)), C.enjambreTxt(null)], ['🐝 Táctica de enjambre +2: 2 aliados al lado', '🐝 Táctica de enjambre +1: 1 aliado al lado', '']);
+  // La pasiva se lee igual en los tres: creep (ficha privada), invocación y personaje (lo que publican en su resumen).
+  const sc = creepPrueba({pasivas: [{...pas, compras: 1}]});
+  const inv = {id: 'i1', nombre: 'Abeja', hp: 10, hpMax: 10, pasivas: [{...pas, compras: 2}], estados: [], inventario: []};
+  igual([CreepCalculo.modTotal(sc, 'enjambre'), FichaResumen.invModTotal(inv, 'enjambre')], [1, 2]);
 });
 
 Promise.all(pendientes).then(() => {

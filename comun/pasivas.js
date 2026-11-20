@@ -81,6 +81,11 @@ const PASIVAS_BASE = [
   // debuff… sube la probabilidad de golpe, el stat probabilidad de golpe»). Corrección del mismo día: «a cualquier tirada que use Probabilidad de Golpe, armas y hechizos» (PdG y PdG.Esp).
   {poolId: 'ojo-de-carancho', nombre: 'Ojo de carancho', jobCosto: 1, etiquetas: ['ofensiva'],
    detalle: '+1 a la Probabilidad de Golpe (PdG con armas y PdG.Esp con hechizos) contra cualquier rival que tenga algún estado malo encima (Sangrado, Veneno, Rengo, Armadura rota…): el carancho huele al que está flojo. ⚙ Automatizado: el duelo lo suma solo y se ve «+1 Ojo de carancho» en la tirada.', mods: [{stat: 'ojocarancho', val: 1}]},
+  // 🐝 Táctica de enjambre (dueño, 2026-11-20: «tenés +1 a la pdg por cada aliado adyacente. cuesta 2 puntos de job»). Lo suma el mapa al atacar
+  // (vtt-hexgrid/js/65, enjambreDeToken → Duelo.crear). Solo los ataques con arma y el PdG común, mientras tanto: P249 en docs/preguntas-abiertas.md.
+  {poolId: 'tactica-de-enjambre', nombre: 'Táctica de enjambre', jobCosto: 2, etiquetas: ['ofensiva'],
+   detalle: '+1 a la Probabilidad de Golpe por cada aliado que tengas pegado (a 1 casilla tuya) en el momento de atacar con tu arma, sin tope: solo sos uno más, en enjambre sos un problema. ⚙ Automatizado en el mapa: al atacar cuenta a tus aliados pegados (los de tu bando que están en pie; vos no te contás) y se ve «🐝 Táctica de enjambre +2: 2 aliados al lado» en el cuadro del duelo y en la tirada. Vale también en el contraataque y en el ataque de oportunidad. ✋ Fuera del mapa (la ficha suelta) no suma: ahí se suma a mano.',
+   mods: [{stat: 'enjambre', val: 1}]},
   // 🛡 Resistencia a crítico (2026-11-05, dueño: «si no existe ninguna pasiva… que interactúe con la resistencia del crítico, ya diseñaría alguno»;
   // docs/propuesta-pasivas-consumibles-res-critico.md). Las de la vida las suma el duelo al calcular el crítico (Combatiente.resCritPorVida).
   {poolId: 'callo-de-batalla', nombre: 'Callo de batalla', jobCosto: 1, etiquetas: ['stat', 'defensiva'],

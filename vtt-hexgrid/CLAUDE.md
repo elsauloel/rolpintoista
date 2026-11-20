@@ -2389,4 +2389,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`sigiloDelatarPorDano`); Marcado; «Revelar lo oculto» del GM. El oído (`oidoPorJugadores`) y la luz portada son de la niebla: no sacan del sigilo.
   Detalle a saber: adentro de la niebla de una varita solo descubre un rival pegado (`sigiloRevisar`), pero el camino se corta igual en el cono
   (`sigiloEvaluarRuta`); se pinta rojo (lo prudente). Probado con clics en «Claude · pruebas 2» (GM y Jugador 1).
+- **🏷 Los tokens de un personaje se llaman como su ficha** (2026-11-20, dueño: «estaría bueno que lo solucione la pantalla del jugador y que además el
+  GM tenga permiso para modificarlo»): `tokensSincronizarNombres` (js/09, cada 5 s). **Jugador:** por cada personaje suyo llama a
+  `TokensAuto.nombresPonerAlDia({fichaId, nombre})` (comun/tokens-auto.js), que recorre TODOS los mapas de la partida (el primero y los guardados) y
+  renombra sus tokens que digan otra cosa; una vez por personaje y por nombre (si lo renombra, de nuevo). **GM:** como antes con los creeps del mapa
+  abierto, y ahora también lo intenta con los tokens de personaje: lo permiten las reglas nuevas (solo el campo `nombre`; **hay que pegarlas**) y, si
+  todavía no, falla en silencio. Las invocaciones (`fichaId` con `~`) guardan su propio nombre. La ficha hace lo mismo al abrirse y al guardar un
+  nombre nuevo (ficha js/12, `FichaSesion.guardar`). Probado en «El origen · CLON de pruebas» (los seis tokens de Rockardo).
 

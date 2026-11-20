@@ -2085,4 +2085,8 @@ versión parecida en más de una, es candidato a juntar.
   pruebas): `unir([{cono, alerta}])` → `{cono, alerta}` (el cono de un rival le gana a la alerta de otro), `estado(union, clave)` → 'riesgo' | 'alerta'
   | 'libre', `referencia(seleccion, candidatos)` (de quién se muestran), `camino(union, claves)` → `{corte, alerta}` (como al soltar el token) y
   `leyenda(nombre, cuantos, soyGM)` (el cartel). Las zonas de cada rival y qué rivales cuentan los pone el mapa (`vtt-hexgrid/js/124-zonas-riesgo.js`).
+- **`tokens-auto.js`, 🏷 los tokens se llaman como su ficha** (2026-11-20): `TokensAuto.nombresCambios(docs, fichaId, nombre)` (qué tokens hay que
+  renombrar: los `pj` de esa ficha con otro nombre; no invocaciones) y `nombresPonerAlDia({fichaId, nombre})` (recorre el primer mapa y los guardados
+  y los renombra; una vez por nombre y por pantalla; si no puede, calla). Lo llama la pantalla del jugador dueño: el mapa (js/09), la ficha al
+  abrirse (js/12) y `FichaSesion.guardar` cuando guarda un nombre nuevo. Regla nueva: el GM puede cambiar solo el `nombre` de un token de personaje.
 

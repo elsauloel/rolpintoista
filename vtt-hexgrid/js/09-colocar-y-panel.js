@@ -334,10 +334,19 @@ function componerFondo(){
 /* 🏷 El nombre guardado en el token sigue al del creep o el personaje (2026-11-03, dueño: un token decía «Goblin híbrido» y su creep ya se
    llamaba «Goblin scout»). El token guarda su `nombre` al colocarse; si después se renombra el creep en GM Tools (o el personaje), el token
    quedaba con el viejo: el dibujo y la Mesa usan el del creep (nombreDe), pero el panel del token, los buscadores y los scripts, el viejo.
-   La pantalla del GM pone al día el nombre de los tokens vinculados del mapa abierto. */
+   La pantalla del GM pone al día el nombre de los tokens vinculados del mapa abierto.
+   (2026-11-20, dueño: «estaría bueno que lo solucione la pantalla del jugador y que además el GM tenga permiso para modificarlo») La pantalla del
+   jugador DUEÑO pone al día el nombre de los tokens de sus personajes en TODOS los mapas de la partida (`TokensAuto.nombresPonerAlDia`, comun/
+   tokens-auto.js: una vez por personaje y por nombre; también al cambiarle el nombre). El GM también lo intenta con los tokens de personaje del
+   mapa abierto: lo dejan las reglas nuevas (solo el campo `nombre`); mientras no estén pegadas en la consola, falla en silencio (sin error). */
 const tokensNombreHecho = new Map();   // tokenId -> nombre ya escrito (para no repetir)
 function tokensSincronizarNombres(){
-  if(!soyGM || !fbDb || typeof coleccionTokens !== 'function' || typeof tokens === 'undefined') return;
+  if(!fbDb || !fbUsuario || typeof coleccionTokens !== 'function' || typeof tokens === 'undefined') return;
+  if(!soyGM){   // el jugador: sus personajes, en todos los mapas
+    if(typeof TokensAuto === 'undefined' || !TokensAuto.nombresPonerAlDia || typeof fichasPub === 'undefined') return;
+    fichasPub.forEach((f, fichaId) => { if(f && f.duenoUid === fbUsuario.uid) TokensAuto.nombresPonerAlDia({fichaId, nombre: f.nombre}).catch(() => {}); });
+    return;
+  }
   tokens.forEach((t, id) => {
     if(!t || !t.fichaId || !t.tipo) return;
     const v = vinculo(t), nombre = v && v.nombre && v.nombre !== '?' ? String(v.nombre).slice(0, 40) : '';
@@ -345,7 +354,8 @@ function tokensSincronizarNombres(){
     if(t.tipo !== 'creep' && t.tipo !== 'pj') return;
     if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return;   // las invocaciones guardan su propio nombre
     tokensNombreHecho.set(id, nombre);
-    coleccionTokens().doc(id).update({nombre}).catch(err => { tokensNombreHecho.delete(id); console.error('No se pudo poner al día el nombre del token:', err); });
+    // El de un personaje: si las reglas todavía no lo dejan (sin pegar), calla y no insiste (lo va a corregir la pantalla de su jugador).
+    coleccionTokens().doc(id).update({nombre}).catch(err => { if(t.tipo === 'pj') return; tokensNombreHecho.delete(id); console.error('No se pudo poner al día el nombre del token:', err); });
   });
 }
 setInterval(() => { try{ tokensSincronizarNombres(); }catch(e){ console.error(e); } }, 5000);

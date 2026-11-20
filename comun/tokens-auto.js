@@ -299,5 +299,40 @@ const TokensAuto = (() => {
     return {mapaId, combate: d.exists && d.data().modo === 'combate'};
   }
 
-  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
+  /* 🏷 Los tokens de un personaje se llaman como su ficha (2026-11-20, dueño, al ver en el clon de El origen una ficha con un nombre y sus tokens
+     con otros dos: «estaría bueno que lo solucione la pantalla del jugador y que además el GM tenga permiso para modificarlo»). El token guarda su
+     `nombre` al colocarse; si después se renombra el personaje, quedaba el viejo. La pantalla del jugador DUEÑO (el mapa al abrirse, la ficha al
+     abrirse y al guardar un nombre nuevo) pone al día sus tokens en TODOS los mapas de la partida. Las invocaciones guardan su propio nombre.
+     Si algo no se puede (sin permiso, sin conexión), calla. */
+  const nombreDeFicha = n => { n = String(n == null ? '' : n).trim(); return n && n !== '?' ? n.slice(0, 40) : ''; };
+  // Qué tokens hay que renombrar. docs = [{id, tipo, fichaId, nombre}], fichaId, nombre → [{id, nombre}]
+  function nombresCambios(docs, fichaId, nombre){
+    const n = nombreDeFicha(nombre);
+    if(!n || !fichaId) return [];
+    return (docs || []).filter(t => t && t.tipo === 'pj' && t.fichaId === fichaId && !String(t.fichaId).includes('~') && t.nombre !== n).map(t => ({id: t.id, nombre: n}));
+  }
+  const nombresHechos = new Map();   // fichaId -> nombre ya puesto al día (una vez por nombre y por pantalla)
+  // → Promise<cuántos tokens cambió> (0 si no había nada, si ya se hizo o si no se pudo).
+  async function nombresPonerAlDia(o){
+    const fichaId = o && o.fichaId, n = nombreDeFicha(o && o.nombre);
+    const db = (o && o.db) || (typeof fbDb !== 'undefined' ? fbDb : null), ruta = (o && o.ruta) || (typeof fbRutaCampana === 'function' ? fbRutaCampana : null);   // (db y ruta: para las pruebas)
+    if(!fichaId || !n || !db || !ruta || String(fichaId).includes('~')) return 0;
+    if(nombresHechos.get(fichaId) === n) return 0;
+    nombresHechos.set(fichaId, n);
+    let cambiados = 0;
+    try{
+      const mapas = [MAPA_PRINCIPAL_ID];
+      try{ (await db.collection(ruta('mapas')).get()).forEach(d => { if(d.id !== MAPA_PRINCIPAL_ID) mapas.push(d.id); }); }catch(e){}
+      for(const m of mapas){
+        let snap = null;
+        try{ snap = await db.collection(ruta(rutaTokens(m))).where('fichaId', '==', fichaId).get(); }catch(e){ continue; }
+        const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        for(const c of nombresCambios(docs, fichaId, n)){
+          try{ await db.collection(ruta(rutaTokens(m))).doc(c.id).update({nombre: c.nombre}); cambiados++; }catch(e){ /* sin permiso: calla */ }
+        }
+      }
+    }catch(e){ nombresHechos.delete(fichaId); }
+    return cambiados;
+  }
+  return {nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
 })();

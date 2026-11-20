@@ -180,6 +180,9 @@ const FichaSesion = (() => {
         if(f.debe) delete f.debe[parte];
       });
       f.ultimoResumen = resumenJson;
+      // 🏷 Un nombre nuevo: su dueño pone al día el de sus tokens en todos los mapas (comun/tokens-auto.js, 2026-11-20).
+      if(cambios.nombre && typeof TokensAuto !== 'undefined' && TokensAuto.nombresPonerAlDia && typeof fbUsuario !== 'undefined' && fbUsuario && f.duenoUid === fbUsuario.uid)
+        TokensAuto.nombresPonerAlDia({fichaId: f.id, nombre}).catch(() => {});
       f.reintentarDesde = 0;
       if(juntos && o.juntosListo) o.juntosListo();
       ok = true;

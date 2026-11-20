@@ -658,6 +658,9 @@ service cloud.firestore {
             // (mover libre, sin estela), le cambia el frente o lo oculta.
             || (resource.data.tipo == 'pj' && esGM(c)
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel', 'pf']))
+            // 🏷 El GM le pone al día el nombre (solo el nombre) a un token de personaje (2026-11-20).
+            || (resource.data.tipo == 'pj' && esGM(c)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']))
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
@@ -959,6 +962,9 @@ service cloud.firestore {
               || (resource.data.tipo == 'creep' && esGM(c))
               || (resource.data.tipo == 'pj' && esGM(c)
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel', 'pf']))
+              // 🏷 El GM le pone al día el nombre (solo el nombre) a un token de personaje (2026-11-20).
+              || (resource.data.tipo == 'pj' && esGM(c)
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']))
             );
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);

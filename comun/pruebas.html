@@ -8907,6 +8907,38 @@ grupo('Zonas de riesgo: en sigilo se ve solo lo que miran los rivales');
   });
 })();
 
+/* ---------- 🏷 Los tokens de un personaje se llaman como su ficha (comun/tokens-auto.js, 2026-11-20) ---------- */
+grupo('Tokens con otro nombre que su ficha');
+(() => {
+  const docs = [
+    {id: 't1', tipo: 'pj', fichaId: 'f1', nombre: 'Petro EskanderSon'},
+    {id: 't2', tipo: 'pj', fichaId: 'f1', nombre: 'Rockardo Pedruscko'},          // ya está bien
+    {id: 't3', tipo: 'pj', fichaId: 'f1~inv1', nombre: 'Abeja'},                   // una invocación: guarda su propio nombre
+    {id: 't4', tipo: 'pj', fichaId: 'f2', nombre: 'Otro'},                         // de otro personaje
+    {id: 't5', tipo: 'creep', fichaId: 'f1', nombre: 'Rata'},                      // un creep no es asunto del jugador
+  ];
+  prueba('solo cambian los tokens de ESE personaje que tienen otro nombre (ni invocaciones, ni creeps, ni los de otro)', () =>
+    igual(TokensAuto.nombresCambios(docs, 'f1', 'Rockardo Pedruscko'), [{id: 't1', nombre: 'Rockardo Pedruscko'}]));
+  prueba('sin nombre (o «?») no se toca nada; un nombre largo se corta a 40 como pide el token', () => {
+    igual([TokensAuto.nombresCambios(docs, 'f1', ''), TokensAuto.nombresCambios(docs, 'f1', '?'), TokensAuto.nombresCambios(docs, '', 'X')], [[], [], []]);
+    igual(TokensAuto.nombresCambios(docs, 'f2', 'x'.repeat(60))[0].nombre.length, 40);
+  });
+  prueba('en todos los mapas: recorre el principal y los guardados, cambia los que hacen falta, una sola vez por nombre, y si no puede calla', async () => {
+    const escritos = [], leidos = [];
+    const datos = {'c/tokens': [{id: 'a', tipo: 'pj', fichaId: 'fx', nombre: 'Viejo'}], 'c/mapas/m1/tokens': [{id: 'b', tipo: 'pj', fichaId: 'fx', nombre: 'Otro viejo'}, {id: 'c', tipo: 'pj', fichaId: 'fx', nombre: 'Nuevo'}],
+      'c/mapas/m2/tokens': [{id: 'd', tipo: 'pj', fichaId: 'fx', nombre: 'Sin permiso'}]};
+    const col = ruta => ({
+      get: async () => ({forEach: fn => ['m1', 'm2'].forEach(id => fn({id}))}),
+      where: () => ({get: async () => { leidos.push(ruta); return {docs: (datos[ruta] || []).map(d => ({id: d.id, data: () => d}))}; }}),
+      doc: id => ({update: async x => { if(id === 'd') throw new Error('permission-denied'); escritos.push([ruta, id, x.nombre]); }}),
+    });
+    const con = {db: {collection: col}, ruta: r => 'c/' + r};
+    const n = await TokensAuto.nombresPonerAlDia({fichaId: 'fx', nombre: 'Nuevo', ...con});
+    const otra = await TokensAuto.nombresPonerAlDia({fichaId: 'fx', nombre: 'Nuevo', ...con});
+    igual([n, otra, escritos, leidos.length], [2, 0, [['c/tokens', 'a', 'Nuevo'], ['c/mapas/m1/tokens', 'b', 'Nuevo']], 3]);
+  });
+})();
+
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');

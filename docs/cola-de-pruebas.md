@@ -253,13 +253,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   dibuja en el piso, trazo por trazo → una columna de luz oscura (violeta / roja) sube desde el círculo → el token se levanta y el círculo se quema
   de afuera hacia adentro como papel; queda titilando (lo de hoy). Mandar un VIDEO de cada una para que el dueño las revise en la compu (anotarlo en
   docs/pendientes.md 🖥). Va después de la tarea «al resucitar se borran los estados» (mismo punto del código).
-- **⬜ en cola — 🏷 Tokens con otro nombre que su ficha: que se corrija solo, y que el GM pueda cambiarlo** (visto al clonar El origen: la ficha se
+- **✅ hecho (2026-11-20) — 🏷 Tokens con otro nombre que su ficha: que se corrija solo, y que el GM pueda cambiarlo** (visto al clonar El origen: la ficha se
   llama «Rockardo Pedruscko» y sus tokens «Petro EskanderSon» / «Rockardo Petroshvnick Son»; `tokensSincronizarNombres`,
   vtt-hexgrid/js/09-colocar-y-panel.js, falla en la pantalla del GM por permisos y deja un error en la consola). Dueño, 2026-11-20: «estaría bueno
   que lo solucione la pantalla del jugador y que además el GM tenga permiso para modificarlo». (1) La pantalla del jugador DUEÑO pone al día el nombre
   de sus tokens (en todos los mapas donde tenga permiso) al abrir el mapa o la ficha. (2) En firebase/firestore.rules, permitir al GM cambiar el
   `nombre` de un token de personaje (solo ese campo): **avisar al dueño que hay que pegar las reglas**; mientras no estén pegadas, que la pantalla
   del GM no deje el error (intenta y, si no puede, calla). Probar en el clon (Rockardo → Jugador 2).
+  **Qué quedó:** (1) la pantalla del jugador DUEÑO pone al día el nombre de los tokens de sus personajes en TODOS los mapas de la partida: al abrir
+  el mapa, al abrir su ficha y cuando le cambia el nombre al personaje (`TokensAuto.nombresPonerAlDia`, comun/tokens-auto.js; las invocaciones
+  conservan el suyo). (2) Las reglas dejan al GM cambiar SOLO el `nombre` de un token de personaje: **hay que pegarlas** (anotado en
+  docs/pendientes.md 🖥). Mientras tanto la pantalla del GM intenta y calla (ya no deja el error en la consola).
+  **Probado en el clon:** Rockardo tenía la ficha «Rockardo Pedruscko» y seis tokens (uno por mapa) con «Petro EskanderSon» o «Rockardo Petroshvnick
+  Son». GM con el código nuevo y las reglas sin pegar: no cambió nada y la consola quedó limpia. Jugador 2 abre el mapa: a los pocos segundos los seis
+  dicen «Rockardo Pedruscko». Poniéndole a mano un nombre viejo a uno y abriendo la ficha suelta: también lo corrigió. **Sin probar:** el GM
+  corrigiéndolo con las reglas ya pegadas (falta pegarlas). Ojo: el nombre guardado en el token casi no se ve en pantalla (el mapa ya dibujaba el de
+  la ficha); lo usan los buscadores, los scripts y los respaldos.
 - **✅ hecho (2026-11-20) — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
   de un combate nuevo nadie le «empieza» el turno; «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa
   es como si fuera su turno. Podríamos hacer que se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que

@@ -484,6 +484,9 @@ async function fichaAbrir(id){
   fichaRecordar(id, doc.data().duenoUid !== (fbUsuario && fbUsuario.uid));
   fichaEstadoAlDia();
   fichaEscuchar(f);
+  // 🏷 Al abrir su ficha, el dueño pone al día el nombre de sus tokens en todos los mapas (comun/tokens-auto.js, 2026-11-20).
+  if(fbUsuario && doc.data().duenoUid === fbUsuario.uid && typeof TokensAuto !== 'undefined' && TokensAuto.nombresPonerAlDia)
+    TokensAuto.nombresPonerAlDia({fichaId: id, nombre: doc.data().nombre}).catch(() => {});
   return true;
 }
 

@@ -812,6 +812,11 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
+  el GM cambie SOLO el campo `nombre` de un token de personaje (dos lugares: los tokens del primer mapa y los de los mapas guardados). Mientras no
+  estén pegadas no se rompe nada: la pantalla del GM lo intenta y, si no puede, calla (sin error); los nombres los corrige igual la pantalla del
+  jugador dueño al abrir el mapa o su ficha.
+
 - [ ] **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
   `descubierta` en una trampa (dos lugares: los elementos del mapa de siempre y los de los mapas guardados). Mientras no estén pegadas, «Volver a
   ocultar» y «✋ No la detectó» andan igual por un camino de respaldo (el mapa vuelve a colocar la misma trampa, tarda unos segundos más) si la

@@ -237,6 +237,7 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   el token a una ficha (pj), a una invocación de una ficha
   (`<fichaId>~<idInvocación>`, tipo pj) o a un creep: el mapa toma de ahí nombre,
   miniatura, barras (vida roja; SP azul, solo PJ) y estados. Tokens del mapa de
+  hexágonos. (Desde el 2026-11-20 el GM también puede cambiarle SOLO el `nombre` a un token de PJ, para ponerlo al día con su ficha.)
   hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
   solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
   de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`

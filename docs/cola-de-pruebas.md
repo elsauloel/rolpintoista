@@ -124,6 +124,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   combate); (3) una línea fija dentro de la ventana que diga lo mismo en corto («Podés cerrar o minimizar esta ventana: el botín sigue acá hasta que
   el GM lo cierre»); (4) que el botón para reabrirlo se note mientras haya botín abierto (pulso / color). Textos en rioplatense, simples, sin jerga.
   Verificar de paso que de verdad se puede reabrir siempre (también recargando la página) mientras el GM no lo cerró.
+  **Textos aprobados por el dueño (2026-11-20):** cartel al cerrar: «**Tranqui: el botín no se pierde.** Sigue abierto para todos hasta que el GM lo
+  cierre. Lo volvés a abrir cuando quieras con el botón 🎁.» [Entendido, cerrar] · [Mejor minimizar]; sale la primera vez en cada combate.
 - **⬜ en cola — 🎭 Que sea claro cómo poner tu personaje en el mapa** (dueño, 2026-11-20, sobre la observación de un ayudante: «lo del botón de
   personajes y el botón de tokens es poco claro… vamos con tu sugerencia, hacer las 2 y 3 juntas»). (2) En la lista de **👥 Personajes** del mapa, al
   lado de cada personaje PROPIO que no tiene token en el mapa que se está viendo, un botón **«🎭 Ponerlo en el mapa»** que hace lo mismo que el 🎭

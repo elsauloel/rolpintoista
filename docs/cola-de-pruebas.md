@@ -140,6 +140,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   recalcula después? ¿se copia la vida de la invocación anterior? ¿cambia entre la primera invocación y las siguientes? (3) Arreglar la causa: una
   invocación nueva aparece con la vida llena, salvo que una regla escrita diga otra cosa (si la hay, mostrarla y no tocar). Probar también otra
   invocación distinta para ver si es general.
+- **⬜ en cola — 🔥 «Ver detalle» de una zona puesta en el mapa (Muro de fuego y todas las demás)** (dueño, 2026-11-20: «invoqué el Muro de fuego
+  y después, cuando quería recordar bien qué hacía, tenía que ir a la ficha del personaje que lo invocó, ir a su lista de skills y ver el detalle. Me
+  gustaría que skills como el muro de fuego, al seleccionarlo, arriba, donde aparece el título, a la derecha, aparezca un botoncito que diga "ver
+  detalle". Y en ese detalle te diga específicamente el efecto de esa zona: quien ingresa o quien está parado recibe X de daño. Y también en qué
+  momento de la ronda o del turno se triggerea ese efecto. Y a quién le pertenece, y si tiene friendly fire o no»). Al seleccionar una zona en el
+  mapa (y lo mismo una trampa visible, un tótem / estandarte / objeto puesto por una habilidad, si comparten el cuadro), en la cabecera del cuadro,
+  a la derecha del título, un botón **«🔍 Ver detalle»** que abre una tarjeta con, armado desde los DATOS de la zona (no texto escrito a mano):
+  · **Qué hace**: daño (fórmula y tipo / elemento), estado que deja (con chance y turnos), cura, lo que sea; y la descripción de la habilidad.
+  · **A quién le pega**: al entrar, al estar parado, al salir, al atravesarla; **fuego amigo sí / no** (aliados del dueño, el propio dueño).
+  · **Cuándo se dispara**: al entrar; al empezar el turno de quien está adentro; al empezar el turno de quien la creó; cada ronda… lo que diga el dato.
+  · **De quién es** y con qué habilidad se puso; **cuánto le queda** (turnos / rondas, o «hasta que…»).
+  · Si hay tirada para evitarla (qué tira cada uno).
+  Lo ven el GM y los jugadores que ven la zona (a un jugador no se le muestra lo que no debería saber: p. ej. el dueño si quien la puso está oculto,
+  con el mismo criterio de la tarea del sigilo). Si algún dato no existe en la zona, decir «a mano» en vez de inventarlo.
 - **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
   ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
   que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás

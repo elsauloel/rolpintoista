@@ -1341,7 +1341,7 @@ function renderPublicacion(){
   caja.classList.remove('al-dia', 'pendiente');
   const cerrar = $('#btn-cerrar-tienda');
   if(!tiendaFb.publicadaJson){
-    $('#publicacion-texto').textContent = 'Los jugadores no tienen ninguna tienda abierta.';
+    $('#publicacion-texto').textContent = 'Los jugadores no tienen ninguna tienda abierta.' + (tiendaActual ? ` Para que vean «${tiendaActual.nombre || 'la que estás armando'}», tocá el botón verde «Publicar y abrir tienda».` : '');
     cerrar.style.display = 'none';
     return;
   }
@@ -1566,7 +1566,7 @@ function renderGuardadas(){
       </div>
       ${publicadaId === g.id ? '<span class="resumen-chip" style="border-color:var(--absenta)">La ven los jugadores</span>' : ''}
       ${esAbierta
-        ? '<span class="resumen-chip" style="border-color:var(--copper)">Abierta</span>'
+        ? '<span class="resumen-chip" style="border-color:var(--copper)" title="Es la que tenés cargada acá abajo para editar. Que esté acá no quiere decir que los jugadores la vean: para eso, «Publicar y abrir tienda».">✎ La estás editando</span>'
         : `<button type="button" class="iconbtn" data-abrir-guardada="${esc(g.id)}">Abrir</button>`}
       <button type="button" class="iconbtn" data-borrar-guardada="${esc(g.id)}">Borrar</button>
     </div>`;

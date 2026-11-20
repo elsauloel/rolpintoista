@@ -121,6 +121,8 @@ const FichaCalculo = (() => {
     {id:'pdgt8', label:'PdG con hachas', full:'PdG extra al atacar con un hacha (Tipo 8)'},
     {id:'pdgt10', label:'PdG con contundentes', full:'PdG extra al atacar con un arma contundente (Tipo 10)'},
     {id:'pdgdist', label:'PdG a distancia', full:'PdG extra al atacar con un arma a distancia'},
+    // 🔨 Maestría en armas pesadas (2026-11-20, dueño): Parry extra solo al parar con un arma de esa familia (no con un escudo).
+    {id:'parryt10', label:'Parry con contundentes', full:'Parry extra al parar con un arma contundente (Tipo 10); no con un escudo'},
     {id:'oporahorro', label:'Oportunidad más barata', full:'No2 de menos que cuesta tu ataque de oportunidad (nunca menos de 0)'},
     {id:'contraahorro', label:'Contraataque más barato', full:'No2 de menos que cuesta tu contraataque, el que hacés después de ganar un Parry (nunca menos de 0)'},
     {id:'soltarse', label:'Soltarse', full:'Suma a la tirada para soltarte de una red, un cepo o una telaraña'},

@@ -123,7 +123,11 @@ const InvCalculo = (() => {
   }
   function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
   // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07). Sin `con`, la de siempre.
-  function parryValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'parry', d && (d.id || d.nombre)); }
+  function parryValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'parry', d && (d.id || d.nombre)) + parryExtra(inv, con); }
+  // 🔨 El Parry de más por la familia del arma con que para (Maestría en armas pesadas, 2026-11-20): solo con un arma de ese Tipo, no con un escudo.
+  function parryExtra(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return Combatiente.parryExtraArma(st => modTotal(inv, st), Combatiente.piezaDeDefensa(inv, d)); }
+  // El PdG de más por la familia del arma en la mano o a distancia (pdgt4/6/8/10, pdgdist; guantes y Maestría en armas pesadas).
+  function pdgExtra(inv){ const a = Combatiente.armaEnMano(inv); return Combatiente.pdgExtraArma(st => modTotal(inv, st), {tipoDado: a.tipoDado, armaDeRango: a.armaDeRango}); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
   // ⚔⚔ Con dos armas (dueño, 2026-11-07: «para todo», como los creeps): cada arma paga su propio primer ataque (Combatiente.ataquesConArmaCreep).
   function costoAtaque0(inv){ const a = armaDe(inv), hechos = Combatiente.ataquesConArmaCreep(inv); if(Combatiente.cargadaGratis(a, hechos, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos) - Combatiente.ahorroArco(a, hechos, inv.descargada, inv.ultimoPego)); }
@@ -200,6 +204,6 @@ const InvCalculo = (() => {
 
   return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
-    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
+    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};
 })();

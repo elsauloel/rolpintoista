@@ -546,7 +546,11 @@ const CreepCalculo = (() => {
   }
   function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // `con`: el nombre de lo que paró (2026-11-03); sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
   // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07: los bonos de Parry de un arma o un escudo, solo al atajar con esa pieza). Sin `con`, la de siempre.
-  function parryValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'parry', d && (d.id || d.nombre)); }
+  function parryValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'parry', d && (d.id || d.nombre)) + parryExtra(sc, con); }
+  // 🔨 El Parry de más por la familia del arma con que para (Maestría en armas pesadas, 2026-11-20): solo con un arma de ese Tipo, no con un escudo.
+  function parryExtra(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return Combatiente.parryExtraArma(st => modTotal(sc, st), Combatiente.piezaDeDefensa(sc, d)); }
+  // El PdG de más por la familia del arma en la mano o a distancia (pdgt4/6/8/10, pdgdist; guantes y Maestría en armas pesadas).
+  function pdgExtra(sc){ const a = Combatiente.armaEnMano(sc); return Combatiente.pdgExtraArma(st => modTotal(sc, st), {tipoDado: a.tipoDado, armaDeRango: a.armaDeRango}); }
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -796,7 +800,7 @@ const CreepCalculo = (() => {
     percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
     resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. eléctrica', restoxico:'Res. tóxico', resacido:'Res. ácido', resluz:'Res. luz', ressiniestro:'Res. siniestro', armadmg:'Defensa especial', hpregen:'Regeneración de vida',
     pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)', levantarse:'Levantarse rápido', levitar:'Levitar', suelagruesa:'Suela gruesa', meditar:'Meditar',
-    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', evadisparo:'Evasión contra disparos',
+    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', parryt10:'Parry con contundentes', evadisparo:'Evasión contra disparos',
     oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
     ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',
   };
@@ -933,6 +937,6 @@ const CreepCalculo = (() => {
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, vidaAlDia, nitrosMax, actualizarNo2PorAgl,
-    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor, parryValor,
+    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra,
     fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

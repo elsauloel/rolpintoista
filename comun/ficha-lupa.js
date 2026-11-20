@@ -72,7 +72,33 @@ const FichaLupa = (() => {
   }
 
   // Stat completo: base, modificadores con su origen y efectos que lo alteran.
-  function lupaStat(S, id, c, {valor, excluidos = [], sinTirada = false} = {}){
+  // 🔨 Lo que suma la familia del arma (2026-11-20, Maestría en armas pesadas y los guantes): las filas de `statFam` (pdgt10, parryt10…), con su origen.
+  function filasFamilia(S, c, statFam, cuando){
+    const {STAT_LABEL} = FichaCalculo;
+    return (c.mods[statFam] || []).filter(m => num(m.val)).map(m => lupaFila(`${origenHtml(S, m)} <span class="lupa-gris">(${esc(m.tipo || '')} · ${esc(STAT_LABEL[statFam] || statFam)}: ${esc(cuando)})</span>`, lupaSigno(m.val))).join('');
+  }
+  // Los stats de familia que le suman al PdG al atacar con esa arma (pdgt4/6/8/10 y pdgdist).
+  function familiaPdg(S, arma, c){
+    if(!arma) return '';
+    const t = num(arma.tipoDado);
+    return ([4, 6, 8, 10].includes(t) ? filasFamilia(S, c, 'pdgt' + t, 'con esta arma') : '') + (arma.armaDeRango ? filasFamilia(S, c, 'pdgdist', 'a distancia') : '');
+  }
+  // 🔨 El Parry con cada arma o escudo, cuando hay un Parry de familia (parryt10): con qué suma y con qué no.
+  function lupaParryPorArma(S, c){
+    if(!Combatiente.PARRY_FAMILIA.some(st => num(c.final[st]) > 0)) return '';
+    const lista = FichaCombate.armasYEscudosParaParry(S).map(a => a.item);
+    if(!lista.length) return '';
+    let h = '';
+    lista.forEach(it => {
+      const st = Combatiente.parryStatDe(it);
+      const fam = st ? filasFamilia(S, c, st, 'solo al parar con esta arma') : '';
+      h += lupaFila(`Parry con ${esc(it.nombre)}${fam ? '' : ` <span class="lupa-gris">(${Combatiente.esEscudo(it) ? 'escudo' : 'otro Tipo'}: no suma lo de una familia de armas)</span>`}`, fmt(FichaCombate.statParaArma(S, 'parry', it, c)), 'lupa-total');
+      h += fam;
+    });
+    return lupaSeccion('Con cada arma o escudo', h);
+  }
+
+  function lupaStat(S, id, c, {valor, excluidos = [], sinTirada = false, familia = ''} = {}){
     const {STAT_LABEL, STAT_FULL} = FichaCalculo;
     valor = valor ?? c.final[id];
     let h = lupaBase(S, id, c);
@@ -80,7 +106,8 @@ const FichaLupa = (() => {
       const fuera = excluidos.includes(m);
       h += lupaFila(`${origenHtml(S, m)} <span class="lupa-gris">(${esc(m.tipo || '')})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
     });
-    if(!(c.mods[id] || []).length) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
+    h += familia;
+    if(!(c.mods[id] || []).length && !familia) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
     const activos = (S.efectos || []).filter(e => e.activo !== false);
     const mitad = [];
     if(['pdg', 'pdgmg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
@@ -133,7 +160,7 @@ const FichaLupa = (() => {
     const ref = resto.join(':');
     const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
     if(tipo === 'stat'){
-      return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(S, ref, c) + sinCosto};
+      return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(S, ref, c) + (ref === 'parry' ? lupaParryPorArma(S, c) : '') + sinCosto};
     }
     if(tipo === 'defensa'){
       return {titulo: STAT_FULL[ref] || ref, html: lupaStat(S, ref, c, {sinTirada: true}) + lupaNota('Valor fijo: no se tira.')};
@@ -141,7 +168,7 @@ const FichaLupa = (() => {
     if(tipo === 'atacar'){
       const arma = S.inventario.find(i => i.id === ref) || null;
       const pdg = FichaCombate.pdgParaArma(S, arma, c);
-      return {titulo: `Atacar${arma ? ` con ${arma.nombre}` : ' sin arma'}`, html: lupaStat(S, 'pdg', c, pdg) + lupaCostoAtaque(S, arma)};
+      return {titulo: `Atacar${arma ? ` con ${arma.nombre}` : ' sin arma'}`, html: lupaStat(S, 'pdg', c, {...pdg, familia: familiaPdg(S, arma, c)}) + lupaCostoAtaque(S, arma)};
     }
     if(tipo === 'danio'){
       const arma = S.inventario.find(i => i.id === ref);

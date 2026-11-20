@@ -1597,3 +1597,9 @@ objeto inerte (tótem, estandarte: `esInerte`, js/73) no camina, así que ya no 
 **pegado** a alguien, ¿cuenta como «está enfrentando a un rival» (`vueltaFlanco`)? Hoy sí: con un tótem pegado de frente, si otro rival se le acerca por
 atrás no se le ofrece darse vuelta (sale «Flanqueado»). Propuesta de Claude: que no cuente (un objeto no lo tiene ocupado); sin tocar hasta que decida el dueño.
 
+
+### P248 — 🔨 Maestría en armas pesadas: ¿las maestrías de las otras familias? (2026-11-20, Claude)
+La pasiva nueva (dueño: «da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas», `comun/pasivas.js`) quedó con **jobCosto 1**
+(confirmado por el dueño el mismo día). Para el Parry se sumó el stat `parryt10` («Parry con contundentes»): se suma solo al parar con un arma de Tipo 10,
+nunca con un escudo ni con otra arma, y el asistente de ítems lo ofrece como bono. La cuenta (`Combatiente.parryExtraArma`) ya sirve para `parryt4/6/8`,
+pero no se registraron (dueño: solo lo de Tipo 10 por ahora). **Para el dueño:** ¿querés las maestrías de las otras familias (Tipo 4, 6 y 8)?

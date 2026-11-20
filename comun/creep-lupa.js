@@ -16,17 +16,33 @@ const CreepLupa = (() => {
   const K = CreepCalculo;
   const PARA_TXT = {creep: '🐾 Creep · cooldown', jugador: '🧙 Jugador · SP'};
 
-  function stat(sc, statId, {sinTirada = false} = {}){
+  /* 🔨 Lo que suma la familia del arma (2026-11-20, Maestría en armas pesadas y los guantes): al atacar, el PdG con el Tipo de su arma (pdgt4/6/8/10) o a
+     distancia (pdgdist); al parar, el Parry con el Tipo del arma con que para (parryt…, nunca con un escudo). → {filas, extra, pieza}. */
+  function familia(sc, statId, ataque){
+    const fila = (st, cuando) => K.aportesMod(sc, st).map(a => lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(K.STAT_LABEL[st] || st)}: ${cuando})</span>`, lupaSigno(a.val))).join('');
+    if(statId === 'pdg' && ataque){
+      const a = Combatiente.armaEnMano(sc), t = num(a.tipoDado);
+      return {filas: ([4, 6, 8, 10].includes(t) ? fila('pdgt' + t, 'con esta arma') : '') + (a.armaDeRango ? fila('pdgdist', 'a distancia') : ''), extra: K.pdgExtra(sc)};
+    }
+    if(statId === 'parry'){
+      const d = K.defensa(sc), st = Combatiente.parryStatDe(Combatiente.piezaDeDefensa(sc, d));
+      return {filas: st ? fila(st, `solo al parar con ${d.nombre}`) : '', extra: K.parryExtra(sc), pieza: d ? (d.id || d.nombre) : undefined};
+    }
+    return {filas: '', extra: 0};
+  }
+  function stat(sc, statId, {sinTirada = false, ataque = false} = {}){
     const d = K.STAT_LOOKUP[statId];
     const attr = d.attr;
+    const fam = familia(sc, statId, ataque);
     let h = lupaFila(`${K.ATTR_NOMBRE[attr]} base`, fmt(num(sc[attr])));
     K.aportesMod(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${K.ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
-    if(statId !== attr) K.aportesMod(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
-    if(!K.aportesMod(sc, attr).length && (statId === attr || !K.aportesMod(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
+    if(statId !== attr) K.aportesMod(sc, statId, fam.pieza).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
+    h += fam.filas;
+    if(!fam.filas && !K.aportesMod(sc, attr).length && (statId === attr || !K.aportesMod(sc, statId, fam.pieza).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
     if(['pdg', 'pdgmg', 'eva'].includes(statId) && K.estadoActivo(sc, 'mitadPdgEva')) h += lupaFila('Pajaritos <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
     if((statId === 'pdg' || statId === 'parry') && K.estadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
     if(statId === 'resmg' && sc.jefe) h += lupaFila('Protección de jefe', '+1');
-    const valor = K.statValor(sc, statId);
+    const valor = K.statValor(sc, statId, fam.pieza) + fam.extra;
     h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
     let out = lupaSeccion('De dónde sale', h);
     if(sinTirada) return out;
@@ -62,7 +78,7 @@ const CreepLupa = (() => {
         : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
       h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), costo > num(sc.nitros) ? 'lupa-falta' : '');
       h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
-      return {titulo: `${sc.nombre} · Atacar`, html: stat(sc, 'pdg') + lupaSeccion('Costo', h)};
+      return {titulo: `${sc.nombre} · Atacar`, html: stat(sc, 'pdg', {ataque: true}) + lupaSeccion('Costo', h)};
     }
     if(tipo === 'danio'){
       const dmg = K.statValor(sc, 'dmg');

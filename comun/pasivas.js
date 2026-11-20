@@ -116,6 +116,11 @@ const PASIVAS_BASE = [
    detalle: 'Con la vida en menos de un cuarto: +2 Res. crítico contra todos los Tipos (se suma a Mañas de sobreviviente). ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritcuarto', val: 2}]},
   {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
+  // 🔨 Maestría en armas pesadas (dueño, 2026-11-20: «da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas», para jugadores y
+  // creeps). jobCosto 1: propuesto, a confirmar con el dueño (P248 en docs/preguntas-abiertas.md).
+  {poolId: 'maestria-armas-pesadas', nombre: 'Maestría en armas pesadas', jobCosto: 1, etiquetas: ['ofensiva', 'defensiva'],
+   detalle: '+2 a la Probabilidad de Golpe con armas de Tipo 10 (contundentes) y +1 al Parry cuando parás con un arma de Tipo 10. ⚙ Automatizado: el PdG de más se suma solo al atacar con un arma de Tipo 10, y el Parry de más solo al parar con ella (no con un escudo ni con un arma de otro Tipo); se ve en la 🔍 de Atacar y de Parry.',
+   mods: [{stat: 'pdgt10', val: 2}, {stat: 'parryt10', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 PdG.Esp (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
   {poolId: 'potencia-especial', nombre: 'Potencia especial', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

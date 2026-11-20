@@ -48,13 +48,13 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261119quita"></script>
-<script src="creep-calculo.js?v=20261118pas"></script>
-<script src="creep-botonera.js"></script>
+<script src="combatiente.js?v=20261120maestria"></script>
+<script src="creep-calculo.js?v=20261120maestria"></script>
+<script src="creep-botonera.js?v=20261120maestria"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js"></script>
-<script src="ficha-combate.js"></script>
+<script src="ficha-calculo.js?v=20261120maestria"></script>
+<script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261114sang"></script>
 <script src="estados-aplicar.js?v=20261114av"></script>
 <script src="recibidos.js?v=20261110vaq"></script>
@@ -66,19 +66,19 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
-<script src="generador-tiendas.js"></script>
+<script src="generador-tiendas.js?v=20261120maestria"></script>
 <script src="items-subidos.js"></script>
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js?v=20261114cha"></script>
 <script src="ficha-sesion.js"></script>
-<script src="inv-calculo.js"></script>
-<script src="inv-botonera.js"></script>
+<script src="inv-calculo.js?v=20261120maestria"></script>
+<script src="inv-botonera.js?v=20261120maestria"></script>
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
-<script src="inv-lupa.js"></script>
+<script src="inv-lupa.js?v=20261120maestria"></script>
 <script src="ficha-acciones.js?v=20261118ae"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
@@ -111,15 +111,15 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261119orb"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js"></script>
+<script src="ficha-lupa.js?v=20261120maestria"></script>
 <script src="ficha-editor.js"></script>
-<script src="creep-lupa.js"></script>
+<script src="creep-lupa.js?v=20261120maestria"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js"></script>
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
-<script src="ficha-lite.js"></script>
-<script src="pasivas.js"></script>
+<script src="ficha-lite.js?v=20261120maestria"></script>
+<script src="pasivas.js?v=20261120maestria"></script>
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
@@ -7694,6 +7694,37 @@ prueba('⚔⚔ Invocación con dos armas (dueño, 2026-11-07, como los creeps): 
   const parry = InvCalculo.parryValor(inv, 'Sable de caballería') - InvCalculo.parryValor(inv, 'hoz');
   igual([antes, difPdg, tras, ataque.armaCreepId, dev > 0, inv.armaActiva, (html.match(/Atacar con /g) || []).length, parry],
     [[3, 3], 1, ['sable', 6, 3], 'hoz', true, 'sable', 2, 1]);
+});
+prueba('🔨 Maestría en armas pesadas (dueño, 2026-11-20): +2 PdG y +1 Parry solo con un arma de Tipo 10 — personaje, creep e invocación; con otra arma o un escudo no suma; se ve en la 🔍 y en la ficha lite', () => {
+  const pas = PASIVAS_BASE.find(p => p.poolId === 'maestria-armas-pesadas');
+  const maza = {id: 'maza', nombre: 'Maza de prueba', tipoItem: 'arma_1m', tipoDado: 10, peso: 2, equipado: true, mods: []};
+  const espada = {id: 'esp', nombre: 'Espada de prueba', tipoItem: 'arma_1m', tipoDado: 6, peso: 1, equipado: true, mods: []};
+  const escudo = {id: 'esc', nombre: 'Escudo de prueba', tipoItem: 'escudo_1m', peso: 1, equipado: true, mods: [{stat: 'def', val: 1}]};
+  const pj = (inv, conPas) => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.inventario = structuredClone(inv);
+    S.pasivas = conPas ? [{...structuredClone(pas), id: 'p1', compras: 1}] : []; return S; };
+  const dif = (inv, f) => f(pj(inv, true)) - f(pj(inv, false));
+  const pdgCon = it => S => FichaCombate.pdgParaArma(S, S.inventario.find(x => x.id === it.id)).valor;
+  const parryCon = it => S => FichaCombate.statParaArma(S, 'parry', S.inventario.find(x => x.id === it.id));
+  const personaje = [dif([maza, escudo], pdgCon(maza)), dif([maza, escudo], parryCon(maza)), dif([maza, escudo], parryCon(escudo)),
+    dif([espada], pdgCon(espada)), dif([espada], parryCon(espada))];
+  const S = pj([maza, escudo], true);
+  const lupaParry = FichaLupa.contenido(S, 'stat:parry').html, lupaAtacar = FichaLupa.contenido(S, 'atacar:maza').html;
+  const lite = FichaLite.personaje(S).manos.flatMap(m => m.lineas.map(l => l.txt)).join(' | ');
+  const pasC = pasivaParaCombatiente(pas, 'p1');
+  const sc = creepPrueba({armaNombre: 'Mazo', armaTipo: 10, armaPeso: 2, pasivas: [pasC], equipo: [{id: 'e1', nombre: 'Escudo chico', tipoItem: 'escudo_1m', def: 1, peso: 1, mods: []}]});
+  const scSin = creepPrueba({armaNombre: 'Mazo', armaTipo: 10, armaPeso: 2, equipo: [{id: 'e1', nombre: 'Escudo chico', tipoItem: 'escudo_1m', def: 1, peso: 1, mods: []}]});
+  const scHacha = creepPrueba({pasivas: [pasC]}), scHachaSin = creepPrueba();
+  const creep = [CreepCalculo.pdgExtra(sc), CreepCalculo.parryValor(sc, 'Mazo') - CreepCalculo.parryValor(scSin, 'Mazo'), CreepCalculo.parryValor(sc, 'Escudo chico') - CreepCalculo.parryValor(scSin, 'Escudo chico'),
+    CreepCalculo.pdgExtra(scHacha), CreepCalculo.parryValor(scHacha) - CreepCalculo.parryValor(scHachaSin)];
+  const fCreep = [CreepBotonera.formulasCombate(sc).pdg === formulaParaValor(CreepCalculo.statValor(sc, 'pdg') + 2).formula,
+    /Maestría en armas pesadas/.test(CreepLupa.contenido(sc, 'x|stat|parry').html), /Maestría en armas pesadas/.test(CreepLupa.contenido(sc, 'x|atacar|').html),
+    /Parry \+1/.test(FichaLite.creep(sc).manos[0].lineas.map(l => l.txt).join(' '))];
+  const inv = InvCalculo.migrar({id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [pasC], equipo: [{...structuredClone(maza), id: 'mz'}]});
+  const invSin = InvCalculo.migrar({id: 'i2', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, equipo: [{...structuredClone(maza), id: 'mz'}]});
+  const invocacion = [InvCalculo.pdgExtra(inv), InvCalculo.parryValor(inv) - InvCalculo.parryValor(invSin), /Maestría en armas pesadas/.test(InvLupa.contenido(inv, 'inv:i1:stat:parry').html)];
+  igual([personaje, /Maestría en armas pesadas/.test(lupaParry), /Escudo de prueba.*no suma/.test(lupaParry), /Maestría en armas pesadas/.test(lupaAtacar), /PdG \+2 · Parry \+1/.test(lite),
+    creep, fCreep, invocacion, FichaCalculo.MOD_TARGETS.some(x => x.id === 'parryt10'), CreepCalculo.STAT_LABEL.parryt10],
+    [[2, 1, 0, 0, 0], true, true, true, true, [2, 1, 0, 0, 0], [true, true, true, true], [2, 1, true], true, 'Parry con contundentes']);
 });
 prueba('⚔⚔ Personaje: el Daño con un arma no suma el bono de daño de la otra (dueño, 2026-11-07); la Iniciativa de un arma cuenta siempre', () => {
   const S = fichaDePrueba({inventario: [

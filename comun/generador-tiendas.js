@@ -152,7 +152,7 @@ const GeneradorTiendas = (() => {
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
   const DE_DESTREZA = ['eva', 'sigilo', 'percepcion', 'veoculto', 'ini', 'des', 'agl', 'pasosgratis', 'rng', 'pdgdist', 'pdgt4', 'pdgt6', 'retirada', 'reflejos',
     'levitar', 'pasodoble', 'trampaoculta', 'soltarse', 'crit', 'oporahorro', 'saquerapido'];
-  const DE_FUERZA = ['def', 'fue', 'con', 'bloqueo', 'parry', 'hp', 'hpmax', 'pdgt8', 'pdgt10', 'inamovible', 'guardian', 'dmg', 'tipo1', 'tipo2', 'tipo3', 'tipo4',
+  const DE_FUERZA = ['def', 'fue', 'con', 'bloqueo', 'parry', 'hp', 'hpmax', 'pdgt8', 'pdgt10', 'parryt10', 'inamovible', 'guardian', 'dmg', 'tipo1', 'tipo2', 'tipo3', 'tipo4',
     'tipo5', 'paradafacil', 'escolta', 'embestida', 'critpot', 'contraahorro'];
   const suma = (it, lista) => lista.reduce((a, st) => a + Math.max(0, mod(it, st)), 0);
   /* A qué sección va un ítem (siempre la misma: así la tienda publicada no guarda nada nuevo y lo que se repone cae en la misma pestaña).

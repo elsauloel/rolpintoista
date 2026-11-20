@@ -43,6 +43,18 @@ const FichaLite = (() => {
   const ELEM = {resfuego: 'fuego', reshielo: 'hielo', resrayo: 'rayo', restoxico: 'toxico', resacido: 'acido', resluz: 'luz', ressiniestro: 'siniestro'};
   const ETQ_EXTRA = {sigilo: '🕶 Sigilo', armadmg: '✨ Defensa especial', resfuego: '🔥 Res. fuego', reshielo: '❄ Res. hielo', resrayo: '⚡ Res. eléctrica', restoxico: '☠ Res. tóxico', resacido: '🧪 Res. ácido', resluz: '☀ Res. luz', ressiniestro: '🌑 Res. siniestro'};
 
+  /* 🔨 Lo que suma la familia del arma con ESA arma (2026-11-20, Maestría en armas pesadas y los guantes): el PdG al atacar (pdgt4/6/8/10, pdgdist) y el
+     Parry al parar (parryt…, solo con un arma de ese Tipo). `valorDe(stat)` = lo que suma ese stat; `fuentes(stat)` = de dónde sale (nombres). */
+  function familiaLinea(arma, valorDe, fuentes){
+    if(!arma || typeof Combatiente === 'undefined' || !Combatiente.parryExtraArma) return null;
+    const pdg = Combatiente.pdgExtraArma(valorDe, arma), parry = arma.armaDeRango ? 0 : Combatiente.parryExtraArma(valorDe, arma);
+    if(!pdg && !parry) return null;
+    const t = num(arma.tipoDado), sts = [[4, 6, 8, 10].includes(t) ? 'pdgt' + t : '', arma.armaDeRango ? 'pdgdist' : '', parry ? 'parryt' + t : ''].filter(Boolean);
+    const de = [...new Set(sts.flatMap(st => (fuentes && fuentes(st)) || []))].filter(Boolean);
+    const partes = [pdg ? `PdG ${signo(pdg)}` : '', parry ? `Parry ${signo(parry)}` : ''].filter(Boolean).join(' · ');
+    return {txt: `Con esta arma: ${partes}${de.length ? ` (${de.join(', ')})` : ''}`, val: undefined};
+  }
+
   /* ---------- Personaje ---------- */
   function lineasFicha(S, c, stat){
     const L = [];
@@ -73,6 +85,8 @@ const FichaLite = (() => {
     const mt = modsTxt(i.mods);
     if(mt) lineas.push({txt: mt});
     (i.efectosGolpe || []).forEach(e => lineas.push({txt: efectoTxt(e)}));
+    if(esArma && !roto){ const c = FichaCalculo.calcular(S);
+      const fl = familiaLinea(i, st => c.final[st], st => (c.mods[st] || []).filter(m => num(m.val)).map(m => m.origen)); if(fl) lineas.push({txt: fl.txt}); }
     if(roto) lineas.push({txt: '⚠ Rota: no da ningún efecto hasta repararla'});
     return {nombre: i.nombre || '(sin nombre)', detalle: (roto ? '⚠ rota · ' : '') + partes.join(' · '), lineas, roto};
   }
@@ -151,7 +165,7 @@ const FichaLite = (() => {
     if(e.armaduraRota) return -st;
     return (e.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val) * st, 0);
   };
-  function manoGuardada(o, danoTxt, slotDe){
+  function manoGuardada(o, danoTxt, slotDe, calc){
     const a = Combatiente.armaEnMano(o);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
     if(a.sinArma){
       // ✨ Sin arma física pero con un arma especial en la mano (una varita): esa es su arma (2026-11-04, dueño, con Basilio: «sigue teniendo problemas
@@ -170,6 +184,7 @@ const FichaLite = (() => {
     if(mt) lineas.push({txt: mt});
     if(a.natural) lineas.push({txt: 'Arma natural (no sirve para Parry ni Bloqueo)'});
     a.efectosGolpe.forEach(e => lineas.push({txt: efectoTxt(e)}));
+    if(calc && !a.natural){ const fl = familiaLinea(a, st => calc.modTotal(o, st), st => calc.aportesMod(o, st).map(x => x.nombre)); if(fl) lineas.push({txt: fl.txt}); }
     return {nombre: a.nombre, detalle: `${danoTxt} · Tipo ${fmt(a.tipoDado)}`, lineas};
   }
   // La otra mano de un creep o una invocación (2026-10-17, dueño: varitas, báculos, orbes y escudos son armas, no equipo): el primer escudo, o
@@ -179,11 +194,11 @@ const FichaLite = (() => {
   const espEnMano = (o, slotDe) => Combatiente.armaEnMano(o).sinArma
     ? Combatiente.puestoSinArma(o).find(it => it && it.especial && /^arma_/.test(String(it.tipoItem || '')) && it !== otraManoDe(o, slotDe)) || null : null;
   const otraManoDe = (o, slotDe) => Combatiente.puestoSinArma(o).find(it => slotDe(it.tipoItem) === 'escudo') || Combatiente.puestoSinArma(o).find(it => enMano(it, slotDe)) || null;
-  function segundaMano(o, slotDe, danoDe){
+  function segundaMano(o, slotDe, danoDe, calc){
     const esc2 = otraManoDe(o, slotDe);
     if(!esc2) return {nombre: '', detalle: 'vacía', lineas: []};
     // ⚔⚔ Una segunda arma (dos armas, 2026-11-03): con su daño, como la de la mano.
-    if(danoDe && Combatiente.esArmaDeMano(esc2) && esc2.id){ const o2 = {...o, armaActiva: esc2.id}; return manoGuardada(o2, danoDe(o2)); }
+    if(danoDe && Combatiente.esArmaDeMano(esc2) && esc2.id){ const o2 = {...o, armaActiva: esc2.id}; return manoGuardada(o2, danoDe(o2), undefined, calc); }
     if(slotDe(esc2.tipoItem) !== 'escudo'){
       const d = String(esc2.detalle || '').split('⚙')[0].trim();
       return {nombre: esc2.nombre || 'Arma', detalle: d.slice(0, 60) || 'en la mano', lineas: d ? [{txt: d}] : []};
@@ -208,7 +223,7 @@ const FichaLite = (() => {
     return {
       titulo: sc.nombre || 'Creep',
       subtitulo: [`Nivel ${fmt(num(sc.nivel) || 1)}`, sc.jefe ? 'jefe' : '', sc.raza].filter(Boolean).join(' · '),
-      manos: [manoGuardada(sc, C.danoTxt(sc, dmg), C.slotDe), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')))],
+      manos: [manoGuardada(sc, C.danoTxt(sc, dmg), C.slotDe, C), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')), C)],
       defensa: lineasGuardadas(sc, C.defensaEfectiva(sc), sc.defensa, defItem, defEstado),
       crit: [0, 1, 2, 3].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(sc, C.slotDe),
@@ -225,7 +240,7 @@ const FichaLite = (() => {
     return {
       titulo: inv.nombre || 'Invocación',
       subtitulo: ['Invocación', duenoNombre ? `de ${duenoNombre}` : '', inv.activa === false ? 'dormida' : ''].filter(Boolean).join(' · '),
-      manos: [manoGuardada(inv, I.danoTxt(inv, dmg), slotDe), segundaMano(inv, slotDe)],
+      manos: [manoGuardada(inv, I.danoTxt(inv, dmg), slotDe, I), segundaMano(inv, slotDe, undefined, I)],
       // Armadura rota de una invocación cuenta por acumulación (como en InvCalculo.defensaEfectiva).
       defensa: lineasGuardadas(inv, I.defensaEfectiva(inv), inv.defensa, defItem, defEstado),
       crit: [0, 1, 2, 3].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),

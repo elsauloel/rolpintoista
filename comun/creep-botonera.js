@@ -20,7 +20,7 @@ const CreepBotonera = (() => {
   function formulasCombate(sc){
     const f = (v, id) => { const x = formulaParaValor(v); return x ? x.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(sc.estados, id)) : ''; };
     return {
-      pdg: f(C().statValor(sc, 'pdg'), 'pdg'),
+      pdg: f(C().statValor(sc, 'pdg') + C().pdgExtra(sc), 'pdg'),   // + la familia del arma (guantes, Maestría en armas pesadas: 2026-11-20)
       eva: f(C().statValor(sc, 'eva'), 'eva'),
       parry: f(C().parryValor(sc), 'parry'),   // con la pieza de siempre (sus bonos de Parry, solo los de esa: 2026-11-07)
       bloqueo: f(C().bloqueoValor(sc)),

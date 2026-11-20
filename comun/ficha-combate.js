@@ -78,11 +78,15 @@ const FichaCombate = (() => {
   const STATS_DEFENSA_POR_ITEM = ['parry', 'bloqueo'];
   function statParaArma(S, statId, arma, c){
     c = calc(S, c);
+    // 🔨 Parry con esa familia de armas (Maestría en armas pesadas, 2026-11-20): solo al parar con un arma de ese Tipo, nunca con un escudo.
+    const fam = statId === 'parry' ? parryExtra(S, arma, c) : 0;
     const deOtro = STATS_DEFENSA_POR_ITEM.includes(statId) ? id => esEnMano(S, id) : id => esArmaEnMano(S, id);
     const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && deOtro(m.itemId));
-    if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
-    return c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
+    if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId] + fam;
+    return c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0) + fam;
   }
+  // El Parry de más con ESA arma por su familia (parryt10): 0 con un escudo, sin arma o con otro Tipo.
+  const parryExtra = (S, arma, c) => Combatiente.parryExtraArma(st => calc(S, c).final[st], arma);
   // ⚔⚔ El Dmg al pegar con ESA arma (dueño, 2026-11-07: los bonos de ataque de un arma, solo con esa): sin los bonos de daño de la otra arma.
   const dmgParaArma = (S, arma, c) => { const v = statParaArma(S, 'dmg', arma, c); return Number.isNaN(v) ? 0 : v; };
   // El Bloqueo: tu Bloqueo (de Fuerza, con su equipo) MÁS el peso del arma o escudo; esa suma es el dado.
@@ -134,6 +138,6 @@ const FichaCombate = (() => {
   }
 
   return {desregistrarAtaque, TIPO_SIN_ARMA, danoSinArmaTxt, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
-    esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, dmgParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
+    esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, parryExtra, dmgParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
     claveAtaque, tipoAtaque, ataquesConArma, costoAtaque, costoAtaqueEspecial, registrarAtaque};
 })();

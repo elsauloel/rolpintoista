@@ -338,6 +338,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     return {...calcular(sc), simulado: true, sim: sc};
   }
   const res = await modificarCreep(t.fichaId, calcular);
+  if(golpe > 0 && typeof inmuneCartelDano === 'function') inmuneCartelDano(t, res.r);   // 🛡 «INVULNERABLE» flotando sobre el token (js/121, 2026-11-20)
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.fenix){
@@ -542,6 +543,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, elige, hpFenix: datos.hp, desperto};
   });
   if(res && res.simulado) return res;
+  if(golpe > 0 && typeof inmuneCartelDano === 'function') inmuneCartelDano(t, res.r);   // 🛡 «INVULNERABLE» flotando sobre el token (js/121, 2026-11-20)
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.aliento){
     const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
@@ -620,6 +622,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     return {r, previo, nuevo: inv.hp, desperto};
   });
   if(res && res.simulado) return res;
+  if(golpe > 0 && typeof inmuneCartelDano === 'function') inmuneCartelDano(t, res.r);   // 🛡 «INVULNERABLE» flotando sobre el token (js/121, 2026-11-20)
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(guarda && golpe > 0) guardianAviso(t, guarda);
@@ -804,6 +807,7 @@ async function rayoCadenaAplicar(cadena, o){
       const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
       if(puede){
         const res = (await resistenciasDe(s.t, 'rayo')).res;
+        if(typeof inmuneCartelElemento === 'function') inmuneCartelElemento(s.t, 'rayo', res, null);   // 🛡 «INMUNE A LO ELÉCTRICO» (js/121)
         const vxAntes = rayoVidaExtraDe(s.t);
         if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
         const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
@@ -1681,8 +1685,8 @@ async function abrirEstadoNuevo(t){
     }
     const lista = inv ? (inv.estados = inv.estados || []) : (S.efectos = S.efectos || []);
     const nuevo = inv ? SelectorEstados.estadoInvocacion(preset, idEstadoNuevo()) : SelectorEstados.estadoPersonaje(preset, idEstadoNuevo());
-    const r = Combatiente.agregarEstado(lista, nuevo);
     const quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || '');
+    const r = Combatiente.agregarEstado(lista, nuevo, {nombre: quien, ref: invId ? fichaId + SEP_INVOCACION + invId : fichaId});   // (`ref`: para el cartel flotante de lo que frena una inmunidad, js/121)
     if(!r.ok){ toast(`🛡 ${quien}: inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return guardar; }
     if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
     if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);

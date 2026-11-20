@@ -2115,6 +2115,7 @@ async function dueloAplicarDano(d, o){
   const resElem = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0, resEl = resElem + suelaD;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resElem ? [Combatiente.resElementalTxt(elDano, resElem)] : []), ...(suelaD ? [`Suela gruesa ${suelaD}`] : [])].join(' − ');
   if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
+  if(!simular && elDano && !trueDmg && num(dn.crudo) > 0 && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elDano, resElem, idHab);   // 🛡 «INMUNE AL FUEGO…» flotando sobre el token (js/121, 2026-11-20)
   if(!simular && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resElem || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resElem, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
@@ -2227,6 +2228,7 @@ async function dueloAplicarDano(d, o){
       // 🌑 El Arma siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
       const idMag = idMag0 && idMag0.estado && num(dn.magico.identidadTurnos) > 0 ? {...idMag0, estado: {...idMag0.estado, turnos: num(dn.magico.identidadTurnos)}} : idMag0;
       if(elMag && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resMag || (idMag && idMag.mult === 0))) debilRevelar(t, elMag, {res: resMag, mult: idMag ? idMag.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
+      if(elMag && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elMag, resMag, idMag);   // 🛡 (js/121)
       const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
       const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)

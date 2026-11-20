@@ -1224,7 +1224,9 @@ const FichaAcciones = (() => {
       // 🛡 Invulnerable (2026-11-10, bug de la tanda 3): la rotura va a las piezas, no a un estado, así que la inmunidad se mira acá
       // (en invocaciones y creeps ya la frena Combatiente.agregarEstado). Ni el escudo ni la armadura pierden durabilidad.
       const inmune = Combatiente.inmunidad(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'});
-      if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); avisarNoEntro(S, 'Armadura rota', inmune, origen, ui); return; }
+      if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); avisarNoEntro(S, 'Armadura rota', inmune, origen, ui);
+        if(Combatiente.avisoInmune) Combatiente.avisoInmune({motivo: inmune, estado: 'Armadura rota', quien: (S.meta && S.meta.nombre) || '', id: '', ref: String((o && o.ref) || '')});   // 🛡 el cartel flotante (2026-11-20)
+        return; }
       // 🐞 La Vaquita de San Antonio la espanta antes de que toque las piezas.
       if(!(o && o.propio) && Combatiente.vaquitaEspanta(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'}, {nombre: (S.meta && S.meta.nombre) || ''})){
         ui.toast('🐞 La vaquita de San Antonio espantó la Armadura rota'); ui.cambio(['efectos', 'refresh']); return;
@@ -1379,7 +1381,7 @@ const FichaAcciones = (() => {
     // 🔮 La Piedra bezoar: el Veneno entra con 1 stack menos (si no queda nada, no entra).
     if(!Combatiente.bezoar(draft, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)))){ ui.toast(`🔮 ${quien}la Piedra bezoar se tragó el Veneno`); return; }
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
-    const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? undefined : {vaquita: true, nombre: (S.meta && S.meta.nombre) || ''});
+    const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? undefined : {vaquita: true, nombre: (S.meta && S.meta.nombre) || '', ref: String((o && o.ref) || '')});   // (`o.ref`: de qué ficha es, para el cartel flotante «INVULNERABLE» / «INMUNE A …» del mapa)
     if(!r.ok && r.vaquita){ ui.toast(`🐞 ${quien}la vaquita de San Antonio espantó ${draft.nombre}`); ui.cambio(['efectos', 'refresh']); return; }
     if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); avisarNoEntro(S, draft.nombre, r.motivo, origen, ui); return; }
     if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }

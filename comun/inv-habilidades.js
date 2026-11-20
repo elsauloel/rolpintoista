@@ -77,7 +77,7 @@ const InvHabilidades = (() => {
   // `o.deAfuera` (2026-11-10): un estado que le pone otro (lo recibido) puede gastar la 🐞 Vaquita de San Antonio.
   function ponerEstado(inv, d, o){
     inv.estados = inv.estados || [];
-    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural, nombre: inv.nombre, ...(o && o.deAfuera ? {vaquita: true} : {})});
+    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural, nombre: inv.nombre, ...(o && o.deAfuera ? {vaquita: true} : {}), ...(o && o.ref ? {ref: o.ref} : {})});
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;

@@ -560,6 +560,7 @@ async function escudoQuemarYa(pid, vid, motivo, respaldo){
     partes.push(aMano ? `✋ a mano: ${dado}` : `${dadoF}: ${dado}${mult !== 1 ? ` × ${String(mult).replace('.', ',')} = ${monto}` : ''}`);
     if(aMano) notasV.push(`Resuelto a mano: la mesa decidió ${dado}.`);
     let recibido = 0, perdio = 0;
+    if(!aMano && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(v, el, resEl, idE);   // 🛡 «INMUNE AL FUEGO…» flotando sobre el token (js/121, 2026-11-20)
     if(monto > 0){
       const o = {magico: true};
       const rm = v.tipo === 'creep' ? await danioCreep(v, String(monto), true, 0, resEl, o) : await (esInv ? danioInv : danioPj)(v, String(monto), true, 0, resEl, o);

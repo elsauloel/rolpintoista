@@ -168,7 +168,7 @@ async function zonaExtraAplicar(id, d, porGM){
           const nombre = ((S.meta && S.meta.nombre) || '').trim();
           const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: m => toast(m),
             recordatorios: lista => (lista || []).forEach(x => x && x.nombre && mesaLinea(`${x.nombre}${x.detalle ? ' — ' + x.detalle : ''}`, 'recordatorio', nombre))};
-          FichaAcciones.aplicarEstadoRecibido(S, {...fila.estado}, origen, ui);
+          FichaAcciones.aplicarEstadoRecibido(S, {...fila.estado}, origen, ui, {ref: fichaId});
           return true;
         });
         if(ok === null) throw new Error('no pude abrir su ficha');

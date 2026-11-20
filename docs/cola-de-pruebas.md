@@ -12,24 +12,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
-  el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»). Además de la línea
-  «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel flotante azul-plateado: «INVULNERABLE» si el motivo es la invulnerabilidad,
-  «INMUNE A <lo que sea>» si es otra inmunidad. Que lo vean todas las pantallas (GM y jugadores). Vale para estados y para daño frenado.
-- **⬜ en cola — 🏹 El carcaj se ve dos veces en el Equipo, y los botones no dicen cuántos No2 cuestan** (dueño, 2026-11-20, con captura: «en este menú
-  del equipo se ve duplicado el carcaj. También me gustaría que los botones de cargar o descargar te digan cuántos No2 va a costar la acción»). Hoy,
-  con un arco o ballesta y sin Carcaj de cuero, salen dos recuadros: «CARCAJ 0 / 1 · Vacío» (el lugar para equipar un carcaj) y «🏹 CARCAJ INCLUIDO
-  0 / 5». Que quede UN solo recuadro de carcaj: el incluido (5) si no hay uno equipado, o el equipado (con su capacidad) si lo hay; sin perder la
-  forma de equipar/sacar un Carcaj de cuero. Y cada botón («→ Carcaj (N)», «→ Mochila (N)», «Cargar todo lo que entre», «Vaciar a la mochila») dice
-  cuántos No2 cuesta en ese momento (en combate; fuera de combate, que diga que no cuesta), con el costo real que ya cobra el código: no inventar uno.
-- **⬜ en cola — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
-  botón para poder pasarle a un aliado»). En la ventanita «DDE y despojos» de la ficha, un botón 🤝 «Pasar a un aliado» que deja elegir a quién, qué
-  (DDE, despojos normales, mágicos o especiales) y cuánto, usando el mismo mecanismo de intercambio que ya pasa ítems (`comun/intercambio.js`); que el
-  que recibe se entere (aviso / línea en la Mesa). Si en combate pasar un ítem cuesta No2, usar el mismo criterio que ya existe; no inventar otro.
-- **⬜ en cola — 🏁 Al terminar «Finalizar combate», el mapa vuelve solo a modo narrativo** (dueño, 2026-11-20: «al poner finalizar combate y terminar
-  con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»). Cuando el proceso termina de verdad (se cierra el botín y se
-  reparten XP y oro; o al publicar si no hay ítems), el mapa publicado pasa de Combate a Narrativo, con lo mismo que hace el interruptor a mano.
-  En «Simular» no cambia nada. Vale desde el mapa y desde GM Tools.
+- **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
+  el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
+  *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las
+  pantallas (es el mismo texto flotante del «−2 EVA», con otro color). Dice **«INVULNERABLE»** si lo frena la invulnerabilidad (Invulnerable / Titilando),
+  sea un estado o un golpe; **«INMUNE A <ESTADO>»** con cualquier otra inmunidad a un estado («INMUNE A MIEDO», «INMUNE A CEGUERA», «INMUNE A VENENO»,
+  «INMUNE A STUN»…); e **«INMUNE A LO TÓXICO / AL FUEGO / A LO ELÉCTRICO…»** cuando un daño de ese elemento no le hace nada (las mismas palabras de la
+  etiqueta que ya sale al apuntar). Vale para personajes, creeps e invocaciones. Si la pantalla tiene el cuadro del duelo o un aviso tapando el mapa, el
+  cartel espera a que se cierre (como la Transfusión; como mucho 25 s). Si el jugador tiene solo la ficha abierta (sin el mapa), el cartel sale igual en
+  los mapas de los demás. **Probado con clics en «Claude · pruebas 2» / «Prueba · R4 M4», GM y Jugador 1** (capturas de las dos pantallas): golpe de
+  Blanco creep a Blanco J1 Titilando → «INVULNERABLE»; Cegar de Control mental 2 a Blanco J1 con Inmunidad a CC → «INMUNE A CEGUERA»; Punzada mental
+  (puesta como daño tóxico para la prueba) a Blanco J1 inmune a lo tóxico → «INMUNE A LO TÓXICO»; Veneno y Miedo que le llegan con Sangre pura e
+  Inmunidad mental → «INMUNE A VENENO» e «INMUNE A MIEDO»; Miedo a la Abeja de prueba (invocación) Titilando y «Recibe daño» a mano sobre ella →
+  «INVULNERABLE»; «+ Estado» a mano del GM (Stun) sobre Blanco creep con Inmunidad a CC → «INMUNE A STUN»; y con el jugador solo en la ficha, el cartel
+  en el mapa del GM. 892 pruebas automáticas en verde. **No lo cubre:** el Veneno o el Sangrado que ya tenía puesto y no le hace daño en el Mantenimiento
+  (hoy solo lo dice el texto del Mantenimiento) y la Maldición tormentosa sobre un invulnerable. Lo que no se vio en el mapa (la Protección de jefe, las
+  zonas, trampas, el Escudo elemental y el rayo en cadena con un inmune al elemento, un golpe a un creep invulnerable) quedó anotado en
+  `pruebas-en-el-mapa.md`. La partida quedó como estaba (comparada contra una foto de antes).
 
 - **✅ hecho (2026-11-20; el caso exacto de la partida no se pudo reproducir: ver el resultado) — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
   «no funcionaba el aplicarle debuffs automatizados a Bizzante… murió y quedó invulnerable por el pacto pero dejó de recibirlos aún después de terminado

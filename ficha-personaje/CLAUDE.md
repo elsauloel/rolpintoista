@@ -692,3 +692,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   esperaba al guardado de cada segundo y un cambio de otra pantalla en ese rato lo pisaba) y, si un aviso tomado falla al aplicarse (o la ficha se
   cerró justo), lo devuelve a la cola con `Recibidos.noAplicados` (línea roja en la Mesa). Lo que frena una inmunidad queda en la Mesa con el motivo
   (`habUi.recordatorios`). Ver `comun/CLAUDE.md`.
+- **🛡 El cartel flotante «INVULNERABLE» / «INMUNE A …» también desde la ficha** (2026-11-20): cuando la ficha (sin el mapa) aplica un estado que le
+  llegó de afuera y una inmunidad lo frena, `window.avisoInmune` (js/12-en-vivo.js, lo llama `Combatiente.avisoInmune`) publica el momento sin tarjeta
+  `gancho-eva` con `ref` (la ficha o «ficha~invocación»), el texto y `color: 'inmune'`: cada mapa abierto busca el token y muestra el cartel. Solo lo
+  recibido (lo que llega con `ref` desde `comun/recibidos.js`); el «+ Estado» a mano de la ficha no publica nada. Ver `comun/CLAUDE.md`.

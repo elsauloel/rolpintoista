@@ -801,6 +801,7 @@ async function trampaDanoCalcular(dt, x, simular){
     try{
       // Daño de un elemento (2026-10-04): resta la resistencia a ese elemento y, como es daño mágico, la Defensa especial.
       const rr = dt.elemento ? await resistenciasDe(x, dt.elemento) : {res: 0, armadmg: 0};
+      if(dt.elemento && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(x, dt.elemento, rr.res, null);   // 🛡 «INMUNE AL FUEGO…» flotando sobre el token (js/121, 2026-11-20)
       const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // la Defensa especial (también lo tóxico, 2026-10-07)
       freno = [...(arm ? [`Defensa especial ${arm}`] : []), ...(rr.res ? [Combatiente.resElementalTxt(dt.elemento, rr.res)] : [])].join(' − ');
       const suela = dt.altura === 'aire' ? 0 : Math.max(0, statPiesDe(x, 'suelagruesa'));   // solo lo que toca el piso (2026-10-07)   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos

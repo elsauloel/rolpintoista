@@ -182,6 +182,15 @@ function fichaMomentoControl(tomo){
     datos: {centro: true, paraUid: fichaVivo.duenoUid || ''}, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('No se pudo publicar el momento del control:', err));
 }
+/* 🛡 El cartel flotante «INVULNERABLE» / «INMUNE A …» (2026-11-20, dueño): cuando esta ficha aplica un estado que le llegó de afuera y una inmunidad
+   lo frena (Combatiente.avisoInmune), publica el mismo momento sin tarjeta que usa el mapa ('gancho-eva', vtt-hexgrid/js/96 y js/121) con de quién es
+   (`ref`: la ficha o «ficha~invocación»): cada mapa abierto busca su token y muestra el cartel. Solo lo que llega con `ref` (lo recibido). */
+window.avisoInmune = function(info){
+  if(!info || !info.texto || !info.ref || !fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('momentos')).add({tipo: 'gancho-eva', icono: '', titulo: '', estado: 'listo', resuelve: '',
+    datos: {ref: String(info.ref), texto: String(info.texto).slice(0, 40), color: 'inmune', dur: 2200}, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar el cartel de inmunidad:', err));
+};
 function fichaAvisarMesaControl(texto){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   fbDb.collection(fbRutaCampana('tiradas')).add({

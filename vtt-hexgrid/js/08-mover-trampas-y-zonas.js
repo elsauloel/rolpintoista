@@ -874,6 +874,7 @@ async function zonaResolverBanner(){
     const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
     const idZ = elZ ? Combatiente.identidadElemento(elZ, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 la luz ×1,5 a lo oscuro; lo siniestro, nada (2026-10-26)
+    if(elZ && !porDuelo && monto > 0 && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elZ, rz.res, idZ);   // 🛡 «INMUNE A LO TÓXICO…» flotando sobre el token (js/121, 2026-11-20)
     if(idZ && idZ.mult !== 1 && monto > 0){ monto = Math.ceil(monto * idZ.mult); partes.push(idZ.txt); }
     const agZ = monto > 0 && typeof aguaRayo === 'function' ? aguaRayo(t, elZ, monto) : null;   // 💧 en el agua, el rayo ×1,5 (js/50)
     if(agZ && agZ.txt){ monto = agZ.monto; partes.push(agZ.txt); }

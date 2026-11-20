@@ -2020,3 +2020,12 @@ versión parecida en más de una, es candidato a juntar.
   `ficha-acciones.js`: cuando una inmunidad frena un estado que llega de afuera (`aplicarEstadoRecibido`: Invulnerable / Titilando, Inmunidad a CC…;
   también la Armadura rota), además del toast a quien lo recibe deja una línea en la Mesa con el motivo por `ui.recordatorios`
   (`FichaAcciones.noEntroTxt(quien, estado, motivo, origen)` → «🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito»).
+- **🛡 El cartel flotante de lo que no entra por una inmunidad** (2026-11-20, dueño: «que también salte el cartel flotante desde el token, en un
+  azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO"»). `combatiente.js`: `cartelInmune(motivo, que)` → «INVULNERABLE» (Invulnerable /
+  Titilando), «INMUNE A <QUE>» (cualquier otra inmunidad; `que` = el estado que no entró) o '' si el motivo no es una inmunidad (Marcado, la Vaquita,
+  la Piedra bezoar, sin armadura); y `avisoInmune(info)`: cada vez que `agregarEstado` frena un estado por una inmunidad le avisa a la pantalla
+  (`window.avisoInmune`, como `avisoVaquita` / `avisoJefe`: fuera de la transacción y una vez aunque se repita en 1,5 s) con {motivo, estado, quien,
+  id (el creep: viene en `o`), ref («fichaId» o «fichaId~invId»), texto}. La Protección de jefe no pasa por ahí (su cartel sale cuando el GM aplica la
+  regla, `avisoJefe`). Para saber de quién es, `recibidos.js` pasa `{ref}` a `FichaAcciones.aplicarEstadoRecibido(S, spec, origen, ui, o)` y a
+  `InvHabilidades.ponerEstado(inv, d, o)` (que lo llevan a `agregarEstado`); la Armadura rota frenada avisa igual. Lo dibuja el mapa
+  (`vtt-hexgrid/js/121-cartel-inmune.js`); la ficha suelta publica el mismo momento para que lo dibujen los mapas abiertos (ficha `js/12-en-vivo.js`).

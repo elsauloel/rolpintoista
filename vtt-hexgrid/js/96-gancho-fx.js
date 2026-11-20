@@ -73,8 +73,9 @@ const ganchoEvaVistos = new Set();
 async function ganchoEvaPublicar(aId, texto, o){   // o (2026-11-09, el Escudo elemental): {retraso ms, dur ms, fila (0, 1…: uno arriba del otro)}
   if(!aId) return;
   o = o || {};
-  const datos = {a: aId, texto: String(texto || '−2 EVA').slice(0, 20), ...(num(o.retraso) > 0 ? {retraso: Math.round(num(o.retraso))} : {}),
-    ...(num(o.dur) > 0 ? {dur: Math.round(num(o.dur))} : {}), ...(num(o.fila) > 0 ? {fila: Math.round(num(o.fila))} : {})};
+  const datos = {a: aId, texto: String(texto || '−2 EVA').slice(0, 40), ...(num(o.retraso) > 0 ? {retraso: Math.round(num(o.retraso))} : {}),
+    ...(num(o.dur) > 0 ? {dur: Math.round(num(o.dur))} : {}), ...(num(o.fila) > 0 ? {fila: Math.round(num(o.fila))} : {}),
+    ...(GANCHO_EVA_COLOR[o.color] ? {color: o.color} : {})};   // 🛡 `color: 'inmune'` (2026-11-20): el azul-plateado de «INVULNERABLE» / «INMUNE A …» (js/121)
   const id = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'gancho-eva', icono: '', titulo: '', estado: 'listo', datos}) : null;
   if(!id) ganchoEvaEmpezar(datos);
 }
@@ -85,9 +86,25 @@ function ganchoEvaRecibido(id, d){
   if(Date.now() - t > 20000) return;
   ganchoEvaEmpezar(d.datos);
 }
+// Los colores del texto que flota: el rojo de siempre y el azul-plateado de lo que no entra por una inmunidad (dueño, 2026-11-20).
+const GANCHO_EVA_COLOR = {inmune: {arriba: '#f4f9ff', abajo: '#8fb4dc', borde: 'rgba(10,22,40,.95)', brillo: 'rgba(150,200,255,.9)', chico: 0.8}};
 function ganchoEvaEmpezar(dt){
-  if(!dt || !tokens.get(dt.a)) return;
-  GANCHO_EVA.push({a: dt.a, texto: String(dt.texto || '−2 EVA'), t0: performance.now() + Math.max(0, num(dt.retraso)), dur: num(dt.dur) > 0 ? num(dt.dur) : 1600,
+  if(!dt) return;
+  // `ref` (2026-11-20): quien publica no siempre sabe el token (la ficha suelta, sin el mapa): va de quién es («fichaId» o «fichaId~invId») y
+  // cada mapa busca su token.
+  if(!dt.a && dt.ref){ const par = [...tokens.entries()].find(([, t]) => t && t.tipo !== 'creep' && String(t.fichaId || '') === String(dt.ref)); if(par) dt = {...dt, a: par[0]}; }
+  if(!tokens.get(dt.a)) return;
+  if(dt.color === 'inmune'){
+    // 🛡 El cartel de inmunidad espera a que esta pantalla no tenga el cuadro del duelo ni un aviso al centro tapando el mapa (como la Transfusión,
+    // js/92; como mucho 25 s, después sale igual). Si ya flota el mismo sobre ese token, no se repite; si flota otro distinto, va arriba.
+    const desde = dt.desde || Date.now();
+    const tapado = (typeof Duelo !== 'undefined' && Duelo.abiertoId && Duelo.abiertoId()) || (typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto());
+    if(tapado && Date.now() - desde < 25000){ setTimeout(() => ganchoEvaEmpezar({...dt, desde}), 400); return; }
+    const ahora = performance.now(), otros = GANCHO_EVA.filter(f => f.a === dt.a && f.color === 'inmune' && ahora - f.t0 < f.dur * 0.8);
+    if(otros.some(f => f.texto === String(dt.texto))) return;
+    dt = {...dt, fila: otros.length ? Math.max(...otros.map(f => f.fila)) + 1 : 0};
+  }
+  GANCHO_EVA.push({a: dt.a, texto: String(dt.texto || '−2 EVA'), color: GANCHO_EVA_COLOR[dt.color] ? dt.color : '', t0: performance.now() + Math.max(0, num(dt.retraso)), dur: num(dt.dur) > 0 ? num(dt.dur) : 1600,
     fila: Math.max(0, Math.round(num(dt.fila))), poco: ganchoPocoMovimiento()});
   pedirDibujo();
 }
@@ -103,15 +120,18 @@ function ganchoEvaDibujar(z){
     // Aparece de golpe (crece un poquito), sube ~0,7 casilla y se apaga en el último tercio.
     const sube = fx.poco ? 0 : HEX * 0.7 * Math.min(1, k * 1.4), alfa = k < 0.65 ? 1 : Math.max(0, 1 - (k - 0.65) / 0.35);
     const esc = fx.poco ? 1 : (k < 0.12 ? 0.6 + (k / 0.12) * 0.5 : k < 0.22 ? 1.1 - ((k - 0.12) / 0.1) * 0.1 : 1);
-    const px = Math.max(14 / z, HEX * 0.62) * esc;
+    const col = GANCHO_EVA_COLOR[fx.color] || null;
+    const px = Math.max(14 / z, HEX * 0.62) * esc * (col ? col.chico : 1);   // (los carteles de inmunidad son palabras largas: un poco más chicos)
     ctx.save();
     ctx.globalAlpha = alfa;
     ctx.font = `900 ${px}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     const y = c.y - HEX * 1.05 - sube - num(fx.fila) * px * 1.15;
-    ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(3 / z, px * 0.2); ctx.strokeStyle = 'rgba(20,6,8,.95)';
+    ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(3 / z, px * 0.2); ctx.strokeStyle = col ? col.borde : 'rgba(20,6,8,.95)';
     ctx.strokeText(fx.texto, c.x, y);
-    ctx.shadowColor = 'rgba(255,60,60,.8)'; ctx.shadowBlur = px * 0.5;
-    ctx.fillStyle = '#ff4d4d'; ctx.fillText(fx.texto, c.x, y);
+    ctx.shadowColor = col ? col.brillo : 'rgba(255,60,60,.8)'; ctx.shadowBlur = px * 0.5;
+    if(col){ const g = ctx.createLinearGradient(0, y - px * 0.5, 0, y + px * 0.5); g.addColorStop(0, col.arriba); g.addColorStop(1, col.abajo); ctx.fillStyle = g; }   // azul-plateado: claro arriba, azul abajo
+    else ctx.fillStyle = '#ff4d4d';
+    ctx.fillText(fx.texto, c.x, y);
     ctx.restore();
   }
   return GANCHO_EVA.length > 0;

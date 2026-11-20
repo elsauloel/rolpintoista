@@ -281,6 +281,15 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+
+- [ ] **🛡 El cartel flotante «INVULNERABLE» / «INMUNE A …» en los caminos que no se vieron** (2026-11-20; `vtt-hexgrid/js/121-cartel-inmune.js`). Ya
+  visto con clics en «Claude · pruebas 2» (GM y J1): golpe del duelo a un personaje Titilando, un estado del duelo frenado por Inmunidad a CC, daño tóxico
+  de una habilidad a un inmune a lo tóxico, Veneno y Miedo que llegan con Sangre pura / Inmunidad mental, una invocación Titilando (estado y «Recibe daño»),
+  el «+ Estado» a mano a un creep con Inmunidad a CC y la ficha suelta. **Falta ver** (mismo código, sin probar en el mapa): un golpe a un **creep**
+  invulnerable; la **Protección de jefe** (que el cartel «INMUNE A <ESTADO>» salga al elegir «Aplicar la regla» y no con «Aplicar igual»); el daño de un
+  elemento al que es inmune desde una **zona**, una **trampa**, el **Escudo elemental**, el **rayo en cadena** y el **elemental de un arma**; lo siniestro
+  contra un no-muerto o un demonio («INMUNE A LO SINIESTRO»); Vuela (Sentado / Rengo), Arma natural (Desarmado) y Coagulación (Sangrado); dos carteles
+  distintos a la vez sobre el mismo token (uno arriba del otro); y un token que esa pantalla no ve (no tiene que salir).
 - [ ] **🎺🔄🥁🩸🐈‍⬛ El orden de turnos (2026-11-05).** Probado en Claude · pruebas:
   ✔ Toque de carga: el costo sube a «5 SP (+2 por usarla seguida)»; ✔ **Marcar el ritmo con dos aliados pegados**: al empezar la ronda, al dueño le sale
   «🥁 … marca el ritmo: ¿a cuál…?» con los dos y «No subir a nadie»; ✔ el que sube se mueve en la lista con la animación verde en las otras pantallas

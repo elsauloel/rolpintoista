@@ -104,7 +104,7 @@ const Recibidos = (() => {
     const sp = spec(d), origen = (d.data() || {}).origen || '';
     if(!sp || !sp.nombre) return {};
     const invId = fichaDe(d).split(SEP)[1];
-    if(!invId){ FichaAcciones.aplicarEstadoRecibido(S, sp, origen, ui); return {}; }
+    if(!invId){ FichaAcciones.aplicarEstadoRecibido(S, sp, origen, ui, {ref: fichaDe(d)}); return {}; }   // (`ref`: para el cartel flotante de lo que frena una inmunidad)
     const inv = (S.invocaciones || []).find(i => i && i.id === invId);
     if(!inv){ ui.toast(`${origen ? origen + ': ' : ''}${sp.nombre} — la invocación ya no está`); return {}; }
     if(sp.nombre === 'Quitar estado'){ inv.estados = (inv.estados || []).filter(x => !(x && x.nombre === sp.estado)); return {inv}; }   // los Estandartes (2026-10-18)
@@ -140,7 +140,7 @@ const Recibidos = (() => {
       ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${t2}`);
       return {inv};
     }
-    const txt = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec(sp, ui.presets), {deAfuera: true});
+    const txt = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec(sp, ui.presets), {deAfuera: true, ref: fichaDe(d)});
     ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${txt}`);
     return {inv};
   }

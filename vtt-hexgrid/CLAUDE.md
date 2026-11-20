@@ -2267,3 +2267,17 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   aplicarse o cuya ficha no se pudo guardar vuelve a la cola (`Recibidos.noAplicados`: se reintenta solo, línea roja en la Mesa; a la tercera, «aplicáselo
   a mano»); con la Botonera abierta lo aplicado sigue en memoria y el guardado se reintenta, así que se avisa sin devolverlo (no se aplica dos veces).
   Lo que frena una inmunidad queda en la Mesa con el motivo (comun/ficha-acciones.js). Las recompensas siguen como antes (no vuelven a la cola).
+- **🛡 El cartel flotante «INVULNERABLE» / «INMUNE A …»** (2026-11-20, dueño: «que también salte el cartel flotante desde el token, en un
+  azul-plateado»): `js/121-cartel-inmune.js`. Reusa el texto flotante del «−2 EVA» (js/96: `ganchoEvaPublicar(id, texto, {color: 'inmune', dur})`, el
+  momento sin tarjeta `gancho-eva`; `GANCHO_EVA_COLOR` tiene los colores; el texto ahora admite 40 letras y `datos.ref` = «fichaId» o «fichaId~invId»
+  cuando quien publica no sabe el token, como la ficha suelta). `inmuneCartel(tok, texto)` lo publica (no repite el mismo en 1,5 s). De dónde sale:
+  **estados** → `window.avisoInmune(info)`, que llama `Combatiente.agregarEstado` cada vez que una inmunidad frena uno (el token por `info.ref`, por el
+  id del creep o por el nombre); **golpes frenados por la invulnerabilidad** → `inmuneCartelDano(t, r)` en `danioCreep` / `danioPj` / `danioInv`
+  (js/10: por ahí pasan el duelo, las zonas, las trampas, el rayo y el Escudo elemental; no en la vista previa `simular`); **daño de un elemento al que
+  es inmune** (resistencia ≥ 99 o identidad ×0) → `inmuneCartelElemento(t, el, res, id)` donde se lee la resistencia: `dueloAplicarDano` (js/13, la
+  habilidad y el elemental del arma), el cartel de la zona (js/08), la trampa (js/19), el Escudo elemental (js/106) y el rayo en cadena (js/10); el texto
+  es «INMUNE » + `DEBIL_NOMBRE_INM` (js/89). La Protección de jefe: el cartel sale cuando el GM elige «Aplicar la regla» (js/90). En cada pantalla, un
+  cartel de inmunidad espera a que no haya cuadro del duelo ni aviso al centro (máx. 25 s, como la Transfusión), no se repite si ya flota el mismo sobre
+  ese token y, si flota otro distinto, va una fila más arriba (`ganchoEvaEmpezar`). No llevan cartel: Marcado, la Vaquita, la Piedra bezoar, «no tiene
+  armadura». Sin cubrir: el Veneno / Sangrado ya puesto que no hace daño en el Mantenimiento y la Maldición tormentosa sobre un invulnerable.
+  Probado con clics en «Claude · pruebas 2» (GM y J1; ver `docs/cola-de-pruebas.md`).

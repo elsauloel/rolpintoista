@@ -6,13 +6,15 @@
 window.avisoJefe = async function(info){
   if(!info) return;
   const linea = t => { try{ mesaLinea(t); }catch(e){} };
-  if(!soyGM || typeof Confirmar === 'undefined' || !info.estado){ linea(info.txt); return; }
+  // 🛡 Si vale la regla y el estado no entra, el cartel flotante «INMUNE A <ESTADO>» sobre el jefe (js/121, 2026-11-20).
+  const cartel = () => { try{ if(info.tipo === 'inmune' && typeof window.avisoInmune === 'function') window.avisoInmune({id: info.creepId, quien: info.creepNombre, texto: Combatiente.cartelInmune('Protección de jefe', (info.estado && info.estado.nombre) || '')}); }catch(e){} };
+  if(!soyGM || typeof Confirmar === 'undefined' || !info.estado){ linea(info.txt); cartel(); return; }
   const unTurno = info.tipo === 'unTurno';
   const r = await Confirmar.elegir(info.txt, {titulo: 'Protección de jefe', icono: '🛡', no: unTurno ? 'Aplicar la regla (1 turno)' : 'Aplicar la regla (no entra)',
     opciones: [
       {texto: unTurno ? 'Aplicar la regla (1 turno)' : 'Aplicar la regla (no entra)', detalle: 'Lo que dice la Protección de jefe', valor: 'regla'},
       {texto: unTurno ? `Aplicar completo (${info.antes || info.turnos + ' turnos'})` : 'Aplicar igual', detalle: 'Sin la protección: lo decide el GM', valor: 'igual'}]});
-  if(r !== 'igual'){ linea(info.txt); return; }
+  if(r !== 'igual'){ linea(info.txt); cartel(); return; }
   // El creep: por su id (el de su ficha) o por el nombre del token.
   const tok = [...tokens.values()].find(t => t.tipo === 'creep' && (t.fichaId === info.creepId || ((typeof creepPrivadoDe === 'function' && creepPrivadoDe(t.fichaId)) || {}).id === info.creepId))
     || [...tokens.values()].find(t => t.tipo === 'creep' && nombreDe(t) === info.creepNombre);

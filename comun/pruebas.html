@@ -5972,6 +5972,40 @@ prueba('un estado que llega de afuera y lo frena una inmunidad (Invulnerable / T
   igual([conTit, mesa, toasts.length, /Invulnerable/.test(toasts[0]), S.efectos.map(e => e.nombre), mesa.length],
     [[tit.nombre], ['🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito espeluznante', '🛡 Blanco J1: Armadura rota no le hizo nada (Invulnerable) · Blanco creep · Hachazo'], 3, true, ['Miedo'], 2]);
 });
+prueba('🛡 El cartel flotante de lo que no entra (dueño, 2026-11-20): «INVULNERABLE» con Invulnerable / Titilando, «INMUNE A <ESTADO>» con cualquier otra inmunidad; lo que no es una inmunidad no lleva cartel', () => {
+  const c = Combatiente.cartelInmune;
+  igual([c('Invulnerable', 'Miedo'), c('Titilando', 'Veneno'), c('Invulnerable'), c('Inmunidad a CC', 'Stun'), c('Inmunidad mental', 'Miedo'), c('Sangre pura', 'Veneno'), c('Coagulación', 'Sangrado'),
+    c('Vuela', 'Sentado'), c('Arma natural', 'Desarmado'), c('Protección de jefe', 'Sueño'), c('Marcado', 'Sigilo'), c('Vaquita de San Antonio', 'Miedo'), c('la Piedra bezoar se tragó el Veneno', 'Veneno'),
+    c(EstadosAplicar.SIN_ARMADURA_TXT, 'Armadura rota'), c('', 'Miedo')],
+    ['INVULNERABLE', 'INVULNERABLE', 'INVULNERABLE', 'INMUNE A STUN', 'INMUNE A MIEDO', 'INMUNE A VENENO', 'INMUNE A SANGRADO', 'INMUNE A SENTADO', 'INMUNE A DESARMADO', 'INMUNE A SUEÑO', '', '', '', '', '']);
+});
+prueba('🛡 Cada vez que una inmunidad frena un estado, Combatiente le avisa a la pantalla para el cartel flotante: con la ficha (ref), el creep (id) y el texto; una vez aunque se repita; la Protección de jefe y lo que entra, no', async () => {
+  const antes = window.avisoInmune, vistos = [];
+  window.avisoInmune = info => { if(/cartel$/.test(info.quien)) vistos.push([info.quien, info.texto, info.ref, info.id, info.motivo, info.estado].join(' | ')); };
+  try{
+    // Un personaje Titilando recibe Miedo y Armadura rota de afuera (comun/recibidos.js manda de qué ficha es).
+    const S = structuredClone(FichaGuardado.DEFAULT); S.meta.nombre = 'Blanco cartel'; S.hp = 12;
+    Combatiente.agregarEstado(S.efectos, Combatiente.estadoTitilando(estadosPresetFicha()));
+    const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: () => {}, recordatorios: () => {}};
+    FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Miedo'}, 'Rata · Grito', ui, {ref: 'f1'});
+    FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Miedo'}, 'Rata · Grito', ui, {ref: 'f1'});          // repetido enseguida: un solo cartel
+    FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota'}, 'Rata · Hachazo', ui, {ref: 'f1'});
+    // Un creep con Inmunidad a CC recibe Stun (no entra) y Veneno (entra: sin cartel); un jefe, Sueño (lo decide el GM: no pasa por acá).
+    const sc = creepPrueba({id: 'c9', nombre: 'Rata cartel', estados: [EstadosAplicar.componer({nombre: 'Inmunidad a CC'})]});
+    const r1 = EstadosAplicar.aplicarACreep(sc, {nombre: 'Stun'}), r2 = EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno'});
+    const jefe = creepPrueba({id: 'c8', nombre: 'Jefe cartel', jefe: true, estados: []});
+    const avisoJefe = window.avisoJefe; window.avisoJefe = () => {};
+    const r3 = EstadosAplicar.aplicarACreep(jefe, {nombre: 'Sueño'});
+    // Una invocación con Sangre pura recibe Veneno de afuera.
+    const inv = {id: 'i1', nombre: 'Abeja cartel', hp: 5, hpMax: 5, estados: [{...EstadosAplicar.componer({nombre: 'Sangre pura'})}], inventario: []};
+    InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec({nombre: 'Veneno'}, estadosPresetFicha()), {deAfuera: true, ref: 'f1~i1'});
+    await new Promise(r => setTimeout(r, 30));
+    window.avisoJefe = avisoJefe;
+    igual([r1.ok, r2.ok, r3.ok, r3.motivo, vistos],
+      [false, true, false, 'Protección de jefe', ['Blanco cartel | INVULNERABLE | f1 |  | Invulnerable | Miedo', 'Rata cartel | INMUNE A STUN |  | c9 | Inmunidad a CC | Stun',
+        'Abeja cartel | INMUNE A VENENO | f1~i1 |  | Sangre pura | Veneno']]);
+  }finally{ window.avisoInmune = antes; }
+});
 prueba('un aviso tomado que no se pudo aplicar vuelve a la cola (uno nuevo igual, pendiente) y se avisa en la Mesa; a la cuarta vez ya no vuelve: se le pide al GM que lo aplique a mano', () => {
   const datos = {};
   return conFbFalso(datos, async () => {

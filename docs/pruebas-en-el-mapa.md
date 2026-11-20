@@ -2947,3 +2947,15 @@ Capturas y videos en `cola10/`.
 - [ ] **Falta que lo mire el dueño en su compu.**
 Capturas en `cola11/`.
 
+
+## 2026-11-20 · 🌀 El creep que se va por un Town portal cuenta como «Escapó» («Claude · pruebas 2», mapa de prueba «Prueba · Town portal», GM + Jugador 1)
+
+- [x] **En combate, un creep vivo pisa el portal**: el GM arrastra a Protector 2 (vivo) hasta el Town portal → «¿Entra?» → Entrar → el token se va y
+  queda anotado en `gm/escapados`. El Blanco creep, caído, sigue en el mapa.
+- [x] **Finalizar → Simular**: en Experiencia, «Blanco creep · Derrotado +37 XP» y «Protector 2 · Escapó 🌀 +19 XP» (el 20 %); XP total 56, 28 por
+  jugador. Sin oro ni ítems del que escapó. Simular no tocó la lista.
+- [x] **Finalizar → Avanzar → Publicar**: lo mismo; al publicar la lista se vació (en el mismo lote), Protector 2 quedó repartido y, cerrado el botín, la XP
+  y el oro llegaron a las fichas.
+- [x] **El combate siguiente no lo arrastra**: otro «Finalizar → Simular» ya no muestra a Protector 2. (Después se restauró la partida.)
+- [ ] **Falta que lo mire el dueño en su compu.**
+Capturas en `cola12/`.

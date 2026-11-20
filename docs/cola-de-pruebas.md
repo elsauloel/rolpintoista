@@ -12,12 +12,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🌀 Un creep que se va por un Town portal cuenta como «Escapó» al finalizar el combate** (dueño, 2026-11-20, jugando El origen: «un
+- **✅ hecho (2026-11-20) — 🌀 Un creep que se va por un Town portal cuenta como «Escapó» al finalizar el combate** (dueño, 2026-11-20, jugando El origen: «un
   creep escapó con un portal, y ahora en la simulación no aparece como que escapó, ni lo contabiliza para la experiencia»). Causa: al pisar el Town
   portal el token se borra del mapa (js/84, `townPortalRevisar` desde moverToken js/07) y el fin del combate solo cuenta los creeps con token en el mapa
   publicado (`CombateFin.creepsEnMapa`, comun/combate-fin.js). Arreglo: cuando un creep se va por el portal durante un combate, que quede anotado (en el
   creep o en el combate en curso) y que el reporte lo sume como «Escapó» (el 20 % de su XP si «contar a los que escaparon» está tildado; sin oro ni
   ítems), igual en Simular y en Avanzar. Probar en «Claude · pruebas 2»: un creep vivo pisa un Town portal en combate → Finalizar → aparece «Escapó».
+  *Resultado:* si el mapa está en combate, al entrar un creep por el portal la pantalla del GM lo anota en una lista de la partida (`gm/escapados`, solo
+  el GM: no hacen falta reglas nuevas); el fin del combate lo suma y lo muestra «Escapó 🌀» con sus reglas de siempre (20 % de la XP si está tildado
+  contar a los que escaparon; sin oro ni ítems), en Simular y en Avanzar. La lista se vacía al publicar las recompensas y con «↺ Reiniciar combate»; el
+  Ctrl+Z de la entrada al portal lo saca. Probado en «Claude · pruebas 2» con GM y Jugador 1 (Blanco creep caído, Protector 2 vivo por el portal):
+  Simular y Avanzar dieron «Escapó 🌀 +19 XP», publicar vació la lista y el combate siguiente ya no lo mostró. Partida restaurada. 877 pruebas en verde.
 - **⬜ en cola — 🔨 Pasiva nueva «Maestría en armas pesadas»** (dueño, 2026-11-20: «quiero sumar una habilidad pasiva para jugadores (y creeps):
   Maestría en armas pesadas. da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas»). En `comun/pasivas.js` (PASIVAS_BASE,
   la ofrecen la ficha y los creeps). El +2 al PdG con Tipo 10 ya existe como stat (`pdgt10`, «PdG con contundentes», lo suma

@@ -113,6 +113,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — 💍 Anillo de Puntería Certera: el +2 aparece aunque te hayas movido; y que avise cuando se activa y cuando lo vas a perder**
+  (dueño, 2026-11-20, El origen, lo lleva Bizzante: «le aparecía el bono a la probabilidad de golpe independientemente de si se había cumplido la
+  condición o no… correr los testeos pertinentes para que funcione bien. Y estaría bueno que cuando se active el bono aparezca algún tipo de cartel
+  flotante que diga "Puntería certera", y que una vez que la tenés activada, si te vas a mover, te aparezca una notificación: tenés Puntería certera,
+  si te movés la vas a perder. Aceptar, cancelar»). El ítem: `new-anillo-de-punteria-certera` (comun/catalogo.js), stat `pulso` +2, «Pulso quieto:
+  si no te moviste ni en esta ronda ni en la anterior, PdG +2». Lo calcula el mapa: `quietoDe` (vtt-hexgrid/js/13-tokens-portal-duelo.js) con
+  `seMovioEsteTurno` / `seMovioTurnoAnterior`. (1) Reproducir con clics en la partida de pruebas: equipado, moverse y atacar (no debe sumar);
+  moverse la ronda anterior y atacar (no debe sumar); dos rondas quieto (suma +2). Sospechas a mirar: que «no se movió» se recuerde solo en la
+  memoria de una pantalla (se pierde al recargar, o la pantalla que abre el duelo no es la que vio el movimiento: jugador / GM / GM con el control),
+  que en la primera ronda del combate cuente como «quieto» sin haberlo estado, que no cuenten los movimientos que no son arrastrar el token
+  (empujones, Dash, Salto, Parpadeo, portal, que lo mueva el GM), o que el bono se muestre en la lupa / la ficha / el cuadro antes de saber si
+  corresponde. Arreglar la causa; mirar que el **Anillo de Foco Arcano** (`foco`, mismo mecanismo, PdG.Esp) quede igual de bien. (2) **Cartel
+  flotante** desde el token cuando se cumple la condición y el bono queda activo («🎯 Puntería certera» / «Foco»), visible para su dueño y el GM
+  (definir y contar si lo ven todos). (3) **Aviso antes de moverse** con el bono activo, en combate: «Tenés Puntería certera activa (+2 a PdG). Si
+  te movés, la perdés. [Moverme igual] [Cancelar]»; Cancelar deja el token donde estaba. Solo al jugador dueño (o al GM si lo mueve él), una vez
+  por activación. No inventar reglas: qué cuenta como «moverse» y cualquier duda, a preguntas-abiertas.
 - **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
   ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
   que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás

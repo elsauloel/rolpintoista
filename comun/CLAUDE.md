@@ -2081,4 +2081,8 @@ versión parecida en más de una, es candidato a juntar.
   conocido}], visibles, mantenimiento})` → `{modo: 'ver' | 'anon' | 'incierta' | 'nada', esconder, todos}`; `INCIERTA` = el texto de la acción
   incierta, sin nombre. Quién está escondido para cada pantalla lo decide el mapa (`vtt-hexgrid/js/29-accion-incierta.js`, que lo usa para la Mesa,
   la Crónica y los Avisos). Pruebas en `pruebas.html`. La ficha suelta y GM Tools no filtran.
+- **`zonas-riesgo.js`** (`ZonasRiesgo`, 2026-11-20) — **🕵 las cuentas de las «Zonas de riesgo» de quien está en sigilo** (sin mapa ni Firebase, con
+  pruebas): `unir([{cono, alerta}])` → `{cono, alerta}` (el cono de un rival le gana a la alerta de otro), `estado(union, clave)` → 'riesgo' | 'alerta'
+  | 'libre', `referencia(seleccion, candidatos)` (de quién se muestran), `camino(union, claves)` → `{corte, alerta}` (como al soltar el token) y
+  `leyenda(nombre, cuantos, soyGM)` (el cartel). Las zonas de cada rival y qué rivales cuentan los pone el mapa (`vtt-hexgrid/js/124-zonas-riesgo.js`).
 

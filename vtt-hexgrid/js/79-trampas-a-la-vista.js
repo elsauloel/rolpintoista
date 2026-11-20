@@ -186,30 +186,4 @@ async function trampaArrastreFin(el, origen0){
   trampaAnunciarVista(mio ? {fichaId: mio.fichaId, tipoToken: mio.tipo, nombre: el.nombre} : {nombre: el.nombre}, vistos, el.nombre);
   return {descubierta: true};
 }
-/* 👁 En sigilo: el botón «Ver campo de visión de los rivales (Ctrl + L)» (2026-11-09, dueño: «cuando alguien entra en sigilo aparezca algún
-   botón disponible ahí arriba… visible con algún tipo de efecto de latir… que uno lo pueda prender y apagar fácilmente, y que ponga entre
-   paréntesis el hotkey»). Aparece mientras un token propio (o que maneja) está en sigilo: el jugador, su personaje; el GM, un creep suyo. Prende
-   los lentes con «ver todas las zonas de riesgo» (los conos de los rivales que esta pantalla ve: los que no se ven no se delatan, las mismas
-   reglas de los 👓); apagarlo apaga los lentes. Ctrl + L hace lo mismo mientras el botón está. Al salir del sigilo el botón se va y, si lo había
-   prendido él, apaga los lentes. */
-let visionSigiloPrendida = false;
-function visionSigiloDisponible(){ return typeof huboAlguienEnSigilo === 'function' && huboAlguienEnSigilo(); }
-function renderBotonVisionSigilo(){
-  const b = $('#btn-vision-sigilo');
-  if(!b) return;
-  const hay = visionSigiloDisponible();
-  if(!hay && visionSigiloPrendida){ visionSigiloPrendida = false; verZonas = false; try{ localStorage.setItem('mapa-ver-zonas', '0'); }catch(e){} renderBotonZonas(); pedirDibujo(); }
-  b.hidden = !hay;
-  const on = hay && verZonas && lentesTodos;
-  b.classList.toggle('activo', on);
-  b.textContent = on ? '👁 Ocultar campo de visión de los rivales (Ctrl + L)' : '👁 Ver campo de visión de los rivales (Ctrl + L)';
-}
-function alternarVisionSigilo(){
-  const on = verZonas && lentesTodos;
-  if(on){ verZonas = false; visionSigiloPrendida = false; }
-  else{ verZonas = true; lentesTodos = true; visionSigiloPrendida = true; try{ localStorage.setItem('mapa-lentes-todos', '1'); }catch(e){} }
-  try{ localStorage.setItem('mapa-ver-zonas', verZonas ? '1' : '0'); }catch(e){}
-  renderBotonZonas(); if(typeof actualizarAvisoLentes === 'function') actualizarAvisoLentes(); renderBotonVisionSigilo(); pedirDibujo();
-  toast(verZonas ? '👁 Campos de visión de los rivales a la vista' : '👁 Campos de visión de los rivales ocultos');
-}
-if($('#btn-vision-sigilo')) $('#btn-vision-sigilo').onclick = alternarVisionSigilo;
+// (🕵 El botón de quien está en sigilo —antes «Ver campo de visión de los rivales», 2026-11-09— se mudó a js/124-zonas-riesgo.js: «Zonas de riesgo», 2026-11-20.)

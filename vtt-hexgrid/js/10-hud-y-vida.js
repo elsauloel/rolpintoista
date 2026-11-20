@@ -119,7 +119,8 @@ function hudHtml(t){
   let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
-    (typeof revelarHudIcono === 'function' ? revelarHudIcono(t, icono) : '') +   // 👁 Revelar a mano lo oculto / en sigilo (js/122, 2026-11-20)
+    (typeof revelarHudIcono === 'function' ? revelarHudIcono(t, icono) : '') +
+    (typeof zonasRiesgoHudIcono === 'function' ? zonasRiesgoHudIcono(t, icono) : '') +   // 🕵 Zonas de riesgo: en sigilo, lo que miran los rivales (js/124, 2026-11-20)   // 👁 Revelar a mano lo oculto / en sigilo (js/122, 2026-11-20)
     (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     // ✚ Revivir (2026-11-04, dueño: «cuando hay un token caído, el GM al seleccionarlo vea entre sus botones uno para revivirlo; tanto para creeps como
     // para jugadores»): js/98, gmRevivirToken.
@@ -1320,6 +1321,7 @@ function hudConectar(t){
     if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }
     if(clave === 'revivir'){ if(typeof revivirToken === 'function') revivirToken(t); return; }   // ✚ (js/98)
     if(clave === 'volver'){ if(typeof volverPreguntar === 'function') volverPreguntar(t.fichaId); return; }   // ☥ (js/98)
+    if(clave === 'riesgo'){ if(typeof alternarVisionSigilo === 'function') alternarVisionSigilo(); return; }   // 🕵 (js/124)
     if(clave === 'pacto'){ if(typeof pactoRenovar === 'function') pactoRenovar(t); return; }   // 😇 (js/83)
     if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)

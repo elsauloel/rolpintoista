@@ -282,6 +282,11 @@
 
 ## Pendientes
 
+- **🕵 Zonas de riesgo, lo que quedó sin probar con clics** (2026-11-20; lo probado: GM con un creep y Jugador 1 con su personaje, en «Claude · pruebas
+  2»): (1) con la **niebla de guerra** prendida, que un creep tapado por la niebla no pinte zona (la cuenta es la misma que para un creep en sigilo,
+  que sí se probó, y tiene su prueba automática); (2) el GM con 🎮 el control de un personaje en sigilo; (3) una **invocación** en sigilo; (4) adentro
+  de la niebla de una varita (se pinta rojo aunque ahí solo descubre un rival pegado); (5) con un Sólido o una pared que tape el cono.
+
 - [ ] **🌿 El aviso de «volvió a modo narrativo» adentro de «🩺 Cómo quedó el grupo»: lo que no se vio** (2026-11-20; `vtt-hexgrid/js/81`, y el
   renglón del «🎁 Botín concluido», js/11). Visto con clics en «Claude · pruebas 2» (GM y Jugador 1), con botín y sin ítems, y con el mapa ya en
   narrativo (ahí no sale). **Falta ver**: (a) cerrando el combate **desde GM Tools**: el jugador tiene que ver el renglón igual, y el GM solo el

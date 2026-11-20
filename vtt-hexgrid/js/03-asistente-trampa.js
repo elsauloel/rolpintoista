@@ -413,11 +413,8 @@ const autoLentesDesde = Date.now() + 8000;
 function revisarAutoLentes(){
   const ahora = huboAlguienEnSigilo();
   if(Date.now() < autoLentesDesde){ sigiloPropioPrevio = ahora; return; }
-  if(ahora && !sigiloPropioPrevio && !verZonas){
-    verZonas = true;
-    try{ localStorage.setItem('mapa-ver-zonas', '1'); }catch(e){}
-    renderBotonZonas(); actualizarAvisoLentes();
-  }
+  // (2026-11-20: entrar en sigilo ya NO prende los 👓 lentes. Para eso está el botón «🕵 Ver zonas de riesgo (Ctrl + L)», js/124, que aparece
+  // latiendo; con los lentes prendidos y el propio token seleccionado se veía el cono PROPIO, y se confundía con el de los rivales.)
   sigiloPropioPrevio = ahora;
   if(typeof renderBotonVisionSigilo === 'function') renderBotonVisionSigilo();   // 👁 el botón de los campos de visión (js/79)
 }

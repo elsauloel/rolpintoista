@@ -217,7 +217,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Invulnerable» (el Titilando), con el aviso y la línea. **Sin ver:** «¿Con qué volvés?» con dos formas a la vez (pasa por el mismo lugar; lo
   cubren las pruebas automáticas), un creep con la Llama, una invocación, GM Tools suelto y la ficha suelta. Dudas: P256. Sin cambios en las reglas
   de Firestore. Pruebas automáticas 917/917 (3 nuevas).
-- **⬜ en cola — 🕵 En sigilo: ver SOLO los conos de visión de los rivales (zonas de riesgo y zonas libres)** (dueño, 2026-11-20, jugando con la
+- **✅ hecho (2026-11-20) — 🕵 En sigilo: ver SOLO los conos de visión de los rivales (zonas de riesgo y zonas libres)** (dueño, 2026-11-20, jugando con la
   rata en sigilo: «apretaba Control L para ver las superficies de visión de los rivales, pero me mostraba el cono de visión propio de la rata. Quedó
   medio entreverado eso. Cuando uno está en sigilo tiene que haber algún comando, puede ser ese o puede ser otro, que le permita ver exclusivamente
   los conos de visión de los rivales. Es decir, uno tiene que ver claramente cuáles son las zonas de riesgo y cuáles son las zonas liberadas para
@@ -229,6 +229,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   mismo criterio que `comun/no-visto.js`). Que se entienda de un vistazo: rojo = te ven si entrás, sin color = libre. Decir en el informe qué pasa
   con lo que NO es visión pero igual descubre (percepción por cercanía, zonas de alerta, oído) y si se puede pintar distinto. No inventar reglas de
   detección: solo mostrar las que ya existen.
+  **Qué quedó:** el modo **«🕵 Zonas de riesgo»** (`vtt-hexgrid/js/124-zonas-riesgo.js` + las cuentas en `comun/zonas-riesgo.js`). Con alguien propio en
+  sigilo aparece latiendo arriba a la derecha el botón «🕵 Ver zonas de riesgo (Ctrl + L)»; se prende y se apaga con ese botón, con Ctrl + L o con el 🕵
+  del anillo del token. Pinta SOLO lo que miran los rivales de ese token: **rojo** = te descubren al entrar (el cono), **naranja rayado** = cada paso
+  pide una tirada de Percepción (la zona de alerta), **sin color** = libre; abajo queda un cartel con la leyenda. Es la misma cuenta que la detección
+  de verdad (`zonasSigilo`). El cono propio ya no se mezcla (mientras está prendido no se dibujan los 👓 lentes) y acompaña mientras se arrastra el
+  token. Un jugador ve solo las zonas de los rivales que ve (un creep oculto, en sigilo o en la niebla no pinta: el cartel lo aclara).
+  **Por qué pasaba:** Ctrl + L prendía los lentes con «ver todas», pero con un token seleccionado los lentes muestran solo las zonas de ESE token: con
+  la rata seleccionada, su propio cono. Además, entrar en sigilo ya no prende los lentes solos (el botón nuevo los reemplaza).
+  **Probado con clics** en «Claude · pruebas 2» (GM con un creep en sigilo junto a los dos personajes y la abeja; Jugador 1 con su personaje en sigilo
+  entre 18 creeps, uno oculto por el GM y después uno en sigilo): a casilla libre sigue escondido; a naranja, salió el pedido de Percepción; a roja, lo
+  descubrieron y el camino se cortó ahí. Lo que no es visión y lo que quedó sin probar: `vtt-hexgrid/CLAUDE.md` («🕵 Zonas de riesgo») y
+  `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — ✨ Animaciones de resurrección (Ankh, Fénix, Revive, Pacto)** (dueño, 2026-11-20: «me encantan tus propuestas de animación»).
   Aprobadas tal cual las propuso Claude; duran 2–3 s, las ven todas las pantallas, el token caído se ve apagado antes de empezar. Dibujadas con el
   mecanismo de animaciones del mapa (formas, brillos, partículas; sin ilustraciones). **☥ Ankh:** aparece un ankh dorado flotando y girando sobre el

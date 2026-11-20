@@ -835,7 +835,9 @@ function dibujarLienzo(){
 
   // 👓 Ver conos: el cono de detección (azul) y la zona de alerta (naranja) de todos los tokens
   // que se ven (los ocultos o en sigilo que no ves, tampoco muestran sus zonas).
-  if(verZonas){
+  // 🕵 Con las «Zonas de riesgo» prendidas (js/124) los lentes no se dibujan: solo lo que miran los rivales, sin el cono propio.
+  const riesgoOn = typeof zonasRiesgoPrendidas === 'function' && zonasRiesgoPrendidas();
+  if(verZonas && !riesgoOn){
     const pintarZona = (lista, relleno, borde) => {
       if(!lista.length) return;
       ctx.beginPath();
@@ -855,6 +857,7 @@ function dibujarLienzo(){
     });
   }
 
+  if(typeof zonasRiesgoDibujar === 'function') zonasRiesgoDibujar(z);   // 🕵 en sigilo: solo las zonas de los rivales (js/124)
   if(typeof trampaConosDibujar === 'function') trampaConosDibujar(z);   // 🪤👁 los conos de los rivales mientras se elige dónde va una trampa (js/79)
   if(typeof ceboDibujar === 'function' && ceboDibujar(z)) animando = true;   // 💎 el brillo del cebo (js/80)
   if(typeof vigilanciaDibujar === 'function') vigilanciaDibujar(z);   // 👁 el alcance de quien está en vigilancia (js/58)

@@ -130,6 +130,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261120a"></script>
+<script src="zonas-riesgo.js?v=20261120zr"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -8840,6 +8841,69 @@ grupo('No visto: la Mesa y la Crónica no delatan a quien no se ve');
     const d = {titulo: `${RATA} → Bizzante`, lineas: [`${RATA} tira PdG: 12`, 'Bizzante esquiva: 9'], datos: {x: 1}};
     const x = NoVisto.anonimoEn(d, ['titulo', 'resultado', 'lineas'], {todos: [RATA, 'Bizzante'], esconder: [RATA]});
     igual([x.titulo, x.lineas, d.titulo, x.datos === d.datos], ['Alguien → Bizzante', ['Alguien tira PdG: 12', 'Bizzante esquiva: 9'], `${RATA} → Bizzante`, true]);
+  });
+})();
+
+/* ---------- 🕵 Zonas de riesgo de quien está en sigilo (comun/zonas-riesgo.js + vtt-hexgrid/js/124, 2026-11-20) ---------- */
+grupo('Zonas de riesgo: en sigilo se ve solo lo que miran los rivales');
+(() => {
+  prueba('se juntan los conos y las alertas de todos los rivales; el cono de uno le gana a la alerta de otro', () => {
+    const u = ZonasRiesgo.unir([{cono: [1, 2], alerta: [3, 4]}, {cono: [4, 5], alerta: [2, 6]}]);
+    igual([[...u.cono].sort(), [...u.alerta].sort()], [[1, 2, 4, 5], [3, 6]]);
+    igual([ZonasRiesgo.estado(u, 4), ZonasRiesgo.estado(u, 3), ZonasRiesgo.estado(u, 9)], ['riesgo', 'alerta', 'libre']);
+  });
+  prueba('sin rivales a la vista no hay nada pintado: todo libre', () => {
+    const u = ZonasRiesgo.unir([]);
+    igual([u.cono.size, u.alerta.size, ZonasRiesgo.estado(u, 1), ZonasRiesgo.estado(null, 1)], [0, 0, 'libre', 'libre']);
+  });
+  prueba('de quién se muestran: el seleccionado si es uno mío en sigilo; si no, el primero mío en sigilo; si no hay, nadie', () =>
+    igual([ZonasRiesgo.referencia('b', ['a', 'b']), ZonasRiesgo.referencia('x', ['a', 'b']), ZonasRiesgo.referencia(null, ['a']), ZonasRiesgo.referencia('x', [])], ['b', 'a', 'a', null]));
+  prueba('un camino: se corta en la primera casilla roja y cuenta los pasos en naranja hasta ahí (como al soltar el token)', () => {
+    const u = ZonasRiesgo.unir([{cono: [5], alerta: [3, 4, 7]}]);
+    igual([ZonasRiesgo.camino(u, [1, 2, 3, 4, 5, 7]), ZonasRiesgo.camino(u, [1, 2, 9]), ZonasRiesgo.camino(u, [3, 4, 9])],
+      [{corte: 4, alerta: 2}, {corte: -1, alerta: 0}, {corte: -1, alerta: 1}]);   // la casilla donde ya está parado no cuenta
+  });
+  prueba('el cartel: a un jugador le aclara que son solo los rivales que ve; al GM no', () => {
+    cierto(ZonasRiesgo.leyenda('Bizzante', 2, false).includes('solo de los rivales que ves') && !ZonasRiesgo.leyenda('Rata', 2, true).includes('que ves'));
+    cierto(ZonasRiesgo.leyenda('Bizzante', 0, false).includes('no ves a ningún rival'));
+  });
+  prueba('en el mapa (js/124): solo los rivales que la pantalla ve aportan zona, el propio cono no se mezcla, y es la misma cuenta que la detección', async () => {
+    const src = await (await fetch('../vtt-hexgrid/js/124-zonas-riesgo.js', {cache: 'no-store'})).text();
+    // Un tablero a mano: cada token «mira» su casilla + 1 (cono) y su casilla + 2 (alerta).
+    const mundo = (tokens, o) => new Function('tokens', 'seleccion', 'soyGM', 'fbUsuario', 'SEP_INVOCACION', 'enSigilo', 'rivalesDe', 'tokenVisiblePorNiebla', 'estadoDe', 'zonasSigilo', 'nbPack', 'controloFicha', '$', 'ZonasRiesgo',
+      src + '\nreturn {zonasRiesgoCalcular, zonasRiesgoCandidatos, zonasRiesgoEstadoDe, visionSigiloDisponible, zonasRiesgoPuede};')(
+      tokens, o.seleccion || null, !!o.gm, {uid: 'yo'}, '~', t => !!t.sigilo,
+      t => [...tokens.values()].filter(r => r !== t && !r.oculto && (t.tipo === 'pj' ? r.tipo === 'creep' : r.tipo === 'pj')),
+      t => !t.noVisto, t => ({muerto: !!t.muerto}),
+      t => ({cono: [{col: t.col + 1, fila: 0}], alerta: [{col: t.col + 2, fila: 0}]}),
+      (c, f) => c * 100 + f, () => !!o.control, () => null, ZonasRiesgo);
+    // Jugador: su personaje en sigilo, una rata a la vista, otra en la niebla (no la ve) y una caída.
+    const tk = new Map([
+      ['yo', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', col: 0, fila: 0, sigilo: true}],
+      ['otro', {tipo: 'pj', fichaId: 'f2', duenoUid: 'otro', col: 50, fila: 0, sigilo: true}],
+      ['rataA', {tipo: 'creep', fichaId: 'c1', col: 10, fila: 0}],
+      ['rataB', {tipo: 'creep', fichaId: 'c2', col: 20, fila: 0, noVisto: true}],
+      ['rataC', {tipo: 'creep', fichaId: 'c3', col: 30, fila: 0, muerto: true}],
+    ]);
+    const j = mundo(tk, {seleccion: 'yo'});
+    const c = j.zonasRiesgoCalcular();
+    igual([j.zonasRiesgoCandidatos(), c.id, c.rivales.length, c.cono, c.alerta], [['yo'], 'yo', 1, [{col: 11, fila: 0}], [{col: 12, fila: 0}]]);
+    igual([j.zonasRiesgoEstadoDe(11, 0), j.zonasRiesgoEstadoDe(12, 0), j.zonasRiesgoEstadoDe(21, 0), j.zonasRiesgoEstadoDe(31, 0), j.zonasRiesgoEstadoDe(1, 0)],
+      ['riesgo', 'alerta', 'libre', 'libre', 'libre']);   // la rata de la niebla y la caída no pintan; su propio cono (1,0) tampoco
+    // GM: una rata en sigilo; sus rivales son los personajes (el que está en sigilo y no ve, no aporta).
+    const tg = new Map([
+      ['rata', {tipo: 'creep', fichaId: 'c1', col: 0, fila: 0, sigilo: true}],
+      ['pj1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'a', col: 10, fila: 0}],
+      ['pj2', {tipo: 'pj', fichaId: 'f2', duenoUid: 'b', col: 20, fila: 0}],
+      ['pj3', {tipo: 'pj', fichaId: 'f3', duenoUid: 'c', col: 30, fila: 0, sigilo: true, noVisto: true}],
+      ['rata2', {tipo: 'creep', fichaId: 'c2', col: 40, fila: 0}],
+    ]);
+    const g = mundo(tg, {gm: true, seleccion: 'rata'});
+    const cg = g.zonasRiesgoCalcular();
+    igual([g.zonasRiesgoCandidatos(), cg.rivales.length, cg.cono.map(x => x.col).sort(), g.zonasRiesgoEstadoDe(1, 0), g.zonasRiesgoEstadoDe(41, 0)], [['rata'], 2, [11, 21], 'libre', 'libre']);
+    // Sin nadie en sigilo: el modo no está disponible. Un jugador no «maneja» el personaje de otro.
+    const sin = mundo(new Map([['pj1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', col: 0, fila: 0}], ['r', {tipo: 'creep', fichaId: 'c', col: 5, fila: 0, sigilo: true}]]), {});
+    igual([sin.visionSigiloDisponible(), sin.zonasRiesgoCalcular(), j.zonasRiesgoPuede(tk.get('otro')), j.zonasRiesgoPuede(tk.get('yo'))], [false, null, false, true]);
   });
 })();
 

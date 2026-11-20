@@ -147,12 +147,17 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 /* Con muchos mapas (u otros paneles largos) el panel del costado se desplaza en vez de cortarse. */
 #panel-token{max-height:62vh;overflow-y:auto}
 /* Aviso fijo mientras se coloca un token nuevo (lugar y orientación). */
-#colocando-aviso,#lentes-aviso{
+#colocando-aviso,#lentes-aviso,#riesgo-aviso{
   position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:26;max-width:80%;text-align:center;pointer-events:none;
   background:rgba(26,20,24,.94);border:1px solid var(--copper);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.55);
   padding:8px 16px;font-size:13px;color:var(--paper)
 }
 #colocando-aviso button{pointer-events:auto;margin-left:8px}
+/* 🕵 Zonas de riesgo (2026-11-20, js/124): el cartel con la leyenda. */
+#riesgo-aviso{border-color:#e0453f;top:auto;bottom:18px}
+#riesgo-aviso .zr-rojo{color:#ff6b61;font-weight:700}
+#riesgo-aviso .zr-naranja{color:#ffb347;font-weight:700}
+#riesgo-aviso .zr-nota{opacity:.75;font-size:12px}
 #colocando-aviso b{color:var(--brass)}
 #colocando-aviso span{color:var(--muted)}
 /* (⌨) de los atajos de teclado: a la derecha de todo de la cabecera; el globo se abre hacia la izquierda. */
@@ -221,7 +226,7 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #btn-zonas-todas{position:absolute;top:calc(100% + 6px);left:0;z-index:39}
 /* 👁 En sigilo (2026-11-09, dueño): el botón para ver los campos de visión de los rivales, al lado de los lentes, latiendo. */
 #btn-vision-sigilo{position:absolute;top:calc(100% + 46px);right:0;left:auto;z-index:39;white-space:nowrap;font-size:12px;border-color:#7c5cff;animation:vision-sigilo-latido 1.6s ease-in-out infinite}
-#btn-vision-sigilo.activo{background:#3b2f73;border-color:#a991ff}
+#btn-vision-sigilo.activo{background:#7a1f1f;border-color:#ff6b61;color:#fff}
 @keyframes vision-sigilo-latido{50%{box-shadow:0 0 0 4px rgba(124,92,255,.25),0 0 14px rgba(150,120,255,.7)}}
 .btn-cuadrado.revelando{background:#8E2323;border-color:#D8524B;color:#fff}
 #ojo-menu{left:auto;right:0;min-width:220px;display:flex;flex-direction:column;gap:5px}

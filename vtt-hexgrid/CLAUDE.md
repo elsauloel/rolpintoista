@@ -2361,4 +2361,32 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `visibleParaJugadores` (antes no miraba la niebla: salían los movimientos, con casillas, de creeps que nunca habían visto) y al entrar el GM ya no
   anota «entró al mapa» de todos. No se tocó: el cuadro del duelo (nombra a quien ataca: atacar delata), el orden de turnos (un creep conocido
   conserva su fila) y el lado del GM con un personaje en sigilo — P255. Probado con clics en «El origen · CLON de pruebas» (GM, J1 y J2).
+- **🕵 Zonas de riesgo** (2026-11-20, dueño, jugando de GM con una rata en sigilo: «apretaba Control L… pero me mostraba el cono de visión propio de la
+  rata… tiene que haber algún comando… que le permita ver exclusivamente los conos de visión de los rivales… cuáles son las zonas de riesgo y cuáles
+  las zonas liberadas»): `js/124-zonas-riesgo.js` + las cuentas en `comun/zonas-riesgo.js` (`ZonasRiesgo.unir / estado / referencia / camino / leyenda`).
+  Con un token EN SIGILO que esta pantalla maneja (`zonasRiesgoCandidatos`: el jugador, su personaje o invocación; el GM, un creep o un personaje con 🎮
+  el control), el modo (`zonasRiesgoActivas`, no se guarda) pinta desde js/05 (`zonasRiesgoDibujar`) SOLO lo que miran sus rivales: **rojo** = el cono
+  de alguno (lo descubren al entrar y el camino se corta ahí), **naranja rayado** = la zona de alerta (cada paso pide una tirada de Percepción), sin
+  color = libre; el cartel `#riesgo-aviso` (abajo) lleva la leyenda. Es la misma cuenta que la detección (`zonasSigilo` de cada rival de `rivalesDe`, la
+  que usan `sigiloRevisar` y `sigiloEvaluarRuta`). Mientras está prendido **no se dibujan los 👓 lentes** (así no se mezcla el cono propio del token
+  seleccionado). De quién: el seleccionado si es uno mío en sigilo; si no, el primero mío en sigilo. **Solo cuentan los rivales que la pantalla ve**
+  (`zonasRiesgoRivales`: `tokenVisiblePorNiebla`, vivos y despiertos): un creep oculto, en sigilo o en la niebla no pinta (no se delata), aunque el
+  que está en sigilo o en la niebla sí descubre de verdad; por eso al jugador el cartel le dice «solo de los rivales que ves».
+  **Se prende y se apaga** con `#btn-vision-sigilo` («🕵 Ver zonas de riesgo (Ctrl + L)», late arriba a la derecha mientras hay alguien propio en
+  sigilo), con **Ctrl + L** (js/06: con alguien en sigilo es este modo; sin nadie, los lentes de siempre) o con el **🕵 del anillo del token**
+  (`zonasRiesgoHudIcono`, js/10). Se apaga solo cuando no queda nadie propio en sigilo. `zonasRiesgoEstadoDe(col, fila)` contesta 'riesgo' / 'alerta' /
+  'libre' (para las pruebas). Reemplaza al «👁 Ver campo de visión de los rivales» del 2026-11-09 (js/79), que prendía los lentes con «ver todas»: con
+  un token seleccionado los lentes muestran solo las zonas de ESE token (`lentesMuestra`), o sea el cono de la rata. **Entrar en sigilo ya no prende
+  los lentes solos** (`revisarAutoLentes`, js/03, solo refresca el botón).
+  **Qué hace cada modo de visión** (relevado ese día): 👓 lentes (botón, o Ctrl + L sin nadie en sigilo): cono azul + alerta naranja del token
+  seleccionado, de cualquiera que se vea; con «👁 ver todas», sin selección, las de los rivales (GM: los personajes; jugador: los creeps que ve).
+  👁 del GM → 🌫 Niebla sí/no; «Como jugador» (el GM ve con la niebla de los jugadores); «Revelar lo oculto» (ve a los personajes en sigilo, avisa a
+  todos); «👹 Visión de los creeps» (velo sobre lo que ningún creep ve, con `celdasVisionDe`: radio de luz y punto ciego — es la visión de la niebla,
+  NO la detección del sigilo); «💡 Luz de la escena». 📏 R / T: el rango del token seleccionado.
+  **Lo que descubre sin ser el cono ni la alerta, y NO se pinta** (no son zonas fijas): un rival que camina y deja al escondido en SU cono
+  (`percepcionEvaluarRuta`: el cono se mueve con él; con Percepción aumentada, también su alerta en cada paso); «Ve lo oculto» de un rival (lo deja
+  ver, `reveladas`); entrar en sigilo a la vista (js/72); pisar una trampa; atacar (js/109, js/82); un golpe de área que saca más vida que su Sigilo
+  (`sigiloDelatarPorDano`); Marcado; «Revelar lo oculto» del GM. El oído (`oidoPorJugadores`) y la luz portada son de la niebla: no sacan del sigilo.
+  Detalle a saber: adentro de la niebla de una varita solo descubre un rival pegado (`sigiloRevisar`), pero el camino se corta igual en el cono
+  (`sigiloEvaluarRuta`); se pinta rojo (lo prudente). Probado con clics en «Claude · pruebas 2» (GM y Jugador 1).
 

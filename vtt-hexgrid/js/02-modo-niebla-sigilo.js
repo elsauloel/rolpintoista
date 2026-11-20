@@ -463,7 +463,7 @@ async function mapaCambiarControl(fichaId, nombre, tomar){
 // Cartel fijo: con el modo prendido, nada seleccionado y "Ver todas" apagado, recuerda cómo ver algo.
 function actualizarAvisoLentes(){
   const el = $('#lentes-aviso');
-  el.hidden = !(verZonas && !seleccion && !lentesTodos);
+  el.hidden = !(verZonas && !seleccion && !lentesTodos) || (typeof zonasRiesgoPrendidas === 'function' && zonasRiesgoPrendidas());   // 🕵 con las Zonas de riesgo manda su cartel (js/124)
 }
 
 /* ---------- Sigilo, paso 4: detección automática y avisos ----------

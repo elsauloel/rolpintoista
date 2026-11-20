@@ -113,6 +113,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
+  ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
+  que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás
+  cerrando el botín, pero lo podés volver a abrir. El botín no desaparece hasta que el máster no ejecuta… comunicáselo en un lenguaje adecuado,
+  simple y amigable»). En la ventana del botín del jugador (mapa y ficha, la misma pieza): (1) un botón **«— Minimizar»** bien visible: la ventana
+  se achica a una pastilla fija («🎁 Botín abierto · tocá para volver») que no tapa nada y la reabre con un clic; (2) al tocar **Cerrar / ✕ / afuera**,
+  un cartel amable, del estilo: «Tranqui: el botín no se pierde. Sigue abierto para todos hasta que el GM lo cierre. Lo volvés a abrir cuando quieras
+  con el botón 🎁 de <dónde esté>» con [Entendido, cerrar] y [Mejor minimizar]; que no canse (p. ej. «No mostrar de nuevo» o solo la primera vez por
+  combate); (3) una línea fija dentro de la ventana que diga lo mismo en corto («Podés cerrar o minimizar esta ventana: el botín sigue acá hasta que
+  el GM lo cierre»); (4) que el botón para reabrirlo se note mientras haya botín abierto (pulso / color). Textos en rioplatense, simples, sin jerga.
+  Verificar de paso que de verdad se puede reabrir siempre (también recargando la página) mientras el GM no lo cerró.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

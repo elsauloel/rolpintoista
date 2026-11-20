@@ -160,6 +160,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — 🏷 Que los jugadores de prueba se llamen como su cuenta** (dueño, 2026-11-20: «los nombres jugador 1 de prueba, jugador 2 de
+  prueba, ¿se pueden cambiar y ponerles el nombre que sea igual al email asociado a esa cuenta?»). En «Claude · pruebas 2» y en «El origen · CLON de
+  pruebas», el nombre visible de cada cuenta de jugador de pruebas pasa a ser la parte de su email anterior a la arroba (tomada de la variable de
+  entorno, sin imprimirla). Cambiarlo con la interfaz si hay dónde (⚙ Partida / el nombre con que se unió); si no, contarlo. **Esos nombres NO van
+  al repo** (ni en docs, ni en commits, ni en nombres de capturas): en la documentación se sigue diciendo «Jugador 1 / Jugador 2». Tarea chica: se
+  puede hacer junto con otra. Preguntar al dueño si el GM de pruebas también.
 - **⬜ en cola — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las
   trampas de los jugadores** (dueño, 2026-11-20, sobre lo hecho en 0dda1bcb, `vtt-hexgrid/js/122-revelar.js`): (1) «para las trampas también debería
   aparecer un botón que se despliegue desde el propio token, al igual que los botones que se despliegan de los tokens de personajes, los circulitos

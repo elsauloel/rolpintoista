@@ -66,6 +66,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     igual y avisa (ADN: avisar, no bloquear). Tiene que funcionar con el jugador desconectado (lo recibe y ve el cartel al entrar) y aplicarse desde el
     mapa o desde la ficha (como `comun/recibidos.js`). Reglas de Firebase: si hace falta una colección nueva, avisar que hay que pegarlas.
   · Sin definir (anotar como pregunta): ¿una casilla «en secreto» para que la línea de la Mesa no la vean los demás?
+- **⬜ en cola — 💨 Prisa pasa a ser +5 a la tirada de iniciativa** (dueño, 2026-11-20: «cambiar la habilidad Prisa para que en lugar de que te
+  mande siempre primero a la lista de iniciativas, te dé +5 a la tirada de iniciativa. En El origen de las especies, el personaje Rocardo la tiene,
+  así que habría que cambiársela a él también»). La pasiva `prisa` de `comun/pasivas.js` deja de poner primero en el orden de turnos y da **+5 a
+  Iniciativa** (stat `ini`), con el texto nuevo. Sacar lo de «va primero» (el orden en `ordenarIniciativa`, js/04; el cartel de `vtt-hexgrid/js/86-prisa.js`;
+  el stat `prisa` en ficha-calculo / ficha-resumen) o dejarlo sin efecto, sin romper nada. **Quien ya la tiene** (personajes y creeps guardados, con
+  la copia vieja: `mods: [{stat: 'prisa', val: 1}]`) tiene que pasar solo a la versión nueva al cargarse (una conversión por `poolId: 'prisa'`, como
+  las otras migraciones): así Rocardo queda cambiado sin que nadie toque a mano la partida del dueño (que NO se abre ni se escribe para probar).
+  Revisar también los creeps esenciales / de fábrica y los ítems que den `prisa`. Mismo costo de Job (1) salvo que el dueño diga otra cosa.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

@@ -164,7 +164,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   puede hacer junto con otra. **El GM de pruebas también** (dueño, 2026-11-20: «quiero lo mismo para la cuenta del GM de pruebas»).
   **Resultado:** hecho con la interfaz del sitio, sin tocar datos por detrás: cada jugador de pruebas entró con su cuenta, abrió **«✎ Mis nombres»**
   (arriba, en la página de inicio) y se cambió el nombre en «Claude · pruebas 2» y en «El origen · CLON de pruebas»; se releyó después de recargar y
-  quedó guardado en las dos. No se tocaron las otras partidas de esas cuentas ni el GM de pruebas (el dueño todavía no respondió). Lo ya escrito en
+  quedó guardado en las dos. No se tocaron las otras partidas de esas cuentas. **El GM de pruebas, también** (dueño, después: «quiero lo mismo
+  para la cuenta del GM de pruebas»): hecho igual, en las mismas dos partidas (el script del clon no se rompe: comprueba la cuenta y el nombre de
+  la partida, no el nombre visible del GM). Lo ya escrito en
   la Mesa y el Historial conserva el nombre viejo. **Ojo con las capturas desde ahora:** en pantalla se ve el nombre nuevo; las capturas quedan
   fuera del repo, y en el repo y los docs se sigue diciendo «Jugador 1 / Jugador 2». Actualizar el clon no los cambia (los miembros no se copian).
 - **✅ hecho (2026-11-20) — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las

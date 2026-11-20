@@ -115,10 +115,11 @@
   que tuvo el Jugador 1) se sacó ese día: **no volver a darle un segundo personaje a un jugador**; si hace falta otro rival, un creep o Blanco J2.
   **Lo que necesita dos personas distintas** (pasar cosas, aceptar ofertas, duelos entre jugadores) **se prueba con J1 y J2**, cada uno en su
   pantalla. Un jugador pone su token con 🎭 → «Traer a … ya». Al terminar: narrativo, sin orden de turnos, sin ofertas pendientes.
-  **El nombre visible de J1 y J2 es el de su cuenta** (2026-11-20, dueño: «ponerles el nombre que sea igual al email asociado a esa cuenta»): en
+  **El nombre visible de J1, de J2 y del GM de pruebas es el de su cuenta** (2026-11-20, dueño: «ponerles el nombre que sea igual al email asociado
+  a esa cuenta»; «quiero lo mismo para la cuenta del GM de pruebas»): en
   «Claude · pruebas 2» y en el clon de El origen cada uno se llama como la parte de su email anterior a la arroba (se cambia en el inicio, «✎ Mis
-  nombres»). **Ese nombre no va al repo** (ni en docs, ni en commits, ni en nombres de archivos): acá se sigue diciendo «Jugador 1 / Jugador 2».
-  Las capturas lo muestran: quedan fuera del repo. El GM de pruebas no se tocó (falta que el dueño responda).
+  nombres»). **Ese nombre no va al repo** (ni en docs, ni en commits, ni en nombres de archivos): acá se sigue diciendo «Jugador 1 / Jugador 2» y
+  «GM de pruebas». Las capturas lo muestran: quedan fuera del repo.
 - **Ojo con los respaldos «restaurar todo» de una partida de prueba** (2026-11-05: se borraron los 17 tokens y el estado de «Mapa 1» de
   «Claude · pruebas»): el primer mapa puede tener un documento en `mapas/_principal` (solo el nombre, si se lo renombró), pero sus tokens y su
   estado viven en `tokens/` y `mapa/`. Un script que recorre `mapas/*` y guarda `mapas/<id>/tokens` bajo la clave `_principal` pisa lo de

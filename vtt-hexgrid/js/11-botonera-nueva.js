@@ -117,7 +117,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120carcaj', '../comun/ficha-botin.js?v=20261120lugar', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120enj', '../comun/ficha-combate.js?v=20261120maestria', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120carcaj3', '../comun/ficha-botin.js?v=20261120lugar', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120enj', '../comun/ficha-combate.js?v=20261120maestria', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
   '../comun/catalogo.js?v=20261120carcaj2', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120volverb', '../comun/inv-calculo.js?v=20261120maestria', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261105c2', '../comun/inv-duelo.js?v=20261118vx', '../comun/ficha-acciones.js?v=20261120inmune', '../comun/inv-habilidades.js?v=20261120inmune', '../comun/inv-lupa.js?v=20261120maestria',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261118vx', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261120maestria'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -2269,7 +2269,7 @@ function cerrarBotoneraNueva(){
   bn.host.hidden = true;
 }
 // El modo del mapa (narrativo/combate) cambia el orden de los Talentos: se redibuja.
-function bnModoCambio(){ if(bn && !bn.host.hidden) bnDibujar(); }
+function bnModoCambio(){ if(bn && !bn.host.hidden){ bnDibujar(); if(bn.raiz.querySelector('#bn-equipo.open')) bnEquipoDibujar(); } }   // el Equipo abierto también: sus botones dicen lo que cuestan en este modo (🏹 2026-11-20)
 document.addEventListener('keydown', e => {
   if(!bn || bn.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
   if(e.key !== 'Escape') return;

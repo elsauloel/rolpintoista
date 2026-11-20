@@ -2492,6 +2492,40 @@ prueba('🏹 cargar y descargar el carcaj fácil (2026-11-20): cada pila con su 
       /Vaciar a la mochila/.test(llenoHtml), /→ Mochila \(3\)/.test(llenoHtml), /data-alcarcaj="v"[^>]*disabled/.test(llenoHtml) || /disabled>→ Carcaj/.test(llenoHtml), vacio, deVuelta, S.carcajIncluido],
     [true, true, true, 5, [['Virote perforante', 2]], true, true, true, true, 0, [['Flecha de fuego', 3], ['Virote perforante', 4]], undefined]);
 });
+prueba('🏹 un solo recuadro de carcaj en el Equipo, y los botones dicen cuántos No2 cuestan (2026-11-20): el incluido, el equipado con su «Sacar», o cómo conseguir uno; en combate 1 No2 por clase, fuera de combate gratis', () => {
+  const flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego'), virote = CATALOGO_BASE.find(i => i.id === 'virote-perforante'), cuero = CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero');
+  const arco = {id: 'a', nombre: 'Arco', armaDeRango: true, arco: true, tipoItem: 'arma_2m', equipado: true};
+  const cab = h => (h.split('equipo-tit">Mochila')[0].match(/equipo-slot-cab"><span[^>]*>([^<]*)</g) || []).map(x => x.replace(/.*>/, '').replace(/<$/, '')).filter(t => /carcaj/i.test(t));
+  // 1) Sin arco ni carcaj: un solo recuadro, que explica cómo tener uno.
+  const S0 = fichaDePrueba({inventario: []}), h0 = FichaEquipo.html(S0, {});
+  // 2) Con arco y sin carcaj: solo el incluido.
+  const S = fichaDePrueba({inventario: [arco, {...structuredClone(flecha), id: 'f', unidades: 3}, {...structuredClone(virote), id: 'v', unidades: 4}, {...structuredClone(cuero), id: 'c', equipado: false}]});
+  S.nitros = 10;
+  const hInc = FichaEquipo.html(S, {}), hIncCombate = FichaEquipo.html(S, {enCombate: true});
+  // El costo que anuncia «Cargar todo» es el que cobra.
+  const ui = {toast: () => {}, cambio: () => {}, modoCombate: () => true, avisarSinNitros: () => {}};
+  FichaEquipo.alCarcaj(S, '*', ui);
+  const cobroCargar = 10 - S.nitros, hLleno = FichaEquipo.html(S, {enCombate: true});
+  FichaEquipo.delCarcaj(S, '*', ui);
+  const cobroVaciar = 10 - cobroCargar - S.nitros;
+  // 3) Con el Carcaj de cuero puesto: un solo recuadro, con su fila y «Sacar».
+  S.inventario.find(i => i.id === 'c').equipado = true;
+  const hReal = FichaEquipo.html(S, {});
+  // Extenuado: el botón muestra lo que de verdad va a cobrar.
+  const unaExt = FichaEquipo.costoCarcaj({efectos: [{nombre: 'Extenuado'}]}, 1, true) === Combatiente.conExtenuado([{nombre: 'Extenuado'}], FichaCalculo.IT2.nitrosEquipar);
+  igual([cab(h0), /carcaj incluido de 5 lugares/.test(h0),
+      cab(hInc), /Carcaj<\/span><span class="hint">0 \/ 1/.test(hInc), /→ Carcaj \(3\)<span[^>]*> · gratis/.test(hInc), /Cargar todo lo que entre<span[^>]*> · gratis/.test(hInc), /Fuera de combate, cargar y descargar no cuesta No2/.test(hInc),
+      /→ Carcaj \(3\)<span[^>]*> · 1 No2/.test(hIncCombate), /Cargar todo lo que entre<span[^>]*> · 2 No2/.test(hIncCombate), cobroCargar,
+      /Vaciar a la mochila<span[^>]*> · 2 No2/.test(hLleno), /→ Mochila \(3\)<span[^>]*> · 1 No2/.test(hLleno), cobroVaciar,
+      cab(hReal), /Carcaj de cuero/.test(hReal) && /data-toggle="c"[^>]*>Sacar/.test(hReal), /0 \/ 10/.test(hReal), /Carcaj incluido/.test(hReal),
+      FichaEquipo.costoCarcaj(S, 3, false), FichaEquipo.costoCarcaj(S, 3, true), unaExt],
+    [['🏹 Carcaj'], true,
+      ['🏹 Carcaj incluido'], false, true, true, true,
+      true, true, 2,
+      true, true, 2,
+      ['🏹 Carcaj'], true, true, false,
+      0, 3, true]);
+});
 prueba('💸 un duelo cancelado que no cuenta devuelve lo que se pagó de verdad, no el costo entero (2026-10-28): sin No2 «de cualquier modo», 0', () => {
   const x = {};
   for(let i = 0; i < 12; i++) Combatiente.anotarPagoDuelo(x, 'd' + i, i);

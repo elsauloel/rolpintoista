@@ -29,6 +29,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (hoy solo lo dice el texto del Mantenimiento) y la Maldición tormentosa sobre un invulnerable. Lo que no se vio en el mapa (la Protección de jefe, las
   zonas, trampas, el Escudo elemental y el rayo en cadena con un inmune al elemento, un golpe a un creep invulnerable) quedó anotado en
   `pruebas-en-el-mapa.md`. La partida quedó como estaba (comparada contra una foto de antes).
+- **✅ hecho (2026-11-20) — 🏹 El carcaj se ve dos veces en el Equipo, y los botones no dicen cuántos No2 cuestan** (dueño, 2026-11-20, con captura: «en este menú
+  del equipo se ve duplicado el carcaj. También me gustaría que los botones de cargar o descargar te digan cuántos No2 va a costar la acción»). Hoy,
+  con un arco o ballesta y sin Carcaj de cuero, salen dos recuadros: «CARCAJ 0 / 1 · Vacío» (el lugar para equipar un carcaj) y «🏹 CARCAJ INCLUIDO
+  0 / 5». Que quede UN solo recuadro de carcaj: el incluido (5) si no hay uno equipado, o el equipado (con su capacidad) si lo hay; sin perder la
+  forma de equipar/sacar un Carcaj de cuero. Y cada botón («→ Carcaj (N)», «→ Mochila (N)», «Cargar todo lo que entre», «Vaciar a la mochila») dice
+  cuántos No2 cuesta en ese momento (en combate; fuera de combate, que diga que no cuesta), con el costo real que ya cobra el código: no inventar uno.
+  *Resultado:* en «Equipo y mochila» (ficha y 🛡 del mapa) queda UN solo recuadro «🏹 Carcaj», al final de lo equipado: sin carcaj puesto y con arco o
+  ballesta, «Carcaj incluido · N / 5»; con uno puesto, «Carcaj · N / 10» con la fila del Carcaj de cuero (Ver, Editar, **Sacar**) y sus flechas; sin
+  arco, ni ballesta ni carcaj, «Vacío» y cómo conseguir uno (antes decía «Carcaj 0 / 1 · Vacío»). El carcaj se sigue equipando desde la mochila
+  (columna de la derecha, «Equipar»). Cada botón dice lo que cuesta: fuera de combate «· gratis»; en combate «→ Carcaj (N) · 1 No2», «→ Mochila (N) ·
+  1 No2», y «Cargar todo lo que entre» / «Vaciar a la mochila» con el total (1 No2 por cada clase de flecha que pasa: con dos clases, «· 2 No2»). Es
+  el costo que ya cobraba (el de equipar, 1 No2 por acción, más lo que sume Extenuado): no se agregó ninguno. Abajo, una línea lo explica. Con el
+  Equipo abierto, si el GM cambia de modo los botones se actualizan solos. Probado con clics en «Claude · pruebas 2» (Jugador 1, ficha y 🛡 del mapa):
+  fuera de combate no cobró nada; en combate cobró exactamente lo que decía cada botón (6 → 5 → 4 → 2 No2, sacar el carcaj 1 más) y, sin No2
+  suficientes, salió el cartel de siempre «cuesta 2 No2 y tenés 1». 1 prueba automática nueva (893 en verde). Detalle en `pruebas-en-el-mapa.md`.
+  (La entrada «en cola» se había borrado sin querer al cerrar la tarea anterior: se repuso acá.)
 
 - **✅ hecho (2026-11-20; el caso exacto de la partida no se pudo reproducir: ver el resultado) — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
   «no funcionaba el aplicarle debuffs automatizados a Bizzante… murió y quedó invulnerable por el pacto pero dejó de recibirlos aún después de terminado

@@ -169,6 +169,7 @@ function modoMapaEscuchar(){
       modoMapaListo = true;
       modoMapa = (doc.exists && doc.data().modo === 'narrativo') ? 'narrativo' : 'combate';
       renderBotoneraSiAbierta();
+      if($('#scrim-equipo').classList.contains('open')) renderEquipo();   // 🏹 los botones del carcaj dicen lo que cuestan en este modo (2026-11-20)
     }, err => console.error('Error escuchando el modo del mapa:', err));
   };
   fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {

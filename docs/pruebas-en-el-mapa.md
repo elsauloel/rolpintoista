@@ -3088,3 +3088,25 @@ Capturas en `cola17/`.
   aviso en la cola); dos pantallas distintas guardando la misma parte en el mismo instante; la ficha suelta en una pestaña dormida de verdad.
 - [ ] **Falta que lo mire el dueño**, y que avise si vuelve a pasar: ahora tiene que quedar una línea en la Mesa.
 Capturas en `cola18/`.
+
+## 2026-11-20 · 🏹 Un solo recuadro de carcaj y los botones con su costo en No2 («Claude · pruebas 2», mapa «Prueba · R4 M4», Jugador 1; el GM solo cambió el modo)
+
+- [x] **Sin arco, ni ballesta ni carcaj** (ficha, 🛡 Equipo): un solo recuadro «🏹 Carcaj · Vacío. Con un arco o una ballesta equipados tenés un carcaj
+  incluido de 5 lugares…»; las flechas de la mochila se listan con su botón apagado. Ya no sale «Carcaj 0 / 1».
+- [x] **Con un arco y sin carcaj**: un solo recuadro «🏹 Carcaj incluido · 0 / 5». Fuera de combate: «→ Carcaj (3) · gratis», «Cargar todo lo que entre ·
+  gratis», «→ Mochila (3) · gratis», «Vaciar a la mochila · gratis» y la línea «Fuera de combate, cargar y descargar no cuesta No2». Se apretaron los
+  cuatro: los No2 no se movieron (6).
+- [x] **Con el Carcaj de cuero** (se equipó con «Equipar» desde la mochila; las 5 flechas pasaron solas): un solo recuadro «🏹 Carcaj · 5 / 10» con la
+  fila «Carcaj de cuero · Ver · Editar · Sacar» y las flechas debajo.
+- [x] **En combate** (el GM pasó el mapa a combate con el Equipo abierto: los botones cambiaron solos): «→ Mochila (3) · 1 No2» cobró 1 (6 → 5);
+  «→ Carcaj (3) · 1 No2», 1 (→ 4); «Vaciar a la mochila · 2 No2» (dos clases), 2 (→ 2); «Sacar» el Carcaj de cuero, 1 (→ 1) y el recuadro pasó a
+  «Carcaj incluido». «Cargar todo lo que entre · 2 No2» con 1 No2: el cartel de siempre «No podés cargar el carcaj incluido: cuesta 2 No2 y tenés 1»
+  (se canceló). Al volver a narrativo, otra vez «· gratis».
+- [x] **🛡 del mapa** (la misma ventana): el mismo recuadro único, «gratis» en narrativo y «1 No2» / «Vaciar · 2 No2» en combate, cambiando solo al
+  cambiar el modo. La ventana se abrió por su función, no con el clic en el 🛡 del token.
+- [x] La partida quedó como estaba (Blanco J1 con su cuchillo y sus botas, 6 No2, 0 DDE, sin flechas; narrativo, sin orden de turnos).
+- [ ] **Sin ver en pantalla:** el costo con **Extenuado** (el botón suma lo que suma Extenuado: solo en las pruebas automáticas); una **ballesta** con
+  Carcaj integrado; el recuadro con flechas «huérfanas» (flechas en el carcaj incluido sin arco: normalmente vuelven solas a la mochila); el modo del
+  mapa cambiado con el interruptor del GM (se cambió por detrás, para no abrir sus carteles); «Realizar de cualquier modo» sin No2 suficientes.
+- [ ] **Falta que lo mire el dueño.**
+Capturas en `cola20/`.

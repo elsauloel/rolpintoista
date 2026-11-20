@@ -1567,6 +1567,11 @@ versión parecida en más de una, es candidato a juntar.
   `reemplazar`) pasa las del incluido al de verdad o a la mochila y devuelve el aviso; `carcajHuerfano` = quedaron flechas sin arco (se ven en Equipo).
   Cargar y descargar: cada pila con «→ Carcaj (N)» / «→ Mochila (N)» y, con más de una, «Cargar todo lo que entre» / «Vaciar a la mochila»
   (`alCarcaj(S, '*')` / `delCarcaj(S, '*')`: una acción de equipar por pila en combate). Solo personajes. Dudas: P250.
+  **Un solo recuadro y el costo a la vista** (dueño, 2026-11-20: «se ve duplicado el carcaj… que los botones te digan cuántos No2 va a costar»):
+  `FichaEquipo.html` ya no dibuja el lugar «Carcaj» con los demás: lo dibuja `carcajHtml(S, o)` (`.equipo-carcaj`), que muestra el incluido, o el
+  equipado con su fila y su «Sacar», o «Vacío» y cómo conseguir uno. Cada botón lleva su precio (`costoCarcaj(S, pilas, enCombate)`: el mismo número
+  que cobra `conCosto`, 1 No2 de equipar por pila + Extenuado; «· gratis» fuera de combate, `o.enCombate`); `pilasQueEntran(S, c)` son las pilas que
+  pasa (y cobra) «Cargar todo lo que entre». La ficha y el mapa redibujan el Equipo abierto cuando cambia el modo.
 - **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
   **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El

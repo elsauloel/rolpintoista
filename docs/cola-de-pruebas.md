@@ -22,6 +22,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   0 / 5». Que quede UN solo recuadro de carcaj: el incluido (5) si no hay uno equipado, o el equipado (con su capacidad) si lo hay; sin perder la
   forma de equipar/sacar un Carcaj de cuero. Y cada botón («→ Carcaj (N)», «→ Mochila (N)», «Cargar todo lo que entre», «Vaciar a la mochila») dice
   cuántos No2 cuesta en ese momento (en combate; fuera de combate, que diga que no cuesta), con el costo real que ya cobra el código: no inventar uno.
+- **⬜ en cola — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
+  botón para poder pasarle a un aliado»). En la ventanita «DDE y despojos» de la ficha, un botón 🤝 «Pasar a un aliado» que deja elegir a quién, qué
+  (DDE, despojos normales, mágicos o especiales) y cuánto, usando el mismo mecanismo de intercambio que ya pasa ítems (`comun/intercambio.js`); que el
+  que recibe se entere (aviso / línea en la Mesa). Si en combate pasar un ítem cuesta No2, usar el mismo criterio que ya existe; no inventar otro.
 
 - **✅ hecho (2026-11-20; el caso exacto de la partida no se pudo reproducir: ver el resultado) — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
   «no funcionaba el aplicarle debuffs automatizados a Bizzante… murió y quedó invulnerable por el pacto pero dejó de recibirlos aún después de terminado

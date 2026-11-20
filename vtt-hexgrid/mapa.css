@@ -154,7 +154,7 @@ header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 }
 #colocando-aviso button{pointer-events:auto;margin-left:8px}
 /* 🕵 Zonas de riesgo (2026-11-20, js/124): el cartel con la leyenda. */
-#riesgo-aviso{border-color:#e0453f;top:auto;bottom:18px}
+#riesgo-aviso{border-color:#e0453f;top:144px}   /* debajo del botón «🕵 … zonas de riesgo» de arriba a la derecha, para no taparlo */
 #riesgo-aviso .zr-rojo{color:#ff6b61;font-weight:700}
 #riesgo-aviso .zr-naranja{color:#ffb347;font-weight:700}
 #riesgo-aviso .zr-nota{opacity:.75;font-size:12px}

@@ -2367,7 +2367,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Con un token EN SIGILO que esta pantalla maneja (`zonasRiesgoCandidatos`: el jugador, su personaje o invocación; el GM, un creep o un personaje con 🎮
   el control), el modo (`zonasRiesgoActivas`, no se guarda) pinta desde js/05 (`zonasRiesgoDibujar`) SOLO lo que miran sus rivales: **rojo** = el cono
   de alguno (lo descubren al entrar y el camino se corta ahí), **naranja rayado** = la zona de alerta (cada paso pide una tirada de Percepción), sin
-  color = libre; el cartel `#riesgo-aviso` (abajo) lleva la leyenda. Es la misma cuenta que la detección (`zonasSigilo` de cada rival de `rivalesDe`, la
+  color = libre; el cartel `#riesgo-aviso` (arriba, al centro) lleva la leyenda. Es la misma cuenta que la detección (`zonasSigilo` de cada rival de `rivalesDe`, la
   que usan `sigiloRevisar` y `sigiloEvaluarRuta`). Mientras está prendido **no se dibujan los 👓 lentes** (así no se mezcla el cono propio del token
   seleccionado). De quién: el seleccionado si es uno mío en sigilo; si no, el primero mío en sigilo. **Solo cuentan los rivales que la pantalla ve**
   (`zonasRiesgoRivales`: `tokenVisiblePorNiebla`, vivos y despiertos): un creep oculto, en sigilo o en la niebla no pinta (no se delata), aunque el

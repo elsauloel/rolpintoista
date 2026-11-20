@@ -232,7 +232,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Qué quedó:** el modo **«🕵 Zonas de riesgo»** (`vtt-hexgrid/js/124-zonas-riesgo.js` + las cuentas en `comun/zonas-riesgo.js`). Con alguien propio en
   sigilo aparece latiendo arriba a la derecha el botón «🕵 Ver zonas de riesgo (Ctrl + L)»; se prende y se apaga con ese botón, con Ctrl + L o con el 🕵
   del anillo del token. Pinta SOLO lo que miran los rivales de ese token: **rojo** = te descubren al entrar (el cono), **naranja rayado** = cada paso
-  pide una tirada de Percepción (la zona de alerta), **sin color** = libre; abajo queda un cartel con la leyenda. Es la misma cuenta que la detección
+  pide una tirada de Percepción (la zona de alerta), **sin color** = libre; arriba queda un cartel con la leyenda. Es la misma cuenta que la detección
   de verdad (`zonasSigilo`). El cono propio ya no se mezcla (mientras está prendido no se dibujan los 👓 lentes) y acompaña mientras se arrastra el
   token. Un jugador ve solo las zonas de los rivales que ve (un creep oculto, en sigilo o en la niebla no pinta: el cartel lo aclara).
   **Por qué pasaba:** Ctrl + L prendía los lentes con «ver todas», pero con un token seleccionado los lentes muestran solo las zonas de ESE token: con

@@ -75,6 +75,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Claude, a confirmar con el dueño (anotar en preguntas-abiertas): un jugador no puede revelar lo que no ve. Que quede línea en la Mesa («👁 El GM
   reveló la trampa…») y, si aplica, la contraria («volver a ocultar») para el GM. De paso, mirar por qué la tirada de detectar pudo dar «no
   detectada» por un malentendido: que el cuadro de detectar ofrezca al GM «Resolver a mano» (detectada / no detectada), como el resto de lo automático.
+- **⬜ en cola — 🐀 Un creep en sigilo no puede quedar delatado por la Mesa ni por la Crónica** (dueño, 2026-11-20, El origen: «las ratas tiraron
+  su polvareda y quedaron en sigilo. Sin embargo, después realizaron un par de acciones… que aparecían en la Mesa, en la Crónica. Al jugador por lo
+  menos dos veces le apareció un mensaje de que la rata hacía una acción específica, con lo cual revelaba el sigilo… quiero que hagas una copia de la
+  rata en la partida de pruebas y realices varias acciones para ver cuáles aparecen botoneadas por el log de la Mesa o por la Crónica. Hay
+  determinadas acciones que tienen que tener una advertencia, como "uy, percibís algo raro, tirada de percepción", pero no puede suceder que la rata
+  haga algo y se revele»). Pasos: (1) armar en «Claude · pruebas 2» una copia de esa rata (la del pool/biblioteca si es la misma; si hace falta
+  mirarla en El origen, SOLO lectura con la página con escrituras bloqueadas de scratchpad/simfin/, sin abrir el mapa ni GM Tools ahí). (2) Ponerla
+  en sigilo con su Polvareda y, mirando la pantalla de un JUGADOR (Mesa, Crónica, 📜 Historial, carteles, toasts, textos flotantes, orden de turnos,
+  Tablero, animaciones), hacer todas sus acciones: moverse, cada habilidad, atacar, defenderse, recibir un estado/daño de zona, Mantenimiento, pasar
+  el turno, No2, cooldowns. (3) Tabla en el informe: acción → qué vio el jugador → ¿delata? (4) Arreglar las fugas con UN criterio común (un punto
+  por donde pasan las líneas de la Mesa/Crónica de un creep que los jugadores no ven: se callan o se vuelven anónimas, y el GM las sigue viendo
+  completas), no parche por parche. Lo que por regla ya rompe el sigilo (p. ej. atacar, si la regla dice eso) sigue igual: no inventar reglas;
+  lo dudoso, a preguntas-abiertas. (5) Proponer (sin programar todavía, salvo que ya exista) qué acciones merecen el aviso «percibís algo raro →
+  tirada de Percepción» y traerle la lista al dueño. Mirar lo mismo para un personaje / invocación en sigilo si sale barato.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

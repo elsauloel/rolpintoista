@@ -124,6 +124,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   combate); (3) una línea fija dentro de la ventana que diga lo mismo en corto («Podés cerrar o minimizar esta ventana: el botín sigue acá hasta que
   el GM lo cierre»); (4) que el botón para reabrirlo se note mientras haya botín abierto (pulso / color). Textos en rioplatense, simples, sin jerga.
   Verificar de paso que de verdad se puede reabrir siempre (también recargando la página) mientras el GM no lo cerró.
+- **⬜ en cola — 🎭 Que sea claro cómo poner tu personaje en el mapa** (dueño, 2026-11-20, sobre la observación de un ayudante: «lo del botón de
+  personajes y el botón de tokens es poco claro… vamos con tu sugerencia, hacer las 2 y 3 juntas»). (2) En la lista de **👥 Personajes** del mapa, al
+  lado de cada personaje PROPIO que no tiene token en el mapa que se está viendo, un botón **«🎭 Ponerlo en el mapa»** que hace lo mismo que el 🎭
+  («Traer a <personaje> ya» / el asistente de token nuevo, lo que ya exista). (3) Si un jugador entra al mapa y su personaje no tiene token en ese
+  mapa, un cartel: «<Personaje> todavía no está en este mapa. [🎭 Ponerlo ahora] [Ahora no]»; sale solo cuando falta el token, una vez por entrada
+  (no insistir si dijo «Ahora no»), y no le sale al GM. Con más de un personaje propio, que deje elegir. Respetar lo que ya limite al jugador para
+  poner tokens (si hay mapas donde no puede, no ofrecerlo).
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

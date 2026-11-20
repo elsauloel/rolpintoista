@@ -139,6 +139,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
+  de un combate nuevo nadie le «empieza» el turno; «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa
+  es como si fuera su turno. Podríamos hacer que se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que
+  diga Iniciar combate, y ahí se inicia con el primer turno del primero de la lista con sus regeneraciones pertinentes, recarga de nitros, etc.»).
+  En el panel «Orden de turnos» del GM, después de Ordenar, un botón destacado **«▶ Iniciar combate»**. Al apretarlo: (1) **todos** los del orden
+  (personajes, invocaciones, creeps) quedan con los **No2 llenos** y la cuenta de ataques del turno en cero (esto último ya lo hace el paso a Combate,
+  commit 96edd265: no duplicar); (2) al **primero** de la lista se le **empieza el turno** como a cualquiera cuando le toca: su inicio de turno de
+  siempre (regeneraciones, estados que cuentan, recarga), por el MISMO camino que usa «Siguiente» (el cartel «Empezá tu turno → Aplicar» del jugador o
+  el Mantenimiento del creep), sin lógica nueva; (3) línea en la Mesa / Crónica: «▶ Empieza el combate: turno de X». Mientras no se apriete, que se
+  note que el combate no empezó (el botón pulsando; «Siguiente» avisa o lo ofrece). Ver cómo convive con lo que ya hace el paso a Combate (carteles
+  «Registro del combate», etc.) y con Prisa / Ordenar. Si el mapa no está en Combate, ofrecer pasarlo. Dudas (¿los estados del primero pierden un
+  turno al iniciar?, ¿cooldowns?) → resolver como un inicio de turno normal y anotarlas en preguntas-abiertas.
+- **⬜ en cola — ⏳ Vigilancia y Aguante: que digan «se va al empezar tu próximo turno» en vez de ∞** (dueño, 2026-11-20: «en Vigilancia y Aguante
+  estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno. El resto está bien porque se entiende que se van con acciones o
+  situaciones específicas»). Con el dato genérico `hasta` que se agregó para Desequilibrado (commit 96edd265): al poner esos dos estados, `hasta:
+  'el comienzo de tu próximo turno'` (o «del próximo turno de <nombre>» donde lo lee otro). Solo esos dos. Tarea chica.
 - **⬜ en cola — 🧬 Partida clon de «El origen de las especies», solo para pruebas** (dueño, 2026-11-20: «que crees una partida que sea clon del
   origen de las especies, que la vamos a usar para hacer pruebas pertinentes al origen… cada tanto te voy a pedir que la actualices… exclusivamente
   para pruebas… y que solamente tenga como personajes a Bizzante, Larry y Rocardo. Aurelius y la Estrella culona no. Que el GM sea la cuenta de Rol

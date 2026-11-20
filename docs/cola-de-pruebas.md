@@ -300,6 +300,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la copia vieja: `mods: [{stat: 'prisa', val: 1}]`) tiene que pasar solo a la versión nueva al cargarse (una conversión por `poolId: 'prisa'`, como
   las otras migraciones): así Rocardo queda cambiado sin que nadie toque a mano la partida del dueño (que NO se abre ni se escribe para probar).
   Revisar también los creeps esenciales / de fábrica y los ítems que den `prisa`. Mismo costo de Job (1) salvo que el dueño diga otra cosa.
+- **⬜ en cola — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
+  que no se probó, anotalo en la cola»). Sin programar nada nuevo: probar con clics en «Claude · pruebas 2» (GM, J1, J2) lo que cada informe dejó
+  sin ver (también está en docs/pruebas-en-el-mapa.md; tachar ahí lo que se vea) y arreglar solo lo que falle:
+  · **Arrastrar / Desequilibrado / primer ataque** (96edd265): una invocación arrastrada; un creep arrastrando a un personaje; cerrar con
+    «Finalizar combate → Publicar» y abrir otro combate (costo del primer ataque); una ballesta «que llega cargada» en el primer turno del combate
+    nuevo; el «hasta el fin del turno de…» en GM Tools (chip, Ver, Tablero) y en la 🔍 del estado en la ficha.
+  · **Cartel «INVULNERABLE / INMUNE A…»** (56a48f10): golpe a un creep invulnerable; Protección de jefe; inmune a un elemento desde una zona, una
+    trampa, el Escudo elemental, el rayo en cadena y el elemental de un arma; «INMUNE A LO SINIESTRO»; dos carteles a la vez; token que esa pantalla no ve.
+  · **Debuffs que no entraban tras el Pacto** (79ef20c7): el GM con 🎮 el control tomando los avisos; origen zona o trampa; ficha suelta en pestaña dormida.
+  · **Carcaj** (b31433a8): costo con Extenuado; ballesta con carcaj integrado; «Realizar de cualquier modo» sin No2; abrir el Equipo con el 🛡 del token.
+  · **Pasar DDE y despojos** (c2ee6fb5): despojos e ítems entre J1 y J2; Rechazar / Cancelar; despojos especiales; con el mapa en Combate.
+  · **Vuelta a narrativo** (d592fa7b, c5b24399): el GM mirando otro mapa que el publicado; con orden de turnos armado; que se libere lo «una vez por
+    combate»; cerrar desde GM Tools; la pantalla del Jugador 2.
+  · De antes: enjambre en contraataque / oportunidad / habilidad con arma; Llama de Fénix como tercera opción de «¿Con qué volvés?»; el camino
+    Avanzar de la XP en «Batalla terminada».
+  Informe: tabla caso → visto / falló / no se pudo, con capturas.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

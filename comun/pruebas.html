@@ -3791,6 +3791,19 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
     [150, 2, 28, [14, 3], ['Garras de Orco 60'], 25, [18, 3], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-31, P237: sin habilidades, pasivas ni equipo, y con 18 puntos de atributo, dan menos)   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
 });
+prueba('🌀 fin del combate: el creep que se fue por un Town portal cuenta como «Escapó» (2026-11-20): 20 % de la XP, sin oro ni ítems; si volvió al mapa, no se marca', () => {
+  const enMapa = CombateFin.unirEscapados(new Set(['a', 'c']), ['b', 'c']);
+  const rep = CombateFin.nuevo(); rep.enMapa = enMapa;
+  const creeps = [creepPrueba({id: 'a', nivel: 2, hp: 0}), creepPrueba({id: 'b', nivel: 2, hp: 7, oroBase: 50}), creepPrueba({id: 'c', nivel: 1, hp: 4})];
+  const r = CombateFin.generar(rep, creeps, []), fb = r.filas.find(f => f.sc.id === 'b'), fa = r.filas.find(f => f.sc.id === 'a');
+  rep.paso = 'experiencia';
+  const html = CombateFin.vista(rep, creeps, []).html;
+  CombateFin.cambio(rep, {dataset: {repEscapados: ''}, checked: false});
+  const r2 = CombateFin.generar(rep, creeps, []);
+  igual([[...enMapa].sort(), [...enMapa.portal], r.filas.length, fb.derrotado, fb.portal, fb.xp === Math.round(CombateFin.xpDeCreep(creeps[1]).total * CombateFin.XP_ESCAPO_PCT), fb.oro, fb.items.length,
+    fb.cuenta, html.includes('Escapó 🌀'), r.filas.find(f => f.sc.id === 'c').portal, r2.filas.find(f => f.sc.id === 'b').cuenta, r2.xpTotal === fa.xp],
+    [['a', 'b', 'c'], ['b'], 3, false, true, true, 0, 0, true, true, false, false, true]);
+});
 prueba('🔮 fin del combate simulado (2026-11-20): misma ventana con el cartel, sin Publicar; quién cobra en memoria; «Pasar a Avanzar» la vuelve real; publicar se niega', async () => {
   const rep = CombateFin.nuevo(); rep.simulacion = true;
   rep.enMapa = new Set(['a']);

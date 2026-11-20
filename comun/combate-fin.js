@@ -7,7 +7,7 @@
    - nuevo() → rep: el estado del reporte. contarEscapados vive adentro (antes xpContarEscapados).
    - generar(rep, creeps, cat) → {filas, xpTotal}; calcularReparto(rep, r); itemsPublicables(rep, r). `creeps` = los creeps de la
      partida (forma de GM Tools), `cat` = el catálogo en la forma del equipo de un creep (itemParaCreep).
-   - creepsEnMapa() → Set de los creeps con token en el mapa publicado; jugadores(previos) → los personajes con su estado.
+   - creepsEnMapa() → Set de los creeps con token en el mapa publicado (más los que se fueron por un Town portal en combate, `.portal`); jugadores(previos) → los personajes con su estado.
    - vista(rep, creeps, cat) → {html, publicar: 'oculto'|'activo'|'inactivo', faltanJugadores}: el cuerpo de la ventana.
    - cambio(rep, t) / clic(rep, b, raiz, creeps, cat): lo que hacen sus controles (data-rep-*), → true | {ver: ítem} | {toast}.
    - publicar(rep, {creeps, cat, combateActual, confirmar, alEmpezar}) → null (canceló) | {error} | {ok, items, filas}.
@@ -96,8 +96,30 @@ const CombateFin = (() => {
     const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
     const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : '_principal';
     const ruta = mapaId === '_principal' ? 'tokens' : `mapas/${mapaId}/tokens`;
-    const snap = await fbDb.collection(fbRutaCampana(ruta)).get();
-    return new Set(snap.docs.map(d => d.data()).filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId));
+    const [snap, esc] = await Promise.all([fbDb.collection(fbRutaCampana(ruta)).get(), escapadosLeer()]);
+    return unirEscapados(new Set(snap.docs.map(d => d.data()).filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId)), esc);
+  }
+
+  /* 🌀 Los que se fueron por un Town portal durante el combate (2026-11-20, dueño: «un creep escapó con un portal, y ahora en la simulación no
+     aparece como que escapó, ni lo contabiliza para la experiencia»). Al pisar el portal su token se borra del mapa, así que creepsEnMapa no lo
+     veía. La pantalla del GM que lo mueve en modo combate (vtt-hexgrid/js/84, townPortalRevisar) lo anota en `gm/escapados` = {ids} (solo el GM,
+     sin reglas nuevas); creepsEnMapa lo suma y el reporte lo cuenta como «Escapó» con sus reglas de siempre (el 20 % de la XP si «contar a los
+     que escaparon» está tildado; sin oro ni ítems), en Simular y en Avanzar. La lista se vacía al publicar las recompensas (en el mismo lote) y con
+     «↺ Reiniciar combate» de GM Tools: no pasa al combate siguiente. Ctrl+Z de la entrada al portal lo saca. */
+  const refEscapados = () => fbDb.doc(fbRutaCampana('gm/escapados'));
+  async function escapadosLeer(){
+    try{ const d = await refEscapados().get(); return d.exists && Array.isArray(d.data().ids) ? d.data().ids.filter(x => typeof x === 'string' && x) : []; }
+    catch(err){ console.error('No se pudo leer quién escapó por un portal:', err); return []; }
+  }
+  // Une los del mapa con los que escaparon: el Set lleva además `.portal` = los que se fueron por el portal (y no volvieron al mapa).
+  function unirEscapados(enMapa, ids){
+    const s = new Set(enMapa);
+    s.portal = new Set();
+    (ids || []).forEach(id => { if(!s.has(id)){ s.add(id); s.portal.add(id); } });
+    return s;
+  }
+  async function escapadosLimpiar(){
+    try{ await refEscapados().delete(); }catch(err){ console.error('No se pudo vaciar la lista de los que escaparon por un portal:', err); }
   }
 
   // El oro se tira UNA sola vez por creep (±20% sobre su valor base) y no se recalcula al reabrir el reporte.
@@ -406,7 +428,8 @@ const CombateFin = (() => {
       const xpBase = xpDeCreep(sc).total;   // ⭐ P237
       const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
       const cuenta = derrotado || rep.contarEscapados;
-      return {sc, derrotado, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
+      const portal = !derrotado && !!(rep.enMapa.portal && rep.enMapa.portal.has(sc.id));   // 🌀 se fue por un Town portal
+      return {sc, derrotado, portal, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
     });
     const xpTotal = filas.reduce((a, f) => a + (f.cuenta ? f.xp : 0), 0);
     return {filas, xpTotal};
@@ -579,7 +602,7 @@ const CombateFin = (() => {
         <div class="reporte-seccion-titulo">Quién cobra</div><div class="reporte-lista">${jugadoresHtml('dde')}</div>`;
     }else if(paso === 'experiencia'){
       const filasHtml = filas.map(f => `<div class="reporte-fila${f.cuenta ? '' : ' no-cuenta'}"><span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
-        <span class="reporte-estado ${f.derrotado ? 'derrotado' : 'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span><span class="reporte-xp">+${fmt(f.xp)} XP</span></div>`).join('');
+        <span class="reporte-estado ${f.derrotado ? 'derrotado' : 'escapo'}"${f.portal ? ' title="Se fue por un Town portal"' : ''}>${f.derrotado ? 'Derrotado' : f.portal ? 'Escapó 🌀' : 'Escapó'}</span><span class="reporte-xp">+${fmt(f.xp)} XP</span></div>`).join('');
       cuerpo = `<div class="reporte-lista">${filasHtml}</div>
         ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" data-rep-escapados ${rep.contarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)} % de lo que darían derrotados)</label>` : ''}
         <div class="reporte-total">XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador (paso Doblones)'}</div>
@@ -702,6 +725,7 @@ const CombateFin = (() => {
       // `despojos`: los del equipo que no se ofrece (se pagan al cerrar el botín, con la XP y el oro).
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {numero: Date.now(), estado: items.length ? 'publicado' : 'cerrado', titulo: 'Batalla terminada', items: items.length, creado: ts,
         jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde, despojos}) => ({fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100, despojos: despojos || 0}))});
+      batch.delete(refEscapados());   // 🌀 los que escaparon por un portal ya cuentan en este combate: no pasan al siguiente
       items.forEach(i => {
         batch.set(fbDb.collection(fbRutaCampana('botin')).doc(), {nombre: String(i.nombre).slice(0, 80), json: JSON.stringify(i.template), origen: String(i.origen).slice(0, 80),
           precioCompra: num(i.precioCompra), despojos: K.despojosDePrecio(i.precioCompra), tomadoPor: '', tomadoNombre: '', creado: ts});
@@ -906,7 +930,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

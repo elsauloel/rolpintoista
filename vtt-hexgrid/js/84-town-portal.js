@@ -90,12 +90,24 @@ async function townPortalDeshacer(u){
   try{
     await coleccionTokens().doc(u.id).set({...u.datos, creado: firebase.firestore.FieldValue.serverTimestamp()});
     townPortalEntrados.delete(u.id);
+    townPortalEscapo(u.datos, false);
     toast(`Deshecho: ${u.nombre || 'el token'} vuelve del Town portal`);
     try{ mesaLinea(`↩ ${u.nombre || 'El token'} volvió del Town portal (deshecho)`, 'recordatorio'); }catch(e){}
   }catch(err){
     console.error('No se pudo deshacer el Town portal:', err);
     toast(err && err.code === 'permission-denied' ? 'No podés deshacer eso' : 'No se pudo deshacer');
   }
+}
+/* 🌀 Un creep que se va por el portal DURANTE un combate cuenta como «Escapó» al finalizarlo (2026-11-20, dueño: «un creep escapó con un portal, y
+   ahora en la simulación no aparece como que escapó, ni lo contabiliza para la experiencia»): sin token, el fin del combate no lo veía
+   (CombateFin.creepsEnMapa solo mira los tokens del mapa publicado). Se anota en `gm/escapados` = {ids} (la misma lista que lee y vacía
+   comun/combate-fin.js al publicar las recompensas): solo el GM, solo en modo combate y desde el mapa publicado. Ctrl+Z lo saca. */
+function townPortalEscapo(t, si){
+  if(!soyGM || !t || t.tipo !== 'creep' || !t.fichaId) return;
+  if(si && (modoMapa !== 'combate' || mapaMostrado !== mapaActivo)) return;
+  const FV = firebase.firestore.FieldValue;
+  fbDb.doc(fbRutaCampana('gm/escapados')).set({ids: si ? FV.arrayUnion(String(t.fichaId)) : FV.arrayRemove(String(t.fichaId)), actualizado: FV.serverTimestamp()}, {merge: true})
+    .catch(err => console.error('No se pudo anotar al creep que escapó por el portal:', err));
 }
 // La pisada (desde moverToken, js/07): cualquier token que pasa por el portal se va del mapa (si confirma).
 const townPortalEntrados = new Set();
@@ -119,6 +131,7 @@ async function townPortalRevisar(tokenId, celdas){
   try{
     await coleccionTokens().doc(tokenId).delete();
     if(guardado) deshacerRegistrar({tipo: 'townPortal', id: tokenId, datos: guardado, nombre: nom});
+    townPortalEscapo(t, true);
   }catch(err){
     console.error('Town portal: no se pudo sacar el token', err);
     townPortalEntrados.delete(tokenId);

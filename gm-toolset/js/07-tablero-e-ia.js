@@ -624,6 +624,7 @@ async function reiniciarCombate(){
     sc.recompensado = false;   // un combate nuevo: vuelve a contar para el reporte
   });
   combateRep = nuevoCombateRep();
+  if(typeof CombateFin !== 'undefined' && CombateFin.escapadosLimpiar) CombateFin.escapadosLimpiar();   // 🌀 los que escaparon por un portal no pasan al combate nuevo
   nieblaReiniciarDesdeGM();
   renderAll();
   toast('Combate reiniciado · Turno 0 · No2 recargados · niebla restablecida');

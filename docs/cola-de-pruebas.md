@@ -62,8 +62,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   automáticamente te aparece el carcaj en el equipo, el básico, con la descripción "carcaj elemental", y desde la mochila puede equiparse un carcaj
   mejor y ahí cambia la descripción con sus características»). Sobre el recuadro único que ya quedó (commit b31433a8, `comun/ficha-equipo.js`):
   · **Arriba, el carcaj equipado, como una pieza**: su nombre, su descripción y características (capacidad, peso, lo que dé) y «N / capacidad».
-    Con arco o ballesta y sin otro carcaj: el **carcaj básico** que viene incluido (nombre a confirmar por el dueño: dijo «carcaj elemental»; mientras,
-    «Carcaj básico», con su texto: 5 lugares, no pesa ni ocupa lugar, viene con el arco o la ballesta). Con uno mejor equipado desde la mochila
+    Con arco o ballesta y sin otro carcaj: el **«Carcaj básico»** que viene incluido (nombre confirmado por el dueño, 2026-11-20: «es el carcaj básico»),
+    con su texto: 5 lugares, no pesa ni ocupa lugar, viene con el arco o la ballesta). Con uno mejor equipado desde la mochila
     (Carcaj de cuero…), esa fila pasa a ser la de ese carcaj, con Ver / Editar / Sacar.
   · **Abajo, el subtítulo «Proyectiles especiales»** (no «flechas y virotes»): lo que hay ADENTRO del carcaj, con sus botones «→ Mochila» y su costo;
     y, aparte y bien distinguido, los que están en la mochila para cargar («→ Carcaj», «Cargar todo lo que entre»).

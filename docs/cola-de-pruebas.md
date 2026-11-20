@@ -251,10 +251,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Confirmado por el dueño (2026-11-20):** «al apretarlo le tiene que aparecer el cartelito clásico de "empieza tu turno": se regenera tal cosa,
   pasa tal cosa, aceptar». O sea: al primero del orden le sale EL MISMO cartel de inicio de turno de siempre (con su detalle y su Aceptar/Aplicar),
   en su pantalla si es de un jugador, o al GM si es un creep; no un aviso distinto.
-- **⬜ en cola — ⏳ Vigilancia y Aguante: que digan «se va al empezar tu próximo turno» en vez de ∞** (dueño, 2026-11-20: «en Vigilancia y Aguante
+- **✅ hecho (2026-11-20) — ⏳ Vigilancia y Aguante: que digan «se va al empezar tu próximo turno» en vez de ∞** (dueño, 2026-11-20: «en Vigilancia y Aguante
   estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno. El resto está bien porque se entiende que se van con acciones o
   situaciones específicas»). Con el dato genérico `hasta` que se agregó para Desequilibrado (commit 96edd265): al poner esos dos estados, `hasta:
   'el comienzo de tu próximo turno'` (o «del próximo turno de <nombre>» donde lo lee otro). Solo esos dos. Tarea chica.
+  **Resultado:** los dos estados llevan el dato `hasta` en su definición (`comun/estados-presets.js`), así que lo dicen los ponga quien los ponga
+  (la habilidad de un creep, la de un personaje o el GM a mano): **«hasta que empiece su próximo turno»** en vez de «∞ / no vence». Se eligió
+  «su» y no «tu» porque el mismo texto lo leen el dueño, los compañeros y el GM (y coincide con la descripción de las dos habilidades). No cambia
+  cuándo se van. **Probado con clics en «Claude · pruebas 2»:** el GM le puso Aguante a un creep y Vigilancia a otro creep y al personaje del
+  Jugador 1 (con «+ Estado»); se leyó bien en el globo de estados del GM y del jugador («⏳ Dura hasta que empiece su próximo turno»), al pasar el
+  mouse por el creep desde la pantalla del jugador y en la ficha lite. **Sin ver:** usando la habilidad de verdad (ningún creep ni personaje de
+  esa partida las tiene; pasa por el mismo lugar) y que se vayan al empezar el turno (eso no se tocó). Pruebas automáticas 914/914 (1 nueva).
 - **✅ hecho (2026-11-20) — 🧬 Partida clon de «El origen de las especies», solo para pruebas** (dueño, 2026-11-20). Quedó creada
   **«El origen · CLON de pruebas»** (con la interfaz del sitio; los dos jugadores entraron con «Unirme como jugador»). GM: la cuenta GM de
   pruebas (es la cuenta de Rol Pintoísta). **Bizzante → Jugador 1, Rockardo → Jugador 2, Larry sin jugador** (a nombre del GM, hasta que el

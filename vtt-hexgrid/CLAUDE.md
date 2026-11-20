@@ -2295,7 +2295,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   duración de un estado pregunta primero `Combatiente.hastaTxt(e)`: el globo de estados y la tarjeta (js/10, renglón `.hud-estado-hasta`), el hover
   (js/30), el Tablero (js/07), «Cómo quedó el grupo» (js/81), el registro (js/99), las listas de Anular / Disipar (js/13) y el Anillo del curandero (js/25).
   Es solo lo que se muestra: no decide cuándo se va. Un estado nuevo de ese tipo (se guarda permanente, lo saca el sistema) lleva `hasta` en su spec y
-  listo. **(2)** `ataquesACeroAlEmpezar` (js/04): al pasar el mapa a Combate con el interruptor, la pantalla del GM pone en cero la cuenta de ataques
+  listo (o en su definición de `comun/estados-presets.js`, como **Vigilancia y Aguante**: «hasta que empiece su próximo turno», 2026-11-20). **(2)** `ataquesACeroAlEmpezar` (js/04): al pasar el mapa a Combate con el interruptor, la pantalla del GM pone en cero la cuenta de ataques
   «de este turno» de los personajes (con sus invocaciones) y los creeps con token en el mapa (`Combatiente.ataquesACeroPj / ataquesACeroCreep`); solo
   escribe a quien tenía algo anotado y no toca No2, vida, estados ni cooldowns. Antes, al primero del orden de un combate nuevo le quedaba la cuenta del
   combate anterior (su primer ataque costaba como segundo), porque esa cuenta solo la vacía el inicio de turno y a él nadie se lo empieza.

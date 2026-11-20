@@ -56,7 +56,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261120enj"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
-<script src="estados-presets.js?v=20261114sang"></script>
+<script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261120cola18"></script>
 <script src="tokens-auto.js"></script>
@@ -8194,6 +8194,21 @@ prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado,
   igual([!!p, p && p.polaridad, p && JSON.stringify(p.mods), p && p.turnos, r.ok, CreepCalculo.modTotal(sc, 'eva'), fin.quedan.length,
     !!hab && /Desequilibrado/.test(hab.detalle), !!hab && /\+2 a la Probabilidad de Golpe/.test(hab.detalle)],
     [true, 'debuff', '[{"stat":"eva","val":-2}]', 1, true, -2, 1, true, false]);
+});
+prueba('⏳ Vigilancia y Aguante dicen «hasta que empiece su próximo turno» en vez de ∞ (dueño, 2026-11-20); solo esos dos, y siguen yéndose igual', () => {
+  const H = 'hasta que empiece su próximo turno';
+  ['Vigilancia', 'Aguante'].forEach(n => {
+    const sc = {estados: []};
+    EstadosAplicar.aplicarACreep(sc, {nombre: n});
+    const ec = sc.estados[0], ep = FichaAcciones.estadoDeSpec({nombre: n}, estadosPresetFicha());
+    const lite = FichaLite.estadosLista([ec])[0];
+    igual([n, ec.permanente, Combatiente.hastaTxt(ec), ep.permanente, Combatiente.hastaTxt(ep), JSON.stringify(Combatiente.hastaPub(ec)), lite.datos.includes(H), lite.datos.includes('∞'),
+      lite.lineas.some(l => l.txt === 'No vence'), !!ec.alEmpezarTurno, !!ep.alEmpezarTurno],
+      [n, true, H, true, H, '{"hasta":"que empiece su próximo turno"}', true, false, false, true, true]);
+  });
+  igual(ESTADOS_PRESET.filter(p => p.hasta).map(p => p.nombre).sort(), ['Aguante', 'Vigilancia']);
+  const sentado = {estados: []}; EstadosAplicar.aplicarACreep(sentado, {nombre: 'Sentado'});
+  igual(Combatiente.hastaTxt(sentado.estados[0]), '');
 });
 prueba('⏳ Desequilibrado «hasta el fin del turno de…» (dueño, 2026-11-20: «parecía como que no tenía fin»): el estado permanente lleva `hasta`, viaja al creep, al personaje y a la ficha lite, y sin `hasta` todo sigue como antes', () => {
   const spec = {nombre: 'Desequilibrado', permanente: true, hasta: 'el fin del turno de Rocardo', polaridad: 'debuff', mods: [{stat: 'eva', val: -2}]};

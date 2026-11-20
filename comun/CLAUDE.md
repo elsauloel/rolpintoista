@@ -2053,7 +2053,8 @@ versión parecida en más de una, es candidato a juntar.
   estado es `permanente` y lleva `hasta` (si no, ''); `hastaPub(e)` → `{hasta}` para los resúmenes públicos (`ficha-resumen.js`, los del mapa y GM
   Tools). Es para los estados que se guardan «no vence» pero el sistema saca solos (el Desequilibrado de Arrastrar): cada pantalla muestra eso en vez
   de «∞ / no vence» (`ficha-lite.js`, `ficha-lupa.js`, la ficha, GM Tools, el mapa). El dato viaja en el spec: `EstadosAplicar.limpiarSpec / componer`
-  y `FichaAcciones.estadoDeSpec`. `ataquesACeroPj(S)` (con sus invocaciones), `ataquesACeroInv(inv)` y `ataquesACeroCreep(sc)`: vacían la cuenta de
+  y `FichaAcciones.estadoDeSpec`, o va en la definición del estado en `estados-presets.js` (**Vigilancia y Aguante**, 2026-11-20: `hasta: 'que empiece su
+  próximo turno'`; son los únicos dos presets que lo llevan). `ataquesACeroPj(S)` (con sus invocaciones), `ataquesACeroInv(inv)` y `ataquesACeroCreep(sc)`: vacían la cuenta de
   ataques y las marcas «una vez por turno» que viven con ella (no No2, vida, estados, cooldowns ni `pagosDuelo`); devuelven si cambió algo. Las usa el
   mapa al empezar un combate (`vtt-hexgrid/js/04`, `ataquesACeroAlEmpezar`).
 - **`revelar.js`** (`Revelar`, 2026-11-20) — **👁 revelar a mano lo oculto**, lo puro: `elemento(el, {gm, mio})` → null o `{accion: 'revelar' |

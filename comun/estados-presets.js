@@ -62,11 +62,13 @@ const ESTADOS_PRESET = [
     detalle:'Agarrado de los dientes: no se puede mover. Al empezar su turno tira para soltarse, gratis; si no se suelta, el mordisco le vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. ⚙ Automatizado en el mapa.'},
   // 👁 Vigilancia (2026-10-21, dueño; creeps y Shooter): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la
   // vista y con línea de tiro, recibe un disparo (el mapa lo frena, como al ataque de oportunidad: vtt-hexgrid/js/58). Un solo disparo.
-  {nombre:'Vigilancia', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, vigilancia:true,
+  // ⏳ `hasta` (2026-11-20, dueño: «en Vigilancia y Aguante estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno»): solo lo que
+  // se muestra en vez de «∞ / no vence» (Combatiente.hastaTxt → «hasta que empiece su próximo turno»); no cambia cuándo se va.
+  {nombre:'Vigilancia', polaridad:'buff', turnos:0, permanente:true, hasta:'que empiece su próximo turno', alEmpezarTurno:true, vigilancia:true,
     detalle:'En vigilancia: hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, recibe un disparo con +2 a la Probabilidad de Golpe (el movimiento se frena ahí). Quien ya estaba adentro, solo si se mueve. Un solo disparo. ⚙ Automatizado en el mapa.'},
   // 🛡 Aguante (2026-10-21, dueño, los creeps de choque pesado): +2 Defensa y +2 Defensa especial hasta que empiece su próximo turno; cuenta los golpes
   // que le pegan (`golpes`) y su próximo ataque suma +1 dado del Tipo de su arma por cada uno (vtt-hexgrid/js/56).
-  {nombre:'Aguante', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, aguante:true, mods:[{stat:'def', val:2}, {stat:'armadmg', val:2}],
+  {nombre:'Aguante', polaridad:'buff', turnos:0, permanente:true, hasta:'que empiece su próximo turno', alEmpezarTurno:true, aguante:true, mods:[{stat:'def', val:2}, {stat:'armadmg', val:2}],
     detalle:'En modo aguante: +2 a la Defensa y +2 a la Defensa especial hasta que empiece su próximo turno. Cuenta cada golpe que le pega: en su próximo turno, su primer ataque suma +1 dado del Tipo de su arma por cada uno, hasta su nivel + 1 dados (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado). Si no ataca en ese turno, lo pierde. ⚙ Automatizado en el mapa.'},
   // 🤼 El agarre de las bestias (2026-10-21, dueño: «skills de agarre con y sin daño por parte de bestias»): como el Mordido, sin morder.
   {nombre:'Agarrado', polaridad:'debuff', turnos:0, permanente:true, inmovilizado:true, esCC:true,

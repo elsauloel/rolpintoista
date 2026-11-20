@@ -1702,4 +1702,7 @@ Percepción siempre incierta). Lo que se podría sumar, con la misma tirada y el
 6. **Empezar su turno pegado a un personaje** (a 1 casilla, fuera del cono): una tirada por turno. *Para pensar: puede ser mucho.*
 7. **Llamar refuerzos**: el que llega aparece a la vista si cae a la vista; el que llamó, como el punto 1.
 Si gana la Percepción, lo de siempre: el escondido tira su Sigilo y, si pierde, queda a la vista.
+**✅ Respuestas del dueño (2026-11-20):** (a) «Alguien está realizando una acción incierta» está bien. (b) El cuadro del duelo nombra a quien ataca
+desde donde no se ve: está bien, «al atacar se revela su posición». (c) El orden de turnos mantiene la fila del creep conocido que se escondió:
+correcto. Lo de «percibís algo raro» por habilidades ruidosas: «por ahora afuera». (d) y (e) sin responder; quedan como están.
 

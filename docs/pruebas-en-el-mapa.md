@@ -2959,3 +2959,17 @@ Capturas en `cola11/`.
 - [x] **El combate siguiente no lo arrastra**: otro «Finalizar → Simular» ya no muestra a Protector 2. (Después se restauró la partida.)
 - [ ] **Falta que lo mire el dueño en su compu.**
 Capturas en `cola12/`.
+
+## 2026-11-20 · 🔨 Pasiva «Maestría en armas pesadas» (+2 PdG y +1 Parry con armas de Tipo 10) («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+
+- [x] **Personaje (Blanco J1, de Jugador 1) con la pasiva, una Cachiporra (Tipo 10) y su Cuchillo de cazador (Tipo 4)**: en la Botonera, «Atacar ·
+  Cachiporra 🎲 1d8» (6 + 2) y «Atacar · Cuchillo 🎲 1d6»; «Parry · Cuchillo 1d6 · Cachiporra 1d6+1». La 🔍 de Parry: «Con cada arma o escudo» →
+  Cuchillo 6 (otro Tipo: no suma), Cachiporra 7 con «Maestría en armas pesadas +1»; la 🔍 de Atacar con la Cachiporra muestra el +2. Ficha lite: «Con
+  esta arma: PdG +2 · Parry +1 (Maestría en armas pesadas)». En un duelo real (el creep lo ataca), «Elegí cómo te defendés»: Parry · Cuchillo 1d6,
+  Parry · Cachiporra 1d6+1.
+- [x] **Creep (Blanco creep) con la pasiva y una Cachiporra**: Acciones «Atacar (PdG) 🎲 1d8+1» (7 + 2), «Parry 🎲 1d8» (7 + 1); las 🔍 con la línea de la
+  pasiva; ficha lite con la línea. En el duelo (Blanco J1 lo ataca): Parry · Cachiporra 1d8, Parry · Escudo de caparazón 1d6+1 (con el escudo no suma).
+- [x] **El mismo creep con su Hacha de piedra (Tipo 8), con la pasiva**: Atacar 1d6+1 y Parry 1d6+1 (7, sin nada de más); las 🔍 sin la pasiva.
+- [x] Se sacó lo prestado (Cachiporra y pasiva) y la partida quedó como estaba (vida llena, sin estados, narrativo, orden de turnos vacío).
+- [ ] **Falta que lo mire el dueño** (la va a usar en «El origen de las especies»).
+Capturas en `cola13/`.

@@ -23,13 +23,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   contar a los que escaparon; sin oro ni ítems), en Simular y en Avanzar. La lista se vacía al publicar las recompensas y con «↺ Reiniciar combate»; el
   Ctrl+Z de la entrada al portal lo saca. Probado en «Claude · pruebas 2» con GM y Jugador 1 (Blanco creep caído, Protector 2 vivo por el portal):
   Simular y Avanzar dieron «Escapó 🌀 +19 XP», publicar vació la lista y el combate siguiente ya no lo mostró. Partida restaurada. 877 pruebas en verde.
-- **⬜ en cola — 🔨 Pasiva nueva «Maestría en armas pesadas»** (dueño, 2026-11-20: «quiero sumar una habilidad pasiva para jugadores (y creeps):
+- **✅ hecho (2026-11-20) — 🔨 Pasiva nueva «Maestría en armas pesadas»** (dueño, 2026-11-20: «quiero sumar una habilidad pasiva para jugadores (y creeps):
   Maestría en armas pesadas. da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas»). En `comun/pasivas.js` (PASIVAS_BASE,
   la ofrecen la ficha y los creeps). El +2 al PdG con Tipo 10 ya existe como stat (`pdgt10`, «PdG con contundentes», lo suma
   `Combatiente.pdgExtraArma`). El +1 al Parry solo con un arma de Tipo 10 NO existe: sumar un stat `parryt10` (y, si sale natural, `parryt4/6/8`) que
   se sume al Parry cuando se para con un arma de ese Tipo (no con escudo), en personajes (FichaCombate.statParaArma / el Parry de la Botonera y del
   duelo), creeps (CreepCalculo) e invocaciones, con su 🔍 («Maestría en armas pesadas +1»). Job: 1 (propuesto por Claude, a confirmar con el dueño).
   Prueba automática y probar en el mapa: un personaje y un creep con un arma de Tipo 10 (y otra de otro Tipo para ver que ahí no suma).
+  *Resultado:* en `comun/pasivas.js`, Job 1 (confirmado por el dueño): pdgt10 +2 y el stat nuevo `parryt10` +1 («Parry con contundentes»), que se suma al
+  Parry solo al parar con un arma de Tipo 10 (no con escudo ni otra arma), en personajes, creeps e invocaciones (`Combatiente.parryExtraArma`), con su línea
+  en la 🔍 de Parry y de Atacar y en la ficha lite. Probado en «Claude · pruebas 2» (GM + Jugador 1): Blanco J1 con Cachiporra y Cuchillo (Atacar 1d8 / 1d6,
+  Parry 1d6+1 / 1d6) y el Blanco creep con Cachiporra (Atacar 1d8+1, Parry 1d8; con el escudo, 1d6+1) y con su hacha Tipo 8 (sin nada de más); también en
+  el «Elegí cómo te defendés» de un duelo real. Lo prestado, sacado. 878 pruebas en verde. Abierta: P248 (las maestrías de otras familias).
 - **✅ hecho (2026-11-20) — 🔮 «Finalizar combate»: Avanzar o Simular** (dueño, 2026-11-20: «me gustaría poder hacer esa simulación que al poner finalizar combate
   como GM tenga la opción de avanzar o de simulación»). Al tocar «Finalizar combate», el GM elige: **Avanzar** (lo de siempre: reporte, publicar
   recompensas, botín) o **Simular**: la misma ventana «Batalla terminada» con la XP de cada personaje, el oro y el botín (despojos y drop al azar, con

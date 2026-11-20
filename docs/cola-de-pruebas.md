@@ -12,13 +12,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🐝 Pasiva nueva «Táctica de enjambre»** (dueño, 2026-11-20: «sumá una pasiva más: táctica de enjambre. tenés +1 a la pdg por cada
+- **✅ hecho (2026-11-20) — 🐝 Pasiva nueva «Táctica de enjambre»** (dueño, 2026-11-20: «sumá una pasiva más: táctica de enjambre. tenés +1 a la pdg por cada
   aliado adyacente. cuesta 2 puntos de job»). En `comun/pasivas.js` (PASIVAS_BASE, jobCosto 2), para personajes, creeps e invocaciones. +1 a la
   Probabilidad de Golpe por cada aliado pegado a QUIEN ATACA (a 1 casilla de él), contado en el momento del ataque. Depende de la posición: lo suma el
   mapa al atacar (mirar cómo lo hace la Patota, vtt-hexgrid/js/65, y el Guardián, js/10: «aliado» = del mismo bando, con ficha, en el mapa, ni caído
   ni bajo tierra; quien ataca no se cuenta), con su línea en la tirada/el duelo («Táctica de enjambre +2: 2 aliados al lado») y un estado o indicador
   derivado a la vista mientras tenga aliados pegados, si sale natural. Fuera del mapa (ficha suelta) no suma: aclararlo en la descripción.
   Dudas de alcance (¿también la PdG especial?, ¿tope?) → como lo dijo el dueño: la PdG, sin tope; lo demás a `preguntas-abiertas.md`.
+  *Resultado:* la pasiva está en la lista (2 puntos de job), para personajes, creeps e invocaciones. Al atacar con el arma en el mapa, cuenta los
+  aliados pegados a quien ataca y suma +1 PdG por cada uno, sin tope; se ve en el cuadro del duelo («🐝 Táctica de enjambre +2: 2 aliados al lado») y
+  en la tirada («+2 enjambre»). Vale también para el contraataque y el de oportunidad (nacen en el mismo lugar). Fuera del mapa no suma (lo dice la
+  descripción). Sin indicador sobre el token. Probado en «Claude · pruebas 2»: creep con 0, 1 y 2 aliados; personaje de Jugador 1 con 2; invocación
+  con 1. Prueba automática nueva (879 en verde). Alcance mientras tanto (solo PdG común y ataques con arma): P249. Capturas en `cola14/`.
 - **✅ hecho (2026-11-20) — 🌀 Un creep que se va por un Town portal cuenta como «Escapó» al finalizar el combate** (dueño, 2026-11-20, jugando El origen: «un
   creep escapó con un portal, y ahora en la simulación no aparece como que escapó, ni lo contabiliza para la experiencia»). Causa: al pisar el Town
   portal el token se borra del mapa (js/84, `townPortalRevisar` desde moverToken js/07) y el fin del combate solo cuenta los creeps con token en el mapa

@@ -2973,3 +2973,17 @@ Capturas en `cola12/`.
 - [x] Se sacó lo prestado (Cachiporra y pasiva) y la partida quedó como estaba (vida llena, sin estados, narrativo, orden de turnos vacío).
 - [ ] **Falta que lo mire el dueño** (la va a usar en «El origen de las especies»).
 Capturas en `cola13/`.
+
+## 2026-11-20 · 🐝 Pasiva «Táctica de enjambre» (+1 PdG por cada aliado pegado a quien ataca) («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+
+- [x] **Creep (Blanco creep) con la pasiva, atacando a Blanco J1**: sin aliados al lado, el cuadro del duelo no dice nada y tira «1d6+1»; con un creep
+  pegado (Protector 3), «🐝 Táctica de enjambre +1: 1 aliado al lado» y la tirada «1d6+1 +1 enjambre»; con dos (Protector 3 y 4), «+2: 2 aliados al
+  lado» y «1d6+1 +2 enjambre». Lo ven igual las dos pantallas (GM y Jugador 1).
+- [x] **Personaje (Blanco J1, de Jugador 1) con la pasiva**, con su otro personaje y su invocación pegados: «🐝 Táctica de enjambre +2: 2 aliados al
+  lado», tirada «1d6 +1 espalda +2 enjambre» (se suma con los otros bonos).
+- [x] **Invocación (Abeja de prueba) con la pasiva**, con Blanco J1 pegado: «+1: 1 aliado al lado», tirada «1d4 +1 espalda +1 enjambre».
+- [x] Se sacó lo prestado y la partida quedó como estaba (vida y No2 llenos, sin estados, narrativo, orden de turnos vacío, cada token en su casilla).
+- [ ] **Sin probar en el mapa**: el contraataque y el ataque de oportunidad (pasan por el mismo lugar del código, `Duelo.crear`), y un ataque de
+  habilidad «con tu arma».
+- [ ] **Falta que lo mire el dueño** (la va a usar en «El origen de las especies»). Duda de alcance: P249.
+Capturas en `cola14/`.

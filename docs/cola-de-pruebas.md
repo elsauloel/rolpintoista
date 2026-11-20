@@ -89,6 +89,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   completas), no parche por parche. Lo que por regla ya rompe el sigilo (p. ej. atacar, si la regla dice eso) sigue igual: no inventar reglas;
   lo dudoso, a preguntas-abiertas. (5) Proponer (sin programar todavía, salvo que ya exista) qué acciones merecen el aviso «percibís algo raro →
   tirada de Percepción» y traerle la lista al dueño. Mirar lo mismo para un personaje / invocación en sigilo si sale barato.
+  **Lo primero que pasó (dueño, mismo día):** «la rata, estando detrás de la niebla de guerra, tiró la Polvareda, pero parte de la polvareda apareció
+  revelada en el mapa y eso ya reveló la existencia de la rata». Reproducirlo: la rata fuera de la vista de los jugadores (niebla), tira la Polvareda
+  y se mira la pantalla del jugador: la zona, su animación, su línea de Mesa/Crónica y cualquier cartel. Una zona (o la parte de una zona) que cae en
+  casillas que el jugador no ve NO se le dibuja ni se le anuncia; la parte que cae en casillas que sí ve, se ve (eso es correcto: ve humo, no a la
+  rata). Si hoy se le muestran casillas que no ve, o el anuncio nombra a quien la tiró, es la fuga a arreglar. Revisar lo mismo para trampas y otras
+  zonas puestas desde la niebla.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

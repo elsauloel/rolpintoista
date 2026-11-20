@@ -110,13 +110,19 @@ function renderListaPersonajes(sinLeer){
         const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : `<span class="pj-mini"></span>`;
         const enlace = `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
           `${mini}<span class="pj-nombre">${esc(f.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</a>`;
-        if(!soyGM) return enlace;
+        // 🎭 Tu personaje no tiene token en el mapa que estás viendo: se pone desde acá (lo mismo que el 🎭; js/09, 2026-11-20).
+        const falta = fbMiembro && fbUsuario && f.duenoUid === fbUsuario.uid && escucharTokens.listo && ![...tokens.values()].some(t => t.fichaId === id);
+        const poner = falta ? `<button type="button" class="pj-poner" data-poner-personaje="${esc(id)}" title="Todavía no tiene token en este mapa. Tocá y elegí la casilla con un clic">🎭 Ponerlo en el mapa</button>` : '';
+        if(!soyGM) return poner ? `<div class="pj-fila">${enlace}${poner}</div>` : enlace;
         const inactivo = personajesInactivos.has(id);
-        return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">${enlace}<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button><button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
+        return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">${enlace}${poner}<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button><button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
       }).join('')
     : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
   $('#personajes-lista').querySelectorAll('[data-borrar-personaje]').forEach(b => {
     b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
+  });
+  $('#personajes-lista').querySelectorAll('[data-poner-personaje]').forEach(b => {
+    b.onclick = () => { abrirListaPersonajes(false); ponerPersonajeEnMapa(b.dataset.ponerPersonaje); };
   });
   $('#personajes-lista').querySelectorAll('[data-inactivo-personaje]').forEach(b => {
     b.onclick = async () => { const id = b.dataset.inactivoPersonaje; b.disabled = true;

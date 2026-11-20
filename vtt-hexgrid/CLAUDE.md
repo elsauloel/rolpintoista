@@ -669,6 +669,15 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   usan — ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)).
   **⟳ Mantenimiento** (solo GM) va en verde arriba de todo en la barra lateral
   (`#caja-mantenimiento`).
+- **🎭 Poner tu personaje en el mapa: tres entradas, un solo camino** (2026-11-20, dueño: «lo del botón de personajes y el botón de tokens es
+  poco claro»; js/09 `ponerPersonajeEnMapa`, `misPersonajesSinToken`; quiénes faltan: `TokensAuto.sinToken`, `comun/tokens-auto.js`). (1) El 🎭 →
+  «⬇ Traer a … ya» de siempre. (2) En la lista **👥 Personajes**, al lado de cada personaje PROPIO sin token en el mapa que se está viendo, el
+  botón **«🎭 Ponerlo en el mapa»** (`.pj-poner`; la lista se redibuja sola si está abierta cuando cambian los tokens). (3) **El cartel al entrar**
+  (`#sin-token-aviso`, `avisoSinTokenRevisar`): «<Personaje> todavía no está en este mapa. [🎭 Ponerlo ahora] [Ahora no]»; con varios personajes
+  propios, un botón por cada uno. Se mira **una sola vez por mapa en cada entrada** (cuando ya llegaron los tokens y las fichas): si dijo «Ahora no»
+  no insiste hasta recargar, si el GM le saca el token con el mapa abierto no sale nada, y si el token aparece el cartel se va solo. **Nunca al GM.**
+  Los tres terminan en lo mismo: elegir la casilla con un clic y hacia dónde mira. Hoy lo único que limita a un jugador para poner su token es ser
+  miembro de la partida; si algún día hay mapas donde no puede, el corte va en `misPersonajesSinToken` (así no se ofrece en ningún lado).
 - **⚡ Botonera** (solo en tu propio personaje): abre la ficha en un iframe
   a pantalla completa con `?modo=botonera`, que muestra solo la Botonera.
   Se hablan con `postMessage` (`botonera-lista`, `botonera-cerrada`,

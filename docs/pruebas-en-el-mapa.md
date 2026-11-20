@@ -282,6 +282,10 @@
 
 ## Pendientes
 
+- [ ] **🎭 El cartel «todavía no está en este mapa» con más de un personaje propio** (2026-11-20; `vtt-hexgrid/js/09`, `avisoSinTokenRevisar`):
+  que salga un botón por personaje («🎭 Poner a X») y que al poner uno se cierre. No se probó con clics porque las partidas de prueba tienen un
+  solo personaje por jugador (a pedido del dueño). Lo demás (un personaje: cartel, «Ahora no», el botón de 👥 Personajes, el GM sin cartel) está probado.
+
 - [ ] **🎁 El botín minimizado: lo que no se probó con clics** (2026-11-20; `comun/ficha-botin.js`): con **dos jugadores a la vez** (uno lo
   minimiza, el otro reclama: que al volver se vea lo reclamado), en medio de una **disputa** de piedra, papel o tijera, y pasando de la ventana
   del botín a «🎒 Mochila y equipo» y volviendo. Lo demás (Cerrar, Esc, afuera, la pastilla, el 🎁, recargar, el cierre del GM) está probado.

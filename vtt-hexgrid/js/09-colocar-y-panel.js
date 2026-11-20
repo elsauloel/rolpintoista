@@ -183,6 +183,8 @@ function escucharTokens(){
     const primeraVez = !escucharTokens.listo;
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
+    avisoSinTokenRevisar();   // 🎭 ¿tu personaje no tiene token en este mapa? (2026-11-20)
+    if(!$('#personajes-lista').hidden) renderListaPersonajes(true);
     renderPanel();
     // Ojo (2026-09-22): la ruptura de sigilo vivía solo adentro de dibujar(), que se
     // dispara con requestAnimationFrame — en una pestaña de fondo (minimizada, otra
@@ -307,6 +309,7 @@ function escucharVinculables(){
     });
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
     if(coleccion === 'fichas') actualizarCabecera();   // el nombre del personaje principal
+    if(coleccion === 'fichas'){ escucharVinculables.fichasListas = true; avisoSinTokenRevisar(); if(!$('#personajes-lista').hidden) renderListaPersonajes(true); }   // 🎭 ¿falta tu token? (2026-11-20)
     try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
@@ -1027,6 +1030,52 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && mapasMenuAb
    En la ventana común (comun/paso-a-paso.js). GM: Qué es (creep de la lista / NPC u objeto / personaje) → Cuál (el creep o la ficha) →
    Cómo se ve (nombre, imagen si no está vinculado, color) → Dueño (solo un personaje) → Listo. Jugador: Cuál (sus personajes e invocaciones,
    o sin vincular) → Cómo se ve → Listo. Al terminar se elige la casilla y hacia dónde mira (iniciarColocacion). */
+/* ---------- 🎭 Poner tu personaje en el mapa: un solo camino (2026-11-20) ----------
+   Dueño: «lo del botón de personajes y el botón de tokens es poco claro». El «Traer a … ya» del 🎭, el botón «🎭 Ponerlo en el mapa» de la lista
+   👥 Personajes (js/04) y el cartel que sale al entrar a un mapa donde tu personaje no tiene token hacen LO MISMO: `ponerPersonajeEnMapa`
+   (elegís la casilla con un clic y hacia dónde mira). Quiénes faltan: `TokensAuto.sinToken` (comun/tokens-auto.js).
+   Lo único que hoy limita a un jugador para poner su token es ser miembro de la partida (`fbMiembro`): si no lo es, no se ofrece nada. */
+function misPersonajesSinToken(){
+  if(!fbMiembro || !fbUsuario) return [];
+  return TokensAuto.sinToken(fichasPub.entries(), tokens.values(), fbUsuario.uid);
+}
+function ponerPersonajeEnMapa(fichaId, color){
+  const f = fichasPub.get(fichaId);
+  if(!f || !fbMiembro) return false;
+  if([...tokens.values()].some(t => t.fichaId === fichaId)){ toast(`${f.nombre} ya está en este mapa`); return false; }
+  if(tokenNuevoPap){ const v = tokenNuevoPap; tokenNuevoPap = null; v.cerrar(); }
+  avisoSinTokenCerrar();
+  iniciarColocacion({nombre: String(f.nombre || 'Personaje').slice(0, 40), color: color || COLORES[Math.floor(Math.random() * COLORES.length)], tipo: 'pj', fichaId, imagen: ''});
+  return true;
+}
+// El cartel: sale solo al ENTRAR al mapa (una vez por mapa en cada entrada: si dijo «Ahora no» no insiste hasta que vuelva a entrar), nunca al GM, y se va solo si
+// el token aparece (lo puso él o se lo trajo el GM). Lo revisan la llegada de los tokens y la de las fichas.
+const avisoSinTokenVistos = new Set();   // mapas donde ya se ofreció en esta entrada
+let avisoSinTokenMapa = null;            // el mapa del cartel que está en pantalla
+function avisoSinTokenCerrar(){
+  avisoSinTokenMapa = null;
+  const el = $('#sin-token-aviso'); if(el){ el.hidden = true; el.innerHTML = ''; }
+}
+function avisoSinTokenRevisar(){
+  const el = $('#sin-token-aviso'); if(!el) return;
+  if(avisoSinTokenMapa !== null && (avisoSinTokenMapa !== mapaMostrado || !misPersonajesSinToken().length)){ avisoSinTokenCerrar(); }
+  if(soyGM || !fbMiembro || !escucharTokens.listo || !escucharVinculables.fichasListas) return;
+  if(avisoSinTokenMapa !== null || avisoSinTokenVistos.has(mapaMostrado)) return;
+  avisoSinTokenVistos.add(mapaMostrado);   // se mira UNA vez, al entrar: si después el GM le saca el token (o muere), no sale un cartel de la nada
+  const faltan = misPersonajesSinToken();
+  if(!faltan.length || colocando || creando) return;
+  avisoSinTokenMapa = mapaMostrado;
+  el.innerHTML = `<span class="sta-txt">${faltan.length === 1 ? `<b>${esc(faltan[0][1].nombre)}</b> todavía no está en este mapa.` : esc(TokensAuto.sinTokenTexto(faltan.map(x => x[1].nombre)))}</span>` +
+    faltan.map(([id, f]) => `<button type="button" class="btn primary chico" data-sta-poner="${esc(id)}">🎭 ${faltan.length === 1 ? 'Ponerlo ahora' : 'Poner a ' + esc(f.nombre)}</button>`).join('') +
+    '<button type="button" class="btn chico" data-sta-no="1">Ahora no</button>';
+  el.hidden = false;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('#sin-token-aviso button'); if(!b) return;
+  if(b.dataset.staPoner) ponerPersonajeEnMapa(b.dataset.staPoner);
+  else{ avisoSinTokenCerrar(); toast('Cuando quieras: 👥 Personajes → «🎭 Ponerlo en el mapa», o el 🎭 del borde izquierdo'); }
+});
+
 let tokenNuevoPap = null;
 function cancelarNuevoToken(){
   if(!creando) return;
@@ -1045,8 +1094,7 @@ function abrirTokenNuevo(){
   // Mis personajes que todavía no tienen token en el mapa (jugador: el atajo "Traer a …").
   const libre = () => {
     if(soyGM) return null;
-    const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
-    return [...fichasPub.entries()].filter(([id, f]) => f.duenoUid === fbUsuario.uid && !enMapa.has(id)).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'))[0] || null;
+    return misPersonajesSinToken()[0] || null;
   };
   const TIPOS = [
     ['creep', '👹', 'Un creep de tu lista', 'Toma el nombre, la imagen, la vida y los estados del creep (borde rojo). Lo mueve el GM.'],
@@ -1104,7 +1152,7 @@ function abrirTokenNuevo(){
       if(b.dataset.tnTraer){
         const l = libre(); if(!l) return;
         api.cerrar(); tokenNuevoPap = null;
-        iniciarColocacion({nombre: String(l[1].nombre || 'Personaje').slice(0, 40), color: st.color, tipo: 'pj', fichaId: l[0], imagen: ''});
+        ponerPersonajeEnMapa(l[0], st.color);
         return;
       }
       if(b.dataset.tnImg === 'quitar'){ st.imagen = ''; api.redibujar(); return; }

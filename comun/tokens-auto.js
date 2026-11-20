@@ -334,5 +334,20 @@ const TokensAuto = (() => {
     }catch(e){ nombresHechos.delete(fichaId); }
     return cambiados;
   }
-  return {nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
+  // 🎭 Los personajes de `uid` que todavía no tienen token en el mapa que se está viendo (2026-11-20, dueño: «lo del botón de personajes y el
+  // botón de tokens es poco claro»). `fichas`: pares [id, {nombre, duenoUid}]; `tokens`: los tokens de ese mapa. Devuelve los pares, por nombre.
+  // Lo usan el 🎭 («Traer a … ya»), la lista 👥 Personajes («🎭 Ponerlo en el mapa») y el cartel al entrar al mapa.
+  function sinToken(fichas, tokens, uid){
+    if(!uid) return [];
+    const enMapa = new Set([...(tokens || [])].map(t => t && t.fichaId).filter(Boolean));
+    return [...(fichas || [])].filter(([id, f]) => f && f.duenoUid === uid && !enMapa.has(id))
+      .sort((a, b) => String(a[1].nombre || '').localeCompare(String(b[1].nombre || ''), 'es'));
+  }
+  // El texto del cartel: con uno lo nombra; con varios deja elegir.
+  function sinTokenTexto(nombres){
+    const n = (nombres || []).map(x => String(x || 'Tu personaje'));
+    if(!n.length) return '';
+    return n.length === 1 ? `${n[0]} todavía no está en este mapa.` : 'Tus personajes todavía no están en este mapa. ¿A cuál ponés?';
+  }
+  return {sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
 })();

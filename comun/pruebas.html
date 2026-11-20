@@ -9163,6 +9163,23 @@ grupo('🎁 El botín: minimizar y que cerrar no lo pierde (comun/ficha-botin.js
   });
 })();
 
+/* ---------- 🎭 Poner tu personaje en el mapa (comun/tokens-auto.js, 2026-11-20) ---------- */
+grupo('Tu personaje todavía no está en este mapa');
+(() => {
+  const fichas = [['f2', {nombre: 'Zulma', duenoUid: 'yo'}], ['f1', {nombre: 'Ana', duenoUid: 'yo'}], ['f3', {nombre: 'De otro', duenoUid: 'otro'}]];
+  prueba('faltan los personajes PROPIOS sin token en el mapa que se ve, por nombre; los de otro jugador no cuentan', () =>
+    igual(TokensAuto.sinToken(fichas, [], 'yo').map(x => x[0]), ['f1', 'f2']));
+  prueba('con su token puesto ya no falta; el token de una invocación suya o un token sin ficha no lo cuentan como puesto', () => {
+    igual(TokensAuto.sinToken(fichas, [{fichaId: 'f1'}, {fichaId: 'f2~inv1'}, {nombre: 'marca'}], 'yo').map(x => x[0]), ['f2']);
+    igual(TokensAuto.sinToken(fichas, [{fichaId: 'f1'}, {fichaId: 'f2'}], 'yo'), []);
+  });
+  prueba('sin cuenta o sin personajes propios no falta nadie (no hay nada que ofrecer)', () =>
+    igual([TokensAuto.sinToken(fichas, [], ''), TokensAuto.sinToken(fichas, [], 'nadie'), TokensAuto.sinToken(null, null, 'yo')], [[], [], []]));
+  prueba('el cartel nombra al personaje si es uno, y deja elegir si son varios', () =>
+    igual([TokensAuto.sinTokenTexto(['Blanco']), TokensAuto.sinTokenTexto(['Ana', 'Zulma']), TokensAuto.sinTokenTexto([])],
+      ['Blanco todavía no está en este mapa.', 'Tus personajes todavía no están en este mapa. ¿A cuál ponés?', '']));
+})();
+
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');

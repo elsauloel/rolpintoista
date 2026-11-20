@@ -444,13 +444,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pastilla se va y el 🎁 se apaga. La XP que repartió la prueba se repuso (la partida quedó como estaba). **La ventana del GM («🎁 Despojos»)** no
   se tocó: ya se cierra y se reabre con su 🎁; un «Minimizar» ahí sería solo por comodidad (propuesta, sin hacer). Sin probar: con el Jugador 2 a
   la vez y en medio de una disputa de piedra, papel o tijera. 950 pruebas automáticas en verde (4 nuevas).
-- **⬜ en cola — 🎭 Que sea claro cómo poner tu personaje en el mapa** (dueño, 2026-11-20, sobre la observación de un ayudante: «lo del botón de
+- **✅ hecho (2026-11-20) — 🎭 Que sea claro cómo poner tu personaje en el mapa** (dueño, 2026-11-20, sobre la observación de un ayudante: «lo del botón de
   personajes y el botón de tokens es poco claro… vamos con tu sugerencia, hacer las 2 y 3 juntas»). (2) En la lista de **👥 Personajes** del mapa, al
   lado de cada personaje PROPIO que no tiene token en el mapa que se está viendo, un botón **«🎭 Ponerlo en el mapa»** que hace lo mismo que el 🎭
   («Traer a <personaje> ya» / el asistente de token nuevo, lo que ya exista). (3) Si un jugador entra al mapa y su personaje no tiene token en ese
   mapa, un cartel: «<Personaje> todavía no está en este mapa. [🎭 Ponerlo ahora] [Ahora no]»; sale solo cuando falta el token, una vez por entrada
   (no insistir si dijo «Ahora no»), y no le sale al GM. Con más de un personaje propio, que deje elegir. Respetar lo que ya limite al jugador para
   poner tokens (si hay mapas donde no puede, no ofrecerlo).
+  **Qué quedó**: (2) en **👥 Personajes**, al lado de tu personaje sin token en el mapa que estás viendo, el botón «🎭 Ponerlo en el mapa»; (3) al
+  entrar a un mapa donde tu personaje no tiene token, el cartel «Blanco J2 todavía no está en este mapa. [🎭 Ponerlo ahora] [Ahora no]». Los dos
+  hacen lo mismo que el 🎭 → «Traer a … ya» (un solo camino por dentro): elegís la casilla con un clic y hacia dónde mira. El cartel se fija una
+  sola vez al entrar: con «Ahora no» no vuelve hasta que recargues (y te recuerda dónde está el botón); si el GM te saca el token con el mapa
+  abierto no aparece de la nada; al GM no le sale nunca. Con más de un personaje propio muestra un botón por cada uno. Hoy un jugador puede poner
+  su token en cualquier mapa que esté viendo (no hay mapas vedados), así que no hubo nada que esconder.
+  **Probado con clics** («Claude · pruebas 2», mapa «Prueba · R4 M4», GM y Jugador 2, sacándole el token a Blanco J2): el cartel al entrar; «Ahora
+  no» (se va y no vuelve aunque cambien cosas en el mapa); el botón de la lista → casilla → orientación → token puesto, y el botón desaparece de la
+  lista; «Ponerlo ahora» del cartel → token puesto; entrar con el token ya puesto (sin cartel); el GM (sin cartel); el 🎭 de siempre sigue andando.
+  El token de Blanco J2 quedó como estaba. **Sin probar**: un jugador con dos personajes propios (las partidas de prueba tienen uno por jugador,
+  a pedido; lo cubren las pruebas automáticas y queda anotado en `pruebas-en-el-mapa.md`). 954 pruebas automáticas en verde (4 nuevas).
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

@@ -1076,7 +1076,7 @@ function actualizarBotonDespojosMapa(){
   const b = $('#toolkit-botin');
   if(!b) return;
   b.disabled = !combatePublicado();
-  b.title = combatePublicado() ? (soyGM ? 'Despojos: ver qué tomó cada uno y convertir en despojos lo que nadie tomó' : 'Despojos: abrir la ventana de la batalla para elegir del botín') : 'Despojos: se habilita cuando el GM publica el botín de un combate';
+  b.title = combatePublicado() ? (soyGM ? 'Despojos: ver qué tomó cada uno y convertir en despojos lo que nadie tomó' : 'Botín abierto: tocá para ver la batalla y elegir. Lo podés cerrar y volver a abrir las veces que quieras hasta que el GM lo cierre') : 'Despojos: se habilita cuando el GM publica el botín de un combate';
 }
 function abrirBatallaDeJugador(){
   const fichaId = fichaPrincipalId();
@@ -1101,6 +1101,8 @@ function escucharBotinParaJugador(){
     if(cerrada && bnBotinCombateCerrado()) toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
     else if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
     if(typeof bnBotinDibujar === 'function') bnBotinDibujar();
+    if(cerrada && typeof FichaBotin !== 'undefined') FichaBotin.restaurado();   // 🎁 el GM lo cerró: se van la pastilla y el cartel
+    if(typeof bnBotinPastillaAlDia === 'function') bnBotinPastillaAlDia();   // 🎁 minimizado antes de recargar: la pastilla vuelve
     if(soyGM) vgCombateCambio();   // la ventana del botín del GM (js/18)
   }, err => console.error('Error escuchando el fin del combate:', err));
 }

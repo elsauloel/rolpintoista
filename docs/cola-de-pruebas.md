@@ -421,7 +421,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   es lo que el mapa hace; el texto del Muro de fuego dice «empieza su turno adentro» (queda anotado en `docs/preguntas-abiertas.md`). Los tótems y
   estandartes son tokens, no comparten ese cartel: no llevan el botón. Sin probar con clics: una trampa, una zona puesta por un personaje (para
   ver su descripción leída de la ficha) y una curación (`docs/pruebas-en-el-mapa.md`). 946 pruebas automáticas en verde (6 nuevas).
-- **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
+- **✅ hecho (2026-11-20) — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
   ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
   que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás
   cerrando el botín, pero lo podés volver a abrir. El botín no desaparece hasta que el máster no ejecuta… comunicáselo en un lenguaje adecuado,
@@ -434,6 +434,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Verificar de paso que de verdad se puede reabrir siempre (también recargando la página) mientras el GM no lo cerró.
   **Textos aprobados por el dueño (2026-11-20):** cartel al cerrar: «**Tranqui: el botín no se pierde.** Sigue abierto para todos hasta que el GM lo
   cierre. Lo volvés a abrir cuando quieras con el botón 🎁.» [Entendido, cerrar] · [Mejor minimizar]; sale la primera vez en cada combate.
+  **Hecho** (mapa y ficha, la misma pieza): (1) botón «— Minimizar» en la cabecera de la ventana → queda una pastilla abajo al centro, «🎁 Botín
+  abierto · tocá para volver», que la reabre con un clic; (2) al tocar Cerrar, Esc o afuera, el cartel con el texto aprobado y [Entendido, cerrar]
+  · [Mejor minimizar], la primera vez en cada combate (después cierra directo); (3) arriba de todo en la ventana, en verde: «Podés cerrar o
+  minimizar esta ventana: el botín sigue acá hasta que el GM lo cierre»; (4) el 🎁 ya latía con el botín publicado: ahora dice «🎁 Botín abierto ·
+  tocá para verlo», y en la ficha el botón 🎁 Despojos también late. **Probado con clics** («Claude · pruebas 2», GM y Jugador 1, con un botín de
+  verdad publicado): todo lo anterior en el mapa y en la ficha; **se puede reabrir siempre** mientras el GM no lo cerró: con el 🎁, con la
+  pastilla, y también recargando la página (minimizado: la pastilla vuelve sola; cerrado: el 🎁 sigue latiendo y abre). Cuando el GM despoja, la
+  pastilla se va y el 🎁 se apaga. La XP que repartió la prueba se repuso (la partida quedó como estaba). **La ventana del GM («🎁 Despojos»)** no
+  se tocó: ya se cierra y se reabre con su 🎁; un «Minimizar» ahí sería solo por comodidad (propuesta, sin hacer). Sin probar: con el Jugador 2 a
+  la vez y en medio de una disputa de piedra, papel o tijera. 950 pruebas automáticas en verde (4 nuevas).
 - **⬜ en cola — 🎭 Que sea claro cómo poner tu personaje en el mapa** (dueño, 2026-11-20, sobre la observación de un ayudante: «lo del botón de
   personajes y el botón de tokens es poco claro… vamos con tu sugerencia, hacer las 2 y 3 juntas»). (2) En la lista de **👥 Personajes** del mapa, al
   lado de cada personaje PROPIO que no tiene token en el mapa que se está viendo, un botón **«🎭 Ponerlo en el mapa»** que hace lo mismo que el 🎭

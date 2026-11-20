@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../comun/dock-izq.css?v=20261118mc">
-<link rel="stylesheet" href="ficha.css?v=20261105rv">
+<link rel="stylesheet" href="ficha.css?v=20261120min1">
 <style>
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
@@ -713,7 +713,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 
 <div class="scrim" id="scrim-botin-loot">
   <div class="modal" style="max-width:920px;width:94vw">
-    <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" id="botin-loot-x">Cerrar</button></header>
+    <header><h3>⚔ Batalla terminada</h3><span style="display:flex;gap:8px;align-items:center"><button class="iconbtn" id="botin-loot-min" title="Achicar la ventana a una pastilla: el botín sigue abierto y volvés con un clic" style="font-weight:700;border:1px solid var(--copper,#B87333);background:rgba(184,115,51,.22);padding:6px 14px">— Minimizar</button><button class="iconbtn" id="botin-loot-x">Cerrar</button></span></header>
     <div class="body" id="botin-loot-body"></div>
   </div>
 </div>
@@ -834,7 +834,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/inv-calculo.js?v=20261120invocar"></script>
 <script src="../comun/ficha-mantenimiento.js?v=20261114av"></script>
 <script src="../comun/ficha-equipo.js?v=20261120carcaj3"></script>
-<script src="../comun/ficha-botin.js?v=20261120lugar"></script>
+<script src="../comun/ficha-botin.js?v=20261120min1"></script>
 <script src="../comun/glosario.js?v=20261120carcaj"></script>
 <script src="../comun/tip-ejecutar.js?v=20261109tip3"></script>
 <script src="../comun/item-corto.js?v=20261112sind2"></script>
@@ -866,7 +866,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/05-estados-y-botonera.js?v=20261031luz2"></script>
 <script src="js/06-cajas-y-carga.js?v=20261120invocar"></script>
 <script src="js/07-editor-y-catalogo.js?v=20261111r33"></script>
-<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261120pasardde"></script>
+<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261120min1"></script>
 <script src="js/09-inventario-y-tienda.js?v=20261103nit"></script>
 <script src="js/10-habilidades-pasivas-e-items.js?v=20261104e"></script>
 <script src="js/11-combate.js?v=20261104rv2"></script>

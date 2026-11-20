@@ -282,6 +282,10 @@
 
 ## Pendientes
 
+- [ ] **🎁 El botín minimizado: lo que no se probó con clics** (2026-11-20; `comun/ficha-botin.js`): con **dos jugadores a la vez** (uno lo
+  minimiza, el otro reclama: que al volver se vea lo reclamado), en medio de una **disputa** de piedra, papel o tijera, y pasando de la ventana
+  del botín a «🎒 Mochila y equipo» y volviendo. Lo demás (Cerrar, Esc, afuera, la pastilla, el 🎁, recargar, el cierre del GM) está probado.
+
 - [ ] **🔍 «Ver detalle» de una zona: lo que no se probó con clics** (2026-11-20; `vtt-hexgrid/js/127`): (1) una **trampa a la vista** (armada y ya
   disparada, y una que deja zona): el botón y la tarjeta; (2) una zona puesta por un **personaje** (la Nube tóxica del Debuffer, una varita): que
   «De quién es» lo nombre y que la descripción salga leída de su ficha (con una varita va a decir «puede venir de un ítem: a mano»); (3) una zona

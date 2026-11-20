@@ -117,7 +117,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120carcaj3', '../comun/ficha-botin.js?v=20261120lugar', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120enj', '../comun/ficha-combate.js?v=20261120maestria', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120carcaj3', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120enj', '../comun/ficha-combate.js?v=20261120maestria', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
   '../comun/catalogo.js?v=20261120carcaj2', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120hasta', '../comun/inv-calculo.js?v=20261120invocar', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261105c2', '../comun/inv-duelo.js?v=20261118vx', '../comun/ficha-acciones.js?v=20261120invocar', '../comun/inv-habilidades.js?v=20261120inmune', '../comun/inv-lupa.js?v=20261120maestria',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261118vx', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261120hasta'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1139,7 +1139,7 @@ function bnCrear(){
       <footer><button class="btn ghost" data-bn-ti="aleatorio">🎲 Tirar de nuevo</button><button class="btn primary" data-bn-ti="aleatorio-no">Cerrar</button></footer>
     </div></div>
     <div class="scrim" id="bn-botin"><div class="modal" style="max-width:920px;width:94vw">
-      <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" data-bn-eq="botin-no">Cerrar</button></header>
+      <header><h3>⚔ Batalla terminada</h3><span style="display:flex;gap:8px;align-items:center"><button class="iconbtn" data-bn-eq="botin-min" title="Achicar la ventana a una pastilla: el botín sigue abierto y volvés con un clic" style="font-weight:700;border:1px solid var(--copper,#B87333);background:rgba(184,115,51,.22);padding:6px 14px">— Minimizar</button><button class="iconbtn" data-bn-eq="botin-no">Cerrar</button></span></header>
       <div class="body" id="bn-botin-cuerpo"></div>
     </div></div>
     <div class="scrim" id="bn-slot-lleno"><div class="modal" style="max-width:460px">
@@ -1211,7 +1211,7 @@ function bnCrear(){
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
   ['bn-slot-lleno', 'bn-comparar'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
   raiz.querySelector('#bn-equipo').addEventListener('mousedown', e => { if(e.target.id === 'bn-equipo') bnEquipoCerrar(); });
-  raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinCerrar(); });
+  raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinPedirCerrar(); });   // (afuera: con el cartel «el botín no se pierde» la primera vez)
   raiz.querySelector('#bn-tienda').addEventListener('mousedown', e => { if(e.target.id === 'bn-tienda') bnTiendaCerrar(); });
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
@@ -1821,7 +1821,8 @@ function bnEquipoClic(b){
   if(enEquipo && Intercambio.clic(b, bn.fichaId)) return true;   // 🤝 Dar (comun/intercambio.js)
   if(b.dataset.bnEq){
     if(b.dataset.bnEq === 'cerrar') bnEquipoCerrar();
-    else if(b.dataset.bnEq === 'botin-no') bnBotinCerrar();
+    else if(b.dataset.bnEq === 'botin-no') bnBotinPedirCerrar();
+    else if(b.dataset.bnEq === 'botin-min') bnBotinMinimizar();
     else if(b.dataset.bnEq === 'slot-no') r.querySelector('#bn-slot-lleno').classList.remove('open');
     else if(b.dataset.bnEq === 'comparar-no'){ r.querySelector('#bn-comparar').classList.remove('open'); bnComparando = null; }
     return true;
@@ -1891,6 +1892,7 @@ async function abrirBotinMapa(fichaId){
   bn.soloBotin = !yaVisible;
   if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
   bn.raiz.querySelector('#bn-botin').classList.add('open');
+  FichaBotin.restaurado();   // (si estaba minimizado: se va la pastilla)
   bnBotinDibujar();
 }
 function bnBotinDibujar(){
@@ -1902,6 +1904,23 @@ function bnBotinCerrar(seguir){
   if(!bn) return;
   bn.raiz.querySelector('#bn-botin').classList.remove('open');
   if(bn.soloBotin){ bn.soloBotin = false; if(seguir) bn.host.hidden = true; else cerrarBotoneraNueva(); }
+}
+/* 🎁 Minimizar y el cartel al cerrar (2026-11-20, dueño: «tengo miedo de cerrar el botín y después no poder volver a abrirlo… se tiene que poder
+   minimizar y, si un jugador aprieta cerrar, le tiene que aparecer una notificación»): lo común en comun/ficha-botin.js. Cerrar, la ✕, Esc o un clic
+   afuera pasan por el cartel la primera vez en cada combate; «— Minimizar» deja la pastilla «🎁 Botín abierto · tocá para volver». */
+function bnBotinMinimizar(){
+  bnBotinCerrar();
+  FichaBotin.minimizar(combateMapa, () => abrirBatallaDeJugador());
+}
+function bnBotinPedirCerrar(){
+  FichaBotin.pedirCerrar({combate: combateMapa, cerrar: () => bnBotinCerrar(), minimizar: bnBotinMinimizar});
+}
+// Al entrar o recargar: si el botín sigue publicado y esta pantalla lo había minimizado, la pastilla vuelve (js/12 la llama con cada cambio del combate).
+async function bnBotinPastillaAlDia(){
+  if(soyGM) return;
+  if(!combatePublicado()){ if(typeof FichaBotin !== 'undefined') FichaBotin.pastilla(false); return; }
+  try{ await bnCargarPiezas(); }catch(err){ return; }
+  if(FichaBotin.minimizado(combateMapa) && !(bn && bn.raiz && bn.raiz.querySelector('#bn-botin.open'))) FichaBotin.pastilla(true, () => abrirBatallaDeJugador());
 }
 // El GM cerró el botín (js/12, escucharBotinParaJugador): la ventana se cierra.
 function bnBotinCombateCerrado(){
@@ -2282,7 +2301,7 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   const abiertos = [...bn.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
   if(cartel && cartel.id === 'bn-equipo'){ bnEquipoCerrar(); return; }
-  if(cartel && cartel.id === 'bn-botin'){ bnBotinCerrar(); return; }
+  if(cartel && cartel.id === 'bn-botin'){ bnBotinPedirCerrar(); return; }
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
   if(cartel && cartel.id === 'bn-reroll'){ bnRerollCerrar(); return; }

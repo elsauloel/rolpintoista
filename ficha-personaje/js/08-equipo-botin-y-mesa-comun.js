@@ -85,12 +85,15 @@ function combateEscuchar(){
     const abierta = $('#scrim-botin-loot').classList.contains('open');
     if(nuevo && !document.documentElement.classList.contains('modo-botonera') && botinPuedeTomar()){
       toast('⚔ Batalla terminada');
-      botinLootCuerpo();
-      $('#scrim-botin-loot').classList.add('open');
+      botinLootAbrir();
     }else if(cerrada && abierta){
       $('#scrim-botin-loot').classList.remove('open');
       toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
     }
+    // 🎁 El GM lo cerró: se van la pastilla y el cartel. Minimizado antes de recargar (y sigue publicado): la pastilla vuelve.
+    if(cerrada || !combatePublicado()) FichaBotin.restaurado();
+    else if(FichaBotin.minimizado(d) && !$('#scrim-botin-loot').classList.contains('open') && !document.documentElement.classList.contains('modo-botonera')) FichaBotin.pastilla(true, botinLootAbrir);
+    const bb = $('#btn-botin-loot'); if(bb) bb.classList.toggle('pendiente', combatePublicado());
   }, err => console.error('Error escuchando el fin del combate:', err));
 }
 const combatePublicado = () => !!(combateActual && combateActual.estado === 'publicado');
@@ -127,8 +130,14 @@ function botinLootCuerpo(){
 const botinUi = () => ({toast: t => toast(t), puede: botinPuedeTomar, fichaId: fichaVivo && fichaVivo.id});
 function botinTomar(docId){ return FichaBotin.tomar(S, botinLoot.find(x => x.docId === docId), botinUi()); }
 function botinTomarBoton(btn){ const ids = FichaBotin.idsDeBoton(btn, $('#botin-loot-body')); return FichaBotin.tomarVarios(S, ids.map(id => botinLoot.find(x => x.docId === id)), botinUi()); }   // uno, o N de una pila (2026-10-22)
-$('#btn-botin-loot').onclick = () => { botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); };
-$('#botin-loot-x').onclick = () => $('#scrim-botin-loot').classList.remove('open');
+/* 🎁 Minimizar y el cartel al cerrar (2026-11-20, dueño; lo común en comun/ficha-botin.js): Cerrar (y Esc, que aprieta ese botón) pasa por el cartel
+   «el botín no se pierde» la primera vez en cada combate; «— Minimizar» deja la pastilla «🎁 Botín abierto · tocá para volver». */
+function botinLootAbrir(){ botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); FichaBotin.restaurado(); }
+function botinLootMinimizar(){ $('#scrim-botin-loot').classList.remove('open'); FichaBotin.minimizar(combateActual, botinLootAbrir); }
+$('#btn-botin-loot').onclick = botinLootAbrir;
+$('#botin-loot-x').onclick = () => FichaBotin.pedirCerrar({combate: combateActual, cerrar: () => $('#scrim-botin-loot').classList.remove('open'), minimizar: botinLootMinimizar});
+$('#botin-loot-min').onclick = botinLootMinimizar;
+$('#scrim-botin-loot').addEventListener('mousedown', e => { if(e.target.id === 'scrim-botin-loot') $('#botin-loot-x').click(); });   // un clic afuera: lo mismo que Cerrar
 $('#botin-loot-body').addEventListener('click', e => {
   const t = e.target.closest('[data-botin-tomar]');
   if(t){ botinTomarBoton(t); return; }

@@ -9135,6 +9135,34 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
   });
 })();
 
+
+/* ---------- 🎁 El botín: minimizar y el cartel al cerrar (comun/ficha-botin.js, 2026-11-20) ---------- */
+grupo('🎁 El botín: minimizar y que cerrar no lo pierde (comun/ficha-botin.js)');
+(() => {
+  const pub = {estado: 'publicado', numero: 7, jugadores: []}, cerrado = {estado: 'cerrado', numero: 7, jugadores: []};
+  const Sx = FichaGuardado.normalizar({}).S;
+  prueba('los textos aprobados por el dueño, tal cual', () => {
+    igual(FichaBotin.CARTEL.titulo, 'Tranqui: el botín no se pierde.');
+    igual(FichaBotin.CARTEL.texto, 'Sigue abierto para todos hasta que el GM lo cierre. Lo volvés a abrir cuando quieras con el botón 🎁.');
+    igual([FichaBotin.CARTEL.cerrar, FichaBotin.CARTEL.minimizar], ['Entendido, cerrar', 'Mejor minimizar']);
+    igual(FichaBotin.NOTA, 'Podés cerrar o minimizar esta ventana: el botín sigue acá hasta que el GM lo cierre');
+    igual(FichaBotin.PASTILLA, '🎁 Botín abierto · tocá para volver');
+  });
+  prueba('el cartel sale la primera vez en cada combate: no con el botín ya cerrado, ni dos veces en el mismo, sí en el siguiente', () => {
+    igual([FichaBotin.avisoToca(pub, ''), FichaBotin.avisoToca(pub, '7'), FichaBotin.avisoToca({...pub, numero: 8}, '7'), FichaBotin.avisoToca(cerrado, ''), FichaBotin.avisoToca(null, '')],
+      [true, false, true, false, false]);
+  });
+  prueba('la línea fija está adentro de la ventana mientras el botín está publicado, y no cuando ya se cerró', () => {
+    const con = FichaBotin.html(Sx, {combate: pub, loot: [], puede: true, fichaId: 'f1'}), sin = FichaBotin.html(Sx, {combate: cerrado, loot: [], puede: true, fichaId: 'f1'});
+    igual([con.includes(FichaBotin.NOTA), sin.includes(FichaBotin.NOTA)], [true, false]);
+  });
+  prueba('cerrar con el botín ya cerrado cierra directo, sin cartel; y minimizado solo cuenta para ese combate publicado', () => {
+    let n = 0; const mostro = FichaBotin.pedirCerrar({combate: cerrado, cerrar: () => n++});
+    igual([mostro, n, !!document.getElementById('botin-aviso-fondo')], [false, 1, false]);
+    igual([FichaBotin.minimizado(cerrado), FichaBotin.minimizado(null)], [false, false]);
+  });
+})();
+
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');

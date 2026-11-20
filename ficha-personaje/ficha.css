@@ -1230,3 +1230,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 /* El cartel de «Solo lectura» / «Editar como GM» / «Tenés el control» va fijo arriba al centro: le hacemos lugar bajando la línea de la ficha
    para que no la tape (dueño, 2026-11-01). */
 html.con-lectura .accesos{padding-top:44px}
+
+/* 🎁 Con el botín publicado, el botón del menú de la izquierda late (2026-11-20, dueño: que se note por dónde se vuelve a abrir). */
+#btn-botin-loot.pendiente{border-color:var(--copper);color:var(--brass);animation:botinLate 1.6s ease-in-out infinite}
+@keyframes botinLate{0%,100%{box-shadow:0 0 0 0 rgba(184,115,51,.75)}50%{box-shadow:0 0 0 8px rgba(184,115,51,0)}}
+@media (prefers-reduced-motion:reduce){#btn-botin-loot.pendiente{animation:none}}

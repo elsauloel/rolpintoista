@@ -2085,6 +2085,15 @@ versión parecida en más de una, es candidato a juntar.
   pruebas): `unir([{cono, alerta}])` → `{cono, alerta}` (el cono de un rival le gana a la alerta de otro), `estado(union, clave)` → 'riesgo' | 'alerta'
   | 'libre', `referencia(seleccion, candidatos)` (de quién se muestran), `camino(union, claves)` → `{corte, alerta}` (como al soltar el token) y
   `leyenda(nombre, cuantos, soyGM)` (el cartel). Las zonas de cada rival y qué rivales cuentan los pone el mapa (`vtt-hexgrid/js/124-zonas-riesgo.js`).
+- **`ficha-botin.js`, 🎁 minimizar y «cerrarlo no lo pierde»** (2026-11-20, dueño: «un jugador… dijo: tengo miedo de cerrar el botín y después no
+  poder volver a abrirlo… se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación»): la misma
+  pieza para el mapa y la ficha. `NOTA` (la línea fija, que `html` pone arriba de la ventana mientras el botín está publicado), `CARTEL` (los
+  textos APROBADOS por el dueño: no cambiarlos sin preguntarle), `PASTILLA`; `pedirCerrar({combate, cerrar, minimizar})` (con el botín publicado,
+  la primera vez en cada combate —`avisoToca(combate, visto)`, recordado por navegador— muestra el cartel con [Entendido, cerrar] · [Mejor
+  minimizar]; después, o con el botín cerrado, cierra directo); `pastilla(visible, alAbrir)` (la pastilla fija abajo al centro);
+  `minimizar(combate, alAbrir)`, `minimizado(combate)` y `restaurado()` (recuerda por navegador y por combate que quedó minimizado: al recargar,
+  la pastilla vuelve). El cartel y la pastilla van en el `<body>` con sus estilos propios (`estilos()`), así sirven aunque la ventana esté en el
+  recuadro aislado de la Botonera del mapa. Nada de esto toca el botín: solo lo que se ve en esa pantalla. Pruebas en `pruebas.html`.
 - **`zona-detalle.js`** (`ZonaDetalle`, 2026-11-20) — **🔍 la tarjeta «Ver detalle» de lo que está puesto en el mapa**, armada desde los datos del
   elemento (sin mapa ni Firebase, con pruebas): `tiene(el)` (zona, trampa, terreno en llamas, nube, portal, Acelerador) y `armar(el, ctx)` →
   `{icono, titulo, esencial, filas: [{k, v, aMano}], descripcion, descripcionNo}`. `esencial` es la frase de arriba (cuánto daño o qué efecto, a

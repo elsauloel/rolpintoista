@@ -704,3 +704,10 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   invocación dormida (js/06, `data-reinvocar`) llama a `InvCalculo.invocar(inv)` (comun/inv-calculo.js): vida y No2 llenos, sus turnos y los
   cooldowns en cero. Antes no tocaba la vida y la invocación volvía con la que le había quedado (herida, o en 0 si había muerto). Probado con
   clics en «El origen · CLON de pruebas».
+
+- **🎁 El botín: minimizar, y cerrarlo no lo pierde** (2026-11-20, dueño; lo común en `comun/ficha-botin.js`): la ventana «⚔ Batalla terminada»
+  (`#scrim-botin-loot`) suma «— Minimizar» (`#botin-loot-min` → `botinLootMinimizar`: deja la pastilla «🎁 Botín abierto · tocá para volver»);
+  Cerrar (y Esc, que aprieta ese botón; y un clic afuera) pasa por `FichaBotin.pedirCerrar`: el cartel «Tranqui: el botín no se pierde…» la primera
+  vez en cada combate. `botinLootAbrir` es la única forma de abrirla (saca la pastilla). El botón 🎁 Despojos del menú de la izquierda late
+  (`.pendiente`, ficha.css) mientras el botín esté publicado. Al recargar minimizado, la pastilla vuelve; cuando el GM cierra el botín, se va.
+

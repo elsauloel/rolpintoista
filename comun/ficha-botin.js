@@ -109,7 +109,7 @@ const FichaBotin = (() => {
     const todas = pilas(lista, yo, miUid);
     const grupos = GRUPOS.map(g => ({...g, pilas: todas.filter(p => p.grupo === g.id)})).filter(g => g.pilas.length);
     return `
-    ${recompensas}${cerrado}
+    ${publicado(combate) ? `<div class="botin-nota-fija" style="margin:0 0 12px;padding:8px 12px;border-radius:8px;background:rgba(78,201,138,.12);border:1px solid rgba(78,201,138,.55);color:#BFEBD3;font-size:13.5px;font-weight:600">🎁 ${NOTA}.</div>` : ''}${recompensas}${cerrado}
     <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Botín: reclamá lo que querés</div>
     <div class="hint" style="margin-bottom:8px">Lo que reclamás queda a tu nombre y llega a tu mochila cuando el GM cierra el botín. Si otro también lo quiere, te lo puede disputar: ✊ piedra, papel o tijera, y el que gana se lo lleva. Lo repetido va en una pila: elegí cuántos reclamás.</div>
     <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
@@ -281,5 +281,76 @@ const FichaBotin = (() => {
     mesa(S, `↩ ${S.meta.nombre || fbMiembro.nombre} soltó ${b.nombre}`);
   }
 
-  return {loot, publicado, textoItem, html, tomar, tomarVarios, idsDeBoton, grupoDe, pilas, GRUPOS, disputar, soltar};
+  /* ---------- 🎁 Minimizar el botín y el cartel al cerrarlo (2026-11-20, dueño: «un jugador… dijo: tengo miedo de cerrar el botín y después no
+     poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene que ser súper claro. El botín se tiene que poder minimizar y, si un jugador
+     aprieta cerrar botín, le tiene que aparecer una notificación… en un lenguaje adecuado, simple y amigable»). La misma pieza para el mapa y la
+     ficha: cada pantalla pone el botón «— Minimizar» en la cabecera de su ventana y pasa por acá al cerrar.
+     - NOTA: la línea fija de adentro de la ventana (la pone `html` mientras el botín está publicado).
+     - pedirCerrar({combate, cerrar, minimizar}): con el botín publicado, la PRIMERA vez en cada combate muestra el cartel (texto aprobado por el
+       dueño) con [Entendido, cerrar] · [Mejor minimizar]; después (o con el botín ya cerrado) cierra directo.
+     - pastilla(visible, alAbrir): la pastilla fija «🎁 Botín abierto · tocá para volver», abajo al centro; un clic la saca y llama a `alAbrir`.
+     - minimizar(combate, alAbrir) / minimizado(combate) / restaurado(): recuerda (por navegador y por combate) que quedó minimizado, así al recargar
+       la página la pastilla vuelve a estar. Nada de esto toca el botín: solo qué se ve en esta pantalla. */
+  const NOTA = 'Podés cerrar o minimizar esta ventana: el botín sigue acá hasta que el GM lo cierre';
+  const CARTEL = {titulo: 'Tranqui: el botín no se pierde.', texto: 'Sigue abierto para todos hasta que el GM lo cierre. Lo volvés a abrir cuando quieras con el botón 🎁.',
+    cerrar: 'Entendido, cerrar', minimizar: 'Mejor minimizar'};
+  const PASTILLA = '🎁 Botín abierto · tocá para volver';
+  const numeroDe = combate => (combate && combate.numero !== undefined && combate.numero !== null ? String(combate.numero) : '');
+  const leer = k => { try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } };
+  const guardar = (k, v) => { try{ if(v) localStorage.setItem(k, v); else localStorage.removeItem(k); }catch(e){} };
+  const claveNav = k => `${k}:${typeof FB_CAMPANA !== 'undefined' && FB_CAMPANA ? FB_CAMPANA : ''}`;
+  // ¿Toca mostrar el cartel? Solo con el botín publicado y si en este combate todavía no salió.
+  function avisoToca(combate, visto){ return publicado(combate) && !!numeroDe(combate) && String(visto || '') !== numeroDe(combate); }
+  function estilos(){
+    if(typeof document === 'undefined' || document.getElementById('botin-min-css')) return;
+    const st = document.createElement('style'); st.id = 'botin-min-css';
+    st.textContent = `
+#botin-aviso-fondo{position:fixed;inset:0;z-index:2147483000;background:rgba(10,7,9,.62);display:flex;align-items:center;justify-content:center;padding:16px}
+#botin-aviso{max-width:440px;width:100%;background:#241a20;color:#EDE3D6;border:1px solid #B87333;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.7);padding:20px 22px;font:15px/1.45 inherit;font-family:inherit}
+#botin-aviso .ba-ico{font-size:34px;line-height:1;margin-bottom:8px}
+#botin-aviso b{display:block;font-size:19px;margin-bottom:6px;color:#F3D9A4}
+#botin-aviso p{margin:0 0 16px}
+#botin-aviso .ba-botones{display:flex;gap:10px;flex-wrap:wrap}
+#botin-aviso button{flex:1;min-width:150px;cursor:pointer;font:inherit;font-weight:700;padding:10px 14px;border-radius:10px;border:1px solid #B87333;background:rgba(184,115,51,.18);color:#EDE3D6}
+#botin-aviso button.ba-min{background:#B87333;color:#1b1418}
+#botin-aviso button:hover{filter:brightness(1.15)}
+#botin-pastilla{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:2147482000;cursor:pointer;font:inherit;font-size:14px;font-weight:700;
+  padding:9px 18px;border-radius:999px;border:1px solid #F3D9A4;background:#B87333;color:#1b1418;box-shadow:0 6px 20px rgba(0,0,0,.55);animation:botinPastilla 1.8s ease-in-out infinite}
+#botin-pastilla:hover{filter:brightness(1.1)}
+@keyframes botinPastilla{0%,100%{box-shadow:0 6px 20px rgba(0,0,0,.55),0 0 0 0 rgba(243,217,164,.7)}50%{box-shadow:0 6px 20px rgba(0,0,0,.55),0 0 0 9px rgba(243,217,164,0)}}
+@media (prefers-reduced-motion:reduce){#botin-pastilla{animation:none}}`;
+    document.head.appendChild(st);
+  }
+  function avisoCerrar(){ const f = document.getElementById('botin-aviso-fondo'); if(f) f.remove(); }
+  function pedirCerrar(o){
+    o = o || {};
+    const cerrar = () => { if(typeof o.cerrar === 'function') o.cerrar(); };
+    if(typeof document === 'undefined' || !avisoToca(o.combate, leer(claveNav('botin-aviso-cierre')))){ cerrar(); return false; }
+    if(document.getElementById('botin-aviso-fondo')) return true;   // ya está a la vista
+    guardar(claveNav('botin-aviso-cierre'), numeroDe(o.combate));
+    estilos();
+    const f = document.createElement('div'); f.id = 'botin-aviso-fondo';
+    f.innerHTML = `<div id="botin-aviso" role="alertdialog" aria-labelledby="botin-aviso-t"><div class="ba-ico">🎁</div><b id="botin-aviso-t">${CARTEL.titulo}</b><p>${CARTEL.texto}</p>` +
+      `<div class="ba-botones"><button type="button" class="ba-cerrar">${CARTEL.cerrar}</button><button type="button" class="ba-min">${CARTEL.minimizar}</button></div></div>`;
+    f.addEventListener('mousedown', e => e.stopPropagation());
+    f.querySelector('.ba-cerrar').onclick = () => { avisoCerrar(); cerrar(); };
+    f.querySelector('.ba-min').onclick = () => { avisoCerrar(); if(typeof o.minimizar === 'function') o.minimizar(); else cerrar(); };
+    document.body.appendChild(f);
+    f.querySelector('.ba-min').focus();
+    return true;
+  }
+  function pastilla(visible, alAbrir){
+    if(typeof document === 'undefined') return;
+    let b = document.getElementById('botin-pastilla');
+    if(!visible){ if(b) b.remove(); return; }
+    estilos();
+    if(!b){ b = document.createElement('button'); b.type = 'button'; b.id = 'botin-pastilla'; b.textContent = PASTILLA; b.title = 'El botín sigue abierto: un clic y volvés a verlo'; document.body.appendChild(b); }
+    b.onclick = () => { restaurado(); if(typeof alAbrir === 'function') alAbrir(); };
+  }
+  function minimizar(combate, alAbrir){ guardar(claveNav('botin-minimizado'), numeroDe(combate) || '1'); pastilla(true, alAbrir); }
+  function minimizado(combate){ return publicado(combate) && !!numeroDe(combate) && leer(claveNav('botin-minimizado')) === numeroDe(combate); }
+  function restaurado(){ guardar(claveNav('botin-minimizado'), ''); pastilla(false); avisoCerrar(); }
+
+  return {loot, publicado, textoItem, html, tomar, tomarVarios, idsDeBoton, grupoDe, pilas, GRUPOS, disputar, soltar,
+    NOTA, CARTEL, PASTILLA, avisoToca, pedirCerrar, pastilla, minimizar, minimizado, restaurado, estilos};
 })();

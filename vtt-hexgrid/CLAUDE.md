@@ -2302,6 +2302,16 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Probado con clics en «Claude · pruebas 2» (GM y J1: Muro de fuego, Nube tóxica y Bomba de humo de un creep, comparado con lo que hicieron) y en
   el clon de El origen (la Polvareda de la rata).
 
+- **🎁 El botín del jugador: minimizar, y cerrarlo no lo pierde** (2026-11-20, dueño; lo común en `comun/ficha-botin.js`): la ventana «⚔ Batalla
+  terminada» (`#bn-botin`, js/11) tiene **«— Minimizar»** en la cabecera (`data-bn-eq="botin-min"` → `bnBotinMinimizar`: cierra la ventana y deja
+  la pastilla «🎁 Botín abierto · tocá para volver», que la reabre con `abrirBatallaDeJugador`). **Cerrar, Esc y el clic afuera** pasan por
+  `bnBotinPedirCerrar` (`FichaBotin.pedirCerrar`): el cartel «Tranqui: el botín no se pierde…» la primera vez en cada combate. `bnBotinCerrar`
+  queda para los cierres internos (pasar a la mochila, el GM que cerró el botín). `abrirBotinMapa` saca la pastilla; `escucharBotinParaJugador`
+  (js/12) la saca cuando el GM cierra el botín y, con cada cambio del combate, `bnBotinPastillaAlDia` la vuelve a poner si esa pantalla lo había
+  minimizado (al recargar). El 🎁 del borde izquierdo late con «🎁 Botín abierto · tocá para verlo» mientras esté publicado (ya latía; cambió el
+  texto). La ventana del GM («🎁 Despojos», js/18) no se tocó. Probado con clics en «Claude · pruebas 2» (GM y J1): Cerrar, Esc, clic afuera,
+  minimizar, la pastilla, el 🎁, recargando minimizado y sin minimizar, y que todo se va cuando el GM despoja.
+
 - **🦵🩸👣🦎🔄 La tanda del choque liviano** (2026-11-07, dueño): `js/107-liviano.js`. Tendón cortado (`tendonAlMoverse`, desde `confirmarRuta` js/08:
   1 de vida directa por casilla mientras sangre); Corte en la arteria (`arteriaBonos`, desde `dueloElegirObjetivoMapa` js/13 →
   `Combatiente.arteriaAtaque`); Paso atrás y Escurridizo (`pasoTrasEvasion`, gancho `evasionGanada` de `Duelo.escuchar` en js/14: aviso al centro para

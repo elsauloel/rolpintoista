@@ -55,6 +55,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tarjeta, ficha, ficha lite, Botonera, lupa, Tablero, GM Tools) que diga «hasta el fin del turno de <quien arrastró>» en vez de sin límite. Mejor
   con un dato genérico en el estado (p. ej. `hasta: 'el fin del turno de X'`) que otros estados parecidos puedan usar, y revisar si hay otros estados
   que se guardan permanentes pero se sacan solos (decir cuáles en el informe; no cambiarlos sin avisar). No tocar cuándo se va.
+  **Y en la misma prueba (dueño, 2026-11-20, El origen):** «Rocardo empezó su turno, el primer turno del combate. Tiró Arrastrar y después cuando
+  quiso atacar le aparecía como que ya había atacado una vez, que le costaba 10 nitros. Pero él no había atacado… no me quedó claro si fue el
+  arrastre o si había quedado desde la partida anterior… lo observaría». Arma de Tipo 10: 10 No2 = ya figura un ataque con esa arma
+  (`S.ataquesArma`, `FichaCombate.registrarAtaque`). Dos sospechas a comprobar con clics: (a) Arrastrar pasa por el duelo tirando PdG y alguna parte
+  lo cuenta como ataque con el arma (no debería: «cuesta 2 No2 fijos, no lo de un ataque»); (b) la cuenta de ataques solo se vacía en el
+  Mantenimiento de inicio de turno (`comun/ficha-mantenimiento.js`), así que si el combate anterior terminó después de que atacara y en el primer
+  turno del combate nuevo no se aplicó ese inicio de turno (o se aplica después de abrir la Botonera), queda la cuenta vieja. Reproducir las dos:
+  Arrastrar y después Atacar en el mismo turno; y atacar, cerrar el combate (Finalizar / pasar a narrativo), abrir otro y mirar el costo del
+  primer ataque. Arreglar la causa que aparezca (si es la (b): que al empezar un combate —pasar a Combate / tirar iniciativa / Finalizar combate— la
+  cuenta de ataques arranque en cero para todos, personajes, invocaciones y creeps). Si no se reproduce ninguna, decirlo tal cual.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

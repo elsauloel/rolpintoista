@@ -3239,3 +3239,25 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [ ] **Sin ver en pantalla:** una invocación en el orden (sus No2); un caído primero en la lista (tiene que empezar el siguiente); «▶ Iniciar sin
   cambiar el modo»; «⏭ Pasar el turno sin iniciar»; un combate que venía andando de antes del botón (no tiene que ofrecerlo); el anillo que marca
   de quién es el turno al iniciar, en la pantalla de los jugadores.
+
+## ⚔ Las cinco maestrías nuevas: punzantes, cortantes, hachas, arcos y ballestas (2026-11-20)
+(«Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1 + Jugador 2; a Blanco J1 se le dio cada pasiva y el arma del catálogo, y después quedó como estaba.)
+
+- [x] **Punzantes + Daga**: 🔍 de Atacar con el renglón «Maestría con esta arma» (oportunidad +1, espalda +1, daño +1); 🔍 de Daño «1d4 + 7» (6 de
+  Fuerza + 1 de la maestría). Duelo por la espalda contra Blanco J2: «🗡 por la espalda: +2 PdG (1 por la Maestría en armas punzantes) · ⚔ Maestría en
+  armas punzantes: +1 al daño»; la tirada «1d6 +2 espalda» y el daño «1d4+7». Ataque de oportunidad (el creep se aleja, en combate): «+1 PdG por ser
+  de oportunidad», tirada 1d6+1. Con una espada (Tipo 6): nada de eso (daño 2d6 + 6, sin renglón de maestría).
+- [x] **Cortantes + Espada de la colimba**: botones Parry 1d6+1 y Bloqueo 1d8+1 (sin la pasiva, 1d6 y 1d8); 🔍 de Parry y de Bloqueo «Con cada arma o
+  escudo»; en un duelo real (lo ataca Blanco J2) paró con 1d6+1 y bloqueó con 1d8+1; con Devolver gentileza contraatacó con 1d6+1. Con una daga: «otro
+  Tipo: no suma». Con una ballesta de Tipo 6: nada.
+- [x] **Hachas + Hacha de leñador**: primer ataque 4 No2; después, el botón Atacar dice «6 No2» y la 🔍 «Tipo completo 8 · Maestría en hachas −2 ·
+  Cuesta 6 No2»; el duelo del segundo ataque, «descuenta 6 No2». Bloqueo 7 (6 + 1). Con un bastón de Tipo 10: 5 y 10 No2, Bloqueo sin sumar.
+  Un **creep** (Blanco creep, Hacha de piedra) con la pasiva: 4 No2 el primero, 6 el segundo, y su 🔍 lo explica.
+- [x] **Arcos + Arco corto**: Atacar 1d6+1 y la 🔍 con «PdG con arcos +1» y «Crítico potente con arcos +2»; en el duelo contra el creep, «⚔ Maestría
+  en arcos: +1 PdG, Crítico potente +2» y la tabla del crítico «Blanco J1 tiene Crítico potente 2… doble 7 → 5». Con una ballesta: nada.
+- [x] **Ballestas + Ballesta de estribo** (Perfora 1): Atacar 1d6+1; en el duelo, «⚔ Maestría en ballestas: +1 PdG, Perfora +1 · perfora 2». Con un
+  arco: nada.
+- [ ] **Sin ver en pantalla:** una invocación con una maestría; el golpe de la ballesta aplicado hasta el final (que pasen los 2 de Perfora contra
+  una Defensa alta); una habilidad «con tu arma» (Pegar fuerte) con una maestría; el contraataque mostrando «⚔ Maestría en armas cortantes» en la
+  declaración (se sumó después de la prueba; la tirada sí se vio con el +1); el arcabuz contando como ballesta.
+

@@ -318,7 +318,7 @@ async function oporArmasDe(r){
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if((costo > 0 && n < 0) || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad; sin No2 va a negativo, ya en negativo no (2026-11-01)
     return [{nombre: Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
-      ataque: Combatiente.ataqueConSuArma(sc, 'oportunidad', CreepCalculo.alcance(sc))}];
+      ataque: Combatiente.ataqueConSuArma(sc, 'oportunidad', CreepCalculo.alcance(sc), st => CreepCalculo.modTotal(sc, st))}];
   }
   await bnCargarPiezas();
   const [fichaId, invId] = String(r.fichaId).split(SEP_INVOCACION);
@@ -331,7 +331,7 @@ async function oporArmasDe(r){
     const costo = Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => FichaResumen.invModTotal(inv, st)));
     if(costo > 0 && num(inv.nitros) < 0) return [];   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
     return [{nombre: Combatiente.armaEnMano(inv).nombre || (Combatiente.armaEnMano(inv).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'pj', nombre}, detalle: oporDetalle(typeof InvCalculo !== 'undefined' ? InvCalculo.ataqueTxt(inv) : '', inv, Combatiente.armaDeCombatiente(inv)),
-      ataque: Combatiente.ataqueConSuArma(inv, 'oportunidad', typeof InvCalculo !== 'undefined' ? InvCalculo.alcance(inv) : 1)}];
+      ataque: Combatiente.ataqueConSuArma(inv, 'oportunidad', typeof InvCalculo !== 'undefined' ? InvCalculo.alcance(inv) : 1, typeof InvCalculo !== 'undefined' ? st => InvCalculo.modTotal(inv, st) : undefined)}];
   }
   const calc = FichaCalculo.calcular(S);
   const disponibles = S.nitros === null || S.nitros === undefined ? num(calc.final.nitros) : num(S.nitros);
@@ -341,7 +341,7 @@ async function oporArmasDe(r){
     .filter(x => !x.costo || disponibles >= 0)   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
     .map(({arma, costo}) => ({nombre: arma ? arma.nombre : 'sin arma', costo, yo: {ref: fichaId, tipo: 'pj', nombre},
       detalle: arma ? [`Daño ${FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(S, arma, calc))}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · ') : 'A mano limpia',
-      ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));
+      ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma, st => calc.final[st], 'oportunidad')}}));
 }
 async function oporAtacar(a){
   const od = oporDecision;

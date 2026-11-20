@@ -19,11 +19,21 @@ const InvLupa = (() => {
     const fila = (st, cuando) => I.aportesMod(inv, st).map(a => lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(L[st] || st)}: ${cuando})</span>`, lupaSigno(a.val))).join('');
     if(statId === 'pdg' && ataque){
       const a = Combatiente.armaEnMano(inv), t = num(a.tipoDado);
-      return {filas: ([4, 6, 8, 10].includes(t) ? fila('pdgt' + t, 'con esta arma') : '') + (a.armaDeRango ? fila('pdgdist', 'a distancia') : ''), extra: I.pdgExtra(inv)};
+      return {filas: ([4, 6, 8, 10].includes(t) ? fila('pdgt' + t, 'con esta arma') : '') + (a.armaDeRango ? fila('pdgdist', 'a distancia') : '') + (Combatiente.statFamilia('pdg', a) ? fila(Combatiente.statFamilia('pdg', a), 'con esta arma') : ''), extra: I.pdgExtra(inv)};
     }
     if(statId === 'parry'){
       const d = I.defensa(inv), st = Combatiente.parryStatDe(Combatiente.piezaDeDefensa(inv, d));
       return {filas: st ? fila(st, `solo al parar con ${d.nombre}`) : '', extra: I.parryExtra(inv), pieza: d ? (d.id || d.nombre) : undefined};
+    }
+    // ⚔ Las maestrías (2026-11-20): el Bloqueo con la pieza con que bloquea (cortantes, hachas) y, con `statId` = 'maestria' / 'dmgfam', lo demás.
+    if(statId === 'bloqueo'){
+      const d = I.defensa(inv), pieza = Combatiente.piezaDeDefensa(inv, d), st = Combatiente.statFamilia('bloqueo', pieza);
+      return {filas: st ? fila(st, `solo al bloquear con ${d.nombre}`) : '', extra: I.famExtra(inv, 'bloqueo', pieza), pieza: d ? (d.id || d.nombre) : undefined};
+    }
+    if(statId === 'maestria' || statId === 'dmgfam'){
+      const a = Combatiente.armaEnMano(inv);
+      return {filas: (statId === 'dmgfam' ? [['dmg', 'con esta arma']] : [['pdgopor', 'solo en un ataque de oportunidad'], ['pdgcontra', 'solo en un contraataque'], ['espalda', 'solo al pegar por la espalda (lo suma el mapa)'], ['dmg', 'al daño de cada golpe'], ['critpot', 'si el golpe es crítico'], ['perfora', 'en cada disparo'], ['ahorro', 'No2 de menos desde el segundo ataque del turno con esta arma'], ['bloqueo', 'al bloquear con esta arma']])
+        .map(([cual, cuando]) => Combatiente.statFamilia(cual, a) ? (cual === 'ahorro' ? fila(Combatiente.statFamilia(cual, a), cuando).replace(/\+(\d)/g, '−$1') : fila(Combatiente.statFamilia(cual, a), cuando)) : '').join(''), extra: 0};
     }
     return {filas: '', extra: 0};
   }
@@ -60,7 +70,7 @@ const InvLupa = (() => {
         : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
       h += lupaFila('No2 disponibles', fmt(num(inv.nitros)), costo > num(inv.nitros) ? 'lupa-falta' : '');
       h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
-      return {titulo: `${inv.nombre} · Atacar`, html: stat(inv, 'pdg', {ataque: true}) + lupaSeccion('Costo', h)};
+      return {titulo: `${inv.nombre} · Atacar`, html: stat(inv, 'pdg', {ataque: true}) + (familia(inv, 'maestria').filas ? lupaSeccion('Maestría con esta arma', familia(inv, 'maestria').filas) : '') + lupaSeccion('Costo', h)};
     }
     if(tipo === 'danio'){
       const dmg = I.statValor(inv, 'dmg');
@@ -71,6 +81,7 @@ const InvLupa = (() => {
       h += !Combatiente.armaEnMano(inv).armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
         : Combatiente.esArco(inv) ? lupaFila('Dmg <span class="lupa-gris">(arco: la mitad, para arriba)</span>', lupaSigno(Combatiente.dmgDelArma(inv, dmg)))
         : lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado');
+      h += familia(inv, 'dmgfam').filas;   // ⚔ la maestría de su arma (punzantes)
       h += lupaFila('Daño', esc(I.danoTxt(inv, dmg)), 'lupa-total');
       let out = lupaSeccion('De dónde sale', h);
       if(!Combatiente.armaEnMano(inv).armaDeRango || Combatiente.esArco(inv)) out += stat(inv, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');

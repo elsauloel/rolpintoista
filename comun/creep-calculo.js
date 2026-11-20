@@ -159,9 +159,11 @@ const CreepCalculo = (() => {
     const a = armaDe(sc);
     const dados = a.peso + a.danoAmplificado + Math.max(0, num(dadosMas));
     const tipo = a.tipoDado;
-    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
+    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra)) + famExtra(sc, 'dmg');   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada · + la maestría de su arma (2026-11-20)
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
+  // ⚔ Lo que suma la familia del arma (las maestrías, 2026-11-20; Combatiente.extraFamilia): `pieza` = con qué (por defecto, el arma en la mano).
+  function famExtra(sc, cual, pieza){ return Combatiente.extraFamilia(st => modTotal(sc, st), cual, pieza === undefined ? armaDe(sc) : pieza); }
 
   // Lo que el creep tiene puesto y da bonos (su arma adentro; lo guardado no: paso 4).
   // ⚔⚔ Con dos armas (2026-11-03; regla general del dueño, 2026-11-07): los bonos de ataque de un arma cuentan solo con esa arma (la de la mano);
@@ -483,7 +485,7 @@ const CreepCalculo = (() => {
   function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }
   // ⚔⚔ Lo que costaría atacar con un arma puntual (las Acciones con dos armas: un «Atacar con…» por arma).
   function costoAtaqueCon(sc, armaId){ return costoAtaque({...sc, armaActiva: armaId}); }   // + Extenuado (2026-10-12)
-  function costoAtaque0(sc){ const a = armaDe(sc), hechos = Combatiente.ataquesConArmaCreep(sc); if(Combatiente.cargadaGratis(a, hechos, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos) - Combatiente.ahorroArco(a, hechos, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  function costoAtaque0(sc){ const a = armaDe(sc), hechos = Combatiente.ataquesConArmaCreep(sc); if(Combatiente.cargadaGratis(a, hechos, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos, st => modTotal(sc, st)) - Combatiente.ahorroArco(a, hechos, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
@@ -544,13 +546,13 @@ const CreepCalculo = (() => {
     const c = typeof CATALOGO_BASE !== 'undefined' && it ? CATALOGO_BASE.find(x => x && x.nombre === it.nombre) : null;
     return c ? num(c.peso) : 0;
   }
-  function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // `con`: el nombre de lo que paró (2026-11-03); sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
+  function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0) + famExtra(sc, 'bloqueo', Combatiente.piezaDeDefensa(sc, d)); }   // `con`: el nombre de lo que paró (2026-11-03); sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
   // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07: los bonos de Parry de un arma o un escudo, solo al atajar con esa pieza). Sin `con`, la de siempre.
   function parryValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'parry', d && (d.id || d.nombre)) + parryExtra(sc, con); }
   // 🔨 El Parry de más por la familia del arma con que para (Maestría en armas pesadas, 2026-11-20): solo con un arma de ese Tipo, no con un escudo.
   function parryExtra(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return Combatiente.parryExtraArma(st => modTotal(sc, st), Combatiente.piezaDeDefensa(sc, d)); }
   // El PdG de más por la familia del arma en la mano o a distancia (pdgt4/6/8/10, pdgdist; guantes y Maestría en armas pesadas).
-  function pdgExtra(sc){ const a = Combatiente.armaEnMano(sc); return Combatiente.pdgExtraArma(st => modTotal(sc, st), {tipoDado: a.tipoDado, armaDeRango: a.armaDeRango}); }
+  function pdgExtra(sc){ return Combatiente.pdgExtraArma(st => modTotal(sc, st), Combatiente.armaEnMano(sc)); }
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -800,7 +802,7 @@ const CreepCalculo = (() => {
     percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
     resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. eléctrica', restoxico:'Res. tóxico', resacido:'Res. ácido', resluz:'Res. luz', ressiniestro:'Res. siniestro', armadmg:'Defensa especial', hpregen:'Regeneración de vida',
     pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)', levantarse:'Levantarse rápido', levitar:'Levitar', suelagruesa:'Suela gruesa', meditar:'Meditar',
-    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', parryt10:'Parry con contundentes', evadisparo:'Evasión contra disparos',
+    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', parryt10:'Parry con contundentes', dmgt4:'Daño con punzantes', oport4:'PdG de oportunidad con punzantes', espaldat4:'PdG por la espalda con punzantes', parryt6:'Parry con cortantes', bloqueot6:'Bloqueo con cortantes', contrat6:'PdG de contraataque con cortantes', ahorrot8:'Hachas: ataques seguidos más baratos', bloqueot8:'Bloqueo con hachas', pdgarco:'PdG con arcos', critpotarco:'Crítico potente con arcos', pdgballesta:'PdG con ballestas', perforaballesta:'Perfora con ballestas', evadisparo:'Evasión contra disparos',
     oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
     ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',
   };
@@ -937,6 +939,6 @@ const CreepCalculo = (() => {
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, vidaAlDia, nitrosMax, actualizarNo2PorAgl,
-    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra,
+    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, famExtra,
     fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

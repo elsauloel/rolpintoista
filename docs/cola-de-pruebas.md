@@ -490,7 +490,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   textos; anotado en `pruebas-en-el-mapa.md`). 955 pruebas automáticas en verde (1 nueva, 2 ajustadas).
   **Para que lo sepas**: al sacar un carcaj mejor con proyectiles adentro, esos proyectiles se quedan guardados adentro de ese carcaj en la mochila
   (ya era así): no pasan solos al básico.
-- **⬜ en cola — ⚔ Cinco maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6), hachas (Tipo 8), arcos y ballestas** (dueño, 2026-11-20, conversación de
+- **✅ hecho (2026-11-20) — ⚔ Cinco maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6), hachas (Tipo 8), arcos y ballestas** (dueño, 2026-11-20, conversación de
   diseño; mismo molde que «Maestría en armas pesadas», `comun/pasivas.js`; valen para jugadores y para creeps). Cierra P248.
   · **Maestría en armas punzantes** (1 Job): con un arma de **Tipo 4 cuerpo a cuerpo** (NO las de rango / proyectiles: «vamos a hacer una distinción
     en las armas punzantes melee y las de rango… esta sería para tipo 4 melee»), **+1 al daño** y **+2 al PdG en ataque de oportunidad**.
@@ -511,6 +511,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     «por la espalda» que ya use el mapa; si no hay un stat para eso, crearlo como se hizo con `pdgt10`).
   · **Hachas** queda: el segundo ataque del turno y los siguientes cuestan 2 No2 menos, **y +1 al Bloqueo** (con el hacha en la mano; «siempre» =
     no depende de qué ataque sea: interpretación de Claude, a confirmar).
+  **Cómo quedó (2026-11-20):** las cinco están en el catálogo de pasivas (1 Job cada una, jugadores y creeps). **Punzantes** (arma de Tipo 4 cuerpo a
+  cuerpo): +1 al daño, +1 PdG en ataque de oportunidad, +1 PdG por la espalda. **Cortantes** (arma de mano de Tipo 6): +1 Parry y +1 Bloqueo al parar
+  y bloquear con ella, +1 PdG en contraataque. **Hachas** (Tipo 8 cuerpo a cuerpo): desde el segundo ataque del turno con el hacha, 2 No2 menos (6 en
+  vez de 8), y +1 Bloqueo al bloquear con el hacha. **Arcos**: +1 PdG y +2 Crítico potente. **Ballestas**: +1 PdG y Perfora +1 (sumada a la del arma y
+  el virote). Con otra arma no suman nada. Se ve en la 🔍 de Atacar (renglón propio «Maestría con esta arma»), de Daño, de Parry y de Bloqueo, en el
+  botón Atacar (el costo ya rebajado) y en el cuadro del duelo («⚔ Maestría en …: +1 PdG, …»).
+  **Probado con clics** en «Claude · pruebas 2» (Jugador 1 con cada pasiva y el arma del catálogo, y con el arma equivocada): la daga por la espalda
+  («+2 PdG (1 por la Maestría)», daño 1d4+7 en vez de +6), el ataque de oportunidad con la daga (1d6+1), la espada parando y bloqueando (1d6+1 y
+  1d8+1) y contraatacando (1d6+1), el hacha (4 No2 el primero, 6 el segundo; con un bastón de Tipo 10, 5 y 10), el arco (1d6+1 y la tabla del crítico
+  con «Crítico potente 2») y la ballesta (1d6+1, «perfora 2» con una de Perfora 1); un creep con hacha (4 y 6 No2). Con el arma equivocada, nada.
+  **Sin probar con clics:** una invocación con una maestría; el daño de la Perfora de más aplicado hasta el final; una habilidad «con tu arma».
+  **Decidido por Claude mientras tanto (P260):** el Bloqueo de cortantes y de hachas vale al bloquear CON esa arma (no con un escudo teniendo el arma
+  en la otra mano); «ballesta» = el arma de rango con Recarga (entran los arcabuces); una ballesta de Tipo 6 no es un arma cortante; las armas
+  naturales (garras, colmillos) no cuentan para ninguna maestría. 956 pruebas automáticas en verde (1 nueva).
 - **⬜ en cola — 🛡 Pasiva nueva «Aguante de trinchera»** (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la
   defensa y +1 la defensa especial por cada enemigo adyacente. Busquémosle un nombre y publiquémosla»). 2 Job; **+1 Defensa y +1 Defensa especial por
   cada enemigo pegado** al que la tiene. Es el espejo de «Táctica de enjambre» (`comun/pasivas.js`, stat `enjambre`, `Combatiente.aliadosPegados`):

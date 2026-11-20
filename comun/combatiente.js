@@ -447,7 +447,7 @@ const Combatiente = (() => {
      un efecto pasivo, como menos Defensa o menos Evasión, no»). Uno que cambia algo de su ataque (PdG, PdG.Esp, daño, Ef.Esp, crítico…), que suma a sus
      golpes (cargas, arma elemental), o que pesa en lo que hace (Pajaritos, Lisiado, Ceguera, Silencio, Confusión, Extenuado, Atormentado, Maldito); o
      marcado `turnosCompletos`. (Stun y Miedo tienen su propia regla.) */
-  const STATS_ACTIVOS = new Set(['pdg', 'pdgmg', 'dmg', 'dmgesp', 'crit', 'critpot', 'pdgopor', 'pdgcontra', 'pdgdist', 'pdgt4', 'pdgt6', 'pdgt8', 'pdgt10']);
+  const STATS_ACTIVOS = new Set(['pdg', 'pdgmg', 'dmg', 'dmgesp', 'crit', 'critpot', 'pdgopor', 'pdgcontra', 'pdgdist', 'pdgt4', 'pdgt6', 'pdgt8', 'pdgt10', 'dmgt4', 'oport4', 'espaldat4', 'contrat6', 'pdgarco', 'critpotarco', 'pdgballesta', 'perforaballesta']);
   const MARCAS_ACTIVAS = ['mitadPdgEva', 'lisiado', 'ceguera', 'silencio', 'confusion', 'extenuante', 'tormenta', 'sangraSp'];
   const efectoActivo = e => !!e && !e.stun && !e.alEmpezarTurno && (!!e.turnosCompletos || !!e.golpe || MARCAS_ACTIVAS.some(k => !!e[k])
     || (Array.isArray(e.mods) && e.mods.some(m => m && STATS_ACTIVOS.has(m.stat) && n(m.val) !== 0)));
@@ -1236,9 +1236,9 @@ const Combatiente = (() => {
   /* 🗡 El ataque de un creep o de una invocación con lo que tiene en la mano (paso 8, 2026-10-22: antes, la misma cuenta en siete archivos).
      `alcance`: lo pone quien llama (CreepCalculo.alcance, InvCalculo.alcance). `armaParaArreglos`: lo mismo para una habilidad «con tu arma»
      (Combatiente.ataqueConArreglos). */
-  function ataqueConSuArma(x, tipo, alcance){
+  function ataqueConSuArma(x, tipo, alcance, valorDe){   // `valorDe(stat)`: sus bonos, para lo que suman las maestrías (la Perfora con ballesta, la espalda con punzantes)
     const a = armaEnMano(x);
-    return {tipo: tipo || 'normal', armaId: '', ...(armasDeMano(x).length > 1 && a.id ? {armaCreepId: a.id} : {}), armaNombre: a.nombre || '', tipoDado: a.tipoDado, rango: a.armaDeRango, ...(alcance !== undefined ? {alcance} : {}), ...ataqueDeArma(a)};
+    return {tipo: tipo || 'normal', armaId: '', ...(armasDeMano(x).length > 1 && a.id ? {armaCreepId: a.id} : {}), armaNombre: a.nombre || '', tipoDado: a.tipoDado, rango: a.armaDeRango, ...(alcance !== undefined ? {alcance} : {}), ...ataqueDeArma(a, valorDe, tipo || 'normal')};
   }
   const armaParaArreglos = x => { const a = armaEnMano(x); return {...a, id: '', nombre: a.nombre || '', rango: a.armaDeRango}; };
   /* 🕳 Salir de abajo de la tierra atacando (dueño, 2026-10-28, P231): solo con un arma cuerpo a cuerpo de Tipo 4 a 10 — no de rango ni especial (varita,
@@ -1275,7 +1275,7 @@ const Combatiente = (() => {
   }
   // ¿Es un efecto de Romper armadura? (el nombre del efecto al golpear: «Rompe armadura», «Rompe armadura x3», «Armadura rota doble»…)
   const esRompeArmadura = e => !!e && /^(romp\w* armadura|arruina armadura|media armadura|armadura rota)/i.test(String(e.nombre || '').trim());
-  function ataqueDeArma(arma){
+  function ataqueDeArma(arma, valorDe, tipo){   // `valorDe(stat)` y `tipo` ('normal' | 'oportunidad' | 'contra'), opcionales: lo de las maestrías (2026-11-20)
     const o = {};
     if(arma && arma.espalda) o.espalda = arma.espalda;
     if(arma && arma.sinParry) o.sinParry = true;
@@ -1283,7 +1283,10 @@ const Combatiente = (() => {
     if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
     if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
     if(tieneTiroAlto(arma)) o.tiroAlto = true;
-    if(n(arma && arma.perfora) > 0) o.perfora = Math.min(5, Math.round(n(arma.perfora)));   // Perfora N del arma (la suma el mapa al daño)
+    { const pf = n(arma && arma.perfora) + extraFamilia(valorDe, 'perfora', arma);   // Perfora N del arma (la suma el mapa al daño) + la de la Maestría en ballestas
+      if(pf > 0) o.perfora = Math.min(5, Math.round(pf)); }
+    { const em = extraFamilia(valorDe, 'espalda', arma); if(em > 0) o.espaldaMas = Math.min(3, em);   // 🗡 Maestría en armas punzantes: +N PdG por la espalda (lo suma el mapa, espaldaBono)
+      const mt = maestriaTxt(valorDe, arma, tipo); if(mt) o.maestria = mt; }   // lo que se lee en el cuadro del duelo
     if(arma && arma.armaDeRango && n(arma.apuntada) > 0) o.apuntada = Math.min(5, Math.round(n(arma.apuntada)));   // +N PdG si no se movió (el mapa)
     if(arma && arma.armaDeRango && arma.atraviesaEscudos) o.atraviesaEscudos = true;
     // 🛡 Romper armadura de un arma de rango (2026-10-29, dueño): si el disparo lo paran con un escudo, el escudo se lo come (lo aplica el mapa, js/26).
@@ -1435,7 +1438,8 @@ const Combatiente = (() => {
   }
   const sirveDeOportunidad = arma => !esArco(arma) && !esHonda(arma);   // ni el arco ni la honda (2026-10-14)
   // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
-  const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
+  // `valorDe(stat)` (opcional): los bonos de quien ataca — 🪓 Maestría en hachas (2026-11-20): desde el segundo ataque del turno con el hacha, N No2 menos.
+  const costoConAhorro = (costo, arma, previos, valorDe) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : extraFamilia(valorDe, 'ahorro', arma)));
   const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : recargaDe(arma) || costoPrimerAtaque(tipoDado);
   const RE_IGNORA_CRIT = /^ignora\s+(\d+)\s+de\s+res/i;
   const esEfectoIgnora = e => RE_IGNORA_CRIT.test(String((e && e.nombre) || '').trim());
@@ -2585,7 +2589,8 @@ const Combatiente = (() => {
     // Por la espalda (2026-10-03): lo del arma más lo de la habilidad (`arma.espaldaPdg/Fijo/Critpot` del ✨, ej. Backstab).
     const ESP = {pdg: 'espaldaPdg', fijo: 'espaldaFijo', critpot: 'espaldaCritpot'};
     const esp = Object.keys(ESP).reduce((acc, k) => { const v = nf(arma.espalda && arma.espalda[k]) + nf(a[ESP[k]]); if(v > 0) acc[k] = v; return acc; }, {});
-    const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
+    const armaM = o.armaItem || arma;   // ⚔ las maestrías (2026-11-20): `o.valorDe(stat)` = los bonos de quien ataca
+    const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora) + extraFamilia(o.valorDe, 'perfora', armaM)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
     // 🏹 Un disparo con una habilidad sigue siendo un disparo con ese arma (2026-11-10, cola de pruebas 35: el Hostigador con el Arco de la sombra perdía la
     // Emboscada y la Espalda a distancia en Tiro certero, Tiro a la rodilla…): lo que el mapa usa al apuntar —la distancia mínima del arco, el tiro alto, la
     // distancia ideal y las mecánicas de arco (RASGOS_ARCO)— viaja también acá. La espalda, el sin Parry y la Perfora ya se suman arriba con los de la habilidad.
@@ -2593,6 +2598,7 @@ const Combatiente = (() => {
     const delArma = (() => { const it = o.armaItem || arma; if(!it || !it.armaDeRango) return {}; const r = ataqueDeArma(it); ['espalda', 'sinParry', 'armaDetalle', 'perfora'].forEach(k => delete r[k]); return r; })();
     return {...delArma, tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
       alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}), ...(perfora > 0 ? {perfora} : {}),
+      ...(extraFamilia(o.valorDe, 'espalda', armaM) > 0 ? {espaldaMas: Math.min(3, extraFamilia(o.valorDe, 'espalda', armaM))} : {}), ...(maestriaTxt(o.valorDe, armaM, 'normal') ? {maestria: maestriaTxt(o.valorDe, armaM, 'normal')} : {}),
       mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, fuerza: nf(a.fuerza), dados: nf(a.dados) + nf(a.dadosPorX) * X,   // `dados`: fijos, del Tipo del arma (2026-10-20, Golpe fuerte de creep)
         fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono),
         ...(/^\d{1,2}d\d{1,3}$/i.test(String(a.dadoExtra || '')) ? {dadoExtra: String(a.dadoExtra).toLowerCase()} : {})},   // +1d6 de otro tamaño que el arma (2026-10-13)
@@ -3095,12 +3101,54 @@ const Combatiente = (() => {
     if(!arma || typeof valorDe !== 'function') return 0;
     const v = st => Math.max(0, Math.round(n(valorDe(st))));
     const t = n(arma.tipoDado);
-    return ([4, 6, 8, 10].includes(t) ? v('pdgt' + t) : 0) + (arma.armaDeRango ? v('pdgdist') : 0);
+    return ([4, 6, 8, 10].includes(t) ? v('pdgt' + t) : 0) + (arma.armaDeRango ? v('pdgdist') : 0) + extraFamilia(valorDe, 'pdg', arma);   // + Maestría en arcos / en ballestas
+  }
+  /* ⚔ Las maestrías por familia de arma (dueño, 2026-11-20; docs/cola-de-pruebas.md): cada bono vale SOLO con un arma de esa familia en la mano.
+     `familiaDeArma(pieza)`: 'punzante' (Tipo 4 cuerpo a cuerpo), 'cortante' (Tipo 6 cuerpo a cuerpo), 'hacha' (Tipo 8 cuerpo a cuerpo), 'contundente'
+     (Tipo 10 cuerpo a cuerpo), 'arco', 'ballesta' (un arma de rango con Recarga, como la distingue la munición: `municionDe`) o '' (un escudo, un orbe,
+     una varita, lo natural, el puño, la honda, otro Tipo). Un arma de rango nunca es punzante / cortante / hacha, tenga el Tipo que tenga.
+     `MAESTRIA_STATS[familia]` = {para qué: el stat que lo da}. `extraFamilia(valorDe, cual, pieza)` → lo que suma (0 si esa pieza no es de la familia).
+     cual: 'dmg' (al daño), 'pdgopor' / 'pdgcontra' (al PdG de un ataque de oportunidad / un contraataque), 'espalda' (al PdG por la espalda: lo suma
+     el mapa), 'parry', 'bloqueo' (al parar / bloquear CON esa pieza), 'ahorro' (No2 de menos desde el segundo ataque del turno), 'pdg', 'critpot',
+     'perfora'. (El PdG y el Parry de los guantes y de la Maestría en armas pesadas —pdgt4/6/8/10, parryt10— siguen por pdgExtraArma / parryExtraArma.) */
+  const esBallesta = arma => recargaDe(arma) > 0;
+  function familiaDeArma(p){
+    if(!p || p.sinArma || p.natural || p.escudo === true || esEscudo(p) || p.orbe || (p.especial && !n(p.tipoDado))) return '';
+    if(p.armaDeRango) return esArco(p) ? 'arco' : esBallesta(p) ? 'ballesta' : '';
+    return ({4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente'})[n(p.tipoDado)] || '';
+  }
+  const MAESTRIA_STATS = {
+    punzante: {dmg: 'dmgt4', pdgopor: 'oport4', espalda: 'espaldat4'},
+    cortante: {parry: 'parryt6', bloqueo: 'bloqueot6', pdgcontra: 'contrat6'},
+    hacha: {bloqueo: 'bloqueot8', ahorro: 'ahorrot8'},
+    contundente: {},
+    arco: {pdg: 'pdgarco', critpot: 'critpotarco'},
+    ballesta: {pdg: 'pdgballesta', perfora: 'perforaballesta'},
+  };
+  const MAESTRIA_NOMBRE = {punzante: 'armas punzantes', cortante: 'armas cortantes', hacha: 'hachas', contundente: 'armas pesadas', arco: 'arcos', ballesta: 'ballestas'};
+  const MAESTRIA_STAT_IDS = [...new Set(Object.values(MAESTRIA_STATS).flatMap(o => Object.values(o)))];
+  const statFamilia = (cual, pieza) => (MAESTRIA_STATS[familiaDeArma(pieza)] || {})[cual] || '';
+  function extraFamilia(valorDe, cual, pieza){
+    const st = cual === 'parry' ? '' : statFamilia(cual, pieza);   // (el Parry de familia va por parryExtraArma: no contarlo dos veces)
+    return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
+  }
+  // Lo que las maestrías le suman a ESTE ataque, en palabras (para el cuadro del duelo): «⚔ Maestría en armas punzantes: +1 al daño, +1 PdG (oportunidad)». '' si nada.
+  function maestriaTxt(valorDe, arma, tipo){
+    const fam = familiaDeArma(arma);
+    if(!fam || typeof valorDe !== 'function') return '';
+    const v = c => extraFamilia(valorDe, c, arma), p = [];
+    if(v('pdg')) p.push(`+${v('pdg')} PdG`);
+    if(tipo === 'oportunidad' && v('pdgopor')) p.push(`+${v('pdgopor')} PdG por ser de oportunidad`);
+    if(tipo === 'contra' && v('pdgcontra')) p.push(`+${v('pdgcontra')} PdG por ser contraataque`);
+    if(v('dmg')) p.push(`+${v('dmg')} al daño`);
+    if(v('critpot')) p.push(`Crítico potente +${v('critpot')}`);
+    if(v('perfora')) p.push(`Perfora +${v('perfora')}`);
+    return p.length ? `⚔ Maestría en ${MAESTRIA_NOMBRE[fam]}: ${p.join(', ')}` : '';
   }
   /* 🔨 Maestría en armas pesadas (dueño, 2026-11-20: «+1 al parry con ese tipo de armas»): el Parry con una familia de armas (hoy solo parryt10; parryt<Tipo>), SOLO al parar con un arma de ese Tipo: con un escudo, un orbe o lo natural, nada. `pieza` = el ítem con que para (con su tipoDado). */
-  const PARRY_FAMILIA = ['parryt10'];   // (por ahora solo el de los contundentes: dueño, 2026-11-20; la cuenta ya sirve para otro Tipo)
+  const PARRY_FAMILIA = ['parryt10', 'parryt6'];   // contundentes (Maestría en armas pesadas) y cortantes (Maestría en armas cortantes, 2026-11-20)
   function parryExtraArma(valorDe, pieza){
-    if(!pieza || typeof valorDe !== 'function' || pieza.escudo === true || esEscudo(pieza) || pieza.natural || pieza.orbe) return 0;
+    if(!pieza || typeof valorDe !== 'function' || pieza.escudo === true || esEscudo(pieza) || pieza.natural || pieza.orbe || pieza.armaDeRango) return 0;   // (un arma de rango no para; una ballesta de Tipo 6 no es un arma cortante)
     const t = n(pieza.tipoDado);
     return [4, 6, 8, 10].includes(t) ? Math.max(0, Math.round(n(valorDe('parryt' + t)))) : 0;
   }
@@ -3182,7 +3230,11 @@ const Combatiente = (() => {
     // `porArma`: un personaje cuenta el primer ataque por arma (cada arma tiene el suyo a mitad de precio).
     else if(n(o.hechos) > 0) l.push(`Ya atacó ${n(o.hechos) === 1 ? 'una vez' : `${Math.round(n(o.hechos))} veces`} ${o.porArma ? 'con esta arma' : ''} este turno: Tipo completo = ${t}`.replace('  ', ' '));
     else l.push(`Primer ataque ${o.porArma ? 'con esta arma' : 'del turno'}: Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}`);
-    const base = o.ataque === 'oportunidad' || o.ataque === 'contra' ? mitad : n(o.hechos) > 0 ? t : mitad;
+    const base0 = o.ataque === 'oportunidad' || o.ataque === 'contra' ? mitad : n(o.hechos) > 0 ? t : mitad;
+    // 🪓 Maestría en hachas (2026-11-20): desde el segundo ataque del turno con el hacha, N No2 menos (`o.valorDe`: los bonos de quien ataca).
+    const mh = base0 === t && n(o.hechos) > 0 ? Math.min(t, extraFamilia(o.valorDe, 'ahorro', o.arma)) : 0;
+    if(mh > 0) l.push(`🪓 Maestría en hachas (desde el segundo ataque del turno): −${mh} → ${t - mh}`);
+    const base = base0 - mh;
     if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
     l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
     return {no2: costo, lineas: l};
@@ -3394,7 +3446,7 @@ const Combatiente = (() => {
     return !!(c && uid && c !== uid && !soyGM);
   }
   const AVISO_CONTROL_TXT = nombre => `🎮 El GM está manejando a ${nombre || 'tu personaje'}: las tiradas le salen a él. Mientras tanto solo podés mirar.`;
-  return {quedaAlVolver, alVolver, volverLimpio, vueltaTomar, vueltaTxt, vueltaAviso, vueltaIcono, vueltaNombres, hastaTxt, hastaPub, ataquesACeroPj, ataquesACeroInv, ataquesACeroCreep, volverOpciones, volverTxt, volverIcono, volverPendienteTxt, aliadosPegados, enjambreBono, enjambreTxt, controlAjeno, AVISO_CONTROL_TXT, sigiloAvisoTitulo, percepcionIncierta, PERCEPCION_FRASES, PERCEPCION_TIRA, PERCEPCION_NADA, sigiloPasoSiguiente, sigiloDetecta, saqueRapidoAviso, saqueRapidoToast, trabaNarrativo, colisionFormula, disparoClavadoTxt, golpeEscudoFormula, dosAlHiloSiguientes, quitarEscudosGastados, esSoloEscudo, ESCUDOS_ELEMENTALES, ESCUDO_ELEMENTAL, escudoElementalDuelo, escudoElementalVariantes, escudoElementalDe, estadoAplicaAlArma, baseNombreEstado, armaElementalDe, nombreArmaElemental, armaElementalDelGolpe, roboOro, oroConRobos, esSanguijuela, sanguijuelaDe, curaRobada, repartoCuraRobada, curaRobadaTxt, curaPerdidaTxt, permiteDefNegativa, pisoDefensa, ESTADOS_MAGICOS, esEstadoMagico, GRITO_ESPELUZNANTE, migrarGritoEspeluznante, JEFE_INMUNE, JEFE_UN_TURNO, ADRENALINA_CREEP, PILA_PILA, migrarAdrenalina, AZAR_ELEGIR, varianteAlAzar, elegirVarianteAzar, migrarArmaElementalAzar, sinNo2Negativo, LUZ_SANADORA_CREEP, migrarLuzSanadora, VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, ponerAlDiaItemsFabrica, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, PACTO_AVISO, PACTO_A_MANO, pactoRenovadoTxt, pactoQuitadoTxt, pactoQuitadoAviso, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, esVidaExtraComun, juntarVidaExtra, sumarVidaExtra, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, conEstadoMalo, OJO_CARANCHO_TXT, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, PARRY_FAMILIA, parryExtraArma, parryStatDe, piezaDeDefensa, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, unaEvasionDe, gastarUnaEvasion, arteriaAtaque, STATS_DEL_ARMA, STATS_DE_LA_PIEZA, piezaEnMano, fuentesParaStat, armaEnMano, sumarArmaEnMano, sobraEnManos, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, armasDeMano, ataquesConArmaCreep, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, manosQueOcupa, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, fantasmaEvaHab, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, chanceSale, chanceEtiqueta, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, resCritPorVida, repararArmRotaEstados, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, SOBREPESO_RECARGO, recargoSobrepeso, costoParrySobrepeso, costoParryTxt, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, permitirNo2Negativo, permisoNo2, cerrarPermisoNo2, reglaNo2, reglaNo2Texto, REGLA_NO2_SI, REGLA_NO2_NO, errorNo2, errorReglaNo2, alertaReglaNo2, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {familiaDeArma, MAESTRIA_STATS, MAESTRIA_NOMBRE, MAESTRIA_STAT_IDS, statFamilia, extraFamilia, maestriaTxt, esBallesta, quedaAlVolver, alVolver, volverLimpio, vueltaTomar, vueltaTxt, vueltaAviso, vueltaIcono, vueltaNombres, hastaTxt, hastaPub, ataquesACeroPj, ataquesACeroInv, ataquesACeroCreep, volverOpciones, volverTxt, volverIcono, volverPendienteTxt, aliadosPegados, enjambreBono, enjambreTxt, controlAjeno, AVISO_CONTROL_TXT, sigiloAvisoTitulo, percepcionIncierta, PERCEPCION_FRASES, PERCEPCION_TIRA, PERCEPCION_NADA, sigiloPasoSiguiente, sigiloDetecta, saqueRapidoAviso, saqueRapidoToast, trabaNarrativo, colisionFormula, disparoClavadoTxt, golpeEscudoFormula, dosAlHiloSiguientes, quitarEscudosGastados, esSoloEscudo, ESCUDOS_ELEMENTALES, ESCUDO_ELEMENTAL, escudoElementalDuelo, escudoElementalVariantes, escudoElementalDe, estadoAplicaAlArma, baseNombreEstado, armaElementalDe, nombreArmaElemental, armaElementalDelGolpe, roboOro, oroConRobos, esSanguijuela, sanguijuelaDe, curaRobada, repartoCuraRobada, curaRobadaTxt, curaPerdidaTxt, permiteDefNegativa, pisoDefensa, ESTADOS_MAGICOS, esEstadoMagico, GRITO_ESPELUZNANTE, migrarGritoEspeluznante, JEFE_INMUNE, JEFE_UN_TURNO, ADRENALINA_CREEP, PILA_PILA, migrarAdrenalina, AZAR_ELEGIR, varianteAlAzar, elegirVarianteAzar, migrarArmaElementalAzar, sinNo2Negativo, LUZ_SANADORA_CREEP, migrarLuzSanadora, VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, ponerAlDiaItemsFabrica, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, PACTO_AVISO, PACTO_A_MANO, pactoRenovadoTxt, pactoQuitadoTxt, pactoQuitadoAviso, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, esVidaExtraComun, juntarVidaExtra, sumarVidaExtra, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, conEstadoMalo, OJO_CARANCHO_TXT, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, PARRY_FAMILIA, parryExtraArma, parryStatDe, piezaDeDefensa, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, unaEvasionDe, gastarUnaEvasion, arteriaAtaque, STATS_DEL_ARMA, STATS_DE_LA_PIEZA, piezaEnMano, fuentesParaStat, armaEnMano, sumarArmaEnMano, sobraEnManos, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, armasDeMano, ataquesConArmaCreep, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, manosQueOcupa, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, fantasmaEvaHab, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, chanceSale, chanceEtiqueta, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, resCritPorVida, repararArmRotaEstados, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, SOBREPESO_RECARGO, recargoSobrepeso, costoParrySobrepeso, costoParryTxt, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, permitirNo2Negativo, permisoNo2, cerrarPermisoNo2, reglaNo2, reglaNo2Texto, REGLA_NO2_SI, REGLA_NO2_NO, errorNo2, errorReglaNo2, alertaReglaNo2, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, DUR_VERSION, esDurable, durPorPeso, durExtra, durBase, durMax, durMaxViejo, migrarDurItem, marcarDur, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, cartelInmune, avisoInmune, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

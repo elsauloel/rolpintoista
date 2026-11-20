@@ -121,16 +121,18 @@ const InvCalculo = (() => {
     // el id de la pieza (para que el duelo distinga «Parry con el arma» de «Parry con el escudo» y el Desarmar sepa qué se cae)
     return lista.map(x => { const it = (inv.equipo || []).find(e => e && e.nombre === x.nombre && e.equipado !== false); return it && it.id ? {...x, id: it.id} : x; });
   }
-  function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
+  function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0) + famExtra(inv, 'bloqueo', Combatiente.piezaDeDefensa(inv, d)); }   // sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
   // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07). Sin `con`, la de siempre.
   function parryValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'parry', d && (d.id || d.nombre)) + parryExtra(inv, con); }
   // 🔨 El Parry de más por la familia del arma con que para (Maestría en armas pesadas, 2026-11-20): solo con un arma de ese Tipo, no con un escudo.
   function parryExtra(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return Combatiente.parryExtraArma(st => modTotal(inv, st), Combatiente.piezaDeDefensa(inv, d)); }
   // El PdG de más por la familia del arma en la mano o a distancia (pdgt4/6/8/10, pdgdist; guantes y Maestría en armas pesadas).
-  function pdgExtra(inv){ const a = Combatiente.armaEnMano(inv); return Combatiente.pdgExtraArma(st => modTotal(inv, st), {tipoDado: a.tipoDado, armaDeRango: a.armaDeRango}); }
+  function pdgExtra(inv){ return Combatiente.pdgExtraArma(st => modTotal(inv, st), Combatiente.armaEnMano(inv)); }
+  // ⚔ Lo que suma la familia del arma (las maestrías, 2026-11-20; Combatiente.extraFamilia): `pieza` = con qué (por defecto, el arma en la mano).
+  function famExtra(inv, cual, pieza){ return Combatiente.extraFamilia(st => modTotal(inv, st), cual, pieza === undefined ? armaDe(inv) : pieza); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
   // ⚔⚔ Con dos armas (dueño, 2026-11-07: «para todo», como los creeps): cada arma paga su propio primer ataque (Combatiente.ataquesConArmaCreep).
-  function costoAtaque0(inv){ const a = armaDe(inv), hechos = Combatiente.ataquesConArmaCreep(inv); if(Combatiente.cargadaGratis(a, hechos, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos) - Combatiente.ahorroArco(a, hechos, inv.descargada, inv.ultimoPego)); }
+  function costoAtaque0(inv){ const a = armaDe(inv), hechos = Combatiente.ataquesConArmaCreep(inv); if(Combatiente.cargadaGratis(a, hechos, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos, st => modTotal(inv, st)) - Combatiente.ahorroArco(a, hechos, inv.descargada, inv.ultimoPego)); }
   // Lo que costaría atacar con un arma puntual (un «Atacar con…» por arma).
   function costoAtaqueCon(inv, armaId){ return costoAtaque({...inv, armaActiva: armaId}); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   function costoNitrosHab(inv, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(inv), IT2_INV.nitrosHabilidad); return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE' ? c : Combatiente.conExtenuado(inv.estados, c); }   // + Extenuado
@@ -147,7 +149,7 @@ const InvCalculo = (() => {
     const a = armaDe(inv);
     const dados = a.peso + a.danoAmplificado;
     const tipo = a.tipoDado;
-    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
+    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra)) + famExtra(inv, 'dmg');   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada · + la maestría de su arma (2026-11-20)
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
   function ataqueTxt(inv){
@@ -220,6 +222,6 @@ const InvCalculo = (() => {
 
   return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
-    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
+    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, famExtra, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, invocar, migrar, regenPasivas};
 })();

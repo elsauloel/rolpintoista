@@ -128,7 +128,7 @@ const CreepAcciones = (() => {
   // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
   // ⚔ El Contraataque del creep (2026-10-27, dueño: «+1 PdG»): con la habilidad, su contraataque suma +1 más.
   const contraHab = sc => (sc.habilidades || []).some(h => h && h.contraEsquiva);
-  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };   // (el +2 del Contraataque va en el duelo: `ataque.contraHab`, 2026-11-05)
+  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) + C().famExtra(sc, st) : 0; };   // + la maestría de su arma (punzantes en oportunidad, cortantes en contraataque; 2026-11-20)   // (el +2 del Contraataque va en el duelo: `ataque.contraHab`, 2026-11-05)
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   // 💸 (2026-11-01, dueño): el ataque de oportunidad y el contraataque, sin No2, se hacen igual y dejan en negativo (como una defensa): no se pregunta.
   // Ya en negativo no se pregunta tampoco: pagarAtaque lo frena con el aviso.
@@ -189,7 +189,7 @@ const CreepAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango});
+  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), Combatiente.armaEnMano(sc));
   function tiradaAtaque(sc, tipo, bonoHab){
     const extra = pdgExtraCreep(sc) + (Number(bonoHab) || 0);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
     if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + extra, sc, 'pdg');
@@ -227,7 +227,7 @@ const CreepAcciones = (() => {
     return atq;
   }
   function ataqueDeHabBase(sc, h, c, o){
-    return Combatiente.ataqueConArreglos(h, c, {arma: (o && o.arma) || Combatiente.armaParaArreglos(sc),
+    return Combatiente.ataqueConArreglos(h, c, {arma: (o && o.arma) || Combatiente.armaParaArreglos(sc), valorDe: st => C().modTotal(sc, st),
       // (con otra arma —🕳 la de salir de abajo, cuerpo a cuerpo—: 1 más su +Rng, no el alcance del arco que tenga en la mano)
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s))
         : o && o.arma ? 1 + Math.max(0, Math.round((o.arma.mods || []).filter(m => m && m.stat === 'rng').reduce((a, m) => a + num(m.val), 0))) : C().alcance(sc),

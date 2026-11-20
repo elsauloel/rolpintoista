@@ -22,11 +22,21 @@ const CreepLupa = (() => {
     const fila = (st, cuando) => K.aportesMod(sc, st).map(a => lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(K.STAT_LABEL[st] || st)}: ${cuando})</span>`, lupaSigno(a.val))).join('');
     if(statId === 'pdg' && ataque){
       const a = Combatiente.armaEnMano(sc), t = num(a.tipoDado);
-      return {filas: ([4, 6, 8, 10].includes(t) ? fila('pdgt' + t, 'con esta arma') : '') + (a.armaDeRango ? fila('pdgdist', 'a distancia') : ''), extra: K.pdgExtra(sc)};
+      return {filas: ([4, 6, 8, 10].includes(t) ? fila('pdgt' + t, 'con esta arma') : '') + (a.armaDeRango ? fila('pdgdist', 'a distancia') : '') + (Combatiente.statFamilia('pdg', a) ? fila(Combatiente.statFamilia('pdg', a), 'con esta arma') : ''), extra: K.pdgExtra(sc)};
     }
     if(statId === 'parry'){
       const d = K.defensa(sc), st = Combatiente.parryStatDe(Combatiente.piezaDeDefensa(sc, d));
       return {filas: st ? fila(st, `solo al parar con ${d.nombre}`) : '', extra: K.parryExtra(sc), pieza: d ? (d.id || d.nombre) : undefined};
+    }
+    // ⚔ Las maestrías (2026-11-20): el Bloqueo con la pieza con que bloquea (cortantes, hachas) y, con `statId` = 'maestria' / 'dmgfam', lo demás.
+    if(statId === 'bloqueo'){
+      const d = K.defensa(sc), pieza = Combatiente.piezaDeDefensa(sc, d), st = Combatiente.statFamilia('bloqueo', pieza);
+      return {filas: st ? fila(st, `solo al bloquear con ${d.nombre}`) : '', extra: K.famExtra(sc, 'bloqueo', pieza), pieza: d ? (d.id || d.nombre) : undefined};
+    }
+    if(statId === 'maestria' || statId === 'dmgfam'){
+      const a = Combatiente.armaEnMano(sc);
+      return {filas: (statId === 'dmgfam' ? [['dmg', 'con esta arma']] : [['pdgopor', 'solo en un ataque de oportunidad'], ['pdgcontra', 'solo en un contraataque'], ['espalda', 'solo al pegar por la espalda (lo suma el mapa)'], ['dmg', 'al daño de cada golpe'], ['critpot', 'si el golpe es crítico'], ['perfora', 'en cada disparo'], ['ahorro', 'No2 de menos desde el segundo ataque del turno con esta arma'], ['bloqueo', 'al bloquear con esta arma']])
+        .map(([cual, cuando]) => Combatiente.statFamilia(cual, a) ? (cual === 'ahorro' ? fila(Combatiente.statFamilia(cual, a), cuando).replace(/\+(\d)/g, '−$1') : fila(Combatiente.statFamilia(cual, a), cuando)) : '').join(''), extra: 0};
     }
     return {filas: '', extra: 0};
   }
@@ -75,10 +85,10 @@ const CreepLupa = (() => {
       h += lupaFila(dosArmas ? 'Ataques con esta arma este turno' : 'Ataques este turno', fmt(hechos));
       h += hechos === 0
         ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
-        : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
+        : lupaFila(`Ya atacó: Tipo completo${K.famExtra(sc, 'ahorro') ? ` − ${fmt(K.famExtra(sc, 'ahorro'))} (🪓 Maestría en hachas)` : ''}`, `${fmt(costo)} No2`, 'lupa-total');
       h += lupaFila('No2 disponibles', fmt(num(sc.nitros)), costo > num(sc.nitros) ? 'lupa-falta' : '');
       h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
-      return {titulo: `${sc.nombre} · Atacar`, html: stat(sc, 'pdg', {ataque: true}) + lupaSeccion('Costo', h)};
+      return {titulo: `${sc.nombre} · Atacar`, html: stat(sc, 'pdg', {ataque: true}) + (familia(sc, 'maestria').filas ? lupaSeccion('Maestría con esta arma', familia(sc, 'maestria').filas) : '') + lupaSeccion('Costo', h)};
     }
     if(tipo === 'danio'){
       const dmg = K.statValor(sc, 'dmg');
@@ -89,6 +99,7 @@ const CreepLupa = (() => {
       h += !Combatiente.armaEnMano(sc).armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
         : Combatiente.esArco(sc) ? lupaFila('Dmg <span class="lupa-gris">(arco: la mitad, para arriba)</span>', lupaSigno(Combatiente.dmgDelArma(sc, dmg)))
         : lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado');
+      h += familia(sc, 'dmgfam').filas;   // ⚔ la maestría de su arma (punzantes)
       h += lupaFila('Daño', esc(K.danoTxt(sc, dmg)), 'lupa-total');
       let out = lupaSeccion('De dónde sale', h);
       if(!Combatiente.armaEnMano(sc).armaDeRango || Combatiente.esArco(sc)) out += stat(sc, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');

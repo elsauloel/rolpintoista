@@ -189,7 +189,7 @@ async function golpeQueSigueResuelto(d){
   const h = (sc.habilidades || []).find(x => x && x.duelo && x.duelo.sigue);
   mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))}${giro} (Dos al hilo: sin No2 de más)`, 'recordatorio');
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
-  const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
+  const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc), st => CreepCalculo.modTotal(sc, st));
   if(atq && atq.sigue) delete atq.sigue;
   // 🌀 Como un golpe del Barrido (dueño, 2026-11-10: «que siga la misma lógica que el barrido: late un token, se despliega el menú, se resuelve, se
   // repliega; late el siguiente token, se despliega, se resuelve, se repliega»): el duelo del segundo se arma directo sobre el elegido, sin abrir las

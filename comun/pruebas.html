@@ -8141,6 +8141,81 @@ prueba('🔨 Maestría en armas pesadas (dueño, 2026-11-20): +2 PdG y +1 Parry 
     creep, fCreep, invocacion, FichaCalculo.MOD_TARGETS.some(x => x.id === 'parryt10'), CreepCalculo.STAT_LABEL.parryt10],
     [[2, 1, 0, 0, 0], true, true, true, true, [2, 1, 0, 0, 0], [true, true, true, true], [2, 1, true], true, 'Parry con contundentes']);
 });
+prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortantes, hachas, arcos y ballestas — cada bono solo con un arma de esa familia; personaje, creep e invocación; la 🔍 y el costo', () => {
+  const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);
+  const pun = P('maestria-armas-punzantes'), cor = P('maestria-armas-cortantes'), hac = P('maestria-hachas'), arc = P('maestria-arcos'), bal = P('maestria-ballestas');
+  igual([pun, cor, hac, arc, bal].map(p => [p.jobCosto, p.mods.map(m => m.stat + m.val).join(' ')]),
+    [[1, 'dmgt41 oport41 espaldat41'], [1, 'parryt61 bloqueot61 contrat61'], [1, 'ahorrot82 bloqueot81'], [1, 'pdgarco1 critpotarco2'], [1, 'pdgballesta1 perforaballesta1']]);
+  // Las familias: el Tipo cuerpo a cuerpo; un arma de rango nunca es punzante / cortante / hacha; ni un escudo, ni lo natural, ni el puño.
+  const A = (id, tipoDado, x) => ({id, nombre: id, tipoItem: 'arma_1m', tipoDado, peso: 2, equipado: true, mods: [], ...(x || {})});
+  const daga = A('daga', 4), sable = A('sable', 6), hacha = A('hacha', 8), maza = A('maza', 10), arco = A('arco', 4, {tipoItem: 'arma_2m', armaDeRango: true, arco: true}),
+    ballesta = A('ballesta', 4, {tipoItem: 'arma_2m', armaDeRango: true, recarga: 2}), ballesta6 = A('ballesta6', 6, {tipoItem: 'arma_2m', armaDeRango: true, recarga: 2, perfora: 1}),
+    honda = A('honda', 10, {armaDeRango: true, honda: true}), escudo = {id: 'esc', nombre: 'esc', tipoItem: 'escudo_1m', peso: 1, equipado: true, mods: []};
+  igual([daga, sable, hacha, maza, arco, ballesta, ballesta6, honda, escudo, {...daga, natural: true}, {tipoDado: 4, sinArma: true}, null].map(C.familiaDeArma),
+    ['punzante', 'cortante', 'hacha', 'contundente', 'arco', 'ballesta', 'ballesta', '', '', '', '', '']);
+  const todo = st => 1;   // alguien con todas las maestrías
+  igual([['dmg', daga], ['dmg', arco], ['dmg', sable], ['pdgopor', daga], ['pdgopor', ballesta], ['espalda', daga], ['espalda', hacha], ['bloqueo', sable], ['bloqueo', hacha], ['bloqueo', maza], ['bloqueo', escudo], ['bloqueo', ballesta6],
+    ['pdgcontra', sable], ['pdgcontra', ballesta6], ['ahorro', hacha], ['ahorro', sable], ['pdg', arco], ['pdg', ballesta], ['pdg', daga], ['critpot', arco], ['critpot', ballesta], ['perfora', ballesta], ['perfora', arco]]
+    .map(([c, a]) => C.extraFamilia(todo, c, a)), [1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0]);
+  igual([C.parryExtraArma(todo, sable), C.parryExtraArma(todo, ballesta6), C.parryExtraArma(todo, escudo), C.pdgExtraArma(st => st === 'pdgarco' ? 1 : st === 'pdgballesta' ? 5 : 0, arco), C.pdgExtraArma(st => st === 'pdgarco' ? 1 : st === 'pdgballesta' ? 5 : 0, ballesta)], [1, 0, 0, 1, 5]);
+  // El costo: desde el segundo ataque del turno con el hacha, 2 menos (8 → 6); el primero no cambia; con otra arma, nada.
+  const vH = st => st === 'ahorrot8' ? 2 : 0;
+  igual([C.costoConAhorro(C.costoAtaque(8, 0, hacha), hacha, 0, vH), C.costoConAhorro(C.costoAtaque(8, 1, hacha), hacha, 1, vH), C.costoConAhorro(C.costoAtaque(8, 2, hacha), hacha, 2, vH),
+    C.costoConAhorro(C.costoAtaque(8, 1, hacha), hacha, 1), C.costoConAhorro(C.costoAtaque(6, 1, sable), sable, 1, vH)], [4, 6, 6, 8, 6]);
+  igual([/Maestría en hachas.*−2 → 6/.test(C.costoAtaqueLineas({tipoArma: 8, arma: hacha, hechos: 1, costo: 6, tiene: 10, valorDe: vH}).lineas.join(' | ')),
+    /Ahorro|Maestría/.test(C.costoAtaqueLineas({tipoArma: 8, arma: hacha, hechos: 0, costo: 4, tiene: 10, valorDe: vH}).lineas.join(' | '))], [true, false]);
+  // Lo que viaja al duelo: la Perfora de la ballesta (+ la del arma), el +PdG por la espalda de los punzantes y el texto.
+  igual([C.ataqueDeArma(ballesta6, todo, 'normal').perfora, C.ataqueDeArma(ballesta6).perfora, C.ataqueDeArma(arco, todo, 'normal').perfora, C.ataqueDeArma(daga, todo, 'normal').espaldaMas, C.ataqueDeArma(sable, todo, 'normal').espaldaMas,
+    C.ataqueDeArma(daga, todo, 'oportunidad').maestria, C.ataqueDeArma(daga, todo, 'normal').maestria, C.ataqueDeArma(arco, todo, 'normal').maestria, C.ataqueDeArma(sable, todo, 'contra').maestria, C.ataqueDeArma(sable, todo, 'normal').maestria, C.ataqueDeArma(daga).maestria],
+    [2, 1, undefined, 1, undefined, '⚔ Maestría en armas punzantes: +1 PdG por ser de oportunidad, +1 al daño', '⚔ Maestría en armas punzantes: +1 al daño', '⚔ Maestría en arcos: +1 PdG, Crítico potente +1',
+      '⚔ Maestría en armas cortantes: +1 PdG por ser contraataque', undefined, undefined]);
+  // Personaje: con el arma de la familia suma; con otra, no.
+  const pj = (inv, pas) => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.inventario = structuredClone(inv); S.pasivas = (pas || []).map((p, i) => ({...structuredClone(p), id: 'p' + i, compras: 1})); return S; };
+  const dif = (inv, pas, f) => f(pj(inv, pas)) - f(pj(inv, []));
+  const it = (S, a) => S.inventario.find(x => x.id === a.id);
+  const dmg = a => S => FichaCombate.dmgParaArma(S, it(S, a)), st = (s, a) => S => FichaCombate.statParaArma(S, s, it(S, a)), pdg = a => S => FichaCombate.pdgParaArma(S, it(S, a)).valor, blo = a => S => FichaCombate.bloqueoValor(S, it(S, a));
+  igual([dif([daga], [pun], dmg(daga)), dif([sable], [pun], dmg(sable)), dif([arco], [pun], dmg(arco)), dif([daga], [pun], st('pdgopor', daga)), dif([sable], [pun], st('pdgopor', sable)), dif([daga], [pun], st('pdgcontra', daga)), dif([daga], [pun], pdg(daga))],
+    [1, 0, 0, 1, 0, 0, 0]);
+  igual([dif([sable, escudo], [cor], st('parry', sable)), dif([sable, escudo], [cor], st('parry', escudo)), dif([sable, escudo], [cor], blo(sable)), dif([sable, escudo], [cor], blo(escudo)), dif([sable], [cor], st('pdgcontra', sable)),
+    dif([sable], [cor], st('pdgopor', sable)), dif([maza], [cor], st('parry', maza)), dif([maza], [cor], blo(maza)), dif([maza], [cor], st('pdgcontra', maza))], [1, 0, 1, 0, 1, 0, 0, 0, 0]);
+  const costo2 = (inv, pas, a) => { const S = pj(inv, pas); const c1 = FichaCombate.costoAtaque(S, it(S, a)); FichaCombate.registrarAtaque(S, it(S, a)); const c2 = FichaCombate.costoAtaque(S, it(S, a)); FichaCombate.registrarAtaque(S, it(S, a)); return [c1, c2, FichaCombate.costoAtaque(S, it(S, a))]; };
+  igual([costo2([hacha], [hac], hacha), costo2([hacha], [], hacha), costo2([maza], [hac], maza), dif([hacha, escudo], [hac], blo(hacha)), dif([hacha, escudo], [hac], blo(escudo)), dif([sable], [hac], blo(sable))],
+    [[4, 6, 6], [4, 8, 8], [5, 10, 10], 1, 0, 0]);
+  igual([dif([arco], [arc], pdg(arco)), dif([arco], [arc], st('critpot', arco)), dif([ballesta], [arc], pdg(ballesta)), dif([ballesta], [arc], st('critpot', ballesta)), dif([daga], [arc], pdg(daga)),
+    dif([ballesta], [bal], pdg(ballesta)), dif([arco], [bal], pdg(arco)), dif([ballesta6], [bal], st('parry', ballesta6))], [1, 2, 0, 0, 0, 1, 0, 0]);
+  // La 🔍: Atacar, Daño, Parry, Bloqueo y el costo dicen de dónde sale.
+  const Sp = pj([daga], [pun]), Sh = pj([hacha], [hac]), Sa = pj([arco], [arc]), Sb = pj([ballesta], [bal]), Sc = pj([sable, escudo], [cor]);
+  FichaCombate.registrarAtaque(Sh, it(Sh, hacha));
+  igual([/Maestría con esta arma[\s\S]*Maestría en armas punzantes[\s\S]*oportunidad[\s\S]*espalda/.test(FichaLupa.contenido(Sp, 'atacar:daga').html), /Maestría en armas punzantes/.test(FichaLupa.contenido(Sp, 'danio:daga').html),
+    /Maestría en hachas/.test(FichaLupa.contenido(Sh, 'atacar:hacha').html) && /6 No2/.test(FichaLupa.contenido(Sh, 'atacar:hacha').html), /Maestría en hachas/.test(FichaLupa.contenido(Sh, 'stat:bloqueo').html),
+    /Maestría en arcos[\s\S]*PdG con arcos/.test(FichaLupa.contenido(Sa, 'atacar:arco').html) && /Crítico potente con arcos/.test(FichaLupa.contenido(Sa, 'atacar:arco').html),
+    /Maestría en ballestas/.test(FichaLupa.contenido(Sb, 'atacar:ballesta').html) && /Perfora con ballestas/.test(FichaLupa.contenido(Sb, 'atacar:ballesta').html),
+    /Maestría en armas cortantes/.test(FichaLupa.contenido(Sc, 'stat:parry').html), /Maestría en armas cortantes/.test(FichaLupa.contenido(Sc, 'stat:bloqueo').html) && /esc.*no suma/.test(FichaLupa.contenido(Sc, 'stat:bloqueo').html),
+    /Maestría/.test(FichaLupa.contenido(pj([maza], [pun, cor, hac, arc, bal]), 'atacar:maza').html)],
+    [true, true, true, true, true, true, true, true, false]);
+  // Creep: lo mismo con su arma en la mano.
+  const cp = (arma, pas) => creepPrueba({...arma, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i))});
+  const dc = (arma, pas, f) => f(cp(arma, pas)) - f(cp(arma, []));
+  const dnum = sc => { const m = /\+ (\d+)$/.exec(CreepCalculo.danoTxt(sc, CreepCalculo.statValor(sc, 'dmg'))); return m ? Number(m[1]) : 0; };
+  const cDaga = {armaNombre: 'Daga', armaTipo: 4, armaPeso: 1}, cSable = {armaNombre: 'Sable', armaTipo: 6, armaPeso: 1}, cHacha = {armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2};
+  igual([dc(cDaga, [pun], dnum), dc(cSable, [pun], dnum), dc(cDaga, [pun], sc => CreepAcciones.bonoEspecial ? CreepAcciones.bonoEspecial(sc, 'oportunidad') : CreepCalculo.famExtra(sc, 'pdgopor')), dc(cSable, [cor], sc => CreepCalculo.parryValor(sc)),
+    dc(cSable, [cor], sc => CreepCalculo.bloqueoValor(sc)), dc(cHacha, [hac], sc => CreepCalculo.bloqueoValor(sc)), dc(cDaga, [cor, hac], sc => CreepCalculo.bloqueoValor(sc)), dc(cSable, [cor], sc => CreepCalculo.famExtra(sc, 'pdgcontra'))],
+    [1, 0, 1, 1, 1, 1, 0, 1]);
+  const scH = cp(cHacha, [hac]), scH0 = cp(cHacha, []);
+  const c1 = [CreepCalculo.costoAtaque(scH), CreepCalculo.costoAtaque(scH0)];
+  [scH, scH0].forEach(sc => { sc.ataquesTurno = 1; if(sc.ataquesArma) sc.ataquesArma = {}; });
+  igual([c1, CreepCalculo.costoAtaque({...scH, ataquesTurno: 1}), CreepCalculo.costoAtaque({...scH0, ataquesTurno: 1}), /Maestría en armas punzantes/.test(CreepLupa.contenido(cp(cDaga, [pun]), 'x|atacar|').html),
+    /Maestría en armas punzantes/.test(CreepLupa.contenido(cp(cDaga, [pun]), 'x|danio|').html), CreepCalculo.STAT_LABEL.dmgt4, FichaCalculo.STAT_LABEL.perforaballesta],
+    [[4, 4], 6, 8, true, true, 'Daño con punzantes', 'Perfora con ballestas']);
+  const scA = creepPrueba({armaNombre: 'Arco', armaTipo: 4, armaPeso: 1, pasivas: [pasivaParaCombatiente(arc, 'p1'), pasivaParaCombatiente(bal, 'p2')]});
+  Object.assign(C.armaPrincipal(scA), {armaDeRango: true, arco: true});
+  igual([C.familiaDeArma(C.armaEnMano(scA)), CreepCalculo.pdgExtra(scA), CreepCalculo.famExtra(scA, 'critpot'), CreepCalculo.famExtra(scA, 'perfora'), C.ataqueConSuArma(scA, 'normal', 5, s => CreepCalculo.modTotal(scA, s)).maestria],
+    ['arco', 1, 2, 0, '⚔ Maestría en arcos: +1 PdG, Crítico potente +2']);
+  // Invocación.
+  const inv = pas => InvCalculo.migrar({id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i)), equipo: [{...structuredClone(sable), id: 'sb'}]});
+  igual([InvCalculo.parryValor(inv([cor])) - InvCalculo.parryValor(inv()), InvCalculo.bloqueoValor(inv([cor])) - InvCalculo.bloqueoValor(inv()), InvCalculo.famExtra(inv([cor]), 'pdgcontra'), InvCalculo.famExtra(inv([pun, hac, arc, bal]), 'dmg'),
+    InvCalculo.bloqueoValor(inv([hac])) - InvCalculo.bloqueoValor(inv())], [1, 1, 1, 0, 0]);
+});
 prueba('⚔⚔ Personaje: el Daño con un arma no suma el bono de daño de la otra (dueño, 2026-11-07); la Iniciativa de un arma cuenta siempre', () => {
   const S = fichaDePrueba({inventario: [
     {id: 'a', nombre: 'Maza', tipoItem: 'arma_1m', tipoDado: 6, peso: 1, equipado: true, mods: [{stat: 'dmg', val: 2}, {stat: 'ini', val: 1}]},

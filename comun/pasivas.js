@@ -122,10 +122,28 @@ const PASIVAS_BASE = [
   {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
   // 🔨 Maestría en armas pesadas (dueño, 2026-11-20: «da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas», para jugadores y
-  // creeps). jobCosto 1: propuesto, a confirmar con el dueño (P248 en docs/preguntas-abiertas.md).
+  // creeps). jobCosto 1 (confirmado por el dueño, P248).
   {poolId: 'maestria-armas-pesadas', nombre: 'Maestría en armas pesadas', jobCosto: 1, etiquetas: ['ofensiva', 'defensiva'],
    detalle: '+2 a la Probabilidad de Golpe con armas de Tipo 10 (contundentes) y +1 al Parry cuando parás con un arma de Tipo 10. ⚙ Automatizado: el PdG de más se suma solo al atacar con un arma de Tipo 10, y el Parry de más solo al parar con ella (no con un escudo ni con un arma de otro Tipo); se ve en la 🔍 de Atacar y de Parry.',
    mods: [{stat: 'pdgt10', val: 2}, {stat: 'parryt10', val: 1}]},
+  /* ⚔ Las otras cinco maestrías (dueño, 2026-11-20; docs/cola-de-pruebas.md, con los «ajustes del dueño»): 1 Job cada una, para jugadores y creeps. Cada
+     bono vale SOLO con un arma de esa familia en la mano (Combatiente.familiaDeArma / MAESTRIA_STATS): punzante = Tipo 4 cuerpo a cuerpo, cortante = Tipo 6
+     cuerpo a cuerpo, hacha = Tipo 8 cuerpo a cuerpo; arco y ballesta, como los distingue el juego (la ballesta es el arma de rango con Recarga). */
+  {poolId: 'maestria-armas-punzantes', nombre: 'Maestría en armas punzantes', jobCosto: 1, etiquetas: ['ofensiva'],
+   detalle: 'Con un arma punzante cuerpo a cuerpo (Tipo 4; no arcos, ballestas ni proyectiles): +1 al daño de cada golpe, +1 a la Probabilidad de Golpe en un ataque de oportunidad y +1 a la Probabilidad de Golpe al pegar por la espalda (se suma al +1 que ya da la espalda). ⚙ Automatizado: el daño y el ataque de oportunidad se suman solos al tirar; lo de la espalda lo suma el mapa al abrirse el duelo. Se ve en la 🔍 de Atacar y de Daño y en el cuadro del duelo. Con otra arma no suma nada.',
+   mods: [{stat: 'dmgt4', val: 1}, {stat: 'oport4', val: 1}, {stat: 'espaldat4', val: 1}]},
+  {poolId: 'maestria-armas-cortantes', nombre: 'Maestría en armas cortantes', jobCosto: 1, etiquetas: ['ofensiva', 'defensiva'],
+   detalle: 'Con un arma cortante de mano (Tipo 6; no una ballesta): +1 al Parry y +1 al Bloqueo cuando parás y bloqueás con ella (no con un escudo ni con un arma de otro Tipo), y +1 a la Probabilidad de Golpe en un contraataque hecho con ella. ⚙ Automatizado: se suma solo al tirar; se ve en la 🔍 de Parry, de Bloqueo y de Atacar.',
+   mods: [{stat: 'parryt6', val: 1}, {stat: 'bloqueot6', val: 1}, {stat: 'contrat6', val: 1}]},
+  {poolId: 'maestria-hachas', nombre: 'Maestría en hachas', jobCosto: 1, etiquetas: ['ofensiva', 'defensiva'],
+   detalle: 'Con un hacha (Tipo 8, cuerpo a cuerpo): el segundo ataque del turno con ella y los siguientes cuestan 2 No2 menos (6 en vez de 8), y +1 al Bloqueo cuando bloqueás con el hacha. ⚙ Automatizado: el botón Atacar ya muestra el costo rebajado desde el segundo ataque y su 🔍 dice por qué; el Bloqueo de más se ve en la 🔍 de Bloqueo.',
+   mods: [{stat: 'ahorrot8', val: 2}, {stat: 'bloqueot8', val: 1}]},
+  {poolId: 'maestria-arcos', nombre: 'Maestría en arcos', jobCosto: 1, etiquetas: ['ofensiva'],
+   detalle: 'Con un arco: +1 a la Probabilidad de Golpe y +2 al Crítico potente. ⚙ Automatizado: se suma solo al disparar con un arco (no con una ballesta ni con otra arma de rango); se ve en la 🔍 de Atacar y en el cuadro del duelo.',
+   mods: [{stat: 'pdgarco', val: 1}, {stat: 'critpotarco', val: 2}]},
+  {poolId: 'maestria-ballestas', nombre: 'Maestría en ballestas', jobCosto: 1, etiquetas: ['ofensiva'],
+   detalle: 'Con una ballesta: +1 a la Probabilidad de Golpe y Perfora +1 (1 punto más del daño pasa siempre la Defensa del rival; se suma a la Perfora que ya tengan la ballesta y el virote). ⚙ Automatizado: se suma solo al disparar con una ballesta (no con un arco); se ve en la 🔍 de Atacar y en el cuadro del duelo.',
+   mods: [{stat: 'pdgballesta', val: 1}, {stat: 'perforaballesta', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 PdG.Esp (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
   {poolId: 'potencia-especial', nombre: 'Potencia especial', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

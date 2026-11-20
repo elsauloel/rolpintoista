@@ -1719,7 +1719,7 @@ function porLaEspalda(atq, def){
 // sigilo no se suma: lo reemplaza la defensa en 1 (porLaEspalda → `cfg.espalda`, dueño, 2026-10-30: «la del sigilo reemplaza a la otra»).
 function espaldaBono(atq, def, ataque){
   if(!atq || !def || (ataque && ataque.hab) || !enCunaCiega(atq, def)) return 0;
-  return 1 + (pasosSilenciosos(atq) ? 1 : 0);
+  return 1 + (pasosSilenciosos(atq) ? 1 : 0) + Math.max(0, Math.min(3, Math.round(num(ataque && ataque.espaldaMas))));   // + 🗡 Maestría en armas punzantes (2026-11-20: lo trae el ataque, Combatiente.ataqueDeArma)
 }
 // 🦅 Ojo de carancho (2026-11-07, dueño): +1 PdG si quien ataca tiene la pasiva y el defensor algún estado malo activo (Combatiente.conEstadoMalo).
 // La pasiva: un personaje la publica en su resumen; la de un creep la ve el GM en su ficha privada (ordenPasiva, js/102). Vale para el PdG y el PdG.Esp (armas y hechizos); si la habilidad no tira ninguno de los dos, duelo.js no la suma.

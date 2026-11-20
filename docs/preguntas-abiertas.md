@@ -1598,11 +1598,12 @@ objeto inerte (tótem, estandarte: `esInerte`, js/73) no camina, así que ya no 
 atrás no se le ofrece darse vuelta (sale «Flanqueado»). Propuesta de Claude: que no cuente (un objeto no lo tiene ocupado); sin tocar hasta que decida el dueño.
 
 
-### P248 — 🔨 Maestría en armas pesadas: ¿las maestrías de las otras familias? (2026-11-20, Claude)
+### P248 — ✅ 🔨 Maestría en armas pesadas: ¿las maestrías de las otras familias? (2026-11-20, Claude)
 La pasiva nueva (dueño: «da +2 a pdg en armas de tipo 10, y además da +1 al parry con ese tipo de armas», `comun/pasivas.js`) quedó con **jobCosto 1**
 (confirmado por el dueño el mismo día). Para el Parry se sumó el stat `parryt10` («Parry con contundentes»): se suma solo al parar con un arma de Tipo 10,
 nunca con un escudo ni con otra arma, y el asistente de ítems lo ofrece como bono. La cuenta (`Combatiente.parryExtraArma`) ya sirve para `parryt4/6/8`,
 pero no se registraron (dueño: solo lo de Tipo 10 por ahora). **Para el dueño:** ¿querés las maestrías de las otras familias (Tipo 4, 6 y 8)?
+**✅ Resuelta (2026-11-20):** sí; el dueño definió las cinco (punzantes, cortantes, hachas, arcos y ballestas) y quedaron programadas — ver P253 y P260.
 
 ### P249 — 🐝 Táctica de enjambre: ¿también el PdG especial y los ataques con habilidad? (2026-11-20, Claude)
 La pasiva nueva (dueño: «tenés +1 a la pdg por cada aliado adyacente. cuesta 2 puntos de job», `comun/pasivas.js`, stat `enjambre`) quedó, **mientras
@@ -1642,10 +1643,12 @@ estaba y el GM la borra con «Limpiar»), así que el cambio automático **tampo
 haya pedido. **Para el dueño:** ¿querés que al terminar el combate también se limpie sola la lista del orden de turnos (y, en ese caso, también al
 pasar a narrativo a mano con el interruptor)?
 
-### P253 — ⚔ Maestrías de Tipo 4, 6 y 8: lo que quedó sin definir (2026-11-20, Claude)
+### P253 — ✅ ⚔ Maestrías de Tipo 4, 6 y 8: lo que quedó sin definir (2026-11-20, Claude)
 El dueño definió las tres (ver `docs/cola-de-pruebas.md`): punzantes melee (+1 daño, +2 PdG en oportunidad), cortantes (+1 Parry, +1 Bloqueo, +1 PdG
 en contraataque) y hachas (el segundo ataque del turno cuesta 2 No2 menos). **(a) ✅ la de hachas cuesta 1 Job** (dueño, 2026-11-20). ~~quedó en
 2, provisorio~~ **(b) ✅ de rango, dos maestrías** (dueño, 2026-11-20): arcos = +1 PdG y +2 Crítico potente; ballestas = +1 PdG y Perfora +1; 1 Job cada una.
+**✅ Resuelta (2026-11-20):** programadas con los ajustes del dueño (punzantes: +1 al daño, +1 PdG en oportunidad —ya no +2— y +1 PdG por la espalda;
+hachas: 2 No2 menos desde el segundo ataque y +1 Bloqueo). Lo que quedó elegido «mientras tanto» al programarlas: P260.
 
 ### P254 — 👁 Revelar a mano lo oculto: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 Al programar «👁 Revelar» (`docs/cola-de-pruebas.md`; `vtt-hexgrid/js/122-revelar.js`) se eligió lo más conservador. **Para el dueño:**
@@ -1776,4 +1779,22 @@ Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detal
 3. **La nube (Polvareda, Bomba de humo) no guarda quién la puso ni con qué.** La tarjeta dice «a mano». Guardarlo pide permisos nuevos de
    Firebase (y habría que no mostrárselo al jugador si quien la puso está escondido, que es justo el caso de la Polvareda). ¿Vale la pena?
 4. **Tótems y estandartes.** Son tokens, no zonas: su cartel es otro y no llevan el botón. ¿Se les suma un «Ver detalle» propio?
+
+### P260 — ⚔ Las cinco maestrías: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+Las maestrías de punzantes, cortantes, hachas, arcos y ballestas (`comun/pasivas.js`; la cuenta, `Combatiente.familiaDeArma` / `MAESTRIA_STATS`) quedaron
+con estas decisiones conservadoras. **Para el dueño**, cuando quieras:
+1. **El Bloqueo de cortantes y de hachas vale al bloquear CON esa arma** (como el Parry de las armas pesadas: no con un escudo). Dijiste «+1 al
+   bloqueo, siempre» para las hachas: lo tomé como «no importa qué ataque sea». ¿O querías que valga también bloqueando con el escudo, mientras
+   tengas el hacha en la otra mano?
+2. **«Ballesta» = el arma de rango con Recarga** (así las distingue el juego para los virotes): entran también los **arcabuces**, que usan la misma
+   mecánica. La **honda** no es ni arco ni ballesta: no recibe ninguna de las dos. ¿Los arcabuces afuera?
+3. **Un arma de rango nunca es punzante, cortante ni hacha**, tenga el Tipo que tenga (una ballesta de Tipo 6 no recibe la de cortantes; un arcabuz
+   de Tipo 8, la de hachas tampoco).
+4. **Las armas naturales** (garras, colmillos, aguijón) y **el puño** no cuentan para ninguna maestría, aunque sean de Tipo 4. (Los guantes de «PdG
+   con punzantes» sí las cuentan, como antes.) ¿Un creep de garras tendría que poder usar la de punzantes?
+5. **Hachas:** la rebaja es por arma (el segundo ataque del turno *con esa hacha*), igual que el «primer ataque a mitad de precio». No rebaja el
+   ataque de oportunidad ni el contraataque (ya cuestan lo de un primer ataque).
+6. **Punzantes por la espalda:** el +1 se suma al +1 de siempre (y al de Paso ligero). Desde el sigilo no suma, porque ahí la defensa del rival ya
+   vale 1 (la regla que ya había).
+7. **Comprada dos veces**, cada bono se duplica (como cualquier pasiva): la de hachas llegaría a 4 No2 menos. ¿Tope de una compra para las maestrías?
 

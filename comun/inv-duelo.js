@@ -98,10 +98,10 @@ const InvDuelo = (() => {
         if(campo === 'parry') return {formula: F(I().parryValor(inv, modo || ''), 'parry'), ...L('stat:parry')};   // modo = la pieza (itemId), 2026-11-07
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'
-            ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg')
+            ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), Combatiente.armaEnMano(inv)), 'pdg')
             : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo;
-          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: Combatiente.ataquesConArmaCreep(inv), ...(Combatiente.armasDeMano(inv).length > 1 ? {porArma: true} : {}),
+          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: Combatiente.ataquesConArmaCreep(inv), valorDe: st => I().modTotal(inv, st), ...(Combatiente.armasDeMano(inv).length > 1 ? {porArma: true} : {}),
             costo: tipo === 'habilidad-arma' ? 0 : A().costoAtaqueDe(inv, tipo === 'normal' ? undefined : tipo), tiene: num(inv.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: F(I().statValor(inv, 'fue') + I().pesoArma(inv), 'fue'), ...L('stat:fue'), titulo: `${inv.nombre} · Fuerza del golpe`};
@@ -120,7 +120,7 @@ const InvDuelo = (() => {
           ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv)); });
           if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
-        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg'));
+        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), Combatiente.armaEnMano(inv)), 'pdg'));
         else return atacarSuelto(inv, d.ataque.tipo, d.id, false, d.ataque.contraHab ? 2 : 0, d.ataque.armaCreepId);
       },
       // ✍ El PdG elegido a mano (2026-10-21): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
@@ -158,7 +158,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         const f = I().statValor(inv, 'crit'), p = I().statValor(inv, 'critpot');
         const cc = Combatiente.cargaCritico(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv));   // Ojo de asesino: el crítico de una carga
-        return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
+        return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + I().famExtra(inv, 'critpot') + cc.critpot,   /* + Maestría en arcos */ cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(inv)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(inv).critD20)))};
       },
       blindado: d => { const inv = ui.inv(d.defensor); return !!(inv && (inv.estados || []).some(e => e && e.activo !== false && e.blindado)); },   // 🛡 (2026-10-20)
@@ -258,8 +258,8 @@ const InvDuelo = (() => {
       },
       armaContra: d => {
         const inv = ui.inv(d.defensor);
-        const a = Combatiente.ataqueConSuArma(inv);
-        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado};
+        const a = Combatiente.ataqueConSuArma(inv, 'contra', undefined, st => I().modTotal(inv, st));
+        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado, ...(a.maestria ? {maestria: a.maestria} : {})};
       },
     };
   }

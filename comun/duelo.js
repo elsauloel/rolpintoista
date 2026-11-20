@@ -798,6 +798,8 @@ const Duelo = (() => {
       inicial.ataque.perfora = Math.min(15, pc * rf);
       if(rf > 1) inicial.ataque.perforaCorte = pc;
     }
+    if(cfg.ataque.maestria && !hab) inicial.ataque.maestria = txtCorto(cfg.ataque.maestria, 160);   // ⚔ lo que le suman las maestrías a este ataque, en palabras (2026-11-20; los números ya van en las tiradas)
+    if(_num(cfg.espaldaPdg) > 0 && _num(cfg.ataque.espaldaMas) > 0 && !hab && !cfg.espalda) inicial.ataque.espaldaMas = Math.min(3, Math.round(_num(cfg.ataque.espaldaMas)));   // (ya viene adentro de espaldaPdg: es para decirlo)
     if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
     if(cfg.ataque.cambiaLugar && !hab) inicial.ataque.cambiaLugar = true;   // 🔄 Cambiar de lugar (2026-11-07): si pega, el mapa del GM los cambia de lugar (vtt-hexgrid/js/107)
@@ -874,7 +876,7 @@ const Duelo = (() => {
     if(_num(m.ignoraResistCrit)) t.push(`ignora ${_fmt(m.ignoraResistCrit)} de Res. a crítico`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
     if(d.ataque && d.ataque.porLaEspalda){
-      const pe = [d.ataque.sorpresa ? 'desde el sigilo, la defensa vale 1' : '', _num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
+      const pe = [d.ataque.sorpresa ? 'desde el sigilo, la defensa vale 1' : '', _num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG${_num(d.ataque.espaldaMas) > 0 ? ` (${_fmt(d.ataque.espaldaMas)} por la Maestría en armas punzantes)` : ''}` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
     if(d.ataque && _num(d.ataque.carancho) > 0) t.push(`🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)`);
@@ -883,6 +885,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`${d.ataque.malviaje ? '🌺 malviajando' : '😱 con miedo'}: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
+    if(d.ataque && d.ataque.maestria) t.push(_esc(String(d.ataque.maestria)));   // ⚔ las maestrías (2026-11-20)
     if(d.ataque && d.ataque.enjambre && _num(d.ataque.enjambre.pdg) > 0) t.push(typeof Combatiente !== 'undefined' && Combatiente.enjambreTxt ? Combatiente.enjambreTxt(d.ataque.enjambre) : `🐝 Táctica de enjambre +${_fmt(d.ataque.enjambre.pdg)}`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
@@ -3715,7 +3718,7 @@ const Duelo = (() => {
         if(err){ _toast('No se pudo contraatacar: ' + err); return; }
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
         await col().doc(d.id).update({'defensa.contraPre': 'si', resultado: 'fallo', fase: 'fin', estado: 'resuelto'});
-        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, contraHab: true}}, tok, d.defensor.tokenId, d.id);
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, contraHab: true, ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
         if(nid) await col().doc(d.id).update({contra: nid});
         return;
       }
@@ -3728,7 +3731,7 @@ const Duelo = (() => {
           if(err){ _toast('No se pudo contraatacar: ' + err); return; }
         }
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
-        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, ...(alEsquivar ? {contraHab: true} : {})}}, tok, d.defensor.tokenId, d.id);
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, ...(alEsquivar ? {contraHab: true} : {}), ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
         await col().doc(d.id).update({contra: nid});
         return;
       }

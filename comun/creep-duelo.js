@@ -86,7 +86,7 @@ const CreepDuelo = (() => {
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
   function pdgDeArreglos(sc, atq){
-    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg) + Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango}), sc, 'pdg');
+    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg) + Combatiente.pdgExtraArma(st => C().modTotal(sc, st), Combatiente.armaEnMano(sc)), sc, 'pdg');
   }
 
   function hooks(ui){
@@ -131,7 +131,7 @@ const CreepDuelo = (() => {
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
-          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: Combatiente.ataquesConArmaCreep(sc), ...(Combatiente.armasDeMano(sc).length > 1 ? {porArma: true} : {}), costo, tiene: num(sc.nitros), ataque: tipo})};
+          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: Combatiente.ataquesConArmaCreep(sc), ...(Combatiente.armasDeMano(sc).length > 1 ? {porArma: true} : {}), costo, tiene: num(sc.nitros), ataque: tipo, valorDe: st => C().modTotal(sc, st)})};
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc, d.defensa && d.defensa.itemNombre || '') + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
@@ -186,7 +186,7 @@ const CreepDuelo = (() => {
       statsCritico: d => {
         const sc = deLado(d.atacante);
         const cc = sc ? Combatiente.cargaCritico(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)) : {crit: 0, critpot: 0};   // Ojo de asesino: el crítico de una carga
-        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
+        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + C().famExtra(sc, 'critpot') + cc.critpot,   /* + Maestría en arcos */ cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(sc)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(sc).critD20)))} : {frecuente: 0, potente: 0};
       },
       blindado: d => { const sc = deLado(d.defensor); return !!(sc && (sc.estados || []).some(e => e && e.activo !== false && e.blindado)); },   // 🛡 (2026-10-20)
@@ -331,8 +331,8 @@ const CreepDuelo = (() => {
       },
       armaContra: d => {
         const sc = deLado(d.defensor);
-        const a = Combatiente.ataqueConSuArma(sc);
-        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado};
+        const a = Combatiente.ataqueConSuArma(sc, 'contra', undefined, st => C().modTotal(sc, st));
+        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado, ...(a.maestria ? {maestria: a.maestria} : {})};
       },
     };
   }

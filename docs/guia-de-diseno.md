@@ -239,6 +239,22 @@ Con la dinámica de [[Contraataque]] algunas armas de **Tipo 6** (cortantes) pue
 ## PdG en ataque de oportunidad (`pdgopor`) — el «mundo de la oportunidad» es de los Tipo 4 (dueño, 2026-09-26)
 Mismo criterio que el contraataque, pero para las armas de **Tipo 4** (punzantes: dagas, estiletes, estoques, lanzas y picas): **+1, +2 o +3 al PdG solo en ataques de oportunidad** (stat **PdG en oportunidad**, `pdgopor`). **0,8 PC por punto** (el PdG normal vale 3,5) y **stat de casa de los punzantes** (sin recargo). Se suma solo al elegir **Ataque de oportunidad** en el menú de Atacar, en la ficha y en las tarjetas de creeps. **Set nuevo (tanda 7, 11 armas):** Daga de vigía +1 · Estilete de centinela +2 · Estoque de guardia +2 (Común) · Lanza de centinela +1 · Lanza del portón +2 · Aguja de la vigilia +3 (Buena) · Pica de retaguardia +2 · Lanza del guardián del paso +3 · Puñal del sereno +3 (Raro) · Pica del Muro Eterno +3 (Excepcional) · Lanza del Paso de las Tres Puertas +3 (Legendario). Las lanzas y picas suman Alcance (pegan al que quiere pasar de largo); lo alto trae Lisiado.
 
+## Maestrías por familia de arma: pasivas de 1 Job que siguen la «casa» de cada Tipo (dueño, 2026-11-20)
+Cada familia tiene su **maestría**: una pasiva de 1 punto de Job (para jugadores y creeps) cuyos bonos valen **solo con un arma de esa familia en
+la mano**. Siguen la identidad de cada Tipo, así que sirven de guía al diseñar armas, skills y creeps:
+
+| Maestría | Con qué arma | Qué da |
+|---|---|---|
+| **Armas punzantes** | Tipo 4 cuerpo a cuerpo (no arcos, ballestas ni proyectiles) | +1 al daño · +1 PdG en ataque de oportunidad · +1 PdG por la espalda |
+| **Armas cortantes** | Tipo 6 de mano | +1 Parry y +1 Bloqueo con esa arma · +1 PdG en contraataque |
+| **Hachas** | Tipo 8 cuerpo a cuerpo | Desde el segundo ataque del turno, 2 No2 menos (6 en vez de 8) · +1 Bloqueo con el hacha |
+| **Armas pesadas** | Tipo 10 | +2 PdG · +1 Parry con esa arma |
+| **Arcos** | un arco | +1 PdG · +2 Crítico potente |
+| **Ballestas** | una ballesta | +1 PdG · Perfora +1 |
+
+Descartado por el dueño: +1 Rango para los arcos («ya tienen un rango zarpado»), Recarga −1 No2 para las ballestas («demasiado poderoso»). En el
+código: `comun/pasivas.js` y `Combatiente.MAESTRIA_STATS` (ver `comun/CLAUDE.md`). Lo que quedó elegido mientras tanto: P260.
+
 ## Tipo 12 = efecto Explosión (dueño, 2026-09-26)
 El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T12 si y solo si tiene ese efecto. No hay mazas ni martillos T12 que "solo peguen más". Las armas de Explosión son **muy raras y circunstanciales** (pocas, tiers altos, casi todas de rango y a dos manos). La calculadora valora la Explosión en 6 PC a radio 1 (+50 % por radio extra). Definición exacta del efecto: `preguntas-abiertas.md` (P-Explosión).
 **En pausa (2026-09-26):** no se diseñan armas T12 hasta que el resto esté consolidado; el único T12 del catálogo es el Lanzallamas (Excepcional).

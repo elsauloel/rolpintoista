@@ -76,10 +76,12 @@ const FichaCombate = (() => {
   // El valor de un stat usando ESA arma: no cuentan los bonos de otra arma; para Parry y Bloqueo, tampoco los de un escudo que
   // no es con el que se para (P129, "cada uno con lo suyo").
   const STATS_DEFENSA_POR_ITEM = ['parry', 'bloqueo'];
+  const STATS_FAMILIA = ['dmg', 'bloqueo', 'critpot', 'pdgopor', 'pdgcontra'];
   function statParaArma(S, statId, arma, c){
     c = calc(S, c);
     // 🔨 Parry con esa familia de armas (Maestría en armas pesadas, 2026-11-20): solo al parar con un arma de ese Tipo, nunca con un escudo.
-    const fam = statId === 'parry' ? parryExtra(S, arma, c) : 0;
+    // ⚔ Las otras maestrías (2026-11-20): lo que suma la familia de ESA arma al daño, al Bloqueo, al Crítico potente y al PdG de oportunidad / contraataque.
+    const fam = statId === 'parry' ? parryExtra(S, arma, c) : STATS_FAMILIA.includes(statId) ? Combatiente.extraFamilia(st => c.final[st], statId, arma) : 0;
     const deOtro = STATS_DEFENSA_POR_ITEM.includes(statId) ? id => esEnMano(S, id) : id => esArmaEnMano(S, id);
     const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && deOtro(m.itemId));
     if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId] + fam;
@@ -102,7 +104,7 @@ const FichaCombate = (() => {
     c = calc(S, c);
     const fPdg = formulaParaValor(c.final.pdg), fEva = formulaParaValor(c.final.eva), fParry = formulaParaValor(c.final.parry), fBloqueo = formulaParaValor(c.final.bloqueo);
     const armas = (S.inventario || []).filter(i => i.equipado && esMano(i.tipoItem) && esArma(i.tipoItem));
-    const danio = armas.length === 1 ? armaDanoTxt(armas[0], c.final.dmg) : armas.length > 1 ? 'elegís arma' : 'sin arma equipada';
+    const danio = armas.length === 1 ? armaDanoTxt(armas[0], dmgParaArma(S, armas[0], c)) : armas.length > 1 ? 'elegís arma' : 'sin arma equipada';
     const conMit = (f, id) => f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(S.efectos, id)) : '';
     return {pdg: conMit(fPdg, 'pdg'), eva: conMit(fEva, 'eva'), parry: conMit(fParry, 'parry'), bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
   }
@@ -115,7 +117,7 @@ const FichaCombate = (() => {
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
   // Llega cargada (2026-10-10): el primer disparo del turno es gratis si con esa arma no disparó el turno anterior (S.descargadas, ficha-mantenimiento).
   const costoAtaque = (S, arma) => Math.max(0, Combatiente.conExtenuado(S.efectos, costoAtaque0(S, arma)) - (arma && arma.armaDeRango ? Combatiente.acelerado(S.efectos) : 0));   // + Extenuado, − Acelerado (2026-10-12)
-  const costoAtaque0 = (S, arma) => Combatiente.cargadaGratis(arma, ataquesConArma(S, arma), arma && (S.descargadas || {})[claveAtaque(arma)]) ? 0 : Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma), arma), arma, ataquesConArma(S, arma))   // − ahorroNitros del arma en el primero
+  const costoAtaque0 = (S, arma) => Combatiente.cargadaGratis(arma, ataquesConArma(S, arma), arma && (S.descargadas || {})[claveAtaque(arma)]) ? 0 : Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma), arma), arma, ataquesConArma(S, arma), st => calc(S).final[st])   // − ahorroNitros del arma en el primero
     - Combatiente.ahorroArco(arma, ataquesConArma(S, arma), arma && (S.descargadas || {})[claveAtaque(arma)], arma && (S.ataquesArma || {})['pego:' + claveAtaque(arma)]));   // Flecha en la cuerda / Encadenar (2026-10-11)
   // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
   // S (opcional): con quien ataca, sus guantes que abaratan la oportunidad o el contraataque (2026-10-05).

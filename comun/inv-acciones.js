@@ -65,7 +65,7 @@ const InvAcciones = (() => {
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
   function ataqueDuelo(inv, tipo){
-    return Combatiente.ataqueConSuArma(inv, tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', I().alcance(inv));
+    return Combatiente.ataqueConSuArma(inv, tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', I().alcance(inv), st => I().modTotal(inv, st));
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
      pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
@@ -73,7 +73,7 @@ const InvAcciones = (() => {
      como ataque del turno y suman el «PdG en oportunidad» / «PdG en contraataque» de su arma. Antes se cobraban y tiraban como uno normal. */
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
-  const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
+  const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) + I().famExtra(inv, st) : 0; };   // + la maestría de su arma (2026-11-20)
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
   const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
   // 💸 (2026-11-01, dueño): la oportunidad y el contraataque, sin No2, van a negativo sin preguntar; ya en negativo, pagarAtaque lo frena.
@@ -132,7 +132,7 @@ const InvAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango});   // guantes (2026-10-05)
+  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), Combatiente.armaEnMano(inv));   // guantes (2026-10-05)
   const tiradaAtaque = (inv, tipo, bonoHab) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv) + (Number(bonoHab) || 0), 'pdg')
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 

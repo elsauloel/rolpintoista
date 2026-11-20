@@ -130,7 +130,7 @@ const FichaDuelo = (() => {
           const extra = tipo === 'habilidad-arma' ? num(d.ataque.mods && d.ataque.mods.pdg) : tipo === 'contra' ? statParaArma('pdgcontra', arma) + (d.ataque.contraHab ? 2 : 0) : tipo === 'oportunidad' ? statParaArma('pdgopor', arma) : 0;
           const costo = tipo === 'oportunidad' || tipo === 'contra' ? FichaCombate.costoAtaqueEspecial(arma, tipo, S) : FichaCombate.costoAtaque(S, arma);
           return {formula: f(FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(extra) ? 0 : extra), 'pdg'), ...L('atacar:' + (arma ? arma.id : '')),
-            costo: Combatiente.costoAtaqueLineas({tipoArma: FichaCombate.tipoAtaque(arma), arma, hechos: FichaCombate.ataquesConArma(S, arma), costo, tiene: num(S.nitros), ataque: tipo, porArma: true})};
+            costo: Combatiente.costoAtaqueLineas({tipoArma: FichaCombate.tipoAtaque(arma), arma, hechos: FichaCombate.ataquesConArma(S, arma), costo, tiene: num(S.nitros), ataque: tipo, porArma: true, valorDe: st => c.final[st]})};
         }
         if(campo === 'fuerza'){
           const l = L('stat:fue');
@@ -409,7 +409,7 @@ const FichaDuelo = (() => {
         const usada = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null;
         const conDano = FichaCombate.armasEquipadasConDano(S);
         const it = (usada && conDano.some(a => a.item.id === usada.id)) ? usada : (conDano.length ? conDano[0].item : null);
-        return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: FichaCombate.tipoAtaque(it), alcance: FichaCombate.alcanceDeArma(S, it)};
+        return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: FichaCombate.tipoAtaque(it), alcance: FichaCombate.alcanceDeArma(S, it), maestria: Combatiente.maestriaTxt(st => compute().final[st], it, 'contra')};   // ⚔ lo de las maestrías, para el cuadro (2026-11-20)
       },
       // ⚔ Contraataque (Warrior, 2026-10-13, dueño): al esquivar, 2 SP (siempre: es en turno ajeno) — el No2 de un primer ataque lo cobra el
       // duelo nuevo al tirar el PdG. Sin límite, mientras alcancen los recursos: si falta SP o No2, no se contraataca. '' = cobrado.

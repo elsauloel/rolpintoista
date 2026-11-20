@@ -81,18 +81,35 @@ const FichaLupa = (() => {
   function familiaPdg(S, arma, c){
     if(!arma) return '';
     const t = num(arma.tipoDado);
-    return ([4, 6, 8, 10].includes(t) ? filasFamilia(S, c, 'pdgt' + t, 'con esta arma') : '') + (arma.armaDeRango ? filasFamilia(S, c, 'pdgdist', 'a distancia') : '');
+    return ([4, 6, 8, 10].includes(t) ? filasFamilia(S, c, 'pdgt' + t, 'con esta arma') : '') + (arma.armaDeRango ? filasFamilia(S, c, 'pdgdist', 'a distancia') : '') + filasMaestria(S, c, 'pdg', arma, 'con esta arma');
+  }
+  // ⚔ Las maestrías (2026-11-20): las filas de lo que suma la familia de ESA arma a `cual` ('pdg', 'dmg', 'bloqueo', 'critpot'…; Combatiente.statFamilia).
+  function filasMaestria(S, c, cual, arma, cuando){
+    const st = Combatiente.statFamilia(cual, arma);
+    return st ? (cual === 'ahorro' ? filasFamilia(S, c, st, cuando).replace(/\+(\d)/g, '−$1') : filasFamilia(S, c, st, cuando)) : '';   // (el ahorro es No2 de menos: con «−»)
+  }
+  // Lo demás que las maestrías le suman a un ataque con esa arma (no va en la tirada de PdG de siempre): se lee en la 🔍 de Atacar.
+  const MAESTRIA_CUANDO = [['pdgopor', 'solo en un ataque de oportunidad'], ['pdgcontra', 'solo en un contraataque'], ['espalda', 'solo al pegar por la espalda (lo suma el mapa)'], ['dmg', 'al daño de cada golpe'],
+    ['critpot', 'si el golpe es crítico'], ['perfora', 'en cada disparo'], ['ahorro', 'No2 de menos desde el segundo ataque del turno con esta arma'], ['bloqueo', 'al bloquear con esta arma']];
+  function lupaMaestria(S, c, arma){
+    if(!arma) return '';
+    const h = MAESTRIA_CUANDO.map(([cual, cuando]) => filasMaestria(S, c, cual, arma, cuando)).join('');
+    return h ? lupaSeccion('Maestría con esta arma', h) : '';
   }
   // 🔨 El Parry con cada arma o escudo, cuando hay un Parry de familia (parryt10): con qué suma y con qué no.
-  function lupaParryPorArma(S, c){
-    if(!Combatiente.PARRY_FAMILIA.some(st => num(c.final[st]) > 0)) return '';
+  // (2026-11-20, las maestrías de cortantes y hachas: lo mismo para el Bloqueo, `id` = 'parry' | 'bloqueo'.)
+  const BLOQUEO_FAMILIA = ['bloqueot6', 'bloqueot8'];
+  function lupaParryPorArma(S, c, id){
+    id = id || 'parry';
+    const esParry = id === 'parry', que = esParry ? 'Parry' : 'Bloqueo';
+    if(!(esParry ? Combatiente.PARRY_FAMILIA : BLOQUEO_FAMILIA).some(st => num(c.final[st]) > 0)) return '';
     const lista = FichaCombate.armasYEscudosParaParry(S).map(a => a.item);
     if(!lista.length) return '';
     let h = '';
     lista.forEach(it => {
-      const st = Combatiente.parryStatDe(it);
-      const fam = st ? filasFamilia(S, c, st, 'solo al parar con esta arma') : '';
-      h += lupaFila(`Parry con ${esc(it.nombre)}${fam ? '' : ` <span class="lupa-gris">(${Combatiente.esEscudo(it) ? 'escudo' : 'otro Tipo'}: no suma lo de una familia de armas)</span>`}`, fmt(FichaCombate.statParaArma(S, 'parry', it, c)), 'lupa-total');
+      const st = esParry ? Combatiente.parryStatDe(it) : Combatiente.statFamilia('bloqueo', it);
+      const fam = st ? filasFamilia(S, c, st, `solo al ${esParry ? 'parar' : 'bloquear'} con esta arma`) : '';
+      h += lupaFila(`${que} con ${esc(it.nombre)}${fam ? '' : ` <span class="lupa-gris">(${Combatiente.esEscudo(it) ? 'escudo' : 'otro Tipo'}: no suma lo de una familia de armas)</span>`}`, fmt(FichaCombate.statParaArma(S, id, it, c)), 'lupa-total');
       h += fam;
     });
     return lupaSeccion('Con cada arma o escudo', h);
@@ -136,11 +153,14 @@ const FichaLupa = (() => {
     const tipo = FichaCombate.tipoAtaque(arma);
     const hechos = FichaCombate.ataquesConArma(S, arma);
     const costo = FichaCombate.costoAtaque(S, arma);
+    const mhProx = Combatiente.extraFamilia(st => FichaCalculo.calcular(S).final[st], 'ahorro', arma), mh = hechos > 0 ? mhProx : 0;   // 🪓 Maestría en hachas
     let h = lupaFila(arma ? `Tipo del arma (d${fmt(tipo)})` : `Sin arma: Tipo provisorio ${IT2_PENDIENTE('Tipo de un ataque sin arma')}`, fmt(tipo));
     h += lupaFila(`Ataques con ${arma ? 'esta arma' : 'las manos'} este turno`, fmt(hechos));
     h += hechos === 0
       ? lupaFila(`Primer ataque con ${arma ? 'esta arma' : 'las manos'}: Tipo ÷ 2${tipo % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
-      : lupaFila('Ya atacó con ella: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
+      : (mh ? lupaFila('Ya atacó con ella: Tipo completo', fmt(tipo)) + filasFamilia(S, FichaCalculo.calcular(S), 'ahorrot8', 'desde el segundo ataque del turno con el hacha').replace(/\+(\d)/g, '−$1') + lupaFila('Cuesta', `${fmt(costo)} No2`, 'lupa-total')
+        : lupaFila('Ya atacó con ella: Tipo completo', `${fmt(costo)} No2`, 'lupa-total'));
+    if(hechos === 0 && mhProx) h += lupaNota(`🪓 Maestría en hachas: desde el segundo ataque del turno con esta arma, ${fmt(mhProx)} No2 menos (${fmt(Math.max(0, tipo - mhProx))} en vez de ${fmt(tipo)}).`);
     h += lupaFila('Nitros disponibles', fmt(num(S.nitros)), costo > num(S.nitros) ? 'lupa-falta' : '');
     h += lupaNota('Cada arma tiene su propio primer ataque a mitad de precio. Se reinicia en el Mantenimiento.');
     return lupaSeccion('Costo', h);
@@ -160,7 +180,7 @@ const FichaLupa = (() => {
     const ref = resto.join(':');
     const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
     if(tipo === 'stat'){
-      return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(S, ref, c) + (ref === 'parry' ? lupaParryPorArma(S, c) : '') + sinCosto};
+      return {titulo: STAT_FULL[ref] || STAT_LABEL[ref] || ref, html: lupaStat(S, ref, c) + (ref === 'parry' || ref === 'bloqueo' ? lupaParryPorArma(S, c, ref) : '') + sinCosto};
     }
     if(tipo === 'defensa'){
       return {titulo: STAT_FULL[ref] || ref, html: lupaStat(S, ref, c, {sinTirada: true}) + lupaNota('Valor fijo: no se tira.')};
@@ -168,12 +188,13 @@ const FichaLupa = (() => {
     if(tipo === 'atacar'){
       const arma = S.inventario.find(i => i.id === ref) || null;
       const pdg = FichaCombate.pdgParaArma(S, arma, c);
-      return {titulo: `Atacar${arma ? ` con ${arma.nombre}` : ' sin arma'}`, html: lupaStat(S, 'pdg', c, {...pdg, familia: familiaPdg(S, arma, c)}) + lupaCostoAtaque(S, arma)};
+      return {titulo: `Atacar${arma ? ` con ${arma.nombre}` : ' sin arma'}`, html: lupaStat(S, 'pdg', c, {...pdg, familia: familiaPdg(S, arma, c)}) + lupaMaestria(S, c, arma) + lupaCostoAtaque(S, arma)};
     }
     if(tipo === 'danio'){
       const arma = S.inventario.find(i => i.id === ref);
       if(!arma) return {titulo: 'Daño', html: lupaNota('No tenés un arma con daño equipada.')};
-      const dmg = FichaCombate.dmgParaArma(S, arma, c);   // sin los bonos de daño de la otra arma (2026-11-07)
+      const dmgM = Combatiente.extraFamilia(st => c.final[st], 'dmg', arma);   // ⚔ la maestría de su familia (punzantes, 2026-11-20): va en su propia fila
+      const dmgCon = FichaCombate.dmgParaArma(S, arma, c), dmg = dmgCon - dmgM;   // sin los bonos de daño de la otra arma (2026-11-07)
       let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(arma.peso) || 1)));
       if(num(arma.danoAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(arma.danoAmplificado)));
       h += lupaFila('Tipo (caras del dado)', `d${fmt(num(arma.tipoDado) || 8)}`);
@@ -181,7 +202,8 @@ const FichaLupa = (() => {
       h += !arma.armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
         : Combatiente.esArco(arma) ? lupaFila('Dmg <span class="lupa-gris">(arco: la mitad, para arriba)</span>', lupaSigno(Combatiente.dmgDelArma(arma, dmg)))
         : lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado');
-      h += lupaFila('Daño', esc(FichaCombate.armaDanoTxt(arma, dmg)), 'lupa-total');
+      h += filasMaestria(S, c, 'dmg', arma, 'con esta arma');
+      h += lupaFila('Daño', esc(FichaCombate.armaDanoTxt(arma, dmgCon)), 'lupa-total');
       let out = lupaSeccion('De dónde sale', h);
       if(!arma.armaDeRango || Combatiente.esArco(arma)) out += lupaStat(S, 'dmg', c, {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
       return {titulo: `Daño · ${arma.nombre}`, html: out + sinCosto};

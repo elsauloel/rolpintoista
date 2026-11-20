@@ -2126,3 +2126,19 @@ versión parecida en más de una, es candidato a juntar.
   llena** (`hp = hpMax`), los No2 llenos y los cooldowns de sus habilidades en cero; los estados no se tocan. Lo usan el botón «Invocar» de la
   ficha (`ficha-personaje/js/06`, que antes no tocaba la vida: volvía con la que le había quedado) y `FichaAcciones.invocacionDeHab` (la habilidad
   con `invoca`). Una forma nueva de invocar pasa por acá.
+- **⚔ Las maestrías por familia de arma** (2026-11-20, dueño; `combatiente.js` + `pasivas.js`): cinco pasivas nuevas de 1 Job (punzantes, cortantes,
+  hachas, arcos, ballestas), al lado de «Maestría en armas pesadas». **Un solo lugar dice qué arma es de qué familia y qué stat da cada bono**:
+  `Combatiente.familiaDeArma(pieza)` ('punzante' = Tipo 4 cuerpo a cuerpo, 'cortante' = Tipo 6 c. a c., 'hacha' = Tipo 8 c. a c., 'contundente',
+  'arco', 'ballesta' = de rango con Recarga, o '': escudos, orbes, varitas, lo natural, el puño, la honda) y `MAESTRIA_STATS` (`dmgt4`, `oport4`,
+  `espaldat4`, `parryt6`, `bloqueot6`, `contrat6`, `ahorrot8`, `bloqueot8`, `pdgarco`, `critpotarco`, `pdgballesta`, `perforaballesta`).
+  `extraFamilia(valorDe, cual, pieza)` → lo que suma (`cual`: 'dmg', 'pdgopor', 'pdgcontra', 'espalda', 'bloqueo', 'ahorro', 'pdg', 'critpot',
+  'perfora'); el Parry sigue por `parryExtraArma` y el PdG por `pdgExtraArma` (que ya suma arco / ballesta). Dónde entra cada uno: personaje,
+  `FichaCombate.statParaArma` (daño, Bloqueo, Crítico potente, PdG de oportunidad / contraataque) y `costoAtaque`; creep e invocación,
+  `CreepCalculo` / `InvCalculo.famExtra` (en `danoTxt`, `bloqueoValor`, `costoAtaque0`, `bonoEspecial` y `statsCritico` del duelo);
+  `costoConAhorro(costo, arma, previos, valorDe)` rebaja el hacha desde el segundo ataque y `costoAtaqueLineas({…, valorDe})` lo explica;
+  `ataqueDeArma(arma, valorDe, tipo)` / `ataqueConSuArma(x, tipo, alcance, valorDe)` / `ataqueConArreglos(…, {valorDe})` llevan al duelo la Perfora
+  de la ballesta (`ataque.perfora`), el +PdG por la espalda (`espaldaMas`, lo suma `espaldaBono` del mapa) y el texto `ataque.maestria` («⚔ Maestría
+  en …», `maestriaTxt`; lo muestra el cuadro del duelo). Las 🔍: `ficha-lupa.js` (`filasMaestria`, `lupaMaestria`, `lupaParryPorArma(S, c, 'bloqueo')`),
+  `creep-lupa.js` e `inv-lupa.js` (`familia(x, 'maestria' | 'dmgfam' | 'bloqueo')`). **Una maestría nueva = un renglón en `MAESTRIA_STATS`, su stat
+  en `ficha-calculo.js` / `creep-calculo.js` y la pasiva.** Lo provisorio: P260.
+

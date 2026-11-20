@@ -35,7 +35,7 @@ async function vigilanciaArmasDe(r){
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if(n < costo) return [];
     return [{nombre: Combatiente.armaEnMano(sc).nombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
-      ataque: Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc))}];
+      ataque: Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc), st => CreepCalculo.modTotal(sc, st))}];
   }
   await bnCargarPiezas();
   const fichaId = String(r.fichaId).split(SEP_INVOCACION)[0];
@@ -47,7 +47,7 @@ async function vigilanciaArmasDe(r){
   return armas.map(arma => ({arma, costo: FichaCombate.costoAtaque(arma, S)})).filter(x => x.costo <= disponibles)
     .map(({arma, costo}) => ({nombre: arma.nombre, costo, yo: {ref: fichaId, tipo: 'pj', nombre},
       detalle: [`Daño ${FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(S, arma, calc))}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · '),
-      ataque: {tipo: 'normal', armaId: arma.id, armaNombre: arma.nombre, tipoDado: FichaCombate.tipoAtaque(arma), rango: true, alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));
+      ataque: {tipo: 'normal', armaId: arma.id, armaNombre: arma.nombre, tipoDado: FichaCombate.tipoAtaque(arma), rango: true, alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma, st => calc.final[st], 'normal')}}));
 }
 // Se le va la vigilancia (disparó): un creep directo; un personaje, por aviso a su pantalla.
 async function vigilanciaQuitar(r){

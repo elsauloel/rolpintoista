@@ -41,10 +41,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cambiaron bien en las dos (la Mesa: «Blanco J1 le pasó 1 DDE a Blanco J2»). Después los dos quedaron en 0 DDE, sin ofertas pendientes; el mapa en
   narrativo y sin orden de turnos. No apareció ningún error del programa. Desde ahora, lo de dos personas se prueba con J1 y J2
   (`docs/memoria-claude.md`, «Probar»).
-- **⬜ en cola — 🌿 El aviso «el mapa volvió a modo narrativo», dentro del cartel «🩺 Cómo quedó el grupo»** (dueño, 2026-11-20: «lo del cambio en
+- **✅ hecho (2026-11-20) — 🌿 El aviso «el mapa volvió a modo narrativo», dentro del cartel «🩺 Cómo quedó el grupo»** (dueño, 2026-11-20: «lo del cambio en
   modo narrativo me gusta, pero quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito verde ese pasa bastante
-  desapercibido»). Cuando el fin del combate pasa el mapa a narrativo, el cartel «Cómo quedó el grupo» lo dice bien visible (arriba, destacado:
-  «🌿 Terminó el combate: el mapa volvió a modo narrativo»). Si ese cartel no llega a salir (p. ej. desde GM Tools), queda el cartelito de abajo.
+  desapercibido»).
+  **Qué quedó**: cuando el fin del combate pasa el mapa a narrativo, el cartel «🩺 Cómo quedó el grupo» del GM abre con una franja verde arriba de
+  todo: «🌿 **Terminó el combate**: el mapa volvió a **modo narrativo**» (y abajo, en chico: «Moverse ya no gasta No2. Si hace falta, lo volvés a
+  combate con el interruptor de arriba»). Sale solo si ese fin de combate lo cambió de verdad: si el mapa ya estaba en narrativo, o cuando el cartel
+  aparece al pasar a combate, no va. **A los jugadores** no se les agregó ningún cartel: su «🎁 Botín concluido» de siempre suma un renglón
+  «🌿 Modo narrativo — Terminó el combate: el mapa volvió a modo narrativo (moverse ya no gasta No2)». El cartelito verde de abajo quedó como estaba
+  (es lo único que ve el GM si cierra el combate desde GM Tools, donde ese cartel no existe).
+  **Probado con clics** en «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1): con botín (1 ítem) y sin ítems, la franja sale en el cartel del GM
+  y el renglón en el del jugador; con el mapa ya en narrativo, ninguno de los dos. La partida quedó como estaba (XP, creeps, sin combate abierto,
+  narrativo). Pruebas automáticas 896/896. Sin ver: `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 🐞 Desequilibrado (Arrastrar) se muestra como si no tuviera fin** (dueño, 2026-11-20, jugando El origen: «el personaje arrastrado
   apareció con el debuff Desequilibrado, y cuando me fijé cuánto duraba, parecía como que no tenía fin. Sin embargo, cuando pasó el tiempo
   correspondiente, se fue solo… quiero que pases una prueba en el mapa, corrobores esta información, y si es solamente un error de comunicación,

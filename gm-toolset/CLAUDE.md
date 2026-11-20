@@ -434,6 +434,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   sin ítems (`publicarRecompensas`, js/08), `CombateFin` pasa el mapa publicado de Combate a Narrativo (`TokensAuto.volverANarrativo`, la misma
   escritura del interruptor del mapa: GM Tools no tiene código propio para esto) y el toast lo dice (`res.narrativo`, `CombateFin.AVISO_NARRATIVO`).
   Simular no cambia nada; si ya estaba en narrativo, tampoco.
+  Desde GM Tools ese toast es el único aviso para el GM (el cartel «🩺 Cómo quedó el grupo», que lo dice en una franja arriba, es del mapa);
+  a los jugadores se lo dice igual su cartel «🎁 Botín concluido» (por el `narrativo: true` de la recompensa, `comun/CLAUDE.md`).
 
 - **El editor de creeps, en `comun/creep-editor.js`** (2026-10-02, hoja de ruta A6c): el editor de habilidades (`editorHabCreep`, js/04;
   `abrirEditorHabCreep` es un atajo; la ventana `#scrim-hab-creep` ya no está en `gm-tools.html`: la arma el componente), Subir y Reemplazar

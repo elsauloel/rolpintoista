@@ -5,8 +5,11 @@
    Una ventana con los personajes que tienen token en el mapa que mira el GM: vida, SP y No2 con su máximo, y sus estados. Los temporales (con turnos y que
    no son permanentes) llevan − turnos + y ✕ Sacar; los que no vencen (o salen del equipo y las pasivas) solo se muestran. Escribe con hudEstadoCambiar
    (js/10), lo mismo que el globo de estados del token. Se abre sola al cerrar el botín (js/18, o al publicar sin botín) y al pasar a combate (js/04);
-   `motivo`: 'fin' | 'combate'. Se redibuja sola cuando llegan los cambios de las fichas. */
-let eg = null;   // {el, motivo, firma, reloj}
+   `motivo`: 'fin' | 'combate'. Se redibuja sola cuando llegan los cambios de las fichas.
+   🌿 (dueño, 2026-11-20: «lo del cambio en modo narrativo… quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito
+   verde ese pasa bastante desapercibido») Con `o.narrativo` (el fin del combate acaba de pasar el mapa de combate a narrativo: lo dice CombateFin en
+   `res.narrativo`), arriba de todo va una franja verde con ese aviso. Si el mapa ya estaba en narrativo, o el cartel sale al pasar a combate, no va. */
+let eg = null;   // {el, motivo, narrativo, firma, reloj}
 function estadoGrupoTokens(){
   return [...tokens.entries()].filter(([, t]) => t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && vinculo(t))
     .sort((a, b) => nombreDe(a[1]).localeCompare(nombreDe(b[1])));
@@ -31,11 +34,14 @@ function estadoGrupoHtml(){
       ${fijos.length ? `<div class="eg-fijos">No vencen: ${fijos.map(({e}) => esc(e.nombre)).join(' · ')}</div>` : ''}
     </div>`;
   }).join('');
+  const franja = eg && eg.narrativo && eg.motivo !== 'combate';
   const intro = eg && eg.motivo === 'combate'
     ? 'Empieza el combate. Si algún estado tiene que durar más o menos, ajustale los turnos (o sacáselo).'
+    : franja ? 'Mirá cómo quedó cada uno y decidí si le sacás algún estado temporal o lo dejás.'
     : 'Terminó el combate. Mirá cómo quedó cada uno y decidí si le sacás algún estado temporal o lo dejás.';
   return `<div class="eg-caja" role="dialog" aria-modal="true">
     <div class="eg-tit"><span>🩺 Cómo quedó el grupo</span><button type="button" data-eg-cerrar title="Cerrar">✕</button></div>
+    ${franja ? `<div class="eg-narrativo" role="status"><span class="eg-narr-ico">🌿</span><span><b>Terminó el combate</b>: el mapa volvió a <b>modo narrativo</b><small>Moverse ya no gasta No2. Si hace falta, lo volvés a combate con el interruptor de arriba.</small></span></div>` : ''}
     <div class="eg-intro">${intro}</div>
     <div class="eg-lista">${filas || '<div class="eg-nada">No hay personajes con token en este mapa.</div>'}</div>
     <div class="eg-pie"><button type="button" data-eg-cerrar>Listo</button></div></div>`;
@@ -48,6 +54,10 @@ function estadoGrupoEstilos(){
 .eg-caja{width:min(560px,96vw);max-height:90vh;display:flex;flex-direction:column;background:var(--panel);color:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.6);font-size:13px}
 .eg-tit{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:800;font-size:15px}
 .eg-tit button{background:none;border:0;color:var(--paper);font-size:16px;cursor:pointer}
+.eg-narrativo{display:flex;align-items:center;gap:12px;margin:12px 14px 0;padding:10px 14px;border:2px solid #4fc27e;border-radius:10px;background:rgba(63,170,105,.22);color:#d6f8e2;font-size:15px;line-height:1.35}
+.eg-narrativo b{color:#fff}
+.eg-narr-ico{font-size:26px;line-height:1}
+.eg-narrativo small{display:block;font-size:12px;font-weight:400;color:#b6e6c6;margin-top:2px}
 .eg-intro{padding:10px 14px 0;color:var(--muted)}
 .eg-lista{overflow:auto;padding:10px 14px;display:flex;flex-direction:column;gap:10px}
 .eg-pj{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:rgba(0,0,0,.18)}
@@ -66,14 +76,14 @@ function estadoGrupoEstilos(){
 .eg-pie button{padding:6px 18px}`;
   document.head.appendChild(s);
 }
-function abrirEstadoDelGrupo(motivo){
+function abrirEstadoDelGrupo(motivo, o){
   if(!soyGM) return;
   estadoGrupoEstilos();
   cerrarEstadoDelGrupo();
   const el = document.createElement('div');
   el.id = 'eg-fondo';
   document.body.appendChild(el);
-  eg = {el, motivo: motivo || 'fin', firma: ''};
+  eg = {el, motivo: motivo || 'fin', narrativo: !!(o && o.narrativo), firma: ''};
   // (2026-10-28, probando: un clic justo cuando llegaba la XP se perdió) No se redibuja con un botón apretado: el clic caería entre dos dibujos.
   let apretado = false;
   el.addEventListener('mousedown', () => { apretado = true; });

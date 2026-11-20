@@ -282,6 +282,12 @@
 
 ## Pendientes
 
+- [ ] **🌿 El aviso de «volvió a modo narrativo» adentro de «🩺 Cómo quedó el grupo»: lo que no se vio** (2026-11-20; `vtt-hexgrid/js/81`, y el
+  renglón del «🎁 Botín concluido», js/11). Visto con clics en «Claude · pruebas 2» (GM y Jugador 1), con botín y sin ítems, y con el mapa ya en
+  narrativo (ahí no sale). **Falta ver**: (a) cerrando el combate **desde GM Tools**: el jugador tiene que ver el renglón igual, y el GM solo el
+  cartelito de abajo (es el mismo código, no se volvió a recorrer); (b) un jugador que **entra más tarde** (más de 10 minutos después) y cobra ahí
+  su recompensa: su cartel no tiene que hablar del modo del mapa; (c) el cartel «Cómo quedó el grupo» que sale **al pasar a combate**, mirado
+  abierto (no lleva la franja por código; se revisó recién después de cerrarlo); (d) el Jugador 2 en su pantalla (se miró solo el Jugador 1).
 - [ ] **🌿 Al terminar «Finalizar combate», el mapa vuelve a narrativo: lo que no se vio** (2026-11-20; `TokensAuto.volverANarrativo`,
   `comun/combate-fin.js`). Visto con clics en «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1), desde el mapa y desde GM Tools, con botín y sin
   ítems: el mapa pasa solo a Narrativo en las dos pantallas, y Simular no lo cambia. **Falta ver**: (a) el GM **mirando otro mapa** que el publicado al

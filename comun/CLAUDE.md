@@ -1622,6 +1622,13 @@ versión parecida en más de una, es candidato a juntar.
   narrativo»), que va en el toast del GM (el mapa y GM Tools). Una simulación no llega (publicar se niega antes). Si esa escritura falla, el combate
   queda cerrado igual y el GM usa el interruptor. Lo demás que arrastra el cambio (liberar lo «una vez por combate», js/25) lo hace cada mapa abierto
   cuando le llega el modo nuevo, como con el interruptor. El orden de turnos no se toca (el interruptor tampoco lo limpia).
+  **El aviso, bien a la vista** (2026-11-20, dueño: «quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito
+  verde ese pasa bastante desapercibido»): con `res.narrativo` el mapa le pone una franja verde arriba al cartel «🩺 Cómo quedó el grupo»
+  (`vtt-hexgrid/js/81`; texto de referencia en `CombateFin.AVISO_NARRATIVO_FIN`). **Para los jugadores**: las recompensas que pagan `despojar` y
+  `publicar` sin ítems llevan `narrativo: true` cuando el mapa publicado está en combate en ese momento (`TokensAuto.publicadoEnCombate()` →
+  `{mapaId, combate}`, se lee ANTES de escribirlas), y el cartel «🎁 Botín concluido» de cada jugador suma el renglón «🌿 Modo narrativo»
+  (`recompensaAnuncio`, `vtt-hexgrid/js/11`; solo si la recompensa es de hace menos de 10 minutos). El toast del GM sigue igual (es lo único que
+  ve quien cierra el combate desde GM Tools). No hizo falta tocar los permisos de Firebase (las recompensas las crea el GM con los campos que quiera).
 - **`combate-fin.js`, ⭐ la XP de cada personaje en el reporte** (2026-11-20, dueño): `jugadores()` lee además la parte `general` de cada ficha
   (solo lectura; `xp: {nivel, exp}` o `null`), y en el paso de la experiencia `vista` muestra, debajo de cada nombre, «Nv · XP / la que pide · le
   faltan» y lo que pasa con lo que cobra («sube a nivel N» / «le quedan faltando N»); en Publicar, «⬆ sube a nivel N». `progresoXp(xp, cobra)` /

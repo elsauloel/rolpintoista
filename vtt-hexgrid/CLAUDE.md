@@ -1591,6 +1591,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
     **🌿 Al terminar, el mapa vuelve a narrativo** (2026-11-20, dueño): al cerrar el botín (o al publicar sin ítems) `CombateFin` pasa el mapa
     publicado de Combate a Narrativo con la misma escritura del interruptor (`TokensAuto.ponerModo`, que desde ese día usa también `#modo-switch`,
     js/04); el toast del GM lo dice. Simular no cambia nada. Pasar a narrativo no abre ningún cartel (los carteles son los de pasar a combate).
+    **El aviso va adentro del cartel «🩺 Cómo quedó el grupo»** (2026-11-20, dueño: «el cartelito verde ese pasa bastante desapercibido»):
+    `abrirEstadoDelGrupo('fin', {narrativo: res.narrativo})` (`vgDespojar` y `vgPublicar` sin ítems) → franja verde arriba de todo (`.eg-narrativo`,
+    js/81): «🌿 Terminó el combate: el mapa volvió a modo narrativo». Solo si ese fin de combate lo cambió de verdad: con el mapa ya en narrativo,
+    o cuando el cartel sale al pasar a combate, no va. A los jugadores, un renglón «🌿 Modo narrativo» en su «🎁 Botín concluido»
+    (`recompensaAnuncio`, js/11, por el `narrativo: true` de la recompensa; ver `comun/CLAUDE.md`). El toast queda como estaba.
 - **Hoja de ruta A6b: el editor de la ficha, hecho por el mapa** (2026-10-02, `../docs/plan-a6b-editor.md`): el **Editar** del Ver y del
   Equipo abren el editor común (`comun/ficha-editor.js`) adentro de la Botonera nueva (`#bn-editor`, `bnEditar`, `bnCrearEditor`; las piezas en
   `ED_PIEZAS`; la categoría de un ítem en `#bn-tipoitem`; los estados de la lista con `SelectorEstados`). Guarda con `bnUi`. El **⚙ de un

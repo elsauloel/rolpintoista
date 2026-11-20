@@ -741,6 +741,15 @@ const CombateFin = (() => {
      con la misma escritura del interruptor del mapa (TokensAuto.ponerModo). Si ya estaba en narrativo, nada. En una simulación no se llega acá.
      Si falla, el combate queda bien cerrado igual (el GM lo cambia a mano con el interruptor). → true si lo cambió. */
   const AVISO_NARRATIVO = '🌿 El mapa volvió a modo narrativo';
+  /* El mismo aviso, bien a la vista (dueño, 2026-11-20: «quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito
+     verde ese pasa bastante desapercibido»): la franja de arriba del cartel «🩺 Cómo quedó el grupo» del GM (vtt-hexgrid/js/81) y un renglón del
+     «🎁 Botín concluido» de cada jugador (js/11). Para que el jugador lo sepa, su recompensa lleva `narrativo: true` cuando el mapa publicado está en
+     combate al pagarla (o sea, cuando este fin de combate lo va a pasar a narrativo). */
+  const AVISO_NARRATIVO_FIN = '🌿 Terminó el combate: el mapa volvió a modo narrativo';
+  async function mapaEnCombate(){
+    try{ return typeof TokensAuto !== 'undefined' && !!TokensAuto.publicadoEnCombate && !!(await TokensAuto.publicadoEnCombate()).combate; }
+    catch(err){ console.error('No se pudo leer el modo del mapa:', err); return false; }
+  }
   async function volverANarrativo(){
     try{ return typeof TokensAuto !== 'undefined' && !!(await TokensAuto.volverANarrativo()); }
     catch(err){ console.error('No se pudo volver el mapa a modo narrativo:', err); return false; }
@@ -762,9 +771,10 @@ const CombateFin = (() => {
     if(alEmpezar) await alEmpezar();   // (el mapa arranca ahí lo de «al terminar el combate»: que llegue antes que el botín)
     try{
       const ts = firebase.firestore.FieldValue.serverTimestamp();
+      const aNarrativo = !items.length && await mapaEnCombate();   // 🌿 sin ítems el combate termina acá: el cartel del jugador también lo dice
       const batch = fbDb.batch();
       if(!items.length) rp.porJugador.forEach(({j, xp, dde, despojos}) => {
-        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: despojos || 0, estado: j.estado, aplicada: false, creado: ts});
+        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: despojos || 0, estado: j.estado, aplicada: false, creado: ts, ...(aNarrativo ? {narrativo: true} : {})});
       });
       // `despojos`: los del equipo que no se ofrece (se pagan al cerrar el botín, con la XP y el oro).
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {numero: Date.now(), estado: items.length ? 'publicado' : 'cerrado', titulo: 'Batalla terminada', items: items.length, creado: ts,
@@ -845,6 +855,7 @@ const CombateFin = (() => {
     if(alEmpezar) alEmpezar();
     try{
       const ts = firebase.firestore.FieldValue.serverTimestamp();
+      const aNarrativo = await mapaEnCombate();   // 🌿 el cartel «Botín concluido» del jugador también dice que el mapa vuelve a narrativo
       const batch = fbDb.batch();
       // Un solo pago por personaje: la XP y el DDE de la batalla + su parte de los despojos. La ficha del dueño lo aplica sola.
       const ids = [...new Set([...cobran.map(c => c.fichaId), ...elegidos.map(j => j.id), ...porFicha.keys()])];
@@ -854,7 +865,7 @@ const CombateFin = (() => {
         const items = (porFicha.get(id) || []).map(d => String(d.json || '')).filter(Boolean);
         const duenoUid = (c && c.duenoUid) || (f && f.duenoUid) || '';
         if(!duenoUid || !(xp > 0 || dde > 0 || desp > 0 || items.length)) return;
-        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: id, duenoUid, nombre: String((c && c.nombre) || (f && f.nombre) || '').slice(0, 60), xp, dde, despojos: desp, ...(items.length ? {items} : {}), estado: (c && c.estado) || 'despojos', aplicada: false, creado: ts});
+        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: id, duenoUid, nombre: String((c && c.nombre) || (f && f.nombre) || '').slice(0, 60), xp, dde, despojos: desp, ...(items.length ? {items} : {}), estado: (c && c.estado) || 'despojos', aplicada: false, creado: ts, ...(aNarrativo ? {narrativo: true} : {})});
       });
       st.docs.forEach(d => batch.delete(fbDb.collection(fbRutaCampana('botin')).doc(d.id)));
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
@@ -975,7 +986,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {AVISO_NARRATIVO, elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {AVISO_NARRATIVO, AVISO_NARRATIVO_FIN, elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, progresoXp, progresoXpTexto, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

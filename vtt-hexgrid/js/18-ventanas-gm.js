@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261120narr'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261120narr2'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -185,7 +185,7 @@ async function vgPublicar(){
   if(res.items.length){
     combateMapa = {...(combateMapa || {}), estado: 'publicado'};   // sin esperar al snapshot
     abrirBotinGMMapa();   // el GM ve qué toma cada uno; puede cerrar la ventana y volver a abrirla con 🎁
-  }else abrirEstadoDelGrupo('fin');   // 🩺 sin botín, el combate terminó acá (js/81)
+  }else abrirEstadoDelGrupo('fin', {narrativo: res.narrativo});   // 🩺 sin botín, el combate terminó acá (js/81); arriba, la franja 🌿 si el mapa volvió a narrativo
 }
 
 /* --- 🎁 Despojos: lo que nadie tomó → despojos, y se pagan la XP y el oro --- */
@@ -225,7 +225,7 @@ async function vgDespojar(){
   toast(res.mensaje);
   vgBotin = null;   // el próximo combate arranca con la lista de personajes de nuevo
   vgCerrar('vg-botin');
-  abrirEstadoDelGrupo('fin');   // 🩺 cómo quedó el grupo: el GM decide qué estados temporales les saca (js/81)
+  abrirEstadoDelGrupo('fin', {narrativo: res.narrativo});   // 🩺 cómo quedó el grupo: el GM decide qué estados temporales les saca (js/81); arriba, la franja 🌿 si el mapa volvió a narrativo
 }
 // El combate cambió (js/12, escucharBotinParaJugador): si el botín ya no está publicado, su ventana se cierra (salvo mientras despoja).
 function vgCombateCambio(){

@@ -6067,6 +6067,17 @@ prueba('fin del combate: el mapa publicado vuelve a narrativo (solo si estaba en
       [true, ['narrativo', 'combate'], false, true, false, false, {modo: 'combate', actualizado: 'ahora'}, 'mapa/modo', 'mapas/m9/estado/modo']);
   });
 });
+prueba('fin del combate: al cerrar el botín con el mapa en combate, la recompensa de cada jugador lleva `narrativo` (su cartel «Botín concluido» lo dice) y el resultado también (la franja del cartel del GM); con el mapa ya en narrativo, ninguno de los dos', () => {
+  const correr = modo => { const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapas/m2/estado/modo': {modo}};
+    return conFbFalso(datos, async () => {
+      const st = CombateFin.nuevoBotin(); st.jugadores = [{id: 'f1', nombre: 'Blanco J1', duenoUid: 'u1'}]; st.incluidos = new Set(['f1']);
+      const res = await CombateFin.despojar(st, {combateActual: {jugadores: [{fichaId: 'f1', duenoUid: 'u1', nombre: 'Blanco J1', xp: 10, dde: 2}]}, confirmar: () => true});
+      const rec = Object.entries(datos).filter(([k]) => k.startsWith('recompensas/')).map(([, v]) => [v.fichaId, v.xp, v.narrativo]);
+      return [res && res.narrativo, rec, datos['mapas/m2/estado/modo'].modo, (await TokensAuto.publicadoEnCombate()).combate];
+    }); };
+  return Promise.all([correr('combate'), correr('narrativo')]).then(([a, b]) => igual([a, b, CombateFin.AVISO_NARRATIVO_FIN],
+    [[true, [['f1', 10, true]], 'narrativo', false], [false, [['f1', 10, undefined]], 'narrativo', false], '🌿 Terminó el combate: el mapa volvió a modo narrativo']));
+});
 prueba('fin del combate: una simulación no publica ni cambia el modo del mapa', () => {
   const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapas/m2/estado/modo': {modo: 'combate'}};
   return conFbFalso(datos, async () => {

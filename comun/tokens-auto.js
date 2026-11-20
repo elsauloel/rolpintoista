@@ -286,13 +286,18 @@ const TokensAuto = (() => {
      se vuelva a poner en modo narrativo»): si el mapa publicado está en combate, pasa a narrativo. → true si lo cambió (si ya estaba en
      narrativo no escribe nada). */
   async function volverANarrativo(){
+    const p = await publicadoEnCombate();
+    if(!p.combate) return false;
+    await ponerModo(p.mapaId, 'narrativo');
+    return true;
+  }
+  // El mapa publicado (el que ven los jugadores) y si está en modo combate. → {mapaId, combate}
+  async function publicadoEnCombate(){
     const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
     const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : MAPA_PRINCIPAL_ID;
     const d = await fbDb.doc(fbRutaCampana(rutaModo(mapaId))).get();
-    if(!d.exists || d.data().modo !== 'combate') return false;
-    await ponerModo(mapaId, 'narrativo');
-    return true;
+    return {mapaId, combate: d.exists && d.data().modo === 'combate'};
   }
 
-  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo};
+  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
 })();

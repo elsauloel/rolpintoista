@@ -1641,6 +1641,10 @@ function recompensaAnuncio(S, nombre, d, r, vueltas){
     items.length ? {titulo: 'Ítems reclamados', html: itemsHtml + ' <span class="hint">(ya están en tu mochila; pasá el mouse por cada uno para ver qué es)</span>'} : {titulo: 'Ítems reclamados', texto: 'ninguno'}];
   if(vueltas) pasos.push({titulo: 'Trampas', texto: vueltas});
   if(r && r.subio) pasos.push({titulo: '⬆ Subiste de nivel', texto: `Ahora sos nivel ${n(S.meta && S.meta.nivel)}`});
+  // 🌿 (dueño, 2026-11-20) Si este fin de combate pasó el mapa a narrativo (`narrativo` en la recompensa, comun/combate-fin.js), el cartel lo dice.
+  // Solo si es de recién (10 minutos): una recompensa que se cobra otro día no habla del modo del mapa.
+  const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(d.narrativo === true && Date.now() - ms < 600000) pasos.push({titulo: '🌿 Modo narrativo', texto: 'Terminó el combate: el mapa volvió a modo narrativo (moverse ya no gasta No2).'});
   AvisoCombate.mostrar({clave: 'recompensa:' + Date.now(), icono: '🎁', titulo: `Botín concluido · ${nombre || 'recibiste'}`, texto: 'Recibiste:', pasos,
     veredicto: {tono: 'bueno', grande: `+${n(d.xp)} XP · +${n(d.dde)} DDE`, chico: items.length ? `${items.length} ítem${items.length === 1 ? '' : 's'} a la mochila` : ''},
     botones: [{texto: '✔ Aceptar', alClic: () => AvisoCombate.cerrar()}]});

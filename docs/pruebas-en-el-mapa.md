@@ -3186,3 +3186,13 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [ ] **Con la partida real y gente de verdad:** que entre que la rata tira la Polvareda a la vista y llega el anuncio no pase nada raro (el anuncio
   ahora sale antes que la nube).
 
+
+## ☥ Al resucitar se van los estados (2026-11-20)
+
+- [x] (2026-11-20, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, con Bendecido y Veneno puestos antes de morir) el Pacto, el Ankh del
+  cinturón y la Llama de Fénix (al recibir un golpe de 999), el Revive que usa el Jugador 2 sobre el Jugador 1 caído, el ✚ del GM sobre el personaje
+  caído y el ✚ del GM sobre un creep caído: en los seis quedó solo «Invulnerable», con el cartelito, la línea de la Mesa («☥ … volvió: se le fueron 2
+  estados (…)») y el Aviso al jugador.
+- [ ] **Sin ver en pantalla:** «¿Con qué volvés?» eligiendo entre dos formas (mismo lugar del código; cubierto por las pruebas automáticas); un creep
+  que revive con la Llama de Fénix (por un golpe y en su Mantenimiento); una invocación revivida con el ✚ de su token; revivir un creep desde GM Tools
+  suelto; revivir desde la ficha suelta (toast y línea en la Mesa); que un estado del equipo puesto (un anillo, «Inmune a …») siga después de volver.

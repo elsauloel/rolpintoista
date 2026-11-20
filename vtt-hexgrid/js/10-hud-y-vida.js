@@ -317,8 +317,8 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     // 🔥 Llama de Fénix (2026-10-20): si cae con la llama, revive con toda la vida y Titilando.
-    let fenix = false;
-    if(sc.hp <= 0){ const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []); if(q){ sc.estados = q; sc.hp = Math.max(1, num(sc.hpMax)); fenix = true; } }
+    let fenix = false, vuelta = null;
+    if(sc.hp <= 0){ const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []); if(q){ sc.estados = q; Combatiente.volverLimpio(sc, 'estados', 'llama'); vuelta = Combatiente.vueltaTomar(sc); sc.hp = Math.max(1, num(sc.hpMax)); fenix = true; } }   // ☥ al volver se van los estados
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
     // 🎯 Si le entra daño, pierde la puntería (Tiro a la cabeza, 2026-10-21, dueño: «solamente si le hacen daño»).
     let punteria = '';
@@ -330,7 +330,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
         golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.golpeAnunciado && (h.nombre === e.hab || h.id === e.hab)) || null;   // (el estado guarda el nombre, js/63)   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
         if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(sc.estados);   // 💤 el daño lo despierta (js/87)
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab, desperto};
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, vuelta, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab, desperto};
   };
   if(o && o.simular){   // `o.sim`: seguir sobre lo que dejó un golpe simulado antes (el elemental del arma después del golpe)
     const sc0 = o.sim || creepPrivadoDe(t.fichaId);
@@ -346,6 +346,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y queda Titilando.`);
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
   }
+  if(res.fenix && typeof resurreccionAnunciar === 'function') resurreccionAnunciar({t, forma: 'llama', sacados: (res.vuelta && res.vuelta.sacados) || []});   // ☥ js/123
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
   if(res.golpeCae || res.golpeAcum){   // 🪓 (js/63)
     const h = res.golpeHab, hechizo = typeof GA_HECHIZO === 'function' && GA_HECHIZO(h), ico = typeof GA_ICONO === 'function' ? GA_ICONO(h) : '🪓';
@@ -499,7 +500,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     // de que la pantalla del dueño esté abierta).
     // ☥ Con más de una forma de volver (la Llama, el Pacto, un Ankh en el cinturón), no revive solo: queda en 0 y quien lo maneja elige con cuál
     // (dueño, 2026-11-20; js/98, volverPreguntar). Con una sola, como siempre.
-    let fenix = false, elige = false;
+    let fenix = false, elige = false, sacados = [];
     if(previo > 0 && datos.hp <= 0){
       let cin = []; try{ cin = (partCin.exists && JSON.parse(partCin.data().json || '{}').cinturon) || []; }catch(e){}
       const formas = (Combatiente.revivirFenix(efectos, []) ? 1 : 0) + (datos.meta && datos.meta.pacto ? 1 : 0) + (cin.some(i => i && i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0) ? 1 : 0);
@@ -507,11 +508,12 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     }
     if(!elige && previo > 0 && datos.hp <= 0){
       const q = Combatiente.revivirFenix(efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
-      if(q){ efectos.splice(0, efectos.length, ...q); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }
+      if(q){ const lv = Combatiente.alVolver(q); sacados = lv.sacados; efectos.splice(0, efectos.length, ...lv.quedan); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }   // ☥ al volver se van los estados (el mismo criterio que Combatiente.volverLimpio; acá la lista es la de la transacción)
     }
     // 😇 El Pacto (2026-10-28): si no lo levantó la llama, lo levanta el pacto: revive con un cuarto de la vida, Titilando, y el pacto se gasta.
     let pacto = false;
     if(!elige && previo > 0 && datos.hp <= 0 && datos.meta && datos.meta.pacto){
+      const lv = Combatiente.alVolver(efectos); sacados = lv.sacados; efectos.splice(0, efectos.length, ...lv.quedan);   // ☥ al volver se van los estados
       const tit = Combatiente.estadoTitilando(typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
       if(tit) Combatiente.agregarEstado(efectos, tit);
       datos.meta.pacto = false;
@@ -533,15 +535,18 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     // Titilando, en el resumen público igual que en la ficha (2026-10-28: la marca «Titilando» sin turnos se volvía «Invulnerable · 1 turno» al guardar la
     // ficha, y la lista del GM cambiaba de forma; ver js/81): el mismo nombre, turnos y detalle del estado que se le puso.
     const titE = (fenix || pacto) ? efectos.find(x => x && x.titilando && x.activo !== false) : null;
+    // ☥ lo que se fue al volver también sale del resumen público (por nombre; lo derivado y lo de los anillos queda)
+    const idos = new Set(sacados.map(x => x.nombre));
+    const sinIdos = l => idos.size ? l.filter(x => !(x && !x.derivado && !x.anillo && idos.has(String(x.nombre || '').trim()))) : l;
     const titPub = titE ? {nombre: String(titE.nombre).slice(0, 60), turnos: num(titE.turnos), permanente: false, invulnerable: true, polaridad: 'buff', detalle: String(titE.detalle || '').slice(0, 300)}
       : {nombre: 'Titilando', polaridad: 'buff', invulnerable: true};
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}),
       ...(desperto ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
-      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
-      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {}),
+      ...(fenix ? {'resumen.estados': sinIdos(estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
+      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': sinIdos(estPub || rs.estados || []).concat([titPub])})} : {}),
       // ☥ lo que usó sale de la lista de formas de volver del resumen (2026-11-20)
       ...((fenix || pacto) && Array.isArray(rs.volver) ? {'resumen.volver': rs.volver.filter(f => f && f.id !== (fenix ? 'llama' : 'pacto'))} : {})});
-    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, elige, hpFenix: datos.hp, desperto};
+    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, elige, sacados, hpFenix: datos.hp, desperto};
   });
   if(res && res.simulado) return res;
   if(golpe > 0 && typeof inmuneCartelDano === 'function') inmuneCartelDano(t, res.r);   // 🛡 «INVULNERABLE» flotando sobre el token (js/121, 2026-11-20)
@@ -566,6 +571,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       datos: {...(t.duenoUid ? {paraUid: t.duenoUid} : {}), aviso: true, tituloAviso: 'Zafaste de morir: te salvó el pacto',
         textoAviso: `Volvés con ${fmt(res.hpFenix)} HP y quedás Titilando (invulnerable) hasta tu próximo turno. El pacto se gastó.`}}); }catch(e){}
   }
+  if((res.fenix || res.pacto) && typeof resurreccionAnunciar === 'function') resurreccionAnunciar({t, forma: res.fenix ? 'llama' : 'pacto', sacados: res.sacados || []});   // ☥ js/123
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
   await mitiMitiCobrar(t, prot, res);
   await cosechaSiMuere(t, res);

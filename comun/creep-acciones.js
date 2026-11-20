@@ -741,7 +741,7 @@ const CreepAcciones = (() => {
     if(robo) rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, sc.nombre) : Combatiente.curaRobadaTxt(robo, sc.nombre)));
     else if(d.hp > 0 && !dh) rep.push(num(sc.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
-    if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
+    if(fenixCreep(sc)){ rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`); const vta = Combatiente.vueltaTomar(sc); if(vta && vta.sacados.length) rep.push(Combatiente.vueltaTxt(sc.nombre, vta.sacados)); }
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
     if(C().modoSP(sc) && seca){ if(C().spActual(sc) < C().spMax(sc)) rep.push(`🏜 Sequía: no recupera SP`); }
     else if(C().modoSP(sc)){   // 💧 recarga su SP (mínimo 1 por turno)
@@ -757,6 +757,7 @@ const CreepAcciones = (() => {
     const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []);
     if(!q) return false;
     sc.estados = q;
+    Combatiente.volverLimpio(sc, 'estados', 'llama');   // ☥ al volver se van los estados
     sc.hp = Math.max(1, num(sc.hpMax));
     return true;
   }

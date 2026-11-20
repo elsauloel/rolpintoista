@@ -933,6 +933,16 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   anillo del token (`volverPuede`: el dueño o el GM, que elige por él) y el botón «☥ ¿Con qué volvés? Elegí» de la pantalla roja (js/13). `volverPreguntar`
   aplica SOLO la elegida (`FichaAcciones.volverCon` por `editarPersonajeMapa`), con su toast, la línea de la Mesa (`Combatiente.volverTxt`) y el Anuncio.
   Con una sola forma, automático como siempre. Mientras no elige, sigue caído (los turnos para morir corren).
+- **☥ Al volver de la muerte se van los estados, y el mapa lo cuenta** (2026-11-20, dueño; `js/123-al-volver.js`): los estados los saca
+  `Combatiente.volverLimpio` (comun/CLAUDE.md). Lo que se VE pasa por un solo lugar: **`resurreccionAnunciar({t | fichaId, nombre?, forma, sacados})`**
+  (toast, línea de la Mesa «☥ X volvió: se le fueron N estados (…)» y el Aviso al centro para el jugador dueño; un creep oculto no deja línea).
+  **✨ Las animaciones de resurrección se enganchan ahí** (llega el token, la forma —'llama' | 'pacto' | 'ankh' | 'revive'— y es el momento en que
+  volvió; hoy, sin estados que sacar, no hace nada). Llegan: un personaje por `resurreccionRevisarPj(fichaId, S)` desde `editarPersonajeMapa` y
+  `bnRevisarVida` (js/11: cubre el Ankh y el Pacto de `vidaCeroRevisar`, «¿Con qué volvés?», el ✚ del token, el ✚ de la pantalla roja, el Revive que
+  le llega por aviso y el Mantenimiento) y desde `danioPj` (js/10: el Pacto o la Llama que saltan con el golpe; ahí la lista es la de la transacción,
+  con `Combatiente.alVolver`, y también limpia `resumen.estados`); un creep desde `danioCreep` (la Llama), `revivirToken` (js/98, también una
+  invocación) y `revivirElegido` (js/22, el Revive). Probado con clics en «Claude · pruebas 2» (Pacto, Ankh, Fénix, Revive de J2, ✚ del GM a un
+  personaje y a un creep).
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa
   «Renovando…»), línea en la Mesa (`Combatiente.pactoRenovadoTxt`) y un momento `pacto` con el Aviso al jugador (`Combatiente.PACTO_AVISO`). La ficha

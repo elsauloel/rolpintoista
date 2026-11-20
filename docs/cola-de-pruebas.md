@@ -194,7 +194,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   vieron cartel). No hubo nada que arreglar. Sale con Percepción aumentada (la pasiva o el anillo que la da) o con Pisada atenta (los pies que la
   dan, o saber desarmar trampas). Después se le sacó la pasiva. Sin ver: tirar esa Percepción hasta el final (ya probado en la tarea anterior) y la
   Pisada atenta de un creep o una invocación. Sin cambios en las reglas de Firestore. Pruebas automáticas 913/913.
-- **⬜ en cola — ☥ Al resucitar se borran todos los estados temporales, buenos y malos** (dueño, 2026-11-20: «algo que debe pasar cuando un
+- **✅ hecho (2026-11-20) — ☥ Al resucitar se borran todos los estados temporales, buenos y malos** (dueño, 2026-11-20: «algo que debe pasar cuando un
   personaje muere y resucita, de cualquier forma, ya sea resurrección automática con un Pacto, con un Ankh, con la poción de Fénix, o que lo
   resuciten con un Revive. Al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna
   poción o algún pergamino. Tanto los buenos como los malos»). En UN solo lugar por donde pasen todas las formas de volver (Pacto, Ankh, Llama /
@@ -205,6 +205,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «permanente», Mala sombra, Bronca, estados de invocaciones propias, cooldowns) a preguntas-abiertas, eligiendo mientras tanto lo más fiel a la frase
   del dueño. Aviso al jugador y línea en la Mesa («☥ X volvió: se le fueron N estados»). Vale para personajes, y ver creeps / invocaciones que revivan.
   Probar las cuatro formas en el mapa.
+  **Resultado:** al volver de la muerte, del modo que sea, se van todos los estados puestos por habilidades, pociones, pergaminos, zonas, trampas y
+  golpes, buenos y malos, tengan turnos o no. Quedan: lo del equipo puesto y los anillos, lo de las pasivas, «Inmune a …», Vuela, la Armadura rota,
+  Desarmado, la Bronca de un creep, los Toques de carga, la Llama de Fénix que no se usó y el Titilando que pone la propia resurrección. Caer no saca
+  nada: se van al volver. Todas las formas pasan por un solo lugar (`Combatiente.volverLimpio`) y el mapa lo cuenta en otro
+  (`resurreccionAnunciar`, vtt-hexgrid/js/123-al-volver.js: **ahí se enganchan las animaciones de resurrección**): cartelito, línea en la Mesa
+  («☥ Blanco J1 volvió: se le fueron 2 estados (Bendecido, Veneno)») y el Aviso al centro para el jugador («Volviste: se te fueron los estados»).
+  Vale para personajes, creeps (✚ del GM, el Revive, la Llama) e invocaciones (✚ de su token). **Probado con clics en «Claude · pruebas 2»**, siempre
+  con Bendecido y Veneno puestos antes de morir: el Pacto, el Ankh del cinturón, la Llama de Fénix (los tres al recibir un golpe de 999), el Revive
+  que usó el Jugador 2 sobre el Jugador 1 caído, el ✚ del GM sobre el personaje caído y el ✚ del GM sobre un creep caído. En los seis quedó solo
+  «Invulnerable» (el Titilando), con el aviso y la línea. **Sin ver:** «¿Con qué volvés?» con dos formas a la vez (pasa por el mismo lugar; lo
+  cubren las pruebas automáticas), un creep con la Llama, una invocación, GM Tools suelto y la ficha suelta. Dudas: P256. Sin cambios en las reglas
+  de Firestore. Pruebas automáticas 917/917 (3 nuevas).
 - **⬜ en cola — 🕵 En sigilo: ver SOLO los conos de visión de los rivales (zonas de riesgo y zonas libres)** (dueño, 2026-11-20, jugando con la
   rata en sigilo: «apretaba Control L para ver las superficies de visión de los rivales, pero me mostraba el cono de visión propio de la rata. Quedó
   medio entreverado eso. Cuando uno está en sigilo tiene que haber algún comando, puede ser ese o puede ser otro, que le permita ver exclusivamente

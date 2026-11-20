@@ -115,6 +115,7 @@ const FichaAcciones = (() => {
     const cc = FichaCalculo.calcular(S);
     const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
     S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+    Combatiente.volverLimpio(S, 'efectos', 'ankh');   // ☥ al volver se van los estados (el punto común: comun/combatiente.js)
     ponerTitilando(S);
     return it.nombre;
   }
@@ -186,6 +187,7 @@ const FichaAcciones = (() => {
       const conLlama = Combatiente.revivirFenix(S.efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
       if(!conLlama) return null;
       S.efectos = conLlama;
+      Combatiente.volverLimpio(S, 'efectos', 'llama');   // ☥ al volver se van los estados (Titilando queda)
       const cf = FichaCalculo.calcular(S);
       S.hp = Math.max(1, Number.isNaN(cf.final.hpmax) ? 1 : num(cf.final.hpmax));
       S.spGastado = 0;
@@ -197,6 +199,7 @@ const FichaAcciones = (() => {
       const cp = FichaCalculo.calcular(S);
       S.meta.pacto = false;
       S.hp = Combatiente.pactoVida(Number.isNaN(cp.final.hpmax) ? 1 : cp.final.hpmax);
+      Combatiente.volverLimpio(S, 'efectos', 'pacto');   // ☥ al volver se van los estados
       ponerTitilando(S);
       return 'El Pacto';
     }
@@ -263,6 +266,7 @@ const FichaAcciones = (() => {
     if(num(S.hp) > 0){
       if(S.muerto.activo){
         S.muerto = {activo:false, turnos:5, definitivo:false};
+        Combatiente.volverLimpio(S, 'efectos', 'revive');   // ☥ estaba caído y vuelve, de la forma que sea (✚, Revive, o ya limpio por volverCon): se van los estados
         ponerTitilando(S);
         return {vivo: true, revivio: true};
       }

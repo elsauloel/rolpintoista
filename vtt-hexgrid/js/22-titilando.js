@@ -69,11 +69,14 @@ function elegirCaidoParaRevivir(o){
 // Revivir al elegido: un personaje por aviso a su pantalla; un creep, directo.
 async function revivirElegido(c, pct, origen){
   if(c.tipo === 'creep'){
+    let vuelta = null;
     await modificarCreep(c.fichaId, sc => {
       sc.hp = Math.max(1, Math.floor(num(sc.hpMax) * pct / 100));
+      Combatiente.volverLimpio(sc, 'estados', 'revive'); vuelta = Combatiente.vueltaTomar(sc);   // ☥ al volver se van los estados
       const e = typeof estadosPresetCreep === 'function' ? Combatiente.estadoTitilando(estadosPresetCreep()) : null;
       if(e){ sc.estados = sc.estados || []; Combatiente.agregarEstado(sc.estados, e); }
     });
+    if(vuelta && typeof resurreccionAnunciar === 'function'){ const tk = [...tokens.values()].find(x => x && x.tipo === 'creep' && x.fichaId === c.fichaId); resurreccionAnunciar({t: tk, nombre: c.nombre, forma: 'revive', sacados: vuelta.sacados}); }
     return;
   }
   const f = fichasPub.get(c.fichaId);

@@ -139,16 +139,18 @@ async function revivirToken(t){
   const nom = nombreDe(t), esInv = String(t.fichaId).includes(SEP_INVOCACION);
   const val = await Revivir.elegirVida(nom, maxVidaDe(t), {titila: !esInv});
   if(!val) return;
+  let vuelta = null;   // ☥ al volver se van los estados (Combatiente.volverLimpio); un personaje lo cuenta editarPersonajeMapa (js/11)
   try{
     if(t.tipo === 'creep'){
       await modificarCreep(t.fichaId, sc => {
         sc.hp = val;
+        Combatiente.volverLimpio(sc, 'estados', 'revive'); vuelta = Combatiente.vueltaTomar(sc);
         const e = typeof estadosPresetCreep === 'function' ? Combatiente.estadoTitilando(estadosPresetCreep()) : null;
         if(e){ sc.estados = sc.estados || []; Combatiente.agregarEstado(sc.estados, e); }
       });
     }else if(esInv){
       const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
-      const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false; inv.hp = val; return true; });
+      const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false; inv.hp = val; Combatiente.volverLimpio(inv, 'estados', 'revive'); vuelta = Combatiente.vueltaTomar(inv); Combatiente.vueltaTomar(S); return true; });
       if(!ok) throw new Error('no se pudo escribir la ficha de su dueño');
     }else{
       const ok = await editarPersonajeMapa(t.fichaId, S => { FichaAcciones.revivir(S, val); return true; });
@@ -159,6 +161,7 @@ async function revivirToken(t){
   toast(txt);
   try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
   try{ momentoAbrir({tipo: 'buff', icono: '✚', titulo: `${nom} vuelve a pie`, resultado: txt, estado: 'listo', datos: soyGM && t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid, aviso: true, boton: 'Entendido'} : {}}); }catch(e){}
+  if(vuelta && typeof resurreccionAnunciar === 'function') resurreccionAnunciar({t, forma: 'revive', sacados: vuelta.sacados});   // (creep e invocación; js/123)
   pedirDibujo();
 }
 const gmRevivirToken = revivirToken;   // el nombre de antes (js/10)

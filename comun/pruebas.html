@@ -49,10 +49,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261120hasta"></script>
+<script src="combatiente.js?v=20261120volver"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
-<script src="creep-acciones.js?v=20261110vaq"></script>
+<script src="creep-acciones.js?v=20261120volver"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261120enj"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
@@ -80,7 +80,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261120hasta"></script>
+<script src="ficha-acciones.js?v=20261120volver"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -2708,6 +2708,64 @@ prueba('☥ ¿Con qué volvés? con la Llama de Fénix: tres formas, ninguna sol
   const soloPacto = FichaAcciones.revisarAnkh(M);   // el Ankh en la mochila no es una forma de volver sola: queda una → automática
   igual([r, S.hp, ids, conLlama, L.hp === hpmax, L.spGastado, L.meta.pacto, L.cinturon[0].unidades, L.efectos.some(e => e.fenix), L.efectos.some(e => e.titilando), soloPacto, M.inventario[0].unidades],
     [null, 0, ['llama', 'pacto', 'ankh'], 'Llama de Fénix', true, 0, true, 1, false, true, 'El Pacto', 1]);
+});
+prueba('☥ Al volver se van los estados (2026-11-20): qué se va y qué queda (Combatiente.alVolver)', () => {
+  const lista = [
+    {nombre: 'Veneno', polaridad: 'debuff', turnos: 4}, {nombre: 'Bendecido', polaridad: 'buff', turnos: 2}, {nombre: 'Veneno severo', polaridad: 'debuff', permanente: true},
+    {nombre: 'Marcado', polaridad: 'debuff', turnos: 3, marcado: true}, {nombre: 'Sigilo', polaridad: 'buff', permanente: true}, {nombre: 'Arma envenenada', polaridad: 'buff', permanente: true, cargas: 2},
+    {nombre: 'Mala sombra', polaridad: 'otro', turnos: 2}, {nombre: 'Vida extra', polaridad: 'buff', permanente: true, finCombate: true}, {nombre: 'Estado propio', polaridad: 'buff', permanente: true},
+    // lo que queda
+    {nombre: 'Apagado', polaridad: 'debuff', turnos: 2, activo: false}, {nombre: 'Regeneración (pasiva)', derivado: true}, {nombre: 'Anillo de fuerza', origenItem: 'x1', permanente: true},
+    {nombre: 'Cáscara protectora', anillo: true, permanente: true}, {nombre: 'Invulnerable', titilando: true, turnos: 1}, {nombre: 'Llama de Fénix', fenix: true, turnos: 3},
+    {nombre: 'Vuela', volador: true, permanente: true}, {nombre: 'Armadura rota', armaduraRota: true, stacks: 2}, {nombre: 'Desarmado', desarmado: true}, {nombre: 'Bronca', stacks: 3},
+    {nombre: 'Toques de carga', stacks: 1, finCombate: true}, {nombre: 'Inmune a Veneno (Anillo)', permanente: true}];
+  const copia = structuredClone(lista), r = Combatiente.alVolver(lista);
+  igual([r.sacados.map(x => x.nombre), r.quedan.map(x => x.nombre), r.sacados[0].polaridad, JSON.stringify(lista) === JSON.stringify(copia), Combatiente.alVolver(null)],
+    [['Veneno', 'Bendecido', 'Veneno severo', 'Marcado', 'Sigilo', 'Arma envenenada', 'Mala sombra', 'Vida extra', 'Estado propio'],
+     ['Apagado', 'Regeneración (pasiva)', 'Anillo de fuerza', 'Cáscara protectora', 'Invulnerable', 'Llama de Fénix', 'Vuela', 'Armadura rota', 'Desarmado', 'Bronca', 'Toques de carga', 'Inmune a Veneno (Anillo)'],
+     'debuff', true, {quedan: [], sacados: []}]);
+  igual([Combatiente.vueltaTxt('Blanco', r.sacados.slice(0, 2)), Combatiente.vueltaTxt('Blanco', r.sacados.slice(0, 1)), Combatiente.vueltaTxt('Blanco', []), /fueron 2 estados, buenos y malos: Veneno, Bendecido/.test(Combatiente.vueltaAviso(r.sacados.slice(0, 2))), Combatiente.vueltaIcono('llama'), Combatiente.vueltaIcono('revive')],
+    ['☥ Blanco volvió: se le fueron 2 estados (Veneno, Bendecido)', '☥ Blanco volvió: se le fue 1 estado (Veneno)', '', true, '🔥', '✚']);
+});
+prueba('☥ Al volver se van los estados: las cuatro formas de un personaje pasan por el mismo punto (Pacto, Ankh, Llama de Fénix, ✚ Revivir / Revive)', () => {
+  const puestos = () => [{id: 'v', nombre: 'Veneno', polaridad: 'debuff', turnos: 4, stacks: 4, activo: true}, {id: 'b', nombre: 'Bendecido', polaridad: 'buff', turnos: 2, activo: true},
+    {id: 'q', nombre: 'Anillo puesto', polaridad: 'buff', permanente: true, origenItem: 'it1', activo: true}];
+  const nueva = () => ({...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: puestos(), cinturon: []});
+  const nombres = S => S.efectos.map(e => e.titilando ? 'Titilando' : e.nombre).sort();
+  // Pacto (automático al llegar a 0)
+  const P = nueva(); P.meta.pacto = true; P.hp = 0;
+  const rp = FichaAcciones.revisarAnkh(P); FichaAcciones.revisarMuerte(P);
+  const vp = Combatiente.vueltaTomar(P);
+  // Ankh del cinturón
+  const A = nueva(); A.cinturon = [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]; A.hp = 0;
+  const ra = FichaAcciones.revisarAnkh(A); const va = Combatiente.vueltaTomar(A);
+  // Llama de Fénix (el Elixir): la llama se gasta, lo demás se va
+  const L = nueva(); FichaHabilidades.aplicarEfectoDeConsumo(L, CATALOGO_BASE.find(i => i.nombre === 'Elixir de Fénix'), presetsDePrueba); L.hp = 0;
+  const rl = FichaAcciones.revisarAnkh(L); const vl = Combatiente.vueltaTomar(L);
+  // ✚ Revivir (el del token, el de la ficha y el consumible Revive terminan en FichaAcciones.revivir): estaba caído
+  const R = nueva(); R.hp = 0; FichaAcciones.revisarMuerte(R);
+  const caidoCon = R.efectos.length;   // caer no saca nada: se van al VOLVER
+  FichaAcciones.revivir(R, 5); const vr = Combatiente.vueltaTomar(R);
+  // Elegida con «¿Con qué volvés?» estando caído: volverCon + revisarMuerte no la cuentan dos veces y conserva la forma
+  const E = nueva(); E.meta.pacto = true; E.cinturon = [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]; E.hp = 0;
+  FichaAcciones.revisarAnkh(E); FichaAcciones.revisarMuerte(E); const sigueCaido = E.efectos.length;
+  FichaAcciones.volverCon(E, 'pacto'); FichaAcciones.revisarMuerte(E); const ve = Combatiente.vueltaTomar(E);
+  // De pie y sin haber caído: nada que contar
+  const N = nueva(); N.hp = 10; FichaAcciones.revisarAnkh(N); FichaAcciones.revisarMuerte(N);
+  const esperado = ['Anillo puesto', 'Titilando'], idos = ['Veneno', 'Bendecido'];
+  igual([rp, nombres(P), vp.forma, vp.sacados.map(x => x.nombre), ra, nombres(A), va.forma, va.sacados.length, rl, nombres(L), vl.forma, vl.sacados.map(x => x.nombre),
+    caidoCon, nombres(R), vr.forma, vr.sacados.length, sigueCaido, nombres(E), ve.forma, ve.sacados.map(x => x.nombre), Combatiente.vueltaTomar(E), Combatiente.vueltaTomar(N), N.efectos.length],
+    ['El Pacto', esperado, 'pacto', idos, 'Ankh de Reencarnación', esperado, 'ankh', 2, 'Llama de Fénix', esperado, 'llama', idos,
+     3, esperado, 'revive', 2, 3, esperado, 'pacto', idos, null, null, 3]);
+});
+prueba('☥ Al volver se van los estados: un creep (la Llama en su Mantenimiento) y una invocación', () => {
+  const sc = {id: 'c', nombre: 'Rata', hp: 0, hpMax: 12, estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 3, activo: true}, {nombre: 'Llama de Fénix', fenix: true, turnos: 3, activo: true}, {nombre: 'Vuela', volador: true, permanente: true, activo: true}]};
+  const sacados = (() => { const q = Combatiente.revivirFenix(sc.estados, estadosPresetCreep()); sc.estados = q; return Combatiente.volverLimpio(sc, 'estados', 'llama'); })();
+  const v = Combatiente.vueltaTomar(sc);
+  const inv = {id: 'i', hp: 0, estados: [{nombre: 'Rengo', polaridad: 'debuff', turnos: 2}]};
+  const si = Combatiente.volverLimpio(inv, 'estados', 'revive');
+  igual([sacados.map(x => x.nombre), sc.estados.map(e => e.titilando ? 'Titilando' : e.nombre).sort(), v.forma, si.map(x => x.nombre), inv.estados, Combatiente.volverLimpio(null, 'estados'), Combatiente.volverLimpio({}, 'estados').length],
+    [['Veneno'], ['Titilando', 'Vuela'], 'llama', ['Rengo'], [], [], 0]);
 });
 prueba('☥ ¿Con qué volvés?: el cartel explica cada opción y la línea de la Mesa dice con cuál volvió', () => {
   const c = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 2}, {id: 'llama', hp: 30}], false), g = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 1}], true);

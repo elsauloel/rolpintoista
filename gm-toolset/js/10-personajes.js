@@ -338,10 +338,13 @@ $('#revivircreep-confirmar').onclick = () => {
   if(!sc) return;
   const {val} = calcularHpRevivirCreep();
   sc.hp = val;
+  const idos = Combatiente.volverLimpio(sc, 'estados', 'revive');   // ☥ al volver se van los estados (el punto común: comun/combatiente.js)
+  Combatiente.vueltaTomar(sc);
   revivirCreepId = null;
   $('#scrim-revivir-creep').classList.remove('open');
   renderAll();
-  toast(`${sc.nombre} revivido con ${fmt(val)} HP`);
+  toast(`${sc.nombre} revivido con ${fmt(val)} HP${idos.length ? ` · ${Combatiente.vueltaTxt(sc.nombre, idos)}` : ''}`);
+  if(idos.length){ try{ mesaLinea(Combatiente.vueltaTxt(sc.nombre, idos), 'recordatorio'); }catch(e){} }
 };
 $('#revivircreep-cancel').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };
 $('#revivircreep-x').onclick = () => { revivirCreepId = null; $('#scrim-revivir-creep').classList.remove('open'); };

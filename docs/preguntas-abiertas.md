@@ -1706,3 +1706,25 @@ Si gana la Percepción, lo de siempre: el escondido tira su Sigilo y, si pierde,
 desde donde no se ve: está bien, «al atacar se revela su posición». (c) El orden de turnos mantiene la fila del creep conocido que se escondió:
 correcto. Lo de «percibís algo raro» por habilidades ruidosas: «por ahora afuera». (d) y (e) sin responder; quedan como están.
 
+### P256 — ☥ Al resucitar se van los estados: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+El dueño: «al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna poción o algún
+pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAlVolver`, comun/combatiente.js); estas son las dudas, con lo elegido:
+- (a) **La Llama de Fénix que no se usó** (volvió con el Ankh o el Pacto teniendo las dos): **queda**, porque el cartel «¿Con qué volvés?» promete
+  que las otras formas «te quedan guardadas». El Pacto sin gastar también queda (no es un estado).
+- (b) **Veneno severo, Sangrado, Marcado, Mala sombra, Sanguijuela, Maldito** y cualquier otro «permanente» que puso un golpe o una habilidad: **se
+  van** (es lo que dice la frase). ¿Alguno debería sobrevivir a la muerte?
+- (c) **Armadura rota:** **queda** (en un personaje es de las piezas; en un creep o una invocación se dejó igual, por ser daño a la armadura y no un
+  estado «de paso»). **Desarmado:** queda (el arma sigue en el piso). ¿Está bien?
+- (d) **Sigilo y Sentado:** se van (vuelve de pie y a la vista). **Agarrado / Mordido** (y Agarrando / Mordiendo): se van; el otro lado se suelta
+  solo cuando le toca.
+- (e) **Un estado «sin límite» puesto a mano** (por el GM o el jugador, con nombre propio: un rasgo, una maldición de la historia): hoy **se va**,
+  porque no hay forma de distinguirlo de uno que dejó una poción. Los que el sistema reconoce como rasgo sí quedan: Vuela, «Inmune a …», lo de las
+  pasivas y lo del equipo. ¿Hace falta una marca «rasgo: no se va al morir» para los estados a mano?
+- (f) **La Bronca de un creep y los Toques de carga:** quedan (son cuentas del combate, no estados de paso). **La Vida extra** (también la del
+  Relicario): se va.
+- (g) **Los cooldowns, el SP y los No2:** no se tocan (no son estados). **Los estados de las invocaciones del que vuelve:** no se tocan (solo se
+  limpia quien vuelve). ¿Alguno debería reiniciarse?
+- (h) **Una invocación que revive a mano desde la ficha** (subiéndole la vida): no pasa por el punto común (solo el ✚ de su token en el mapa).
+- (i) **Subirle la vida a mano a un caído** (HP directo desde el token): cuando su pantalla lo saca de «inconsciente», cuenta como volver y se le
+  van los estados. ¿O eso no debería contar como resucitar?
+

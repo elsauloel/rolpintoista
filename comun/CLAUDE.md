@@ -933,6 +933,17 @@ versión parecida en más de una, es candidato a juntar.
   (`volverPendiente(S)` → las opciones si está en 0 con dos o más; `volverCon(S, id)` aplica solo esa y no gasta las otras). El cartel y los textos:
   `Combatiente.volverOpciones(nombre, formas, porGM)` (→ `{texto, o}` para `Confirmar.elegir`), `volverTxt`, `volverIcono`, `volverPendienteTxt`. El
   resumen público lleva `volver` (lo usa el mapa, js/98). Quien llame a `revisarAnkh` no tiene que cambiar nada.
+- **☥ Al volver de la muerte se van los estados** (2026-11-20, dueño: «al resucitar se le borran todos los estados alterados… tanto los buenos como los
+  malos»; `combatiente.js`): **el punto común de toda vuelta a la vida es `Combatiente.volverLimpio(quien, campo, forma)`** (`quien` = el personaje `S`
+  con `'efectos'`, o un creep / una invocación con `'estados'`; `forma` = 'llama' | 'pacto' | 'ankh' | 'revive'). Saca los estados y anota la vuelta;
+  la pantalla la cuenta con `vueltaTomar(quien)` → `{forma, sacados}` (una sola vez) y los textos `vueltaTxt(nombre, sacados)` («☥ X volvió: se le
+  fueron N estados (…)»), `vueltaAviso(sacados)`, `vueltaIcono(forma)`. Lo llaman `FichaAcciones.volverCon` (Llama, Pacto), `aplicarRevivirConAnkh`
+  (Ankh del cinturón o a mano) y `revisarMuerte` cuando deja de estar caído (✚ Revivir, el consumible Revive, la vida subida a mano); el creep con la
+  Llama en su Mantenimiento (`CreepAcciones.fenixCreep`); GM Tools al revivir un creep; y el mapa (ver vtt-hexgrid/CLAUDE.md). **Una forma nueva de
+  volver tiene que llamar a `volverLimpio`.** Qué queda (`quedaAlVolver(e)`; `alVolver(estados)` es la versión pura → `{quedan, sacados}`): lo apagado,
+  lo `derivado` (pasivas, sobrepeso, Armadura rota de las piezas), lo del equipo (`origenItem`, `anillo`, «Inmune a X»), Titilando, la Llama de Fénix
+  sin usar, Vuela, Armadura rota, Desarmado, Bronca y Toques de carga. Todo lo demás se va (con o sin turnos). Caer no saca nada: se van al volver.
+  Lo dudoso: P256. La ficha lo cuenta en `renderVitals` (js/02): toast y línea en la Mesa.
 - **`ficha-acciones.js`** (`FichaAcciones`, 2026-10-01, paso 4 etapa 3c) — **los botones de la Botonera que cambian al personaje**, para la ficha y el mapa: `alternarSigilo(S, forzar, ui)`, `levantarse(S, forzar, ui)` y `gastoNitrosForzado(S, costo, hizo)` (la línea roja de la Mesa). `ui = {presets, toast, avisarSinNitros(costo, accion, continuar), cambio(lista)}`: lo que se ve lo pone cada pantalla. Los próximos botones que se muden (atacar…) van acá. Desde el paso 3: `consumir(S, id, forzar, ui)` (ui suma `fijarHp`, `efecto`, `tirarExtra`, `colocarTrampa`) y la vida (`fijarHp`, `revisarAnkh`, `revisarMuerte`, `aplicarRevivirConAnkh`), con `purgarSiAgotado`, `restaurarSpDeConsumo`, `repararArmadura`, `efectoDeConsumo` y `tiradasDeItem`. Desde el paso 4a: el combate suelto — `tirarValorStat` (con el cartel de sobrepeso de la Evasión), `sobrepesoPagar`, `parryConArma`, `bloqueoConArma`, `fuerzaGolpeConArma`, `elegirArmaDefensa`/`armaElegida`, `tirarDanoDeArma`, `pedirArmaYTirar` (ui suma `registrarTirada`, `preguntarSobrepeso`, `getParry`/`setParry`, `elegirArma`, `efectosAlPegar`). Desde el 4b: `atacarConArma` y `ataqueEspecialConArma` (oportunidad / contraataque, `NOMBRE_ATAQUE_ESPECIAL`). Desde el 5a
   (habilidades): `ejecutarHabilidad(S, id, armaId, forzar, ui)`, `confirmarCostoVariable(S, it, sp, nitros, arma, ui)`,
   `anunciarHabilidad`, `habilidadTira`, `tirarPrimeraDeHab`, `tirarSegundaDeHab`, `registrarAtaqueDeHabilidad` y `limiteCostoX`

@@ -284,6 +284,14 @@ function renderOverlayMuerte(){
 function renderVitals(){
   revisarAnkh();
   revisarMuerte();
+  // ☥ Si en esta pasada volvió de la muerte (del modo que sea), se le fueron los estados (Combatiente.volverLimpio): acá se cuenta.
+  const vuelta = Combatiente.vueltaTomar(S);
+  if(vuelta && vuelta.sacados.length){
+    const txtV = Combatiente.vueltaTxt(((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje', vuelta.sacados);
+    toast(txtV);
+    try{ mesaLinea(txtV, 'recordatorio'); }catch(e){}
+    try{ renderList('efectos'); }catch(e){}
+  }
   const c = compute();
   const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
   $('#v-hpmax').textContent = fmt(hpmax);

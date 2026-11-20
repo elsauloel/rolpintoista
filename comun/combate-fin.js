@@ -736,6 +736,16 @@ const CombateFin = (() => {
     }catch(err){ console.error('No se pudo escribir la línea verde en la Mesa:', err); }
   }
 
+  /* 🌿 Al terminar el proceso de verdad (dueño, 2026-11-20: «al poner finalizar combate y terminar con todo ese proceso, el mapa automáticamente
+     se vuelva a poner en modo narrativo»): al cerrar el botín (despojar) o al publicar sin ítems, el mapa publicado pasa de combate a narrativo
+     con la misma escritura del interruptor del mapa (TokensAuto.ponerModo). Si ya estaba en narrativo, nada. En una simulación no se llega acá.
+     Si falla, el combate queda bien cerrado igual (el GM lo cambia a mano con el interruptor). → true si lo cambió. */
+  const AVISO_NARRATIVO = '🌿 El mapa volvió a modo narrativo';
+  async function volverANarrativo(){
+    try{ return typeof TokensAuto !== 'undefined' && !!(await TokensAuto.volverANarrativo()); }
+    catch(err){ console.error('No se pudo volver el mapa a modo narrativo:', err); return false; }
+  }
+
   // 📢 Publicar despojos. `confirmar(texto)` → bool (o promesa); `alEmpezar()` se llama al ponerse a escribir (para redibujar).
   // Con ítems en el botín, la XP y el oro se cargan en las fichas al CERRAR el botín (despojar); sin ítems, ya mismo.
   async function publicar(rep, {creeps, cat, combateActual, confirmar, alEmpezar}){
@@ -767,7 +777,7 @@ const CombateFin = (() => {
       await batch.commit();
       const lineas = rp.porJugador.map(({j, xp, dde, despojos}) => `${j.nombre}: +${fmt(xp)} XP${j.estado !== 'en pie' ? ` (${j.estado})` : ''}, +${fmt(dde)} DDE${despojos ? `, +${fmt(despojos)} despojos` : ''}`).join(' · ');
       await lineaVerde('🎁 Recompensas del combate', lineas + (items.length ? ` · ${items.length} ítem(s) en el botín` : ''));
-      return {ok: true, items, filas: r.filas};
+      return {ok: true, items, filas: r.filas, narrativo: items.length ? false : await volverANarrativo()};   // 🌿 sin ítems, el combate terminó acá
     }catch(err){
       console.error('No se pudieron publicar las recompensas:', err);
       rep.publicando = false;
@@ -860,7 +870,8 @@ const CombateFin = (() => {
       // Regla del dueño (2026-10-03): al desarmarla, cada trampa tiene 50 % de romperse; las que aguantan vuelven a la mochila de su dueño.
       const nR = des.rotas.length;
       if(des.total) await lineaVerde('🪤 Trampas desarmadas', `${des.total} trampa${des.total === 1 ? '' : 's'} de consumible sin disparar (cada una, 50 % de romperse al desarmarla): ${des.vuelven ? `${des.vuelven} ${des.vuelven === 1 ? 'volvió' : 'volvieron'} a la mochila o al cinturón de su dueño` : 'ninguna volvió'}${nR ? ` · ${nR} se ${nR === 1 ? 'rompió' : 'rompieron'} (${des.rotas.join(', ')})` : ''}`);
-      return {ok: true, mensaje: 'Botín cerrado ✓ — XP, oro y despojos cargados en las fichas' + (des.total ? ` · ${des.total} trampa${des.total === 1 ? '' : 's'} desarmada${des.total === 1 ? '' : 's'}${nR ? ` (${nR} rota${nR === 1 ? '' : 's'})` : ''}` : '')};
+      const narrativo = await volverANarrativo();   // 🌿 el proceso terminó: el mapa publicado vuelve a narrativo
+      return {ok: true, narrativo, mensaje: 'Botín cerrado ✓ — XP, oro y despojos cargados en las fichas' + (narrativo ? ' · ' + AVISO_NARRATIVO : '') + (des.total ? ` · ${des.total} trampa${des.total === 1 ? '' : 's'} desarmada${des.total === 1 ? '' : 's'}${nR ? ` (${nR} rota${nR === 1 ? '' : 's'})` : ''}` : '')};
     }catch(err){
       console.error('No se pudo despojar:', err);
       return {error: err.code === 'permission-denied' ? 'Faltan las reglas nuevas de Firebase' : 'No se pudo despojar — mirá la consola'};
@@ -964,7 +975,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {AVISO_NARRATIVO, elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, progresoXp, progresoXpTexto, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

@@ -1232,7 +1232,7 @@ $('#modo-switch').onclick = async () => {
   if(!soyGM) return;
   const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
   try{
-    await fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await TokensAuto.ponerModo(mapaMostrado, nuevo);   // la misma escritura que usa el fin del combate para volver a narrativo (comun/tokens-auto.js)
     if(nuevo === 'combate' && typeof Registro !== 'undefined') await Registro.recordar().catch(err => console.error('Registro: el recordatorio', err));   // 🗂 ¿registro nuevo? (2026-11-04)
     if(nuevo === 'combate') abrirEstadoDelGrupo('combate');   // 🩺 los turnos de los estados que traen, para ajustarlos (js/81)
   }catch(err){

@@ -430,6 +430,10 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   `verCreepDatos` y `verItemDatos` arman su HTML con `comun/creep-lupa.js` (`verCreep`, `verItem`). El mapa del GM muestra las mismas
   ventanas él mismo (`vtt-hexgrid/js/18-ventanas-gm.js`): el `?modo=finalizar|botin` y el `&ver=1` de `modo=acciones` quedaron sin uso
   (limpieza A′).
+- **🌿 Al terminar «Finalizar combate», el mapa vuelve a narrativo** (2026-11-20, dueño): al cerrar el botín (`despojarBotin`, js/09) o al publicar
+  sin ítems (`publicarRecompensas`, js/08), `CombateFin` pasa el mapa publicado de Combate a Narrativo (`TokensAuto.volverANarrativo`, la misma
+  escritura del interruptor del mapa: GM Tools no tiene código propio para esto) y el toast lo dice (`res.narrativo`, `CombateFin.AVISO_NARRATIVO`).
+  Simular no cambia nada; si ya estaba en narrativo, tampoco.
 
 - **El editor de creeps, en `comun/creep-editor.js`** (2026-10-02, hoja de ruta A6c): el editor de habilidades (`editorHabCreep`, js/04;
   `abrirEditorHabCreep` es un atajo; la ventana `#scrim-hab-creep` ya no está en `gm-tools.html`: la arma el componente), Subir y Reemplazar

@@ -87,7 +87,7 @@ async function publicarRecompensas(){
   combateRep = nuevoCombateRep();
   renderAll();
   $('#scrim-finalizar-combate').classList.remove('open');
-  toast(items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, apretás Despojar' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas');
+  toast(items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, apretás Despojar' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas' + (res.narrativo ? ' · ' + CombateFin.AVISO_NARRATIVO : ''));
   if(items.length) abrirBotinGM();   // el GM ve qué toma cada uno; puede cerrar la ventana y volver a abrirla con 🎁 Despojos
 }
 

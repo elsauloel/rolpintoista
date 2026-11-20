@@ -5934,7 +5934,7 @@ function fbFalso(datos){
   });
   return {
     collection: col,
-    doc: ruta => ({ruta, get: async () => ({exists: ruta in datos, data: () => datos[ruta]}), delete: async () => { delete datos[ruta]; }}),
+    doc: ruta => ({ruta, get: async () => ({exists: ruta in datos, data: () => datos[ruta]}), set: async d => { datos[ruta] = d; }, delete: async () => { delete datos[ruta]; }}),
     batch: () => { const ops = []; return {delete: r => ops.push(() => delete datos[r.ruta]), update: (r, d) => ops.push(() => { const x = {...(datos[r.ruta] || {}), ...d}; Object.keys(x).forEach(k => { if(x[k] === '__borrar') delete x[k]; }); datos[r.ruta] = x; }), set: (r, d) => ops.push(() => { datos[r.ruta] = d; }), commit: async () => ops.forEach(f => f())}; },
   };
 }
@@ -6050,6 +6050,29 @@ prueba('un aviso tomado que no se pudo aplicar vuelve a la cola (uno nuevo igual
     const cola = Object.entries(datos).filter(([k]) => k.startsWith('estados/')).map(([, v]) => [v.fichaId, v.duenoUid, v.spec, v.origen, v.aplicada, v.creado]);
     igual([rs.map(r => [r.devueltos, r.agotados]), cola.length, cola[0], mesa.length, /Se reintenta solo/.test(mesa[0]), /aplicáselo a mano/.test(mesa[1]), toasts.length, Recibidos.intentos(d), Recibidos.nombreDe(d)],
       [[[1, 0], [1, 0], [1, 0], [0, 1]], 3, ['f1', 'u1', '{"nombre":"Miedo"}', 'Blanco creep · Grito', false, 'ahora'], 2, true, true, 1, 0, 'Miedo (Blanco creep · Grito)']);
+  });
+});
+prueba('fin del combate: el mapa publicado vuelve a narrativo (solo si estaba en combate; el primer mapa y los demás, cada uno con su ruta; los otros mapas no se tocan)', () => {
+  const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapa/modo': {modo: 'combate'}, 'mapas/m2/estado/modo': {modo: 'combate'}};
+  return conFbFalso(datos, async () => {
+    const a = await TokensAuto.volverANarrativo();           // el publicado (m2) estaba en combate → narrativo
+    const trasA = [datos['mapas/m2/estado/modo'].modo, datos['mapa/modo'].modo];
+    const b = await TokensAuto.volverANarrativo();           // ya está en narrativo: no escribe
+    delete datos['mapa/activo'];                             // sin mapa publicado elegido: el primero
+    const c = await TokensAuto.volverANarrativo();
+    delete datos['mapa/modo'];                               // un mapa que nunca cambió de modo: narrativo, nada que hacer
+    const d = await TokensAuto.volverANarrativo();
+    await TokensAuto.ponerModo('m3', 'combate');             // la escritura del interruptor
+    igual([a, trasA, b, c, d, 'mapa/modo' in datos, datos['mapas/m3/estado/modo'], TokensAuto.rutaModo('_principal'), TokensAuto.rutaModo('m9')],
+      [true, ['narrativo', 'combate'], false, true, false, false, {modo: 'combate', actualizado: 'ahora'}, 'mapa/modo', 'mapas/m9/estado/modo']);
+  });
+});
+prueba('fin del combate: una simulación no publica ni cambia el modo del mapa', () => {
+  const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapas/m2/estado/modo': {modo: 'combate'}};
+  return conFbFalso(datos, async () => {
+    const rep = CombateFin.nuevo(); rep.simulacion = true;
+    const res = await CombateFin.publicar(rep, {creeps: [], cat: [], combateActual: null, confirmar: () => true});
+    igual([!!res.error, datos['mapas/m2/estado/modo'].modo, Object.keys(datos).length, CombateFin.AVISO_NARRATIVO], [true, 'combate', 2, '🌿 El mapa volvió a modo narrativo']);
   });
 });
 prueba('fin del combate: cada trampa consumible sin disparar tiene 50 % de romperse al desarmarla; las sanas vuelven a su dueño (y las disparadas no se tocan)', () => {

@@ -1614,6 +1614,14 @@ versión parecida en más de una, es candidato a juntar.
 - **`combate-fin.js`, 🔮 Simular** (2026-11-20, dueño): `elegirModo()` (el cartel ▶ Avanzar / 🔮 Simular de «Finalizar combate», mapa js/18 y GM Tools
   js/06) y `rep.simulacion`: `vista` suma el cartel «Simulación: no se guarda nada» con «▶ Pasar a Avanzar» (`data-rep-avanzar`, lo maneja `clic`) y
   esconde Publicar; `publicar` se niega. `cambio`/`clic` no escriben nada (quién cobra queda en `rep.jugadores`, no pasa por `fueraCambiar`).
+- **`combate-fin.js` + `tokens-auto.js`, 🌿 al terminar el combate el mapa vuelve a narrativo** (2026-11-20, dueño: «al poner finalizar combate y
+  terminar con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»): `TokensAuto.rutaModo(mapaId)` / `ponerModo(mapaId, modo)`
+  es **la única escritura del modo de un mapa** (la usa el interruptor del mapa, js/04) y `TokensAuto.volverANarrativo()` pasa el mapa **publicado** a
+  narrativo solo si estaba en combate (→ `true` si lo cambió). `CombateFin.despojar` (al cerrar el botín) y `CombateFin.publicar` cuando no hay ítems
+  (el combate queda `cerrado` ahí mismo) lo llaman al final y devuelven `narrativo`; el aviso es `CombateFin.AVISO_NARRATIVO` («🌿 El mapa volvió a modo
+  narrativo»), que va en el toast del GM (el mapa y GM Tools). Una simulación no llega (publicar se niega antes). Si esa escritura falla, el combate
+  queda cerrado igual y el GM usa el interruptor. Lo demás que arrastra el cambio (liberar lo «una vez por combate», js/25) lo hace cada mapa abierto
+  cuando le llega el modo nuevo, como con el interruptor. El orden de turnos no se toca (el interruptor tampoco lo limpia).
 - **`combate-fin.js`, ⭐ la XP de cada personaje en el reporte** (2026-11-20, dueño): `jugadores()` lee además la parte `general` de cada ficha
   (solo lectura; `xp: {nivel, exp}` o `null`), y en el paso de la experiencia `vista` muestra, debajo de cada nombre, «Nv · XP / la que pide · le
   faltan» y lo que pasa con lo que cobra («sube a nivel N» / «le quedan faltando N»); en Publicar, «⬆ sube a nivel N». `progresoXp(xp, cobra)` /

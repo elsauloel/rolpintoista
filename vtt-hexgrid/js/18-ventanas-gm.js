@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261120xp'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261120narr'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -181,7 +181,7 @@ async function vgPublicar(){
   }
   vgRep = null;
   vgCerrar('vg-finalizar');
-  toast(res.items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, apretás Despojar' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas');
+  toast(res.items.length ? 'Publicado ✓ — los jugadores ven la ventana de la batalla en el mapa; cuando hayan elegido, apretás Despojar' : 'Publicado ✓ — la XP y el oro se cargan solos en las fichas' + (res.narrativo ? ' · ' + CombateFin.AVISO_NARRATIVO : ''));
   if(res.items.length){
     combateMapa = {...(combateMapa || {}), estado: 'publicado'};   // sin esperar al snapshot
     abrirBotinGMMapa();   // el GM ve qué toma cada uno; puede cerrar la ventana y volver a abrirla con 🎁

@@ -1588,6 +1588,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
     propio (`#ventanas-gm`, z-index 90, con el `gm-tools.css`) con `comun/combate-fin.js`. Los creeps del reporte se leen de su parte
     privada (`vgLeerCreeps`); al publicar se marcan recompensados con `modificarCreep`; el catálogo es el de fábrica + lo subido, en la forma
     de `CreepCalculo.itemParaCreep` (`vgCatalogo`). El Ver de un ítem, con `CreepLupa.verItem`. `abrirModoGM` quedó sin uso (limpieza A′).
+    **🌿 Al terminar, el mapa vuelve a narrativo** (2026-11-20, dueño): al cerrar el botín (o al publicar sin ítems) `CombateFin` pasa el mapa
+    publicado de Combate a Narrativo con la misma escritura del interruptor (`TokensAuto.ponerModo`, que desde ese día usa también `#modo-switch`,
+    js/04); el toast del GM lo dice. Simular no cambia nada. Pasar a narrativo no abre ningún cartel (los carteles son los de pasar a combate).
 - **Hoja de ruta A6b: el editor de la ficha, hecho por el mapa** (2026-10-02, `../docs/plan-a6b-editor.md`): el **Editar** del Ver y del
   Equipo abren el editor común (`comun/ficha-editor.js`) adentro de la Botonera nueva (`#bn-editor`, `bnEditar`, `bnCrearEditor`; las piezas en
   `ED_PIEZAS`; la categoría de un ítem en `#bn-tipoitem`; los estados de la lista con `SelectorEstados`). Guarda con `bnUi`. El **⚙ de un

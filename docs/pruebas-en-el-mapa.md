@@ -282,6 +282,12 @@
 
 ## Pendientes
 
+- [ ] **🌿 Al terminar «Finalizar combate», el mapa vuelve a narrativo: lo que no se vio** (2026-11-20; `TokensAuto.volverANarrativo`,
+  `comun/combate-fin.js`). Visto con clics en «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1), desde el mapa y desde GM Tools, con botín y sin
+  ítems: el mapa pasa solo a Narrativo en las dos pantallas, y Simular no lo cambia. **Falta ver**: (a) el GM **mirando otro mapa** que el publicado al
+  cerrar el botín (tiene que cambiar el publicado y no el que mira); (b) con un **orden de turnos armado**: queda como estaba, igual que con el
+  interruptor (P252); (c) que lo de «una vez por combate» (Primera sangre, Emboscada, la Campana, la poción de emergencia…) se libere igual que al
+  tocar el interruptor (es el mismo aviso de modo que le llega a cada pantalla; no se miró ítem por ítem).
 - [ ] **🤝 «Pasar a un aliado» de la ventanita «💰 DDE y despojos», con el mapa en Combate** (2026-11-20; `#btn-pasar-dde`, ficha js/08). Visto con clics
   en «Claude · pruebas 2», fuera de combate: el botón abre la ventana de siempre y pasar 20 DDE y 2 despojos normales cambió bien los números de los dos
   (aceptó el otro personaje del mismo Jugador 1). **Falta ver**: con el mapa en Combate, que la ventana que abre muestre el aviso «⚔ En combate, solo

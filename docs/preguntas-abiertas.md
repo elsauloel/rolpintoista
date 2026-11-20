@@ -1634,3 +1634,10 @@ Con más de una forma de volver (Pacto, Ankh de Reencarnación en el cinturón, 
 una sola; (d) al GM el cartel le sale solo únicamente si tiene 🎮 el control; si no, elige por el jugador con el ☥ del token cuando quiera (la Mesa le
 avisa que hay alguien eligiendo); (e) con una sola forma **no se pregunta** (ni «¿querés usar tu Ankh?»): automático. **Para el dueño:** ¿está bien así?
 ¿Los turnos para morir tendrían que esperar mientras elige?
+
+### P252 — 🌿 Al terminar «Finalizar combate», ¿se limpia también el orden de turnos? (2026-11-20, Claude)
+Desde el 2026-11-20, cuando el proceso de «🏁 Finalizar combate» termina (se cierra el botín, o se publica sin ítems), el mapa publicado vuelve solo a
+modo narrativo, igual que si el GM tocara el interruptor. **El interruptor no limpia el orden de turnos** (si había uno armado, la lista queda como
+estaba y el GM la borra con «Limpiar»), así que el cambio automático **tampoco lo limpia**: se eligió lo más conservador, no borrar nada que el GM no
+haya pedido. **Para el dueño:** ¿querés que al terminar el combate también se limpie sola la lista del orden de turnos (y, en ese caso, también al
+pasar a narrativo a mano con el interruptor)?

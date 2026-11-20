@@ -20,10 +20,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   ficha lite no la tienen; ahí se pasa con el 🤝 de arriba de la Mochila). Probado con clics en «Claude · pruebas 2»: Blanco J1 le pasó 20 DDE y 2 despojos
   normales a Blanco J1 b (50 → 30 y 3 → 1 en uno; 0 → 20 y 0 → 2 en el otro), y todo volvió a 0 al terminar. Aceptó la misma cuenta del Jugador 1 con su otro
   personaje: el Jugador 2 no es parte de esa partida. Pruebas automáticas 893/893. Sin ver: el botón con el mapa en Combate (`docs/pruebas-en-el-mapa.md`).
-- **⬜ en cola — 🏁 Al terminar «Finalizar combate», el mapa vuelve solo a modo narrativo** (dueño, 2026-11-20: «al poner finalizar combate y terminar
-  con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»). Cuando el proceso termina de verdad (se cierra el botín y se
-  reparten XP y oro; o al publicar si no hay ítems), el mapa publicado pasa de Combate a Narrativo, con lo mismo que hace el interruptor a mano.
-  En «Simular» no cambia nada. Vale desde el mapa y desde GM Tools.
+- **✅ hecho (2026-11-20) — 🏁 Al terminar «Finalizar combate», el mapa vuelve solo a modo narrativo** (dueño, 2026-11-20: «al poner finalizar combate y terminar
+  con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»).
+  *Resultado:* cuando el proceso termina de verdad —al apretar «🏁 Despojar lo que nadie tomó y repartir XP y oro» (o «Cerrar botín y repartir…») y
+  confirmar, o al publicar cuando no hay ítems— el mapa publicado pasa solo de Combate a Narrativo en todas las pantallas, con la misma escritura que
+  usa el interruptor del mapa. Al GM se lo dice el cartelito de abajo: «Botín cerrado ✓ — … · 🌿 El mapa volvió a modo narrativo» (a los jugadores les
+  sale el aviso de siempre, «🌿 Modo narrativo: moverse no gasta No2»). Vale igual desde el mapa y desde GM Tools. En «🔮 Simular» no cambia nada, y si
+  el mapa ya estaba en narrativo tampoco. Pasar a narrativo no abre ningún cartel ni pregunta nada (los carteles del interruptor son los de pasar a
+  combate), así que no se sumó ninguno. El orden de turnos no se toca, igual que con el interruptor (queda preguntado en P252). Probado con clics en
+  «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1): desde el mapa y desde GM Tools, con un ítem en el botín y sin ítems; y Simular. Todo quedó
+  como estaba (XP, despojos, creeps, sin combate abierto, narrativo). Pruebas automáticas 895/895. Sin ver: `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 👥 Sumar al Jugador 2 a «Claude · pruebas 2»** (dueño, 2026-11-20: «podría sumar al jugador 2 a la partida de pruebas, así tenemos
   en la partida de pruebas todas las opciones posibles»). Con la cuenta de pruebas del Jugador 2 («Unirme como jugador»), y crearle un personaje de
   pruebas («Blanco J2», en blanco como Blanco J1) con su token en «Prueba · R4 M4». Sirve para probar lo que necesita dos personas distintas

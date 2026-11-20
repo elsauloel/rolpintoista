@@ -275,5 +275,24 @@ const TokensAuto = (() => {
     return {total: n, vuelven: n - rotas.length, rotas};
   }
 
-  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR};
+  /* 🌿 El modo de un mapa (narrativo / combate). Una sola escritura para todos: el interruptor del mapa (vtt-hexgrid/js/04) y el fin del
+     combate (comun/combate-fin.js). Lo demás (lo que cada pantalla libera o arranca al cambiar el modo) lo hace cada mapa abierto cuando le
+     llega el cambio (escucharModo, js/04; js/25). */
+  function rutaModo(mapaId){ return mapaId === MAPA_PRINCIPAL_ID || !mapaId ? 'mapa/modo' : `mapas/${mapaId}/estado/modo`; }
+  function ponerModo(mapaId, modo){
+    return fbDb.doc(fbRutaCampana(rutaModo(mapaId))).set({modo: modo === 'combate' ? 'combate' : 'narrativo', actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+  }
+  /* 🏁 Al terminar «Finalizar combate» (dueño, 2026-11-20: «al poner finalizar combate y terminar con todo ese proceso, el mapa automáticamente
+     se vuelva a poner en modo narrativo»): si el mapa publicado está en combate, pasa a narrativo. → true si lo cambió (si ya estaba en
+     narrativo no escribe nada). */
+  async function volverANarrativo(){
+    const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+    const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : MAPA_PRINCIPAL_ID;
+    const d = await fbDb.doc(fbRutaCampana(rutaModo(mapaId))).get();
+    if(!d.exists || d.data().modo !== 'combate') return false;
+    await ponerModo(mapaId, 'narrativo');
+    return true;
+  }
+
+  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo};
 })();

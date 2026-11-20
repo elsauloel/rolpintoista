@@ -12,6 +12,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
+  «no funcionaba el aplicarle debuffs automatizados a Bizzante… murió y quedó invulnerable por el pacto pero dejó de recibirlos aún después de terminado
+  invulnerable»). Lo que se vio leyendo la partida (solo lectura, 2026-11-20): la ficha guardada de Bizzante NO tiene ningún Invulnerable/Titilando
+  (efectos: Regeneración, Arma ígnea, Parálisis; el Pacto ya gastado); en la cola `estados` sus avisos figuran todos `aplicada: true`, pero al menos uno
+  (un Miedo, ~1 min después de la última vez que se guardó su parte `efectos`) fue tomado y NUNCA quedó en sus estados: la parte `efectos` no se volvió
+  a guardar, aunque `general` sí (después). O sea: el aviso se marca tomado (`Recibidos.tomar`) y después el estado se pierde: o lo rechaza
+  `Combatiente.inmunidad` contra una copia en memoria que sigue con el Titilando (el Titilando ya sacado en Firebase por otra pantalla), o no se guarda.
+  Sospechosos: la copia del personaje en la pantalla que aplica (`bn.S` de la Botonera / la sesión temporal de `editarPersonajeMapa`, js/11; la ficha
+  suelta), quién saca el Titilando al empezar el turno y si esa quita le llega a las otras pantallas (FichaSesion, partes), y que `tomar` va ANTES de
+  aplicar (si no se aplica, se pierde sin rastro). Reproducir en «Claude · pruebas 2»: Blanco J1 con Pacto, cae por un golpe, revive Titilando, pasa su
+  turno (se va el Titilando) y un creep le aplica un debuff automático (Cegar, Parálisis, Miedo…) con el jugador con la Botonera abierta y cerrada, y
+  con el GM pasando el turno. Arreglar la causa y, además, que un aviso tomado que no se pudo aplicar no se pierda en silencio (aviso al jugador y al GM
+  con el motivo, p. ej. «no te hizo nada (Invulnerable)» también en la Mesa).
 - **⬜ en cola — ⭐ En el reporte «Batalla terminada» del GM, la XP que tiene cada jugador y cuánto le falta para subir** (dueño, 2026-11-20: «que en la
   gestión del loot, previo a publicar, que el gm pueda ver cuánta exp tiene cada jugador, y cuánto falta para subir de nivel»). En el paso de la
   experiencia de `CombateFin.vista` (comun/combate-fin.js; lo usan el mapa del GM y GM Tools, en Simular y en Avanzar), al lado de cada personaje:

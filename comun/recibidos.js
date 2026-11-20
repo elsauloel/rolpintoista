@@ -11,6 +11,7 @@
    - `deFicha(docs, fichaId)`: los de ese personaje y los de sus invocaciones.
    - `tomar(doc, borrar)`: transacción; true si lo tomó esta pantalla (si otra ya lo aplicó, false). `borrar` = el GM con el control
      (las reglas solo le dejan marcarlo como aplicado al dueño).
+   - `devolver(doc)` / `noAplicados(docs, quien, motivo, ui)`: un aviso tomado que no se pudo aplicar vuelve a la cola (no se pierde en silencio).
    - `estado(S, doc, ui)`: al personaje (FichaAcciones.aplicarEstadoRecibido) o a su invocación (InvHabilidades.ponerEstado).
      ui = {presets, toast, cambio(lista)}. → {inv?} (la invocación que cambió).
    - `recompensa(S, doc)`: XP (con la subida de nivel), DDE, despojos y trampas devueltas. → {partes: ['+52 XP', …], subio, vueltas}.
@@ -49,6 +50,50 @@ const Recibidos = (() => {
       if(err && err.code === 'permission-denied') return false;   // ya lo tomó (y borró) otra pantalla
       throw err;
     }
+  }
+
+  /* 🐞 Un aviso tomado que no se pudo aplicar no se pierde (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs»): las reglas no
+     dejan «des-tomarlo» (solo pasa de pendiente a aplicado), así que vuelve a la cola como un aviso NUEVO igual (cualquier miembro puede dejar uno).
+     Quien llama cuenta los reintentos (`intentos(d)` / `reintento(d)`: hasta MAX_REINTENTOS por aviso en esta pantalla) y, si se agotan, avisa. */
+  const MAX_REINTENTOS = 3;
+  const reintentos = new Map();
+  const clave = d => { const x = (d && d.data && d.data()) || {}; return `${x.fichaId}|${x.origen}|${x.spec}`; };
+  const intentos = d => reintentos.get(clave(d)) || 0;
+  async function devolver(d){
+    const x = d.data() || {};
+    reintentos.set(clave(d), intentos(d) + 1);
+    await fbDb.collection(fbRutaCampana('estados')).add({fichaId: String(x.fichaId || ''), duenoUid: String(x.duenoUid || ''), spec: String(x.spec || '').slice(0, 600),
+      origen: String(x.origen || '').slice(0, 80), aplicada: false, creado: firebase.firestore.FieldValue.serverTimestamp()});
+  }
+  const hecho = d => { reintentos.delete(clave(d)); };   // se aplicó bien: la cuenta vuelve a cero
+  // Cómo se nombra un aviso en un cartel: «Miedo (Blanco creep · Grito espeluznante)».
+  function nombreDe(d){
+    const sp = spec(d) || {}, origen = String((d.data() || {}).origen || '').trim();
+    const que = sp.nombre === 'Quitar estado' || sp.nombre === 'Acortar estado' ? `${sp.nombre} (${sp.estado || '?'})` : (sp.nombre || 'un estado');
+    return origen ? `${que} (${origen})` : que;
+  }
+  /* Lo que se hace con los avisos de estado que se tomaron y no quedaron aplicados. `lista` = los documentos; `motivo` = por qué, en palabras
+     («no se pudo guardar su ficha», «falló al aplicarlo»). Cada uno vuelve a la cola (se reintenta solo) hasta MAX_REINTENTOS; después, se le pide al
+     GM que lo aplique a mano. `ui = {toast(t), mesa(t)}` (la Mesa: una línea roja para todos). → {devueltos, agotados}. */
+  async function noAplicados(lista, quien, motivo, ui){
+    let devueltos = 0, agotados = 0;
+    for(const d of (lista || [])){
+      const que = nombreDe(d);
+      if(intentos(d) >= MAX_REINTENTOS){
+        agotados++; reintentos.delete(clave(d));
+        try{ ui.mesa(`⚠ ${quien || 'Un personaje'}: no se le pudo aplicar ${que} — ${motivo}. Ya se reintentó ${MAX_REINTENTOS} veces: aplicáselo a mano (◎ del token).`); }catch(e){}
+        try{ ui.toast(`⚠ No se te pudo aplicar ${que}: avisale al GM`); }catch(e){}
+        continue;
+      }
+      try{
+        await devolver(d); devueltos++;
+        if(intentos(d) === 1) try{ ui.mesa(`⚠ ${quien || 'Un personaje'}: no se le pudo aplicar ${que} — ${motivo}. Se reintenta solo.`); }catch(e){}
+      }catch(err){
+        console.error('No se pudo devolver el aviso a la cola:', err);
+        try{ ui.mesa(`⚠ ${quien || 'Un personaje'}: no se le pudo aplicar ${que} — ${motivo}. Aplicáselo a mano (◎ del token).`); }catch(e){}
+      }
+    }
+    return {devueltos, agotados};
   }
 
   /* ---------- Estados ---------- */
@@ -187,5 +232,5 @@ const Recibidos = (() => {
     return `🪤 ${v.total} trampa${uno ? '' : 's'} sin disparar ${uno ? 'se desarmó' : 'se desarmaron'} y volvió${uno ? '' : 'eron'} ${v.aCinturon ? (v.aMochila ? 'a tu mochila y al cinturón' : 'a tu cinturón') : 'a tu mochila'}`;
   }
 
-  return {escuchar, deFicha, tomar, spec, estado, aplicarExp, expParaNivel, devolverTrampas, trampasADespojos, itemsDelBotin, recompensa, textoVueltas};
+  return {escuchar, deFicha, tomar, devolver, intentos, hecho, nombreDe, noAplicados, MAX_REINTENTOS, spec, estado, aplicarExp, expParaNivel, devolverTrampas, trampasADespojos, itemsDelBotin, recompensa, textoVueltas};
 })();

@@ -45,11 +45,26 @@ async function estadosRevisar(){
   if(!mios.length) return;
   estadosAplicando = true;
   try{
+    // 🐞 (2026-11-20) Un aviso tomado que no se llega a aplicar vuelve a la cola (Recibidos.noAplicados) en vez de perderse en silencio; lo que frena
+    // una inmunidad queda en la Mesa (FichaAcciones, por habUi.recordatorios). Y lo aplicado se guarda YA: si esperaba al guardado de cada segundo,
+    // un cambio que llegara de otra pantalla en ese rato (el mapa pasando el turno) lo pisaba.
+    const nombre = ((S.meta && S.meta.nombre) || '').trim();
+    const uiCola = {toast: t => toast(t), mesa: t => { if(typeof mesaLinea === 'function') mesaLinea(t, 'alerta-roja', nombre); }};
+    let aplicados = false;
     for(const d of mios){
       const tomada = await Recibidos.tomar(d, fichaControloYo(f));
-      if(!tomada || fichaVivo !== f) continue;
-      if(Recibidos.estado(S, d, habUi).inv) renderInvocaciones();
+      if(!tomada) continue;
+      if(fichaVivo !== f){ await Recibidos.noAplicados([d], nombre, 'se cerró su ficha justo en ese momento', uiCola); continue; }
+      try{
+        if(Recibidos.estado(S, d, habUi).inv) renderInvocaciones();
+        Recibidos.hecho(d);
+        aplicados = true;
+      }catch(err){
+        console.error('No se pudo aplicar un estado recibido:', Recibidos.nombreDe(d), err);
+        await Recibidos.noAplicados([d], nombre, 'falló al aplicarlo', uiCola);
+      }
     }
+    if(aplicados && fichaVivo === f && typeof fichaGuardarTick === 'function') fichaGuardarTick(true);
   }catch(err){
     console.error('No se pudieron aplicar los estados recibidos:', err);
   }finally{

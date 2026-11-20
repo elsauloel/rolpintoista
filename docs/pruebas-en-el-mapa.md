@@ -3054,3 +3054,28 @@ Capturas en `cola17/`.
   una ballesta (ídem).
 - [ ] **Falta que lo mire el dueño.**
 Capturas en `cola17/`.
+
+## 2026-11-20 · 🐞 Después de revivir con el Pacto dejan de entrarle los debuffs — un aviso tomado ya no se pierde («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+
+- [x] **El recorrido de la partida, con clics** (modo combate, orden Blanco creep → Blanco J1): Blanco J1 con el Pacto y 3 de vida cae por un golpe de
+  Blanco creep, vuelve con 12 de vida e Invulnerable (Titilando). Mientras titila, «¡Tu vieeeeja!» del creep (avisa «Es invulnerable · Atacarlo
+  igual») y un Miedo de la cola: no entran, al jugador le sale «Inmune ahora mismo (Invulnerable)» y **queda en la Mesa**: «🛡 Blanco J1: Provocado no le
+  hizo nada (Invulnerable) · Blanco creep · Provocado» y «🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito espeluznante».
+  ▶ Siguiente → «▶ Empieza tu turno» → ✔ Aplicar: se va el Invulnerable. ▶ Siguiente (ronda 2) → «¡Tu vieeeeja!» otra vez: **Provocado entra**
+  («le llegó a su ficha»), y el Miedo también; los dos en su token, en la Botonera y en la ficha guardada.
+- [x] **Quién saca el Titilando** (las tres formas, y después Miedo, Ceguera, Parálisis y Pajaritos entran y quedan guardados): el ⟳ Mantenimiento
+  en narrativo; el «✔ Aplicar» del jugador; el GM pasando el turno sin que nadie aplique. Con la Botonera abierta, cerrada y con la ficha suelta
+  abierta en otra pestaña del jugador (ahí lo aplica la que llega primero; la otra se pone al día sola).
+- [x] **Dos cambios a la vez al mismo personaje** (la falla encontrada; llamando a las funciones del mapa en la pantalla de Jugador 1, con Firebase de
+  verdad): antes del arreglo, sin la Botonera se perdía uno de los dos estados y con la Botonera el segundo quedaba solo en la memoria de esa pantalla
+  (en el resumen sí, en la ficha guardada no, y marcado como guardado); después del arreglo quedan los dos guardados en los dos casos.
+- [x] **Un aviso que falla al aplicarse** (falla provocada a propósito una vez): línea roja en la Mesa «⚠ Blanco J1: no se le pudo aplicar Ceguera
+  (Blanco creep · Arena a los ojos) — falló al aplicarlo. Se reintenta solo.», y a los segundos entró sola.
+- [x] **No se puede guardar la ficha un rato** (el guardado cortado a propósito, con la Botonera): toast al jugador y línea roja «⚠ Blanco J1: le llegó
+  Pajaritos (…) y su ficha todavía no se pudo guardar (se sigue intentando)…»; al volver el guardado quedó escrito solo, sin tocar nada.
+- [x] La partida quedó como estaba (Blanco J1 sin Pacto, vida llena, sin estados; narrativo, sin orden de turnos; los avisos de prueba borrados).
+- [ ] **No se pudo repetir el caso exacto de Bizzante** (debuffs que dejan de entrar de ahí en adelante con todo «normal»). Sin probar: el GM con 🎮 el
+  control tomando los avisos (usa el mismo camino; el GM los borra en vez de marcarlos); una zona con estado y una trampa como origen (dejan el mismo
+  aviso en la cola); dos pantallas distintas guardando la misma parte en el mismo instante; la ficha suelta en una pestaña dormida de verdad.
+- [ ] **Falta que lo mire el dueño**, y que avise si vuelve a pasar: ahora tiene que quedar una línea en la Mesa.
+Capturas en `cola18/`.

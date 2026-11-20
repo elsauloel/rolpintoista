@@ -1201,6 +1201,12 @@ const FichaAcciones = (() => {
     return draft;
   }
   // `o.propio` (2026-11-10): un efecto de tu propia Ejecución sobre vos no gasta la 🐞 Vaquita de San Antonio (lo que te pone otro, sí).
+  /* 🛡 Un estado que llega de afuera y lo frena una inmunidad (2026-11-20, dueño: que no se pierda en silencio): además del toast a quien lo
+     recibe, queda una línea en la Mesa con el motivo, para que el GM sepa que llegó y por qué no entró. */
+  const noEntroTxt = (quien, estado, motivo, origen) => `🛡 ${quien ? quien + ': ' : ''}${estado} no le hizo nada (${motivo})${origen ? ` · ${origen}` : ''}`;
+  function avisarNoEntro(S, estado, motivo, origen, ui){
+    try{ if(ui && ui.recordatorios) ui.recordatorios([{nombre: noEntroTxt(((S.meta && S.meta.nombre) || '').trim(), estado, motivo, origen), detalle: ''}]); }catch(e){}
+  }
   function aplicarEstadoRecibido(S, spec, origen, ui, o){
     // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
     if(spec.nombre === 'Desgaste'){
@@ -1218,7 +1224,7 @@ const FichaAcciones = (() => {
       // 🛡 Invulnerable (2026-11-10, bug de la tanda 3): la rotura va a las piezas, no a un estado, así que la inmunidad se mira acá
       // (en invocaciones y creeps ya la frena Combatiente.agregarEstado). Ni el escudo ni la armadura pierden durabilidad.
       const inmune = Combatiente.inmunidad(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'});
-      if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); return; }
+      if(inmune){ ui.toast(`🛡 Armadura rota: no te hizo nada (${inmune})`); avisarNoEntro(S, 'Armadura rota', inmune, origen, ui); return; }
       // 🐞 La Vaquita de San Antonio la espanta antes de que toque las piezas.
       if(!(o && o.propio) && Combatiente.vaquitaEspanta(S.efectos || [], {nombre: 'Armadura rota', polaridad: 'debuff'}, {nombre: (S.meta && S.meta.nombre) || ''})){
         ui.toast('🐞 La vaquita de San Antonio espantó la Armadura rota'); ui.cambio(['efectos', 'refresh']); return;
@@ -1375,7 +1381,7 @@ const FichaAcciones = (() => {
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
     const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? undefined : {vaquita: true, nombre: (S.meta && S.meta.nombre) || ''});
     if(!r.ok && r.vaquita){ ui.toast(`🐞 ${quien}la vaquita de San Antonio espantó ${draft.nombre}`); ui.cambio(['efectos', 'refresh']); return; }
-    if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
+    if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); avisarNoEntro(S, draft.nombre, r.motivo, origen, ui); return; }
     if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
     // Lo que se dispara (veneno, regeneración…) pega apenas te lo ponen (2026-10-06, P161).
     let resF = 0;
@@ -1704,7 +1710,7 @@ const FichaAcciones = (() => {
   return {gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, itemDeTrampa, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
-    durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
+    durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, noEntroTxt, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
     ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,

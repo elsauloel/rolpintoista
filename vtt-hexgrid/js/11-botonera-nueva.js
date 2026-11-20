@@ -118,7 +118,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120carcaj', '../comun/ficha-botin.js?v=20261120lugar', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120enj', '../comun/ficha-combate.js?v=20261120maestria', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
-  '../comun/catalogo.js?v=20261120carcaj2', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120volverb', '../comun/inv-calculo.js?v=20261120maestria', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261105c2', '../comun/inv-duelo.js?v=20261118vx', '../comun/ficha-acciones.js?v=20261120volverb', '../comun/inv-habilidades.js?v=20261110vaq', '../comun/inv-lupa.js?v=20261120maestria',
+  '../comun/catalogo.js?v=20261120carcaj2', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120volverb', '../comun/inv-calculo.js?v=20261120maestria', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261105c2', '../comun/inv-duelo.js?v=20261118vx', '../comun/ficha-acciones.js?v=20261120cola18', '../comun/inv-habilidades.js?v=20261110vaq', '../comun/inv-lupa.js?v=20261120maestria',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261118vx', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261120maestria'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -492,10 +492,9 @@ function bnUi(antes, comoGM){
     avisarSinNitros: (costo, accion, continuar) => bnSinNitros(costo, accion, continuar),
     cambio: () => {
       bnRevisarVida();
-      const despues = FichaGuardado.partes(bn.S);
-      Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
+      FichaSesion.marcar(f, antes, FichaGuardado.partes(bn.S));   // lo que cambió queda como deuda hasta que se escribe (2026-11-20)
       f.soloLectura = !(bnPuedeGuardar() || comoGM);
-      FichaSesion.guardar(f, true, bnOpcionesGuardado(f));
+      FichaSesion.guardar(f, true, bnOpcionesGuardado(f)).catch(err => console.error('No se pudo guardar el personaje:', err));
       bnDibujar();
     },
   };
@@ -1570,33 +1569,60 @@ function recibidosRevisar(){
       .then(() => recibidosEnCurso.delete(id));
   });
 }
+/* 🐞 (2026-11-20) Un aviso de estado se TOMA (queda marcado como aplicado, o borrado si lo toma el GM con 🎮) antes de aplicarlo, para que lo aplique
+   una sola pantalla. Si después no queda aplicado y guardado, ya no se pierde en silencio:
+   - lo frenó una inmunidad (Invulnerable / Titilando, Inmunidad a CC…): toast a quien lo recibe y una línea en la Mesa con el motivo (FichaAcciones);
+   - falló al aplicarlo, o no se pudo guardar la ficha: vuelve a la cola (Recibidos.noAplicados) y se reintenta solo; a la tercera, se le pide al GM
+     que lo aplique a mano. Con la Botonera abierta lo aplicado sigue en la memoria de esta pantalla y el guardado se reintenta solo (no se devuelve,
+     para no aplicarlo dos veces): se avisa en la Mesa. */
 async function recibidosAplicar(fichaId){
   const de = col => Recibidos.deFicha(recibidosPend[col], fichaId);
   if(!de('estados').length && !de('recompensas').length) return;
-  await editarPersonajeMapa(fichaId, async S => {
-    const nombre = ((S.meta && S.meta.nombre) || '').trim();
-    const aviso = t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t);
-    // recordatorios: las líneas para la Mesa (la pieza a punto de romperse o rota, el anillo que absorbió la Armadura rota; 2026-10-12).
-    const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: aviso,
-      recordatorios: lista => (lista || []).forEach(r => r && r.nombre && mesaLinea(`${r.nombre}${r.detalle ? ' — ' + r.detalle : ''}`, 'recordatorio', nombre))};
-    const borrar = controloFicha(fichaId);   // 🎮 el GM lo borra en vez de marcarlo
-    let hubo = false;
-    for(const d of de('recompensas')){
-      if(!await Recibidos.tomar(d, borrar)) continue;
-      const r = Recibidos.recompensa(S, d);
-      if(r.partes.length) aviso(`🎁 ${r.partes.join(' · ')}`);
-      const vueltas = Recibidos.textoVueltas(r.vueltas);
-      if(vueltas) aviso(vueltas);
-      recompensaAnuncio(S, nombre, d.data() || {}, r, vueltas);
-      hubo = true;
+  const tomados = [], fallidos = [];
+  let nombre = '', enBn = false;
+  const uiCola = {toast: t => toast(t), mesa: t => mesaLinea(t, 'alerta-roja', nombre)};
+  try{
+    await editarPersonajeMapa(fichaId, async (S, o) => {
+      nombre = ((S.meta && S.meta.nombre) || '').trim();
+      enBn = !!(o && o.enBn);
+      const aviso = t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t);
+      // recordatorios: las líneas para la Mesa (la pieza a punto de romperse o rota, el anillo que absorbió la Armadura rota; 2026-10-12; y lo que
+      // frenó una inmunidad, 2026-11-20).
+      const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: aviso,
+        recordatorios: lista => (lista || []).forEach(r => r && r.nombre && mesaLinea(`${r.nombre}${r.detalle ? ' — ' + r.detalle : ''}`, 'recordatorio', nombre))};
+      const borrar = controloFicha(fichaId);   // 🎮 el GM lo borra en vez de marcarlo
+      let hubo = false;
+      for(const d of de('recompensas')){
+        if(!await Recibidos.tomar(d, borrar)) continue;
+        const r = Recibidos.recompensa(S, d);
+        if(r.partes.length) aviso(`🎁 ${r.partes.join(' · ')}`);
+        const vueltas = Recibidos.textoVueltas(r.vueltas);
+        if(vueltas) aviso(vueltas);
+        recompensaAnuncio(S, nombre, d.data() || {}, r, vueltas);
+        hubo = true;
+      }
+      for(const d of de('estados')){
+        if(!await Recibidos.tomar(d, borrar)) continue;
+        tomados.push(d);
+        try{ Recibidos.estado(S, d, ui); }
+        catch(err){ console.error('No se pudo aplicar un estado recibido:', Recibidos.nombreDe(d), err); fallidos.push(d); }
+        hubo = true;
+      }
+      return hubo;
+    }, {exigirGuardado: true});
+  }catch(err){
+    console.error('Lo recibido se tomó y no quedó guardado:', err);
+    if(!tomados.length) throw err;
+    if(enBn){   // sigue en la memoria de esta pantalla y el guardado se reintenta solo: se avisa, no se devuelve (se aplicaría dos veces)
+      mesaLinea(`⚠ ${nombre || 'Un personaje'}: le llegó ${tomados.map(d => Recibidos.nombreDe(d)).join(', ')} y su ficha todavía no se pudo guardar (se sigue intentando). Si no aparece en su token, aplicáselo a mano (◎).`, 'alerta-roja', nombre);
+      toast(`⚠ ${nombre || 'Tu personaje'}: no se pudo guardar lo que te llegó — se sigue intentando`);
+      return;
     }
-    for(const d of de('estados')){
-      if(!await Recibidos.tomar(d, borrar)) continue;
-      Recibidos.estado(S, d, ui);
-      hubo = true;
-    }
-    return hubo;
-  });
+    await Recibidos.noAplicados(tomados, nombre, 'no se pudo guardar su ficha', uiCola);
+    return;
+  }
+  tomados.filter(d => !fallidos.includes(d)).forEach(d => Recibidos.hecho(d));
+  if(fallidos.length) await Recibidos.noAplicados(fallidos, nombre, 'falló al aplicarlo', uiCola);
 }
 // 🎁 Botín concluido (dueño, 2026-10-22): cuando el GM cierra el botín y reparte, al jugador le aparece el resumen de lo que recibió, con Aceptar
 // (Experiencia, DDE, despojos y los ítems que reclamó, que ya están en su mochila). Lo mismo para cualquier otra recompensa que le llegue.
@@ -1622,8 +1648,14 @@ function recompensaAnuncio(S, nombre, d, r, vueltas){
 /* Cambiar a un personaje desde el mapa y guardarlo (2026-10-02, A2/A3): con la sesión de la Botonera nueva si ya está abierta en ese
    personaje; si no, con una sesión de un rato (mantSesionTemporal) que se cierra al terminar. cambiar(S, {enBn}) puede ser async y
    devuelve true si cambió algo (se guarda) o false (no se toca nada). Se escriben solo las partes que cambió (lo que difiera por
-   haberlo armado distinto, no) y el resumen público. → lo que devolvió cambiar, o null si no se pudo leer al personaje. */
-async function editarPersonajeMapa(fichaId, cambiar){
+   haberlo armado distinto, no) y el resumen público. → lo que devolvió cambiar, o null si no se pudo leer al personaje.
+   🐞 (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs»): dos cambios al mismo personaje al mismo tiempo en esta pantalla
+   (un aviso de la cola que llega justo cuando otra cosa lo está guardando) se pisaban: con la Botonera, el segundo no se escribía nunca (quedaba
+   solo en la memoria de esta pantalla, marcado como guardado); sin ella, cada uno leía su copia y el último en guardar borraba lo del otro. Ahora
+   los dos trabajan sobre la MISMA copia (las sesiones de un rato se comparten mientras alguien las usa) y lo que cada uno cambió queda como deuda
+   hasta que se escribe (FichaSesion.marcar / guardar).
+   `o.exigirGuardado`: espera a que quede escrito y, si no se pudo, tira Error('NO_GUARDADO') (lo que no se puede perder: un aviso ya tomado). */
+async function editarPersonajeMapa(fichaId, cambiar, o){
   await bnCargarPiezas();
   const enBn = () => !!(bn && bn.fichaId === fichaId && bn.S && bn.sesion && bn.sesion.cargada);
   const tmp = enBn() ? null : await mantSesionTemporal(fichaId);
@@ -1634,23 +1666,50 @@ async function editarPersonajeMapa(fichaId, cambiar){
     const antes = FichaGuardado.partes(S);
     const hubo = await cambiar(S, {enBn: usarBn});
     if(!hubo) return hubo;
-    if(usarBn){ bnUi(antes).cambio(); return hubo; }
+    if(usarBn){
+      const f = bn.sesion;
+      bnUi(antes).cambio();
+      if(o && o.exigirGuardado && !(await FichaSesion.asentar(f, bnOpcionesGuardado(f)))) throw new Error('NO_GUARDADO');
+      return hubo;
+    }
     const f = tmp.f;
-    const despues = FichaGuardado.partes(S);
-    Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
+    FichaSesion.marcar(f, antes, FichaGuardado.partes(tmp.S));
     f.soloLectura = false;
     const opts = opcionesGuardadoMapa(f, () => tmp.S, () => tmp.doc, () => tmp.vivo);
-    for(let i = 0; i < 6 && FichaSesion.pendiente(f, () => FichaGuardado.partes(tmp.S)); i++){
-      await FichaSesion.guardar(f, true, opts);
-      if(FichaSesion.pendiente(f, () => FichaGuardado.partes(tmp.S))) await new Promise(r => setTimeout(r, 1500));
+    const escrito = await FichaSesion.asentar(f, opts);
+    if(!escrito){
+      console.error('No se pudo guardar el personaje desde el mapa (quedó sin escribir):', fichaId, FichaSesion.debe(f));
+      if(o && o.exigirGuardado) throw new Error('NO_GUARDADO');
     }
     return hubo;
   }finally{
-    if(tmp){ tmp.vivo = false; FichaSesion.cortar(tmp.f); }
+    if(tmp) mantSesionSoltar(tmp);
   }
 }
 // Lee al personaje en vivo un rato (sin mostrarlo), como la Botonera nueva. → {f, S, doc, vivo} o null si no se pudo leer en 15 s.
+// Mientras alguien la usa, otro pedido por el mismo personaje recibe LA MISMA (una sola copia en memoria: 2026-11-20); se corta cuando la sueltan todos.
+const mantSesiones = new Map();   // fichaId → {st, usos, lista (promesa)}
 async function mantSesionTemporal(fichaId){
+  let e = mantSesiones.get(fichaId);
+  if(!e){
+    e = {usos: 0, st: null, lista: null};
+    e.lista = mantSesionAbrir(fichaId).then(st => { e.st = st; if(!st && mantSesiones.get(fichaId) === e) mantSesiones.delete(fichaId); return st; });
+    mantSesiones.set(fichaId, e);
+  }
+  e.usos++;
+  const st = await e.lista;
+  if(!st){ e.usos--; return null; }
+  return st;
+}
+function mantSesionSoltar(st){
+  const e = mantSesiones.get(st.f.id);
+  if(!e || e.st !== st){ st.vivo = false; FichaSesion.cortar(st.f); return; }
+  e.usos--;
+  if(e.usos > 0) return;
+  mantSesiones.delete(st.f.id);
+  st.vivo = false; FichaSesion.cortar(st.f);
+}
+async function mantSesionAbrir(fichaId){
   const f = FichaSesion.nueva(fichaId, '', false, true);
   const st = {f, S: null, doc: null, vivo: true};
   FichaSesion.escuchar(f, {
@@ -1672,6 +1731,16 @@ async function mantSesionTemporal(fichaId){
   if(!st.S){ st.vivo = false; FichaSesion.cortar(f); return null; }
   return st;
 }
+/* Lo que quedó sin escribir en la sesión de la Botonera nueva (falló la red, o la escritura anterior falló): se reintenta solo cada 4 s. La ficha
+   lo hace cada segundo; el mapa guardaba solo después de cada cambio, así que un guardado fallido no se reintentaba nunca (2026-11-20). */
+setInterval(() => {
+  try{
+    const f = typeof bn !== 'undefined' && bn && bn.sesion;
+    if(!f || !f.cargada || f.soloLectura || f.escribiendo || !bn.S || !FichaSesion.debe(f).length) return;
+    if(!bnPuedeGuardar()) return;
+    FichaSesion.guardar(f, true, bnOpcionesGuardado(f)).catch(err => console.error('No se pudo guardar el personaje:', err));
+  }catch(err){ console.error('El reintento del guardado:', err); }
+}, 4000);
 // Para el duelo: abre la sesión de ese personaje si hace falta y devuelve los ganchos (o null: va por el marco). No cambia de personaje
 // si la Botonera nueva está a la vista con otro (no se le cambia lo que está mirando).
 async function bnPrepararParaDuelo(fichaId, armar){

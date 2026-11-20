@@ -57,7 +57,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261114sang"></script>
 <script src="estados-aplicar.js?v=20261114av"></script>
-<script src="recibidos.js?v=20261110vaq"></script>
+<script src="recibidos.js?v=20261120cola18"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261120volverb"></script>
+<script src="ficha-acciones.js?v=20261120cola18"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -5912,6 +5912,78 @@ async function conFbFalsoYa(datos, fn){
   window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora', delete: () => '__borrar'}}};
   try{ return await fn(); }finally{ Object.assign(window, antes); }
 }
+/* ---------- Un aviso tomado que no se pierde y el guardado de la sesión (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs») ---------- */
+// Una sesión de mentira para FichaSesion.guardar: `commits` = lo que se mandó a escribir; cada commit espera a que se lo libere (`soltar()`).
+function sesionFalsa(partes){
+  const commits = [], pend = [], errores = [];
+  const db = {doc: () => ({collection: () => ({doc: id => ({id})})}),
+    batch: () => { const op = {sets: {}, upd: null}; return {set: (r, d) => { op.sets[r.id] = d.json; }, update: (r, d) => { if(JSON.stringify(d) !== JSON.stringify(d, (k, v) => v === undefined ? '__indef' : v)) throw new Error('undefined en el lote'); op.upd = d; },
+      commit: () => new Promise((ok, mal) => { pend.push({ok: () => { commits.push(op); ok(); }, mal}); })}; }};
+  const f = FichaSesion.nueva('x', 'u', true, false);
+  const o = {db, ruta: 'r', marcaDeTiempo: () => 't', partes: () => ({...partes}), resumen: () => ({hp: 1}), nombre: () => 'Blanco', miniatura: async () => '', vigente: () => true, alError: err => errores.push(String(err && err.message))};
+  Object.assign(f.ultimo, partes);
+  return {f, o, commits, pend, errores, partes, soltar: () => { const p = pend.shift(); if(p) p.ok(); return new Promise(r => setTimeout(r, 0)); }};
+}
+prueba('FichaSesion.guardar: un segundo cambio que llega mientras el primero se está escribiendo se guarda apenas termina (antes no se escribía nunca)', async () => {
+  const x = sesionFalsa({general: 'g0', efectos: 'e0'});
+  x.partes.general = 'g1';
+  const p1 = FichaSesion.guardar(x.f, true, x.o);          // el primero: queda escribiendo
+  x.partes.efectos = 'e1 con Miedo';
+  const r2 = await FichaSesion.guardar(x.f, true, x.o);    // el segundo llega mientras tanto
+  await x.soltar(); await x.soltar(); await p1;
+  igual([r2, x.commits.map(c => c.sets), x.f.ultimo.efectos, x.f.escribiendo, FichaSesion.pendiente(x.f, x.o.partes)],
+    [false, [{general: 'g1'}, {efectos: 'e1 con Miedo'}], 'e1 con Miedo', false, false]);
+});
+prueba('FichaSesion.guardar: si armar lo que se escribe falla, la sesión no queda trabada (avisa y el intento siguiente guarda); un undefined en el resumen no rompe', async () => {
+  const x = sesionFalsa({efectos: 'e0'});
+  x.partes.efectos = 'e1';
+  let roto = true;
+  x.o.resumen = () => { if(roto) throw new Error('resumen roto'); return {hp: 1, raro: undefined, lista: [{a: 1, b: undefined}]}; };
+  const r1 = await FichaSesion.guardar(x.f, true, x.o);
+  const trabada = x.f.escribiendo;
+  roto = false;
+  const p2 = FichaSesion.guardar(x.f, true, x.o); await x.soltar(); const r2 = await p2;
+  igual([r1, trabada, x.errores, r2, x.commits.map(c => [c.sets, c.upd.resumen]), x.f.ultimo.efectos],
+    [false, false, ['resumen roto'], true, [[{efectos: 'e1'}, {hp: 1, lista: [{a: 1}]}]], 'e1']);
+});
+prueba('FichaSesion.marcar: lo que cambió una acción queda como deuda hasta que se escribe; la acción siguiente no lo da por guardado (lo que no cambió y solo difiere por cómo se armó, sí)', async () => {
+  const x = sesionFalsa({general: 'g0', efectos: 'e0', otros: 'o-servidor'});
+  x.partes.otros = 'o-armado-distinto';                               // difiere de lo guardado solo por cómo lo arma esta pantalla
+  const a1 = {...x.partes}; x.partes.efectos = 'e1 con Miedo';
+  const c1 = FichaSesion.marcar(x.f, a1, {...x.partes});              // la acción 1 cambió efectos… y su guardado NO llega a hacerse
+  const a2 = {...x.partes}; x.partes.general = 'g1';
+  const c2 = FichaSesion.marcar(x.f, a2, {...x.partes});              // la acción 2 cambió general
+  const deuda = FichaSesion.debe(x.f).sort();
+  const p = FichaSesion.asentar(x.f, x.o, 2, 0); await x.soltar(); const ok = await p;
+  igual([c1, c2, deuda, ok, x.commits.map(c => c.sets), FichaSesion.debe(x.f), x.f.ultimo.otros],
+    [['efectos'], ['general'], ['efectos', 'general'], true, [{general: 'g1', efectos: 'e1 con Miedo'}], [], 'o-armado-distinto']);
+});
+prueba('un estado que llega de afuera y lo frena una inmunidad (Invulnerable / Titilando): no entra, toast a quien lo recibe y una línea para la Mesa con el motivo; sin la inmunidad, entra', () => {
+  const S = structuredClone(FichaGuardado.DEFAULT); S.meta.nombre = 'Blanco J1'; S.hp = 12;
+  const tit = Combatiente.estadoTitilando(estadosPresetFicha());
+  Combatiente.agregarEstado(S.efectos, tit);
+  const toasts = [], mesa = [];
+  const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: t => toasts.push(t), recordatorios: l => l.forEach(r => mesa.push(r.nombre))};
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Miedo'}, 'Blanco creep · Grito espeluznante', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota'}, 'Blanco creep · Hachazo', ui);
+  const conTit = S.efectos.map(e => e.nombre);
+  S.efectos = Combatiente.vencerAlEmpezar(S.efectos).quedan;          // empieza su turno: se va el Titilando
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Miedo'}, 'Blanco creep · Grito espeluznante', ui);
+  igual([conTit, mesa, toasts.length, /Invulnerable/.test(toasts[0]), S.efectos.map(e => e.nombre), mesa.length],
+    [[tit.nombre], ['🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito espeluznante', '🛡 Blanco J1: Armadura rota no le hizo nada (Invulnerable) · Blanco creep · Hachazo'], 3, true, ['Miedo'], 2]);
+});
+prueba('un aviso tomado que no se pudo aplicar vuelve a la cola (uno nuevo igual, pendiente) y se avisa en la Mesa; a la cuarta vez ya no vuelve: se le pide al GM que lo aplique a mano', () => {
+  const datos = {};
+  return conFbFalso(datos, async () => {
+    const d = {id: 'a1', data: () => ({fichaId: 'f1', duenoUid: 'u1', spec: '{"nombre":"Miedo"}', origen: 'Blanco creep · Grito', aplicada: true})};
+    const mesa = [], toasts = [], ui = {toast: t => toasts.push(t), mesa: t => mesa.push(t)};
+    const rs = [];
+    for(let i = 0; i < 4; i++) rs.push(await Recibidos.noAplicados([d], 'Blanco J1', 'no se pudo guardar su ficha', ui));
+    const cola = Object.entries(datos).filter(([k]) => k.startsWith('estados/')).map(([, v]) => [v.fichaId, v.duenoUid, v.spec, v.origen, v.aplicada, v.creado]);
+    igual([rs.map(r => [r.devueltos, r.agotados]), cola.length, cola[0], mesa.length, /Se reintenta solo/.test(mesa[0]), /aplicáselo a mano/.test(mesa[1]), toasts.length, Recibidos.intentos(d), Recibidos.nombreDe(d)],
+      [[[1, 0], [1, 0], [1, 0], [0, 1]], 3, ['f1', 'u1', '{"nombre":"Miedo"}', 'Blanco creep · Grito', false, 'ahora'], 2, true, true, 1, 0, 'Miedo (Blanco creep · Grito)']);
+  });
+});
 prueba('fin del combate: cada trampa consumible sin disparar tiene 50 % de romperse al desarmarla; las sanas vuelven a su dueño (y las disparadas no se tocan)', () => {
   const datos = {'elementos/a': {trampaItem: '{"nombre":"Trampa de oso menor"}', trampaNombre: 'Trampa de oso menor', duenoUid: 'u1', trampaFicha: 'f1', disparada: false},
     'elementos/b': {trampaItem: '{"nombre":"Red de caza"}', trampaNombre: 'Red de caza', duenoUid: 'u1', trampaFicha: 'f1', disparada: false},

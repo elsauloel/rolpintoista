@@ -2256,3 +2256,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `percepcionColaFin` si son varios, js/16). **Modo narrativo:** un token con un estado que traba el movimiento se mueve igual, preguntando al
   soltar «¿Moverlo igual?» (js/06 `soltar`).
 
+- **🐞 Dos cambios al mismo personaje a la vez ya no se pisan, y un aviso tomado no se pierde** (2026-11-20, dueño: Bizzante «dejó de recibir los
+  debuffs»; js/11). Se vio con Firebase de verdad: en la pantalla de quien maneja al personaje, un aviso de la cola que llegaba justo mientras otra
+  cosa lo estaba guardando (un cobro, un anillo, el inicio del turno) quedaba tomado y sin escribir — con la sesión de la Botonera abierta (queda
+  abierta desde el primer duelo) el segundo cambio no se guardaba nunca y la acción siguiente lo marcaba como guardado; sin ella, cada cambio leía su
+  copia y el último en guardar borraba lo del otro. Ahora: `editarPersonajeMapa(fichaId, cambiar, o)` comparte la sesión de un rato mientras alguien
+  la usa (`mantSesiones`: una sola copia en memoria por personaje; `mantSesionTemporal` / `mantSesionSoltar` / `mantSesionAbrir`), usa
+  `FichaSesion.marcar` (la deuda) y `asentar`, y con `o.exigirGuardado` tira `Error('NO_GUARDADO')` si no quedó escrito; la deuda de la sesión de la
+  Botonera se reintenta sola cada 4 s (antes un guardado fallido no se reintentaba nunca). `recibidosAplicar`: un estado tomado que falla al
+  aplicarse o cuya ficha no se pudo guardar vuelve a la cola (`Recibidos.noAplicados`: se reintenta solo, línea roja en la Mesa; a la tercera, «aplicáselo
+  a mano»); con la Botonera abierta lo aplicado sigue en memoria y el guardado se reintenta, así que se avisa sin devolverlo (no se aplica dos veces).
+  Lo que frena una inmunidad queda en la Mesa con el motivo (comun/ficha-acciones.js). Las recompensas siguen como antes (no vuelven a la cola).

@@ -24,7 +24,7 @@ const FichaSesion = (() => {
       control: null,    // {uid, nombre, desde}: quien tiene el control del personaje (el GM, con "🎮 Tomar el control"); null = su dueño
       soloLectura,
       cargada,
-      ultimo: {}, sucias: {}, enviando: {},
+      ultimo: {}, sucias: {}, enviando: {}, debe: {}, otraVez: false,
       ultimoResumen: '', revisarResumen: false,
       escribiendo: false, reintentarDesde: 0,
       cortes: [], cola: Promise.resolve(),
@@ -88,6 +88,7 @@ const FichaSesion = (() => {
           o.aplicarParte(ch.doc.id, FichaGuardado.leerParte(ch.doc.id, json));
           f.ultimo[ch.doc.id] = json;
           delete f.sucias[ch.doc.id];
+          if(f.debe) delete f.debe[ch.doc.id];   // lo de afuera pisa lo que esta pantalla tenía sin guardar en esa parte
           cambio = true;
         });
         if(cambio) o.alCambiar();
@@ -109,10 +110,23 @@ const FichaSesion = (() => {
      o: {db, ruta, marcaDeTiempo() (serverTimestamp), partes() ({parte: json}, FichaGuardado.partes), resumen(), nombre(),
          miniatura() (async: la del token), juntos() / juntosListo() (todas las partes en el mismo lote: recién migrada la
          escala de Tipos), alEstado() (mostrar "Guardando…", "✓ Guardado"…), vigente(), alError(err, primeraVez)} */
+  /* 🐞 (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs»): tres agujeros por los que un cambio ya hecho en memoria
+     no llegaba nunca a Firebase, sin ningún aviso:
+     - si llegaba un segundo cambio mientras el primero se estaba escribiendo, `guardar` volvía sin hacer nada y nadie lo llamaba de nuevo (el mapa
+       guarda solo después de cada cambio, no cada segundo como la ficha): ahora queda anotado (`f.otraVez`) y se guarda apenas termina el primero;
+     - si armar lo que se escribe fallaba (un `undefined` en el resumen: Firestore lo rechaza al armar el lote), `f.escribiendo` quedaba prendido
+       para siempre y esa pantalla no volvía a guardar a ese personaje: ahora el armado va adentro del try, y al resumen se le sacan los `undefined`;
+     - quien llama después de un cambio (el mapa) marcaba como «ya guardada» toda parte que su acción no tocó, también la que otro cambio había
+       dejado sin guardar: ver `marcar` (la deuda, `f.debe`).
+     → true si no quedó nada por escribir de lo que se intentó; false si falló o estaba ocupada. */
+  const sinIndefinidos = v => Array.isArray(v) ? v.map(x => x === undefined ? null : sinIndefinidos(x))
+    : (v && typeof v === 'object' && Object.getPrototypeOf(v) === Object.prototype) ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => [k, sinIndefinidos(x)]))
+    : v;
   async function guardar(f, forzar, o){
-    if(!f || f.soloLectura || !f.cargada || f.escribiendo) return;
+    if(!f || f.soloLectura || !f.cargada) return false;
+    if(f.escribiendo){ if(forzar) f.otraVez = true; return false; }   // se guarda apenas termine la escritura en curso
     const ahora = Date.now();
-    if(f.reintentarDesde && ahora < f.reintentarDesde && !forzar) return;
+    if(f.reintentarDesde && ahora < f.reintentarDesde && !forzar) return false;
     const estado = () => { if(o.alEstado) o.alEstado(); };
     // Recién pasada a la escala nueva de Tipos: la marca (en "otros") y los ítems corridos tienen que llegar juntos, o la
     // próxima carga los correría otra vez.
@@ -121,7 +135,7 @@ const FichaSesion = (() => {
     const actuales = o.partes();
     const listas = [];
     Object.entries(actuales).forEach(([parte, json]) => {
-      if(json === f.ultimo[parte]){ delete f.sucias[parte]; return; }
+      if(json === f.ultimo[parte]){ delete f.sucias[parte]; if(f.debe) delete f.debe[parte]; return; }
       const s = f.sucias[parte];
       if(!s) f.sucias[parte] = {json, desde: ahora, cambio: ahora};
       else if(s.json !== json){ s.json = json; s.cambio = ahora; }
@@ -129,52 +143,84 @@ const FichaSesion = (() => {
       if(forzar || ahora - t.cambio >= QUIETO_MS || ahora - t.desde >= MAX_MS) listas.push([parte, json]);
     });
     if(juntos && !listas.length && o.juntosListo) o.juntosListo();
-    if(!listas.length && !f.revisarResumen && !f.reponerMiniatura){ estado(); return; }
+    if(!listas.length && !f.revisarResumen && !f.reponerMiniatura){ estado(); return true; }
 
     f.escribiendo = true;
     f.revisarResumen = false;
-    estado();
-    const ts = o.marcaDeTiempo();
-    const base = o.db.doc(o.ruta);
-    const batch = o.db.batch();
-    listas.forEach(([parte, json]) => {
-      batch.set(base.collection('partes').doc(parte), {json, actualizado: ts});
-      f.enviando[parte] = json;
-    });
-    const cambios = {};
-    const nombre = o.nombre();
-    const resumen = o.resumen();
-    const resumenJson = estable([nombre, resumen]);
-    if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
-    const retrato = listas.find(([parte]) => parte === 'retrato');
-    if(retrato) cambios.miniatura = await o.miniatura();
-    else if(f.reponerMiniatura){
-      const mini = await o.miniatura();
-      if(mini) cambios.miniatura = mini;
-      f.reponerMiniatura = false;
-    }
-    if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
-
-    const antes = listas.map(([parte, json]) => [parte, f.ultimo[parte], json]);   // para el registro de la pausa (lo de antes y lo de ahora)
+    let ok = false;
     try{
+      estado();
+      const ts = o.marcaDeTiempo();
+      const base = o.db.doc(o.ruta);
+      const batch = o.db.batch();
+      listas.forEach(([parte, json]) => {
+        batch.set(base.collection('partes').doc(parte), {json, actualizado: ts});
+        f.enviando[parte] = json;
+      });
+      const cambios = {};
+      const nombre = o.nombre();
+      const resumen = sinIndefinidos(o.resumen());
+      const resumenJson = estable([nombre, resumen]);
+      if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
+      const retrato = listas.find(([parte]) => parte === 'retrato');
+      if(retrato) cambios.miniatura = await o.miniatura();
+      else if(f.reponerMiniatura){
+        const mini = await o.miniatura();
+        if(mini) cambios.miniatura = mini;
+        f.reponerMiniatura = false;
+      }
+      if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
+
+      const antes = listas.map(([parte, json]) => [parte, f.ultimo[parte], json]);   // para el registro de la pausa (lo de antes y lo de ahora)
       await batch.commit();
-      if(typeof Pausa !== 'undefined') Pausa.alGuardar(antes, nombre);   // ⏸ partida en pausa: lo importante que cambió queda anotado para el GM
+      if(typeof Pausa !== 'undefined') try{ Pausa.alGuardar(antes, nombre); }catch(err){ console.error('El registro de la pausa:', err); }   // ⏸ partida en pausa: lo importante que cambió queda anotado para el GM
       listas.forEach(([parte, json]) => {
         f.ultimo[parte] = json;
         if(f.sucias[parte] && f.sucias[parte].json === json) delete f.sucias[parte];
+        if(f.debe) delete f.debe[parte];
       });
       f.ultimoResumen = resumenJson;
       f.reintentarDesde = 0;
       if(juntos && o.juntosListo) o.juntosListo();
+      ok = true;
     }catch(err){
       console.error('No se pudo guardar la ficha en la mesa:', err);
-      if(o.alError) o.alError(err, !f.reintentarDesde);
+      if(o.alError) try{ o.alError(err, !f.reintentarDesde); }catch(e){}
       f.reintentarDesde = Date.now() + REINTENTO_MS;
     }finally{
       listas.forEach(([parte]) => { delete f.enviando[parte]; });
       f.escribiendo = false;
-      if(!o.vigente || o.vigente()) estado();
+      try{ if(!o.vigente || o.vigente()) estado(); }catch(e){}
     }
+    // Llegó otro cambio mientras se escribía: se guarda ahora (lo que haya quedado distinto de lo escrito).
+    if(f.otraVez){ f.otraVez = false; if(ok) return guardar(f, true, o); }
+    return ok;
+  }
+  /* Después de un cambio hecho por una acción (el mapa: la Botonera nueva y editarPersonajeMapa): `antes` y `despues` son las partes antes y
+     después de la acción ({parte: json}). Lo que la acción cambió queda como DEUDA (`f.debe`) hasta que se escribe o hasta que llega esa parte
+     de afuera; lo que no cambió y difiere de lo guardado solo por haberlo armado distinto se da por guardado (no se reescribe) — salvo que sea
+     deuda de un cambio anterior que todavía no se escribió. → las partes que cambió esta acción. */
+  function marcar(f, antes, despues){
+    f.debe = f.debe || {};
+    const cambiadas = [];
+    Object.keys(despues).forEach(p => {
+      if(despues[p] !== antes[p]){ f.debe[p] = true; cambiadas.push(p); }
+      else if(!f.debe[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p];
+    });
+    return cambiadas;
+  }
+  const debe = f => Object.keys((f && f.debe) || {});
+  /* Guardar YA y esperar a que quede escrito (hasta `intentos` veces, con una pausa entre una y otra): para lo que no se puede perder (un aviso
+     que se tomó de la cola). → true si no quedó nada pendiente. */
+  async function asentar(f, o, intentos, pausaMs){
+    const n = intentos || 6, espera = pausaMs === undefined ? 1500 : pausaMs;
+    for(let i = 0; i < n; i++){
+      if(!pendiente(f, o.partes)) return true;
+      await guardar(f, true, o);
+      if(!pendiente(f, o.partes)) return true;
+      if(i < n - 1) await new Promise(r => setTimeout(r, espera));
+    }
+    return !pendiente(f, o.partes);
   }
   // ¿Queda algo sin guardar? partes(): lo de ahora ({parte: json}).
   function pendiente(f, partes){
@@ -184,5 +230,5 @@ const FichaSesion = (() => {
     return Object.keys(actuales).some(p => actuales[p] !== f.ultimo[p]);
   }
 
-  return {QUIETO_MS, MAX_MS, nueva, escuchar, cortar, guardar, pendiente};
+  return {QUIETO_MS, MAX_MS, nueva, escuchar, cortar, guardar, pendiente, marcar, debe, asentar};
 })();

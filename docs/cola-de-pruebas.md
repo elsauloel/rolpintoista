@@ -12,7 +12,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
+- **✅ hecho (2026-11-20; el caso exacto de la partida no se pudo reproducir: ver el resultado) — 🐞 Después de revivir con el Pacto, al personaje dejan de entrarle los debuffs automáticos** (dueño, 2026-11-20, jugando El origen:
   «no funcionaba el aplicarle debuffs automatizados a Bizzante… murió y quedó invulnerable por el pacto pero dejó de recibirlos aún después de terminado
   invulnerable»). Lo que se vio leyendo la partida (solo lectura, 2026-11-20): la ficha guardada de Bizzante NO tiene ningún Invulnerable/Titilando
   (efectos: Regeneración, Arma ígnea, Parálisis; el Pacto ya gastado); en la cola `estados` sus avisos figuran todos `aplicada: true`, pero al menos uno
@@ -25,6 +25,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   turno (se va el Titilando) y un creep le aplica un debuff automático (Cegar, Parálisis, Miedo…) con el jugador con la Botonera abierta y cerrada, y
   con el GM pasando el turno. Arreglar la causa y, además, que un aviso tomado que no se pudo aplicar no se pierda en silencio (aviso al jugador y al GM
   con el motivo, p. ej. «no te hizo nada (Invulnerable)» también en la Mesa).
+  *Resultado:* el recorrido normal anda bien y **no se logró repetir tal cual lo de Bizzante** en «Claude · pruebas 2» (Blanco J1 con el Pacto, cae por
+  un golpe de Blanco creep, revive Titilando; el Titilando se va con el ⟳ Mantenimiento, con «✔ Aplicar» del jugador al empezar su turno y con el GM
+  pasando el turno sin que nadie aplique; después Miedo, Ceguera, Parálisis, Pajaritos y el Provocado de «¡Tu vieeeeja!» entran y quedan guardados;
+  probado con la Botonera abierta, cerrada y con la ficha suelta en otra pestaña). Lo que **sí se encontró y se repitió con Firebase de verdad**, en el
+  mismo camino y con el mismo síntoma (aviso tomado, estado que no queda en la ficha guardada): si en la pantalla del jugador el aviso llega justo
+  mientras otra cosa está guardando a ese personaje, el estado no se escribía — con la Botonera (queda abierta desde el primer duelo) quedaba solo en
+  la memoria de esa pantalla y marcado como guardado; sin ella, lo borraba el otro guardado. Y dos agujeros más del mismo guardado: un guardado que
+  fallaba no se reintentaba nunca desde el mapa, y un error al armar lo que se escribe dejaba a esa pantalla sin guardar más a ese personaje hasta
+  recargar (esto último encaja con «dejó de recibirlos» de ahí en adelante, pero no se pudo confirmar que haya sido eso). **Arreglado** (comun/ficha-sesion.js,
+  vtt-hexgrid/js/11, comun/recibidos.js, comun/ficha-acciones.js, ficha js/02): los cambios simultáneos comparten una sola copia y cada uno queda como
+  deuda hasta que se escribe; el guardado se reintenta solo; y **un aviso tomado ya no se pierde en silencio**: si lo frena una inmunidad, toast al
+  jugador y línea en la Mesa con el motivo («🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito espeluznante»); si falla al
+  aplicarse o no se puede guardar la ficha, vuelve a la cola y se reintenta solo, con una línea roja en la Mesa (a la tercera, «aplicáselo a mano»).
+  5 pruebas automáticas nuevas (890 en verde). **Hipótesis que quedan** si vuelve a pasar: una carrera entre DOS pantallas distintas (el GM aplicando
+  «por él» el inicio del turno en el mismo instante en que el jugador aplica el aviso: en cada parte gana la última que guarda) y la pestaña de la ficha
+  suelta dormida en segundo plano; ahora, si pasa, tiene que quedar una línea en la Mesa o un error en la consola del jugador (F12). Capturas en `cola18/`.
 - **✅ hecho (2026-11-20) — ⭐ En el reporte «Batalla terminada» del GM, la XP que tiene cada jugador y cuánto le falta para subir** (dueño, 2026-11-20: «que en la
   gestión del loot, previo a publicar, que el gm pueda ver cuánta exp tiene cada jugador, y cuánto falta para subir de nivel»). En el paso de la
   experiencia de `CombateFin.vista` (comun/combate-fin.js; lo usan el mapa del GM y GM Tools, en Simular y en Avanzar), al lado de cada personaje:

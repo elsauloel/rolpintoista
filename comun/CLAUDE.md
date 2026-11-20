@@ -2007,3 +2007,16 @@ versión parecida en más de una, es candidato a juntar.
   o cualquiera) y `Duelo.escuchar` avisa, solo en la pantalla del GM, `cfgEscuchar.intercambioListo(d)` cuando ese duelo queda `resultado: 'pego'` (un
   aliado con `aliadoDirecto`, sin tirada; un rival que perdió la contienda). El mapa lo resuelve con `cambiarLugarResuelto` (vtt-hexgrid/js/107), el
   mismo cambio y la misma animación que Cambiar de lugar; un aliado no tira Inamovible (P243).
+- **🐞 Un aviso tomado ya no se pierde, y el guardado de la sesión no deja cambios afuera** (2026-11-20, dueño: «murió y quedó invulnerable por el
+  pacto pero dejó de recibir los debuffs aún después de terminado invulnerable»). `ficha-sesion.js`: `guardar` ya no descarta un cambio que llega
+  mientras otro se está escribiendo (`f.otraVez`: lo guarda apenas termina), no queda trabado si falla al armar lo que escribe (todo va adentro del
+  try; al resumen se le sacan los `undefined`, que Firestore rechaza) y devuelve true / false; `marcar(f, antes, despues)` (lo que cambió una acción
+  queda como **deuda** en `f.debe` hasta que se escribe o llega esa parte de afuera; lo que no cambió y solo difiere por cómo se armó se da por
+  guardado, salvo que sea deuda), `debe(f)` y `asentar(f, o, intentos, pausaMs)` (guardar YA y esperar a que quede escrito → true / false). El mapa
+  usa `marcar` después de cada cambio (antes marcaba como «ya guardada» toda parte que la acción no tocó, también la que otro cambio había dejado sin
+  escribir). `recibidos.js`: `devolver(doc)` (un aviso tomado vuelve a la cola como uno nuevo igual: las reglas no dejan «des-tomarlo» y cualquier
+  miembro puede dejar uno), `noAplicados(docs, quien, motivo, {toast, mesa})` (lo devuelve hasta `MAX_REINTENTOS` = 3 por pantalla y avisa en la Mesa
+  con una línea roja; después le pide al GM que lo aplique a mano), `intentos`, `hecho`, `nombreDe(doc)` («Miedo (Blanco creep · Grito)»).
+  `ficha-acciones.js`: cuando una inmunidad frena un estado que llega de afuera (`aplicarEstadoRecibido`: Invulnerable / Titilando, Inmunidad a CC…;
+  también la Armadura rota), además del toast a quien lo recibe deja una línea en la Mesa con el motivo por `ui.recordatorios`
+  (`FichaAcciones.noEntroTxt(quien, estado, motivo, origen)` → «🛡 Blanco J1: Miedo no le hizo nada (Invulnerable) · Blanco creep · Grito»).

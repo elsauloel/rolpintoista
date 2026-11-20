@@ -688,3 +688,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   la ficha ya no revive sola: pregunta con cuál (`preguntarVolver`, js/02, con `Confirmar.elegir` y `Combatiente.volverOpciones`) y usa solo la elegida
   (`FichaAcciones.volverCon`). Si se cierra el cartel, sigue caído y la pantalla roja muestra «☥ ¿Con qué volvés? Elegí» (`#btn-volver`) mientras tenga
   opciones. Con una sola forma, automático como siempre. Ver `comun/CLAUDE.md`.
+- **🐞 Los estados que llegan de afuera, sin perderse** (2026-11-20): `estadosRevisar` (js/02) guarda YA lo que aplicó (`fichaGuardarTick(true)`: antes
+  esperaba al guardado de cada segundo y un cambio de otra pantalla en ese rato lo pisaba) y, si un aviso tomado falla al aplicarse (o la ficha se
+  cerró justo), lo devuelve a la cola con `Recibidos.noAplicados` (línea roja en la Mesa). Lo que frena una inmunidad queda en la Mesa con el motivo
+  (`habUi.recordatorios`). Ver `comun/CLAUDE.md`.

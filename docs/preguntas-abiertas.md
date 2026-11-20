@@ -1763,3 +1763,17 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
 - (g) **Sin orden de turnos** (narrativo, o combate sin lista) sigue como antes: lo recuerda solo la pantalla que movió, sin cartel ni aviso.
 - (h) La **Apuntada** y la **Apuntada firme** de las ballestas («si no te moviste…») siguen con la memoria de una sola pantalla: tienen el mismo
   problema que tenía el anillo. ¿Las paso al mismo mecanismo?
+
+### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detalle.js`, `comun/zona-detalle.js`). Para que el dueño decida:
+
+1. **«Empieza su turno adentro» o «al pasar de ronda».** El texto del Muro de fuego (y de otras zonas) dice que quema a quien «empieza su turno
+   adentro»; el mapa, hoy, lo hace **cada vez que se pasa de ronda** (el Mantenimiento), a todos los que siguen adentro a la vez. La tarjeta dice
+   lo que el mapa hace. ¿Se corrige el texto de las habilidades, o se cambia el mapa para que sea al empezar el turno de cada uno?
+2. **La descripción de la habilidad de un creep, al jugador.** Hoy el jugador ve todo lo que la zona hace (daño, estado, tirada), pero no el texto
+   de la habilidad del creep (trae costos y cooldowns). ¿Está bien así, o que la vea?
+3. **La nube (Polvareda, Bomba de humo) no guarda quién la puso ni con qué.** La tarjeta dice «a mano». Guardarlo pide permisos nuevos de
+   Firebase (y habría que no mostrárselo al jugador si quien la puso está escondido, que es justo el caso de la Polvareda). ¿Vale la pena?
+4. **Tótems y estandartes.** Son tokens, no zonas: su cartel es otro y no llevan el botón. ¿Se les suma un «Ver detalle» propio?
+

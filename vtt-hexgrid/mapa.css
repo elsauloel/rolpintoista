@@ -839,3 +839,26 @@ body.con-ruta .toast{bottom:auto;top:74px}
 #hex-info .hi-revelar:hover{background:rgba(255,210,90,.28)}
 #hex-info .hi-revelar.hi-ocultar{border-color:#C9A3FF;background:rgba(201,163,255,.12);color:#C9A3FF}
 #hex-info .hi-revelar.hi-ocultar:hover{background:rgba(201,163,255,.26)}
+
+/* 🔍 «Ver detalle» de una zona (2026-11-20, js/127): el botón en el cartel del elemento y la tarjeta. */
+#elemento-etiqueta.con-detalle{display:flex;align-items:flex-start;gap:10px;white-space:normal;overflow:visible;max-width:min(620px,74%)}
+#elemento-etiqueta.con-detalle .ee-txt{flex:1;min-width:0}
+#elemento-etiqueta .ee-detalle{flex:none;pointer-events:auto;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:#1b1418;
+  background:var(--brass);border:0;border-radius:999px;padding:4px 11px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#elemento-etiqueta .ee-detalle:hover{filter:brightness(1.12)}
+#zona-detalle{position:absolute;right:12px;z-index:26;width:min(470px,calc(100% - 24px));max-height:calc(100% - 150px);overflow:auto;
+  background:rgba(26,20,24,.96);backdrop-filter:blur(6px);border:1px solid rgba(255,200,60,.85);border-radius:var(--r);
+  box-shadow:0 12px 30px rgba(0,0,0,.6);padding:10px 14px 10px;font-size:13px;color:var(--paper);line-height:1.4}
+#zona-detalle .zd-cab{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#zona-detalle .zd-cab b{color:var(--brass);font-size:15px;font-weight:700;flex:1}
+#zona-detalle .zd-cerrar{background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;padding:0 4px}
+#zona-detalle .zd-cerrar:hover{color:var(--paper)}
+#zona-detalle .zd-esencial{display:flex;gap:10px;align-items:flex-start;background:rgba(255,200,60,.14);border:1px solid rgba(255,200,60,.6);
+  border-radius:10px;padding:10px 12px;font-size:15.5px;font-weight:700;line-height:1.35;color:#FFE9B0;margin-bottom:8px}
+#zona-detalle .zd-ico{font-size:22px;line-height:1.1;flex:none}
+#zona-detalle .zd-fila{display:grid;grid-template-columns:128px 1fr;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.08)}
+#zona-detalle .zd-fila b{color:var(--brass);font-weight:600;font-size:12.5px}
+#zona-detalle .zd-amano span,#zona-detalle .zd-amano div{color:var(--muted);font-style:italic}
+#zona-detalle .zd-desc{border-top:1px solid rgba(255,255,255,.08);padding-top:7px;margin-top:2px}
+#zona-detalle .zd-desc b{display:block;color:var(--brass);font-weight:600;font-size:12.5px;margin-bottom:3px}
+#zona-detalle .zd-pie{margin-top:8px;font-size:11px;color:var(--muted)}

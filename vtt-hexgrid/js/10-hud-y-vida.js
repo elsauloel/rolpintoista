@@ -1085,12 +1085,14 @@ function actualizarEtiquetaElemento(){
   const forma = e.tipo === 'linea' ? 'Línea' : e.tipo === 'libre' ? 'Forma libre' : 'Flor';
   // Una trampa, una zona o un portal dicen qué son (2026-10-04, dueño: «debe ser claro lo que es el objeto al seleccionarlo»).
   const especial = elementoQueEs(e);
+  // 🔍 «Ver detalle» (2026-11-20, dueño; js/127 + comun/zona-detalle.js): a la derecha del título, para lo que tiene algo que contar.
+  const verDet = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.tiene(e) ? '<button type="button" class="ee-detalle" data-zona-detalle="1" title="Qué hace, a quién, cuándo, de quién es y cuánto le queda">🔍 Ver detalle</button>' : '';
   if(especial){
     const clave = 'especial|' + especial;
     if(clave === etiquetaElementoTexto) return;
     etiquetaElementoTexto = clave;
-    el.className = 'especial';
-    el.innerHTML = especial;
+    el.className = 'especial' + (verDet ? ' con-detalle' : '');
+    el.innerHTML = verDet ? `<div class="ee-txt">${especial}</div>${verDet}` : especial;
     el.hidden = false;
     return;
   }
@@ -1101,11 +1103,11 @@ function actualizarEtiquetaElemento(){
   const dueno = nombreMiembro(e.duenoUid);
   const html = `<b>${forma}</b> <span>${esc(/^\(/.test(dueno) ? dueno : `(${dueno})`)}</span> · ${estado}${extra}`;
   const clase = e.solido ? 'solido' : 'libre';
-  const clave = clase + '|' + html;
+  const clave = clase + '|' + html + (verDet ? '|d' : '');
   if(clave === etiquetaElementoTexto) return;
   etiquetaElementoTexto = clave;
-  el.className = clase;
-  el.innerHTML = html;
+  el.className = clase + (verDet ? ' con-detalle' : '');
+  el.innerHTML = verDet ? `<div class="ee-txt">${html}</div>${verDet}` : html;
   el.hidden = false;
 }
 
@@ -1127,6 +1129,10 @@ function elementoQueEs(e){
     return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
       ` · <span class="es-libre">la sufre quien entra y quien sigue adentro en el Mantenimiento</span>`;
   }
+  // ☁ La nube y 🔥 el terreno en llamas también dicen qué son (2026-11-20, con el «Ver detalle»; antes salían como «Flor · TRANSITABLE»).
+  if(e.niebla){ const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
+    return `<b>☁ NUBE</b> <span>${de}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''} · <span class="es-libre">tapa la vista: quien está adentro no se ve desde afuera</span>`; }
+  if(e.fuego && !e.zona && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien sigue adentro al pasar de ronda</span>`;
   if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
   if(e.trampa){
     // Quién la dispara y a quién alcanza (dueño, 2026-10-19: «al seleccionar una trampa, arriba a la derecha, también se debe aclarar esto»).

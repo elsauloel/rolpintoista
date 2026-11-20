@@ -282,6 +282,12 @@
 
 ## Pendientes
 
+- [ ] **🔍 «Ver detalle» de una zona: lo que no se probó con clics** (2026-11-20; `vtt-hexgrid/js/127`): (1) una **trampa a la vista** (armada y ya
+  disparada, y una que deja zona): el botón y la tarjeta; (2) una zona puesta por un **personaje** (la Nube tóxica del Debuffer, una varita): que
+  «De quién es» lo nombre y que la descripción salga leída de su ficha (con una varita va a decir «puede venir de un ítem: a mano»); (3) una zona
+  de **curación** y el **hielo** de la Varita de la ventisca; (4) con orden de turnos armado, que «Cuánto le queda» diga «son turnos de X»; (5) un
+  portal y el Acelerador. Las cuentas de todo eso están en las pruebas automáticas; falta verlo en pantalla.
+
 - [ ] **💍 Puntería certera y Foco (2026-11-20, `vtt-hexgrid/js/126-quieto.js`): lo que quedó sin ver en el mapa** — el **Anillo de Foco Arcano**
   (nadie lo tiene en el clon: el bono a PdG.Esp en una habilidad, su cartel «🔮 Foco» y su aviso; usa el mismo camino, cubierto por las pruebas
   automáticas); que el **Dash, el Salto, la Carga, el Takle, el Parpadeo e interponerse** apaguen el bono (Bizzante no tiene ninguno); un **creep**

@@ -2283,6 +2283,25 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   nuevo con efecto se cuenta sumando su línea en `describir`. Probado en «Claude · pruebas» como GM y J1 (capturas `hex-GM-*`, `hex-J1-*`): el jugador no
   ve la trampa del GM ni la forma invisible.
 
+- **🔍 «Ver detalle» de una zona puesta en el mapa** (2026-11-20, dueño: «invoqué el Muro de fuego y después, cuando quería recordar bien qué hacía,
+  tenía que ir a la ficha del personaje que lo invocó… arriba, donde aparece el título, a la derecha, un botoncito que diga "ver detalle"»; «siempre
+  primero el detalle de cuánto daño hace y en qué contexto, y después todo lo demás»): `js/127-zona-detalle.js` + lo puro en `comun/zona-detalle.js`.
+  El cartel del elemento seleccionado (`actualizarEtiquetaElemento`, js/10) suma el botón **🔍 Ver detalle** (`[data-zona-detalle]`, clase
+  `con-detalle`) a todo lo que `ZonaDetalle.tiene(el)`: zonas, trampas que esa pantalla ve, terreno en llamas, nubes, portales, Acelerador. De paso,
+  la nube y el terreno en llamas ahora dicen qué son en el cartel («☁ NUBE», «🔥 TERRENO EN LLAMAS»; antes «Flor · TRANSITABLE»). La tarjeta
+  (`#zona-detalle`, debajo del cartel; ✕, Esc o soltar la selección la cierran; se rearma cada 0,7 s) sale de los DATOS del elemento: arriba y
+  destacada UNA frase (cuánto daño o qué efecto, a quién y cuándo) y debajo fuego amigo, de quién es, con qué se puso, cuánto le queda, cuándo se
+  dispara, tirada para evitarla, estado que deja, qué frena el daño, altura y la descripción. **Lo que sabe el mapa** (`zonaDetalleCtx`): quién la
+  puso (`colocadorDe`; si esta pantalla no ve su token —oculto, en sigilo, bajo la niebla: `loVeoAhora`, el criterio de js/29— dice «No se sabe:
+  quien la puso no está a la vista» y no lo nombra en ningún renglón); cuánto le queda (la cuenta del ⏳: turnos de quien la puso si está en el orden,
+  si no rondas); y la descripción de la habilidad, que la zona NO guarda: la de un creep sale de su parte privada (solo el GM; al jugador se le
+  dice que la ve solo el GM), la de un personaje o invocación se lee de su ficha (`partes/habilidades` / `invocaciones`, por el nombre de la zona).
+  Lo que el elemento no guarda dice «a mano» (una nube —Polvareda, Bomba de humo— no guarda quién ni con qué se puso). **«Cuándo» dice lo que hace
+  el motor** (js/08): al entrar (o al cruzarla con `zonaCadaPaso`) y, mientras se siga adentro, cada vez que se pasa de ronda (el Mantenimiento) —
+  el texto de algunas habilidades dice «al empezar su turno», y no es así. Los tótems y estandartes son tokens (otro cartel): no llevan el botón.
+  Probado con clics en «Claude · pruebas 2» (GM y J1: Muro de fuego, Nube tóxica y Bomba de humo de un creep, comparado con lo que hicieron) y en
+  el clon de El origen (la Polvareda de la rata).
+
 - **🦵🩸👣🦎🔄 La tanda del choque liviano** (2026-11-07, dueño): `js/107-liviano.js`. Tendón cortado (`tendonAlMoverse`, desde `confirmarRuta` js/08:
   1 de vida directa por casilla mientras sangre); Corte en la arteria (`arteriaBonos`, desde `dueloElegirObjetivoMapa` js/13 →
   `Combatiente.arteriaAtaque`); Paso atrás y Escurridizo (`pasoTrasEvasion`, gancho `evasionGanada` de `Duelo.escuchar` en js/14: aviso al centro para

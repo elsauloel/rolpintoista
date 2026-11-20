@@ -2085,6 +2085,13 @@ versión parecida en más de una, es candidato a juntar.
   pruebas): `unir([{cono, alerta}])` → `{cono, alerta}` (el cono de un rival le gana a la alerta de otro), `estado(union, clave)` → 'riesgo' | 'alerta'
   | 'libre', `referencia(seleccion, candidatos)` (de quién se muestran), `camino(union, claves)` → `{corte, alerta}` (como al soltar el token) y
   `leyenda(nombre, cuantos, soyGM)` (el cartel). Las zonas de cada rival y qué rivales cuentan los pone el mapa (`vtt-hexgrid/js/124-zonas-riesgo.js`).
+- **`zona-detalle.js`** (`ZonaDetalle`, 2026-11-20) — **🔍 la tarjeta «Ver detalle» de lo que está puesto en el mapa**, armada desde los datos del
+  elemento (sin mapa ni Firebase, con pruebas): `tiene(el)` (zona, trampa, terreno en llamas, nube, portal, Acelerador) y `armar(el, ctx)` →
+  `{icono, titulo, esencial, filas: [{k, v, aMano}], descripcion, descripcionNo}`. `esencial` es la frase de arriba (cuánto daño o qué efecto, a
+  quién y cuándo); las filas van en orden fijo: Fuego amigo, De quién es, Con qué se puso, Cuánto le queda, Cuándo se dispara, Tirada para
+  evitarla, Estado que deja, Qué frena el daño, Altura. Lo que el elemento no trae dice «a mano» (`A_MANO`). `ctx` lo arma el mapa
+  (`vtt-hexgrid/js/127-zona-detalle.js`: quién la puso y si se lo nombra, turnos que quedan, la descripción). **Un campo nuevo de las zonas que
+  cambie lo que hacen se cuenta acá** (y en `HexInfo.describir`, el cartel de la casilla).
 - **`tokens-auto.js`, 🏷 los tokens se llaman como su ficha** (2026-11-20): `TokensAuto.nombresCambios(docs, fichaId, nombre)` (qué tokens hay que
   renombrar: los `pj` de esa ficha con otro nombre; no invocaciones) y `nombresPonerAlDia({fichaId, nombre})` (recorre el primer mapa y los guardados
   y los renombra; una vez por nombre y por pantalla; si no puede, calla). Lo llama la pantalla del jugador dueño: el mapa (js/09), la ficha al

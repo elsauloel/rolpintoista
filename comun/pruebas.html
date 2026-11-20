@@ -47,6 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
+<script src="zona-detalle.js?v=20261120zd1"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261120volver"></script>
@@ -9064,6 +9065,73 @@ grupo('Invocar: la invocación aparece nueva, con la vida llena');
     a.hp = 10;   // la primera sigue en juego, lastimada: la segunda vez sale una copia, llena
     const b = FichaAcciones.invocacionDeHab(S, {invoca: {invId: 'a1'}});
     igual([b.copiaDe, b.hp, b.hpMax, S.invocaciones.length, a.hp], ['a1', 45, 45, 2, 10]);
+  });
+})();
+
+
+/* ---------- 🔍 «Ver detalle» de una zona puesta en el mapa (comun/zona-detalle.js, 2026-11-20) ---------- */
+grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
+(() => {
+  const lbl = id => ({resmg: 'Res.Esp', agl: 'Agilidad', dmgesp: 'Ef.Esp'})[id] || '';
+  const fila = (m, k) => (m.filas.find(f => f.k === k) || {}).v || '';
+  const ok = v => { if(!v) throw new Error('no se cumple'); };
+  const muro = {zona: true, zonaNombre: 'Muro de fuego', zonaDano: '3d4', zonaDanoTipo: 'fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCadaPaso: true,
+    zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep', zonaEstado: JSON.stringify({nombre: 'Quemadura'}), turnos: 3};
+  prueba('zona de daño (Muro de fuego): arriba de todo cuánto daño, a quién y cuándo; después el resto, en orden', () => {
+    const m = ZonaDetalle.armar(muro, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, quedanDe: 'son turnos de Mago: baja uno cada vez que empieza su turno',
+      autor: {nombre: 'Mago (creep)'}, habilidad: 'Muro de fuego', altura: 'ambos', rivalesTxt: 'los rivales de Mago (los personajes y sus invocaciones)', descripcion: 'Levanta un muro.'});
+    igual(m.icono, '🔥');
+    igual(m.esencial, '3d4 de daño de fuego y Quemadura a los rivales de Mago (los personajes y sus invocaciones): al entrar o cruzarla y, mientras sigan adentro, cada vez que se pasa de ronda.');
+    igual(m.filas.map(f => f.k), ['Fuego amigo', 'De quién es', 'Con qué se puso', 'Cuánto le queda', 'Cuándo se dispara', 'Tirada para evitarla', 'Estado que deja', 'Qué frena el daño', 'Altura']);
+    ok(/^NO\./.test(fila(m, 'Fuego amigo')) && /él mismo/.test(fila(m, 'Fuego amigo')));
+    ok(/3 turnos \(son turnos de Mago/.test(fila(m, 'Cuánto le queda')));
+    igual(fila(m, 'Tirada para evitarla'), 'No tiene: entra directo.');
+    ok(/va directo/.test(fila(m, 'Qué frena el daño')) && /resistencia al fuego/.test(fila(m, 'Qué frena el daño')));
+    igual(m.descripcion, 'Levanta un muro.');
+  });
+  prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
+    const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,
+      zonaEstado: JSON.stringify({nombre: 'Veneno', stacks: 3, pct: 50, unaVez: true, sumaUno: true})};
+    const m = ZonaDetalle.armar(el, {statLabel: lbl, estadoTexto: sp => `${sp.nombre} ×${sp.stacks}`, quedan: 2, autor: {nombre: 'Blanco'}, habilidad: 'Nube tóxica', altura: 'aire'});
+    igual(m.esencial, '50 % de chance de Veneno ×3 a cualquiera: al entrar y, mientras sigan adentro, cada vez que se pasa de ronda (si no la resisten con Res.Esp).');
+    ok(/^SÍ\./.test(fila(m, 'Fuego amigo')));
+    ok(/tira Res\.Esp; la zona tira Ef\.Esp \(9/.test(fila(m, 'Tirada para evitarla')) && /el empate lo gana la zona/.test(fila(m, 'Tirada para evitarla')));
+    ok(/Chance: 50 %/.test(fila(m, 'Estado que deja')) && /le suma 1 stack/.test(fila(m, 'Estado que deja')));
+    igual(fila(m, 'Qué frena el daño'), '');
+  });
+  prueba('lo que el elemento no guarda dice «a mano», no lo inventa; quien la puso escondido no se nombra', () => {
+    const vacia = ZonaDetalle.armar({zona: true, zonaNombre: 'Zona rara', zonaCasteadorTipo: 'pj'}, {autor: {}});
+    ok(/a mano/.test(vacia.esencial)); ok(/a mano/.test(fila(vacia, 'De quién es'))); ok(/a mano/.test(fila(vacia, 'Con qué se puso')));
+    igual(fila(vacia, 'Cuánto le queda'), 'No tiene turnos contados: queda hasta que alguien la saque.');
+    const esc2 = ZonaDetalle.armar(muro, {autor: {escondido: true, nombre: 'Rata'}, habilidad: 'Muro de fuego', quedan: 1});
+    igual(fila(esc2, 'De quién es'), 'No se sabe: quien la puso no está a la vista.');
+    ok(!JSON.stringify(esc2).includes('Rata'));
+  });
+  prueba('la nube (Polvareda / Bomba de humo): no hace daño, tapa la vista; y lo que no guarda, a mano', () => {
+    const m = ZonaDetalle.armar({niebla: true, turnos: 2}, {quedan: 2, autor: {}});
+    igual(m.icono, '☁'); ok(/^No hace daño: tapa la vista/.test(m.esencial));
+    ok(/a mano/.test(fila(m, 'Con qué se puso'))); ok(/2 turnos/.test(fila(m, 'Cuánto le queda')));
+  });
+  prueba('hielo (cada paso), curación (pulsos), terreno en llamas y una zona sin Mantenimiento', () => {
+    const hielo = ZonaDetalle.armar({zona: true, zonaNombre: 'Suelo congelado', zonaResistStat: 'agl', zonaResistValor: 8, zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})}, {statLabel: lbl, autor: {}, altura: 'piso'});
+    igual(hielo.icono, '🧊'); ok(/en cada paso que dan adentro \(si no la resisten con Agilidad\)/.test(hielo.esencial));
+    ok(/tiene que llegar a 8/.test(fila(hielo, 'Tirada para evitarla'))); ok(/vuela o levita/.test(fila(hielo, 'Altura')));
+    const cura = ZonaDetalle.armar({zona: true, zonaNombre: 'Círculo sanador', zonaEstado: JSON.stringify({cura: '4', pulsos: 3})}, {autor: {nombre: 'Ana'}, cura: {cura: '4', pulsos: 3}});
+    igual(cura.icono, '💚'); ok(/^Cura 4 de vida a los aliados/.test(cura.esencial)); ok(/No aplica/.test(fila(cura, 'Fuego amigo')));
+    const fuego = ZonaDetalle.armar({fuego: true, fuegoDano: 7}, {autor: {nombre: 'El GM'}});
+    ok(/^7 de daño de fuego a cualquiera/.test(fuego.esencial)); ok(/^SÍ\./.test(fila(fuego, 'Fuego amigo')));
+    const puas = ZonaDetalle.armar({zona: true, zonaNombre: 'Púas', zonaDano: '1d6', zonaEnMantenimiento: false, zonaCadaPaso: true, zonaCasteadorTipo: 'creep'}, {autor: {nombre: 'El GM'}});
+    igual(puas.esencial, '1d6 de daño a los personajes (y sus invocaciones): al entrar o cruzarla.'); ok(/NO la vuelve a disparar/.test(fila(puas, 'Cuándo se dispara')));
+    igual(fila(puas, 'Qué frena el daño'), 'Le resta la Defensa. El daño lo tira quien la puso (o el GM por él).');
+  });
+  prueba('trampa a la vista: armada dice qué hace y a quién; disparada, que ya saltó; una forma común no tiene detalle', () => {
+    const t = {trampa: true, trampaNombre: 'Trampa de oso', trampaDano: '2d6', trampaEstado: JSON.stringify({nombre: 'Inmovilizado', turnos: 2, salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'efecto'}}), trampaDetalle: 'Muerde la pierna.'};
+    const m = ZonaDetalle.armar(t, {estadoTexto: sp => `${sp.nombre} (${sp.turnos} turnos)`, autor: {nombre: 'El GM'}, habilidad: 'Trampa de oso', sola: true});
+    igual(m.esencial, '2d6 de daño y Inmovilizado (2 turnos) a quien la pisa, cuando la pisa un rival de quien la puso.');
+    ok(/tira Evasión y tiene que llegar a 12/.test(fila(m, 'Tirada para evitarla')) && /no el estado/.test(fila(m, 'Tirada para evitarla')));
+    igual(m.descripcion, 'Muerde la pierna.');
+    ok(/^Ya se disparó/.test(ZonaDetalle.armar({...t, disparada: true}, {autor: {}}).esencial));
+    igual([ZonaDetalle.tiene({tipo: 'flor', solido: true}), ZonaDetalle.tiene(muro), ZonaDetalle.tiene({niebla: true}), ZonaDetalle.armar({tipo: 'flor'}, {})], [false, true, true, null]);
   });
 })();
 

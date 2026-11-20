@@ -392,7 +392,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   token, en su menú y en la pantalla del GM; la Diestra (otra invocación, bajada a 4) vuelve con 10 de 10. 3 pruebas automáticas nuevas.
   *Para mirar* (no se tocó): la Abeja Diestra tiene máximo 10 con Constitución 4 (por la cuenta de siempre serían 20); el máximo es un número que
   se puede escribir a mano en la tarjeta, así que quedó como está. El clon quedó con las tres abejas dormidas y llenas.
-- **⬜ en cola — 🔥 «Ver detalle» de una zona puesta en el mapa (Muro de fuego y todas las demás)** (dueño, 2026-11-20: «invoqué el Muro de fuego
+- **✅ hecho (2026-11-20) — 🔥 «Ver detalle» de una zona puesta en el mapa (Muro de fuego y todas las demás)** (dueño, 2026-11-20: «invoqué el Muro de fuego
   y después, cuando quería recordar bien qué hacía, tenía que ir a la ficha del personaje que lo invocó, ir a su lista de skills y ver el detalle. Me
   gustaría que skills como el muro de fuego, al seleccionarlo, arriba, donde aparece el título, a la derecha, aparezca un botoncito que diga "ver
   detalle". Y en ese detalle te diga específicamente el efecto de esa zona: quien ingresa o quien está parado recibe X de daño. Y también en qué
@@ -409,6 +409,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Debajo, el resto: fuego amigo, de quién es, cuánto le queda, tirada para evitarla, descripción.
   Lo ven el GM y los jugadores que ven la zona (a un jugador no se le muestra lo que no debería saber: p. ej. el dueño si quien la puso está oculto,
   con el mismo criterio de la tarea del sigilo). Si algún dato no existe en la zona, decir «a mano» en vez de inventarlo.
+  **Hecho:** al seleccionar una zona, una trampa a la vista, un terreno en llamas, una nube o un portal, el cartel de arriba a la derecha trae el
+  botón «🔍 Ver detalle»; abre una tarjeta con la frase destacada arriba (cuánto daño o qué efecto, a quién y cuándo) y debajo fuego amigo, de quién
+  es, con qué se puso, cuánto le queda, cuándo se dispara, tirada para evitarla, estado que deja, qué frena el daño y la descripción. Todo sale de
+  los datos de la zona; lo que la zona no guarda dice «a mano». Al jugador no se le nombra a quien la puso si no lo ve, ni se le muestra la
+  descripción de la habilidad de un creep. **Probado con clics** («Claude · pruebas 2», GM y Jugador 1): Muro de fuego (la tarjeta decía 3d4 de
+  fuego directo y Quemadura al entrar y al pasar de ronda, sin tirada: el jugador entró, «no hay nada que tirar», el GM tiró 3d4, entraron los 5
+  y quedó con Quemadura; al pasar de ronda le volvió a saltar), Nube tóxica (Ef.Esp contra Res.Esp en el cuadro del duelo, 2d4 tóxico y Veneno ×3:
+  pasó eso) y Bomba de humo; con el creep oculto, al jugador le dijo «No se sabe: quien la puso no está a la vista». En el clon de El origen, la
+  Polvareda de la rata (la nube no guarda quién la puso: «a mano»). **Para que lo sepas:** la tarjeta dice «cada vez que se pasa de ronda» porque
+  es lo que el mapa hace; el texto del Muro de fuego dice «empieza su turno adentro» (queda anotado en `docs/preguntas-abiertas.md`). Los tótems y
+  estandartes son tokens, no comparten ese cartel: no llevan el botón. Sin probar con clics: una trampa, una zona puesta por un personaje (para
+  ver su descripción leída de la ficha) y una curación (`docs/pruebas-en-el-mapa.md`). 946 pruebas automáticas en verde (6 nuevas).
 - **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
   ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
   que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás

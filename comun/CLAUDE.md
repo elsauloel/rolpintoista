@@ -1554,6 +1554,13 @@ versión parecida en más de una, es candidato a juntar.
   `remachadora` (`Duelo.crear` los guarda en el ataque; el mapa del GM los suma a la Perfora; hook `remachadoraErro` de `Duelo.escuchar`),
   `recuperable` y `cargador`; además `dobleCuerda` / `tiroRapido` (`Combatiente.recargaCosto(arma, h)`: el costo del disparo h+1 con Recarga) y
   `carcajExtra` (`FichaEquipo.capCarcaj(c, S)`). Una flecha o virote con `flecha.sinDano` pega sin daño (el Virote de red).
+- **🏹 El carcaj incluido** (2026-11-20, dueño; `ficha-equipo.js`): con un arco o una ballesta equipados (`Combatiente.municionDe`) y SIN carcaj
+  puesto, `FichaEquipo.carcajDe(S)` devuelve un carcaj que no es un ítem (`incluido: true`, «Carcaj incluido», 5 lugares + `carcajExtra`, sin peso ni
+  lugar); sus flechas viven en `S.carcajIncluido` (viaja en la parte «otros», sin reglas nuevas; `c.flechas` es un getter/setter: para agregar una pila
+  hay que **asignar** `c.flechas = [...]`, no hacer `push`). Con uno de verdad (`carcajReal`) vale ese. `acomodarCarcaj(S)` (lo llaman `equipar` y
+  `reemplazar`) pasa las del incluido al de verdad o a la mochila y devuelve el aviso; `carcajHuerfano` = quedaron flechas sin arco (se ven en Equipo).
+  Cargar y descargar: cada pila con «→ Carcaj (N)» / «→ Mochila (N)» y, con más de una, «Cargar todo lo que entre» / «Vaciar a la mochila»
+  (`alCarcaj(S, '*')` / `delCarcaj(S, '*')`: una acción de equipar por pila en combate). Solo personajes. Dudas: P250.
 - **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
   **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El

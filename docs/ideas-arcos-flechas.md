@@ -342,3 +342,12 @@ Lisiado / Sangrado 4 · Emboscada 7 · Tensar 3 · sin tiro alto 3.
 pasa a Buena) · Tensar +2 y +3 · Perfora 1 junto con Tensar o con Espalda a distancia · Perfora 1 con un daño de 1d4+2 o más · Emboscada de Crítico
 frecuente junto con otra Emboscada y un efecto · dos efectos al golpear con Rango de bono · Rompe armadura (desde Buena, no más de 1/5) · Línea
 limpia (desde Buena) · Emboscada «−1 No2 al primer disparo» (falta programarla).
+
+## 2026-11-20 · El carcaj incluido (dueño; hecho)
+
+«Programá que cualquier jugador tenga por default un carcaj de 5 slot para virotes/flechas especiales incluído, sin peso adicional, por cargar
+cualquier arco o ballesta.» Con un arco o una ballesta equipados y sin carcaj puesto, el personaje tiene un **Carcaj incluido** de 5 lugares: no es un
+ítem, no pesa y no ocupa el lugar de Carcaj ni la mochila. Con un carcaj de verdad puesto vale ese (al ponérselo, las flechas del incluido pasan a ese;
+las que no entran, a la mochila; al sacar el arco sin carcaj, vuelven a la mochila). El mismo día: «las flechas y virotes especiales se deberían poder
+cargar y descargar del carcaj a la mochila fácilmente» → cada clase con su botón «→ Carcaj (N)» / «→ Mochila (N)» y, con más de una, «Cargar todo lo
+que entre» / «Vaciar a la mochila». Detalles elegidos mientras tanto: `preguntas-abiertas.md` P250. Código: `comun/CLAUDE.md` («El carcaj incluido»).

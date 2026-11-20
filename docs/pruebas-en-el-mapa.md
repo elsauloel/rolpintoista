@@ -2987,3 +2987,20 @@ Capturas en `cola13/`.
   habilidad «con tu arma».
 - [ ] **Falta que lo mire el dueño** (la va a usar en «El origen de las especies»). Duda de alcance: P249.
 Capturas en `cola14/`.
+
+## 2026-11-20 · 🏹 Carcaj incluido de 5 lugares y cargar/descargar fácil («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1)
+
+- [x] **Ficha (Jugador 1, Blanco J1 con un Arco corto prestado y sin carcaj puesto)**: en «Equipo y mochila» aparece «🏹 Carcaj incluido 0 / 5»
+  («Viene con el arco o la ballesta: no pesa ni ocupa lugar»), con las flechas y virotes de la mochila abajo, cada una con «→ Carcaj (N)» y «Cargar
+  todo lo que entre». «→ Carcaj (3)» en Flecha de fuego: quedó 3 / 5 y el virote pasó a ofrecer «→ Carcaj (2)» (lo que entra).
+- [x] **Mapa, disparar**: Atacar con el arco → «¿Qué flecha?» → «✨ Flecha especial · 3 en el carcaj incluido · 1 clase» → Flecha de fuego → el duelo
+  dice «🏹 Flecha de fuego: +1d4 de fuego, Quemadura»; el carcaj quedó en 2 y cobró 2 No2 del ataque + 1 de la flecha.
+- [x] **Mapa, 🛡 Equipo**: cargar virotes hasta llenar (5 / 5, «no entran más: 1 quedan en la mochila»); equipar el Carcaj de cuero: «Del carcaj
+  incluido a Carcaj de cuero: 5 flechas o virotes especiales» y el bloque pasa a «Carcaj de cuero 5 / 10»; «Vaciar a la mochila»: «6 del carcaj a la
+  mochila»; sacar el carcaj y «Cargar todo lo que entre»: 5 / 5 en el incluido; sacar el arco: «Sin arco ni ballesta: 5 flechas o virotes especiales
+  del carcaj incluido volvieron a la mochila». El peso equipado no cambió con el incluido. Lo guardado en la nube coincide.
+- [ ] **Sin probar con clics** (cubierto por las pruebas automáticas o por la cuenta): en combate, el costo en No2 de «Cargar todo» / «Vaciar» (una
+  acción de equipar por clase); el arco que se cae por un desarme con flechas en el incluido (quedan guardadas, «Carcaj incluido (sin arco ni
+  ballesta)»); una ballesta con Carcaj integrado (5 + N).
+- De paso: «¿Qué flecha?» decía «Los flechas comunes»; ahora «Las flechas comunes».
+- La partida quedó como estaba (sin lo prestado, vida y No2 llenos, narrativo, sin orden de turnos).

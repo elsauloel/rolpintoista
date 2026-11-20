@@ -129,6 +129,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (definir y contar si lo ven todos). (3) **Aviso antes de moverse** con el bono activo, en combate: «Tenés Puntería certera activa (+2 a PdG). Si
   te movés, la perdés. [Moverme igual] [Cancelar]»; Cancelar deja el token donde estaba. Solo al jugador dueño (o al GM si lo mueve él), una vez
   por activación. No inventar reglas: qué cuenta como «moverse» y cualquier duda, a preguntas-abiertas.
+- **⬜ en cola — 🐝 Las abejas de Bizzante aparecen con menos vida que su máximo (~75 %)** (dueño, 2026-11-20, El origen: «al invocar sus abejas,
+  aparecían con menos HP que el máximo. Algo así como el 75 %… copialo a la partida de pruebas para hacer el testeo»). (1) Leer a Bizzante de El
+  origen en SOLO LECTURA (la página con las escrituras a Firestore bloqueadas de scratchpad/simfin/; nunca abrir ahí el mapa, la ficha ni GM Tools) y
+  armar una **copia** en «Claude · pruebas 2» (ficha completa: atributos, equipo, habilidades, pasivas, invocaciones), con nombre claro («Bizzante
+  (copia)»), a nombre del Jugador 1 o del GM; es temporal: al terminar se saca (la partida de pruebas queda con un personaje por jugador), salvo
+  que sirva para la tarea del anillo, que también es de Bizzante: avisar. Ningún id ni email al repo. (2) Invocar las abejas con clics y mirar con
+  cuánta vida aparecen contra su máximo: en el token, la tarjeta, la ficha de la invocación y la Botonera. Buscar la causa: ¿la vida se fija antes
+  de sumar bonos al máximo (equipo, pasivas, nivel de la habilidad, Constitución del invocador)? ¿la plantilla trae una vida vieja y el máximo se
+  recalcula después? ¿se copia la vida de la invocación anterior? ¿cambia entre la primera invocación y las siguientes? (3) Arreglar la causa: una
+  invocación nueva aparece con la vida llena, salvo que una regla escrita diga otra cosa (si la hay, mostrarla y no tocar). Probar también otra
+  invocación distinta para ver si es general.
 - **⬜ en cola — 🎁 El botín: que se pueda minimizar y que quede clarísimo que cerrarlo no lo pierde** (dueño, 2026-11-20: «un jugador tenía que
   ir a ver algo a su ficha y dijo: tengo miedo de cerrar el botín y después no poder volver a abrirlo. Eso tiene que estar bien comunicado y tiene
   que ser súper claro. El botín se tiene que poder minimizar y, si un jugador aprieta cerrar botín, le tiene que aparecer una notificación: estás

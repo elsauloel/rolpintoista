@@ -171,6 +171,8 @@ const FichaResumen = (() => {
       cinturon: (S.cinturon || []).filter(i => i && n(i.unidades) > 0 && !i.reservado).map(i => ({n: String(i.nombre || '').slice(0, 60), u: Math.min(99, Math.round(n(i.unidades)))})).slice(0, 20),
       wildcards: Math.max(0, Math.round(n(S.meta && S.meta.wildcards))),   // 🃏 (2026-10-15): el mapa muestra la carta y prende el 🪙
       pacto: !!(S.meta && S.meta.pacto),   // 😇 (2026-10-28): el botón de arriba del mapa
+      // ☥ Con qué puede volver si cae (2026-11-20): [{id: 'llama' | 'pacto' | 'ankh', hp, u}]; con más de una y la vida en 0, el mapa le pregunta (js/98).
+      volver: typeof FichaAcciones !== 'undefined' && FichaAcciones.formasDeVolver ? FichaAcciones.formasDeVolver(S).slice(0, 3) : [],
       moneda: [...(S.cinturon || []), ...(S.inventario || [])].some(i => i && (i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || ''))) && n(i.unidades) > 0 && !i.reservado && !i.enMesa),
       // 🎲 De qué pieza (o pasiva, o estado) sale cada chance de los pies y las piernas (2026-11-13): el mapa lo muestra en el cartel («Botas de zapador, 33 %»).
       ...(() => { const ms = FichaCalculo.modsDe(S), o = {};

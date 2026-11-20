@@ -1889,15 +1889,19 @@ function actualizarMuerteMapa(){
     el.id = 'muerte-mapa';
     el.style.cssText = 'position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(ellipse at center,rgba(150,0,0,.05) 35%,rgba(150,0,0,.22) 100%);box-shadow:inset 0 0 110px rgba(190,0,0,.25)';
     el.innerHTML = '<div id="muerte-mapa-txt" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);text-align:center;color:#FFB4B4;font-family:\'Space Mono\',monospace;text-shadow:0 0 10px #000;background:rgba(40,0,0,.55);padding:8px 16px;border-radius:8px"></div>' +
-      '<button type="button" id="muerte-mapa-revivir" class="btn" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#7A1E1E;border:1px solid #FF7E7E;color:#fff">✚ Revivir</button>';
+      '<button type="button" id="muerte-mapa-revivir" class="btn" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#7A1E1E;border:1px solid #FF7E7E;color:#fff">✚ Revivir</button>' +
+      // ☥ (2026-11-20) Con más de una forma de volver (Pacto, Ankh en el cinturón, Llama): el botón para elegir, mientras siga caído (js/98).
+      '<button type="button" id="muerte-mapa-volver" class="btn" style="position:absolute;bottom:76px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#5A4A12;border:1px solid #FFD86B;color:#fff">☥ ¿Con qué volvés? Elegí</button>';
     document.body.appendChild(el);
     el.querySelector('#muerte-mapa-revivir').onclick = () => revivirPersonajePropio(fichaPrincipalId());   // el mismo ✚ del token (js/98, 2026-11-04)
+    el.querySelector('#muerte-mapa-volver').onclick = () => { if(typeof volverPreguntar === 'function') volverPreguntar(fichaPrincipalId()); };
   }
   el.hidden = false;
   $('#muerte-mapa-txt').innerHTML = m.definitivo
     ? '<b>TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATRÁS</b>'
     : `<div style="font-size:11px;letter-spacing:.14em">INCONSCIENTE · turnos hasta morir</div><div style="font-size:34px;font-weight:700;line-height:1.1">${fmt(num(m.turnos))}</div>`;
   $('#muerte-mapa-revivir').style.display = m.definitivo ? 'none' : '';
+  $('#muerte-mapa-volver').style.display = !m.definitivo && typeof volverFormas === 'function' && volverFormas(fid) ? '' : 'none';
 }
 
 // Aplica el daño de un duelo al HP del defensor (solo corre en el mapa del GM, ver comun/duelo.js). Reutiliza «Recibe daño»: Invulnerable y Escudo mágico valen.

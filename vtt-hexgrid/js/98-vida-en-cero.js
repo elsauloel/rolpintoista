@@ -16,12 +16,13 @@ async function vidaCeroRevisar(fichaId){
   if(vidaCeroEnCurso.has(fichaId) || Date.now() - (vidaCeroIntento.get(fichaId) || 0) < 30000) return;
   vidaCeroEnCurso.add(fichaId);
   vidaCeroIntento.set(fichaId, Date.now());
-  let salvado = '', cayo = false, nombre = '';
+  let salvado = '', cayo = false, nombre = '', elige = false;
   try{
     await editarPersonajeMapa(fichaId, S => {
       nombre = ((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje';
       if(num(S.hp) > 0 || (S.muerto && (S.muerto.activo || S.muerto.definitivo))) return false;   // ya lo resolvió otra pantalla
-      salvado = FichaAcciones.revisarAnkh(S) || '';
+      salvado = FichaAcciones.revisarAnkh(S) || '';   // con una sola forma de volver, sola; con más de una, no revive: elige (más abajo)
+      elige = !salvado && FichaAcciones.volverPendiente(S).length > 1;
       const r = FichaAcciones.revisarMuerte(S);
       cayo = !!(r && r.cayo);
       return true;
@@ -29,15 +30,59 @@ async function vidaCeroRevisar(fichaId){
   }catch(err){ console.error('La vida en 0: no se pudo revisar', err); }
   finally{ vidaCeroEnCurso.delete(fichaId); vidaCeroVisto.delete(fichaId); }
   if(salvado){
-    const txt = salvado === 'El Pacto' ? `😇 ${nombre} zafó de morir: lo salvó el pacto (vuelve Titilando)`
-      : salvado === 'Llama de Fénix' ? `🔥 ${nombre}: ¡la Llama de Fénix lo levanta con toda la vida, Titilando!`
-      : `☥ ${nombre}: ¡${salvado} se activó solo y revive!`;
+    const txt = Combatiente.volverTxt(nombre, salvado);
     toast(txt);
     try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
-    try{ momentoAbrir({tipo: 'buff', icono: salvado === 'El Pacto' ? '😇' : salvado === 'Llama de Fénix' ? '🔥' : '☥', titulo: `${nombre} no cae`, resultado: txt, estado: 'listo'}); }catch(e){}
+    try{ momentoAbrir({tipo: 'buff', icono: Combatiente.volverIcono(salvado), titulo: `${nombre} no cae`, resultado: txt, estado: 'listo'}); }catch(e){}
   }else if(cayo){
-    try{ mesaLinea(`💔 ${nombre} quedó en 0 de vida: inconsciente (5 turnos para morir)`, 'recordatorio'); }catch(e){}
+    try{ mesaLinea(elige ? Combatiente.volverPendienteTxt(nombre) : `💔 ${nombre} quedó en 0 de vida: inconsciente (5 turnos para morir)`, 'recordatorio'); }catch(e){}
   }
+}
+
+/* ---------- ☥ ¿Con qué volvés? (dueño, 2026-11-20: «si un jugador tiene un pacto activo y un ankh en el cinturón, al jugador le debe aparecer la opción de
+   qué usar») ----------
+   Con MÁS DE UNA forma de volver (el Pacto, un Ankh de Reencarnación en el cinturón, la Llama de Fénix) el personaje ya no revive solo: queda caído y su
+   resumen dice con qué puede volver (`resumen.volver`, comun/ficha-resumen.js). A quien lo maneja (su jugador, o el GM con 🎮 el control) el cartel le sale
+   solo, una vez por caída y otra vez si recarga la pantalla; si lo cierra, sigue caído y lo reabre con el ☥ del token o el botón de la pantalla roja. El GM
+   puede elegir por él con el ☥ del token. Se usa SOLO la elegida (FichaAcciones.volverCon); con una sola forma, todo sigue automático. */
+const volverEnCurso = new Set();      // fichaId con el cartel abierto (o guardando)
+const volverPreguntado = new Set();   // fichaId al que ya se le mostró el cartel solo en esta caída
+function volverFormas(fichaId){
+  const f = typeof fichasPub !== 'undefined' ? fichasPub.get(fichaId) : null, r = f && f.resumen;
+  if(!r || r.hp === undefined || num(r.hp) > 0 || r.muertoDef || !Array.isArray(r.volver) || r.volver.length < 2) return null;
+  return r.volver;
+}
+function volverPuede(t){
+  if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return false;
+  return !!volverFormas(t.fichaId) && puedeRevivirToken(t);
+}
+async function volverPreguntar(fichaId){
+  const formas = volverFormas(fichaId);
+  if(!formas || volverEnCurso.has(fichaId)) return;
+  volverEnCurso.add(fichaId);
+  try{
+    const f = fichasPub.get(fichaId), nombre = f.nombre || (f.resumen && f.resumen.nombre) || 'Tu personaje', porGM = !!soyGM && f.duenoUid !== fbUsuario.uid;
+    const c = Combatiente.volverOpciones(nombre, formas, porGM);
+    const id = await Confirmar.elegir(c.texto, c.o);
+    if(!id){ toast(`☥ ${nombre} sigue en el piso. Para elegir con qué vuelve: el ☥ de su token`); return; }
+    toast(`☥ ${nombre} vuelve…`);   // (leer y guardar el personaje desde el mapa tarda unos segundos)
+    let salvado = '';
+    try{
+      await editarPersonajeMapa(fichaId, S => {
+        salvado = FichaAcciones.volverCon(S, id) || '';
+        if(!salvado) return false;
+        FichaAcciones.revisarMuerte(S);
+        return true;
+      });
+    }catch(err){ console.error('¿Con qué volvés?:', err); }
+    if(!salvado){ toast(`☥ No se pudo: ${nombre} ya no está caído o ya no tiene eso para volver`); return; }
+    const txt = Combatiente.volverTxt(nombre, salvado, {elegido: true, porGM});
+    toast(txt);
+    try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
+    try{ momentoAbrir({tipo: 'buff', icono: Combatiente.volverIcono(salvado), titulo: `${nombre} no cae`, resultado: txt, estado: 'listo',
+      datos: porGM && f.duenoUid ? {paraUid: f.duenoUid, aviso: true, boton: 'Entendido'} : {}}); }catch(e){}
+    if(typeof pedirDibujo === 'function') pedirDibujo();
+  }finally{ volverEnCurso.delete(fichaId); }
 }
 
 setInterval(() => {
@@ -46,6 +91,9 @@ setInterval(() => {
     const ahora = Date.now();
     for(const [fichaId, f] of fichasPub){
       const r = f && f.resumen;
+      if(!r || num(r.hp) > 0) volverPreguntado.delete(fichaId);   // de pie: la próxima caída vuelve a preguntar
+      // ☥ Caído y con más de una forma de volver: a quien lo maneja, el cartel le sale solo (una vez por caída; al recargar, de nuevo).
+      else if(r.muerto === true && bnManejo(fichaId) && volverFormas(fichaId) && !volverPreguntado.has(fichaId) && !(typeof pausaSoloMirar === 'function' && pausaSoloMirar())){ volverPreguntado.add(fichaId); volverPreguntar(fichaId); }
       if(!r || r.hp === undefined || num(r.hp) > 0 || r.muerto === true || r.muertoDef || !bnManejo(fichaId)){ vidaCeroVisto.delete(fichaId); continue; }
       if(!vidaCeroVisto.has(fichaId)){ vidaCeroVisto.set(fichaId, ahora); continue; }
       if(ahora - vidaCeroVisto.get(fichaId) >= 1500) vidaCeroRevisar(fichaId);

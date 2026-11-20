@@ -162,30 +162,57 @@ const FichaAcciones = (() => {
     const quien = ((S.meta && S.meta.nombre) || 'Tu personaje').trim();
     try{ if(typeof mesaLinea === 'function') mesaLinea(`💍 ${quien}: el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`, 'recordatorio'); else if(typeof toast === 'function') toast(`💍 Anillo del último aliento: quedás con 1 de vida`); }catch(err){}
   }
-  // Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se activa solo (en la mochila no). Devuelve su nombre si se activó.
-  function revisarAnkh(S){
-    if(num(S.hp) > 0) return null;
-    if(S.muerto && S.muerto.definitivo) return null; // muerte definitiva: ya no hay vuelta atrás
-    // 🔥 Llama de Fénix (2026-10-20): revive con toda la vida y todo el SP, Titilando. Va antes que el Ankh (no lo gasta).
-    const conLlama = Combatiente.revivirFenix(S.efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
-    if(conLlama){
+  /* ☥ Con qué vuelve (dueño, 2026-11-20: «si un jugador tiene un pacto activo y un ankh en el cinturón, al jugador le debe aparecer la opción de qué
+     usar»). Las formas de volver solo cuando la vida llega a 0: la 🔥 Llama de Fénix (toda la vida y el SP), el 😇 Pacto (un cuarto; se gasta) y el
+     ☥ Ankh de Reencarnación del cinturón (un cuarto; se gasta uno; en la mochila no). Con UNA sola, se usa sola, como siempre; con MÁS DE UNA no
+     revive solo: queda caído y quien lo maneja elige (Combatiente.volverOpciones arma el cartel; volverCon aplica SOLO la elegida).
+     formasDeVolver(S) → [{id: 'llama' | 'pacto' | 'ankh', hp (con cuánta vida vuelve), u (los Ankh que tiene)}], sin tocar nada. */
+  function formasDeVolver(S){
+    if(!S || (S.muerto && S.muerto.definitivo)) return [];
+    const c = FichaCalculo.calcular(S), hpmax = Number.isNaN(c.final.hpmax) ? 0 : num(c.final.hpmax), lista = [];
+    if(Combatiente.revivirFenix(S.efectos, [])) lista.push({id: 'llama', hp: Math.max(1, hpmax)});
+    if(S.meta && S.meta.pacto) lista.push({id: 'pacto', hp: Combatiente.pactoVida(hpmax || 1)});
+    const ankh = (S.cinturon || []).filter(i => i && i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
+    if(ankh.length) lista.push({id: 'ankh', hp: Math.max(1, Math.floor(hpmax * 0.25)), u: ankh.reduce((a, i) => a + num(i.unidades), 0)});
+    return lista;
+  }
+  // Las que tiene para elegir AHORA: caído (vida 0, sin muerte definitiva) y con más de una. Si no, [].
+  const volverPendiente = S => (S && num(S.hp) <= 0) ? (l => l.length > 1 ? l : [])(formasDeVolver(S)) : [];
+  // Vuelve con UNA forma (la única que tiene, o la que eligió): gasta solo esa. → su nombre ('Llama de Fénix' | 'El Pacto' | el del Ankh) o null.
+  function volverCon(S, id){
+    if(!S || num(S.hp) > 0 || (S.muerto && S.muerto.definitivo)) return null;
+    if(id === 'llama'){
+      // 🔥 Llama de Fénix (2026-10-20): revive con toda la vida y todo el SP, Titilando.
+      const conLlama = Combatiente.revivirFenix(S.efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+      if(!conLlama) return null;
       S.efectos = conLlama;
       const cf = FichaCalculo.calcular(S);
       S.hp = Math.max(1, Number.isNaN(cf.final.hpmax) ? 1 : num(cf.final.hpmax));
       S.spGastado = 0;
       return 'Llama de Fénix';
     }
-    // 😇 El Pacto (2026-10-28): revive solo, Titilando, y se gasta. Va antes que el Ankh (no lo gasta).
-    if(S.meta && S.meta.pacto){
+    if(id === 'pacto'){
+      // 😇 El Pacto (2026-10-28): revive con un cuarto, Titilando, y se gasta.
+      if(!(S.meta && S.meta.pacto)) return null;
       const cp = FichaCalculo.calcular(S);
       S.meta.pacto = false;
       S.hp = Combatiente.pactoVida(Number.isNaN(cp.final.hpmax) ? 1 : cp.final.hpmax);
       ponerTitilando(S);
       return 'El Pacto';
     }
-    const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
-    if(idx < 0) return null;
-    return aplicarRevivirConAnkh(S, 'cinturon', S.cinturon[idx].id);
+    if(id === 'ankh'){
+      const it = (S.cinturon || []).find(i => i && i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
+      return it ? aplicarRevivirConAnkh(S, 'cinturon', it.id) : null;
+    }
+    return null;
+  }
+  // Si el HP llega a 0 y tiene UNA sola forma de volver (la Llama, el Pacto o un Ankh en el cinturón), se activa sola. Devuelve su nombre si se
+  // activó. Con más de una NO revive (devuelve null): queda caído hasta que quien lo maneja elija (volverPendiente / volverCon).
+  function revisarAnkh(S){
+    if(num(S.hp) > 0) return null;
+    if(S.muerto && S.muerto.definitivo) return null; // muerte definitiva: ya no hay vuelta atrás
+    const formas = formasDeVolver(S);
+    return formas.length === 1 ? volverCon(S, formas[0].id) : null;
   }
   // ✚ Revivir (2026-10-02, A6b; antes calcularHpRevivir de la ficha, js/11): con cuánto HP revive — un % del máximo o un valor neto,
   // mínimo 1. → {hpmax, val}. El diálogo lo pone cada pantalla; revivir(S, val) deja el HP (y el estado de muerte, al día).
@@ -1683,6 +1710,6 @@ const FichaAcciones = (() => {
     ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, gastarUnaTirada, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
-    aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,
+    aplicarRevivirConAnkh, fijarHp, revisarAnkh, formasDeVolver, volverPendiente, volverCon, revisarMuerte,
     purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};
 })();

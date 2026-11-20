@@ -925,6 +925,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   varita o del Relámpago van por `dueloCadena` (un duelo por salto, con su cuadro): esos ya se ven. En js/16, un aviso `zona-dano` espera a que se
   cierre el aviso que haya abierto y sale una sola vez (`avisosDanoVistos`); el reporte del rayo (js/110, `rayoFxReporte`) también espera.
 
+- **☥ ¿Con qué volvés?** (2026-11-20, dueño: «si un jugador tiene un pacto activo y un ankh en el cinturón, al jugador le debe aparecer la opción de qué
+  usar»): con MÁS DE UNA forma de volver (Pacto, Ankh de Reencarnación en el cinturón, Llama de Fénix) el personaje ya no revive solo. `danioPj` (js/10)
+  lee también la parte `cinturon` y, si hay más de una, lo deja en 0 (`res.elige`); `vidaCeroRevisar` (js/98) lo deja caído (`revisarAnkh` no revive con
+  más de una) y avisa en la Mesa (`Combatiente.volverPendienteTxt`). El resumen publica `volver` ([{id, hp, u}], `FichaAcciones.formasDeVolver`); con la vida
+  en 0 y dos o más, a quien lo maneja (`bnManejo`) el cartel `Confirmar.elegir` le sale solo (una vez por caída; al recargar, de nuevo) y queda el ☥ en el
+  anillo del token (`volverPuede`: el dueño o el GM, que elige por él) y el botón «☥ ¿Con qué volvés? Elegí» de la pantalla roja (js/13). `volverPreguntar`
+  aplica SOLO la elegida (`FichaAcciones.volverCon` por `editarPersonajeMapa`), con su toast, la línea de la Mesa (`Combatiente.volverTxt`) y el Anuncio.
+  Con una sola forma, automático como siempre. Mientras no elige, sigue caído (los turnos para morir corren).
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa
   «Renovando…»), línea en la Mesa (`Combatiente.pactoRenovadoTxt`) y un momento `pacto` con el Aviso al jugador (`Combatiente.PACTO_AVISO`). La ficha

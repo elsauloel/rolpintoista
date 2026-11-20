@@ -684,3 +684,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   la mochila y del cinturón tiene **🤝 Dar** (`Intercambio.botonDar`), la cabecera de la Mochila **🤝 Pasar** (`#btn-pasar`: oro, despojos y lo
   ofrecido) y la tienda **📦 Baúl común** (`#tienda-baul`). Todo en `comun/intercambio.js`; acá solo `intercambioHost` (js/08). El nombre del
   archivo `08-equipo-botin-y-mesa-comun.js` quedó por historia.
+- **☥ ¿Con qué volvés?** (2026-11-20, dueño): con más de una forma de volver (Pacto, Ankh de Reencarnación en el cinturón, Llama de Fénix), al quedar en 0
+  la ficha ya no revive sola: pregunta con cuál (`preguntarVolver`, js/02, con `Confirmar.elegir` y `Combatiente.volverOpciones`) y usa solo la elegida
+  (`FichaAcciones.volverCon`). Si se cierra el cartel, sigue caído y la pantalla roja muestra «☥ ¿Con qué volvés? Elegí» (`#btn-volver`) mientras tenga
+  opciones. Con una sola forma, automático como siempre. Ver `comun/CLAUDE.md`.

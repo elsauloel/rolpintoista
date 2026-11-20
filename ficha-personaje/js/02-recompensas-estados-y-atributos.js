@@ -225,8 +225,33 @@ function revisarMuerte(){
     if(r.revivio) $('#overlay-muerte').classList.remove('open');
     return;
   }
-  if(r.cayo) $('#scrim-muerte').classList.add('open');
+  // ☥ (2026-11-20) Con más de una forma de volver no revive solo: en vez del cartel de «caíste», la pregunta de con qué vuelve.
+  if(r.cayo){ if(FichaAcciones.volverPendiente(S).length > 1) preguntarVolver(); else $('#scrim-muerte').classList.add('open'); }
   renderOverlayMuerte();
+}
+/* ☥ ¿Con qué volvés? (dueño, 2026-11-20): caído y con más de una forma de volver (el Pacto, un Ankh en el cinturón, la Llama de Fénix), elige cuál usa;
+   las otras no se gastan (FichaAcciones.volverCon). Si lo cierra, sigue caído: el botón ☥ de la pantalla roja lo vuelve a abrir. */
+let volverAbierto = false;
+async function preguntarVolver(){
+  const formas = FichaAcciones.volverPendiente(S);
+  if(formas.length < 2 || volverAbierto) return;
+  const gm = !!(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.editaGM);
+  if(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura && !gm){ toast('Es de otro jugador: elige él, o el GM con el ☥ de su token en el mapa'); return; }
+  volverAbierto = true;
+  try{
+    const nom = ((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje';
+    const c = Combatiente.volverOpciones(nom, formas, gm);
+    const id = await Confirmar.elegir(c.texto, c.o);
+    if(!id) return;
+    const salvado = FichaAcciones.volverCon(S, id);
+    if(!salvado) return;
+    $('#f-hp').value = S.hp;
+    refresh();
+    renderOverlayMuerte();
+    const txt = Combatiente.volverTxt(nom, salvado, {elegido: true, porGM: gm});
+    toast(txt);
+    try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
+  }finally{ volverAbierto = false; }
 }
 
 function renderOverlayMuerte(){
@@ -235,6 +260,7 @@ function renderOverlayMuerte(){
   if(!S.muerto || !S.muerto.activo){ $('#overlay-muerte').classList.remove('open'); return; }
   $('#overlay-muerte').classList.add('open');
   $('#btn-revivir').style.display = S.muerto.definitivo ? 'none' : '';
+  if($('#btn-volver')){ $('#btn-volver').style.display = FichaAcciones.volverPendiente(S).length > 1 ? '' : 'none'; $('#btn-volver').onclick = preguntarVolver; }
   $('#overlay-muerte-centro').innerHTML = S.muerto.definitivo
     ? `<div class="muerte-final">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATRÁS</div>`
     : `<div class="muerte-label">INCONSCIENTE · turnos hasta morir:</div><div class="muerte-numero">${fmt(S.muerto.turnos)}</div>`;

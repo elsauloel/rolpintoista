@@ -124,6 +124,8 @@ function hudHtml(t){
     // para jugadores»): js/98, gmRevivirToken.
     // Desde el 2026-11-04 también el jugador, con su propio personaje o una invocación suya (puedeRevivirToken).
     (!pausaSoloMirar() && typeof tokenCaido === 'function' && typeof puedeRevivirToken === 'function' && puedeRevivirToken(t) && tokenCaido(t) ? icono('revivir', '✚', soyGM ? 'Revivirlo (el GM): elegís con cuánta vida vuelve; queda Titilando hasta su próximo turno' : 'Revivir: elegís con cuánta vida vuelve; queda Titilando hasta su próximo turno') : '') +
+    // ☥ ¿Con qué vuelve? (2026-11-20): caído y con más de una forma de volver (Pacto, Ankh en el cinturón, Llama): elige su jugador o el GM (js/98).
+    (!pausaSoloMirar() && typeof volverPuede === 'function' && volverPuede(t) ? icono('volver', '☥', soyGM ? 'Tiene más de una forma de volver (Pacto, Ankh, Llama): elegí con cuál vuelve' : 'Tenés más de una forma de volver (Pacto, Ankh, Llama): elegí con cuál') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     // 🤝 De mano a mano (dueño, 2026-11-01): el token de un personaje aliado pegado al mío (caído o no) → darle o pedirle un ítem (js/11, comun/intercambio.js).
     (!pausaSoloMirar() && typeof manosMiPersonaje === 'function' && manosMiPersonaje(t) ? icono('manos', '🤝', 'Darle o pedirle un ítem (está pegado a tu personaje)') : '') +
@@ -463,9 +465,10 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
   const efectosRef = base.collection('partes').doc('efectos');   // los estados viven en su propia parte (2026-10-10: antes se leían de «general» y no estaban)
+  const cinturonRef = base.collection('partes').doc('cinturon');   // ☥ ¿tiene un Ankh en el cinturón? (2026-11-20: con más de una forma de volver, elige)
   const ts = firebase.firestore.FieldValue.serverTimestamp();
   const res = await fbDb.runTransaction(async tx => {
-    const [parte, ficha, partEf] = await Promise.all([tx.get(parteRef), tx.get(base), tx.get(efectosRef)]);
+    const [parte, ficha, partEf, partCin] = await Promise.all([tx.get(parteRef), tx.get(base), tx.get(efectosRef), tx.get(cinturonRef)]);
     if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
     const datos = JSON.parse(parte.data().json || '{}');
     const datosEf = partEf.exists ? JSON.parse(partEf.data().json || '{}') : null;
@@ -492,14 +495,21 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(previo > 0 && datos.hp <= 0 && num(rs.ultimoAliento) > 0 && !(datos.meta && datos.meta.ultimoAlientoUsado)){ datos.hp = 1; datos.meta = {...(datos.meta || {}), ultimoAlientoUsado: true}; aliento = true; }
     // 🔥 Llama de Fénix (2026-10-20): el golpe que lo deja en 0 lo hace renacer con toda la vida y todo el SP, Titilando (acá mismo: no depende
     // de que la pantalla del dueño esté abierta).
-    let fenix = false;
+    // ☥ Con más de una forma de volver (la Llama, el Pacto, un Ankh en el cinturón), no revive solo: queda en 0 y quien lo maneja elige con cuál
+    // (dueño, 2026-11-20; js/98, volverPreguntar). Con una sola, como siempre.
+    let fenix = false, elige = false;
     if(previo > 0 && datos.hp <= 0){
+      let cin = []; try{ cin = (partCin.exists && JSON.parse(partCin.data().json || '{}').cinturon) || []; }catch(e){}
+      const formas = (Combatiente.revivirFenix(efectos, []) ? 1 : 0) + (datos.meta && datos.meta.pacto ? 1 : 0) + (cin.some(i => i && i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0) ? 1 : 0);
+      elige = formas > 1;
+    }
+    if(!elige && previo > 0 && datos.hp <= 0){
       const q = Combatiente.revivirFenix(efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
       if(q){ efectos.splice(0, efectos.length, ...q); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }
     }
     // 😇 El Pacto (2026-10-28): si no lo levantó la llama, lo levanta el pacto: revive con un cuarto de la vida, Titilando, y el pacto se gasta.
     let pacto = false;
-    if(previo > 0 && datos.hp <= 0 && datos.meta && datos.meta.pacto){
+    if(!elige && previo > 0 && datos.hp <= 0 && datos.meta && datos.meta.pacto){
       const tit = Combatiente.estadoTitilando(typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
       if(tit) Combatiente.agregarEstado(efectos, tit);
       datos.meta.pacto = false;
@@ -527,7 +537,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       ...(desperto ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
       ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
       ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
-    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp, desperto};
+    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, elige, hpFenix: datos.hp, desperto};
   });
   if(res && res.simulado) return res;
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
@@ -1293,6 +1303,7 @@ function hudConectar(t){
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
     if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }
     if(clave === 'revivir'){ if(typeof revivirToken === 'function') revivirToken(t); return; }   // ✚ (js/98)
+    if(clave === 'volver'){ if(typeof volverPreguntar === 'function') volverPreguntar(t.fichaId); return; }   // ☥ (js/98)
     if(clave === 'pacto'){ if(typeof pactoRenovar === 'function') pactoRenovar(t); return; }   // 😇 (js/83)
     if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)

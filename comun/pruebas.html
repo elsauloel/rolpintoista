@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261120enj"></script>
+<script src="combatiente.js?v=20261120volverb"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
 <script src="creep-acciones.js?v=20261110vaq"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261120enj"></script>
+<script src="ficha-resumen.js?v=20261120volverb"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261120maestria"></script>
 <script src="inv-botonera.js?v=20261120maestria"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261118ae"></script>
+<script src="ficha-acciones.js?v=20261120volverb"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -2622,17 +2622,61 @@ prueba('🔥 Llama de Fénix (2026-10-20): un personaje o un creep que cae con l
   igual([r, S.hp === hpmax, S.spGastado, S.efectos.some(e => e.fenix), S.efectos.some(e => e.titilando), rc, sc.hp, sc.estados.some(e => e.titilando), CreepAcciones.fenixCreep(sc2), sc2.hp],
     ['Llama de Fénix', true, 0, false, true, true, 30, true, false, 0]);
 });
-prueba('😇 El Pacto (2026-10-28): con la vida en 0 revive solo con un cuarto, Titilando, y se gasta; antes del Ankh, después de la llama', () => {
-  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]};
+prueba('😇 El Pacto (2026-10-28): solo (sin otra forma de volver), con la vida en 0 revive solo con un cuarto, Titilando, y se gasta', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: []};
   S.meta.pacto = true;
   const hpmax = FichaCalculo.calcular(S).final.hpmax;
   S.hp = 0;
   const r = FichaAcciones.revisarAnkh(S);
-  const vida = S.hp, tit = S.efectos.some(e => e.titilando), sigue = S.meta.pacto, ankh = S.cinturon[0].unidades;
-  S.hp = 0;
-  const r2 = FichaAcciones.revisarAnkh(S);   // sin pacto: ahora sí el Ankh
-  igual([r, vida === Math.max(1, Math.floor(hpmax / 4)), tit, sigue, ankh, r2, FichaResumen.resumen({...S, meta: {...S.meta, pacto: true}}).pacto, Combatiente.pactoVida(30), Combatiente.pactoVida(2)],
-    ['El Pacto', true, true, false, 1, 'Ankh de Reencarnación', true, 7, 1]);
+  const vida = S.hp, tit = S.efectos.some(e => e.titilando), sigue = S.meta.pacto;
+  S.hp = 0; S.cinturon = [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}];
+  const r2 = FichaAcciones.revisarAnkh(S);   // sin pacto y con un Ankh en el cinturón: el Ankh, solo
+  igual([r, vida === Math.max(1, Math.floor(hpmax / 4)), tit, sigue, r2, S.cinturon[0].unidades, FichaResumen.resumen({...S, meta: {...S.meta, pacto: true}}).pacto, Combatiente.pactoVida(30), Combatiente.pactoVida(2)],
+    ['El Pacto', true, true, false, 'Ankh de Reencarnación', 0, true, 7, 1]);
+});
+prueba('☥ ¿Con qué volvés? (2026-11-20): con el Pacto y un Ankh en el cinturón no revive solo; ofrece las dos y se usa solo la elegida', () => {
+  const nueva = () => { const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 2}]}; S.meta.pacto = true; S.hp = 0; return S; };
+  const S = nueva(), hpmax = FichaCalculo.calcular(S).final.hpmax, cuarto = Math.max(1, Math.floor(hpmax / 4));
+  const r = FichaAcciones.revisarAnkh(S), cae = FichaAcciones.revisarMuerte(S);
+  const formas = FichaAcciones.volverPendiente(S);
+  igual([r, S.hp, S.meta.pacto, S.cinturon[0].unidades, cae.cayo, S.muerto.activo, formas.map(f => f.id), formas.map(f => f.hp), formas[1].u, FichaResumen.resumen(S).volver.map(f => f.id)],
+    [null, 0, true, 2, true, true, ['pacto', 'ankh'], [cuarto, cuarto], 2, ['pacto', 'ankh']]);
+  // Elige el Ankh: gasta uno, el Pacto queda; vuelve Titilando y deja de estar caído.
+  const conAnkh = FichaAcciones.volverCon(S, 'ankh'), m = FichaAcciones.revisarMuerte(S);
+  igual([conAnkh, S.hp, S.meta.pacto, S.cinturon[0].unidades, m.revivio, S.muerto.activo, S.efectos.some(e => e.titilando), FichaAcciones.volverPendiente(S)],
+    ['Ankh de Reencarnación', cuarto, true, 1, true, false, true, []]);
+  // Elige el Pacto: se gasta el Pacto, los Ankh quedan.
+  const P = nueva(); FichaAcciones.revisarAnkh(P); FichaAcciones.revisarMuerte(P);
+  const conPacto = FichaAcciones.volverCon(P, 'pacto');
+  igual([conPacto, P.hp, P.meta.pacto, P.cinturon[0].unidades, P.efectos.some(e => e.titilando)], ['El Pacto', cuarto, false, 2, true]);
+  // De pie no se puede usar; lo que no tiene, tampoco; muerto de verdad, nada.
+  const D = nueva(); D.muerto = {activo: true, turnos: 0, definitivo: true};
+  igual([FichaAcciones.volverCon(P, 'ankh'), FichaAcciones.volverCon({...nueva(), cinturon: []}, 'ankh'), FichaAcciones.formasDeVolver(D), FichaAcciones.volverCon(D, 'pacto'), FichaAcciones.revisarAnkh(D)],
+    [null, null, [], null, null]);
+});
+prueba('☥ ¿Con qué volvés? con la Llama de Fénix: tres formas, ninguna sola; la Llama da toda la vida y el SP y no gasta el Pacto ni el Ankh; un Ankh en la mochila no cuenta', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]};
+  FichaHabilidades.aplicarEfectoDeConsumo(S, CATALOGO_BASE.find(i => i.nombre === 'Elixir de Fénix'), presetsDePrueba);
+  S.meta.pacto = true;
+  const hpmax = FichaCalculo.calcular(S).final.hpmax;
+  S.hp = 0; S.spGastado = 4;
+  const r = FichaAcciones.revisarAnkh(S), ids = FichaAcciones.volverPendiente(S).map(f => f.id);
+  const L = structuredClone(S), conLlama = FichaAcciones.volverCon(L, 'llama');
+  const M = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [], inventario: [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]};
+  M.meta.pacto = true; M.hp = 0;
+  const soloPacto = FichaAcciones.revisarAnkh(M);   // el Ankh en la mochila no es una forma de volver sola: queda una → automática
+  igual([r, S.hp, ids, conLlama, L.hp === hpmax, L.spGastado, L.meta.pacto, L.cinturon[0].unidades, L.efectos.some(e => e.fenix), L.efectos.some(e => e.titilando), soloPacto, M.inventario[0].unidades],
+    [null, 0, ['llama', 'pacto', 'ankh'], 'Llama de Fénix', true, 0, true, 1, false, true, 'El Pacto', 1]);
+});
+prueba('☥ ¿Con qué volvés?: el cartel explica cada opción y la línea de la Mesa dice con cuál volvió', () => {
+  const c = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 2}, {id: 'llama', hp: 30}], false), g = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 1}], true);
+  igual([c.o.titulo, c.o.opciones.map(x => x.valor), /Volvés con un cuarto de tu vida \(7 HP\).*se gasta hasta que la historia te dé otro/.test(c.o.opciones[0].detalle), /Se gasta uno del cinturón \(tenés 2\)/.test(c.o.opciones[1].detalle),
+    /toda tu vida \(30 HP\) y todo el SP/.test(c.o.opciones[2].detalle), g.o.titulo, /solo la que elijas/.test(c.texto), /Vuelve con un cuarto de la vida \(7 HP\)/.test(g.o.opciones[0].detalle), /\(tiene 1\)/.test(g.o.opciones[1].detalle)],
+    ['¿Con qué volvés?', ['pacto', 'ankh', 'llama'], true, true, true, '¿Con qué vuelve Blanco?', true, true, true]);
+  igual([Combatiente.volverTxt('Blanco', 'El Pacto'), Combatiente.volverTxt('Blanco', 'Ankh de Reencarnación'), Combatiente.volverTxt('Blanco', 'Ankh de Reencarnación', {elegido: true}),
+    Combatiente.volverTxt('Blanco', 'El Pacto', {elegido: true, porGM: true}), Combatiente.volverIcono('El Pacto'), Combatiente.volverIcono('Ankh de Reencarnación')],
+    ['😇 Blanco zafó de morir: lo salvó el pacto (vuelve Titilando)', '☥ Blanco: ¡Ankh de Reencarnación se activó solo y revive!', '☥ Blanco: ¡usa su Ankh de Reencarnación y revive! (lo eligió)',
+     '😇 Blanco zafó de morir: lo salvó el pacto (lo eligió el GM) (vuelve Titilando)', '😇', '☥']);
 });
 prueba('😇 Renovar el Pacto (2026-11-19): la línea de la Mesa dice quién lo renovó, el aviso al jugador y la pregunta de la ficha', () => {
   igual([Combatiente.pactoRenovadoTxt('Bizzante', true), Combatiente.pactoRenovadoTxt('Bizzante', false), Combatiente.PACTO_AVISO, Combatiente.PACTO_A_MANO],

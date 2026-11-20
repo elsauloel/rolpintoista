@@ -30,10 +30,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   combate), así que no se sumó ninguno. El orden de turnos no se toca, igual que con el interruptor (queda preguntado en P252). Probado con clics en
   «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1): desde el mapa y desde GM Tools, con un ítem en el botín y sin ítems; y Simular. Todo quedó
   como estaba (XP, despojos, creeps, sin combate abierto, narrativo). Pruebas automáticas 895/895. Sin ver: `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola — 👥 Sumar al Jugador 2 a «Claude · pruebas 2»** (dueño, 2026-11-20: «podría sumar al jugador 2 a la partida de pruebas, así tenemos
-  en la partida de pruebas todas las opciones posibles»). Con la cuenta de pruebas del Jugador 2 («Unirme como jugador»), y crearle un personaje de
-  pruebas («Blanco J2», en blanco como Blanco J1) con su token en «Prueba · R4 M4». Sirve para probar lo que necesita dos personas distintas
-  (pasar cosas, aceptar ofertas, duelos entre jugadores). Anotar en docs/memoria-claude.md que la partida de pruebas ya tiene GM, J1 y J2.
+- **✅ hecho (2026-11-20) — 👥 Sumar al Jugador 2 a «Claude · pruebas 2»** (dueño, 2026-11-20: «podría sumar al jugador 2 a la partida de pruebas, así tenemos
+  en la partida de pruebas todas las opciones posibles»).
+  *Resultado:* todo con clics, sin escribir nada por detrás. El Jugador 2 entró con «Unirme como jugador» (no hizo falta que el GM lo acepte). Con el
+  asistente «＋ Personaje nuevo» se le creó **«Blanco J2»**, igual a Blanco J1 / Blanco J1 b: nivel 1, sin raza ni clase, Constitución 10 · Fuerza 6 ·
+  Agilidad 6 · Destreza 6 · Especial 8 (36 puntos, 3 de más, como ellos), vida 50, SP 24, No2 6, 0 DDE, sin habilidades, pasivas ni talentos, y un
+  Cuchillo de cazador equipado (comprado del catálogo: se le cargaron 85 DDE y quedó otra vez en 0). Su token está en «Prueba · R4 M4», en la casilla
+  libre justo debajo de Blanco J1 (🎭 → «Traer a Blanco J2 ya»); no se movió nada de lo que había. **Prueba de dos personas:** el Jugador 1 le ofreció
+  1 DDE a Blanco J2 desde «💰 DDE y despojos → 🤝 Pasar a un aliado»; al Jugador 2 le saltó «🤝 Te ofrecen algo» en su pantalla, aceptó, y los números
+  cambiaron bien en las dos (la Mesa: «Blanco J1 le pasó 1 DDE a Blanco J2»). Después los dos quedaron en 0 DDE, sin ofertas pendientes; el mapa en
+  narrativo y sin orden de turnos. No apareció ningún error del programa. Desde ahora, lo de dos personas se prueba con J1 y J2
+  (`docs/memoria-claude.md`, «Probar»).
 - **⬜ en cola — 🌿 El aviso «el mapa volvió a modo narrativo», dentro del cartel «🩺 Cómo quedó el grupo»** (dueño, 2026-11-20: «lo del cambio en
   modo narrativo me gusta, pero quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito verde ese pasa bastante
   desapercibido»). Cuando el fin del combate pasa el mapa a narrativo, el cartel «Cómo quedó el grupo» lo dice bien visible (arriba, destacado:

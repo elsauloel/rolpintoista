@@ -291,8 +291,9 @@
 - [ ] **🤝 «Pasar a un aliado» de la ventanita «💰 DDE y despojos», con el mapa en Combate** (2026-11-20; `#btn-pasar-dde`, ficha js/08). Visto con clics
   en «Claude · pruebas 2», fuera de combate: el botón abre la ventana de siempre y pasar 20 DDE y 2 despojos normales cambió bien los números de los dos
   (aceptó el otro personaje del mismo Jugador 1). **Falta ver**: con el mapa en Combate, que la ventana que abre muestre el aviso «⚔ En combate, solo
-  ítems…» y no ofrezca DDE ni despojos (es la regla de siempre de `comun/intercambio.js`, no se tocó); y que acepte **otra persona** (el Jugador 2 no
-  es parte de «Claude · pruebas 2»).
+  ítems…» y no ofrezca DDE ni despojos (es la regla de siempre de `comun/intercambio.js`, no se tocó). ~~Que acepte **otra persona**~~ **visto
+  (2026-11-20, Claude, dos cuentas distintas)**: el Jugador 1 le ofreció 1 DDE a Blanco J2, al Jugador 2 le saltó «🤝 Te ofrecen algo» en su ficha,
+  aceptó, y cambiaron los números de los dos y la Mesa lo contó; todo restaurado.
 - [ ] **🛡 El cartel flotante «INVULNERABLE» / «INMUNE A …» en los caminos que no se vieron** (2026-11-20; `vtt-hexgrid/js/121-cartel-inmune.js`). Ya
   visto con clics en «Claude · pruebas 2» (GM y J1): golpe del duelo a un personaje Titilando, un estado del duelo frenado por Inmunidad a CC, daño tóxico
   de una habilidad a un inmune a lo tóxico, Veneno y Miedo que llegan con Sangre pura / Inmunidad mental, una invocación Titilando (estado y «Recibe daño»),

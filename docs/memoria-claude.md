@@ -108,6 +108,10 @@
   («Claude · pruebas», «Renacuajos no binaries», «Test con claude elsaulo», «Test29-9»: crear, modificar y borrar libre, sin restaurar después).
   Al terminar: duelos con «Terminar duelo» (la ✕ solo esconde), carteles aceptados, menús cerrados, el mapa limpio. Si una tirada tiene que salir
   alta o baja: «✍ Elegir manualmente» con un número fijo.
+- **«Claude · pruebas 2» tiene las tres cuentas de prueba** (2026-11-20): el GM, el Jugador 1 (personajes «Blanco J1» y «Blanco J1 b») y el
+  Jugador 2 («Blanco J2», igual a los otros: nivel 1, 10/6/6/6/8, vida 50, un Cuchillo de cazador). Los tres tienen token en el mapa
+  «Prueba · R4 M4». **Lo que necesita dos personas distintas** (pasar cosas, aceptar ofertas, duelos entre jugadores) **se prueba con J1 y J2**,
+  cada uno en su pantalla. Un jugador pone su token con 🎭 → «Traer a … ya». Al terminar: narrativo, sin orden de turnos, sin ofertas pendientes.
 - **Ojo con los respaldos «restaurar todo» de una partida de prueba** (2026-11-05: se borraron los 17 tokens y el estado de «Mapa 1» de
   «Claude · pruebas»): el primer mapa puede tener un documento en `mapas/_principal` (solo el nombre, si se lo renombró), pero sus tokens y su
   estado viven en `tokens/` y `mapa/`. Un script que recorre `mapas/*` y guarda `mapas/<id>/tokens` bajo la clave `_principal` pisa lo de

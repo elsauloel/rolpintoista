@@ -943,6 +943,17 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   con `Combatiente.alVolver`, y también limpia `resumen.estados`); un creep desde `danioCreep` (la Llama), `revivirToken` (js/98, también una
   invocación) y `revivirElegido` (js/22, el Revive). Probado con clics en «Claude · pruebas 2» (Pacto, Ankh, Fénix, Revive de J2, ✚ del GM a un
   personaje y a un creep).
+- **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
+  turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
+  modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`
+  el pie de la lista suma `#ini-iniciar` (`.ini-iniciar`, verde y pulsando, mapa.css). `iniciativaIniciarCombate()`: en narrativo ofrece
+  `modoPasarA('combate')` (el interruptor de modo ahora llama a esa función); `combateNo2Llenos()` (creeps con `modificarCreep`, personajes e
+  invocaciones del orden con `editarPersonajeMapa`; solo escribe a quien le faltaban); guarda `{turno: el primero no caído, ronda: 1, paso + 1,
+  actuaron: [], iniciado: true}`; y le empieza el turno al primero como `iniciativaSiguiente` (`zonasDelQueLaTiro`, `inicioTurnoPendiente` → el cartel
+  «▶ Empieza tu turno» del jugador; un creep, `inicioDeTurno`), con la línea de la Mesa y el momento `turno` «Empieza el combate: turno de X».
+  `escucharIniciativa` anuncia el turno también cuando `iniciado` pasa a true. El botón ▶ Siguiente pasa por `iniciativaSiguienteBoton()`: sin
+  iniciar, avisa y ofrece iniciar o pasar igual (deja `iniciado`). Las marcas se van con Limpiar y cuando el mapa pasa de Combate a narrativo
+  (`escucharModo`, la pantalla del GM); «Traer tokens» las conserva. Sin reglas nuevas. Dudas: P257.
 - **😇 Renovar el Pacto desde el mapa** (2026-11-19, dueño): en el ⋯ del token de un personaje (no una invocación) con el Pacto gastado, el 😇 para el GM y
   el jugador dueño (`pactoPuedeRenovar` / `pactoRenovar`, js/83): confirma, `editarPersonajeMapa` marca `S.meta.pacto` (tarda unos segundos: avisa
   «Renovando…»), línea en la Mesa (`Combatiente.pactoRenovadoTxt`) y un momento `pacto` con el Aviso al jugador (`Combatiente.PACTO_AVISO`). La ficha

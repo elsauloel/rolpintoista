@@ -1728,3 +1728,16 @@ pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAl
 - (i) **Subirle la vida a mano a un caído** (HP directo desde el token): cuando su pantalla lo saca de «inconsciente», cuenta como volver y se le
   van los estados. ¿O eso no debería contar como resucitar?
 
+### P257 — ▶ «Iniciar combate»: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+El botón del orden de turnos (dueño, 2026-11-20). Dudas chicas, con lo elegido:
+- (a) **Los estados del primero:** su turno empieza como cualquier otro (regeneración, recarga, lo que se dispara al empezar); los turnos de sus
+  estados bajan al TERMINAR su turno, como siempre. No se hizo nada distinto por ser el primer turno del combate.
+- (b) **Cooldowns, SP y vida:** «Iniciar combate» solo llena los No2 (y, al primero, lo de su inicio de turno). ¿Los cooldowns o el SP deberían
+  arrancar de alguna forma especial al empezar un combate?
+- (c) **Cuándo se vuelve a ofrecer:** después de que el mapa vuelve a narrativo (o de «Limpiar») y de apretar Ordenar otra vez. Si un combate termina
+  y el siguiente empieza sin pasar por narrativo ni Limpiar, el botón no aparece (se juega como antes). «Traer tokens» a mitad de combate no lo
+  vuelve a ofrecer, para que no se recarguen los No2 por accidente. ¿Está bien, o preferís un botón chico «reiniciar combate» siempre a mano?
+- (d) **«Siguiente» sin haber iniciado:** avisa y ofrece iniciar o «pasar el turno sin iniciar» (no bloquea). ¿O debería iniciar directo?
+- (e) **Los caídos:** también quedan con los No2 llenos; el primero que juega es el primero de la lista que no está caído.
+- (f) **La ronda:** al iniciar vuelve a «Ronda 1» aunque el orden viniera con otra cuenta de un combate anterior.
+

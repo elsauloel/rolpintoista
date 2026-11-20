@@ -3196,3 +3196,12 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [ ] **Sin ver en pantalla:** «¿Con qué volvés?» eligiendo entre dos formas (mismo lugar del código; cubierto por las pruebas automáticas); un creep
   que revive con la Llama de Fénix (por un golpe y en su Mantenimiento); una invocación revivida con el ✚ de su token; revivir un creep desde GM Tools
   suelto; revivir desde la ficha suelta (toast y línea en la Mesa); que un estado del equipo puesto (un anillo, «Inmune a …») siga después de volver.
+
+## ▶ Iniciar combate (2026-11-20)
+
+- [x] (2026-11-20, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2) el botón después de Ordenar; «Siguiente» sin iniciar avisa; en
+  narrativo ofrece pasar a Combate; todos con los No2 llenos; el cartel «▶ Empieza tu turno» en la pantalla del primero (un personaje); con un creep
+  primero, su inicio directo; «Siguiente» sigue normal; Ordenar a mitad de combate no lo vuelve a ofrecer; al volver a narrativo y Ordenar, sí.
+- [ ] **Sin ver en pantalla:** una invocación en el orden (sus No2); un caído primero en la lista (tiene que empezar el siguiente); «▶ Iniciar sin
+  cambiar el modo»; «⏭ Pasar el turno sin iniciar»; un combate que venía andando de antes del botón (no tiene que ofrecerlo); el anillo que marca
+  de quién es el turno al iniciar, en la pantalla de los jugadores.

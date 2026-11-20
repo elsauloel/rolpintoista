@@ -81,7 +81,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
 <script src="ficha-acciones.js?v=20261120volver"></script>
-<script src="orden-turnos.js?v=20261105orden"></script>
+<script src="orden-turnos.js?v=20261120iniciar"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2766,6 +2766,21 @@ prueba('☥ Al volver se van los estados: un creep (la Llama en su Mantenimiento
   const si = Combatiente.volverLimpio(inv, 'estados', 'revive');
   igual([sacados.map(x => x.nombre), sc.estados.map(e => e.titilando ? 'Titilando' : e.nombre).sort(), v.forma, si.map(x => x.nombre), inv.estados, Combatiente.volverLimpio(null, 'estados'), Combatiente.volverLimpio({}, 'estados').length],
     [['Veneno'], ['Titilando', 'Vuela'], 'llama', ['Rengo'], [], [], 0]);
+});
+prueba('▶ Iniciar combate (2026-11-20): cuándo se ofrece el botón, cuándo no, y quién es el primero que juega', () => {
+  const O = OrdenTurnos, orden = [{id: 'a', valor: 9}, {id: 'b', valor: 5}, {id: 'c', valor: 1}];
+  const nuevo = {orden, turno: 0, ronda: 1, actuaron: []};
+  const ordenado = {...nuevo, ...O.marcasAlOrdenar(nuevo)};
+  const iniciado = {...ordenado, iniciado: true, porIniciar: false};
+  const viejoEnCurso = {orden, turno: 1, ronda: 2, actuaron: ['a']};   // un combate de antes del botón, ya andando
+  igual([O.porIniciar(nuevo), O.marcasAlOrdenar(nuevo), O.porIniciar(ordenado), O.enCurso(ordenado), O.porIniciar(iniciado), O.enCurso(iniciado), O.marcasAlOrdenar(iniciado),
+    O.enCurso(viejoEnCurso), O.marcasAlOrdenar(viejoEnCurso), O.porIniciar({...viejoEnCurso, ...O.marcasAlOrdenar(viejoEnCurso)}), O.enCurso({orden, libre: {id: 'b'}}), O.enCurso({orden, repite: 'b'}),
+    O.porIniciar({orden: [], porIniciar: true}), O.porIniciar({...iniciado, ...O.SIN_INICIAR}), O.porIniciar({...iniciado, ...O.SIN_INICIAR, ...O.marcasAlOrdenar({...iniciado, ...O.SIN_INICIAR})}), O.porIniciar(null), O.enCurso({orden, iniciado: false, actuaron: ['a']}), O.marcasAlOrdenar({orden, iniciado: false, actuaron: ['a']}), O.enCurso(viejoEnCurso, 'narrativo'), O.enCurso(viejoEnCurso, 'combate'), O.enCurso(iniciado, 'narrativo')],
+    [false, {porIniciar: true, iniciado: false}, true, false, false, true, {},
+     true, {}, false, true, true,
+     false, false, true, false, false, {porIniciar: true, iniciado: false}, false, true, true]);
+  igual([O.primero(orden, () => false), O.primero(orden, id => id === 'a'), O.primero(orden, id => id !== 'c'), O.primero(orden, () => true), O.primero([], null), O.primero(['x', 'y'], id => id === 'x')],
+    [0, 1, 2, 0, 0, 1]);
 });
 prueba('☥ ¿Con qué volvés?: el cartel explica cada opción y la línea de la Mesa dice con cuál volvió', () => {
   const c = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 2}, {id: 'llama', hp: 30}], false), g = Combatiente.volverOpciones('Blanco', [{id: 'pacto', hp: 7}, {id: 'ankh', hp: 7, u: 1}], true);

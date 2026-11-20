@@ -73,6 +73,25 @@ const OrdenTurnos = (() => {
   }
   // 🎺 Toque de carga: 3 SP la primera vez en el combate y +2 por cada vez que se vuelve a usar (3, 5, 7…). `usos` = las veces que ya lo usó.
   const costoToque = usos => 3 + 2 * Math.max(0, Math.round(num(usos)));
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque};
+  /* ▶ Iniciar combate (dueño, 2026-11-20: «se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que diga
+     Iniciar combate, y ahí se inicia con el primer turno del primero de la lista con sus regeneraciones pertinentes, recarga de nitros, etc.»).
+     El orden de turnos (`ini` = el documento de la iniciativa) lleva dos marcas: `porIniciar` (se apretó Ordenar y el combate todavía no empezó: se
+     ofrece el botón) e `iniciado` (ya se apretó «▶ Iniciar combate»: no se vuelve a ofrecer). Las dos se van al Limpiar y cuando el mapa vuelve a
+     narrativo (el combate terminó); «Traer tokens» las conserva (sumar a alguien a mitad de combate no lo vuelve a ofrecer).
+     · enCurso: ya se inició, o es un combate de antes de este botón (sin la marca `iniciado`, ni sí ni no) que ya está andando (alguien jugó, hay
+       un turno libre o uno repetido). Con `iniciado: false` (se ordenó, se limpió o el mapa volvió a narrativo) o con el mapa en
+       narrativo (`modo`), no está en curso.
+     · marcasAlOrdenar: lo que se guarda al apretar Ordenar ({} si el combate ya está en curso: reordenar a mitad de combate no lo ofrece de nuevo).
+     · porIniciar: ¿se muestra el botón? · primero(orden, fuera): el índice del primero que puede jugar (saltea a los caídos; si cayeron todos, 0). */
+  const enCurso = (ini, modo) => !!ini && (ini.iniciado === true || (ini.iniciado !== false && modo !== 'narrativo' && ((Array.isArray(ini.actuaron) && ini.actuaron.length > 0) || !!ini.libre || !!ini.repite)));
+  const marcasAlOrdenar = (ini, modo) => enCurso(ini, modo) ? {} : {porIniciar: true, iniciado: false};
+  const porIniciar = ini => !!ini && ini.porIniciar === true && ini.iniciado !== true && Array.isArray(ini.orden) && ini.orden.length > 0;
+  function primero(orden, fuera){
+    const l = Array.isArray(orden) ? orden : [];
+    for(let k = 0; k < l.length; k++) if(!(fuera && fuera(l[k] && l[k].id !== undefined ? l[k].id : l[k]))) return k;
+    return 0;
+  }
+  const SIN_INICIAR = {iniciado: false, porIniciar: false};
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

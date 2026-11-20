@@ -501,6 +501,11 @@ aside{
 .ini-quitar:disabled{opacity:.25;cursor:default;color:var(--muted)}
 #iniciativa-pie{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border-top:1px solid var(--line-soft)}
 #iniciativa-pie .btn{font-size:10px;padding:5px 8px}
+/* ▶ Iniciar combate (2026-11-20): destacado y pulsando mientras no se apretó */
+#iniciativa-pie .btn.ini-iniciar{flex:1 1 100%;font-size:12px;padding:8px 10px;font-weight:800;letter-spacing:.04em;background:#2E9E6B;border-color:#6FCB9F;color:#06140D;animation:ini-iniciar-pulso 1.3s ease-in-out infinite}
+#iniciativa-pie .btn.ini-iniciar:hover{background:#3DB87E}
+#iniciativa-pie .btn.ini-iniciar:disabled{animation:none;opacity:.7}
+@keyframes ini-iniciar-pulso{0%,100%{box-shadow:0 0 0 0 rgba(111,203,159,.75)}50%{box-shadow:0 0 0 7px rgba(111,203,159,0),0 0 16px 3px rgba(111,203,159,.55)}}
 #iniciativa-vacio{padding:8px 10px;color:var(--muted)}
 /* Controles flotantes sobre el token seleccionado (estilo Roll20) */
 #hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20}

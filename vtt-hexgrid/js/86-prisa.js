@@ -19,7 +19,7 @@ function prisaOrdenar(){
   const conPrisa = iniciativa.orden.filter(o => tokenTienePrisa(o.id)).map(o => ({o, t: tokens.get(o.id)})).filter(x => x.t);
   if(!conPrisa.length || typeof AvisoCombate === 'undefined'){
     const orden = ordenarIniciativa(iniciativa.orden);
-    guardarIniciativa({orden, turno: 0, libre: null}).then(ok => { if(ok) iniciativaAvisarPuestos(orden, [], true); });
+    guardarIniciativa({orden, turno: 0, libre: null, ...OrdenTurnos.marcasAlOrdenar(iniciativa, modoMapa)}).then(ok => { if(ok) iniciativaAvisarPuestos(orden, [], true); });
     return;
   }
   const nombres = conPrisa.map(x => nombreDe(x.t)).join(', ');
@@ -34,7 +34,7 @@ function prisaOrdenar(){
 async function prisaAplicar(conPrisa, auto){
   const orden = auto ? ordenarIniciativa(iniciativa.orden)
     : iniciativa.orden.map((o, i) => ({o, i})).sort((a, b) => (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
-  if(!await guardarIniciativa({orden, turno: 0, libre: null})) return;
+  if(!await guardarIniciativa({orden, turno: 0, libre: null, ...OrdenTurnos.marcasAlOrdenar(iniciativa, modoMapa)})) return;   // ▶ ofrece «Iniciar combate» (js/04)
   iniciativaAvisarPuestos(orden, conPrisa.map(x => x.o.id), auto);
 }
 

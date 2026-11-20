@@ -255,7 +255,7 @@ function anunciarTurnoEnMapa(){
 function escucharIniciativa(){
   cortarIniciativa = fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).onSnapshot(doc => {
     const d = doc.exists ? doc.data() : {};
-    const antesTurno = iniciativa.turno, antesRonda = iniciativa.ronda;
+    const antesTurno = iniciativa.turno, antesRonda = iniciativa.ronda, antesIniciado = iniciativa.iniciado === true;
     iniciativa = {
       orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true})).filter(o => o.id),
       turno: Math.max(0, Math.round(num(d.turno))),
@@ -271,8 +271,10 @@ function escucharIniciativa(){
       ordenPendientes: Array.isArray(d.ordenPendientes) ? d.ordenPendientes.filter(x => x && typeof x === 'object').slice(0, 30) : [],
       ordenUsados: d.ordenUsados && typeof d.ordenUsados === 'object' ? {ronda: Math.round(num(d.ordenUsados.ronda)), ids: Array.isArray(d.ordenUsados.ids) ? d.ordenUsados.ids.map(String) : []} : null,
       mufas: d.mufas && typeof d.mufas === 'object' ? d.mufas : {},
+      // ▶ Iniciar combate (2026-11-20, comun/orden-turnos.js): se ordenó y falta empezar / ya empezó.
+      porIniciar: d.porIniciar === true, iniciado: d.iniciado === true ? true : d.iniciado === false ? false : null,   // (null: un orden de antes de este botón)
     };
-    const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
+    const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda || (iniciativa.iniciado === true && !antesIniciado);   // (iniciar el combate también anuncia de quién es el turno)
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
     renderIniciativa();
     if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); }   // 🔓 js/54
@@ -301,11 +303,15 @@ async function guardarIniciativa(cambios){
     ...(iniciativa.libre ? {libre: iniciativa.libre} : {}),
     ...(iniciativa.repite ? {repite: iniciativa.repite} : {}),
     ordenPendientes: iniciativa.ordenPendientes || [], mufas: iniciativa.mufas || {}, ...(iniciativa.ordenUsados ? {ordenUsados: iniciativa.ordenUsados} : {}),   // (js/102)
+    ...(iniciativa.porIniciar ? {porIniciar: true} : {}), ...(typeof iniciativa.iniciado === 'boolean' ? {iniciado: iniciativa.iniciado} : {}),   // ▶ Iniciar combate
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
   if(!datos.libre) delete datos.libre;
   if(!datos.repite) delete datos.repite;
+  if(!datos.porIniciar) delete datos.porIniciar;
+  if(typeof datos.iniciado !== 'boolean') delete datos.iniciado;
+  if(!datos.termino) delete datos.termino;
   if(!datos.ordenUsados) delete datos.ordenUsados;   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
@@ -334,7 +340,7 @@ function tokenTienePrisa(id){
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
   const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
-  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});
+  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});   // (`iniciado` se conserva: sumar un token a mitad de combate no vuelve a ofrecer «Iniciar combate»)
 }
 
 // Mover a mano una fila del orden de turnos (▲ ▼, solo GM): los dos cambian de lugar y nadie gana ni pierde su turno de la ronda (dueño,
@@ -569,6 +575,100 @@ async function iniciativaSiguiente(o){
   }
   const todasR = ordenRonda ? [...ordenRonda.lineas, ...todas] : todas;
   if(todasR.length) momentoActualizar(await tarjeta, {'datos.lineas': todasR.slice(0, 14)});
+}
+/* ▶ INICIAR COMBATE (dueño, 2026-11-20: «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa es como si
+   fuera su turno… se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que diga Iniciar combate, y ahí se
+   inicia con el primer turno del primero de la lista con sus regeneraciones pertinentes, recarga de nitros, etc.»; «al apretarlo le tiene que aparecer
+   el cartelito clásico de "empieza tu turno": se regenera tal cosa, pasa tal cosa, aceptar»).
+   El botón aparece al apretar Ordenar (`porIniciar`, comun/orden-turnos.js) y pulsa hasta que se aprieta. Al apretarlo:
+   1) si el mapa está en narrativo, ofrece pasarlo a Combate (lo mismo que el switch: modoPasarA);
+   2) TODOS los del orden (personajes, invocaciones, creeps) quedan con los No2 llenos (la cuenta de ataques ya la pone en cero el paso a Combate);
+   3) al PRIMERO que puede jugar le empieza el turno por el mismo camino que ▶ Siguiente: «▶ Empieza tu turno → Aplicar» en la pantalla de su jugador
+      (inicioTurnoPendiente) o, si es un creep, su inicio de turno directo (inicioDeTurno), con sus zonas (zonasDelQueLaTiro). Sin lógica nueva: sus
+      estados con turnos descuentan como en cualquier inicio de turno;
+   4) la ronda vuelve a 1, nadie «ya jugó», y queda `iniciado` (no se vuelve a ofrecer: no se pueden recargar los No2 a mitad de combate por accidente);
+   5) Crónica y Mesa: «▶ Empieza el combate: turno de X». */
+let iniciandoCombate = false;
+async function combateNo2Llenos(){
+  const porFicha = new Map();   // fichaId → {pj: bool, invs: Set}
+  const fallas = [];
+  for(const o of iniciativa.orden){
+    const t = tokens.get(o.id);
+    if(!t || !t.fichaId) continue;
+    if(t.tipo === 'creep'){
+      try{
+        const sc = creepPrivadoDe(t.fichaId);
+        if(sc && num(sc.nitros) === num(CreepCalculo.nitrosMax(CreepCalculo.normalizar(structuredClone(sc))))) continue;   // ya los tiene llenos: no se escribe
+        await modificarCreep(t.fichaId, crudo => { const sc2 = CreepCalculo.normalizar(crudo); sc2.nitros = CreepCalculo.nitrosMax(sc2); return {}; });
+      }catch(err){ console.error('Iniciar combate: los No2 de', nombreDe(t), err); fallas.push(nombreDe(t)); }
+      continue;
+    }
+    if(t.tipo !== 'pj') continue;
+    const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+    if(!fichasPub.has(fichaId)) continue;
+    const x = porFicha.get(fichaId) || {pj: false, invs: new Set(), nombre: nombreDe(t)};
+    if(invId) x.invs.add(invId); else x.pj = true;
+    porFicha.set(fichaId, x);
+  }
+  for(const [fichaId, x] of porFicha){
+    try{
+      await editarPersonajeMapa(fichaId, S => {
+        let hubo = false;
+        if(x.pj){ const max = num(FichaBotonera.nitrosMaximo(S)); if(num(S.nitros) !== max){ S.nitros = max; hubo = true; } }
+        (S.invocaciones || []).forEach(inv => { if(inv && x.invs.has(String(inv.id))){ const max = num(InvCalculo.nitrosMax(inv)); if(num(inv.nitros) !== max){ inv.nitros = max; hubo = true; } } });
+        return hubo;
+      });
+    }catch(err){ console.error('Iniciar combate: los No2 de', x.nombre, err); fallas.push(x.nombre); }
+  }
+  return fallas;
+}
+async function iniciativaIniciarCombate(){
+  if(!soyGM || iniciandoCombate) return;
+  if(!iniciativa.orden.length){ toast('Primero armá el orden de turnos (Traer tokens, tirar y Ordenar)'); return; }
+  if(OrdenTurnos.enCurso(iniciativa, modoMapa)){ toast('El combate ya está en curso'); return; }
+  if(modoMapa !== 'combate'){
+    const r = await Confirmar.elegir('El mapa está en modo narrativo: moverse no gasta No2. ¿Lo pasás a Combate para empezar?', {titulo: 'Iniciar combate', icono: '▶', no: 'Cancelar', opciones: [
+      {valor: 'combate', texto: '⚔ Pasar a Combate e iniciar', detalle: 'Lo mismo que el interruptor de arriba, y después empieza el combate.'},
+      {valor: 'igual', texto: '▶ Iniciar sin cambiar el modo', detalle: 'El mapa sigue en narrativo; el orden de turnos arranca igual.'}]});
+    if(!r) return;
+    if(r === 'combate' && !(await modoPasarA('combate'))) return;
+  }
+  iniciandoCombate = true; renderIniciativa();
+  try{
+    await bnCargarPiezas(); await acCargarPiezas();
+    const fallas = await combateNo2Llenos();
+    if(fallas.length) toast(`No se pudieron llenar los No2 de: ${fallas.join(', ')} — hacelo a mano`);
+    const orden = iniciativa.orden, k = OrdenTurnos.primero(orden, iniciativaFueraDeJuego), sig = orden[k];
+    const paso = Math.round(num(iniciativa.paso)) + 1, mapa = mapaMostrado;
+    if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false}))) return;
+    const tSig = tokens.get(sig.id);
+    const publico = !!tSig && !tSig.oculto && !sig.oculto && (tSig.tipo === 'creep' ? creepConocido(tSig) : !enSigilo(tSig));
+    const nomSig = publico ? nombreDe(tSig) : '';
+    const titulo = `▶ Empieza el combate${nomSig ? `: turno de ${nomSig}` : ''}`;
+    try{ mesaLinea(`${titulo} · todos arrancan con los No2 llenos`, 'recordatorio'); }catch(e){}
+    const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `Ronda 1 · ${titulo.replace(/^▶ /, '')}`, estado: 'listo',
+      datos: {lineas: ['Todos los del orden de turnos arrancan con los No2 llenos.', nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {})}});
+    // El turno del primero, como con ▶ Siguiente (sin lógica nueva).
+    const clave = `${mapa}:${paso}`;
+    const lineasZonas = await zonasDelQueLaTiro(sig.id, null);
+    const pendiente = await inicioTurnoPendiente(sig.id, clave);
+    const lineasInicio = pendiente ? [] : await inicioDeTurno(sig.id, clave);
+    const todas = [...lineasZonas, ...lineasInicio];
+    if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': ['Todos los del orden de turnos arrancan con los No2 llenos.', ...todas].slice(0, 14)});
+  }catch(err){ console.error('Iniciar combate:', err); toast('No se pudo iniciar el combate — mirá la consola'); }
+  finally{ iniciandoCombate = false; renderIniciativa(); }
+}
+// ▶ Siguiente, el botón: si se ordenó y el combate todavía no se inició, avisa y ofrece iniciarlo (o seguir sin iniciar: no vuelve a preguntar).
+async function iniciativaSiguienteBoton(){
+  if(soyGM && OrdenTurnos.porIniciar(iniciativa) && !iniciativa.libre){
+    const r = await Confirmar.elegir('El combate todavía no se inició: nadie tiene los No2 recargados y al primero de la lista no le empezó el turno.', {titulo: '▶ Siguiente', icono: '▶', no: 'Cancelar', opciones: [
+      {valor: 'iniciar', texto: '▶ Iniciar combate', detalle: 'Todos con los No2 llenos y empieza el turno del primero de la lista.'},
+      {valor: 'seguir', texto: '⏭ Pasar el turno sin iniciar', detalle: 'Como antes de este botón: termina el turno del primero y le toca al siguiente. No se vuelve a ofrecer «Iniciar combate» en este combate.'}]});
+    if(r === 'iniciar') return iniciativaIniciarCombate();
+    if(r !== 'seguir') return;
+    if(!(await guardarIniciativa({iniciado: true, porIniciar: false}))) return;
+  }
+  return iniciativaSiguiente();
 }
 /* ▶ Es su turno (dueño, 2026-10-15: «poder desde el máster cambiar el turno de a quién le toca… botón derecho sobre el nombre en la tabla de
    iniciativa… que te pregunte si se descuentan los cooldowns, si es como un turno normal de la ronda o es su turno de manera libre sin
@@ -1060,7 +1160,9 @@ function renderIniciativa(){
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
       (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`
         : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +
-      '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>'
+      '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>' +
+      // ▶ Iniciar combate (dueño, 2026-11-20): aparece al apretar Ordenar y pulsa hasta que se aprieta; con el combate en curso no se ofrece.
+      (OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn ini-iniciar" id="ini-iniciar"${iniciandoCombate ? ' disabled' : ''} title="Empieza el combate: todos los del orden con los No2 llenos y arranca el turno del primero de la lista (su inicio de turno de siempre)">${iniciandoCombate ? '⏳ Iniciando…' : '▶ Iniciar combate'}</button>` : '')
     : (fbMiembro ? '<button type="button" class="btn primary" id="ini-tirar" title="Tirar la iniciativa de tu personaje y cargarla junto a su nombre">🎲 Tirar iniciativa</button>' : '');
   conectarIniciativa();
   iniciativaEncuadrar();
@@ -1154,9 +1256,11 @@ function conectarIniciativa(){
   const ordenar = $('#ini-ordenar');
   if(ordenar) ordenar.onclick = () => prisaOrdenar();   // 🏃 con Prisa, el GM elige Aplicar o Resolver a mano (js/86)
   const siguiente = $('#ini-siguiente');
-  if(siguiente) siguiente.onclick = () => iniciativaSiguiente();
+  if(siguiente) siguiente.onclick = () => iniciativaSiguienteBoton();
+  const iniciar = $('#ini-iniciar');
+  if(iniciar) iniciar.onclick = () => iniciativaIniciarCombate();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, ...OrdenTurnos.SIN_INICIAR}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo
@@ -1219,6 +1323,8 @@ function escucharModo(){
   cortarModo = fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).onSnapshot(doc => {
     const nuevo = doc.exists && doc.data().modo === 'combate' ? 'combate' : 'narrativo';
     if(nuevo !== modoMapa && escucharModo.listo) toast(nuevo === 'combate' ? '⚔ Modo combate: moverse gasta No2' : '🌿 Modo narrativo: moverse no gasta No2');
+    // ▶ El mapa volvió a narrativo: el combate terminó. El próximo se vuelve a iniciar con su botón (después de Ordenar).
+    if(soyGM && escucharModo.listo && modoMapa === 'combate' && nuevo === 'narrativo' && (iniciativa.iniciado === true || iniciativa.porIniciar)) guardarIniciativa({...OrdenTurnos.SIN_INICIAR});
     escucharModo.listo = true;
     modoMapa = nuevo;
     renderModo();
@@ -1228,19 +1334,22 @@ function escucharModo(){
   }, err => console.error('Error escuchando el modo del mapa:', err));
 }
 
-$('#modo-switch').onclick = async () => {
-  if(!soyGM) return;
-  const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
+$('#modo-switch').onclick = () => { if(soyGM) modoPasarA(modoMapa === 'combate' ? 'narrativo' : 'combate'); };
+// Pasar el mapa a Combate o a narrativo (el switch de arriba, y «▶ Iniciar combate» si el mapa estaba en narrativo). → true si se pudo.
+async function modoPasarA(nuevo){
+  if(!soyGM) return false;
   try{
     await TokensAuto.ponerModo(mapaMostrado, nuevo);   // la misma escritura que usa el fin del combate para volver a narrativo (comun/tokens-auto.js)
     if(nuevo === 'combate' && typeof Registro !== 'undefined') await Registro.recordar().catch(err => console.error('Registro: el recordatorio', err));   // 🗂 ¿registro nuevo? (2026-11-04)
     if(nuevo === 'combate') ataquesACeroAlEmpezar().catch(err => console.error('Las cuentas de ataques al empezar el combate:', err));   // ⚔ (abajo)
     if(nuevo === 'combate') abrirEstadoDelGrupo('combate');   // 🩺 los turnos de los estados que traen, para ajustarlos (js/81)
+    return true;
   }catch(err){
     console.error('No se pudo cambiar el modo:', err);
     toast('No se pudo cambiar el modo del mapa');
+    return false;
   }
-};
+}
 
 /* ⚔ Empieza un combate: la cuenta de ataques «de este turno» arranca en cero para todos (dueño, 2026-11-20, jugando: «Rocardo empezó su turno, el primer
    turno del combate… cuando quiso atacar le aparecía como que ya había atacado una vez, que le costaba 10 nitros. Pero él no había atacado»). Esa cuenta

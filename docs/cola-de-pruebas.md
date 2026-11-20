@@ -248,7 +248,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de sus tokens (en todos los mapas donde tenga permiso) al abrir el mapa o la ficha. (2) En firebase/firestore.rules, permitir al GM cambiar el
   `nombre` de un token de personaje (solo ese campo): **avisar al dueño que hay que pegar las reglas**; mientras no estén pegadas, que la pantalla
   del GM no deje el error (intenta y, si no puede, calla). Probar en el clon (Rockardo → Jugador 2).
-- **⬜ en cola — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
+- **✅ hecho (2026-11-20) — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
   de un combate nuevo nadie le «empieza» el turno; «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa
   es como si fuera su turno. Podríamos hacer que se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que
   diga Iniciar combate, y ahí se inicia con el primer turno del primero de la lista con sus regeneraciones pertinentes, recarga de nitros, etc.»).
@@ -263,6 +263,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Confirmado por el dueño (2026-11-20):** «al apretarlo le tiene que aparecer el cartelito clásico de "empieza tu turno": se regenera tal cosa,
   pasa tal cosa, aceptar». O sea: al primero del orden le sale EL MISMO cartel de inicio de turno de siempre (con su detalle y su Aceptar/Aplicar),
   en su pantalla si es de un jugador, o al GM si es un creep; no un aviso distinto.
+  **Resultado:** en el «Orden de turnos» del GM, al apretar **Ordenar** aparece abajo un botón verde, ancho y que pulsa: **«▶ Iniciar combate»**. Al
+  apretarlo: (1) si el mapa está en narrativo, pregunta «⚔ Pasar a Combate e iniciar» / «Iniciar sin cambiar el modo» / Cancelar (pasar a Combate hace
+  lo mismo que el interruptor: registro del combate, cuentas de ataques en cero, estado del grupo); (2) todos los del orden —personajes, invocaciones
+  y creeps— quedan con los **No2 llenos**; (3) al **primero** de la lista que puede jugar (saltea a los caídos) le empieza el turno por el mismo
+  camino que «▶ Siguiente»: a su jugador le sale el cartel de siempre «▶ Empieza tu turno … ✔ Aplicar»; si es un creep, su inicio de turno se aplica
+  directo, como siempre; (4) la ronda vuelve a 1 y nadie «ya jugó»; (5) línea en la Mesa y tarjeta en la Crónica: «▶ Empieza el combate: turno de X ·
+  todos arrancan con los No2 llenos». El botón desaparece y **no se vuelve a ofrecer en ese combate** (ni reordenando ni sumando tokens con «Traer
+  tokens»): vuelve a aparecer en el próximo, después de que el mapa pase a narrativo (o de Limpiar) y de apretar Ordenar otra vez. **«▶ Siguiente»
+  sin haber iniciado** avisa: «El combate todavía no se inició» → «▶ Iniciar combate» / «⏭ Pasar el turno sin iniciar» (como antes; no vuelve a
+  preguntar) / Cancelar. Un combate que ya venía andando de antes de este botón no lo muestra. Los estados con turnos del primero cuentan como en
+  cualquier turno (bajan al terminar su turno, como siempre). **Probado con clics en «Claude · pruebas 2»** (GM + Jugador 1 + Jugador 2, con los No2
+  gastados a propósito: 2, 1 y 1): con **Blanco J1 primero** → el botón después de Ordenar, «Siguiente» avisando, la pregunta de pasar a Combate,
+  todos con los No2 llenos (6, 6 y 5), el cartel «▶ Empieza tu turno · No2 recargados a 6 · ✔ Aplicar» solo en la pantalla del Jugador 1, la línea de
+  la Mesa, «Siguiente» pasando normal al creep y Ordenar a mitad de combate sin volver a ofrecerlo; con **el creep primero** → lo mismo, sin cartel
+  para nadie (el del creep se aplica solo) y, con «Siguiente», el cartel de siempre para el Jugador 1. **Sin ver:** una invocación en el orden, un
+  caído primero en la lista, «Iniciar sin cambiar el modo» y «Pasar el turno sin iniciar» (cubiertos en parte por las pruebas automáticas). Dudas:
+  P257. Sin cambios en las reglas de Firestore (lo escribe el GM). Pruebas automáticas 918/918 (1 nueva).
 - **✅ hecho (2026-11-20) — ⏳ Vigilancia y Aguante: que digan «se va al empezar tu próximo turno» en vez de ∞** (dueño, 2026-11-20: «en Vigilancia y Aguante
   estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno. El resto está bien porque se entiende que se van con acciones o
   situaciones específicas»). Con el dato genérico `hasta` que se agregó para Desequilibrado (commit 96edd265): al poner esos dos estados, `hasta:

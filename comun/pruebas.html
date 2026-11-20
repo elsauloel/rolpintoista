@@ -47,6 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
+<script src="revelar.js?v=20261120rev"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261120hasta"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
@@ -8558,6 +8559,50 @@ prueba('🦶 Inamovible al cuadro del duelo (2026-11-12, vtt-hexgrid/js/21): una
   const limpio = Duelo.limpiarHab({nombre: 'Inamovible: empujón', objetivo: 'uno mismo', tira: null, contra: [], dano: null, efectos: [e50]});
   const sp = Duelo.specDeEfecto(limpio.efectos[0]);
   igual([limpio.efectos[0].firme, limpio.efectos[0].caras, sp.nombre, sp.firme], [true, 6, 'No se mueve', true]);
+});
+grupo('👁 Revelar a mano lo oculto (comun/revelar.js, 2026-11-20)');
+prueba('una trampa oculta: el GM y quien la puso la revelan; otro jugador, no', () => {
+  const tr = {trampa: true, trampaNombre: 'Cepo'};
+  const gm = Revelar.elemento(tr, {gm: true}), mio = Revelar.elemento(tr, {mio: true});
+  igual([gm.accion, gm.que, gm.texto, gm.cambios], ['revelar', 'trampa', '👁 Revelar «Cepo»', [{descubierta: true}]]);
+  igual([mio.accion, mio.cambios], ['revelar', [{descubierta: true}]]);
+  igual(Revelar.elemento(tr, {}), null);
+  igual(Revelar.elemento({trampa: true}, {gm: true}).texto, '👁 Revelar la trampa');
+});
+prueba('una trampa ya revelada: solo el GM la vuelve a ocultar; disparada, nadie hace nada', () => {
+  const tr = {trampa: true, trampaNombre: 'Cepo', descubierta: true};
+  const gm = Revelar.elemento(tr, {gm: true});
+  igual([gm.accion, gm.texto, gm.cambios], ['ocultar', '🙈 Volver a ocultar «Cepo»', [{descubierta: false}]]);
+  igual(Revelar.elemento(tr, {mio: true}), null);
+  igual(Revelar.elemento({trampa: true, disparada: true}, {gm: true}), null);
+});
+prueba('algo «Invisible para jugadores»: lo revela el GM (y una trampa invisible deja de serlo)', () => {
+  igual(Revelar.elemento({invisible: true}, {gm: true}).cambios, [{invisible: false}]);
+  igual(Revelar.elemento({invisible: true}, {mio: true}), null);
+  igual(Revelar.elemento({trampa: true, invisible: true}, {gm: true}).cambios, [{descubierta: true}, {invisible: false}]);
+  igual(Revelar.elemento({solido: true}, {gm: true}), null);
+});
+prueba('tokens: oculto solo el GM; en sigilo, el GM o su dueño', () => {
+  igual(Revelar.token({oculto: true}, {gm: true}).que, 'oculto');
+  igual(Revelar.token({oculto: true}, {mio: true}), null);
+  igual(Revelar.token({sigilo: true}, {mio: true}).que, 'sigilo');
+  igual(Revelar.token({sigilo: true}, {gm: true}).que, 'sigilo');
+  igual(Revelar.token({sigilo: true}, {}), null);
+  igual(Revelar.token({}, {gm: true}), null);
+});
+prueba('la línea de la Mesa: nombra lo revelado, no lo que se vuelve a ocultar', () => {
+  const rev = Revelar.elemento({trampa: true, trampaNombre: 'Cepo'}, {gm: true}), ocu = Revelar.elemento({trampa: true, trampaNombre: 'Cepo', descubierta: true}, {gm: true});
+  igual(Revelar.linea(rev, {gm: true, nombre: 'Cepo'}).origen, '👁 El GM reveló una trampa: «Cepo»');
+  igual(Revelar.linea(rev, {quien: 'Jugador 1', nombre: 'Cepo'}).origen, '👁 Jugador 1 reveló su trampa: «Cepo»');
+  igual(/Cepo/.test(Revelar.linea(ocu, {gm: true, nombre: 'Cepo'}).origen), false);
+  igual(Revelar.linea(Revelar.token({sigilo: true}, {gm: true}), {gm: true, nombre: 'Rata'}).origen, '👁 El GM reveló a Rata');
+  igual(Revelar.linea(Revelar.token({oculto: true}, {gm: true}), {gm: true, nombre: 'Rata'}), null);
+});
+prueba('✋ resolver a mano una detección: detectada / no detectada', () => {
+  const si = Revelar.aMano(true, {detector: 'Blanco J1', nombre: 'Cepo'}), no = Revelar.aMano(false, {detector: 'Blanco J1', nombre: 'Cepo'});
+  igual(si.origen, '✋ El GM resolvió a mano: Blanco J1 detectó una trampa («Cepo»)');
+  igual(/encuentra una trampa: «Cepo»/.test(si.resultado), true);
+  igual([no.origen, /Cepo/.test(no.origen + no.formula + no.resultado)], ['✋ El GM resolvió a mano: Blanco J1 no detectó nada', false]);
 });
 /* ---------- Resultado ---------- */
 grupo('⬡ Qué afecta a una casilla (comun/hex-info.js, 2026-11-05)');

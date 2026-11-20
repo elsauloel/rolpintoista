@@ -29,7 +29,7 @@ function hexInfoDatos(celda){
       const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
       quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
     }
-    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta)}));
+    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta)}).map(x => ({...x, elId: id})));   // (elId: para «👁 Revelar», js/122)
   });
   // Las auras de los tokens que se ven (un estandarte oculto o tapado por la niebla no se delata).
   const seVe = x => !(x.oculto && !soyGM) && !x.bajoTierra && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x));
@@ -71,7 +71,8 @@ function hexInfoHtml(d, celda){
     : `<span class="hi-cuenta">${n} cosa${n === 1 ? '' : 's'}</span><button type="button" class="hi-toggle" aria-expanded="${hexInfoAbierto}" ` +
       `title="${hexInfoAbierto ? 'Plegar' : 'Ver la descripción'}" aria-label="${hexInfoAbierto ? 'Plegar' : 'Ver la descripción'}">${hexInfoAbierto ? '▾' : '▸'}</button>`;
   return `<div class="hi-cab"><b>⬡ ${esc(d.titulo)}</b>${extra}<span class="hi-coord">${celda.col} · ${celda.fila}</span>` +
-    `<button type="button" class="hi-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>${!vacio && hexInfoAbierto ? hexInfoLista(d) : ''}`;
+    `<button type="button" class="hi-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>` +
+    `${typeof revelarBotonesHex === 'function' ? revelarBotonesHex(d.items) : ''}${!vacio && hexInfoAbierto ? hexInfoLista(d) : ''}`;   // 👁 Revelar / 🙈 Volver a ocultar (js/122): se ven también con el cartel plegado
 }
 
 // El globo: pasando el mouse por la casilla marcada sale la descripción completa al lado del cursor.
@@ -161,6 +162,7 @@ document.addEventListener('pointerdown', e => {
   const caja = $('#hex-info');
   if(caja && caja.contains(e.target)){
     if(e.target.closest('.hi-cerrar')) hexInfoCerrar();
+    else if(e.target.closest('[data-revelar-el]')){ if(typeof revelarElementoAplicar === 'function') revelarElementoAplicar(e.target.closest('[data-revelar-el]').dataset.revelarEl); }
     else if(e.target.closest('.hi-toggle')){
       hexInfoAbierto = !hexInfoAbierto;
       try { localStorage.setItem('hex-info-abierto', hexInfoAbierto ? '1' : '0'); } catch(_){}

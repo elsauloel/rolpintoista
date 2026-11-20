@@ -106,7 +106,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Blanco J2** (Jugador 2), los dos con token en «Prueba · R4 M4». `docs/memoria-claude.md` ya lo dice así (y que no se le vuelva a dar un
   segundo personaje a un jugador). Lo que nombra a Blanco J1 b en `docs/pruebas-en-el-mapa.md` y más abajo en esta cola son pruebas ya hechas:
   queda como registro.
-- **⬜ en cola — 👁 Revelar a mano lo que está oculto (trampas y demás)** (dueño, 2026-11-20, El origen: «un personaje tiró para detectar una
+- **✅ hecho (2026-11-20) — 👁 Revelar a mano lo que está oculto (trampas y demás)** (dueño, 2026-11-20, El origen: «un personaje tiró para detectar una
   trampa, pasó algo raro con las tiradas, el sistema entendió que la trampa no fue detectada, pero en realidad sí fue detectada… y yo como GM no
   tenía una forma de revelar lo que estaba oculto, entonces eso también tendría que existir en las cosas que están ocultas. Tanto para GMs como para
   jugadores, uno tiene que poder hacerles clic y revelarlas»). Primero relevar qué cosas pueden estar ocultas en el mapa (trampas, zonas, tokens
@@ -116,6 +116,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Claude, a confirmar con el dueño (anotar en preguntas-abiertas): un jugador no puede revelar lo que no ve. Que quede línea en la Mesa («👁 El GM
   reveló la trampa…») y, si aplica, la contraria («volver a ocultar») para el GM. De paso, mirar por qué la tirada de detectar pudo dar «no
   detectada» por un malentendido: que el cuadro de detectar ofrezca al GM «Resolver a mano» (detectada / no detectada), como el resto de lo automático.
+  **Hecho:** (1) **Clic en una trampa oculta** → en el cartel de la casilla, arriba, «👁 Revelar «nombre»»: el GM con cualquiera que vea; un
+  jugador con las suyas. Pasa a verse para todos (es la misma marca de cuando la detectan) y sigue armada. El GM después tiene «🙈 Volver a
+  ocultar». Lo «Invisible para jugadores» también tiene su «👁 Revelar a los jugadores» (GM). (2) **Clic en un token** oculto o en sigilo → un «👁»
+  entre sus botones: el GM con cualquiera; un jugador con el suyo en sigilo (sale del sigilo, sin tirada y sin quedar Marcado). (3) **La tirada
+  de detectar una trampa**: al GM le queda «✋ Resolver a mano» en la tarjeta de la Crónica (3 minutos) y en su propio cartel si tiró él → «👁 La
+  detectó» / «🙈 No la detectó». Línea en la Mesa en todos los casos («👁 El GM reveló una trampa: «…»», «🙈 El GM volvió a ocultar una trampa»,
+  «✋ El GM resolvió a mano: Fulano detectó una trampa»).
+  **Qué puede estar oculto y cómo se revela:** trampa armada → ahora con «👁 Revelar» (antes: solo pisándola, detectándola con Percepción o con una
+  luz) · algo «Invisible para jugadores» → «👁 Revelar» (antes: la casilla del ⚙) · token oculto por el GM → «👁» a la vista (antes: el 🙈 dentro del
+  ⋯) · token en sigilo → «👁» (antes: «Salir del sigilo» en la Botonera, sacarle el estado, o que lo detecten) · bajo tierra → no se tocó (se ve el
+  montículo; sale con su habilidad) · una fila oculta del orden de turnos → su 👁/🙈 de siempre.
+  **Por qué pudo quedar «no detectada» por un malentendido** (mirando el código, sin poder saber cuál fue): la tirada que vale es la del cartel
+  «tirá Percepción» (una Percepción tirada desde la Botonera no cuenta); la dificultad es de la trampa (6 si no tiene) y hay que igualarla; en combate
+  un fallo con esa trampa no deja volver a intentar; y lo decide sola la pantalla de quien tira, sin que el GM pudiera corregir. Eso último es lo
+  que se arregló.
+  **Ojo:** hay una **regla nueva de Firestore para pegar** (el GM puede apagar «detectada»); mientras tanto «volver a ocultar» anda por un camino
+  de respaldo (`docs/pendientes.md`, 🖥). Dudas anotadas en **P254** (un jugador revela solo lo suyo; revelar a mano no marca; el GM no ve las
+  trampas de los jugadores). Probado con clics en «Claude · pruebas 2» («Prueba · R4 M4», GM, J1 y J2): `docs/pruebas-en-el-mapa.md`. Pruebas
+  automáticas 904/904 (6 nuevas). La partida quedó limpia.
 - **⬜ en cola — 🐀 Un creep en sigilo no puede quedar delatado por la Mesa ni por la Crónica** (dueño, 2026-11-20, El origen: «las ratas tiraron
   su polvareda y quedaron en sigilo. Sin embargo, después realizaron un par de acciones… que aparecían en la Mesa, en la Crónica. Al jugador por lo
   menos dos veces le apareció un mensaje de que la rata hacía una acción específica, con lo cual revelaba el sigilo… quiero que hagas una copia de la

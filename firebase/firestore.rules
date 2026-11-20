@@ -872,7 +872,9 @@ service cloud.firestore {
           // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
           || (resource.data.get('trampa', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
-            && request.resource.data.descubierta == true)
+            && (request.resource.data.descubierta == true
+              // 🙈 «Volver a ocultar» / «✋ no la detectó» (2026-11-20, js/122): solo el GM la apaga.
+              || (request.resource.data.descubierta == false && esGM(c))))
           // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
           || (resource.data.get('portal', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
@@ -1003,7 +1005,9 @@ service cloud.firestore {
             // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
-              && request.resource.data.descubierta == true)
+              && (request.resource.data.descubierta == true
+                // 🙈 «Volver a ocultar» / «✋ no la detectó» (2026-11-20, js/122): solo el GM la apaga.
+                || (request.resource.data.descubierta == false && esGM(c))))
             // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
             || (resource.data.get('portal', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])

@@ -119,6 +119,7 @@ function hudHtml(t){
   let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+    (typeof revelarHudIcono === 'function' ? revelarHudIcono(t, icono) : '') +   // 👁 Revelar a mano lo oculto / en sigilo (js/122, 2026-11-20)
     (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     // ✚ Revivir (2026-11-04, dueño: «cuando hay un token caído, el GM al seleccionarlo vea entre sus botones uno para revivirlo; tanto para creeps como
     // para jugadores»): js/98, gmRevivirToken.
@@ -1307,6 +1308,7 @@ function hudConectar(t){
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
     if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); hudPonerNivel('vital'); return; }   // (vuelve al primer menú: el 🧹 ya no va)
+    if(clave === 'revelar'){ if(typeof revelarTokenAplicar === 'function') revelarTokenAplicar(seleccion); return; }   // 👁 (js/122)
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
     if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }

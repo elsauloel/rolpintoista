@@ -1646,3 +1646,15 @@ pasar a narrativo a mano con el interruptor)?
 El dueño definió las tres (ver `docs/cola-de-pruebas.md`): punzantes melee (+1 daño, +2 PdG en oportunidad), cortantes (+1 Parry, +1 Bloqueo, +1 PdG
 en contraataque) y hachas (el segundo ataque del turno cuesta 2 No2 menos). **(a) ✅ la de hachas cuesta 1 Job** (dueño, 2026-11-20). ~~quedó en
 2, provisorio~~ **(b) ✅ de rango, dos maestrías** (dueño, 2026-11-20): arcos = +1 PdG y +2 Crítico potente; ballestas = +1 PdG y Perfora +1; 1 Job cada una.
+
+### P254 — 👁 Revelar a mano lo oculto: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+Al programar «👁 Revelar» (`docs/cola-de-pruebas.md`; `vtt-hexgrid/js/122-revelar.js`) se eligió lo más conservador. **Para el dueño:**
+**(a) Un jugador revela solo LO SUYO** (la trampa que puso él o un personaje que maneja; su token en sigilo). No revela la trampa de otro jugador
+(aunque la vea, por ser del mismo bando) ni nada que no vea. ¿Está bien, o cualquier jugador debería poder revelar las trampas de su bando?
+**(b) «🙈 Volver a ocultar» una trampa es solo del GM.** Un jugador que reveló su trampa no la puede volver a esconder (se lo pide al GM).
+**(c) El GM revela lo que VE.** Las trampas de los jugadores el GM no las ve (regla del 2026-09-30: se entera de que la pusieron, no de dónde), y
+el «👁 Revelar lo oculto» del menú del ojo le muestra a los personajes en sigilo pero NO esas trampas. ¿Tendría que mostrárselas también?
+**(d) Revelar a mano a alguien en sigilo le saca el estado y nada más**: sin tirada y **sin el «Marcado» 2 turnos** de cuando lo descubren
+(ese es de la detección de verdad). Si el GM lo quiere marcado, se lo pone con «+ Estado». ¿O revelar a mano debería marcarlo también?
+**(e) Bajo tierra no tiene «Revelar»**: no está oculto del todo (se ve el montículo) y sale con su habilidad. ¿Hace falta un «sacarlo a mano»?
+**(f) No hay «detectada solo por Fulano»:** hoy una trampa detectada la ven todos (`descubierta`), así que revelar es siempre «a todos».

@@ -2300,3 +2300,19 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   escribe a quien tenía algo anotado y no toca No2, vida, estados ni cooldowns. Antes, al primero del orden de un combate nuevo le quedaba la cuenta del
   combate anterior (su primer ataque costaba como segundo), porque esa cuenta solo la vacía el inicio de turno y a él nadie se lo empieza.
   Probado con clics en «Claude · pruebas 2» (ver `docs/cola-de-pruebas.md`).
+
+- **👁 Revelar a mano lo que está oculto** (2026-11-20, dueño: «yo como GM no tenía una forma de revelar lo que estaba oculto… Tanto para GMs como
+  para jugadores, uno tiene que poder hacerles clic y revelarlas»; `js/122-revelar.js` + las reglas puras en `comun/revelar.js`). **Elementos:** en el
+  cartel de la casilla (js/104; cada línea lleva `elId`), arriba y también plegado, `revelarBotonesHex` pone «👁 Revelar «nombre»» (trampa armada sin
+  `descubierta`: el GM con cualquiera que vea; un jugador con las suyas, `revelarEsMio`: la creó él o la puso un personaje que maneja), «🙈 Volver a
+  ocultar» (trampa `descubierta`, solo el GM) o «👁 Revelar a los jugadores» (algo `invisible`, el GM). Revelar = `descubierta: true`, el mismo campo
+  de cuando la detectan (no hay otra lógica de quién la ve: `puedeVerElemento`). Volver a ocultar = `descubierta: false` (**regla nueva, solo el GM:
+  hay que pegarla**; mientras no esté, `revelarOcultarTrampa` la vuelve a colocar igual, con otro id, si es del GM o dice quién la puso). Al
+  apagarse, cada pantalla la olvida de «las que vi» (`trampaOlvidar`, js/07). **Tokens:** `revelarHudIcono` suma «👁» al primer anillo del token
+  (js/10): el GM con uno `oculto` (lo mismo que el 🙈 del ⋯, sin línea en la Mesa) o en sigilo; un jugador con el suyo en sigilo. Sacar el sigilo a
+  mano es `hudEstadoCambiar(…, 'quitar')`: sin tirada y sin el Marcado de `romperSigilo` (P254). **✋ Resolver a mano la tirada de detectar una
+  trampa:** js/16 guarda `datos.trampaId` y `datos.detector` en el momento de la Percepción; al GM esa tarjeta le queda 3 min en la Crónica con
+  «✋ Resolver a mano» (`revelarBotonFeed`, también si el pedido lo creó su pantalla) y, si tiró él, el botón está en su cartel
+  (`#percepcion-banner-amano`). `revelarAManoAbrir` → «👁 La detectó» / «🙈 No la detectó»: marca o apaga `descubierta`, corrige el resultado del
+  momento (`datos.aMano`) y cada pantalla olvida la trampa si fue «no» (`revelarMomento`). Todo deja su línea en la Mesa (`Revelar.linea` /
+  `Revelar.aMano`, por `sigiloAviso`): nombra lo revelado, no lo que se vuelve a ocultar. Dudas: P254. Probado con clics en «Claude · pruebas 2».

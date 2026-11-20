@@ -2056,3 +2056,8 @@ versión parecida en más de una, es candidato a juntar.
   y `FichaAcciones.estadoDeSpec`. `ataquesACeroPj(S)` (con sus invocaciones), `ataquesACeroInv(inv)` y `ataquesACeroCreep(sc)`: vacían la cuenta de
   ataques y las marcas «una vez por turno» que viven con ella (no No2, vida, estados, cooldowns ni `pagosDuelo`); devuelven si cambió algo. Las usa el
   mapa al empezar un combate (`vtt-hexgrid/js/04`, `ataquesACeroAlEmpezar`).
+- **`revelar.js`** (`Revelar`, 2026-11-20) — **👁 revelar a mano lo oculto**, lo puro: `elemento(el, {gm, mio})` → null o `{accion: 'revelar' |
+  'ocultar', que: 'trampa' | 'invisible', texto, titulo, cambios}` (el GM con cualquiera, un jugador con lo suyo; «volver a ocultar» solo el GM),
+  `token({oculto, sigilo}, {gm, mio})`, `linea(op, {gm, quien, nombre})` (la línea de la Mesa; null si no se anuncia) y `aMano(detectada, {detector,
+  nombre})` (los textos de «✋ Resolver a mano» al detectar una trampa). Qué se ve lo decide el mapa (`vtt-hexgrid/js/122-revelar.js`). Pruebas en
+  `pruebas.html`.

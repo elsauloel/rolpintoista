@@ -3143,3 +3143,28 @@ Capturas en `cola20/`.
   personaje (se probó personaje → creep y personaje → personaje); una ballesta «que llega cargada» en el primer turno del combate nuevo.
 - [ ] **Falta que lo mire el dueño.**
 Capturas en `cola25/`.
+
+## 2026-11-20 · 👁 Revelar a mano lo que está oculto y «✋ Resolver a mano» al detectar una trampa («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1 + Jugador 2)
+Con clics de verdad, las tres pantallas a la vez. Las trampas de prueba se pusieron por detrás (una casilla, sin efecto); todo lo demás, con sus botones.
+- ✔ **El GM revela una trampa suya**: clic en la casilla → cartel «⬡ Hexágono libre» con «👁 Revelar «Cepo de prueba»» → J1 y J2 la ven aparecer;
+  en la Mesa «👁 El GM reveló una trampa: «Cepo de prueba»». A J2, al hacerle clic, no le sale ningún botón.
+- ✔ **El GM la vuelve a ocultar**: el mismo cartel pasa a «🙈 Volver a ocultar…» → J1 y J2 dejan de verla; Mesa «🙈 El GM volvió a ocultar una trampa»
+  (sin nombre). Tardó unos 4 s: **las reglas nuevas de Firestore todavía no están pegadas**, así que usó el camino de respaldo (la vuelve a colocar igual).
+- ✔ **El Jugador 1 revela la suya**: «👁 Revelar «Trampa de J1»» → el GM, que no la veía, la ve aparecer; Mesa «👁 Jugador 1 reveló su trampa…».
+  J2 ya la veía (es de su bando) y no tiene botón para revelarla. A J1 no le queda «volver a ocultar»; al GM sí.
+- ✔ **Detectar con «Resolver a mano»** (J1 tira): trampa del GM en la zona de alerta de Blanco J1, dificultad 30 → a J1 «tirá Percepción» → sacó 3
+  → «Mmm... Puede que estés flasheando». Al GM le queda la tarjeta en la Crónica con «✋ Resolver a mano» (J1 y J2 no tienen ese botón) → «👁 La
+  detectó» → la ven J1 y J2; Mesa «✋ El GM resolvió a mano: Blanco J1 detectó una trampa («Lazo de prueba»)». Después, al revés, «🙈 No la detectó»:
+  vuelve a estar oculta para los dos.
+- ✔ **Detectar con «Resolver a mano» en el cartel del propio GM** (un creep percibe la trampa de J1): el GM tira por Protector 4, falla, y en su
+  cartel, al lado de «Listo», «✋ Resolver a mano» → «👁 La detectó» → el GM ve la trampa de J1.
+- ✔ **Tokens**: un creep en sigilo (Hunter 5) → entre sus botones «👁» → J2 lo ve; Mesa «👁 El GM reveló a Hunter 5», sin «Marcado». Un token oculto
+  por el GM → el mismo «👁» lo muestra (sin línea en la Mesa, como siempre). Blanco J1 en sigilo (lejos de los creeps) → a J1 le sale «👁» en su
+  token → el GM lo ve; Mesa «👁 Blanco J1 se dejó ver». J2, sobre el token de J1, no tiene el botón.
+- **Sin ver:** «Volver a ocultar» y «No la detectó» por el camino nuevo de las reglas (hasta que el dueño las pegue); una trampa colocada con una
+  habilidad o un consumible de verdad (se usaron trampas puestas por detrás); el cartel de Percepción por caminar al lado de una trampa con Percepción
+  aumentada o Pisada atenta (los Blancos no las tienen: se usó el pedido de «poner una trampa cerca de un rival», que termina en la misma tirada); algo
+  «Invisible para jugadores» que no sea trampa (solo en las pruebas automáticas); la detección de fin de combate del talento Desarmar trampas (no tiene
+  «Resolver a mano»: si falla, queda el «👁 Revelar» del cartel de la casilla); el GM revelando a un personaje en sigilo con su 👁 prendido.
+- [ ] **Falta que lo mire el dueño.**
+Capturas en `cola26/`.

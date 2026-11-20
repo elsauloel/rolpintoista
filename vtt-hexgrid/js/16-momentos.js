@@ -107,6 +107,7 @@ function rodilloMomento(id, d){
 }
 const caosHechos = new Set();
 function momentoRecibido(id, d){
+  if(typeof revelarMomento === 'function') revelarMomento(d);   // ✋ el GM resolvió a mano que una trampa no fue detectada (js/122)
   if(d.tipo === 'meteoro-sombra'){ momentosFeed.delete(id); renderMomentosFeed(); if(typeof meteoroSombraMomento === 'function') meteoroSombraMomento(id, d); return; }   // ☄ el aviso de la sombra, sin tarjeta (js/74)
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
   if(d.tipo === 'robo-huida'){ if(typeof roboHuidaMomento === 'function') roboHuidaMomento(id, d); return; }   // 🫳 la huida de un personaje que robó (js/47, 2026-11-03)
@@ -193,7 +194,8 @@ function momentoRecibido(id, d){
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
   if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'escudo-dado' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && d.tipo !== 'pergamino-grupal' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
-  const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
+  const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro
+    && !(typeof revelarEsDeteccion === 'function' && revelarEsDeteccion(d));   // ✋ la detección de una trampa ya tirada le queda al GM en la Crónica aunque el pedido lo haya creado su pantalla (js/122)
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
   if(d.tipo === 'oportunidad' && d.datos && d.datos.secreto && d.estado !== 'si'){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // 🥷 hasta que ataque, nadie más lo ve (P235, js/17)
   const delGM = d.tipo === 'sigilo-pedido' && soyGM && (d.estado === 'esperandoGM' || (deteccionBanner && deteccionBanner.id === id));
@@ -203,7 +205,7 @@ function momentoRecibido(id, d){
   // ▶ El inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»); 🎲 la tirada extra de una zona, mientras espere algo (el GM tiene
   // «Tirar por él», «Que se aplique» y «Aplicar»: a los 14 s se borraba y el GM se quedaba sin el botón; 2026-10-22).
   const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'malviaje' && d.estado !== 'listo') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'escudo-dado' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
-  momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
+  momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : typeof revelarEsDeteccion === 'function' && revelarEsDeteccion(d) && !(d.datos && d.datos.aMano) ? 3 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba (✋ una detección de trampa le queda 3 min al GM, para «Resolver a mano», js/122)
   renderMomentosFeed();
 }
 /* ▶ Empieza tu turno (js/04, 2026-10-17): a su dueño (o a quien tiene 🎮 su control), al centro, con lo que va a pasar y «✔ Aplicar»; al tocarlo,
@@ -257,6 +259,7 @@ function renderMomentosFeed(){
     feed.id = 'momentos-feed';
     feed.style.cssText = 'position:absolute;right:12px;top:118px;width:min(300px,60vw);z-index:31;display:flex;flex-direction:column;gap:6px;pointer-events:none';
     feed.addEventListener('click', ev => {
+      const bam = ev.target.closest('[data-detectar-amano]'); if(bam){ if(typeof revelarAManoDeMomento === 'function') revelarAManoDeMomento(bam.dataset.detectarAmano); return; }   // ✋ (js/122)
       const bx = ev.target.closest('[data-momento-cerrar]'); if(bx){ momentosCerrados.add(bx.dataset.momentoCerrar); renderMomentosFeed(); return; }
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
       const bm = ev.target.closest('[data-mal-de-ojo]'); if(bm){ const v = momentosFeed.get(bm.dataset.malDeOjo); if(v && typeof malDeOjoTirar === 'function'){ bm.disabled = true; malDeOjoTirar(bm.dataset.malDeOjo, v.d, true); } }   // 🧿 (js/60)
@@ -284,6 +287,7 @@ function renderMomentosFeed(){
       ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
+      ${typeof revelarBotonFeed === 'function' ? revelarBotonFeed(k, d) : ''}
       ${d.tipo === 'mal-de-ojo' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-mal-de-ojo="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #8a6fd0;background:#2a1f3a;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'tirado' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-ok="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">✔ Que se aplique (por él)</button></div>` : ''}
@@ -358,7 +362,11 @@ function renderPercepcionBanner(){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción`, texto: percepcionBanner.resultado,
       botones: percepcionBanner.desarmar
         ? [{texto: `${typeof trampaEsMagica === 'function' && trampaEsMagica(elementos.get(percepcionBanner.desarmar)) ? '✨ Disiparla' : '🪤 Desarmarla'}${modoMapa === 'combate' ? ' (1 No2)' : ''}`, id: 'percepcion-banner-desarmar', alClic: desarmarDesdeBanner}, {texto: 'Dejarla', sec: true, alClic: cerrar}]
-        : [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: cerrar}]});
+        : [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: cerrar},
+          // ✋ El GM, en su propio cartel (tiró por un creep o por quien no estaba): decide él qué pasó (js/122, 2026-11-20).
+          ...(soyGM && percepcionBanner.trampaId && typeof revelarAManoAbrir === 'function' ? [{texto: '✋ Resolver a mano', sec: true, id: 'percepcion-banner-amano', titulo: 'Si los dados no cuentan lo que pasó en la mesa: decidí vos si la detectó o no',
+            alClic: () => { const pb = percepcionBanner; revelarAManoAbrir({momentoId: pb.momentoId, trampaId: pb.trampaId, detector: quien, resultado: pb.resultado,
+              alResolver: (det, tx) => { if(percepcionBanner === pb){ pb.resultado = tx.resultado; pb.desarmar = null; renderPercepcionBanner(); } }}); }}] : [])]});
   }else if(percepcionBanner.esperando){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
   }else{
@@ -416,11 +424,11 @@ async function percepcionResolverBanner(){
     pb.resultado = `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`;
     // Desarmar trampas (talento, 2026-10-08, js/28): si es de un rival, ofrece desarmarla.
     if(typeof tokenDesarmaTrampas === 'function' && tokenDesarmaTrampas(t) && trampaEsRival(t, el)){ pb.desarmar = pb.trampaId; pb.resultado += typeof trampaEsMagica === 'function' && trampaEsMagica(el) ? ' Es mágica: ¿querés disiparla (Efecto especial)?' : ' ¿Querés desarmarla (Destreza)?'; }
-    momentoActualizar(mid, {estado: 'listo', resultado: `…y encuentra una trampa${el.trampaNombre ? `: «${el.trampaNombre}»` : ''}.`});
+    momentoActualizar(mid, {estado: 'listo', resultado: `…y encuentra una trampa${el.trampaNombre ? `: «${el.trampaNombre}»` : ''}.`, 'datos.trampaId': pb.trampaId, 'datos.detector': nombre});   // (trampaId y detector: para el «✋ Resolver a mano» del GM, js/122)
   }else{
     pb.resultado = 'Mmm... Puede que estés flasheando.';   // texto del dueño (2026-10-02); la tirada ya está en la Mesa
     if(typeof trampaPerdio === 'function') trampaPerdio(pb.tokenId, pb.trampaId);   // en combate, con esta trampa ya no hay otro intento (2026-10-08)
-    momentoActualizar(mid, {estado: 'listo', resultado: 'Mmm... puede que esté flasheando.'});
+    momentoActualizar(mid, {estado: 'listo', resultado: 'Mmm... puede que esté flasheando.', 'datos.trampaId': pb.trampaId, 'datos.detector': nombre});
   }
   renderPercepcionBanner();
 }

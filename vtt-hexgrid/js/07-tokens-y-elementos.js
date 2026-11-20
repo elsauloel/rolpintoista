@@ -218,6 +218,12 @@ function descubrirTrampa(id){
   try{ localStorage.setItem('trampas-vistas-' + FB_CAMPANA, JSON.stringify([...trampasVistas].slice(-300))); }catch(e){}
   pedirDibujo();
 }
+// 🙈 El GM la volvió a ocultar (o resolvió a mano que no la detectaron, js/122): este navegador deja de recordarla como vista.
+function trampaOlvidar(id){
+  if(!id || !trampasVistas.delete(id)) return;
+  try{ localStorage.setItem('trampas-vistas-' + FB_CAMPANA, JSON.stringify([...trampasVistas].slice(-300))); }catch(e){}
+  pedirDibujo();
+}
 // ¿La trampa es de mi bando? (2026-09-30, regla del dueño: el GM se entera de que un jugador colocó una trampa —por el anuncio
 // en la Mesa— pero NO de dónde.) Las del GM son del bando de los creeps; las de cualquier jugador, del bando de los jugadores.
 // ¿La trampa es del GM (la pisan los personajes) o de los jugadores (la pisan los creeps)? Manda quién la puso (`de` en su trampaEstado,
@@ -308,6 +314,7 @@ function escucharElementos(){
       const celdas = [];
       for(let i = 0; i + 1 < crudo.length; i += 2) celdas.push({dq: num(crudo[i]), dr: num(crudo[i + 1])});
       const previoElem = elementos.get(ch.doc.id);
+      if(previoElem && previoElem.descubierta && d.descubierta !== true) trampaOlvidar(ch.doc.id);   // 🙈 el GM la volvió a ocultar (js/122)
       elementos.set(ch.doc.id, {
         id: ch.doc.id,
         tipo: d.tipo === 'linea' || d.tipo === 'libre' ? d.tipo : 'flor',

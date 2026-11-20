@@ -812,6 +812,11 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
+  `descubierta` en una trampa (dos lugares: los elementos del mapa de siempre y los de los mapas guardados). Mientras no estén pegadas, «Volver a
+  ocultar» y «✋ No la detectó» andan igual por un camino de respaldo (el mapa vuelve a colocar la misma trampa, tarda unos segundos más) si la
+  trampa es del GM o la puso una habilidad / un consumible; con una trampa hecha a mano por un jugador avisa «faltan pegar las reglas».
+
 - [ ] **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
   y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
 - [ ] **Seguir la revisión del bloque 4, de a uno, en el mapa «Prueba · Carteles»** (pausada el 2026-11-12, dueño: «dejemos esto para la próxima

@@ -539,7 +539,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.id === 'btn-finalizar-combate'){
-    abrirReporteFinalizar();
+    CombateFin.elegirModo().then(modo => { if(modo) abrirReporteFinalizar(modo === 'simular'); });   // 🔮 Avanzar o Simular
     return;
   }
   if(b.id === 'btn-respaldo-partida'){

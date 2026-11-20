@@ -3791,6 +3791,21 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
     [150, 2, 28, [14, 3], ['Garras de Orco 60'], 25, [18, 3], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-31, P237: sin habilidades, pasivas ni equipo, y con 18 puntos de atributo, dan menos)   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
 });
+prueba('🔮 fin del combate simulado (2026-11-20): misma ventana con el cartel, sin Publicar; quién cobra en memoria; «Pasar a Avanzar» la vuelve real; publicar se niega', async () => {
+  const rep = CombateFin.nuevo(); rep.simulacion = true;
+  rep.enMapa = new Set(['a']);
+  const creeps = [creepPrueba({id: 'a', nivel: 2, hp: 0})];
+  rep.jugadores = [{id: 'p1', nombre: 'Ana', estado: 'en pie', incluido: true}, {id: 'p2', nombre: 'Beto', estado: 'en pie', incluido: true}];
+  CombateFin.clic(rep, {dataset: {repIr: 'publicar'}});
+  const v1 = CombateFin.vista(rep, creeps, []);
+  CombateFin.cambio(rep, {dataset: {repJug: 'p2'}, checked: false});
+  const n = CombateFin.calcularReparto(rep, CombateFin.generar(rep, creeps, [])).n;
+  const pub = await CombateFin.publicar(rep, {creeps, cat: [], confirmar: () => true});
+  const r = CombateFin.clic(rep, {dataset: {repAvanzar: ''}});
+  const v2 = CombateFin.vista(rep, creeps, []);
+  igual([v1.publicar, v1.html.includes('Simulación: no se guarda nada'), v1.html.includes('data-rep-avanzar'), n, !!(pub && pub.error), r, rep.simulacion, v2.publicar, v2.html.includes('Simulación')],
+    ['oculto', true, true, 1, true, true, false, 'activo', false]);
+});
 prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catálogo con su poder, una pieza propia con sus rasgos, lo guardado también', () => {
   const varita = CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago');
   const tal = CATALOGO_BASE.find(i => i && !i.archivo && (i.espejito || i.relicario));

@@ -64,7 +64,10 @@ $('#finalizar-combate-body').addEventListener('click', e => {
 // Línea verde en la Mesa (comun/mesa.js, desde 'recompensa').
 function mesaLineaVerde(origen, formula){ return CombateFin.lineaVerde(origen, formula); }
 
-function abrirReporteFinalizar(){
+// 🔮 `simular` (dueño, 2026-11-20): la misma ventana, sin publicar ni guardar nada (comun/combate-fin.js, rep.simulacion). Si el reporte
+// abierto era de otro modo, arranca de cero (un reporte simulado no se reabre como real ni al revés: para eso está «Pasar a Avanzar»).
+function abrirReporteFinalizar(simular){
+  if(!!combateRep.simulacion !== !!simular){ combateRep = nuevoCombateRep(); combateRep.simulacion = !!simular; }
   combateRep.enMapa = null;
   renderReporteCombate();
   cargarCreepsEnMapa();

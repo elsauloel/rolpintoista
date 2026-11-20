@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261109cad'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261120sim'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -114,7 +114,11 @@ async function abrirFinalizarMapa(){
   if(!soyGM) return;
   // (Abrir la ventana es solo una vista previa: lo de «al terminar el combate» arranca al publicar, vgFinCombateEmpezar. Dueño, 2026-10-30.)
   try{ await vgCargar(); }catch(err){ console.error(err); toast('No se pudo abrir el reporte del combate'); return; }
+  // 🔮 Avanzar o Simular (dueño, 2026-11-20): simular es la misma ventana, sin publicar ni guardar nada (comun/combate-fin.js, rep.simulacion).
+  const modo = await CombateFin.elegirModo();
+  if(!modo) return;
   vgRep = CombateFin.nuevo();
+  vgRep.simulacion = modo === 'simular';
   vgCreeps = [];
   vgAbrir('vg-finalizar');
   vgFinDibujar();

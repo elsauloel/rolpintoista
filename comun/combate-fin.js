@@ -88,7 +88,7 @@ const CombateFin = (() => {
   /* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
      El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
      ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
-  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosDespojos: true}; }
+  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosDespojos: true, simulacion: false}; }
 
   /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
      puede haber muchos creeps armados de antemano que no están en la pelea. Devuelve el Set de sus ids. */
@@ -504,7 +504,26 @@ const CombateFin = (() => {
   ];
   const pasoBotin = rep => PASOS_BOTIN.findIndex(p => p.id === rep.paso) >= 0 ? rep.paso : 'equipo';
   const esConsumible = i => i && i.template && i.template.tipoItem === 'consumibles';
+  /* 🔮 Simular (dueño, 2026-11-20: «al poner finalizar combate como GM tenga la opción de avanzar o de simulación»): la misma ventana, con lo
+     mismo para mirar (tildar, destildar, 🎲 otro consumible, quién cobra, los extras), pero `rep.simulacion` = true: sin 📢 Publicar, con un cartel
+     y «Pasar a Avanzar» (`data-rep-avanzar`, que apaga la simulación y deja todo lo ajustado). Nada de la ventana escribe hasta publicar: lo que se
+     toca queda en `rep` (en memoria), también «quién cobra» (no pasa por fueraCambiar). `publicar` se niega en simulación. */
+  const CARTEL_SIMULACION = `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:2px solid #9b6cff;border-radius:10px;background:rgba(155,108,255,.16)">
+      <div style="flex:1;min-width:240px"><div style="font-weight:800;font-size:16px;color:#d9c8ff">🔮 Simulación: no se guarda nada</div>
+      <div class="hint" style="margin-top:2px">Mirá cuánto daría el combate: la experiencia, el oro, los despojos y el botín. Podés tildar, destildar y volver a tirar, pero nada llega a las fichas, al botín ni a la Mesa, y el combate sigue abierto.</div></div>
+      <button type="button" class="btn primary" data-rep-avanzar title="Pasa al fin de combate de verdad, con lo que ajustaste: ahí sí aparece 📢 Publicar">▶ Pasar a Avanzar</button></div>`;
+  async function elegirModo(){
+    if(typeof Confirmar === 'undefined' || !Confirmar.elegir) return 'avanzar';
+    return Confirmar.elegir('¿Qué querés hacer con el combate?', {titulo: 'Finalizar combate', icono: '🏁', no: 'Cancelar', opciones: [
+      {valor: 'avanzar', texto: '▶ Avanzar', detalle: 'Lo de siempre: revisás la experiencia, el oro y el botín y, al publicar, se reparte.'},
+      {valor: 'simular', texto: '🔮 Simular', detalle: 'Solo para mirar cuánto daría: no se guarda nada y el combate sigue abierto.'}]});
+  }
   function vista(rep, creeps, cat){
+    const v = vistaReporte(rep, creeps, cat);
+    if(!rep.simulacion) return v;
+    return {...v, html: CARTEL_SIMULACION + v.html, publicar: 'oculto'};
+  }
+  function vistaReporte(rep, creeps, cat){
     if(rep.enMapa === null) return {html: `<div class="hint">Buscando los creeps que están en el mapa publicado…</div>`, publicar: 'oculto', faltanJugadores: false};
     const r = generar(rep, creeps, cat);
     if(!r.filas.length) return {html: `<div class="hint">No hay creeps para repartir. Solo cuentan los creeps con un <b>token vinculado en el mapa publicado</b> que todavía no se repartieron.</div>`, publicar: 'oculto', faltanJugadores: false};
@@ -618,6 +637,7 @@ const CombateFin = (() => {
       return it ? {ver: it.template} : null;
     }
     if(d.repIr !== undefined){ rep.paso = d.repIr; return true; }   // 📋 los pasos
+    if(d.repAvanzar !== undefined){ rep.simulacion = false; return true; }   // 🔮 → ▶ el fin de combate de verdad, con lo ajustado
     if(d.repGrupo !== undefined){   // 📋 Ver el grupo (2026-11-03, dueño): slots vacíos, stats, resistencias y debilidades de los que cobran (comun/grupo-botin.js)
       const items = itemsPublicables(rep, generar(rep, creeps, cat));
       const jugadores = (rep.jugadores || []).filter(j => j.incluido);
@@ -663,6 +683,7 @@ const CombateFin = (() => {
   // Con ítems en el botín, la XP y el oro se cargan en las fichas al CERRAR el botín (despojar); sin ítems, ya mismo.
   async function publicar(rep, {creeps, cat, combateActual, confirmar, alEmpezar}){
     if(rep.publicando) return null;
+    if(rep.simulacion) return {error: 'Es una simulación: no se publica nada (▶ Pasar a Avanzar para repartir de verdad)'};
     if(!fbDb || !fbMiembro || !fbMiembro.gm) return {error: 'Solo el GM de la partida puede publicar'};
     const r = generar(rep, creeps, cat);
     const rp = calcularReparto(rep, r);
@@ -885,7 +906,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

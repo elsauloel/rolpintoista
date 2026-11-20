@@ -3025,3 +3025,18 @@ Capturas en `cola14/`.
   (`ficha.html`, misma pieza); caer por otro camino que no sea un golpe (veneno al pasar el turno, «HP directo»): pasan por la misma revisión.
 - [ ] **Falta que lo mire el dueño.** Lo elegido «mientras tanto»: P251.
 Capturas en `cola16/`.
+
+## 2026-11-20 · ⭐ La XP de cada personaje en el reporte «Batalla terminada» («Claude · pruebas 2», GM)
+
+- [x] **Mapa del GM, 🏁 Finalizar combate → 🔮 Simular → 4. Experiencia** (19 creeps vivos, cuentan como «Escapó»: 348 XP por jugador): debajo de
+  cada personaje, «⭐ Nv 1 · 65 / 100 XP · le faltan 35» y «⬆ con estos 348 sube a nivel 3 (2 niveles) · queda en 113 / 300 XP» (a Blanco J1 se le
+  pusieron 65 XP para la prueba y se le sacaron después).
+- [x] **Cambia al tocar la XP**: «Experiencia por jugador» en 20 → «→ con estos 20 le quedan faltando 15 para el nivel 2»; extra de +15 a uno →
+  «⬆ con estos 35 sube a nivel 2 · queda en 0 / 200 XP», y el otro sigue con «le quedan faltando 80». En «5. Publicar», «⬆ sube a nivel 2» al lado
+  del nombre.
+- [x] **GM Tools**, la misma ventana (Simular): se ve igual.
+- [x] La Simulación no escribió nada: la ficha quedó igual, sin recompensas ni botín, el mapa en narrativo.
+- [ ] **Sin probar con clics**: en ▶ Avanzar (es la misma ventana; no se publicó nada para no repartir XP de prueba); un personaje inconsciente o
+  muerto (cobra menos o nada: la cuenta usa lo que de verdad va a cobrar).
+- [ ] **Falta que lo mire el dueño.**
+Capturas en `cola17/`.

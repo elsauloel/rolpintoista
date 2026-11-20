@@ -25,12 +25,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   turno (se va el Titilando) y un creep le aplica un debuff automático (Cegar, Parálisis, Miedo…) con el jugador con la Botonera abierta y cerrada, y
   con el GM pasando el turno. Arreglar la causa y, además, que un aviso tomado que no se pudo aplicar no se pierda en silencio (aviso al jugador y al GM
   con el motivo, p. ej. «no te hizo nada (Invulnerable)» también en la Mesa).
-- **⬜ en cola — ⭐ En el reporte «Batalla terminada» del GM, la XP que tiene cada jugador y cuánto le falta para subir** (dueño, 2026-11-20: «que en la
+- **✅ hecho (2026-11-20) — ⭐ En el reporte «Batalla terminada» del GM, la XP que tiene cada jugador y cuánto le falta para subir** (dueño, 2026-11-20: «que en la
   gestión del loot, previo a publicar, que el gm pueda ver cuánta exp tiene cada jugador, y cuánto falta para subir de nivel»). En el paso de la
   experiencia de `CombateFin.vista` (comun/combate-fin.js; lo usan el mapa del GM y GM Tools, en Simular y en Avanzar), al lado de cada personaje:
   nivel, XP actual / la que pide el próximo nivel, cuánto le falta, y qué pasa con lo que va a cobrar («con estos 191 sube a nivel 4» / «le quedan
   faltando 35»). La cuenta de niveles ya existe (`Recibidos.aplicarExp` / `expParaNivel`, comun/recibidos.js): usar esa, sin inventar otra. Si la XP de
   la ficha no está en el resumen público, leerla como GM (solo lectura).
+  *Resultado:* en el paso «4. Experiencia» del reporte (Avanzar y Simular, en el mapa del GM y en GM Tools), debajo del nombre de cada personaje:
+  «⭐ Nv 1 · 65 / 100 XP · le faltan 35» y, si cobra, «⬆ con estos 35 sube a nivel 2 · queda en 0 / 200 XP» (verde) o «→ con estos 20 le quedan
+  faltando 15 para el nivel 2» (amarillo); cambia al tocar «Experiencia por jugador» o el extra de uno. En «5. Publicar», «⬆ sube a nivel N» al lado
+  del que sube. La XP se lee de la ficha (solo lectura); la cuenta es la de siempre (nivel × 100). Probado con clics en «Claude · pruebas 2»
+  (Simular, mapa y GM Tools): nada se escribió. 1 prueba automática nueva (885 en verde). Capturas en `cola17/`.
 - **⬜ en cola — 🏹 El Carcaj de cuero ya no se regala con cada arco o ballesta** (dueño, 2026-11-20, P250: «NO» a «¿se sigue regalando…, ahora que hay
   un carcaj incluido de 5?»). Sacar el regalo al comprar (y donde más se entregue solo: tienda, personaje nuevo, etc.; grep) y corregir el texto del
   Carcaj de cuero del catálogo («Viene con cada arco o ballesta que se compra» → ya no; es la mejora de 10 lugares que se compra aparte) y el aviso

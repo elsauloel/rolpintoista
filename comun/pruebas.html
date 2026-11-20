@@ -3900,6 +3900,27 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
     [150, 2, 28, [14, 3], ['Garras de Orco 60'], 25, [18, 3], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-31, P237: sin habilidades, pasivas ni equipo, y con 18 puntos de atributo, dan menos)   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
 });
+prueba('⭐ fin del combate: la XP que tiene cada personaje y lo que le falta para subir (2026-11-20, dueño), con la cuenta de niveles de Recibidos; cambia al tocar la XP', () => {
+  const P = CombateFin.progresoXp, T = g => CombateFin.progresoXpTexto(g);
+  const a = P({nivel: 3, exp: 265}, 191), b = P({nivel: 3, exp: 265}, 0), c = P({nivel: 3, exp: 235}, 65), d = P({nivel: 1, exp: 0}, 350);
+  const rep = CombateFin.nuevo(); rep.enMapa = new Set(['a']); rep.paso = 'experiencia';
+  const creeps = [creepPrueba({id: 'a', nivel: 2, hp: 0})];
+  rep.jugadores = [{id: 'p1', nombre: 'Ana', estado: 'en pie', incluido: true, xp: {nivel: 3, exp: 290}}, {id: 'p2', nombre: 'Beto', estado: 'en pie', incluido: true, xp: null},
+    {id: 'p3', nombre: 'Ceci', estado: 'en pie', incluido: false, xp: {nivel: 1, exp: 10}}];
+  const xp1 = CombateFin.calcularReparto(rep, CombateFin.generar(rep, creeps, [])).porJugador[0].xp, h1 = CombateFin.vista(rep, creeps, []).html;
+  CombateFin.cambio(rep, {dataset: {repTodos: 'xp'}, value: '4'});
+  const h2 = CombateFin.vista(rep, creeps, []).html;
+  CombateFin.cambio(rep, {dataset: {repXp: 'p1'}, value: '6'});
+  const h3 = CombateFin.vista(rep, creeps, []).html;
+  rep.paso = 'publicar';
+  const h4 = CombateFin.vista(rep, creeps, []).html;
+  igual([[a.nivel, a.exp, a.pide, a.falta, a.sube, a.nivelDespues, a.expDespues, a.pideDespues], T(a).tiene, T(a).cobra, T(b).cobra, [c.sube, c.nivelDespues, c.expDespues], T(P({nivel: 3, exp: 200}, 64)).cobra,
+    [d.nivelDespues, d.expDespues], T(d).cobra, P(null, 50), xp1 >= 10, h1.includes('Nv 3 · 290 / 300 XP · le faltan 10'), h1.includes(`con estos ${xp1} sube a nivel 4`),
+    h2.includes('con estos 4 le quedan faltando 6 para el nivel 4'), h3.includes('con estos 10 sube a nivel 4 · queda en 0 / 400 XP'), h1.includes('Nv 1 · 10 / 100 XP · le faltan 90'),
+    (h1.match(/rep-xp-tiene/g) || []).length, (h1.match(/rep-xp-cobra/g) || []).length, h4.includes('⬆ sube a nivel 4')],
+    [[3, 265, 300, 35, true, 4, 156, 400], 'Nv 3 · 265 / 300 XP · le faltan 35', 'con estos 191 sube a nivel 4 · queda en 156 / 400 XP', 'no cobra XP: le siguen faltando 35', [true, 4, 0],
+    'con estos 64 le quedan faltando 36 para el nivel 4', [3, 50], 'con estos 350 sube a nivel 3 (2 niveles) · queda en 50 / 300 XP', null, true, true, true, true, true, true, 2, 1, true]);
+});
 prueba('🌀 fin del combate: el creep que se fue por un Town portal cuenta como «Escapó» (2026-11-20): 20 % de la XP, sin oro ni ítems; si volvió al mapa, no se marca', () => {
   const enMapa = CombateFin.unirEscapados(new Set(['a', 'c']), ['b', 'c']);
   const rep = CombateFin.nuevo(); rep.enMapa = enMapa;

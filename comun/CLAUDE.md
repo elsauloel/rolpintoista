@@ -1609,6 +1609,10 @@ versión parecida en más de una, es candidato a juntar.
 - **`combate-fin.js`, 🔮 Simular** (2026-11-20, dueño): `elegirModo()` (el cartel ▶ Avanzar / 🔮 Simular de «Finalizar combate», mapa js/18 y GM Tools
   js/06) y `rep.simulacion`: `vista` suma el cartel «Simulación: no se guarda nada» con «▶ Pasar a Avanzar» (`data-rep-avanzar`, lo maneja `clic`) y
   esconde Publicar; `publicar` se niega. `cambio`/`clic` no escriben nada (quién cobra queda en `rep.jugadores`, no pasa por `fueraCambiar`).
+- **`combate-fin.js`, ⭐ la XP de cada personaje en el reporte** (2026-11-20, dueño): `jugadores()` lee además la parte `general` de cada ficha
+  (solo lectura; `xp: {nivel, exp}` o `null`), y en el paso de la experiencia `vista` muestra, debajo de cada nombre, «Nv · XP / la que pide · le
+  faltan» y lo que pasa con lo que cobra («sube a nivel N» / «le quedan faltando N»); en Publicar, «⬆ sube a nivel N». `progresoXp(xp, cobra)` /
+  `progresoXpTexto(g)` hacen la cuenta con `Recibidos.aplicarExp` / `expParaNivel` (por eso GM Tools carga ahora `recibidos.js`).
 - **La Defensa especial va siempre con la Defensa** (dueño, 2026-10-12): «Def. especial» (antes «Armad. mágica») en las botoneras de
   personaje, invocación y creep, debajo de la Defensa en Equipo y mochila, en la cabecera de la Botonera («Def 2 · Def.Esp 0») y siempre en
   la ficha lite.

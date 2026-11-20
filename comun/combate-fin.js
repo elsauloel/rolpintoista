@@ -7,7 +7,7 @@
    - nuevo() → rep: el estado del reporte. contarEscapados vive adentro (antes xpContarEscapados).
    - generar(rep, creeps, cat) → {filas, xpTotal}; calcularReparto(rep, r); itemsPublicables(rep, r). `creeps` = los creeps de la
      partida (forma de GM Tools), `cat` = el catálogo en la forma del equipo de un creep (itemParaCreep).
-   - creepsEnMapa() → Set de los creeps con token en el mapa publicado (más los que se fueron por un Town portal en combate, `.portal`); jugadores(previos) → los personajes con su estado.
+   - creepsEnMapa() → Set de los creeps con token en el mapa publicado (más los que se fueron por un Town portal en combate, `.portal`); jugadores(previos) → los personajes con su estado y su XP (`xp: {nivel, exp}`, leída de la ficha; `progresoXp`).
    - vista(rep, creeps, cat) → {html, publicar: 'oculto'|'activo'|'inactivo', faltanJugadores}: el cuerpo de la ventana.
    - cambio(rep, t) / clic(rep, b, raiz, creeps, cat): lo que hacen sus controles (data-rep-*), → true | {ver: ítem} | {toast}.
    - publicar(rep, {creeps, cat, combateActual, confirmar, alEmpezar}) → null (canceló) | {error} | {ok, items, filas}.
@@ -15,7 +15,7 @@
      despojar(st, {combateActual, confirmar, alEmpezar}) → null | {error} | {ok, mensaje}.
    - lineaVerde(origen, formula): la línea verde de la Mesa (desde 'recompensa').
    Las ventanas (dónde se muestran, Ver de un ítem, toasts, marcar los creeps recompensados) las pone cada pantalla.
-   Necesita sesion.js (fbDb, fbRutaCampana, fbUsuario, fbMiembro), creep-calculo.js e items-subidos.js (sinAviso).
+   Necesita sesion.js (fbDb, fbRutaCampana, fbUsuario, fbMiembro), creep-calculo.js, items-subidos.js (sinAviso) y recibidos.js (la cuenta de niveles).
    ========================================================= */
 const CombateFin = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
@@ -463,14 +463,45 @@ const CombateFin = (() => {
     catch(err){ console.error('No se pudo guardar quién cuenta:', err); }
     return s;
   }
+  /* ⭐ La XP que tiene cada personaje (2026-11-20, dueño: «que en la gestión del loot, previo a publicar, que el gm pueda ver cuánta exp tiene
+     cada jugador, y cuánto falta para subir de nivel»). La XP no está en el resumen público de la ficha: se lee, solo lectura, de su parte
+     `general` (meta.nivel, meta.exp; el GM puede). Si no se puede leer, el personaje queda sin ese dato (`xp: null`) y el reporte sigue igual. */
+  async function xpDeFicha(d){
+    try{
+      const g = await d.ref.collection('partes').doc('general').get();
+      const m = (JSON.parse((g.data() || {}).json || '{}') || {}).meta;
+      return m ? {nivel: Math.max(1, num(m.nivel) || 1), exp: Math.max(0, num(m.exp))} : null;
+    }catch(err){ return null; }
+  }
+  /* Dónde está un personaje y dónde queda con lo que va a cobrar, con la cuenta de niveles de siempre (`Recibidos.aplicarExp` / `expParaNivel`,
+     comun/recibidos.js): {nivel, exp, pide, falta, cobra, sube, nivelDespues, expDespues, pideDespues, faltaDespues} | null (sin dato). */
+  function progresoXp(xp, cobra){
+    if(!xp || typeof Recibidos === 'undefined') return null;
+    const nivel = Math.max(1, num(xp.nivel) || 1), exp = Math.max(0, num(xp.exp)), pide = Recibidos.expParaNivel(nivel);
+    const S = {meta: {nivel, exp}}, c = Math.max(0, num(cobra));
+    const sube = Recibidos.aplicarExp(S, exp + c), pideDespues = Recibidos.expParaNivel(S.meta.nivel);
+    return {nivel, exp, pide, falta: Math.max(0, pide - exp), cobra: c, sube, nivelDespues: S.meta.nivel, expDespues: S.meta.exp, pideDespues, faltaDespues: Math.max(0, pideDespues - S.meta.exp)};
+  }
+  // Las dos líneas del reporte: lo que tiene («Nv 3 · 265 / 300 XP · le faltan 35») y lo que pasa con lo que cobra.
+  function progresoXpTexto(g){
+    if(!g) return null;
+    const tiene = `Nv ${fmt(g.nivel)} · ${fmt(g.exp)} / ${fmt(g.pide)} XP · le faltan ${fmt(g.falta)}`;
+    const saltos = g.nivelDespues - g.nivel;
+    const cobra = !g.cobra ? `no cobra XP: le siguen faltando ${fmt(g.falta)}`
+      : g.sube ? `con estos ${fmt(g.cobra)} sube a nivel ${fmt(g.nivelDespues)}${saltos > 1 ? ` (${saltos} niveles)` : ''} · queda en ${fmt(g.expDespues)} / ${fmt(g.pideDespues)} XP`
+      : `con estos ${fmt(g.cobra)} le quedan faltando ${fmt(g.faltaDespues)} para el nivel ${fmt(g.nivel + 1)}`;
+    return {tiene, cobra};
+  }
   async function jugadores(previos){
     const afuera = await fuera();
     const [fichas, miembros] = await Promise.all([fbDb.collection(fbRutaCampana('fichas')).get(), fbDb.collection(fbRutaCampana('miembros')).get()]);
     const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
     const prev = new Map((previos || []).map(j => [j.id, j]));
-    return fichas.docs.map(d => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid, dueno: nombres.get(d.data().duenoUid) || '',
+    const xps = await Promise.all(fichas.docs.map(xpDeFicha));
+    return fichas.docs.map((d, i) => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid, dueno: nombres.get(d.data().duenoUid) || '',
       estado: estadoDeFicha(d.data()), incluido: prev.has(d.id) ? prev.get(d.id).incluido : !afuera.has(d.id),
-      ekeko: num(((d.data().resumen) || {}).ekeko)}))   // 🔮 el Ekeko (2026-10-18): su parte del oro, un % más
+      ekeko: num(((d.data().resumen) || {}).ekeko),   // 🔮 el Ekeko (2026-10-18): su parte del oro, un % más
+      xp: xps[i]}))   // ⭐ {nivel, exp} | null
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
@@ -574,9 +605,12 @@ const CombateFin = (() => {
           const extra = campo === 'dde'
             ? `<span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><span class="hint" style="font-weight:400">extra</span> <input type="number" step="1" class="rep-num${p && p.ddeExtra ? ' editado' : ''}" data-rep-dde="${esc(j.id)}" value="${p ? p.ddeExtra : 0}"> DDE</span><span class="rep-final">= <b>+${fmt(p ? p.dde : 0)}</b> DDE${p && p.ekeko ? ` <span class="hint">(🔮 +${fmt(p.ekeko)})</span>` : ''}</span>`
             : `<span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><span class="hint" style="font-weight:400">extra</span> <input type="number" step="1" class="rep-num${p && p.xpExtra ? ' editado' : ''}" data-rep-xp="${esc(j.id)}" value="${p ? p.xpExtra : 0}"> XP</span><span class="rep-final">= <b>+${fmt(p ? p.xp : 0)}</b> XP</span>`;
+          // ⭐ En el paso de la experiencia: su nivel, la XP que tiene / la que pide el próximo, lo que le falta y qué pasa con lo que cobra.
+          const gp = campo === 'xp' ? progresoXp(j.xp, j.incluido && p ? p.xp : 0) : null, g = progresoXpTexto(gp);
+          const xpHtml = g ? `<span class="reporte-nivel rep-xp-tiene" style="font-size:11px;color:#c8d1dc">⭐ ${esc(g.tiene)}</span>${j.incluido ? `<span class="reporte-nivel rep-xp-cobra" style="font-size:11px;${gp.sube ? 'color:#8fe3a2;font-weight:700' : 'color:#e6c66a'}">${gp.sube ? '⬆ ' : '→ '}${esc(g.cobra)}</span>` : ''}` : '';
           return `<label class="reporte-fila${j.incluido ? '' : ' no-cuenta'}" style="cursor:pointer;gap:8px;align-items:center">
           ${campo === 'dde' ? `<input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>` : ''}
-          <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}</span>
+          <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}${xpHtml}</span>
           <span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span>
           ${j.incluido ? extra : '<span class="reporte-xp">no cobra</span>'}</label>`;
         }).join('')
@@ -624,7 +658,7 @@ const CombateFin = (() => {
           return `<div class="reporte-fila reporte-fila-lista" title="Lo que vale lo que se publica: comprado en una tienda, vendido en una tienda (la mitad del precio de compra) o, lo que nadie toma, convertido en despojos (un cuarto)"><span class="reporte-nombre">💰 Valor del botín</span><span class="reporte-xp">Si venden todo: <b>~${fmt(venta)} DDE</b>${cada(venta)}<br><span class="hint" style="font-weight:400">si nadie toma nada y se despoja: ~${fmt(desp)} DDE${cada(desp)} · en una tienda costaría ${fmt(compra)} DDE</span></span></div>`;
         })()}
         ${rp.despojosEquipo ? `<div class="reporte-fila reporte-fila-lista" title="${esc(ocultos(rep, r).map(o => `${o.i.nombre} (${o.i.origen}): ${fmt(o.valor)} despojos`).join('\n'))}"><span class="reporte-nombre">🧰 Equipo que no se ofrece</span><span class="reporte-xp">${esc(ocultos(rep, r).map(o => o.i.nombre).join(', '))} → ${fmt(rp.despojosEquipo)} despojos</span></div>` : ''}
-        ${rp.porJugador.map(({j, xp, dde, despojos}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE${despojos ? ` · +${fmt(despojos)} despojos` : ''}</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
+        ${rp.porJugador.map(({j, xp, dde, despojos}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}${(g => g && g.sube ? ` <span class="reporte-nivel" style="color:#8fe3a2;font-weight:700">⬆ sube a nivel ${fmt(g.nivelDespues)}</span>` : '')(progresoXp(j.xp, xp))}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE${despojos ? ` · +${fmt(despojos)} despojos` : ''}</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
       </div>`;
     }
     const nav = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${PASOS_BOTIN.map((p, i) => `<button type="button" class="iconbtn" data-rep-ir="${p.id}" style="${p.id === paso ? 'font-weight:700;border-color:#c9a227;color:#f3e2a0' : ''}">${i + 1}. ${esc(p.nombre)}</button>`).join('')}</div>`;
@@ -931,6 +965,6 @@ const CombateFin = (() => {
   }
 
   return {elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
-    plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
+    plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, progresoXp, progresoXpTexto, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

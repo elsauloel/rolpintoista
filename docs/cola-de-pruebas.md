@@ -73,6 +73,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Arrastrar y después Atacar en el mismo turno; y atacar, cerrar el combate (Finalizar / pasar a narrativo), abrir otro y mirar el costo del
   primer ataque. Arreglar la causa que aparezca (si es la (b): que al empezar un combate —pasar a Combate / tirar iniciativa / Finalizar combate— la
   cuenta de ataques arranque en cero para todos, personajes, invocaciones y creeps). Si no se reproduce ninguna, decirlo tal cual.
+- **⬜ en cola — 👥 En la partida de pruebas, un solo personaje por jugador** (dueño, 2026-11-20: «yo dejaría en la partida de pruebas que cada
+  jugador tenga asignado un solo personaje para que sea más claro, porque rara vez un jugador va a tener más de un personaje en su control, salvo
+  que sea una invocación… para las pruebas me gustaría mantenerlo así»). En «Claude · pruebas 2»: sacar a «Blanco J1 b» (el segundo personaje del
+  Jugador 1) con su token, con la interfaz (GM Tools → 👥 Personajes → ✕). Quedan Blanco J1 (Jugador 1) y Blanco J2 (Jugador 2). Actualizar
+  docs/memoria-claude.md (y cualquier guía o script de pruebas que nombre a Blanco J1 b): las pruebas de dos personas se hacen con J1 y J2.
 - **⬜ en cola — 👁 Revelar a mano lo que está oculto (trampas y demás)** (dueño, 2026-11-20, El origen: «un personaje tiró para detectar una
   trampa, pasó algo raro con las tiradas, el sistema entendió que la trampa no fue detectada, pero en realidad sí fue detectada… y yo como GM no
   tenía una forma de revelar lo que estaba oculto, entonces eso también tendría que existir en las cosas que están ocultas. Tanto para GMs como para
@@ -103,6 +108,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   casillas que el jugador no ve NO se le dibuja ni se le anuncia; la parte que cae en casillas que sí ve, se ve (eso es correcto: ve humo, no a la
   rata). Si hoy se le muestran casillas que no ve, o el anuncio nombra a quien la tiró, es la fuga a arreglar. Revisar lo mismo para trampas y otras
   zonas puestas desde la niebla.
+  **Criterio confirmado por el dueño (2026-11-20):** «me parece bien que, si la rata está bajo la niebla, la polvareda se vea. Solo que no tiene que
+  decir "la rata usó Polvareda". Sin embargo, si la rata está a la vista de los jugadores y usa Polvareda, ahí sí aparece el mensaje "la rata usó
+  Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
+  la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
+  lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

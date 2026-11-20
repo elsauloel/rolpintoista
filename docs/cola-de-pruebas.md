@@ -207,7 +207,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   · **Abajo, el subtítulo «Proyectiles especiales»** (no «flechas y virotes»): lo que hay ADENTRO del carcaj, con sus botones «→ Mochila» y su costo;
     y, aparte y bien distinguido, los que están en la mochila para cargar («→ Carcaj», «Cargar todo lo que entre»).
   · Se mantiene lo ya hecho: un solo recuadro y el costo en No2 en cada botón.
-- **⬜ en cola — ⚔ Tres maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6) y hachas (Tipo 8)** (dueño, 2026-11-20, conversación de
+- **⬜ en cola — ⚔ Cinco maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6), hachas (Tipo 8), arcos y ballestas** (dueño, 2026-11-20, conversación de
   diseño; mismo molde que «Maestría en armas pesadas», `comun/pasivas.js`; valen para jugadores y para creeps). Cierra P248.
   · **Maestría en armas punzantes** (1 Job): con un arma de **Tipo 4 cuerpo a cuerpo** (NO las de rango / proyectiles: «vamos a hacer una distinción
     en las armas punzantes melee y las de rango… esta sería para tipo 4 melee»), **+1 al daño** y **+2 al PdG en ataque de oportunidad**.
@@ -215,6 +215,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   · **Maestría en hachas** (Tipo 8; dueño: «tipo 8 son hachas. Su casa es romper armadura»): el **segundo ataque del turno (y los siguientes) con
     un arma de Tipo 8 cuesta 2 No2 menos** (6 en vez de 8). Job: **1** (dueño, 2026-11-20: «cuesta un punto de Job, como el resto»).
   Cada bono vale SOLO con un arma de ese Tipo (como `pdgt10`/`parryt10`): se tiene que ver en la 🔍 de la tirada y en el costo del botón Atacar.
+  · **Maestría en arcos** (1 Job; dueño, 2026-11-20: «para arcos le daría +1 la probabilidad de golpe y +2 al crítico potente»): con un **arco**,
+    **+1 a PdG** y **+2 al Crítico potente** (`critpot`). (Descartado por el dueño: +1 Rango, «ya tienen un rango zarpado»; +1 PdG solo en el primer
+    tiro, «objetivamente peor que la pasiva que da +1 PdG siempre».)
+  · **Maestría en ballestas** (1 Job; dueño: «+1 a la probabilidad de golpe y +1 a Perfora, me parece bien»): con una **ballesta**, **+1 a PdG** y
+    **Perfora +1** (sumado al Perfora que ya traiga el arma, con la regla de Perfora que ya existe: no inventar otra). (Descartado: Recarga −1 No2,
+    «demasiado poderoso».)
+  Arco / ballesta se distinguen como ya lo hace el código (el carcaj incluido, las flechas / virotes), no por el Tipo.
 - **⬜ en cola — 🛡 Pasiva nueva «Aguante de trinchera»** (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la
   defensa y +1 la defensa especial por cada enemigo adyacente. Busquémosle un nombre y publiquémosla»). 2 Job; **+1 Defensa y +1 Defensa especial por
   cada enemigo pegado** al que la tiene. Es el espejo de «Táctica de enjambre» (`comun/pasivas.js`, stat `enjambre`, `Combatiente.aliadosPegados`):

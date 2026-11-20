@@ -1645,4 +1645,4 @@ pasar a narrativo a mano con el interruptor)?
 ### P253 — ⚔ Maestrías de Tipo 4, 6 y 8: lo que quedó sin definir (2026-11-20, Claude)
 El dueño definió las tres (ver `docs/cola-de-pruebas.md`): punzantes melee (+1 daño, +2 PdG en oportunidad), cortantes (+1 Parry, +1 Bloqueo, +1 PdG
 en contraataque) y hachas (el segundo ataque del turno cuesta 2 No2 menos). **(a) ✅ la de hachas cuesta 1 Job** (dueño, 2026-11-20). ~~quedó en
-2, provisorio~~ **Para el dueño:** (b) ¿querés una maestría aparte para las armas de Tipo 4 de rango (proyectiles)? ¿con qué bonos?
+2, provisorio~~ **(b) ✅ de rango, dos maestrías** (dueño, 2026-11-20): arcos = +1 PdG y +2 Crítico potente; ballestas = +1 PdG y Perfora +1; 1 Job cada una.

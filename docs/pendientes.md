@@ -110,6 +110,10 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🍺 Diseñar algún «minijuego» para jugar en las tabernas (dueño, 2026-11-20: «también para lista de ver en pc, diseñar algún "minijuego"
+>   para jugar en las tabernas»).** Pensarlo juntos en la compu: qué juego (dados, cartas, pulseadas, truco, taba…), entre quiénes (jugadores entre sí,
+>   contra un parroquiano que maneja el GM), si se apuesta oro y cómo se ve en el mapa. Hay de dónde partir: el ✊ piedra, papel o tijera (`comun/ppt.js`),
+>   que ya juega dos de la partida en vivo y deja el resultado en la Mesa.
 > - [x] (2026-11-03: hecho por el dueño) **🏃 Prisa de verdad para Rockardo en El origen (2026-10-31, dueño: «para cuando esté en la compu, agregarle la prisa real a Rockardo»).**
 >   Su «Prisa» está escrita a mano (sin el +1 Prisa), así que el mapa no lo pone primero al ordenar los turnos. Desde la nube no se puede: la ficha
 >   es de su jugador y el GM de El origen es la cuenta del dueño. Pasos (GM de El origen): abrir la ficha de Rockardo → «✎ Editar como GM» → en

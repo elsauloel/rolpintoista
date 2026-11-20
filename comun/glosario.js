@@ -93,7 +93,7 @@ const Glosario = (() => {
     {titulo: 'Derribar', texto: 'Derribar: cae al suelo y queda Sentado (Evasión a la mitad, no puede atacar). Levantarse cuesta 1 No2.'},
     {titulo: 'Salto', re: 'salta', texto: 'Salto (rayo): pasa al rival más cercano del mismo bando, a 3 casillas o menos, una vez por objetivo. Si lleva daño, salta con la mitad (para abajo): quien recibe 1 es el último.'},
     {titulo: 'Flecha especial', texto: 'Flecha especial: va en el carcaj y se elige al disparar con un arco. Se gasta al dispararla, pegue o no (si erra, queda en el piso y se puede levantar); su efecto entra siempre que pegue.'},
-    {titulo: 'Carcaj', re: 'carcaj', texto: 'Carcaj: guarda las flechas especiales. Todo arco viene con uno de 10 lugares.'},
+    {titulo: 'Carcaj', re: 'carcaj', texto: 'Carcaj: guarda las flechas y los virotes especiales. Sin un carcaj puesto, cualquier arco o ballesta trae uno incluido de 5 lugares, que no pesa ni ocupa lugar.'},
   ];
   // Lo que se da por sabido (se usa en todos lados: marcarlo llenaría todo de vínculos).
   const BASICOS = new Set(['fuerza', 'destreza', 'especial', 'constitución', 'agilidad', 'pdg', 'dmg', 'evasión', 'parry', 'bloqueo', 'defensa', 'iniciativa',

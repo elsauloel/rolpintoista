@@ -45,6 +45,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   modo narrativo me gusta, pero quiero que lo pongas integrado al mismo mensaje de cómo quedó el grupo, porque el cartelito verde ese pasa bastante
   desapercibido»). Cuando el fin del combate pasa el mapa a narrativo, el cartel «Cómo quedó el grupo» lo dice bien visible (arriba, destacado:
   «🌿 Terminó el combate: el mapa volvió a modo narrativo»). Si ese cartel no llega a salir (p. ej. desde GM Tools), queda el cartelito de abajo.
+- **⬜ en cola — 🐞 Desequilibrado (Arrastrar) se muestra como si no tuviera fin** (dueño, 2026-11-20, jugando El origen: «el personaje arrastrado
+  apareció con el debuff Desequilibrado, y cuando me fijé cuánto duraba, parecía como que no tenía fin. Sin embargo, cuando pasó el tiempo
+  correspondiente, se fue solo… quiero que pases una prueba en el mapa, corrobores esta información, y si es solamente un error de comunicación,
+  simplemente corrijas eso»). Leído el código (Claude): es a propósito que se guarde `permanente: true` cuando quien arrastró está en el orden de
+  turnos (`desequilibradoPoner`, vtt-hexgrid/js/78-choque-pesado.js): no vence por turnos, lo saca `desequilibradosFinTurno` al terminar el turno de
+  quien arrastró. Por eso se ve «sin límite / ∞». Hay que (1) confirmarlo en el mapa (Arrastrar con orden de turnos: aparece, se ve sin fin, y se
+  va al terminar el turno de quien arrastró) y (2) arreglar SOLO lo que se muestra: en todos los lugares donde se ve la duración de un estado (token,
+  tarjeta, ficha, ficha lite, Botonera, lupa, Tablero, GM Tools) que diga «hasta el fin del turno de <quien arrastró>» en vez de sin límite. Mejor
+  con un dato genérico en el estado (p. ej. `hasta: 'el fin del turno de X'`) que otros estados parecidos puedan usar, y revisar si hay otros estados
+  que se guardan permanentes pero se sacan solos (decir cuáles en el informe; no cambiarlos sin avisar). No tocar cuándo se va.
 - **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para

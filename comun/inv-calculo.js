@@ -167,6 +167,22 @@ const InvCalculo = (() => {
     inv.hp = estabaFull ? nuevoHpMax : Math.min(num(inv.hp), nuevoHpMax);
   }
 
+  /* 🐝 Invocar (2026-11-20, dueño, con las abejas de Bizzante: «aparecían con menos HP que el máximo, algo así como el 75 %»): una invocación que
+     entra al juego —sea con el botón «Invocar» de la ficha o con una habilidad que invoca— aparece **nueva**: la vida y los No2 llenos, sus turnos
+     de duración completos y los cooldowns de sus habilidades en cero. Antes el botón «Invocar» de la ficha no tocaba la vida: la abeja volvía con
+     la que le había quedado la última vez (herida, o en 0 si había muerto). No hay regla que diga que vuelve lastimada. Los estados no se tocan.
+     Es EL lugar común: quien invoque algo tiene que pasar por acá. */
+  function invocar(inv){
+    if(!inv) return inv;
+    inv.activa = true;
+    inv.cooldownActual = num(inv.cooldown);
+    delete inv.turnosAgotados;   // ⏳ (2026-10-30)
+    if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
+    inv.nitros = nitrosMax(inv);
+    (inv.habilidades || []).forEach(x => { if(x) x.cdActual = 0; });
+    return inv;
+  }
+
   // Rellena campos que invocaciones viejas (guardadas antes de esta
   // actualización) no tienen, para que el resto del código no se tope con
   // undefined. Convierte Acciones/Movimiento (viejo) a No2, igual que ya
@@ -205,5 +221,5 @@ const InvCalculo = (() => {
   return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
     nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
-    modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};
+    modsAfectanHp, actualizarHpMaxPorCon, invocar, migrar, regenPasivas};
 })();

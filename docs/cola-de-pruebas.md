@@ -369,7 +369,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   aviso al GM; Ctrl+Z devuelve el bono; 🦶 Mover libre no lo saca. 10 pruebas automáticas nuevas. *Sin probar con clics:* el Foco, el Dash y
   demás (nadie los tiene en el clon): `docs/pruebas-en-el-mapa.md`. Lo elegido «mientras tanto» (la ronda 1, qué cuenta como moverse, quién ve
   el cartel): **P258**. Archivos: `comun/quieto.js`, `vtt-hexgrid/js/126-quieto.js`.
-- **⬜ en cola — 🐝 Las abejas de Bizzante aparecen con menos vida que su máximo (~75 %)** (dueño, 2026-11-20, El origen: «al invocar sus abejas,
+- **✅ hecho (2026-11-20) — 🐝 Las abejas de Bizzante aparecen con menos vida que su máximo (~75 %)** (dueño, 2026-11-20, El origen: «al invocar sus abejas,
   aparecían con menos HP que el máximo. Algo así como el 75 %… copialo a la partida de pruebas para hacer el testeo»). (1) Leer a Bizzante de El
   origen en SOLO LECTURA (la página con las escrituras a Firestore bloqueadas de scratchpad/simfin/; nunca abrir ahí el mapa, la ficha ni GM Tools) y
   **usar el Bizzante de la partida clon de El origen** (tarea anterior; ya no hace falta copiarlo a «Claude · pruebas 2»). [Texto viejo:] una copia a nombre del Jugador 1 o del GM; es temporal: al terminar se saca (la partida de pruebas queda con un personaje por jugador), salvo
@@ -379,6 +379,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   recalcula después? ¿se copia la vida de la invocación anterior? ¿cambia entre la primera invocación y las siguientes? (3) Arreglar la causa: una
   invocación nueva aparece con la vida llena, salvo que una regla escrita diga otra cosa (si la hay, mostrarla y no tocar). Probar también otra
   invocación distinta para ver si es general.
+  **Resultado (2026-11-20).** *Qué pasaba* (visto con clics en «El origen · CLON de pruebas», Jugador 1, en la ficha de Bizzante): el botón
+  **«Invocar»** de la tarjeta de cada abeja la despertaba con sus turnos y sus No2, pero **no le tocaba la vida**: volvía con la que le había
+  quedado la última vez. Una Abeja Gorda que se fue con 34 de 45 volvía con 34 de 45 (el 75 %); la Abeja Ágil, que había muerto, volvía con 0 de
+  20. No es una regla: el «Mareo de invocación» solo le saca el primer turno, no vida, y la otra forma de invocar (una habilidad con «invoca»
+  armado) ya la traía llena. La habilidad «Invocar Abeja Mejorada» de Bizzante no tiene eso armado: paga el costo y las abejas se despiertan con
+  el botón de la ficha. No tenía que ver con el equipo, las pasivas ni la Constitución.
+  *Qué se arregló:* invocar pasa por un solo lugar (`InvCalculo.invocar`, comun/inv-calculo.js), que usan el botón de la ficha y la habilidad
+  que invoca: la invocación aparece nueva, con la vida y los No2 llenos, sus turnos completos y los cooldowns de sus habilidades en cero. Los
+  estados que tuviera no se tocan.
+  *Probado con clics:* la Abeja Ágil (muerta) vuelve con 20 de 20; la Gorda (34 de 45) con 45 de 45, y puesta en el mapa se ve 45/45 en el
+  token, en su menú y en la pantalla del GM; la Diestra (otra invocación, bajada a 4) vuelve con 10 de 10. 3 pruebas automáticas nuevas.
+  *Para mirar* (no se tocó): la Abeja Diestra tiene máximo 10 con Constitución 4 (por la cuenta de siempre serían 20); el máximo es un número que
+  se puede escribir a mano en la tarjeta, así que quedó como está. El clon quedó con las tres abejas dormidas y llenas.
 - **⬜ en cola — 🔥 «Ver detalle» de una zona puesta en el mapa (Muro de fuego y todas las demás)** (dueño, 2026-11-20: «invoqué el Muro de fuego
   y después, cuando quería recordar bien qué hacía, tenía que ir a la ficha del personaje que lo invocó, ir a su lista de skills y ver el detalle. Me
   gustaría que skills como el muro de fuego, al seleccionarlo, arriba, donde aparece el título, a la derecha, aparezca un botoncito que diga "ver

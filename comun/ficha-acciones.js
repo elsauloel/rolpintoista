@@ -1634,12 +1634,7 @@ const FichaAcciones = (() => {
       inv.equipo = (inv.equipo || []).map(x => ({...x, id: uid()}));
       lista.splice(lista.indexOf(familia[familia.length - 1]) + 1, 0, inv);
     }
-    inv.activa = true;
-    inv.cooldownActual = num(inv.cooldown);
-    delete inv.turnosAgotados;   // ⏳ (2026-10-30)
-    if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
-    inv.nitros = InvCalculo.nitrosMax(inv);
-    (inv.habilidades || []).forEach(x => { x.cdActual = 0; });
+    InvCalculo.invocar(inv);   // 🐝 aparece nueva: vida y No2 llenos, sus turnos y los cooldowns en cero (lo mismo que el botón «Invocar» de la ficha)
     return inv;
   }
   /* 👁 Un consumible que invoca algo por un rato (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color}`.

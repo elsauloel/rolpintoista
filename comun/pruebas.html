@@ -74,13 +74,13 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js?v=20261120hasta"></script>
 <script src="ficha-sesion.js"></script>
-<script src="inv-calculo.js?v=20261120maestria"></script>
+<script src="inv-calculo.js?v=20261120invocar"></script>
 <script src="inv-botonera.js?v=20261120maestria"></script>
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261120volver"></script>
+<script src="ficha-acciones.js?v=20261120invocar"></script>
 <script src="orden-turnos.js?v=20261120iniciar"></script>
 <script src="ficha-mantenimiento.js?v=20261114sang"></script>
 <script src="estado-preguntas.js"></script>
@@ -9040,6 +9040,30 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const movido = await mundo({ini: {...ini, movidos: {biz: [2]}}, tokens}), r1 = await mundo({ini: {...ini, ronda: 1}, tokens}), narr = await mundo({ini, tokens, modo: 'narrativo'}), dodge = await mundo({ini, tokens, dodge: true});
     igual([await movido.quietoAvisoAntes('biz'), await r1.quietoAvisoAntes('biz'), await narr.quietoAvisoAntes('biz'), await dodge.quietoAvisoAntes('biz')], [true, true, true, true]);
     igual([movido.preguntas.length, r1.preguntas.length, narr.preguntas.length, dodge.preguntas.length], [0, 0, 0, 0]);
+  });
+})();
+
+/* ---------- 🐝 Una invocación aparece con la vida llena (comun/inv-calculo.js `invocar`, 2026-11-20) ---------- */
+grupo('Invocar: la invocación aparece nueva, con la vida llena');
+(() => {
+  const abeja = o => ({id: 'a1', nombre: 'Abeja Gorda', activa: false, cooldown: 3, cooldownActual: 0, hp: 34, hpMax: 45, con: 9, fue: 4, agl: 4, des: 4, esp: 4, nitros: 1,
+    turnosAgotados: true, equipo: [], estados: [{id: 'e1', nombre: 'Vuela', permanente: true, activo: true}], habilidades: [{id: 'h1', nombre: 'Aguijón', cd: 2, cdActual: 2}], pasivas: [], ...o});
+  prueba('el botón «Invocar» (InvCalculo.invocar): una abeja que había quedado en 34 de 45 vuelve con 45; turnos, No2 y cooldowns como nueva', () => {
+    const inv = InvCalculo.invocar(abeja());
+    igual([inv.activa, inv.hp, inv.hpMax, inv.cooldownActual, inv.turnosAgotados, inv.habilidades[0].cdActual, inv.nitros === InvCalculo.nitrosMax(inv)], [true, 45, 45, 3, undefined, 0, true]);
+    igual(inv.estados.map(e => e.nombre), ['Vuela']);   // los estados no se tocan
+  });
+  prueba('una abeja que había muerto (0 de vida) vuelve con la vida llena; sin máximo cargado no inventa nada', () => {
+    igual(InvCalculo.invocar(abeja({hp: 0, hpMax: 20})).hp, 20);
+    igual(InvCalculo.invocar(abeja({hp: 3, hpMax: 0})).hp, 3);
+  });
+  prueba('la habilidad que invoca (FichaAcciones.invocacionDeHab) usa lo mismo: despierta la dormida llena, y una copia nueva también', () => {
+    const S = {invocaciones: [abeja()]};
+    const a = FichaAcciones.invocacionDeHab(S, {invoca: {invId: 'a1'}});
+    igual([a.id, a.activa, a.hp, a.cooldownActual], ['a1', true, 45, 3]);
+    a.hp = 10;   // la primera sigue en juego, lastimada: la segunda vez sale una copia, llena
+    const b = FichaAcciones.invocacionDeHab(S, {invoca: {invId: 'a1'}});
+    igual([b.copiaDe, b.hp, b.hpMax, S.invocaciones.length, a.hp], ['a1', 45, 45, 2, 10]);
   });
 })();
 

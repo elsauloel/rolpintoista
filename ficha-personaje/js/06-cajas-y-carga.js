@@ -519,10 +519,9 @@ document.addEventListener('click', async e => {
   if(b.dataset.reinvocar){
     const inv = S.invocaciones.find(x=>x.id===b.dataset.reinvocar);
     if(inv){
-      inv.activa = true;
-      inv.cooldownActual = num(inv.cooldown);
-      delete inv.turnosAgotados;   // ⏳ (2026-10-30)
-      inv.nitros = invNitrosMax(inv);
+      // 🐝 (2026-11-20, dueño: las abejas «aparecían con menos HP que el máximo») aparece nueva: vida y No2 llenos, sus turnos y los cooldowns en
+      // cero. Antes este botón no tocaba la vida y volvía con la que le había quedado (comun/inv-calculo.js, `invocar`).
+      InvCalculo.invocar(inv);
       renderInvocaciones();
       toast(`${inv.nombre} invocada de nuevo`);
     }

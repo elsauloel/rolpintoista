@@ -2096,3 +2096,9 @@ versión parecida en más de una, es candidato a juntar.
   `marcar(lista, ronda)`, `podar(movidos, ronda, hayOrden)` (lo que se guarda: esta ronda y la anterior), `unir(a, b)`, `ANILLOS`, `bonos({pulso,
   foco})`, `cartel(b)` («🎯 Puntería certera») y `aviso(lista, nombre, propio)` («Tenés … activa (+2 a PdG). Si te movés, la perdés.»). Sin pantalla
   ni Firebase. Lo usa el mapa (`vtt-hexgrid/js/126-quieto.js`, js/04) y las pruebas automáticas.
+
+- **🐝 `InvCalculo.invocar(inv)`** (2026-11-20, dueño: las abejas de Bizzante «aparecían con menos HP que el máximo, algo así como el 75 %»): **el
+  lugar común para que una invocación entre al juego** — `activa`, sus turnos (`cooldownActual = cooldown`), sin `turnosAgotados`, **la vida
+  llena** (`hp = hpMax`), los No2 llenos y los cooldowns de sus habilidades en cero; los estados no se tocan. Lo usan el botón «Invocar» de la
+  ficha (`ficha-personaje/js/06`, que antes no tocaba la vida: volvía con la que le había quedado) y `FichaAcciones.invocacionDeHab` (la habilidad
+  con `invoca`). Una forma nueva de invocar pasa por acá.

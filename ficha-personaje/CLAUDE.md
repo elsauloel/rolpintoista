@@ -699,3 +699,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   llegó de afuera y una inmunidad lo frena, `window.avisoInmune` (js/12-en-vivo.js, lo llama `Combatiente.avisoInmune`) publica el momento sin tarjeta
   `gancho-eva` con `ref` (la ficha o «ficha~invocación»), el texto y `color: 'inmune'`: cada mapa abierto busca el token y muestra el cartel. Solo lo
   recibido (lo que llega con `ref` desde `comun/recibidos.js`); el «+ Estado» a mano de la ficha no publica nada. Ver `comun/CLAUDE.md`.
+
+- **🐝 «Invocar» trae a la invocación con la vida llena** (2026-11-20, dueño, con las abejas de Bizzante): el botón «Invocar» de la tarjeta de una
+  invocación dormida (js/06, `data-reinvocar`) llama a `InvCalculo.invocar(inv)` (comun/inv-calculo.js): vida y No2 llenos, sus turnos y los
+  cooldowns en cero. Antes no tocaba la vida y la invocación volvía con la que le había quedado (herida, o en 0 si había muerto). Probado con
+  clics en «El origen · CLON de pruebas».

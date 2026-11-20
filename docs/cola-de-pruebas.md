@@ -156,12 +156,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de turnos; «Pasos a tu espalda» solo de quien no está en sigilo. Dudas y la **propuesta de «percibís algo raro → Percepción»** (sin programar):
   **P255**. Lo que no se llegó a ver en pantalla: `docs/pruebas-en-el-mapa.md`. Pruebas automáticas 913/913 (9 nuevas). El clon quedó limpio.
   Código: `comun/no-visto.js`, `vtt-hexgrid/js/29`, `16`, `57`, `99`, `09`.
-- **⬜ en cola — 🏷 Que los jugadores de prueba se llamen como su cuenta** (dueño, 2026-11-20: «los nombres jugador 1 de prueba, jugador 2 de
+- **✅ hecho (2026-11-20) — 🏷 Que los jugadores de prueba se llamen como su cuenta** (dueño, 2026-11-20: «los nombres jugador 1 de prueba, jugador 2 de
   prueba, ¿se pueden cambiar y ponerles el nombre que sea igual al email asociado a esa cuenta?»). En «Claude · pruebas 2» y en «El origen · CLON de
   pruebas», el nombre visible de cada cuenta de jugador de pruebas pasa a ser la parte de su email anterior a la arroba (tomada de la variable de
   entorno, sin imprimirla). Cambiarlo con la interfaz si hay dónde (⚙ Partida / el nombre con que se unió); si no, contarlo. **Esos nombres NO van
   al repo** (ni en docs, ni en commits, ni en nombres de capturas): en la documentación se sigue diciendo «Jugador 1 / Jugador 2». Tarea chica: se
   puede hacer junto con otra. Preguntar al dueño si el GM de pruebas también.
+  **Resultado:** hecho con la interfaz del sitio, sin tocar datos por detrás: cada jugador de pruebas entró con su cuenta, abrió **«✎ Mis nombres»**
+  (arriba, en la página de inicio) y se cambió el nombre en «Claude · pruebas 2» y en «El origen · CLON de pruebas»; se releyó después de recargar y
+  quedó guardado en las dos. No se tocaron las otras partidas de esas cuentas ni el GM de pruebas (el dueño todavía no respondió). Lo ya escrito en
+  la Mesa y el Historial conserva el nombre viejo. **Ojo con las capturas desde ahora:** en pantalla se ve el nombre nuevo; las capturas quedan
+  fuera del repo, y en el repo y los docs se sigue diciendo «Jugador 1 / Jugador 2». Actualizar el clon no los cambia (los miembros no se copian).
 - **⬜ en cola — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las
   trampas de los jugadores** (dueño, 2026-11-20, sobre lo hecho en 0dda1bcb, `vtt-hexgrid/js/122-revelar.js`): (1) «para las trampas también debería
   aparecer un botón que se despliegue desde el propio token, al igual que los botones que se despliegan de los tokens de personajes, los circulitos

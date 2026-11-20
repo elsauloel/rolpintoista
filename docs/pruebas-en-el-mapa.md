@@ -3168,3 +3168,21 @@ Con clics de verdad, las tres pantallas a la vez. Las trampas de prueba se pusie
   «Resolver a mano»: si falla, queda el «👁 Revelar» del cartel de la casilla); el GM revelando a un personaje en sigilo con su 👁 prendido.
 - [ ] **Falta que lo mire el dueño.**
 Capturas en `cola26/`.
+
+## 🙈 Lo que hace alguien que no se ve, no lo nombra (2026-11-20)
+
+Probado por Claude con clics en «El origen · CLON de pruebas» (GM, Bizzante con el Jugador 1 y Rockardo con el Jugador 2, las ratas de la grieta):
+ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
+
+- [ ] **Ser objetivo estando escondido:** que un jugador le pegue con un área (o una onda) a una rata en sigilo o en la niebla, y mirar la Mesa y
+  la Crónica de los jugadores (el resumen del duelo, «le entraron N de daño», los efectos). Tendría que salir con «Alguien» o no salir.
+- [ ] **Las habilidades de ataque de la rata (Ojo de asesino) y un duelo jugado hasta el final** desde el sigilo: se probó abrir el duelo con
+  «Atacar» y con «Hit and run» y cancelarlo; falta el resumen final del duelo en la Mesa del jugador con la rata todavía tapada por su nube.
+- [ ] **El Mantenimiento de la ronda con una rata escondida que tiene un estado que duele** (veneno): que su línea no les salga a los jugadores.
+- [ ] **Una zona con efecto puesta por un creep desde la niebla** (los Pedos de un goblin, un muro de fuego): que se vea la zona y no diga quién.
+  Se probó la Polvareda y una trampa.
+- [ ] **Un personaje o una invocación en sigilo vistos desde el GM:** no se cambió nada (P255 d); mirarlo en pantalla si el dueño decide cambiarlo.
+- [ ] **La ficha suelta y GM Tools** (fuera del mapa) no filtran nada, como antes: solo el mapa sabe qué ve cada uno.
+- [ ] **Con la partida real y gente de verdad:** que entre que la rata tira la Polvareda a la vista y llega el anuncio no pase nada raro (el anuncio
+  ahora sale antes que la nube).
+

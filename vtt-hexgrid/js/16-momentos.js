@@ -107,6 +107,11 @@ function rodilloMomento(id, d){
 }
 const caosHechos = new Set();
 function momentoRecibido(id, d){
+  // 🙈 Lo que hace alguien que esta pantalla no ve, no lo nombra (js/29, 2026-11-20): desde acá `d` va con «Alguien» en su lugar (para un
+  // Aviso al centro o una trampa, que se muestran igual) y `nv.modo` dice si va a la esquina. Los efectos de más abajo usan `d.datos`, no el texto.
+  const dCompleto = d;
+  const nv = !soyGM && typeof inciertaMomento === 'function' ? inciertaMomento(id, d) : null;
+  if(nv) d = nv.d;
   if(typeof revelarMomento === 'function') revelarMomento(d);   // ✋ el GM resolvió a mano que una trampa no fue detectada (js/122)
   if(d.tipo === 'meteoro-sombra'){ momentosFeed.delete(id); renderMomentosFeed(); if(typeof meteoroSombraMomento === 'function') meteoroSombraMomento(id, d); return; }   // ☄ el aviso de la sombra, sin tarjeta (js/74)
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
@@ -184,6 +189,13 @@ function momentoRecibido(id, d){
   // Un aviso chico (2026-10-06, la Coraza del guardián): a quien le toca, un toast — y la Crónica sigue, como para todos.
   // 🙈 Solo para el GM (2026-11-05: un token oculto que se mueve fuera de su turno): los jugadores no lo ven ni en la Crónica.
   if(d.datos && d.datos.soloGM && !soyGM){ momentosFeed.delete(id); renderMomentosFeed(); return; }
+  // 🙈 Solo nombra a quien no se ve: no va a la esquina (un Aviso para esta pantalla sí sale, ya sin el nombre). Recién llegado, se vuelve a mirar una vez.
+  const paraEsta = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
+  if(nv && (nv.modo === 'nada' || nv.modo === 'incierta') && !paraEsta){
+    momentosFeed.delete(id); renderMomentosFeed();
+    if(!nv.firme) momentoNoVistoReintentar(id, dCompleto);
+    return;
+  }
   // ▶ «Empieza el turno de X» (2026-11-14, dueño): a quien maneja a X no le sale la tarjeta: ya tiene la ventana «Empieza tu turno».
   if(d.tipo === 'turno' && d.datos && d.datos.tokenId && inicioTurnoTarjetaSobra(d.datos.tokenId)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   const chicoParaMi = d.datos && d.datos.chico && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid;
@@ -249,6 +261,23 @@ function inicioTurnoTarjetaSobra(tokenId){
   const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), ctrl = f && f.resumen && f.resumen.control;
   return ctrl ? ctrl === fbUsuario.uid : (t.duenoUid === fbUsuario.uid || !!(f && f.duenoUid === fbUsuario.uid));
 }
+// 🙈 Un momento recién llegado que se escondió (js/29): a los 3 s se mira de nuevo, por si a quien nombra se lo vio enseguida (lo detectaron,
+// atacó y quedó delatado). Solo la tarjeta de la esquina: lo demás del momento ya pasó.
+const momentosNoVistoPend = new Map();
+function momentoNoVistoReintentar(id, d){
+  const habia = momentosNoVistoPend.has(id);
+  momentosNoVistoPend.set(id, d);
+  if(habia) return;
+  setTimeout(() => {
+    const x = momentosNoVistoPend.get(id);
+    momentosNoVistoPend.delete(id);
+    if(!x || typeof inciertaMomento !== 'function') return;
+    const nv = inciertaMomento(id, x);
+    if(nv.modo !== 'ver' && nv.modo !== 'anon') return;
+    momentosFeed.set(id, {d: nv.d, hasta: Date.now() + MOMENTO_DURA_MS, orden: ++momentosOrden});
+    renderMomentosFeed();
+  }, (typeof NO_VISTO_ESPERA_MS === 'number' ? NO_VISTO_ESPERA_MS : 3000) + 400);
+}
 let momentosFeedTimer = null;
 function renderMomentosFeed(){
   const caja = $('#lienzo-caja');
@@ -306,8 +335,14 @@ function renderMomentosFeed(){
 function dueloPasoCronica(d, nuevos, todos){
   const id = 'duelo:' + d.id;
   const ya = momentosFeed.get(id);
-  momentosFeed.set(id, {d: {icono: d.hab ? '✨' : '⚔', titulo: `${d.atacante.nombre} → ${d.defensor.nombre}${d.hab ? ' · ' + d.hab.nombre : ''}`,
-    lineas: todos.map(p => p.txt), estado: 'listo'}, hasta: Date.now() + MOMENTO_DURA_MS, orden: ya ? ya.orden : ++momentosOrden});
+  let tarjeta = {icono: d.hab ? '✨' : '⚔', titulo: `${d.atacante.nombre} → ${d.defensor.nombre}${d.hab ? ' · ' + d.hab.nombre : ''}`, lineas: todos.map(p => p.txt), estado: 'listo'};
+  // 🙈 Un duelo entre dos que esta pantalla no ve no va a la Crónica; si no ve a uno de los dos, sale «Alguien» (js/29, 2026-11-20).
+  if(!soyGM && typeof inciertaMomento === 'function'){
+    const nv = inciertaMomento(id, tarjeta);
+    if(nv.modo === 'nada' || nv.modo === 'incierta'){ momentosFeed.delete(id); renderMomentosFeed(); return; }
+    tarjeta = nv.d;
+  }
+  momentosFeed.set(id, {d: tarjeta, hasta: Date.now() + MOMENTO_DURA_MS, orden: ya ? ya.orden : ++momentosOrden});
   renderMomentosFeed();
 }
 

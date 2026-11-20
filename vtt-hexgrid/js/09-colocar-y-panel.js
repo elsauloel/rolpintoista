@@ -740,7 +740,7 @@ setInterval(() => {
   if(!soyGM || typeof historialObservarCreeps !== 'function' || window.parent !== window) return;
   historialObservarCreeps([...creepsPriv.entries()].filter(([, e]) => e && e.sc).map(([id, e]) => ({
     id, nombre: e.sc.nombre, hp: e.sc.hp,
-    publico: [...tokens.values()].some(t => t.tipo === 'creep' && t.fichaId === id && !t.oculto && !enSigilo(t)),   // lo ven los jugadores
+    publico: [...tokens.values()].some(t => t.tipo === 'creep' && t.fichaId === id && (typeof visibleParaJugadores === 'function' ? visibleParaJugadores(t) : !t.oculto && !enSigilo(t))),   // lo ven los jugadores AHORA (con la niebla y las nubes, 2026-11-20)
     estados: (Array.isArray(e.sc.estados) ? e.sc.estados : []).filter(x => x && x.activo !== false && x.nombre).map(x => ({nombre: x.nombre, turnos: num(x.turnos)})),
   })));
 }, 1000);

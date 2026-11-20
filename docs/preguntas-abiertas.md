@@ -1662,3 +1662,44 @@ el «👁 Revelar lo oculto» del menú del ojo le muestra a los personajes en s
 lo oculto» del menú del ojo SÍ se las tiene que mostrar** (en la cola). (d) correcto: revelar a mano no deja Marcado. (f) correcto, revelar es para todos;
 queda como conversación de diseño pendiente poder revelar solo para un jugador (`docs/pendientes.md` §4). (e) sin responder. Además: el botón de revelar
 una trampa va como circulito que sale de la propia trampa, y el 👁 de un token oculto por el GM vuelve adentro del «⋯» (en la cola).
+
+### P255 — 🙈 Lo que hace alguien que no se ve: lo que quedó elegido y la propuesta de «percibís algo raro» (2026-11-20, Claude)
+
+Contexto: el dueño pidió que un creep en sigilo (o en la niebla, u oculto) no quede delatado por la Mesa ni por la Crónica (`docs/cola-de-pruebas.md`,
+«🐀 Un creep en sigilo…»). Quedó un solo criterio (`comun/no-visto.js` + `vtt-hexgrid/js/29`): un texto que nombra a un creep que el jugador no ve
+no lo nombra. Al aplicarlo hubo que elegir algunas cosas; quedan así salvo que el dueño diga otra cosa:
+
+**(a) «Acción incierta», ahora sin nombre.** Desde el 2026-10-09 (idea de Pablo) un creep conocido que no se ve dejaba «🎭 Rata de la grieta está
+realizando una acción incierta». Eso era justo lo que delataba. Ahora dice «🎭 Alguien está realizando una acción incierta» (y varias líneas seguidas
+de una misma acción cuentan como una sola). De un creep que nunca vieron no sale nada. ¿Está bien que quede «Alguien…», o preferís que no salga nada
+tampoco de los conocidos?
+
+**(b) El cuadro del duelo sí lo nombra.** Si un creep que no se ve ataca (o le tira una habilidad) a un personaje, a todos se les abre el cuadro del
+duelo con su nombre («ATACA Rata de la grieta. 2»). Con un ataque es la regla de siempre (atacar saca del sigilo y lo deja delatado en esa casilla).
+Con una habilidad que no es un ataque (un mal de ojo desde la niebla, por ejemplo) hoy también lo nombra. No se tocó. ¿Tendría que decir «Alguien»
+hasta que se lo vea?
+
+**(c) El orden de turnos.** Un creep que ya vieron conserva su fila con su nombre aunque se esconda (decisión del 2026-10-09), y se marca cuando le
+toca. No dice dónde está, pero sí que sigue en juego y cuándo actúa. No se tocó (la tarjeta «Empieza el turno de…» de la Crónica sí se esconde).
+
+**(d) Del otro lado: un personaje en sigilo visto por el GM.** El GM no ve el token, pero en su Mesa y su Crónica sí lee todo lo que ese personaje
+tira o hace, con nombre (salvo colocar una trampa, que ya le sale «acción incierta»). No se tocó: el GM modera y resuelve las tiradas. ¿Querés que al
+GM también le salga «Alguien…» de un jugador en sigilo?
+
+**(e) Al entrar de nuevo al mapa**, las líneas viejas de la Mesa se vuelven a decidir con lo que se ve en ese momento: lo que hizo una rata cuando
+estaba a la vista puede quedar como «Alguien…» si ahora está escondida. (Sin recargar, cada línea queda como salió.)
+
+**(f) Propuesta, sin programar: «percibís algo raro → tirada de Percepción».** Hoy ya existe para moverse (el escondido que camina por la zona de
+alerta de un rival, o el rival que termina su movimiento con un escondido en su zona de alerta: «Fulano siente un movimiento extraño…», con la
+Percepción siempre incierta). Lo que se podría sumar, con la misma tirada y el mismo cartel (nunca dice quién, qué ni dónde):
+1. **Usar una habilidad ruidosa estando escondido** (el Chillido que llama a otra rata, un grito, un golpe al piso): tirada para quien lo tenga en su
+   zona de alerta. *Recomendado.* Haría falta una marca «hace ruido» en la habilidad.
+2. **La Polvareda / Bomba de humo desde donde no se ve**: la nube ya se ve; no hace falta tirada. *No recomendado.*
+3. **Colocar una trampa** a la vista de un rival (en su zona de alerta): tirada; si la gana, ve la trampa (no a quien la puso). *Recomendado.*
+4. **Recibir daño estando escondido** (pisar fuego, una zona, un área que lo alcanza): se queja. Tirada para los que estén a 3 casillas o menos.
+   *Recomendado para el daño; para un estado que no duele, no.*
+5. **Curarse, tomar una poción, cambiar de arma, tiradas sueltas del GM, cooldowns, su Mantenimiento**: nada. *No recomendado: es ruido para la mesa.*
+6. **Empezar su turno pegado a un personaje** (a 1 casilla, fuera del cono): una tirada por turno. *Para pensar: puede ser mucho.*
+7. **Llamar refuerzos**: el que llega aparece a la vista si cae a la vista; el que llamó, como el punto 1.
+Si gana la Percepción, lo de siempre: el escondido tira su Sigilo y, si pierde, queda a la vista.
+

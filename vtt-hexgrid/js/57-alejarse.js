@@ -45,6 +45,13 @@ async function bombaDeHumo(msg){
   if(!e){ toast(`${nom}: ${creep ? 'el creep' : 'tu personaje'} no tiene token en el mapa`); if(typeof msg.alTerminar === 'function') msg.alTerminar(); return; }
   const [tid, t] = e, quien = nombreDe(t);
   const radio = Math.max(1, Math.round(num(msg.radio)) || 1), turnos = Math.max(1, Math.round(num(msg.turnos)) || 1), mover = Math.max(0, Math.round(num(msg.mover)) || 3);
+  /* El anuncio va ANTES de la nube y del Sigilo (2026-11-20, dueño: «si la rata está a la vista y usa Polvareda, ahí sí aparece el mensaje»;
+     si no se la ve, no la nombra: js/29). Cada pantalla decide por lo que ve cuando le llega la línea: si llegara después, la nube ya la
+     tapó y a los jugadores no les saldría ni estando a la vista (en una máquina lenta pasan varios segundos entre una cosa y la otra). */
+  const txtDe = sig => `${quien} revienta una bomba de humo (${Combatiente.areaTxt(radio)}, ${turnos} turno${turnos === 1 ? '' : 's'}): ${sig} y puede moverse hasta ${mover} casillero${mover === 1 ? '' : 's'}, gratis y sin ataques de oportunidad.`;
+  const txt = txtDe('entra en Sigilo');
+  try{ await mesaLinea(`💨 ${txt}`, 'recordatorio'); }catch(err){}
+  try{ await momentoAbrir({tipo: 'humo', icono: '💨', titulo: `${nom}: ${quien} se esfuma`, resultado: txt, estado: 'listo'}); }catch(err){}
   await crearNiebla({col: t.col, fila: t.fila}, radio, {nombre: nom, zonaTurnos: turnos});
   let sigilo = '';
   try{
@@ -52,10 +59,12 @@ async function bombaDeHumo(msg){
       if(soyGM){ const r = await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, {nombre: 'Sigilo'})); sigilo = r && r.ok === false ? (r.motivo || 'no') : 'ok'; }
     }else{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Sigilo'}, origen: nom}); sigilo = 'ok'; }
   }catch(err){ console.error('Bomba de humo: no se pudo poner el Sigilo', err); }
-  const sig = sigilo === 'ok' ? 'entra en Sigilo' : sigilo ? `no pudo entrar en Sigilo (${sigilo})` : 'el Sigilo, a mano';
-  const txt = `${quien} revienta una bomba de humo (${Combatiente.areaTxt(radio)}, ${turnos} turno${turnos === 1 ? '' : 's'}): ${sig} y puede moverse hasta ${mover} casillero${mover === 1 ? '' : 's'}, gratis y sin ataques de oportunidad.`;
-  try{ mesaLinea(`💨 ${txt}`, 'recordatorio'); }catch(err){}
-  try{ momentoAbrir({tipo: 'humo', icono: '💨', titulo: `${nom}: ${quien} se esfuma`, resultado: txt, estado: 'listo'}); }catch(err){}
+  // Si el Sigilo no entró (inmune, o no se pudo), se avisa aparte.
+  if(sigilo !== 'ok'){
+    const aviso = sigilo ? `${quien} no pudo entrar en Sigilo (${sigilo})` : `${quien}: el Sigilo, a mano`;
+    toast(`💨 ${aviso}`);
+    try{ mesaLinea(`💨 ${nom}: ${aviso}`, 'recordatorio'); }catch(err){}
+  }
   if(mover > 0){
     seleccionar(tid);
     dodgeBanner = {id: 'humo-' + Date.now(), tokenId: tid, nombre: quien, libre: true, alejarse: mover, motivo: nom};

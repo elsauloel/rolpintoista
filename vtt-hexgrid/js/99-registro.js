@@ -4,18 +4,21 @@
 // teníamos un historial de movimientos o duelos». Lo que se guarda y cuánto dura lo maneja comun/registro.js (este combate y el anterior).
 // Acá, la pantalla del GM (una sola pestaña: historialEsLider) anota en el 📜 Historial:
 //   🦶 cada movimiento de un token del mapa publicado: de qué casilla a qué casilla, cuántas y en qué ronda (al de los jugadores, solo lo que
-//      ellos ven: ni ocultos ni en sigilo);
+//      ellos ven: ni ocultos, ni en sigilo, ni detrás de la niebla);
 //   📸 la foto al pausar (⏸): dónde está cada token y su vida, SP, No2 y estados (a los jugadores, de los creeps a la vista, sin la vida).
 // La Mesa (tiradas y resúmenes de duelos) ya quedaba; ahora también dura hasta el registro nuevo.
 
 const regMovBase = new Map();   // tokenId → {col, fila}
 let regMovMapa = null;
 const regCasilla = t => `${num(t.col)}·${num(t.fila)}`;
-const regVisible = t => !t.oculto && !(typeof enSigilo === 'function' && enSigilo(t));
+// ¿Va al Historial de los jugadores? Un creep, solo si ellos lo ven AHORA (2026-11-20: antes no miraba la niebla, y un creep que nunca habían
+// visto les aparecía con sus casillas; `visibleParaJugadores`, js/29: ni oculto, ni en sigilo, ni detrás de la niebla, ni adentro de una nube).
+const regVisible = t => t.tipo === 'creep' && typeof visibleParaJugadores === 'function' ? visibleParaJugadores(t) : !t.oculto && !(typeof enSigilo === 'function' && enSigilo(t));
 
 function regMovimientos(){
   if(!soyGM || window.parent !== window || typeof historialRegistrar !== 'function' || typeof historialEsLider !== 'function') return;
   if(mapaMostrado !== mapaActivo){ regMovMapa = null; regMovBase.clear(); return; }   // armando otro escenario: no se anota
+  if(!escucharTokens.listo) return;   // sin los tokens todavía no hay «antes»: si no, al entrar el GM todos «entraban al mapa» (2026-11-20)
   if(!historialEsLider('mov')) return;
   const primera = regMovMapa !== mapaActivo;
   regMovMapa = mapaActivo;

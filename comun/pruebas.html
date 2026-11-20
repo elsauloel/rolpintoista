@@ -129,6 +129,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
+<script src="no-visto.js?v=20261120a"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -8707,6 +8708,49 @@ prueba('🐝 Táctica de enjambre (dueño, 2026-11-20): +1 PdG por cada aliado p
   const inv = {id: 'i1', nombre: 'Abeja', hp: 10, hpMax: 10, pasivas: [{...pas, compras: 2}], estados: [], inventario: []};
   igual([CreepCalculo.modTotal(sc, 'enjambre'), FichaResumen.invModTotal(inv, 'enjambre')], [1, 2]);
 });
+
+/* ---------- 🙈 Lo que hace alguien que no se ve, no lo nombra (comun/no-visto.js, 2026-11-20) ---------- */
+grupo('No visto: la Mesa y la Crónica no delatan a quien no se ve');
+(() => {
+  const RATA = 'Rata de la grieta. 2', COPIA = 'Rata de la grieta. 2 (copia)';
+  const ctx = (esc, vis, mant) => ({escondidos: esc, visibles: vis, mantenimiento: !!mant});
+  prueba('una línea que no nombra a ningún escondido se ve tal cual', () =>
+    igual(NoVisto.decidir('Bizzante tira Percepción', ctx([{nombre: RATA, conocido: true}], ['Bizzante'])).modo, 'ver'));
+  prueba('la Polvareda de una rata que nunca vieron (la niebla): no aparece nada', () =>
+    igual([NoVisto.decidir(`💨 ${COPIA} revienta una bomba de humo (diámetro 3 (7 casillas), 1 turno): entra en Sigilo`, ctx([{nombre: COPIA, conocido: false}], ['Bizzante', RATA])).modo,
+      NoVisto.decidir(`⏱ ${COPIA} actúa fuera de su turno: Polvareda`, ctx([{nombre: COPIA, conocido: false}], ['Bizzante'])).modo,
+      NoVisto.decidir(`💍 ${COPIA}: sus anillos despiertan\nManos Ligeras: +2 una vez`, ctx([{nombre: COPIA, conocido: false}], ['Bizzante'])).modo], ['nada', 'nada', 'nada']));
+  prueba('lo que hace una rata conocida que está en sigilo: «acción incierta», sin su nombre', () => {
+    igual(NoVisto.decidir(`${RATA}\nSigilo\n1d6+1d8`, ctx([{nombre: RATA, conocido: true}], ['Bizzante'])).modo, 'incierta');
+    cierto(!NoVisto.INCIERTA.includes('Rata') && NoVisto.INCIERTA.includes('Alguien'));
+  });
+  prueba('si la rata está a la vista, su Polvareda sí la nombra', () =>
+    igual(NoVisto.decidir(`💨 ${RATA} revienta una bomba de humo`, ctx([], ['Bizzante', RATA])).modo, 'ver'));
+  prueba('el Mantenimiento de un escondido no aparece ni como acción incierta', () =>
+    igual(NoVisto.decidir(`${RATA}\nTurno 3\nVeneno: −2 HP`, ctx([{nombre: RATA, conocido: true}], ['Bizzante'], true)).modo, 'nada'));
+  prueba('lo que le pasa a un personaje no se esconde: sale con «Alguien» en lugar del escondido', () => {
+    const c = ctx([{nombre: RATA, conocido: true}], ['Bizzante', 'Rockardo Pedruscko']);
+    const d = NoVisto.decidir(`✖ El GM canceló el duelo: ${RATA} → Bizzante`, c);
+    igual([d.modo, d.esconder], ['anon', [RATA]]);
+    igual(NoVisto.anonimo(`✖ El GM canceló el duelo: ${RATA} → Bizzante`, d.todos, d.esconder), '✖ El GM canceló el duelo: Alguien → Bizzante');
+  });
+  prueba('dos nombres que empiezan igual: el de la copia escondida no arrastra al de la rata que se ve (ni al revés)', () => {
+    const c = ctx([{nombre: COPIA, conocido: false}], ['Bizzante', RATA]);
+    igual([NoVisto.decidir(`${RATA} usó Polvareda`, c).modo, NoVisto.decidir(`${COPIA} usó Polvareda`, c).modo], ['ver', 'nada']);
+    const c2 = ctx([{nombre: RATA, conocido: true}], ['Bizzante', COPIA]);
+    igual([NoVisto.decidir(`${COPIA} usó Polvareda`, c2).modo, NoVisto.decidir(`${RATA} usó Polvareda`, c2).modo], ['ver', 'incierta']);
+    igual(NoVisto.anonimo(`${COPIA} y ${RATA} atacan a Bizzante`, [COPIA, RATA, 'Bizzante'], [RATA]), `${COPIA} y Alguien atacan a Bizzante`);
+  });
+  prueba('el nombre cuenta como palabra entera y sin importar las mayúsculas', () => {
+    const c = ctx([{nombre: 'Rata', conocido: true}], ['Bizzante']);
+    igual([NoVisto.decidir('El Pirata saluda', c).modo, NoVisto.decidir('⚠ RATA · DIENTES INFECCIOSOS · EFECTOS AL GOLPEAR', c).modo, NoVisto.decidir('La rata, quieta.', c).modo], ['ver', 'incierta', 'incierta']);
+  });
+  prueba('anonimoEn cambia los textos y las listas de textos, sin tocar el original', () => {
+    const d = {titulo: `${RATA} → Bizzante`, lineas: [`${RATA} tira PdG: 12`, 'Bizzante esquiva: 9'], datos: {x: 1}};
+    const x = NoVisto.anonimoEn(d, ['titulo', 'resultado', 'lineas'], {todos: [RATA, 'Bizzante'], esconder: [RATA]});
+    igual([x.titulo, x.lineas, d.titulo, x.datos === d.datos], ['Alguien → Bizzante', ['Alguien tira PdG: 12', 'Bizzante esquiva: 9'], `${RATA} → Bizzante`, true]);
+  });
+})();
 
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

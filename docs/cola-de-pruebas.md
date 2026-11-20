@@ -135,31 +135,27 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de respaldo (`docs/pendientes.md`, 🖥). Dudas anotadas en **P254** (un jugador revela solo lo suyo; revelar a mano no marca; el GM no ve las
   trampas de los jugadores). Probado con clics en «Claude · pruebas 2» («Prueba · R4 M4», GM, J1 y J2): `docs/pruebas-en-el-mapa.md`. Pruebas
   automáticas 904/904 (6 nuevas). La partida quedó limpia.
-- **⬜ en cola — 🐀 Un creep en sigilo no puede quedar delatado por la Mesa ni por la Crónica** (dueño, 2026-11-20, El origen: «las ratas tiraron
-  su polvareda y quedaron en sigilo. Sin embargo, después realizaron un par de acciones… que aparecían en la Mesa, en la Crónica. Al jugador por lo
-  menos dos veces le apareció un mensaje de que la rata hacía una acción específica, con lo cual revelaba el sigilo… quiero que hagas una copia de la
-  rata en la partida de pruebas y realices varias acciones para ver cuáles aparecen botoneadas por el log de la Mesa o por la Crónica. Hay
-  determinadas acciones que tienen que tener una advertencia, como "uy, percibís algo raro, tirada de percepción", pero no puede suceder que la rata
-  haga algo y se revele»). Pasos: (1) armar en «Claude · pruebas 2» una copia de esa rata (la del pool/biblioteca si es la misma; si hace falta
-  mirarla en El origen, SOLO lectura con la página con escrituras bloqueadas de scratchpad/simfin/, sin abrir el mapa ni GM Tools ahí). (2) Ponerla
-  en sigilo con su Polvareda y, mirando la pantalla de un JUGADOR (Mesa, Crónica, 📜 Historial, carteles, toasts, textos flotantes, orden de turnos,
-  Tablero, animaciones), hacer todas sus acciones: moverse, cada habilidad, atacar, defenderse, recibir un estado/daño de zona, Mantenimiento, pasar
-  el turno, No2, cooldowns. (3) Tabla en el informe: acción → qué vio el jugador → ¿delata? (4) Arreglar las fugas con UN criterio común (un punto
-  por donde pasan las líneas de la Mesa/Crónica de un creep que los jugadores no ven: se callan o se vuelven anónimas, y el GM las sigue viendo
-  completas), no parche por parche. Lo que por regla ya rompe el sigilo (p. ej. atacar, si la regla dice eso) sigue igual: no inventar reglas;
-  lo dudoso, a preguntas-abiertas. (5) Proponer (sin programar todavía, salvo que ya exista) qué acciones merecen el aviso «percibís algo raro →
-  tirada de Percepción» y traerle la lista al dueño. Mirar lo mismo para un personaje / invocación en sigilo si sale barato.
-  **Lo primero que pasó (dueño, mismo día):** «la rata, estando detrás de la niebla de guerra, tiró la Polvareda, pero parte de la polvareda apareció
-  revelada en el mapa y eso ya reveló la existencia de la rata». Reproducirlo: la rata fuera de la vista de los jugadores (niebla), tira la Polvareda
-  y se mira la pantalla del jugador: la zona, su animación, su línea de Mesa/Crónica y cualquier cartel. Una zona (o la parte de una zona) que cae en
-  casillas que el jugador no ve NO se le dibuja ni se le anuncia; la parte que cae en casillas que sí ve, se ve (eso es correcto: ve humo, no a la
-  rata). Si hoy se le muestran casillas que no ve, o el anuncio nombra a quien la tiró, es la fuga a arreglar. Revisar lo mismo para trampas y otras
-  zonas puestas desde la niebla.
-  **Criterio confirmado por el dueño (2026-11-20):** «me parece bien que, si la rata está bajo la niebla, la polvareda se vea. Solo que no tiene que
-  decir "la rata usó Polvareda". Sin embargo, si la rata está a la vista de los jugadores y usa Polvareda, ahí sí aparece el mensaje "la rata usó
-  Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
-  la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
-  lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **✅ hecho (2026-11-20) — 🐀 Un creep en sigilo no puede quedar delatado por la Mesa ni por la Crónica** (dueño, 2026-11-20, El origen: «las
+  ratas tiraron su polvareda y quedaron en sigilo. Sin embargo, después realizaron un par de acciones… que aparecían en la Mesa, en la Crónica… no
+  puede suceder que la rata haga algo y se revele»; y antes: «la rata, estando detrás de la niebla de guerra, tiró la Polvareda… y eso ya reveló la
+  existencia de la rata»; criterio confirmado: «si la rata está bajo la niebla, la polvareda se ve. Solo que no tiene que decir "la rata usó
+  Polvareda". Si la rata está a la vista… ahí sí»).
+  **Qué pasaba** (reproducido con clics en «El origen · CLON de pruebas», mirando la pantalla de Bizzante y la de Rockardo): la rata en la niebla,
+  que nunca habían visto, usaba la Polvareda y a los jugadores les salían cuatro mensajes con su nombre (dos en la Mesa y dos tarjetas en la Crónica:
+  «actúa fuera de su turno: Polvareda» y «revienta una bomba de humo»); al empezar el combate, «sus anillos despiertan» de cada rata escondida; en
+  sigilo, cada cosa que hacía dejaba «🎭 Rata de la grieta. 2 está realizando una acción incierta»; y en el 📜 Historial de los jugadores, los
+  movimientos (con las casillas) y los estados de ratas que estaban en la niebla.
+  **El criterio que faltaba:** la Mesa solo escondía las líneas que venían «a nombre de» un creep, y casi ningún anuncio del mapa viene así (lo
+  nombran adentro del texto); la Crónica no miraba nada; y el Historial miraba «oculto o en sigilo» pero no la niebla.
+  **Qué quedó:** un solo criterio para todo lo que le llega a un jugador (Mesa, Crónica, Avisos): se mira a quién NOMBRA el texto. Si nombra a un
+  creep que ese jugador no ve (niebla, sigilo, oculto por el GM, tapado por una nube): no aparece; si ya lo conocen, queda «🎭 Alguien está
+  realizando una acción incierta» (sin el nombre; varias seguidas son una sola); y si el texto también habla de un personaje, sale con «Alguien» en
+  lugar del escondido («El GM canceló el duelo: Alguien → Bizzante»). El GM sigue viendo todo. Si la rata está a la vista y usa la Polvareda, sale
+  con su nombre (el anuncio ahora va antes que la nube). La nube se dibuja como antes. El Historial de los jugadores ahora mira también la niebla.
+  **Lo que queda igual, por regla:** atacar saca del sigilo y abre el cuadro del duelo con el nombre; un creep conocido conserva su lugar en el orden
+  de turnos; «Pasos a tu espalda» solo de quien no está en sigilo. Dudas y la **propuesta de «percibís algo raro → Percepción»** (sin programar):
+  **P255**. Lo que no se llegó a ver en pantalla: `docs/pruebas-en-el-mapa.md`. Pruebas automáticas 913/913 (9 nuevas). El clon quedó limpio.
+  Código: `comun/no-visto.js`, `vtt-hexgrid/js/29`, `16`, `57`, `99`, `09`.
 - **⬜ en cola — 🏷 Que los jugadores de prueba se llamen como su cuenta** (dueño, 2026-11-20: «los nombres jugador 1 de prueba, jugador 2 de
   prueba, ¿se pueden cambiar y ponerles el nombre que sea igual al email asociado a esa cuenta?»). En «Claude · pruebas 2» y en «El origen · CLON de
   pruebas», el nombre visible de cada cuenta de jugador de pruebas pasa a ser la parte de su email anterior a la arroba (tomada de la variable de

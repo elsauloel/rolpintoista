@@ -2061,3 +2061,10 @@ versión parecida en más de una, es candidato a juntar.
   `token({oculto, sigilo}, {gm, mio})`, `linea(op, {gm, quien, nombre})` (la línea de la Mesa; null si no se anuncia) y `aMano(detectada, {detector,
   nombre})` (los textos de «✋ Resolver a mano» al detectar una trampa). Qué se ve lo decide el mapa (`vtt-hexgrid/js/122-revelar.js`). Pruebas en
   `pruebas.html`.
+- **`no-visto.js`** (`NoVisto`, 2026-11-20) — **🙈 «lo que hace alguien que no se ve, no lo nombra»**, las cuentas con textos: `hallar(texto,
+  nombres)` / `nombrados` (los nombres como palabra entera, sin importar mayúsculas, los más largos primero: «Rata 2 (copia)» no cuenta como
+  «Rata 2»), `anonimo(texto, todos, esconder)` («Alguien» en su lugar), `anonimoEn(obj, campos, dec)` y `decidir(texto, {escondidos: [{nombre,
+  conocido}], visibles, mantenimiento})` → `{modo: 'ver' | 'anon' | 'incierta' | 'nada', esconder, todos}`; `INCIERTA` = el texto de la acción
+  incierta, sin nombre. Quién está escondido para cada pantalla lo decide el mapa (`vtt-hexgrid/js/29-accion-incierta.js`, que lo usa para la Mesa,
+  la Crónica y los Avisos). Pruebas en `pruebas.html`. La ficha suelta y GM Tools no filtran.
+

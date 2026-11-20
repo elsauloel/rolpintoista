@@ -3,11 +3,13 @@
    - Un creep que todavía no vieron (detrás de la niebla, en sigilo desde el arranque, oculto por el GM) no existe: no aparece en el orden de
      turnos ni en la Mesa. Cuando lo ven por primera vez queda «revelado» (`revelado: true` en su token; lo escribe el mapa del GM,
      inciertaRevisar) y desde ahí su lugar en el orden no desaparece aunque se esconda.
-   - Lo que hace un creep revelado que no se ve (en sigilo o detrás de la niebla) sale en la Mesa como «🎭 Goblin está realizando una acción
-     incierta», sin el detalle (mesaFiltrar, que comun/mesa.js usa antes de dibujar). Moverse no se anuncia.
+   - Lo que hace un creep que no se ve (en sigilo, detrás de la niebla, oculto) no lo nombra: si ya lo conocen sale en la Mesa «🎭 Alguien
+     está realizando una acción incierta», sin el nombre ni el detalle; si no, nada (mesaFiltrar, que comun/mesa.js usa antes de dibujar;
+     desde el 2026-11-20 mira a quién NOMBRA cada texto, lleve o no «quien», y vale también para la Crónica: ver más abajo «🙈»). Moverse
+     no se anuncia.
    - Colocar una trampa (comun/tokens-auto.js) deja una línea `desde: 'incierta-pj' | 'incierta-creep'` con el detalle: su bando la ve entera;
-     el rival ve «acción incierta» si quien la puso está a la vista (un creep revelado, aunque no se vea), y si no, nada.
-   Cada línea se decide una vez, al llegar, y se recuerda en la sesión: no cambia si después se lo ve.
+     el rival ve «acción incierta» (sin el nombre) si quien la puso es conocido (un creep revelado, aunque no se vea), y si no, nada.
+   Cada línea se decide una vez (al llegar, o a los 3 s si hubo que esconderla) y se recuerda en la sesión: no cambia si después se lo ve.
    Limitación: la ficha suelta y GM Tools no filtran (solo el mapa sabe qué ve cada uno). */
 
 // ¿Lo ven los jugadores ahora? (para el mapa del GM, que ve todo: la unión de lo que ven los personajes).
@@ -42,8 +44,74 @@ function inciertaRevisar(){
 }
 setInterval(inciertaRevisar, 1500);
 
+/* ---------- 🙈 Lo que hace alguien que no se ve, no lo nombra (2026-11-20, dueño: «no puede suceder que la rata haga algo y se revele») ----------
+   UN solo criterio para todo texto que le llega a un jugador —la Mesa (mesaFiltrar), la Crónica y los Avisos (inciertaMomento, que usa
+   js/16)—: se mira a quién NOMBRA el texto (comun/no-visto.js). Si nombra a un creep que esta pantalla no ve (niebla, sigilo, oculto por
+   el GM, adentro de una nube): solo a él → no aparece (o «🎭 Alguien está realizando una acción incierta» si ya lo conocen); a él y a
+   alguien que sí se ve (un personaje) → aparece con «Alguien» en su lugar. El GM ve todo completo, como siempre.
+   «No se ve» se decide con lo mismo que dibuja el mapa (tokenVisiblePorNiebla + oculto), con dos márgenes para que el orden de llegada
+   no cambie el resultado: si se lo vio hasta NO_VISTO_MS antes de que llegara la línea, cuenta como visto (la rata A LA VISTA que usa su
+   Polvareda: sus líneas llegan unos segundos después de que la nube la tapó, y sí la nombran; a uno que el GM oculta a mano no se le
+   da ese margen); y una línea recién llegada que habría que esconder se vuelve a
+   mirar a los NO_VISTO_ESPERA_MS (lo detectaron, atacó y quedó delatado: aparece con su nombre). Después queda decidida. */
+const NO_VISTO_MS = 8000, NO_VISTO_ESPERA_MS = 3000;
+const noVistoUltima = new Map();    // token → la última vez que esta pantalla lo vio
+const noVistoLlegada = new Map();   // línea o momento → cuándo llegó a esta pantalla
+function loVeoAhora(t){ return !!t && !(t.oculto && !soyGM) && tokenVisiblePorNiebla(t); }
+function noVistoMarcar(){
+  if(typeof soyGM === 'undefined' || soyGM || !escucharTokens.listo) return;
+  const ahora = Date.now();
+  tokens.forEach((t, id) => {
+    if(t.tipo !== 'creep') return;
+    if(t.oculto) noVistoUltima.delete(id);   // lo escondió el GM a mano: sin margen, desde ya no se lo nombra
+    else if(loVeoAhora(t)) noVistoUltima.set(id, ahora);
+  });
+}
+setInterval(noVistoMarcar, 500);
+// Quién está escondido para esta pantalla y quién no (por nombre: dos tokens con el mismo nombre, uno a la vista → ese nombre se ve).
+function noVistoContexto(desde, mantenimiento){
+  noVistoMarcar();
+  const porNombre = new Map(), visibles = [], escondidos = [];
+  tokens.forEach((t, id) => {
+    const n = String(nombreDe(t) || '').trim();
+    if(!n) return;
+    if(t.tipo !== 'creep'){ visibles.push(n); return; }
+    const g = porNombre.get(n) || {visto: false, conocido: false};
+    if(loVeoAhora(t) || (noVistoUltima.get(id) || 0) >= desde - NO_VISTO_MS) g.visto = true;
+    if(creepConocido(t)) g.conocido = true;
+    porNombre.set(n, g);
+  });
+  porNombre.forEach((g, n) => { if(g.visto) visibles.push(n); else escondidos.push({nombre: n, conocido: g.conocido}); });
+  return {escondidos, visibles, mantenimiento: !!mantenimiento};
+}
+// → {modo: 'ver' | 'anon' | 'incierta' | 'nada', esconder, todos, firme} (firme: ya no cambia)
+function noVistoDecidir(clave, texto, mantenimiento){
+  let ms = noVistoLlegada.get(clave);
+  if(!ms){
+    ms = Date.now(); noVistoLlegada.set(clave, ms);
+    if(noVistoLlegada.size > 800) [...noVistoLlegada.keys()].slice(0, 300).forEach(k => noVistoLlegada.delete(k));
+  }
+  const dec = NoVisto.decidir(texto, noVistoContexto(ms, mantenimiento));
+  dec.firme = dec.modo === 'ver' || Date.now() - ms >= NO_VISTO_ESPERA_MS;
+  return dec;
+}
+const nombresDeTokens = () => [...new Set([...tokens.values()].map(t => String(nombreDe(t) || '').trim()).filter(Boolean))];
+/* La Crónica y los Avisos (js/16): el momento como lo ve esta pantalla. → {d, modo, firme}: `d` ya sin el nombre de los que no se ven
+   (para un Aviso al centro, que se muestra igual); `modo` 'nada' / 'incierta' = no va a la esquina. Sirve también para la tarjeta de un
+   duelo ({titulo, lineas}). */
+function inciertaMomento(id, d){
+  if(soyGM || !escucharTokens.listo || typeof NoVisto === 'undefined') return {d, modo: 'ver', firme: true};
+  const dl = d.datos && Array.isArray(d.datos.lineas) ? d.datos.lineas : [];
+  const texto = [d.titulo, d.resultado, ...(Array.isArray(d.lineas) ? d.lineas : []), ...dl].filter(x => typeof x === 'string' && x).join('\n');
+  const dec = noVistoDecidir('momento:' + id, texto, false);
+  if(!dec.esconder.length) return {d, modo: dec.modo, firme: dec.firme};
+  const x = NoVisto.anonimoEn(d, ['titulo', 'resultado', 'lineas'], dec);
+  if(dl.length) x.datos = NoVisto.anonimoEn(d.datos, ['lineas'], dec);
+  return {d: x, modo: dec.modo, firme: dec.firme};
+}
+
 /* ---------- La Mesa: qué ve cada uno ---------- */
-const inciertaTexto = n => `🎭 ${n || 'Alguien'} está realizando una acción incierta`;
+const inciertaTexto = n => soyGM ? `🎭 ${n || 'Alguien'} está realizando una acción incierta` : NoVisto.INCIERTA;   // a los jugadores, sin el nombre (2026-11-20)
 let inciertaDecisiones = null;
 const inciertaClave = () => 'mesa-incierta-' + (typeof FB_CAMPANA !== 'undefined' ? FB_CAMPANA : '');
 function inciertaCargar(){
@@ -62,45 +130,79 @@ function tokenPorFicha(fichaId, tipo){
   for(const t of tokens.values()) if(t.tipo === tipo && t.fichaId === fichaId) return t;
   return null;
 }
-// 'ver' (tal cual) | 'incierta' (sin el detalle) | 'nada' (no aparece).
-function inciertaDecidir(t){
+// 'ver' (tal cual) | 'incierta' (sin el nombre ni el detalle) | 'nada' (no aparece) | 'anon' + los nombres que se cambian por «Alguien».
+// → {modo, esconder?, firme}
+const ANON_SEP = '\u0001';
+function inciertaDecidir(t, id){
   const des = String(t.desde || '');
   if(des === 'incierta-pj'){
-    if(!soyGM) return 'ver';   // su bando: el detalle
+    if(!soyGM) return {modo: 'ver', firme: true};   // su bando: el detalle
     const tok = tokenPorFicha(t.ficha, 'pj');
-    return tok && !tok.oculto && !ocultoPorSigiloParaMi(tok) ? 'incierta' : 'nada';
+    return {modo: tok && !tok.oculto && !ocultoPorSigiloParaMi(tok) ? 'incierta' : 'nada', firme: true};
   }
-  if(soyGM) return 'ver';
+  if(soyGM || des === 'incierta') return {modo: 'ver', firme: true};
   if(des === 'incierta-creep'){
     const tok = tokenPorFicha(t.ficha, 'creep') || creepPorNombre(t.quien);
-    return !tok || creepConocido(tok) ? 'incierta' : 'nada';
+    return {modo: !tok || creepConocido(tok) ? 'incierta' : 'nada', firme: true};
   }
-  if(!t.quien) return 'ver';
-  const tok = creepPorNombre(t.quien);
-  if(!tok || (!tok.oculto && tokenVisiblePorNiebla(tok))) return 'ver';
-  if(!creepConocido(tok)) return 'nada';
-  return des === 'mantenimiento' ? 'ver' : 'incierta';
+  // Todo lo demás: por a quién nombra (lleve o no «quien»: la mayoría de los anuncios del mapa no lo llevan).
+  const est = Array.isArray(t.estados) ? t.estados.map(e => e && e.n).filter(Boolean) : [];
+  const texto = [t.quien, t.origen, t.formula, t.texto, ...est].filter(x => typeof x === 'string' && x).join('\n');
+  return noVistoDecidir('mesa:' + id, texto, des === 'mantenimiento' || des === 'reporte');
 }
 function inciertaDoc(d, t){
   const x = {...t, origen: inciertaTexto(t.quien), quien: '', formula: '', rolls: [], mod: 0, total: 0, desde: 'incierta', texto: '', estados: [], destacar: ''};
   delete x.ventaja;
   return {id: d.id, data: () => x};
 }
+// La misma línea con «Alguien» en lugar de los que no se ven (lo demás, igual: lo que le pasa a un personaje no se esconde).
+function inciertaAnonDoc(d, t, esconder){
+  const x = NoVisto.anonimoEn(t, ['quien', 'origen', 'formula', 'texto'], {todos: nombresDeTokens(), esconder});
+  return {id: d.id, data: () => x};
+}
+let noVistoTimer = null, noVistoPasada = 0;
+function noVistoReintentar(){   // lo recién llegado que se escondió se vuelve a mirar una vez (por si se lo vio enseguida)
+  if(noVistoTimer) return;
+  const f = () => {
+    noVistoTimer = null;
+    const antes = noVistoPasada;
+    if(typeof mesaRefiltrar === 'function') mesaRefiltrar();
+    if(noVistoPasada === antes) noVistoTimer = setTimeout(f, 1000);   // la Mesa estaba esperando a los dados: después
+  };
+  noVistoTimer = setTimeout(f, NO_VISTO_ESPERA_MS + 300);
+}
 // comun/mesa.js lo llama con los documentos de la Mesa antes de dibujarlos.
 function mesaFiltrar(docs){
   if(!escucharTokens.listo){   // sin los tokens todavía: lo dudoso espera (mesaRefiltrar lo vuelve a pasar cuando llegan)
-    return docs.filter(d => { const t = d.data(); return soyGM ? t.desde !== 'incierta-pj' : !t.quien && !String(t.desde || '').startsWith('incierta'); });
+    // (a un jugador, nada: casi cualquier línea puede nombrar a alguien que no ve, y todavía no se sabe a quién ve; 2026-11-20)
+    return soyGM ? docs.filter(d => d.data().desde !== 'incierta-pj') : [];
   }
   inciertaCargar();
-  let cambio = false;
+  noVistoPasada++;
+  let cambio = false, pendiente = false, ultimaIncierta = null;
   const out = [];
   docs.forEach(d => {
     const t = d.data({serverTimestamps: 'estimate'});
     let dec = inciertaDecisiones.get(d.id);
-    if(!dec){ dec = inciertaDecidir(t); inciertaDecisiones.set(d.id, dec); cambio = true; }
+    if(!dec){
+      const r = inciertaDecidir(t, d.id);
+      dec = r.modo === 'anon' ? ['anon', ...r.esconder].join(ANON_SEP) : r.modo;
+      if(r.firme){ inciertaDecisiones.set(d.id, dec); cambio = true; }
+      else pendiente = true;
+    }
     if(dec === 'ver') out.push(d);
-    else if(dec === 'incierta') out.push(inciertaDoc(d, t));
+    else if(dec.startsWith('anon' + ANON_SEP)) out.push(inciertaAnonDoc(d, t, dec.split(ANON_SEP).slice(1)));
+    else if(dec === 'incierta'){
+      // Varias líneas seguidas de lo mismo (una habilidad deja dos o tres) son UNA acción incierta, no tres.
+      const ms = t.cuando && t.cuando.toMillis ? t.cuando.toMillis() : 0;
+      const pegada = ultimaIncierta !== null && out.length && out[out.length - 1].__incierta && Math.abs(ultimaIncierta - ms) < 20000;
+      ultimaIncierta = ms;
+      if(pegada) return;
+      const x = inciertaDoc(d, t); x.__incierta = true;
+      out.push(x);
+    }
   });
   if(cambio) inciertaGuardar();
+  if(pendiente) noVistoReintentar();
   return out;
 }

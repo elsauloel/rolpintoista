@@ -2316,3 +2316,20 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`#percepcion-banner-amano`). `revelarAManoAbrir` → «👁 La detectó» / «🙈 No la detectó»: marca o apaga `descubierta`, corrige el resultado del
   momento (`datos.aMano`) y cada pantalla olvida la trampa si fue «no» (`revelarMomento`). Todo deja su línea en la Mesa (`Revelar.linea` /
   `Revelar.aMano`, por `sigiloAviso`): nombra lo revelado, no lo que se vuelve a ocultar. Dudas: P254. Probado con clics en «Claude · pruebas 2».
+- **🙈 Lo que hace alguien que no se ve, no lo nombra** (2026-11-20, dueño: «no puede suceder que la rata haga algo y se revele»; «si la rata está
+  bajo la niebla… no tiene que decir "la rata usó Polvareda"; si está a la vista, ahí sí»). **Un solo criterio para todo texto que le llega a un
+  jugador**, en `js/29-accion-incierta.js` + las cuentas con textos en `comun/no-visto.js`: se mira **a quién NOMBRA** el texto (lleve o no «quien»:
+  casi ningún `mesaLinea` / `momentoAbrir` del mapa lo lleva, y por eso se escapaban). Nombra a un creep que esta pantalla no ve (niebla, sigilo,
+  oculto, tapado por una nube) → solo a él: no aparece, o «🎭 Alguien está realizando una acción incierta» si ya lo conocen (sin su nombre; varias
+  seguidas son una; lo del Mantenimiento, nada); a él y a alguien que sí se ve (un personaje) → aparece con «Alguien» en su lugar (lo que le pasa a un
+  personaje no se esconde). El GM ve todo. Pasan por ahí: **la Mesa** (`mesaFiltrar` → `inciertaDecidir`), **la Crónica, los Avisos y los toasts de un
+  momento** (`momentoRecibido`, js/16, llama a `inciertaMomento(id, d)`: desde ahí `d` va sin el nombre y `nv.modo` dice si va a la esquina) y **la
+  tarjeta de un duelo ajeno** (`dueloPasoCronica`). «No se ve» = `loVeoAhora(t)` (lo mismo que dibuja el mapa), con dos márgenes: visto hasta
+  `NO_VISTO_MS` (8 s) antes de que llegara la línea cuenta como visto (no para uno que el GM oculta a mano), y lo recién llegado que se escondió se
+  vuelve a mirar a los 3 s (`noVistoReintentar`, `momentoNoVistoReintentar`) por si se lo vio enseguida. **Una línea nueva no necesita nada especial:**
+  alcanza con que nombre al creep por su nombre de token. La Polvareda / Bomba de humo (js/57) anuncia ANTES de crear la nube (si no, la nube ya
+  tapó a quien la usa cuando llega el anuncio). **El 📜 Historial de los jugadores** (js/99 `regVisible`, js/09 `publico`) ahora usa
+  `visibleParaJugadores` (antes no miraba la niebla: salían los movimientos, con casillas, de creeps que nunca habían visto) y al entrar el GM ya no
+  anota «entró al mapa» de todos. No se tocó: el cuadro del duelo (nombra a quien ataca: atacar delata), el orden de turnos (un creep conocido
+  conserva su fila) y el lado del GM con un personaje en sigilo — P255. Probado con clics en «El origen · CLON de pruebas» (GM, J1 y J2).
+

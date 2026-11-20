@@ -113,6 +113,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — 🧬 Partida clon de «El origen de las especies», solo para pruebas** (dueño, 2026-11-20: «que crees una partida que sea clon del
+  origen de las especies, que la vamos a usar para hacer pruebas pertinentes al origen… cada tanto te voy a pedir que la actualices… exclusivamente
+  para pruebas… y que solamente tenga como personajes a Bizzante, Larry y Rocardo. Aurelius y la Estrella culona no. Que el GM sea la cuenta de Rol
+  Pintoísta. Y a los otros tres personajes asignales las otras cuentas que tenemos habilitadas… si tenemos solo dos, alguno de los personajes dejalo
+  sin cuenta asignada y yo después me ocupo de agregar una cuenta más»).
+  · **Leer** El origen SOLO en lectura (página con las escrituras a Firestore bloqueadas, scratchpad/simfin/; nunca abrir ahí mapa / ficha / GM Tools
+    ni escribir nada). **Crear** una partida nueva con nombre inconfundible («El origen · CLON de pruebas») y volcarle la copia: mapas (con terreno,
+    niebla, zonas, trampas), tokens, creeps (con lo privado del GM), las fichas de Bizzante, Larry y Rocardo completas (todas sus partes e
+    invocaciones), tienda y tiendas guardadas, bitácoras, ajustes de la partida. Sin Aurelius ni la Estrella culona (ni sus tokens). Sin combate /
+    botín / ofertas a medias. Relevar la estructura en docs/workflow-firebase.md antes de copiar y decir en el informe qué se copió y qué no.
+  · **Cuentas**: el GM, la cuenta de pruebas del GM (ROL_GM_*) — **confirmar con el dueño si «la cuenta de Rol Pintoísta» es esa**; si es otra, que
+    él se sume y se le pase el rol. Jugadores: tenemos DOS cuentas de pruebas (ROL_J1_*, ROL_J2_*): asignar dos personajes y dejar el tercero sin
+    cuenta, anotado para que el dueño sume la tercera. Decir cuál quedó sin cuenta.
+  · Dejar un **script reutilizable** (en el scratchpad y documentado sin ids en docs/memoria-claude.md: qué hace y cómo se vuelve a correr) para
+    «actualizar el clon» cuando el dueño lo pida: pisa el clon con el estado actual de El origen. Nunca al revés: el script no puede escribir en El
+    origen (escrituras bloqueadas a esa partida por construcción).
+  · Repo público: ningún id de partida, personaje o cuenta, ni email, en el repo. Anotar en docs/memoria-claude.md que existe el clon y para qué.
+  · Con el clon listo, las pruebas de cosas de El origen (el anillo y las abejas de Bizzante, la rata, Prisa de Rocardo) se hacen ahí.
 - **⬜ en cola — 💍 Anillo de Puntería Certera: el +2 aparece aunque te hayas movido; y que avise cuando se activa y cuando lo vas a perder**
   (dueño, 2026-11-20, El origen, lo lleva Bizzante: «le aparecía el bono a la probabilidad de golpe independientemente de si se había cumplido la
   condición o no… correr los testeos pertinentes para que funcione bien. Y estaría bueno que cuando se active el bono aparezca algún tipo de cartel
@@ -132,8 +150,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🐝 Las abejas de Bizzante aparecen con menos vida que su máximo (~75 %)** (dueño, 2026-11-20, El origen: «al invocar sus abejas,
   aparecían con menos HP que el máximo. Algo así como el 75 %… copialo a la partida de pruebas para hacer el testeo»). (1) Leer a Bizzante de El
   origen en SOLO LECTURA (la página con las escrituras a Firestore bloqueadas de scratchpad/simfin/; nunca abrir ahí el mapa, la ficha ni GM Tools) y
-  armar una **copia** en «Claude · pruebas 2» (ficha completa: atributos, equipo, habilidades, pasivas, invocaciones), con nombre claro («Bizzante
-  (copia)»), a nombre del Jugador 1 o del GM; es temporal: al terminar se saca (la partida de pruebas queda con un personaje por jugador), salvo
+  **usar el Bizzante de la partida clon de El origen** (tarea anterior; ya no hace falta copiarlo a «Claude · pruebas 2»). [Texto viejo:] una copia a nombre del Jugador 1 o del GM; es temporal: al terminar se saca (la partida de pruebas queda con un personaje por jugador), salvo
   que sirva para la tarea del anillo, que también es de Bizzante: avisar. Ningún id ni email al repo. (2) Invocar las abejas con clics y mirar con
   cuánta vida aparecen contra su máximo: en el token, la tarjeta, la ficha de la invocación y la Botonera. Buscar la causa: ¿la vida se fija antes
   de sumar bonos al máximo (equipo, pasivas, nivel de la habilidad, Constitución del invocador)? ¿la plantilla trae una vida vieja y el máximo se

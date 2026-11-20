@@ -222,6 +222,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     **Perfora +1** (sumado al Perfora que ya traiga el arma, con la regla de Perfora que ya existe: no inventar otra). (Descartado: Recarga −1 No2,
     «demasiado poderoso».)
   Arco / ballesta se distinguen como ya lo hace el código (el carcaj incluido, las flechas / virotes), no por el Tipo.
+  **Ajustes del dueño (2026-11-20, pisan lo de arriba):** «en la maestría en hachas también le daría +1 al bloqueo, siempre. Para las punzantes también
+  le pondría un +1 adicional en golpe por la espalda. Y +1 solamente en probabilidad de golpe de oportunidad».
+  · **Punzantes** queda: **+1 al daño**, **+1 a PdG en ataque de oportunidad** (ya no +2) y **+1 a PdG al pegar por la espalda** (con la regla de
+    «por la espalda» que ya use el mapa; si no hay un stat para eso, crearlo como se hizo con `pdgt10`).
+  · **Hachas** queda: el segundo ataque del turno y los siguientes cuestan 2 No2 menos, **y +1 al Bloqueo** (con el hacha en la mano; «siempre» =
+    no depende de qué ataque sea: interpretación de Claude, a confirmar).
 - **⬜ en cola — 🛡 Pasiva nueva «Aguante de trinchera»** (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la
   defensa y +1 la defensa especial por cada enemigo adyacente. Busquémosle un nombre y publiquémosla»). 2 Job; **+1 Defensa y +1 Defensa especial por
   cada enemigo pegado** al que la tiene. Es el espejo de «Táctica de enjambre» (`comun/pasivas.js`, stat `enjambre`, `Combatiente.aliadosPegados`):

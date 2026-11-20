@@ -1593,6 +1593,9 @@ versión parecida en más de una, es candidato a juntar.
   comparten la ficha y GM Tools (salieron de `ficha.css`). Cada página pone sus botones.
 - **`combate-fin.js`, quién cuenta** (2026-10-12): `fuera()` / `fueraCambiar(id, afuera)` — los personajes que el GM deja afuera de los cálculos
   (`gm/personajes`); `jugadores()` los arranca destildados.
+- **`combate-fin.js`, 🔮 Simular** (2026-11-20, dueño): `elegirModo()` (el cartel ▶ Avanzar / 🔮 Simular de «Finalizar combate», mapa js/18 y GM Tools
+  js/06) y `rep.simulacion`: `vista` suma el cartel «Simulación: no se guarda nada» con «▶ Pasar a Avanzar» (`data-rep-avanzar`, lo maneja `clic`) y
+  esconde Publicar; `publicar` se niega. `cambio`/`clic` no escriben nada (quién cobra queda en `rep.jugadores`, no pasa por `fueraCambiar`).
 - **La Defensa especial va siempre con la Defensa** (dueño, 2026-10-12): «Def. especial» (antes «Armad. mágica») en las botoneras de
   personaje, invocación y creep, debajo de la Defensa en Equipo y mochila, en la cabecera de la Botonera («Def 2 · Def.Esp 0») y siempre en
   la ficha lite.

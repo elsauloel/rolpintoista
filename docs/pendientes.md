@@ -804,6 +804,8 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
+  y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
 - [ ] **Seguir la revisión del bloque 4, de a uno, en el mapa «Prueba · Carteles»** (pausada el 2026-11-12, dueño: «dejemos esto para la próxima
   vez que te diga que estoy en la compu»). Hechos: Retirada (queda), Inamovible (al cuadro del duelo, en cola), Recuperarse (queda). **Sigue:
   Reflejos** (el escenario puede quedar armado), después el dado del Escudo elemental, el Malviaje, soltarse, la Confusión y la tirada extra de una

@@ -2934,3 +2934,16 @@ Con la Varita arcana y los orbes prestados (después devueltos), eligiendo el d6
 - La Mesa: «🔮 Orbe salvaje (manual) 1d6 (manual) [6]» y «🔮 Orbe salvaje de Blanco J1 (1d6 → 6, a mano): ¡el daño especial sale doble!». El «Aplicar el
   daño» no aparece hasta que el d6 está tirado.
 Capturas y videos en `cola10/`.
+
+## 2026-11-20 · 🔮 «Finalizar combate»: Avanzar o Simular («Claude · pruebas 2», mapa de prueba «Prueba · Fin de combate», GM + Jugador 1)
+
+- [x] **El cartel de elegir**: «🏁 Finalizar combate» → «¿Qué querés hacer con el combate?» con ▶ Avanzar y 🔮 Simular (y Cancelar).
+- [x] **Simular**: la ventana de siempre con el cartel violeta «🔮 Simulación: no se guarda nada» y ▶ Pasar a Avanzar; en los cinco pasos no aparece
+  📢 Publicar. Se destildó el Hacha de piedra (→ 25 despojos), se volvió a tirar un consumible (🎲) y se sacó a Blanco J1 del reparto. A Jugador 1 no le
+  apareció nada. Leída la partida antes y después: **ningún cambio** (recompensas, botín, combate, Mesa, historiales, momentos, creeps, fichas, quién
+  cuenta). Igual desde GM Tools.
+- [x] **Pasar a Avanzar y lo de siempre**: aparece 📢 Publicar → confirmar → Jugador 1 ve «Batalla terminada» con su XP, su oro y el botín → el GM cierra el
+  botín → se cargan la XP, el oro y los despojos; los creeps quedan repartidos. (Después se restauró la partida.)
+- [ ] **Falta que lo mire el dueño en su compu.**
+Capturas en `cola11/`.
+

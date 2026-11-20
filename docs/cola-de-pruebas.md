@@ -12,12 +12,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
-- **⬜ en cola — 🔮 «Finalizar combate»: Avanzar o Simular** (dueño, 2026-11-20: «me gustaría poder hacer esa simulación que al poner finalizar combate
+- **✅ hecho (2026-11-20) — 🔮 «Finalizar combate»: Avanzar o Simular** (dueño, 2026-11-20: «me gustaría poder hacer esa simulación que al poner finalizar combate
   como GM tenga la opción de avanzar o de simulación»). Al tocar «Finalizar combate», el GM elige: **Avanzar** (lo de siempre: reporte, publicar
   recompensas, botín) o **Simular**: la misma ventana «Batalla terminada» con la XP de cada personaje, el oro y el botín (despojos y drop al azar, con
   «otra tirada»), pero **sin escribir nada** (ni recompensas, ni botín, ni Mesa, ni marcar creeps) y sin cerrar el combate; con un cartel bien claro
   «Simulación: no se guarda nada» y un botón para pasar a Avanzar. Usar `comun/combate-fin.js` (sus funciones de cálculo; nada de lo que publica).
   Probar en «Claude · pruebas 2» y verificar que la simulación no dejó nada escrito.
+  *Resultado:* al tocar «🏁 Finalizar combate» (mapa del GM y GM Tools) sale «¿Qué querés hacer con el combate?» con **▶ Avanzar** (lo de siempre) y
+  **🔮 Simular**: la misma ventana «Batalla terminada», paso a paso, con un cartel violeta arriba «🔮 Simulación: no se guarda nada» y el botón
+  **▶ Pasar a Avanzar** (sigue con lo ajustado y recién ahí aparece 📢 Publicar); en simulación no hay Publicar y, por las dudas, publicar se niega
+  (`rep.simulacion` en `comun/combate-fin.js`). Tildar, destildar, 🎲 otro consumible y sacar a alguien del reparto quedan en memoria (el reparto no pasa
+  por `fueraCambiar`; `darConsumiblesAlAzar` no lo llama esta ventana). Probado en «Claude · pruebas 2» con GM y Jugador 1 (un mapa chico con el Blanco
+  creep caído y el Protector 2 en pie): leída la partida antes y después de simular (recompensas, botín, combate, Mesa, historiales, momentos, creeps,
+  fichas, `gm/personajes`, ajustes): **nada cambió**; lo mismo desde GM Tools. Después, «Pasar a Avanzar» → Publicar → Jugador 1 vio el botín → Cerrar
+  botín: todo como siempre. Partida restaurada. 876 pruebas en verde.
 - **✅ hecho (2026-11-19) — 📣 El daño fijo de una zona (sin dados) se aplica directo, pero con aviso al afectado** (dueño, 2026-11-19, P245 ✅: «igual tiene que
   comunicarse, sobre todo la persona afectada. Si te entra un daño directo, te tiene que aparecer una notificación que diga, te ingresó tanto de daño
   por tal razón»). En las zonas con cartel cuyo daño es un número fijo (lo dejó así el #9, `vtt-hexgrid/js/08`): al afectado (quien lo maneja: su

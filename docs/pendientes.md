@@ -110,6 +110,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🏹 Ver cómo quedó el carcaj, y de paso probar cómo se equipan mochilas y cinturones** (dueño, 2026-11-20: «anotar en lista para ver en la pc, cómo se ve el tema del carcaj. De paso también probar cómo se equipan mochilas y cinturones»). Del carcaj: el «Carcaj incluido 0 / 5» al equipar un arco o una ballesta, los botones «→ Carcaj (N)» / «→ Mochila (N)» / «Cargar todo lo que entre» / «Vaciar a la mochila», y que el Carcaj de cuero (10) ya no viene de regalo con el arco.
 > - [ ] **🍺 Diseñar algún «minijuego» para jugar en las tabernas (dueño, 2026-11-20: «también para lista de ver en pc, diseñar algún "minijuego"
 >   para jugar en las tabernas»).** Pensarlo juntos en la compu: qué juego (dados, cartas, pulseadas, truco, taba…), entre quiénes (jugadores entre sí,
 >   contra un parroquiano que maneja el GM), si se apuesta oro y cómo se ve en el mapa. Hay de dónde partir: el ✊ piedra, papel o tijera (`comun/ppt.js`),

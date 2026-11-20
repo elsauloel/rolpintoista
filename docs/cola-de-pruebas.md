@@ -24,6 +24,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»). Cuando el proceso termina de verdad (se cierra el botín y se
   reparten XP y oro; o al publicar si no hay ítems), el mapa publicado pasa de Combate a Narrativo, con lo mismo que hace el interruptor a mano.
   En «Simular» no cambia nada. Vale desde el mapa y desde GM Tools.
+- **⬜ en cola — 👥 Sumar al Jugador 2 a «Claude · pruebas 2»** (dueño, 2026-11-20: «podría sumar al jugador 2 a la partida de pruebas, así tenemos
+  en la partida de pruebas todas las opciones posibles»). Con la cuenta de pruebas del Jugador 2 («Unirme como jugador»), y crearle un personaje de
+  pruebas («Blanco J2», en blanco como Blanco J1) con su token en «Prueba · R4 M4». Sirve para probar lo que necesita dos personas distintas
+  (pasar cosas, aceptar ofertas, duelos entre jugadores). Anotar en docs/memoria-claude.md que la partida de pruebas ya tiene GM, J1 y J2.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

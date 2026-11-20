@@ -1641,3 +1641,8 @@ modo narrativo, igual que si el GM tocara el interruptor. **El interruptor no li
 estaba y el GM la borra con «Limpiar»), así que el cambio automático **tampoco lo limpia**: se eligió lo más conservador, no borrar nada que el GM no
 haya pedido. **Para el dueño:** ¿querés que al terminar el combate también se limpie sola la lista del orden de turnos (y, en ese caso, también al
 pasar a narrativo a mano con el interruptor)?
+
+### P253 — ⚔ Maestrías de Tipo 4, 6 y 8: lo que quedó sin definir (2026-11-20, Claude)
+El dueño definió las tres (ver `docs/cola-de-pruebas.md`): punzantes melee (+1 daño, +2 PdG en oportunidad), cortantes (+1 Parry, +1 Bloqueo, +1 PdG
+en contraataque) y hachas (el segundo ataque del turno cuesta 2 No2 menos). **Para el dueño:** (a) ¿la de hachas cuesta 1 o 2 puntos de Job? (quedó en
+2, provisorio: es la que más cambia el juego); (b) ¿querés una maestría aparte para las armas de Tipo 4 de rango (proyectiles)? ¿con qué bonos?

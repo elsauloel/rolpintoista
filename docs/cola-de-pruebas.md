@@ -34,6 +34,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en la partida de pruebas todas las opciones posibles»). Con la cuenta de pruebas del Jugador 2 («Unirme como jugador»), y crearle un personaje de
   pruebas («Blanco J2», en blanco como Blanco J1) con su token en «Prueba · R4 M4». Sirve para probar lo que necesita dos personas distintas
   (pasar cosas, aceptar ofertas, duelos entre jugadores). Anotar en docs/memoria-claude.md que la partida de pruebas ya tiene GM, J1 y J2.
+- **⬜ en cola — ⚔ Tres maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6) y hachas (Tipo 8)** (dueño, 2026-11-20, conversación de
+  diseño; mismo molde que «Maestría en armas pesadas», `comun/pasivas.js`; valen para jugadores y para creeps). Cierra P248.
+  · **Maestría en armas punzantes** (1 Job): con un arma de **Tipo 4 cuerpo a cuerpo** (NO las de rango / proyectiles: «vamos a hacer una distinción
+    en las armas punzantes melee y las de rango… esta sería para tipo 4 melee»), **+1 al daño** y **+2 al PdG en ataque de oportunidad**.
+  · **Maestría en armas cortantes** (1 Job): con un arma de **Tipo 6**, **+1 al Parry**, **+1 al Bloqueo** y **+1 al PdG en contraataque**.
+  · **Maestría en hachas** (Tipo 8; dueño: «tipo 8 son hachas. Su casa es romper armadura»): el **segundo ataque del turno (y los siguientes) con
+    un arma de Tipo 8 cuesta 2 No2 menos** (6 en vez de 8). Job: **2, provisorio** (propuesta de Claude, el dueño todavía no lo confirmó: P253).
+  Cada bono vale SOLO con un arma de ese Tipo (como `pdgt10`/`parryt10`): se tiene que ver en la 🔍 de la tirada y en el costo del botón Atacar.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

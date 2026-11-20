@@ -99,11 +99,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Para saber:** al primero del orden de un combate nuevo tampoco se le recargan los No2 ni se le cuentan los estados al empezar (nadie le
   «empieza» ese turno): no se tocó, porque es otra cosa y lo decide el dueño.
   Pruebas automáticas 898/898 (2 nuevas). «Claude · pruebas 2» («Prueba · R4 M4», GM, J1 y J2) quedó como estaba. Sin ver: `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola — 👥 En la partida de pruebas, un solo personaje por jugador** (dueño, 2026-11-20: «yo dejaría en la partida de pruebas que cada
+- **✅ hecho (2026-11-20) — 👥 En la partida de pruebas, un solo personaje por jugador** (dueño, 2026-11-20: «yo dejaría en la partida de pruebas que cada
   jugador tenga asignado un solo personaje para que sea más claro, porque rara vez un jugador va a tener más de un personaje en su control, salvo
-  que sea una invocación… para las pruebas me gustaría mantenerlo así»). En «Claude · pruebas 2»: sacar a «Blanco J1 b» (el segundo personaje del
-  Jugador 1) con su token, con la interfaz (GM Tools → 👥 Personajes → ✕). Quedan Blanco J1 (Jugador 1) y Blanco J2 (Jugador 2). Actualizar
-  docs/memoria-claude.md (y cualquier guía o script de pruebas que nombre a Blanco J1 b): las pruebas de dos personas se hacen con J1 y J2.
+  que sea una invocación… para las pruebas me gustaría mantenerlo así»). **Hecho:** en «Claude · pruebas 2» se sacó a «Blanco J1 b» con los
+  botones de GM Tools (👥 Personajes → ✕ → «Borrar» → escribir el nombre): se fue su ficha y su token. Quedan **Blanco J1** (Jugador 1) y
+  **Blanco J2** (Jugador 2), los dos con token en «Prueba · R4 M4». `docs/memoria-claude.md` ya lo dice así (y que no se le vuelva a dar un
+  segundo personaje a un jugador). Lo que nombra a Blanco J1 b en `docs/pruebas-en-el-mapa.md` y más abajo en esta cola son pruebas ya hechas:
+  queda como registro.
 - **⬜ en cola — 👁 Revelar a mano lo que está oculto (trampas y demás)** (dueño, 2026-11-20, El origen: «un personaje tiró para detectar una
   trampa, pasó algo raro con las tiradas, el sistema entendió que la trampa no fue detectada, pero en realidad sí fue detectada… y yo como GM no
   tenía una forma de revelar lo que estaba oculto, entonces eso también tendría que existir en las cosas que están ocultas. Tanto para GMs como para

@@ -84,6 +84,53 @@ async function revelarElementoAplicar(id){
   }
 }
 
+/* ---------- El circulito que sale de la propia trampa (2026-11-20, dueño: «para las trampas también debería aparecer un botón que se despliegue
+   desde el propio token, al igual que… los circulitos de alrededor») ----------
+   Al hacer clic en la casilla (sale el cartel, js/104), si ahí hay algo que esta pantalla puede revelar o volver a ocultar, un circulito 👁 / 🙈
+   arriba a la derecha de la casilla, con el mismo aspecto que los botones de un token. Hace lo mismo que el botón del cartel (que queda: dice con
+   palabras qué es). Lo ubica cada dibujo (`revelarCirculoUbicar`, lo llama js/104 desde `hexInfoDibujar`). */
+function revelarCirculoOpciones(){
+  if(!hexInfoCelda || seleccion) return [];
+  const out = [], igual = c => c.col === hexInfoCelda.col && c.fila === hexInfoCelda.fila;
+  elementos.forEach((el, id) => {
+    if(id === ID_BORRADOR || !puedeVerElemento(el) || !celdasDeElemento(el).some(igual)) return;
+    const op = revelarOpcionElemento(el);
+    if(op) out.push({id, op});
+  });
+  return out;
+}
+function revelarCirculoUbicar(){
+  let caja = $('#revelar-hud');
+  const ops = typeof hexInfoCelda !== 'undefined' ? revelarCirculoOpciones() : [];
+  if(!ops.length){ if(caja && !caja.hidden){ caja.hidden = true; caja.dataset.firma = ''; } return; }
+  if(!caja){
+    caja = document.createElement('div'); caja.id = 'revelar-hud'; caja.hidden = true;
+    ($('#hud').parentElement || document.body).appendChild(caja);
+    // (en `pointerdown` y en captura: el cartel de la casilla se cierra con cualquier pointerdown fuera del lienzo, js/104)
+    caja.addEventListener('pointerdown', e => {
+      const b = e.target.closest('[data-revelar-el]');
+      if(!b) return;
+      e.preventDefault(); e.stopPropagation();
+      revelarElementoAplicar(b.dataset.revelarEl);
+    }, true);
+  }
+  const firma = ops.map(x => x.id + ':' + x.op.accion + ':' + x.op.texto).join('|');
+  if(caja.dataset.firma !== firma){
+    caja.dataset.firma = firma;
+    caja.innerHTML = ops.map(x => `<button type="button" class="hud-circulo icono${x.op.accion === 'ocultar' ? ' ocultar' : ''}" data-revelar-el="${esc(x.id)}" title="${esc(x.op.texto.replace(/^\S+\s*/, '') + ': ' + x.op.titulo)}" aria-label="${esc(x.op.texto)}">${x.op.accion === 'ocultar' ? '🙈' : '👁'}</button>`).join('');
+  }
+  const c = hexCentro(hexInfoCelda.col, hexInfoCelda.fila);
+  caja.style.left = Math.round(c.x * vista.zoom + vista.x) + 'px';
+  caja.style.top = Math.round(c.y * vista.zoom + vista.y) + 'px';
+  // En ronda, arrancando arriba a la derecha (arriba y a la izquierda están el 🔒 y el ⚙ de una forma seleccionada).
+  const r = HEX * vista.zoom + 18;
+  [...caja.children].forEach((b, i) => {
+    const ang = (-45 + i * 42) * Math.PI / 180;
+    b.style.left = Math.round(Math.cos(ang) * r) + 'px'; b.style.top = Math.round(Math.sin(ang) * r) + 'px';
+  });
+  caja.hidden = false;
+}
+
 /* ---------- Tokens ---------- */
 function revelarOpcionToken(t){
   if(!t || !fbUsuario) return null;
@@ -93,7 +140,7 @@ function revelarOpcionToken(t){
 // El botón, entre los del token (js/10 le pasa su `icono`).
 function revelarHudIcono(t, icono){
   const op = revelarOpcionToken(t);
-  return op ? icono('revelar', '👁', op.titulo, false) : '';
+  return op && !op.enMenu ? icono('revelar', '👁', op.titulo, false) : '';   // (el de un token oculto por el GM: adentro del «⋯», el 🙈 de siempre)
 }
 async function revelarTokenAplicar(id){
   const t = tokens.get(id), op = revelarOpcionToken(t);

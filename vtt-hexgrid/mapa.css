@@ -816,6 +816,14 @@ body.con-ruta .toast{bottom:auto;top:74px}
 #hex-info-globo .hi-gtit{display:block;color:var(--brass);font-weight:600;margin-bottom:3px}
 
 /* 👁 Revelar a mano lo oculto (js/122, 2026-11-20): los botones del cartel de la casilla. */
+/* 👁 El circulito que sale de la propia trampa (js/122, 2026-11-20): igual a los botones de alrededor de un token. */
+#revelar-hud{position:absolute;left:0;top:0;width:0;height:0;z-index:20;pointer-events:none}
+#revelar-hud .hud-circulo{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;width:36px;height:36px;border-radius:50%;
+  border:2.5px solid #FFD25A;background:rgba(15,12,14,.6);color:#FFD25A;font-size:15px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;text-shadow:0 1px 2px rgba(0,0,0,.9);transition:background .12s;
+  box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 8px 2px rgba(255,210,90,.4),0 2px 6px rgba(0,0,0,.3)}
+#revelar-hud .hud-circulo:hover{background:rgba(15,12,14,.9);filter:brightness(1.15)}
+#revelar-hud .hud-circulo.ocultar{border-color:#C9A3FF;color:#C9A3FF;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 8px 2px rgba(201,163,255,.4),0 2px 6px rgba(0,0,0,.3)}
 #hex-info .hi-acciones{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
 #hex-info .hi-revelar{font:inherit;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:7px;border:1px solid #FFD25A;background:rgba(255,210,90,.14);color:#FFD25A;cursor:pointer}
 #hex-info .hi-revelar:hover{background:rgba(255,210,90,.28)}

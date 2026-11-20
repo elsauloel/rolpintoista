@@ -2058,7 +2058,7 @@ versión parecida en más de una, es candidato a juntar.
   mapa al empezar un combate (`vtt-hexgrid/js/04`, `ataquesACeroAlEmpezar`).
 - **`revelar.js`** (`Revelar`, 2026-11-20) — **👁 revelar a mano lo oculto**, lo puro: `elemento(el, {gm, mio})` → null o `{accion: 'revelar' |
   'ocultar', que: 'trampa' | 'invisible', texto, titulo, cambios}` (el GM con cualquiera, un jugador con lo suyo; «volver a ocultar» solo el GM),
-  `token({oculto, sigilo}, {gm, mio})`, `linea(op, {gm, quien, nombre})` (la línea de la Mesa; null si no se anuncia) y `aMano(detectada, {detector,
+  `token({oculto, sigilo}, {gm, mio})` (el de un token oculto por el GM lleva `enMenu`: va adentro del «⋯» del token, no a la vista), `linea(op, {gm, quien, nombre})` (la línea de la Mesa; null si no se anuncia) y `aMano(detectada, {detector,
   nombre})` (los textos de «✋ Resolver a mano» al detectar una trampa). Qué se ve lo decide el mapa (`vtt-hexgrid/js/122-revelar.js`). Pruebas en
   `pruebas.html`.
 - **`no-visto.js`** (`NoVisto`, 2026-11-20) — **🙈 «lo que hace alguien que no se ve, no lo nombra»**, las cuentas con textos: `hallar(texto,

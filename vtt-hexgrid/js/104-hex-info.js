@@ -29,7 +29,7 @@ function hexInfoDatos(celda){
       const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
       quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
     }
-    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta)}).map(x => ({...x, elId: id})));   // (elId: para «👁 Revelar», js/122)
+    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta && trampaEsDelGM(el))}).map(x => ({...x, elId: id})));   // (elId: para «👁 Revelar», js/122)
   });
   // Las auras de los tokens que se ven (un estandarte oculto o tapado por la niebla no se delata).
   const seVe = x => !(x.oculto && !soyGM) && !x.bajoTierra && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x));
@@ -131,6 +131,7 @@ setInterval(() => { if(hexInfoCelda) hexInfoRefrescar(); }, 500);
 
 // El borde de la casilla elegida, en el lienzo (lo llama js/05).
 function hexInfoDibujar(z){
+  if(typeof revelarCirculoUbicar === 'function') revelarCirculoUbicar();   // 👁 el circulito que sale de la trampa (js/122)
   if(!hexInfoCelda) return;
   const c = hexCentro(hexInfoCelda.col, hexInfoCelda.fila);
   ctx.save();
@@ -170,6 +171,7 @@ document.addEventListener('pointerdown', e => {
     }
     return;
   }
+  if(e.target.closest && e.target.closest('#revelar-hud')) return;   // 👁 el circulito de la trampa (js/122): no cierra el cartel
   if(e.target !== lienzo) hexInfoCerrar();
 }, true);
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && hexInfoCelda) hexInfoCerrar(); });

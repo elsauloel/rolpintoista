@@ -167,7 +167,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   quedó guardado en las dos. No se tocaron las otras partidas de esas cuentas ni el GM de pruebas (el dueño todavía no respondió). Lo ya escrito en
   la Mesa y el Historial conserva el nombre viejo. **Ojo con las capturas desde ahora:** en pantalla se ve el nombre nuevo; las capturas quedan
   fuera del repo, y en el repo y los docs se sigue diciendo «Jugador 1 / Jugador 2». Actualizar el clon no los cambia (los miembros no se copian).
-- **⬜ en cola — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las
+- **✅ hecho (2026-11-20) — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las
   trampas de los jugadores** (dueño, 2026-11-20, sobre lo hecho en 0dda1bcb, `vtt-hexgrid/js/122-revelar.js`): (1) «para las trampas también debería
   aparecer un botón que se despliegue desde el propio token, al igual que los botones que se despliegan de los tokens de personajes, los circulitos
   de alrededor… un botón de esa misma forma para revelarlas»: al hacer clic en una trampa oculta que uno puede revelar, un **circulito 👁** que sale
@@ -179,6 +179,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   las revela a nadie). (4) Corroborar y decir en el informe: el cartel de Percepción al caminar al lado de una trampa existe SOLO para quien tiene la
   pasiva que permite detectar trampas (dueño: «ese cartel solo debe existir cuando uno tiene la habilidad pasiva que le permite detectar trampas»);
   si le sale a alguien sin la pasiva, es un error a arreglar.
+  **Resultado (probado con clics en «Claude · pruebas 2», GM + J1 + J2):** (1) al hacer clic en una trampa que uno puede revelar sale un
+  **circulito 👁** arriba a la derecha de la casilla, igual a los botones de un token; el GM lo usó en la suya (los dos jugadores la vieron aparecer
+  y salió la línea en la Mesa), el circulito pasó a **🙈** y con él la volvió a ocultar; el Jugador 1 lo tiene en su propia trampa, el Jugador 2
+  (compañero, no es suya) no, y nadie lo tiene en una trampa ajena ya revelada. **El botón del cartel queda** (decisión de Claude): hace lo mismo,
+  pero dice con palabras qué trampa es, y sirve si hay dos cosas en la misma casilla; si al dueño le sobra, se saca fácil. (2) Con un creep oculto por
+  el GM, entre los botones a la vista ya no está el ojo: está adentro del «⋯» (el 🙈 «Oculto: mostrarlo a los jugadores»), y desde ahí se lo mostró;
+  el 👁 del token en sigilo sigue a la vista (visto con el Jugador 1). (3) El GM no veía la trampa del Jugador 1; con «👁 Revelar lo oculto»
+  prendido la vio (y pudo hacerle clic), sin que quede marcada como descubierta; al apagarlo dejó de verla. (4) **El cartel de Percepción está
+  bien:** el Jugador 1, sin la pasiva, caminó a una casilla pegada a una trampa oculta del GM y no le salió nada; al Jugador 2 se le dio
+  Percepción aumentada, hizo lo mismo y le salió «A Blanco J2 algo le parece inusual… tirá Percepción» (solo a él: ni el otro jugador ni el GM
+  vieron cartel). No hubo nada que arreglar. Sale con Percepción aumentada (la pasiva o el anillo que la da) o con Pisada atenta (los pies que la
+  dan, o saber desarmar trampas). Después se le sacó la pasiva. Sin ver: tirar esa Percepción hasta el final (ya probado en la tarea anterior) y la
+  Pisada atenta de un creep o una invocación. Sin cambios en las reglas de Firestore. Pruebas automáticas 913/913.
 - **⬜ en cola — ☥ Al resucitar se borran todos los estados temporales, buenos y malos** (dueño, 2026-11-20: «algo que debe pasar cuando un
   personaje muere y resucita, de cualquier forma, ya sea resurrección automática con un Pacto, con un Ankh, con la poción de Fénix, o que lo
   resuciten con un Revive. Al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna

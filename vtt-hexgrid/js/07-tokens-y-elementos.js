@@ -241,7 +241,9 @@ function trampaDeMiBando(el){
 function puedeVerElemento(el){
   // Una trampa sin disparar solo la ve su bando (los jugadores las de los jugadores; el GM las suyas) y quien la descubrió;
   // disparada, todos. El GM no ve dónde están las de los jugadores (antes sí).
-  if(el.trampa && !el.disparada && !el.descubierta && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id)) && !iluminadaPorLuz(el)) return false;   // una luz (js/03) la deja ver mientras dura   // descubierta (P145): la ve todo el equipo
+  // 👁 Con «Revelar lo oculto» del menú del ojo prendido, el GM ve también las de los jugadores (2026-11-20, dueño: «Revelar lo oculto, sin embargo, sí
+  // debe mostrarlas»): es solo su visión mientras está prendido; no las marca `descubierta` ni las recuerda.
+  if(el.trampa && !el.disparada && !el.descubierta && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id)) && !iluminadaPorLuz(el) && !(soyGM && ojoRevelando)) return false;   // una luz (js/03) la deja ver mientras dura   // descubierta (P145): la ve todo el equipo
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya

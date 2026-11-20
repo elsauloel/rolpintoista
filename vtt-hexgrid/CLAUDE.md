@@ -2316,6 +2316,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`#percepcion-banner-amano`). `revelarAManoAbrir` → «👁 La detectó» / «🙈 No la detectó»: marca o apaga `descubierta`, corrige el resultado del
   momento (`datos.aMano`) y cada pantalla olvida la trampa si fue «no» (`revelarMomento`). Todo deja su línea en la Mesa (`Revelar.linea` /
   `Revelar.aMano`, por `sigiloAviso`): nombra lo revelado, no lo que se vuelve a ocultar. Dudas: P254. Probado con clics en «Claude · pruebas 2».
+  **Ajustes del mismo día (dueño):** (1) **el circulito de la trampa**: con el cartel de la casilla abierto, `revelarCirculoUbicar` (js/122, lo llama
+  `hexInfoDibujar` en cada dibujo) pone en `#revelar-hud` un circulito 👁 / 🙈 arriba a la derecha de la casilla por cada cosa que esa pantalla puede
+  revelar o volver a ocultar (las mismas opciones que el cartel, `revelarOpcionElemento`); se ve como los botones de un token y hace lo mismo que el
+  botón del cartel, que **queda** (dice con palabras qué trampa es). Un clic en el circulito no cierra el cartel (js/104). (2) **El ojo de un token
+  oculto por el GM va adentro del «⋯»** (el 🙈 de siempre): `Revelar.token` lo devuelve con `enMenu` y `revelarHudIcono` no lo pone entre los botones
+  a la vista; el del sigilo sigue a la vista. (3) **Con «👁 Revelar lo oculto» del menú del ojo prendido, el GM ve las trampas de los jugadores**
+  (`puedeVerElemento`, js/07: `soyGM && ojoRevelando`): es solo su visión mientras está prendido, no las marca `descubierta`. (4) Comprobado: el cartel
+  de Percepción al caminar al lado de una trampa sale solo con Percepción aumentada (la pasiva o el anillo) o Pisada atenta (`atento`, js/08).
 - **🙈 Lo que hace alguien que no se ve, no lo nombra** (2026-11-20, dueño: «no puede suceder que la rata haga algo y se revele»; «si la rata está
   bajo la niebla… no tiene que decir "la rata usó Polvareda"; si está a la vista, ahí sí»). **Un solo criterio para todo texto que le llega a un
   jugador**, en `js/29-accion-incierta.js` + las cuentas con textos en `comun/no-visto.js`: se mira **a quién NOMBRA** el texto (lleve o no «quien»:

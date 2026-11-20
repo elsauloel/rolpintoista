@@ -7,7 +7,8 @@
    · El jugador, solo con lo suyo (interpretación de Claude, P254: no revela lo que no ve ni lo de otro).
    Revelar.elemento(el, quien) → null | {accion: 'revelar' | 'ocultar', que: 'trampa' | 'invisible', texto, titulo, cambios: [{campo: valor}, …]}
        (los cambios van de a uno: las reglas de Firestore dejan marcar `descubierta` solo, sin otro campo en la misma escritura)
-   Revelar.token(t, quien)      → null | {accion: 'revelar' | 'ocultar', que: 'oculto' | 'sigilo', texto, titulo}   (t = {oculto, sigilo})
+   Revelar.token(t, quien)      → null | {accion: 'revelar' | 'ocultar', que: 'oculto' | 'sigilo', texto, titulo, enMenu?}   (t = {oculto, sigilo};
+       `enMenu`: no va entre los botones a la vista del token, va adentro de su «⋯»)
    Revelar.linea(op, o)         → {origen, formula} para la Mesa (o = {gm, quien, nombre}); null si ese cambio no se anuncia.
    Revelar.aMano(detectada, o)  → {origen, formula, resultado} de «✋ Resolver a mano» en una tirada de detectar (o = {detector, nombre}). */
 const Revelar = (() => {
@@ -38,7 +39,9 @@ const Revelar = (() => {
   function token(t, quien){
     if(!t) return null;
     quien = quien || {};
-    if(t.oculto) return quien.gm ? {accion: 'revelar', que: 'oculto', texto: '👁 Revelar', titulo: 'Oculto: mostrarlo a los jugadores'} : null;
+    // (enMenu, 2026-11-20, dueño: «está bien que el botón del ojito aparezca detrás del menú de los tres puntitos»: el de un token oculto por el GM
+    // no va entre los botones a la vista, va adentro del «⋯», donde está el 🙈 de siempre.)
+    if(t.oculto) return quien.gm ? {accion: 'revelar', que: 'oculto', enMenu: true, texto: '👁 Revelar', titulo: 'Oculto: mostrarlo a los jugadores'} : null;
     if(t.sigilo && (quien.gm || quien.mio))
       return {accion: 'revelar', que: 'sigilo', texto: '👁 Revelar',
         titulo: quien.gm ? 'Revelarlo a mano: sale del sigilo y lo ven todos (sin tirada)' : 'Revelarte: salís del sigilo y te ven todos'};

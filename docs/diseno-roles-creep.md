@@ -127,6 +127,7 @@ Las propuestas concretas que se ofrecieron en el camino a 20 y no se eligieron (
 - **Retrasar**: PdG.Esp contra Res.Esp, 1d6 siniestro y Demora 2 (la Demora de varios lugares ya existe: el Cascotazo).
 - **Veneno** (de clase, un escalón arriba): PdG.Esp contra Res.Esp; 1d4 tóxico directo y Veneno 4 (la de clase, 3).
 - **Quebrar la guardia** ✦: sin Parry ni Bloqueo hasta su próximo turno (necesita un estado nuevo).
+- **Engualichar / Gualicho** (dueño, 2026-11-20: pedido el nombre; qué hace, a diseñar juntos — ver `pendientes.md` §4).
 
 **💚 Support**
 - **Shield** (de clase, versión creep): Flash; un escudo de 16 a él o a un aliado en su Rango, hasta el final del turno. 2 SP (4 en turno ajeno), o cooldown 2.

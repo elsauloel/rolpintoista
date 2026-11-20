@@ -123,6 +123,22 @@
 - **Sin el mapa disponible, no se prueba «por detrás»** (con funciones o datos simulados): se anota en `docs/pruebas-en-el-mapa.md` y se prueba
   apenas se pueda.
 
+- **El clon de El origen: «El origen · CLON de pruebas»** (2026-11-20, dueño: «una partida que sea clon del origen de las especies… para hacer
+  pruebas pertinentes al origen… cada tanto te voy a pedir que la actualices… exclusivamente para pruebas»). Es una copia de la partida real
+  para probar ahí lo que es de El origen (el anillo y las abejas de Bizzante, la rata, Prisa de Rocardo) con sus mapas, creeps, tienda y
+  fichas de verdad. Tiene solo a **Bizzante, Larry y Rockardo** (sin Aurelius ni la Estrella culona, ni sus tokens). El GM es la cuenta GM
+  de pruebas; **Bizzante lo maneja el Jugador 1, Rockardo el Jugador 2 y Larry quedó sin jugador** (a nombre del GM; el dueño le va a sumar
+  una cuenta: se le pasa desde el inicio de la partida, «⚙ Partida» → «Pasar un personaje a otro jugador»). Ahí se puede crear, cambiar y
+  borrar libre: en la próxima actualización se pisa todo.
+  **Reglas**: la original **solo se lee, nunca al revés**, y nunca abriendo ahí el mapa, la ficha ni GM Tools (escriben solas). El clon se
+  **actualiza cuando el dueño lo pide** («actualizá el clon») con `herramientas/clon-de-partida/` (leer su `LEEME.md`): lee la original con
+  una página que tiene todas las escrituras apagadas, guarda todo en un archivo fuera del repo, vacía el clon y lo vuelve a llenar con una
+  página que solo deja escribir adentro del clon, y al final compara una «foto» de la original de antes y de después (tienen que dar
+  iguales). Variables: `CLON_ORIGEN="El origen de las especies"`, `CLON_DESTINO="El origen · CLON de pruebas"`,
+  `CLON_PERSONAJES="Bizzante,Larry,Rockardo"`, `CLON_ASIGNAR="Bizzante=J1,Rockardo=J2"`, `CLON_DIR=` una carpeta fuera del repo (los
+  volcados tienen ids: no se suben). Tarda unos 3 minutos. No copia tiradas, historial, duelos, botín ni el combate a medias: el clon
+  arranca en narrativo. Al actualizar, avisarle qué personaje quedó sin jugador si cambió algo.
+
 ## Sesiones en la nube (desde el 2026-10-31)
 
 - **Armar las condiciones para probar, no darlo por «sin probar»** (2026-11-11, dueño, sobre «no hay invocaciones vivas» y «ningún creep la tiene»:

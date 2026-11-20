@@ -176,24 +176,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   estaría bien que en lugar de infinito dijera se van al empezar tu próximo turno. El resto está bien porque se entiende que se van con acciones o
   situaciones específicas»). Con el dato genérico `hasta` que se agregó para Desequilibrado (commit 96edd265): al poner esos dos estados, `hasta:
   'el comienzo de tu próximo turno'` (o «del próximo turno de <nombre>» donde lo lee otro). Solo esos dos. Tarea chica.
-- **⬜ en cola — 🧬 Partida clon de «El origen de las especies», solo para pruebas** (dueño, 2026-11-20: «que crees una partida que sea clon del
-  origen de las especies, que la vamos a usar para hacer pruebas pertinentes al origen… cada tanto te voy a pedir que la actualices… exclusivamente
-  para pruebas… y que solamente tenga como personajes a Bizzante, Larry y Rocardo. Aurelius y la Estrella culona no. Que el GM sea la cuenta de Rol
-  Pintoísta. Y a los otros tres personajes asignales las otras cuentas que tenemos habilitadas… si tenemos solo dos, alguno de los personajes dejalo
-  sin cuenta asignada y yo después me ocupo de agregar una cuenta más»).
-  · **Leer** El origen SOLO en lectura (página con las escrituras a Firestore bloqueadas, scratchpad/simfin/; nunca abrir ahí mapa / ficha / GM Tools
-    ni escribir nada). **Crear** una partida nueva con nombre inconfundible («El origen · CLON de pruebas») y volcarle la copia: mapas (con terreno,
-    niebla, zonas, trampas), tokens, creeps (con lo privado del GM), las fichas de Bizzante, Larry y Rocardo completas (todas sus partes e
-    invocaciones), tienda y tiendas guardadas, bitácoras, ajustes de la partida. Sin Aurelius ni la Estrella culona (ni sus tokens). Sin combate /
-    botín / ofertas a medias. Relevar la estructura en docs/workflow-firebase.md antes de copiar y decir en el informe qué se copió y qué no.
-  · **Cuentas**: el GM, la cuenta de pruebas del GM (ROL_GM_*) — **confirmar con el dueño si «la cuenta de Rol Pintoísta» es esa**; si es otra, que
-    él se sume y se le pase el rol. Jugadores: tenemos DOS cuentas de pruebas (ROL_J1_*, ROL_J2_*): asignar dos personajes y dejar el tercero sin
-    cuenta, anotado para que el dueño sume la tercera. Decir cuál quedó sin cuenta.
-  · Dejar un **script reutilizable** (en el scratchpad y documentado sin ids en docs/memoria-claude.md: qué hace y cómo se vuelve a correr) para
-    «actualizar el clon» cuando el dueño lo pida: pisa el clon con el estado actual de El origen. Nunca al revés: el script no puede escribir en El
-    origen (escrituras bloqueadas a esa partida por construcción).
-  · Repo público: ningún id de partida, personaje o cuenta, ni email, en el repo. Anotar en docs/memoria-claude.md que existe el clon y para qué.
-  · Con el clon listo, las pruebas de cosas de El origen (el anillo y las abejas de Bizzante, la rata, Prisa de Rocardo) se hacen ahí.
+- **✅ hecho (2026-11-20) — 🧬 Partida clon de «El origen de las especies», solo para pruebas** (dueño, 2026-11-20). Quedó creada
+  **«El origen · CLON de pruebas»** (con la interfaz del sitio; los dos jugadores entraron con «Unirme como jugador»). GM: la cuenta GM de
+  pruebas (es la cuenta de Rol Pintoísta). **Bizzante → Jugador 1, Rockardo → Jugador 2, Larry sin jugador** (a nombre del GM, hasta que el
+  dueño sume una tercera cuenta). Sin Aurelius ni la Estrella culona, ni sus tokens.
+  · **Se copió** (385 documentos, sin ninguna falla de permisos): los 7 mapas con fondo, niebla, paredes y dibujos, terreno, zonas y trampas;
+    43 de los 44 tokens (el que falta es el de la Estrella culona); el mapa publicado; los 40 creeps con lo privado del GM y sus imágenes;
+    las tres fichas con todas sus partes e invocaciones; la tienda (borrador y stock) y la tienda guardada; la bitácora; el baúl; lo del GM.
+  · **No se copió** (a propósito): tiradas, historial, duelos, áreas, momentos, estados en cola, recompensas, botín, registro del baúl, la
+    pausa, el orden de turnos (el clon queda en narrativo) y que el GM tenía «tomado el control» de Bizzante. Cambios obligados por los
+    permisos: tokens, dibujos y elementos quedan con fecha de hoy y a nombre del GM de pruebas; la bitácora, firmada por el GM de pruebas
+    con el nombre del autor original.
+  · **El origen no se tocó**: se leyó con una página con las escrituras apagadas; foto de antes, de después de copiar y de después de las
+    pruebas: iguales (24 colecciones, 1843 documentos, mismas huellas).
+  · **Para actualizarlo**: `herramientas/clon-de-partida/` (LEEME ahí; qué es y las reglas, en docs/memoria-claude.md). Probado abriendo el
+    clon como GM, J1 y J2 (mapa, GM Tools y fichas). De paso: al abrir el mapa como GM la consola dice «No se pudo poner al día el nombre
+    del token» (el mapa quiere igualar el nombre de un token de personaje al de su ficha y los permisos no dejan al GM cambiar eso); no
+    rompe nada, queda anotado sin arreglar.
 - **⬜ en cola — 💍 Anillo de Puntería Certera: el +2 aparece aunque te hayas movido; y que avise cuando se activa y cuando lo vas a perder**
   (dueño, 2026-11-20, El origen, lo lleva Bizzante: «le aparecía el bono a la probabilidad de golpe independientemente de si se había cumplido la
   condición o no… correr los testeos pertinentes para que funcione bien. Y estaría bueno que cuando se active el bono aparezca algún tipo de cartel

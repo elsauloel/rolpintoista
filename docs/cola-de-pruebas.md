@@ -462,7 +462,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   lista; «Ponerlo ahora» del cartel → token puesto; entrar con el token ya puesto (sin cartel); el GM (sin cartel); el 🎭 de siempre sigue andando.
   El token de Blanco J2 quedó como estaba. **Sin probar**: un jugador con dos personajes propios (las partidas de prueba tienen uno por jugador,
   a pedido; lo cubren las pruebas automáticas y queda anotado en `pruebas-en-el-mapa.md`). 954 pruebas automáticas en verde (4 nuevas).
-- **⬜ en cola — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
+- **✅ hecho (2026-11-20) — 🏹 El recuadro del carcaj: arriba qué carcaj tenés, abajo «Proyectiles especiales»** (dueño, 2026-11-20, aclarando el pedido
   anterior: «te lo pedí porque lo estaba entendiendo mal… Que aparezca un recuadro donde diga Carcaj y una descripción de qué carcaj tenés equipado
   con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales, que valga tanto para
   virotes como para flechas, y ahí el listado de proyectiles especiales que están dentro del carcaj. Al equiparse una ballesta o un arco,
@@ -475,6 +475,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   · **Abajo, el subtítulo «Proyectiles especiales»** (no «flechas y virotes»): lo que hay ADENTRO del carcaj, con sus botones «→ Mochila» y su costo;
     y, aparte y bien distinguido, los que están en la mochila para cargar («→ Carcaj», «Cargar todo lo que entre»).
   · Se mantiene lo ya hecho: un solo recuadro y el costo en No2 en cada botón.
+  **Qué quedó**: un solo recuadro «🏹 Carcaj» con el «N / capacidad» arriba a la derecha, en dos partes. **Arriba**, el carcaj que tenés: con arco
+  o ballesta y sin otro, «Carcaj básico · 5 lugares · no pesa ni ocupa lugar · Viene con tu arco o tu ballesta. Para llevar más, equipá un carcaj
+  mejor desde la mochila · N / 5 ocupados»; con el Carcaj de cuero equipado, su fila con Ver / Editar / Sacar, su descripción y «10 lugares ·
+  N / 10 ocupados» (si el arma suma lugares, lo dice: «8 lugares (5 del carcaj + 3 de tu arma)»). **Abajo**, «✨ Proyectiles especiales»: «🏹 Adentro
+  del carcaj» con «→ Mochila» y «Vaciar a la mochila», y separado por una línea punteada «🎒 En la mochila, para cargar» con «→ Carcaj» y «Cargar
+  todo lo que entre»; cada botón con su costo. Todo lo que decía «carcaj incluido» ahora dice «Carcaj básico» (avisos, el «¿Qué flecha?» del mapa
+  y el detalle del Carcaj de cuero).
+  **Probado con clics** (ficha de Blanco J1 en «Claude · pruebas 2», con un Arco corto, flechas de fuego, virotes perforantes y un Carcaj de cuero
+  prestados): sin arco («Sin carcaj…»), al equipar el arco aparece solo el Carcaj básico 0 / 5, «→ Carcaj», «→ Mochila», «Cargar todo lo que
+  entre» (5 / 5 y avisa las que no entran), equipar el Carcaj de cuero (la fila cambia, pasan las 5 solas, 5 / 10), cargar el resto (7 / 10), Ver,
+  y Sacar (vuelve el básico). Blanco J1 quedó exactamente como estaba. **Sin probar con clics en esta pasada**: el mismo recuadro adentro del mapa
+  (🛡 Equipo), los precios en combate y el cartel «¿Qué flecha?» con el nombre nuevo (usan la misma pieza y estaban probados antes del cambio de
+  textos; anotado en `pruebas-en-el-mapa.md`). 955 pruebas automáticas en verde (1 nueva, 2 ajustadas).
+  **Para que lo sepas**: al sacar un carcaj mejor con proyectiles adentro, esos proyectiles se quedan guardados adentro de ese carcaj en la mochila
+  (ya era así): no pasan solos al básico.
 - **⬜ en cola — ⚔ Cinco maestrías nuevas: punzantes (Tipo 4 melee), cortantes (Tipo 6), hachas (Tipo 8), arcos y ballestas** (dueño, 2026-11-20, conversación de
   diseño; mismo molde que «Maestría en armas pesadas», `comun/pasivas.js`; valen para jugadores y para creeps). Cierra P248.
   · **Maestría en armas punzantes** (1 Job): con un arma de **Tipo 4 cuerpo a cuerpo** (NO las de rango / proyectiles: «vamos a hacer una distinción

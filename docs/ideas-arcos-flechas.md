@@ -351,3 +351,9 @@ cualquier arco o ballesta.» Con un arco o una ballesta equipados y sin carcaj p
 las que no entran, a la mochila; al sacar el arco sin carcaj, vuelven a la mochila). El mismo día: «las flechas y virotes especiales se deberían poder
 cargar y descargar del carcaj a la mochila fácilmente» → cada clase con su botón «→ Carcaj (N)» / «→ Mochila (N)» y, con más de una, «Cargar todo lo
 que entre» / «Vaciar a la mochila». Detalles elegidos mientras tanto: `preguntas-abiertas.md` P250. Código: `comun/CLAUDE.md` («El carcaj incluido»).
+
+## 2026-11-20 · El recuadro del carcaj en dos partes (dueño; hecho)
+
+El incluido se llama **«Carcaj básico»** («es el carcaj básico»). El recuadro «🏹 Carcaj» muestra arriba qué carcaj tenés (el básico o el equipado,
+con su descripción, sus lugares y cuántos ocupados) y abajo «✨ Proyectiles especiales» (flechas y virotes): lo de adentro y, aparte, lo de la
+mochila para cargar. Código: `comun/CLAUDE.md` («El recuadro en dos partes»).

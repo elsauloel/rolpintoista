@@ -282,6 +282,10 @@
 
 ## Pendientes
 
+- [ ] **🏹 El recuadro del carcaj en dos partes, adentro del mapa** (2026-11-20; `comun/ficha-equipo.js`, `carcajHtml`): en 🛡 Equipo del mapa, que se
+  vea igual que en la ficha («Carcaj básico» arriba, «✨ Proyectiles especiales» abajo); **en combate**, los precios en No2 de cada botón; y el
+  cartel «¿Qué flecha?» diciendo «N en el Carcaj básico». En la ficha y fuera de combate está probado con clics.
+
 - [ ] **🎭 El cartel «todavía no está en este mapa» con más de un personaje propio** (2026-11-20; `vtt-hexgrid/js/09`, `avisoSinTokenRevisar`):
   que salga un botón por personaje («🎭 Poner a X») y que al poner uno se cierre. No se probó con clics porque las partidas de prueba tienen un
   solo personaje por jugador (a pedido del dueño). Lo demás (un personaje: cartel, «Ahora no», el botón de 👥 Personajes, el GM sin cartel) está probado.

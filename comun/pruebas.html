@@ -2473,10 +2473,10 @@ prueba('🏹 el carcaj incluido (2026-11-20): con un arco o una ballesta y sin c
   let aviso2 = '';
   FichaEquipo.equipar(S, elArco.id, {...ui, toast: t => { aviso2 = t; }});
   igual([sinArco, sigueEnMochila, inc && inc.incluido, inc && inc.nombre, FichaEquipo.capCarcaj(inc, S), dentro.map(f => [f.nombre, f.unidades]), quedan, tras, vuelve, trasVolver,
-      pesoDespues === pesoAntes, ranurasAntes - FichaEquipo.mochilaUsada(S) >= 0, /Carcaj incluido/.test(enHtml) && /5 \/ 5/.test(enHtml), guardado.length, capBallesta, virotes,
-      real === car, enReal, enMochila, /Del carcaj incluido a Carcaj de cuero: 3 .* no entraron 2/.test(aviso), true,
+      pesoDespues === pesoAntes, ranurasAntes - FichaEquipo.mochilaUsada(S) >= 0, /Carcaj básico/.test(enHtml) && /5 \/ 5/.test(enHtml), guardado.length, capBallesta, virotes,
+      real === car, enReal, enMochila, /Del Carcaj básico a Carcaj de cuero: 3 .* no entraron 2/.test(aviso), true,
       otraVezIncluido, vacio, FichaEquipo.carcajDe(S), S.carcajIncluido, S.inventario.filter(i => i.flecha).reduce((a, i) => a + i.unidades, 0), /Sin arco ni ballesta: 4 .* volvieron a la mochila/.test(aviso2)],
-    [null, 7, true, 'Carcaj incluido', 5, [['Flecha de fuego', 5]], 2, 4, 'carcaj', 5,
+    [null, 7, true, 'Carcaj básico', 5, [['Flecha de fuego', 5]], 2, 4, 'carcaj', 5,
       true, true, true, 1, 8, [['Virote perforante', 2]],
       true, 3, 4, true, true,
       true, 0, null, undefined, 4, true]);
@@ -2518,18 +2518,46 @@ prueba('🏹 un solo recuadro de carcaj en el Equipo, y los botones dicen cuánt
   const hReal = FichaEquipo.html(S, {});
   // Extenuado: el botón muestra lo que de verdad va a cobrar.
   const unaExt = FichaEquipo.costoCarcaj({efectos: [{nombre: 'Extenuado'}]}, 1, true) === Combatiente.conExtenuado([{nombre: 'Extenuado'}], FichaCalculo.IT2.nitrosEquipar);
-  igual([cab(h0), /carcaj incluido de 5 lugares/.test(h0),
+  igual([cab(h0), /Carcaj básico \(5 lugares/.test(h0),
       cab(hInc), /Carcaj<\/span><span class="hint">0 \/ 1/.test(hInc), /→ Carcaj \(3\)<span[^>]*> · gratis/.test(hInc), /Cargar todo lo que entre<span[^>]*> · gratis/.test(hInc), /Fuera de combate, cargar y descargar no cuesta No2/.test(hInc),
       /→ Carcaj \(3\)<span[^>]*> · 1 No2/.test(hIncCombate), /Cargar todo lo que entre<span[^>]*> · 2 No2/.test(hIncCombate), cobroCargar,
       /Vaciar a la mochila<span[^>]*> · 2 No2/.test(hLleno), /→ Mochila \(3\)<span[^>]*> · 1 No2/.test(hLleno), cobroVaciar,
-      cab(hReal), /Carcaj de cuero/.test(hReal) && /data-toggle="c"[^>]*>Sacar/.test(hReal), /0 \/ 10/.test(hReal), /Carcaj incluido/.test(hReal),
+      cab(hReal), /Carcaj de cuero/.test(hReal) && /data-toggle="c"[^>]*>Sacar/.test(hReal), /0 \/ 10/.test(hReal), /Carcaj básico<\/div>/.test(hReal),
       FichaEquipo.costoCarcaj(S, 3, false), FichaEquipo.costoCarcaj(S, 3, true), unaExt],
     [['🏹 Carcaj'], true,
-      ['🏹 Carcaj incluido'], false, true, true, true,
+      ['🏹 Carcaj'], false, true, true, true,
       true, true, 2,
       true, true, 2,
       ['🏹 Carcaj'], true, true, false,
       0, 3, true]);
+});
+prueba('🏹 el recuadro del carcaj en dos partes (2026-11-20): arriba QUÉ carcaj tenés (el «Carcaj básico» o el equipado, con su descripción, sus lugares y cuántos ocupados); abajo «Proyectiles especiales», con lo de adentro y, aparte, lo de la mochila', () => {
+  const flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego'), virote = CATALOGO_BASE.find(i => i.id === 'virote-perforante'), cuero = CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero');
+  const ui = {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}, slotLleno: () => false};
+  const S = fichaDePrueba({inventario: [{id: 'a', nombre: 'Arco', armaDeRango: true, arco: true, tipoItem: 'arma_2m', equipado: true},
+    {...structuredClone(flecha), id: 'f', unidades: 3}, {...structuredClone(virote), id: 'v', unidades: 4}, {...structuredClone(cuero), id: 'c', equipado: false}]});
+  const orden = (h, ...ts) => ts.map(t => h.indexOf(t)).every((n, i, a) => n >= 0 && (!i || n > a[i - 1]));
+  // El básico, vacío.
+  const h1 = FichaEquipo.carcajHtml(S);
+  FichaEquipo.alCarcaj(S, 'f', ui);
+  // El básico con 3 adentro y los virotes en la mochila.
+  const h2 = FichaEquipo.carcajHtml(S);
+  // El de cuero equipado: su fila, su descripción y sus lugares; las flechas pasaron.
+  FichaEquipo.equipar(S, 'c', ui);
+  const h3 = FichaEquipo.carcajHtml(S);
+  // Una ballesta con Carcaj integrado: dice de dónde salen los lugares.
+  const B = fichaDePrueba({inventario: [{id: 'b', nombre: 'Ballesta', armaDeRango: true, recarga: 2, equipado: true, carcajExtra: 3}]});
+  const hB = FichaEquipo.carcajHtml(B);
+  // Sin arco ni carcaj y sin proyectiles: no hay parte de abajo.
+  const h0 = FichaEquipo.carcajHtml(fichaDePrueba({inventario: []}));
+  igual([orden(h1, '🏹 Carcaj</span>', 'Carcaj básico', '5 lugares · no pesa ni ocupa lugar', 'Viene con tu arco o tu ballesta', '0 / 5 ocupados', '✨ Proyectiles especiales', 'Adentro del carcaj', 'Ninguno todavía', '🎒 En la mochila, para cargar', '→ Carcaj (3)'),
+      /data-view|data-edit|data-toggle/.test(h1.split('carcaj-proyectiles')[0]),
+      orden(h2, '3 / 5 ocupados', '✨ Proyectiles especiales', 'Adentro del carcaj', 'Flecha de fuego', '→ Mochila (3)', '🎒 En la mochila, para cargar', 'Virote perforante', '→ Carcaj (2)'),
+      orden(h3, '🏹 Carcaj</span>', 'Carcaj de cuero', 'data-view="inventario:c"', 'data-edit="inventario:c"', 'data-toggle="c"', 'el doble que el Carcaj básico de 5', '10 lugares', '3 / 10 ocupados', '✨ Proyectiles especiales', 'Adentro del carcaj', '→ Mochila (3)', '🎒 En la mochila, para cargar'),
+      /Carcaj básico<\/div>/.test(h3), /flechas y virotes especiales en la mochila/i.test(h1 + h2 + h3), /carcaj incluido/i.test(h0 + h1 + h2 + h3 + cuero.detalle),
+      /8 lugares \(5 del carcaj \+ 3 de tu arma\)/.test(hB),
+      /Sin carcaj\. Al equipar un arco o una ballesta te aparece solo el Carcaj básico/.test(h0), /Proyectiles especiales/.test(h0)],
+    [true, false, true, true, false, false, false, true, true, false]);
 });
 prueba('💸 un duelo cancelado que no cuenta devuelve lo que se pagó de verdad, no el costo entero (2026-10-28): sin No2 «de cualquier modo», 0', () => {
   const x = {};

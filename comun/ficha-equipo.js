@@ -233,7 +233,8 @@ const FichaEquipo = (() => {
      todo lo que ya usa el carcaj (pasar, sacar, gastar, «¿Qué flecha?», levantar del piso) anda igual. Solo personajes. */
   const CAP_CARCAJ_INCLUIDO = 5;
   const tieneArcoOBallesta = S => typeof Combatiente !== 'undefined' && (S.inventario || []).some(i => i && i.equipado && !!Combatiente.municionDe(i));
-  const carcajIncluido = S => ({incluido: true, id: 'carcaj-incluido', nombre: 'Carcaj incluido', capFlechas: CAP_CARCAJ_INCLUIDO,
+  const CARCAJ_BASICO_NOMBRE = 'Carcaj básico';   // nombre confirmado por el dueño (2026-11-20: «es el carcaj básico»); antes decía «Carcaj incluido»
+  const carcajIncluido = S => ({incluido: true, id: 'carcaj-incluido', nombre: CARCAJ_BASICO_NOMBRE, capFlechas: CAP_CARCAJ_INCLUIDO,
     get flechas(){ return S.carcajIncluido || []; },
     set flechas(v){ if(Array.isArray(v) && v.length) S.carcajIncluido = v; else delete S.carcajIncluido; }});
   const carcajDe = S => carcajReal(S) || (tieneArcoOBallesta(S) ? carcajIncluido(S) : null);
@@ -267,7 +268,7 @@ const FichaEquipo = (() => {
   const TODO_CARCAJ = '*';   // «Cargar todo lo que entre» / «Vaciar a la mochila» (dueño, 2026-11-20): cada pila se cobra como siempre (una acción de equipar en combate)
   const sueltasDe = S => (S.inventario || []).filter(i => esFlecha(i) && !i.equipado && !i.enMesa && !i.reservado);
   function alCarcaj(S, id, ui){
-    const c = carcajDe(S), donde = c && c.incluido ? 'carcaj incluido' : 'carcaj';
+    const c = carcajDe(S), donde = c && c.incluido ? CARCAJ_BASICO_NOMBRE : 'carcaj';
     if(id === TODO_CARCAJ){
       if(!c) return true;
       // Las pilas que van a entrar, en orden, hasta llenar.
@@ -362,8 +363,8 @@ const FichaEquipo = (() => {
       }
     });
     const cuantas = n => n === 1 ? '1 flecha o virote especial' : `${fmt(n)} flechas o virotes especiales`;
-    if(real) return `🏹 Del carcaj incluido a ${real.nombre}: ${cuantas(pasaron)}${aMochila ? ` · no entraron ${fmt(aMochila)}: a la mochila` : ''}`;
-    return `🏹 Sin arco ni ballesta: ${cuantas(aMochila)} del carcaj incluido ${aMochila === 1 ? 'volvió' : 'volvieron'} a la mochila`;
+    if(real) return `🏹 Del ${CARCAJ_BASICO_NOMBRE} a ${real.nombre}: ${cuantas(pasaron)}${aMochila ? ` · no entraron ${fmt(aMochila)}: a la mochila` : ''}`;
+    return `🏹 Sin arco ni ballesta: ${cuantas(aMochila)} del ${CARCAJ_BASICO_NOMBRE} ${aMochila === 1 ? 'volvió' : 'volvieron'} a la mochila`;
   }
   // El texto de lo que hace una flecha (su detalle sin el encabezado «Flecha especial…:»).
   // Lo que hace + su No2 (una sola vez: el detalle del catálogo ya lo trae, se saca y se arma de `flecha.no2`).
@@ -380,9 +381,14 @@ const FichaEquipo = (() => {
     let libre = c ? capCarcaj(c, S) - carcajUsado(c) : 0;
     return sueltasDe(S).filter(it => { const entra = libre > 0; libre -= Math.max(1, num(it.unidades) || 1); return entra; });
   }
-  /* El carcaj en «Equipo y mochila»: UN solo recuadro (dueño, 2026-11-20: «se ve duplicado el carcaj»; antes salían el lugar «Carcaj 0 / 1» y,
-     aparte, el carcaj incluido). Con un carcaj puesto: su fila (Ver, Editar, Sacar) y sus flechas; sin uno y con arco o ballesta: el incluido;
-     sin nada: cómo conseguir uno. Un carcaj se equipa desde la mochila, como cualquier pieza. Cada botón dice cuántos No2 cuesta (`o.enCombate`). */
+  /* El carcaj en «Equipo y mochila»: UN solo recuadro, en dos partes (dueño, 2026-11-20: «un recuadro donde diga Carcaj y una descripción de qué
+     carcaj tenés equipado con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles
+     especiales, que valga tanto para virotes como para flechas»).
+     · ARRIBA, el carcaj equipado como una pieza: con arco o ballesta y sin otro, el «Carcaj básico» (5 lugares, no pesa ni ocupa lugar); con uno
+       mejor equipado desde la mochila, la fila de ese (Ver, Editar, Sacar) con su descripción y sus características; sin nada, cómo conseguir uno.
+     · ABAJO, «Proyectiles especiales»: lo que hay ADENTRO del carcaj («→ Mochila») y, aparte, lo que está en la mochila para cargar («→ Carcaj»,
+       «Cargar todo lo que entre»). Cada botón dice cuántos No2 cuesta (`o.enCombate`). */
+  const CARCAJ_BASICO_TXT = 'Viene con tu arco o tu ballesta. Para llevar más, equipá un carcaj mejor desde la mochila.';
   function carcajHtml(S, o){
     const enCombate = !!(o && o.enCombate);
     const real = carcajReal(S), huerfano = carcajHuerfano(S), c = carcajDe(S) || huerfano, sueltas = (S.inventario || []).filter(i => esFlecha(i) && !i.equipado);
@@ -391,23 +397,38 @@ const FichaEquipo = (() => {
     const precio = pilas => { const n = costoCarcaj(S, pilas, enCombate); return `<span class="carcaj-costo" style="opacity:.85;font-weight:400"> · ${n ? `${fmt(n)} No2` : 'gratis'}</span>`; };
     const precioTit = pilas => { const n = costoCarcaj(S, pilas, enCombate); return enCombate ? (n ? ` Cuesta ${fmt(n)} No2 (en combate).` : ' No cuesta No2.') : ' Fuera de combate no cuesta No2.'; };
     const libre = c && !huerfano ? Math.max(0, capCarcaj(c, S) - carcajUsado(c)) : 0;
-    const puesto = real ? filaHtml(real, `<button type="button" class="mini" data-toggle="${real.id}" title="Pasarlo a la mochila">Sacar</button>`) : '';
-    const dentro = c ? ((c.flechas || []).length ? c.flechas.map(f => fila(f, `<button type="button" class="mini" data-delcarcaj="${f.id}" title="Pasarlas a la mochila.${precioTit(1)}">→ Mochila${cuantas(un(f))}${precio(1)}</button>`)).join('')
-        : `<div class="hint equipo-vacio">${real ? 'Sin flechas ni virotes especiales. ' : 'Vacío. '}${c.incluido ? 'Viene con el arco o la ballesta: no pesa ni ocupa lugar. Para llevar más, equipá un carcaj desde la mochila. ' : ''}Las flechas comunes no se gastan; las especiales se compran en la Talabartería.</div>`)
-      : '<div class="hint equipo-vacio">Vacío. Con un arco o una ballesta equipados tenés un carcaj incluido de 5 lugares para flechas y virotes especiales; un carcaj más grande se equipa desde la mochila.</div>';
-    // Cargar y descargar fácil (dueño, 2026-11-20): cada pila con su botón y cuántas pasan; y todo de una.
+    const cuenta = c ? (huerfano ? fmt(carcajUsado(c)) : `${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c, S))}`) : '';
+    // --- Arriba: qué carcaj tenés ---
+    const extra = c && !huerfano ? carcajExtraDe(S) : 0;
+    const lugares = c ? `${fmt(capCarcaj(c, huerfano ? null : S))} lugares${extra ? ` (${fmt(capCarcaj(c))} del carcaj + ${fmt(extra)} de tu arma)` : ''}` : '';
+    const ocupados = c ? `<b class="carcaj-ocupados">${huerfano ? `${cuenta} adentro` : `${cuenta} ocupados`}</b>` : '';
+    let pieza;
+    if(real) pieza = filaHtml(real, `<button type="button" class="mini" data-toggle="${real.id}" title="Pasarlo a la mochila">Sacar</button>`)
+      + `<div class="hint carcaj-desc" style="margin:2px 0 4px">${real.detalle ? `<div>${esc(real.detalle)}</div>` : ''}<div class="carcaj-carac">${lugares} · ${ocupados}</div></div>`;
+    else if(c) pieza = `<div class="equipo-fila carcaj-basico"><div class="equipo-info"><div class="cat-nombre">${esc(c.nombre)}${huerfano ? ' <span class="hint">(sin arco ni ballesta)</span>' : ''}</div>`
+      + `<div class="cat-meta">${lugares} · no pesa ni ocupa lugar</div></div></div>`
+      + `<div class="hint carcaj-desc" style="margin:2px 0 4px">${huerfano ? 'Te quedaron proyectiles guardados sin arco ni ballesta: pasalos a la mochila o volvé a equipar el arma.' : CARCAJ_BASICO_TXT}<div class="carcaj-carac">${ocupados}</div></div>`;
+    else pieza = `<div class="hint equipo-vacio">Sin carcaj. Al equipar un arco o una ballesta te aparece solo el ${CARCAJ_BASICO_NOMBRE} (${fmt(CAP_CARCAJ_INCLUIDO)} lugares, no pesa ni ocupa lugar); un carcaj mejor se equipa desde la mochila.</div>`;
+    // --- Abajo: los proyectiles especiales ---
     const nDentro = c ? (c.flechas || []).length : 0, entran = c && !huerfano ? pilasQueEntran(S, c).length : 0;
     const todoMochila = nDentro > 1 ? `<button type="button" class="mini" data-delcarcaj="${TODO_CARCAJ}" title="Pasa todo lo del carcaj a la mochila.${precioTit(nDentro)}">Vaciar a la mochila${precio(nDentro)}</button>` : '';
-    const todoCarcaj = c && !huerfano && sueltas.length > 1 && libre > 0 && entran ? `<button type="button" class="mini on" data-alcarcaj="${TODO_CARCAJ}" title="Pasa al carcaj todas las flechas y virotes especiales que entren.${precioTit(entran)}">Cargar todo lo que entre${precio(entran)}</button>` : '';
-    const fuera = sueltas.length ? `<div class="hint" style="margin:6px 0 2px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span>Flechas y virotes especiales en la mochila:</span>${todoCarcaj}</div>`
-      + sueltas.map(f => { const puede = c && !huerfano && libre; return fila(f, `<button type="button" class="mini on" data-alcarcaj="${f.id}" title="${!c || huerfano ? 'Equipá un arco, una ballesta o un carcaj' : libre ? 'Pasarlas al carcaj.' + precioTit(1) : 'El carcaj está lleno'}"${puede ? '' : ' disabled'}>→ Carcaj${cuantas(Math.min(un(f), libre || un(f)))}${puede ? precio(1) : ''}</button>`); }).join('') : '';
+    const todoCarcaj = c && !huerfano && sueltas.length > 1 && libre > 0 && entran ? `<button type="button" class="mini on" data-alcarcaj="${TODO_CARCAJ}" title="Pasa al carcaj todos los proyectiles especiales que entren.${precioTit(entran)}">Cargar todo lo que entre${precio(entran)}</button>` : '';
+    const sub = (txt, boton) => `<div class="hint carcaj-sub" style="margin:6px 0 2px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span>${txt}</span>${boton || ''}</div>`;
+    const dentro = !c ? '' : sub('🏹 Adentro del carcaj', todoMochila)
+      + (nDentro ? c.flechas.map(f => fila(f, `<button type="button" class="mini" data-delcarcaj="${f.id}" title="Pasarlas a la mochila.${precioTit(1)}">→ Mochila${cuantas(un(f))}${precio(1)}</button>`)).join('')
+        : '<div class="hint equipo-vacio">Ninguno todavía. Las flechas y los virotes comunes no se gastan; los especiales se compran en la Talabartería.</div>');
+    const fuera = sueltas.length ? `<div class="carcaj-mochila" style="margin-top:8px;padding-top:2px;border-top:1px dashed var(--line, #4a3b33)">`
+      + sub(`🎒 En la mochila${c && !huerfano ? ', para cargar' : ''}`, todoCarcaj)
+      + sueltas.map(f => { const puede = c && !huerfano && libre; return fila(f, `<button type="button" class="mini on" data-alcarcaj="${f.id}" title="${!c || huerfano ? 'Equipá un arco, una ballesta o un carcaj' : libre ? 'Pasarlas al carcaj.' + precioTit(1) : 'El carcaj está lleno'}"${puede ? '' : ' disabled'}>→ Carcaj${cuantas(Math.min(un(f), libre || un(f)))}${puede ? precio(1) : ''}</button>`); }).join('') + '</div>' : '';
     const hayBotones = nDentro || (sueltas.length && c && !huerfano && libre);
     const unaAccion = costoCarcaj(S, 1, true);
-    const nota = !hayBotones ? '' : `<div class="hint carcaj-nota" style="margin-top:6px">${enCombate ? `⚔ En combate, cargar o descargar cuesta ${fmt(unaAccion)} No2 por cada clase de flecha o virote que pasás (como equipar).` : 'Fuera de combate, cargar y descargar no cuesta No2.'}</div>`;
-    const titulo = !c ? 'Carcaj' : c.incluido ? esc(c.nombre) + (huerfano ? ' (sin arco ni ballesta)' : '') : 'Carcaj';
+    const nota = !hayBotones ? '' : `<div class="hint carcaj-nota" style="margin-top:6px">${enCombate ? `⚔ En combate, cargar o descargar cuesta ${fmt(unaAccion)} No2 por cada clase de proyectil que pasás (como equipar).` : 'Fuera de combate, cargar y descargar no cuesta No2.'}</div>`;
+    const proyectiles = c || sueltas.length ? `<div class="carcaj-proyectiles" style="margin-top:8px;padding-top:6px;border-top:1px solid var(--line, #4a3b33)">
+        <div class="equipo-slot-cab carcaj-titulo2" style="margin-bottom:2px"><span title="Flechas y virotes especiales: los comunes no se gastan ni ocupan lugar">✨ Proyectiles especiales</span></div>
+        ${dentro}${fuera}${nota}</div>` : '';
     return `<div class="equipo-slot equipo-carcaj">
-      <div class="equipo-slot-cab"><span${c && c.incluido && !huerfano ? ' title="Viene con cualquier arco o ballesta mientras no tengas un carcaj puesto: 5 lugares, sin peso y sin ocupar lugar."' : ''}>🏹 ${titulo}</span>${c ? `<span class="hint" title="Flechas y virotes especiales que lleva / los que entran">${huerfano ? fmt(carcajUsado(c)) : `${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c, S))}`}</span>` : ''}</div>
-      ${puesto}${dentro}${todoMochila ? `<div style="text-align:right;margin-top:4px">${todoMochila}</div>` : ''}${fuera}${nota}
+      <div class="equipo-slot-cab"><span>🏹 Carcaj</span>${c ? `<span class="hint" title="Proyectiles especiales que lleva / los que entran">${cuenta}</span>` : ''}</div>
+      ${pieza}${proyectiles}
     </div>`;
   }
   function equipar(S, id, ui){

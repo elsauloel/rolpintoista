@@ -1573,7 +1573,7 @@ versión parecida en más de una, es candidato a juntar.
   `remachadora` (`Duelo.crear` los guarda en el ataque; el mapa del GM los suma a la Perfora; hook `remachadoraErro` de `Duelo.escuchar`),
   `recuperable` y `cargador`; además `dobleCuerda` / `tiroRapido` (`Combatiente.recargaCosto(arma, h)`: el costo del disparo h+1 con Recarga) y
   `carcajExtra` (`FichaEquipo.capCarcaj(c, S)`). Una flecha o virote con `flecha.sinDano` pega sin daño (el Virote de red).
-- **🏹 El carcaj incluido** (2026-11-20, dueño; `ficha-equipo.js`): con un arco o una ballesta equipados (`Combatiente.municionDe`) y SIN carcaj
+- **🏹 El carcaj incluido (a la vista: «Carcaj básico»)** (2026-11-20, dueño; `ficha-equipo.js`): con un arco o una ballesta equipados (`Combatiente.municionDe`) y SIN carcaj
   puesto, `FichaEquipo.carcajDe(S)` devuelve un carcaj que no es un ítem (`incluido: true`, «Carcaj incluido», 5 lugares + `carcajExtra`, sin peso ni
   lugar); sus flechas viven en `S.carcajIncluido` (viaja en la parte «otros», sin reglas nuevas; `c.flechas` es un getter/setter: para agregar una pila
   hay que **asignar** `c.flechas = [...]`, no hacer `push`). Con uno de verdad (`carcajReal`) vale ese. `acomodarCarcaj(S)` (lo llaman `equipar` y
@@ -1585,6 +1585,14 @@ versión parecida en más de una, es candidato a juntar.
   equipado con su fila y su «Sacar», o «Vacío» y cómo conseguir uno. Cada botón lleva su precio (`costoCarcaj(S, pilas, enCombate)`: el mismo número
   que cobra `conCosto`, 1 No2 de equipar por pila + Extenuado; «· gratis» fuera de combate, `o.enCombate`); `pilasQueEntran(S, c)` son las pilas que
   pasa (y cobra) «Cargar todo lo que entre». La ficha y el mapa redibujan el Equipo abierto cuando cambia el modo.
+  **El recuadro en dos partes, y el incluido se llama «Carcaj básico»** (dueño, 2026-11-20: «un recuadro donde diga Carcaj y una descripción de qué
+  carcaj tenés equipado con sus características y cuántos slots tiene ocupados, y dentro de ese mismo recuadro abajo que diga Proyectiles especiales,
+  que valga tanto para virotes como para flechas»; «es el carcaj básico»). `carcajHtml`: título «🏹 Carcaj» y «N / capacidad»; **arriba**, el carcaj
+  como una pieza — el **Carcaj básico** (`CARCAJ_BASICO_NOMBRE`; «5 lugares · no pesa ni ocupa lugar», «Viene con tu arco o tu ballesta…») o el
+  equipado con su fila (Ver, Editar, Sacar), su `detalle` y «N lugares (… del carcaj + … de tu arma) · N / cap ocupados» (`.carcaj-desc`,
+  `.carcaj-carac`); **abajo**, «✨ Proyectiles especiales» (`.carcaj-proyectiles`): «🏹 Adentro del carcaj» («→ Mochila», «Vaciar a la mochila») y,
+  separado por una línea punteada, «🎒 En la mochila, para cargar» («→ Carcaj», «Cargar todo lo que entre»). Los textos visibles ya no dicen «carcaj
+  incluido» (avisos, «¿Qué flecha?» del mapa, el detalle del Carcaj de cuero); por dentro siguen `incluido: true` y `S.carcajIncluido`.
 - **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
   **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El

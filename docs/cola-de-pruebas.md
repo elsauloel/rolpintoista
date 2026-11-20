@@ -161,7 +161,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pruebas», el nombre visible de cada cuenta de jugador de pruebas pasa a ser la parte de su email anterior a la arroba (tomada de la variable de
   entorno, sin imprimirla). Cambiarlo con la interfaz si hay dónde (⚙ Partida / el nombre con que se unió); si no, contarlo. **Esos nombres NO van
   al repo** (ni en docs, ni en commits, ni en nombres de capturas): en la documentación se sigue diciendo «Jugador 1 / Jugador 2». Tarea chica: se
-  puede hacer junto con otra. Preguntar al dueño si el GM de pruebas también.
+  puede hacer junto con otra. **El GM de pruebas también** (dueño, 2026-11-20: «quiero lo mismo para la cuenta del GM de pruebas»).
   **Resultado:** hecho con la interfaz del sitio, sin tocar datos por detrás: cada jugador de pruebas entró con su cuenta, abrió **«✎ Mis nombres»**
   (arriba, en la página de inicio) y se cambió el nombre en «Claude · pruebas 2» y en «El origen · CLON de pruebas»; se releyó después de recargar y
   quedó guardado en las dos. No se tocaron las otras partidas de esas cuentas ni el GM de pruebas (el dueño todavía no respondió). Lo ya escrito en
@@ -190,6 +190,37 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «permanente», Mala sombra, Bronca, estados de invocaciones propias, cooldowns) a preguntas-abiertas, eligiendo mientras tanto lo más fiel a la frase
   del dueño. Aviso al jugador y línea en la Mesa («☥ X volvió: se le fueron N estados»). Vale para personajes, y ver creeps / invocaciones que revivan.
   Probar las cuatro formas en el mapa.
+- **⬜ en cola — 🕵 En sigilo: ver SOLO los conos de visión de los rivales (zonas de riesgo y zonas libres)** (dueño, 2026-11-20, jugando con la
+  rata en sigilo: «apretaba Control L para ver las superficies de visión de los rivales, pero me mostraba el cono de visión propio de la rata. Quedó
+  medio entreverado eso. Cuando uno está en sigilo tiene que haber algún comando, puede ser ese o puede ser otro, que le permita ver exclusivamente
+  los conos de visión de los rivales. Es decir, uno tiene que ver claramente cuáles son las zonas de riesgo y cuáles son las zonas liberadas para
+  poder caminar sin perder el sigilo»). Relevar qué hace hoy Ctrl+L (y los otros modos de visión del menú del ojo: «👹 Visión de los creeps», etc.)
+  para el GM y para un jugador. Después: con un token propio (o seleccionado, para el GM) **en sigilo**, un modo —Ctrl+L mismo o un botón «🕵 Zonas
+  de riesgo» en el token / la Botonera— que pinta SOLO lo que ven los RIVALES de ese token (la unión de sus conos / alertas, con la misma cuenta que
+  usa la detección de verdad: `celdasVisionDe`, punto ciego, luz, «Ve lo oculto», alcance), en un color de peligro, y deja limpio lo demás; sin su
+  propio cono mezclado. Para un JUGADOR en sigilo: solo los rivales que su personaje ve / conoce (no puede delatar creeps ocultos o en la niebla;
+  mismo criterio que `comun/no-visto.js`). Que se entienda de un vistazo: rojo = te ven si entrás, sin color = libre. Decir en el informe qué pasa
+  con lo que NO es visión pero igual descubre (percepción por cercanía, zonas de alerta, oído) y si se puede pintar distinto. No inventar reglas de
+  detección: solo mostrar las que ya existen.
+- **⬜ en cola — ✨ Animaciones de resurrección (Ankh, Fénix, Revive, Pacto)** (dueño, 2026-11-20: «me encantan tus propuestas de animación»).
+  Aprobadas tal cual las propuso Claude; duran 2–3 s, las ven todas las pantallas, el token caído se ve apagado antes de empezar. Dibujadas con el
+  mecanismo de animaciones del mapa (formas, brillos, partículas; sin ilustraciones). **☥ Ankh:** aparece un ankh dorado flotando y girando sobre el
+  caído → se raja con un destello y se parte → los pedazos se vuelven polvo dorado que baja en espiral y entra al token → el token se enciende de
+  dorado y vuelve a su color. **🔥 Fénix:** el token se consume en una llamarada y queda un montoncito de cenizas → sube una silueta de ave de fuego
+  con las alas abiertas, se eleva y se deshace en chispas → las chispas caen y el token reaparece con un borde de brasa que se apaga. **💉 Revive:**
+  un frasquito viaja desde quien lo usa hasta el caído → se rompe y un líquido brillante llena el token de abajo hacia arriba, como un vaso →
+  **al llegar arriba, un latido de dos pulsos que «efectivamente parezca un corazón que late y arranca» (dueño): la forma de un corazón (o el
+  token mismo) haciendo «tu-tum», y con el segundo latido termina la animación y el personaje queda de pie.** **😇 Pacto:** un círculo con símbolos se
+  dibuja en el piso, trazo por trazo → una columna de luz oscura (violeta / roja) sube desde el círculo → el token se levanta y el círculo se quema
+  de afuera hacia adentro como papel; queda titilando (lo de hoy). Mandar un VIDEO de cada una para que el dueño las revise en la compu (anotarlo en
+  docs/pendientes.md 🖥). Va después de la tarea «al resucitar se borran los estados» (mismo punto del código).
+- **⬜ en cola — 🏷 Tokens con otro nombre que su ficha: que se corrija solo, y que el GM pueda cambiarlo** (visto al clonar El origen: la ficha se
+  llama «Rockardo Pedruscko» y sus tokens «Petro EskanderSon» / «Rockardo Petroshvnick Son»; `tokensSincronizarNombres`,
+  vtt-hexgrid/js/09-colocar-y-panel.js, falla en la pantalla del GM por permisos y deja un error en la consola). Dueño, 2026-11-20: «estaría bueno
+  que lo solucione la pantalla del jugador y que además el GM tenga permiso para modificarlo». (1) La pantalla del jugador DUEÑO pone al día el nombre
+  de sus tokens (en todos los mapas donde tenga permiso) al abrir el mapa o la ficha. (2) En firebase/firestore.rules, permitir al GM cambiar el
+  `nombre` de un token de personaje (solo ese campo): **avisar al dueño que hay que pegar las reglas**; mientras no estén pegadas, que la pantalla
+  del GM no deje el error (intenta y, si no puede, calla). Probar en el clon (Rockardo → Jugador 2).
 - **⬜ en cola — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
   de un combate nuevo nadie le «empieza» el turno; «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa
   es como si fuera su turno. Podríamos hacer que se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que

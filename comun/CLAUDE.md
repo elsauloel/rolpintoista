@@ -1572,8 +1572,8 @@ versión parecida en más de una, es candidato a juntar.
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El
   **carcaj** es una pieza propia (`tipoItem: 'carcaj'`, lugar «Carcaj» en `FichaEquipo.SLOT_DEFS`, `capFlechas`; 4 en el catálogo, `carcaj-*`) que
   guarda las flechas adentro (`carcaj.flechas`): `FichaEquipo.carcajDe`, `capCarcaj`, `carcajUsado`, `flechasDelCarcaj`, `alCarcaj` / `delCarcaj`
-  (gratis fuera de combate; en combate como equipar), `gastarFlecha`, `flechaTxt` y `carcajHtml` (en «Equipo y mochila»). **Todo arco viene con el
-  Carcaj de cuero (10)** si no tenía ninguno (`FichaTienda.crearItems`). Una flecha no se «consume» (`FichaAcciones.consumir` la rechaza; la
+  (gratis fuera de combate; en combate como equipar), `gastarFlecha`, `flechaTxt` y `carcajHtml` (en «Equipo y mochila»). **El Carcaj de cuero (10) ya no se regala
+  con cada arco** (dueño, 2026-11-20, P250): se compra aparte; todo arco o ballesta trae el carcaj incluido de 5. Una flecha no se «consume» (`FichaAcciones.consumir` la rechaza; la
   Botonera no la lista). Al disparar con un arco desde el mapa: «¿Qué flecha?» (js/11 `bnElegirFlecha`), se gasta y cobra su No2 al crear el duelo
   (`bnDispararFlecha`; un carcaj veloz, `saqueRapido` = N: las primeras N flechas del turno que cuestan No2 tiran una moneda, 2 = gratis), sus bonos van al `tiro` y sus efectos y su Perfora al duelo
   (`cfg.flecha` → `ataque.flecha`: `guardarDano` suma los efectos; el mapa resta la Perfora de la Defensa). Si erra: hook `flechaErrada` del duelo

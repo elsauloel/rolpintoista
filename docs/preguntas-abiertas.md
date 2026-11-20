@@ -1613,7 +1613,7 @@ tierra): cuentan también las invocaciones y los que están escondidos; un tóte
 aliado. No hay indicador sobre el token: se ve en el cuadro del duelo y en la tirada. **Para el dueño:** ¿la querés también para el PdG.Esp / los
 hechizos? ¿Con algún tope? ¿Los objetos inertes (tótem, estandarte) cuentan como aliado?
 
-### P250 — 🏹 Carcaj incluido: detalles que quedaron elegidos «mientras tanto» (2026-11-20, Claude)
+### P250 — ✅ 🏹 Carcaj incluido: detalles que quedaron elegidos «mientras tanto» (2026-11-20, Claude)
 El carcaj incluido (dueño: «que cualquier jugador tenga por default un carcaj de 5 slot para virotes/flechas especiales incluído, sin peso adicional,
 por cargar cualquier arco o ballesta»; `comun/ficha-equipo.js`) quedó así, **mientras tanto**: (a) el **Carcaj integrado +N** de una ballesta también
 le suma al incluido (5 + N), igual que a uno de verdad; (b) con un carcaj de verdad puesto vale **solo** ese (no se suman los 5 del incluido);
@@ -1622,6 +1622,9 @@ y se ven en Equipo como «Carcaj incluido (sin arco ni ballesta)» con «→ Moc
 entre» y «Vaciar a la mochila»** cobran, en combate, una acción de equipar **por cada clase** de flecha que se mueve (la misma regla que pasarlas de
 a una); (e) al comprar un arco se sigue regalando el **Carcaj de cuero (10)** si no tenía ninguno, y su texto del catálogo («Viene con cada arco o
 ballesta que se compra») no se tocó. **Para el dueño:** ¿está bien así? ¿El Carcaj de cuero se sigue regalando con cada arco, ahora que hay uno incluido?
+**✅ Decidido (dueño, 2026-11-20):** «NO»: el **Carcaj de cuero ya no se regala** con cada arco o ballesta (se compra aparte: es el de 10 lugares; todo
+arco o ballesta trae el incluido de 5), y **con un carcaj de verdad puesto vale solo ese** (b). Aplicado el mismo día (`comun/ficha-tienda.js`, texto
+del Carcaj de cuero en `comun/catalogo.js`); a quien ya tenía uno regalado no se le saca. Lo demás (a, c, d) queda como está.
 
 ### P251 — ☥ ¿Con qué volvés?: detalles que quedaron elegidos «mientras tanto» (2026-11-20, Claude)
 Con más de una forma de volver (Pacto, Ankh de Reencarnación en el cinturón, Llama de Fénix) ahora elige quien maneja al personaje. Quedó así,

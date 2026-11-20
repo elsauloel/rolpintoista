@@ -2406,12 +2406,14 @@ prueba('las mecánicas de ballesta: doble cuerda, tiro rápido, caída, carcaj i
     [[2, 4, 6], [2, 2, 6], [2, 3, 4], 2, 2, 2, {extra: 2, fijo: -4}, null, 9,
      [2, true, true, true, true, 2, 3], undefined, 13, 10, ['Doble cuerda'], ['Alcance con caída: −2 de daño por casillero de más']]);
 });
-prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta; una flecha no se «consume» (2026-10-09)', () => {
+prueba('el carcaj: ya no viene con el arco (2026-11-20, P250: se compra aparte), guarda las flechas especiales y las gasta; una flecha no se «consume» (2026-10-09)', () => {
   const S = fichaDePrueba({inventario: []});
-  const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
+  const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), ballesta = CATALOGO_BASE.find(i => Combatiente.municionDe(i) === 'virote'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
   FichaTienda.crearItems(S, arco, 1);
+  FichaTienda.crearItems(S, ballesta, 1);
+  const regalados = S.inventario.filter(i => i.tipoItem === 'carcaj').length, detalle = CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero').detalle;
+  FichaTienda.crearItems(S, CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero'), 1);   // el de cuero se compra aparte
   const car = S.inventario.find(i => i.tipoItem === 'carcaj');
-  FichaTienda.crearItems(S, arco, 1);   // un segundo arco no trae otro carcaj
   car.equipado = true;
   FichaTienda.crearItems(S, flecha, 3);
   const enMochila = S.inventario.find(i => i.flecha);
@@ -2420,8 +2422,9 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
   const dentro = FichaEquipo.flechasDelCarcaj(S), unidadesAntes = dentro[0].unidades;
   const gastada = FichaEquipo.gastarFlecha(S, dentro[0].id);
   igual([car && car.nombre, car && car.capFlechas, S.inventario.filter(i => i.tipoItem === 'carcaj').length, dentro.length, unidadesAntes, gastada.nombre,
-    FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
-    ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'gondola', 'talabarteria']);
+    FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car),
+    !!ballesta, regalados, /Viene con cada arco/.test(detalle), /Se compra aparte/.test(detalle)],
+    ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'gondola', 'talabarteria', true, 0, false, true]);
 });
 prueba('🏹 el carcaj incluido (2026-11-20): con un arco o una ballesta y sin carcaj puesto, 5 lugares sin peso; con uno de verdad vale ese; sin arco no hay', () => {
   const ui = {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}, slotLleno: () => false};
@@ -2435,6 +2438,7 @@ prueba('🏹 el carcaj incluido (2026-11-20): con un arco o una ballesta y sin c
   const sigueEnMochila = S.inventario.filter(i => i.flecha).reduce((a, i) => a + i.unidades, 0);
   // Con el arco equipado y el carcaj de cuero SIN poner: el incluido, de 5.
   FichaTienda.crearItems(S, arco, 1);
+  FichaTienda.crearItems(S, CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero'), 1);   // (ya no viene con el arco: se compra aparte, P250)
   const elArco = S.inventario.find(i => i.arco), car = S.inventario.find(i => i.tipoItem === 'carcaj');
   elArco.equipado = true;
   const pesoAntes = peso(S), ranurasAntes = FichaEquipo.mochilaUsada(S);
@@ -2503,6 +2507,7 @@ prueba('🏹 la flecha de un duelo cancelado vuelve (2026-10-28): a su pila del 
   const S = fichaDePrueba({inventario: []});
   const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
   FichaTienda.crearItems(S, arco, 1);
+  FichaTienda.crearItems(S, CATALOGO_BASE.find(i => i.id === 'carcaj-de-cuero'), 1);   // (ya no viene con el arco: se compra aparte, P250)
   const car = S.inventario.find(i => i.tipoItem === 'carcaj');
   car.equipado = true;
   FichaTienda.crearItems(S, flecha, 2);

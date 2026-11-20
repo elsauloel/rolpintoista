@@ -36,10 +36,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   faltando 15 para el nivel 2» (amarillo); cambia al tocar «Experiencia por jugador» o el extra de uno. En «5. Publicar», «⬆ sube a nivel N» al lado
   del que sube. La XP se lee de la ficha (solo lectura); la cuenta es la de siempre (nivel × 100). Probado con clics en «Claude · pruebas 2»
   (Simular, mapa y GM Tools): nada se escribió. 1 prueba automática nueva (885 en verde). Capturas en `cola17/`.
-- **⬜ en cola — 🏹 El Carcaj de cuero ya no se regala con cada arco o ballesta** (dueño, 2026-11-20, P250: «NO» a «¿se sigue regalando…, ahora que hay
+- **✅ hecho (2026-11-20) — 🏹 El Carcaj de cuero ya no se regala con cada arco o ballesta** (dueño, 2026-11-20, P250: «NO» a «¿se sigue regalando…, ahora que hay
   un carcaj incluido de 5?»). Sacar el regalo al comprar (y donde más se entregue solo: tienda, personaje nuevo, etc.; grep) y corregir el texto del
   Carcaj de cuero del catálogo («Viene con cada arco o ballesta que se compra» → ya no; es la mejora de 10 lugares que se compra aparte) y el aviso
   «viene uno con cada arco» de `comun/ficha-equipo.js`. No sacarle el carcaj a quien ya lo tiene. Marcar la P250.
+  *Resultado:* comprar un arco o una ballesta (tienda, personaje nuevo, «agregar gratis») ya no suma el Carcaj de cuero; el que ya lo tenía lo conserva.
+  El Carcaj de cuero dice ahora «Lugar para 10 flechas o virotes especiales: el doble que el carcaj incluido de 5 que trae cualquier arco o ballesta.
+  Se compra aparte.» El aviso «viene uno con cada arco» de Equipo ya no existía (se había cambiado con el carcaj incluido). Probado con clics en
+  «Claude · pruebas 2»: Jugador 1 compró un Arco de caña en una Tienda de inicio (95 DDE), llegó solo el arco, y al equiparlo se ve «Carcaj incluido
+  0 / 5». P250 marcada ✅. Pruebas automáticas al día (885 en verde). Capturas en `cola17/`.
 - **✅ hecho (2026-11-20) — 🏹 Carcaj incluido de 5 lugares con cualquier arco o ballesta** (dueño, 2026-11-20: «programá que cualquier jugador tenga por default un
   carcaj de 5 slot para virotes/flechas especiales incluído, sin peso adicional, por cargar cualquier arco o ballesta»). Hoy las flechas y virotes
   especiales solo se llevan en un carcaj equipado (`tipoItem: 'carcaj'`, `capFlechas`; `carcajDe`, `capCarcaj`, `flechasDelCarcaj` en

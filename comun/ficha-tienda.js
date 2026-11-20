@@ -283,19 +283,10 @@ const FichaTienda = (() => {
       restante -= enEsteStack;
     }
   }
-  // 🏹 Todo arco viene con un carcaj de 10 lugares (dueño, 2026-10-09): si el personaje no tiene ninguno, se suma el Carcaj de cuero del catálogo.
-  // Una ballesta también (2026-10-10): los virotes van en el mismo carcaj.
-  const CARCAJ_DEL_ARCO = 'carcaj-de-cuero';
-  function carcajConElArco(S, item){
-    if(!(typeof Combatiente !== 'undefined' && Combatiente.municionDe && Combatiente.municionDe(item))) return;   // un arco o una ballesta (2026-10-10)
-    if((S.inventario || []).some(x => x.tipoItem === 'carcaj')) return;
-    const cat = (S.catalogo || []).find(x => x.id === CARCAJ_DEL_ARCO) || (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === CARCAJ_DEL_ARCO) : null);
-    if(!cat) return;
-    S.inventario.push({...structuredClone(cat), catId: cat.id, id: uid(), equipado: false, unidades: 1, ranuras: cat.ranuras ?? 1, flechas: []});
-  }
+  // 🏹 El Carcaj de cuero ya NO se regala con cada arco o ballesta (dueño, 2026-11-20, P250: «NO»): todo arco o ballesta trae su carcaj incluido
+  // de 5 lugares (comun/ficha-equipo.js); el de cuero (10) se compra aparte. Quien ya tenía uno regalado lo conserva.
   function crearItems(S, item, cantidad){
     if(item.consumible){ agregarConsumible(S, item, cantidad); return; }
-    carcajConElArco(S, item);
     for(let i=0; i<cantidad; i++){
       const nuevo = structuredClone(item);
       nuevo.catId = item.id;   // de qué ítem del catálogo salió (↻ Actualizar desde el catálogo, 2026-10-07)

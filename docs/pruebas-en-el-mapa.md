@@ -3040,3 +3040,17 @@ Capturas en `cola16/`.
   muerto (cobra menos o nada: la cuenta usa lo que de verdad va a cobrar).
 - [ ] **Falta que lo mire el dueño.**
 Capturas en `cola17/`.
+
+## 2026-11-20 · 🏹 El Carcaj de cuero ya no se regala con el arco («Claude · pruebas 2», GM + Jugador 1)
+
+- [x] **Comprar un arco** (el GM publicó una «Tienda de inicio de partida»; Jugador 1, Blanco J1 con 300 DDE prestados, desde su ficha → 🏪 Vendedor →
+  Talabartería → Arco de caña → + Carrito → Comprar): quedó con 205 DDE y **solo el arco** en la mochila, sin Carcaj de cuero.
+- [x] **Su carcaj incluido**: al equipar el arco (Equipar → Reemplazar), en 🛡 Equipo aparece «🏹 Carcaj incluido 0 / 5 — Vacío. Viene con el arco o
+  la ballesta: no pesa ni ocupa lugar…», con el lugar de Carcaj vacío.
+- [x] **El texto del Carcaj de cuero** en la tienda: «Lugar para 10 flechas o virotes especiales: el doble que el carcaj incluido de 5 que trae
+  cualquier arco o ballesta. Se compra aparte.» (20 DDE).
+- [x] La partida quedó como estaba (sin la tienda, Blanco J1 con su cuchillo, sin el arco y con 0 DDE).
+- [ ] **Sin probar con clics**: el personaje nuevo que compra un arco en el asistente (usa la misma pieza, cubierta por la prueba automática);
+  una ballesta (ídem).
+- [ ] **Falta que lo mire el dueño.**
+Capturas en `cola17/`.

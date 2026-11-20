@@ -129,6 +129,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'onda' && typeof ondaFxRecibido === 'function') ondaFxRecibido(id, d);   // 💥 la onda del Shockwave (js/94, 2026-11-03)
   if(d.tipo === 'cambio-fx'){ if(typeof cambioFxRecibido === 'function') cambioFxRecibido(id, d); return; }   // 🔄 Cambiar de lugar (js/107): sin tarjeta
+  if(d.tipo === 'resu-fx' || d.tipo === 'resu-pista'){ if(typeof resuFxRecibido === 'function') resuFxRecibido(id, d); return; }   // ✨ las animaciones de resurrección (js/125): sin tarjeta
   if(d.tipo === 'lanza-fx'){ if(typeof lanzaFxRecibido === 'function') lanzaFxRecibido(id, d); return; }   // ✨ la Lanza arcana (js/120): sin tarjeta
   if(d.tipo === 'lanza-golpe'){ if(typeof lanzaGolpeRecibido === 'function') lanzaGolpeRecibido(id, d); return; }   // ✨ el destello de Deslumbrado (js/120): sin tarjeta
   if(d.tipo === 'blink-tv'){ if(typeof blinkTvRecibido === 'function') blinkTvRecibido(id, d); return; }   // 📺 el Parpadeo (js/111): sin tarjeta
@@ -546,6 +547,8 @@ function momentoAvisoCentro(id, d, espera){
     if(typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto() && num(espera) < 85){
       setTimeout(() => momentoAvisoCentro(id, d, num(espera) + 1), 700); return; }
   }
+  // ✨ Mientras se ve una resurrección (js/125), el cartel espera: primero la animación, después «Volviste…».
+  if(typeof resuFxAvisoEspera === 'function' && resuFxAvisoEspera(id, d, espera)) return;
   avisoCentro = {id, d};
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los pop-ups de efectos de combate): comun/aviso-combate.js.
   const dt = d.datos || {};

@@ -282,6 +282,11 @@
 
 ## Pendientes
 
+- [ ] **✨ Animaciones de resurrección (2026-11-20, `vtt-hexgrid/js/125-resurreccion-fx.js`): lo que quedó sin ver en el mapa** — una
+  **invocación** que revive con el ✚; la **Llama de Fénix de un creep**; volver (Pacto o Fénix) por un golpe **con el cuadro del duelo abierto**
+  (el cuadro se tiene que apartar y volver solo); un token **oculto o en la niebla** para un jugador (no tiene que ver nada); y el Revive usado
+  desde lejos (a 4–5 casillas: el frasquito hace un arco más largo; se probó con los dos tokens pegados).
+
 - **🕵 Zonas de riesgo, lo que quedó sin probar con clics** (2026-11-20; lo probado: GM con un creep y Jugador 1 con su personaje, en «Claude · pruebas
   2»): (1) con la **niebla de guerra** prendida, que un creep tapado por la niebla no pinte zona (la cuenta es la misma que para un creep en sigilo,
   que sí se probó, y tiene su prueba automática); (2) el GM con 🎮 el control de un personaje en sigilo; (3) una **invocación** en sigilo; (4) adentro

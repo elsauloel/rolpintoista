@@ -47,11 +47,14 @@ function caidosParaRevivir(origenTok, bando, rango){
   });
   return out.sort((a, b) => (a.distancia ?? 0) - (b.distancia ?? 0));
 }
+let reviveOrigenId = '';
 // El cartel «¿A quién revivís?» → Promise del elegido ({tokenId, fichaId, tipo, nombre}) o null.
 function elegirCaidoParaRevivir(o){
   const rango = Math.max(1, num(o.rango) || 5);
   const origen = [...tokens.values()].find(t => t && t.fichaId === o.fichaId && t.tipo === o.bando);
   const lista = caidosParaRevivir(origen, o.bando, rango);
+  reviveOrigenId = '';   // ✨ quién usa el Revive (para la animación, js/125)
+  if(origen) for(const [id, x] of tokens.entries()) if(x === origen){ reviveOrigenId = id; break; }
   if(!lista.length){
     toast(`✚ ${o.item}: no hay ningún aliado caído a ${rango} casillas o menos${origen ? '' : ' (y tu token no está en este mapa)'} — no se gastó`);
     return Promise.resolve(null);
@@ -76,10 +79,11 @@ async function revivirElegido(c, pct, origen){
       const e = typeof estadosPresetCreep === 'function' ? Combatiente.estadoTitilando(estadosPresetCreep()) : null;
       if(e){ sc.estados = sc.estados || []; Combatiente.agregarEstado(sc.estados, e); }
     });
-    if(vuelta && typeof resurreccionAnunciar === 'function'){ const tk = [...tokens.values()].find(x => x && x.tipo === 'creep' && x.fichaId === c.fichaId); resurreccionAnunciar({t: tk, nombre: c.nombre, forma: 'revive', sacados: vuelta.sacados}); }
+    if(vuelta && typeof resurreccionAnunciar === 'function'){ const tk = [...tokens.values()].find(x => x && x.tipo === 'creep' && x.fichaId === c.fichaId); resurreccionAnunciar({t: tk, nombre: c.nombre, forma: 'revive', sacados: vuelta.sacados, de: reviveOrigenId}); }
     return;
   }
   const f = fichasPub.get(c.fichaId);
   if(!f) throw new Error('no encuentro su ficha');
+  if(typeof resuFxPista === 'function') resuFxPista(c.tokenId, reviveOrigenId);   // ✨ el frasquito sale de quien lo usó (js/125)
   await EstadosAplicar.encolarPj({fichaId: c.fichaId, duenoUid: f.duenoUid, spec: {nombre: 'Revivir', pct}, origen});
 }

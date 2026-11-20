@@ -943,6 +943,23 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   con `Combatiente.alVolver`, y también limpia `resumen.estados`); un creep desde `danioCreep` (la Llama), `revivirToken` (js/98, también una
   invocación) y `revivirElegido` (js/22, el Revive). Probado con clics en «Claude · pruebas 2» (Pacto, Ankh, Fénix, Revive de J2, ✚ del GM a un
   personaje y a un creep).
+- **✨ Las animaciones de resurrección** (2026-11-20, dueño: «me encantan tus propuestas de animación»; `js/125-resurreccion-fx.js`): ~3 s cada una,
+  dibujadas en el lienzo. ☥ `ankh` (un ankh dorado gira, se raja y se parte; el polvo baja en espiral; el token se enciende de dorado) · 🔥 `llama`
+  (llamarada, cenizas, un ave de fuego que sube y se deshace en chispas, borde de brasa) · 💉 `revive` (el frasquito viaja desde quien lo usó —sin
+  nadie, el líquido cae de arriba—, llena el token como un vaso y un corazón late dos veces) · 😇 `pacto` (el círculo con símbolos trazo por trazo,
+  la columna de luz oscura, el círculo que se quema hacia adentro). `resurreccionAnunciar` (js/123) llama a `resuFxPublicar({a, forma, de})`: la
+  arranca acá y publica el momento `resu-fx` (sin tarjeta, js/16 → `resuFxRecibido`) para las demás pantallas; un token no repite la suya en 6 s
+  (`resuFxUltimo`). El toast, la línea de la Mesa y el cartel «Volviste…» de js/123 salen cuando terminó; los avisos al centro que lleguen mientras
+  tanto esperan (`resuFxAvisoEspera` en `momentoAvisoCentro`, js/16; `resuFxOcupado`). **Quién usó el Revive:** sobre un creep va directo (`de`);
+  sobre un personaje, quien lo usa publica antes una pista (`resuFxPista` → momento `resu-pista`, desde `revivirElegido`, js/22, con
+  `reviveOrigenId`) y cada pantalla la junta con el `resu-fx` que llega después. **El token mientras dura** (ganchos en js/05): `resuFxAlfa(id)` (el
+  Fénix lo hace desaparecer), `resuFxPosToken(id)` → {s, dy} en `calcularDisposicion` (el latido del Revive, el levantarse del Pacto),
+  `resuFxDibujarPiso` (debajo de los tokens: el círculo) y `dibujarEfectosResu` (encima); arranca «apagado» (`resuOscuro`) aunque el dato ya diga
+  que vive. Si hay un cuadro de duelo abierto, se aparta (`Duelo.apartar`). **Otra vía** (alguien que esta pantalla veía caído y aparece vivo sin
+  animación: la vida a mano, la ficha, GM Tools) y «reducir movimiento»: el resplandor corto de ~1 s (`resuDibujarCorta`; lo detecta cada pantalla,
+  un reloj de 450 ms). Lo que la pantalla no ve no se dibuja. Probado con clics en «Claude · pruebas 2» (GM, J1, J2): las cuatro, el ✚ del GM a un
+  personaje y a un creep, y la vida a mano. Sin probar: una invocación, el Fénix de un creep, con un duelo abierto. A las otras pantallas les llega
+  ~1 s después que a la que revive (lo que tarda el aviso).
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

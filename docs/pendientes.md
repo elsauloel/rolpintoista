@@ -812,6 +812,13 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **✨ Mirar las cuatro animaciones de resurrección (2026-11-20)** — Ankh, Fénix, Revive y Pacto ya están en el mapa (`vtt-hexgrid/CLAUDE.md`,
+  «Las animaciones de resurrección»). Claude mandó un video corto de cada una (y uno con las cuatro seguidas): mirarlos en la compu y decir qué
+  cambiar. Para verlas en vivo, en una partida de pruebas: matar a un personaje con el Pacto activo, con un Ankh de Reencarnación en el cinturón o
+  con el Elixir de Fénix tomado; o que un aliado le use un Revive (el frasquito sale de su token) o el GM el ✚ del token. A mirar en especial: si
+  el ave del Fénix se lee como ave, si el latido del Revive «parece un corazón que arranca», si el polvo del Ankh se lee como una espiral, y si
+  molesta que a las otras pantallas la animación les llegue alrededor de un segundo después que a la de quien revive.
+
 - [ ] **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
   el GM cambie SOLO el campo `nombre` de un token de personaje (dos lugares: los tokens del primer mapa y los de los mapas guardados). Mientras no
   estén pegadas no se rompe nada: la pantalla del GM lo intenta y, si no puede, calla (sin error); los nombres los corrige igual la pantalla del
@@ -1153,7 +1160,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 ## 4. Diseño pendiente
 
 - [ ] **👁 Revelar algo oculto solo para un jugador** (dueño, 2026-11-20: «revelar es siempre para todos, eso es correcto, aunque dejá en pendiente la posibilidad de que se revele solo para un jugador»). Conversación de diseño: hoy una trampa detectada la ven todos; pensar «detectada solo por Fulano» (P254 f).
-- [ ] **✨ Animaciones de resurrección** (dueño, 2026-11-20): una por cada forma de volver (Revive, Ankh, Fénix, Pacto). Primero se imaginan conceptualmente con el dueño; después se programan. Propuestas de Claude del mismo día en la conversación; falta que el dueño elija.
+- [x] **✨ Animaciones de resurrección** (dueño, 2026-11-20): hechas las cuatro (Revive, Ankh, Fénix, Pacto), 2026-11-20, `vtt-hexgrid/js/125-resurreccion-fx.js`. Falta que el dueño mire los videos (sección 🖥).
 - [ ] **🪬 Skill de Debuffer: «Engualichar» o «Gualicho»** (dueño, 2026-11-20: «anota en pendientes crear un skill de debuffer que sea "engualichar" o
   "gualicho"»). Diseñarla con el dueño cuando se retome el Debuffer (tiende a lo 🌑 siniestro y ☠ tóxico; ver la lista de ideas del Debuffer en
   `diseno-roles-creep.md`). Por ahora solo el nombre: qué hace, a quién y cómo se resiste, a decidir (no inventar).

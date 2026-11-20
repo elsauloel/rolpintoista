@@ -361,6 +361,11 @@ function calcularDisposicion(){
     const p = blinkTvPosToken(d.id);
     if(p){ d.x = p.x; d.y = p.y; d.radio = HEX * 0.68; d.solo = true; d.gancho = true; d.tv = {sx: p.sx, sy: p.sy}; }
   });
+  // ✨ Las animaciones de resurrección (js/125): el Revive hace latir al token y el Pacto lo levanta un poco.
+  if(typeof resuFxPosToken === 'function') res.forEach(d => {
+    const p = resuFxPosToken(d.id);
+    if(p){ d.y += p.dy; d.gancho = true; d.tv = {sx: p.s, sy: p.s}; }
+  });
   return res;
 }
 
@@ -890,6 +895,7 @@ function dibujarLienzo(){
   }
 
   if(typeof aguaOndasDibujar === 'function' && aguaOndasDibujar(z)) animando = true;   // 💧 las ondas de los pasos en el agua (js/50)
+  if(typeof resuFxDibujarPiso === 'function' && resuFxDibujarPiso(z)) animando = true;   // 😇 el círculo del Pacto, en el piso (js/125)
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
   if(typeof escudoElementalDibujar === 'function' && escudoElementalDibujar(z)) animando = true;   // 🛡 el anillo del Escudo elemental, que sigue al token (js/106)
@@ -948,6 +954,7 @@ function dibujarLienzo(){
     if(etereoDe(t)) ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.55);   // 👁 etéreo: se ve, transparente
     // Titila (2026-10-06, dueño: «como en el Contra»): con cualquier estado que lo hace invulnerable, prende y apaga rápido.
     if(tokenTitila(t)){ if(Math.floor(performance.now() / 260) % 2) ctx.globalAlpha *= 0.2; animando = true; }
+    if(typeof resuFxAlfa === 'function'){ const ra = resuFxAlfa(d.id); if(ra < 1){ ctx.globalAlpha *= ra; animando = true; } }   // 🔥 el Fénix lo consume y lo devuelve (js/125)
 
     trazarPuntos(verticesHex(x + 2 / z, y + 3 / z, rad));
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
@@ -1319,6 +1326,7 @@ function dibujarLienzo(){
   if(typeof areaPreviaDibujar === 'function') areaPreviaDibujar(z);   // 👁 el área siguiendo al mouse mientras se marca el centro (js/118)   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosGancho === 'function' && dibujarEfectosGancho(z)) animando = true;
   if(typeof dibujarEfectosBlinkTv === 'function' && dibujarEfectosBlinkTv(z)) animando = true;   // 📺 el Parpadeo como un televisor viejo (js/111)
+  if(typeof dibujarEfectosResu === 'function' && dibujarEfectosResu(z)) animando = true;   // ✨ las animaciones de resurrección: Ankh, Fénix, Revive, Pacto (js/125)
   if(typeof dibujarEfectosLanza === 'function' && dibujarEfectosLanza(z)) animando = true;   // ✨ la Lanza arcana (js/120, 2026-11-19)
   if(typeof dibujarEfectosCambio === 'function' && dibujarEfectosCambio(z)) animando = true;   // 🔄 Cambiar de lugar (js/107)   // 🪝 la cadena y el gancho de Arrastrar (js/96)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;

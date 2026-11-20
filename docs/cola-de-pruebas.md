@@ -241,7 +241,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   entre 18 creeps, uno oculto por el GM y después uno en sigilo): a casilla libre sigue escondido; a naranja, salió el pedido de Percepción; a roja, lo
   descubrieron y el camino se cortó ahí. Lo que no es visión y lo que quedó sin probar: `vtt-hexgrid/CLAUDE.md` («🕵 Zonas de riesgo») y
   `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola — ✨ Animaciones de resurrección (Ankh, Fénix, Revive, Pacto)** (dueño, 2026-11-20: «me encantan tus propuestas de animación»).
+- **✅ hecho (2026-11-20) — ✨ Animaciones de resurrección (Ankh, Fénix, Revive, Pacto)** (dueño, 2026-11-20: «me encantan tus propuestas de animación»).
   Aprobadas tal cual las propuso Claude; duran 2–3 s, las ven todas las pantallas, el token caído se ve apagado antes de empezar. Dibujadas con el
   mecanismo de animaciones del mapa (formas, brillos, partículas; sin ilustraciones). **☥ Ankh:** aparece un ankh dorado flotando y girando sobre el
   caído → se raja con un destello y se parte → los pedazos se vuelven polvo dorado que baja en espiral y entra al token → el token se enciende de
@@ -253,6 +253,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   dibuja en el piso, trazo por trazo → una columna de luz oscura (violeta / roja) sube desde el círculo → el token se levanta y el círculo se quema
   de afuera hacia adentro como papel; queda titilando (lo de hoy). Mandar un VIDEO de cada una para que el dueño las revise en la compu (anotarlo en
   docs/pendientes.md 🖥). Va después de la tarea «al resucitar se borran los estados» (mismo punto del código).
+  **Hecho:** `vtt-hexgrid/js/125-resurreccion-fx.js`. Las cuatro duran ~3 s (Ankh 3,0 · Fénix 3,3 · Revive 2,95 · Pacto 2,95) y las ven todas las
+  pantallas (la que revive la publica; a las demás les llega alrededor de 1 s después). El token arranca apagado y con la ✕; el Fénix lo hace
+  desaparecer y volver, el Revive lo hace latir (un corazón, tu-tum, con una onda en cada latido) y el Pacto lo levanta. El frasquito del Revive sale
+  del token de quien lo usó; con el ✚ del GM, el líquido cae desde arriba. Un creep o una invocación usan la misma. Quien vuelve por otra vía (la vida
+  escrita a mano, la ficha, GM Tools) y con «reducir movimiento»: un resplandor corto de ~1 s. Los carteles («Zafaste…», «Volviste…», «vuelve a pie»),
+  el toast y la línea de la Mesa de los estados salen DESPUÉS de la animación. **Probado con clics** en «Claude · pruebas 2» (GM + Jugador 1 +
+  Jugador 2, mapa «Prueba · R4 M4»): Pacto, Ankh, Fénix, Revive de un aliado, ✚ del GM a un personaje y a un creep, y la vida de un creep puesta a
+  mano: una sola animación por pantalla en las tres, y el cartel siempre después. Sin probar: una invocación que revive, el Fénix de un creep, un
+  duelo abierto en el momento de volver y un token que esa pantalla no ve. Falta que el dueño mire los videos (`docs/pendientes.md` 🖥).
 - **✅ hecho (2026-11-20) — 🏷 Tokens con otro nombre que su ficha: que se corrija solo, y que el GM pueda cambiarlo** (visto al clonar El origen: la ficha se
   llama «Rockardo Pedruscko» y sus tokens «Petro EskanderSon» / «Rockardo Petroshvnick Son»; `tokensSincronizarNombres`,
   vtt-hexgrid/js/09-colocar-y-panel.js, falla en la pantalla del GM por permisos y deja un error en la consola). Dueño, 2026-11-20: «estaría bueno

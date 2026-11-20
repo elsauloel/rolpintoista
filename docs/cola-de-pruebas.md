@@ -160,6 +160,29 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Polvareda"». O sea: la zona se dibuja siempre (también lo que cae en la niebla, como hoy); lo que cambia es el ANUNCIO: si quien la usa no está a
   la vista de los jugadores (niebla, oculto, sigilo), la Mesa/Crónica no lo nombra (sin línea, o anónima); si está a la vista, lo nombra. Esto pisa
   lo escrito arriba sobre no dibujar la parte de la zona que cae en la niebla.
+- **⬜ en cola — 👁 Ajustes a «Revelar»: circulito en la trampa, el ojo del token oculto adentro del «⋯», y que «Revelar lo oculto» muestre las
+  trampas de los jugadores** (dueño, 2026-11-20, sobre lo hecho en 0dda1bcb, `vtt-hexgrid/js/122-revelar.js`): (1) «para las trampas también debería
+  aparecer un botón que se despliegue desde el propio token, al igual que los botones que se despliegan de los tokens de personajes, los circulitos
+  de alrededor… un botón de esa misma forma para revelarlas»: al hacer clic en una trampa oculta que uno puede revelar, un **circulito 👁** que sale
+  de la trampa (mismo estilo que los botones del token), además del botón del cartel (o en su lugar si queda redundante: contarlo); el GM, también el
+  de volver a ocultar. (2) «Para revelar un token oculto por el GM, está bien que el botón del ojito aparezca detrás del menú de los tres puntitos, o
+  sea, en el menú secundario»: el 👁 del token **oculto por el GM** vuelve adentro del «⋯» (sacarlo de los botones a la vista); el del token en
+  sigilo queda como está. (3) «El GM no ve las trampas que ponen los jugadores [correcto]. Revelar lo oculto, sin embargo, sí debe mostrarlas»: con el
+  **👁 «Revelar lo oculto» del menú del ojo** prendido, el GM ve también las trampas de los jugadores (solo mientras está prendido; es su visión, no
+  las revela a nadie). (4) Corroborar y decir en el informe: el cartel de Percepción al caminar al lado de una trampa existe SOLO para quien tiene la
+  pasiva que permite detectar trampas (dueño: «ese cartel solo debe existir cuando uno tiene la habilidad pasiva que le permite detectar trampas»);
+  si le sale a alguien sin la pasiva, es un error a arreglar.
+- **⬜ en cola — ☥ Al resucitar se borran todos los estados temporales, buenos y malos** (dueño, 2026-11-20: «algo que debe pasar cuando un
+  personaje muere y resucita, de cualquier forma, ya sea resurrección automática con un Pacto, con un Ankh, con la poción de Fénix, o que lo
+  resuciten con un Revive. Al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna
+  poción o algún pergamino. Tanto los buenos como los malos»). En UN solo lugar por donde pasen todas las formas de volver (Pacto, Ankh, Llama /
+  poción de Fénix, Revive de un aliado o consumible, revivir del GM): al volver, se sacan los estados puestos por habilidades, pociones, pergaminos,
+  zonas, trampas y golpes (buffs y debuffs, con o sin turnos). **NO se sacan**: lo que viene del equipo puesto, de pasivas / talentos / raza, las auras
+  mientras su fuente siga, y lo que la propia resurrección pone (el Invulnerable / Titilando del Pacto, etc.). Antes de programar, listar en el
+  informe todos los estados posibles en tres columnas (se borra / queda / dudoso) y lo dudoso (Pacto activo sin gastar, Marcado, Veneno severo
+  «permanente», Mala sombra, Bronca, estados de invocaciones propias, cooldowns) a preguntas-abiertas, eligiendo mientras tanto lo más fiel a la frase
+  del dueño. Aviso al jugador y línea en la Mesa («☥ X volvió: se le fueron N estados»). Vale para personajes, y ver creeps / invocaciones que revivan.
+  Probar las cuatro formas en el mapa.
 - **⬜ en cola — ▶ Botón «Iniciar combate» en el orden de turnos** (dueño, 2026-11-20, a raíz de lo que se vio con Arrastrar: al primero del orden
   de un combate nuevo nadie le «empieza» el turno; «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa
   es como si fuera su turno. Podríamos hacer que se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que

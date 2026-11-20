@@ -1658,3 +1658,7 @@ el «👁 Revelar lo oculto» del menú del ojo le muestra a los personajes en s
 (ese es de la detección de verdad). Si el GM lo quiere marcado, se lo pone con «+ Estado». ¿O revelar a mano debería marcarlo también?
 **(e) Bajo tierra no tiene «Revelar»**: no está oculto del todo (se ve el montículo) y sale con su habilidad. ¿Hace falta un «sacarlo a mano»?
 **(f) No hay «detectada solo por Fulano»:** hoy una trampa detectada la ven todos (`descubierta`), así que revelar es siempre «a todos».
+**✅ Respuestas del dueño (2026-11-20):** (a) correcto. (b) correcto. (c) correcto que el GM no vea las trampas de los jugadores, **pero el «👁 Revelar
+lo oculto» del menú del ojo SÍ se las tiene que mostrar** (en la cola). (d) correcto: revelar a mano no deja Marcado. (f) correcto, revelar es para todos;
+queda como conversación de diseño pendiente poder revelar solo para un jugador (`docs/pendientes.md` §4). (e) sin responder. Además: el botón de revelar
+una trampa va como circulito que sale de la propia trampa, y el 👁 de un token oculto por el GM vuelve adentro del «⋯» (en la cola).

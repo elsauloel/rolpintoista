@@ -1146,6 +1146,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+
+- [ ] **👁 Revelar algo oculto solo para un jugador** (dueño, 2026-11-20: «revelar es siempre para todos, eso es correcto, aunque dejá en pendiente la posibilidad de que se revele solo para un jugador»). Conversación de diseño: hoy una trampa detectada la ven todos; pensar «detectada solo por Fulano» (P254 f).
+- [ ] **✨ Animaciones de resurrección** (dueño, 2026-11-20): una por cada forma de volver (Revive, Ankh, Fénix, Pacto). Primero se imaginan conceptualmente con el dueño; después se programan. Propuestas de Claude del mismo día en la conversación; falta que el dueño elija.
 - [ ] **🪬 Skill de Debuffer: «Engualichar» o «Gualicho»** (dueño, 2026-11-20: «anota en pendientes crear un skill de debuffer que sea "engualichar" o
   "gualicho"»). Diseñarla con el dueño cuando se retome el Debuffer (tiende a lo 🌑 siniestro y ☠ tóxico; ver la lista de ideas del Debuffer en
   `diseno-roles-creep.md`). Por ahora solo el nombre: qué hace, a quién y cómo se resiste, a decidir (no inventar).

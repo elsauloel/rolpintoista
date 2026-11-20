@@ -12,6 +12,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+- **⬜ en cola — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
+  botón para poder pasarle a un aliado»). En la ventanita «DDE y despojos» de la ficha, un botón 🤝 «Pasar a un aliado» que deja elegir a quién, qué
+  (DDE, despojos normales, mágicos o especiales) y cuánto, usando el mismo mecanismo de intercambio que ya pasa ítems (`comun/intercambio.js`); que el
+  que recibe se entere (aviso / línea en la Mesa). Si en combate pasar un ítem cuesta No2, usar el mismo criterio que ya existe; no inventar otro.
+- **⬜ en cola — 🏁 Al terminar «Finalizar combate», el mapa vuelve solo a modo narrativo** (dueño, 2026-11-20: «al poner finalizar combate y terminar
+  con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»). Cuando el proceso termina de verdad (se cierra el botín y se
+  reparten XP y oro; o al publicar si no hay ítems), el mapa publicado pasa de Combate a Narrativo, con lo mismo que hace el interruptor a mano.
+  En «Simular» no cambia nada. Vale desde el mapa y desde GM Tools.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las

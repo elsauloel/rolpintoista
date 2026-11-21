@@ -159,8 +159,12 @@
   **Un solo ayudante a la vez, para TODO** (2026-11-11, dueño: «por esto pedí que cada pedido nuevo se agregue a una cola… y no que se realicen
   en simultáneo»): también las pruebas en el mapa, armar mapas o revisar datos, no solo programar — usan las mismas cuentas de prueba y se pisan
   (un ayudante armando un mapa con J1 le «robó» el aviso al que probaba el escudo).
-  **La cola avanza sola** (2026-11-18, dueño: «cuando termines una prueba de la cola, avanzá con la siguiente sin esperar mi ok»): al
-  terminar una tarea de la cola (probada, subida y marcada), se arranca la siguiente sin pedirle permiso; se le informa el resultado.
+  ~~La cola avanza sola~~ (2026-11-18; **reemplazado el 2026-11-22**, ver abajo).
+  **Se avanza de a una, con el ok del dueño** (2026-11-22, dueño: «tengo muchos resultados del día de ayer sin leer y sin revisar… si se
+  sigue acumulando, se genera una lista muy larga»): la cola se mantiene, pero **solo se arranca una tarea cuando el dueño dice «avanzá»
+  (o «podés avanzar»)**. Al terminarla se le pasan los resultados y **se espera**: él los lee y comenta; lo que corresponda de sus comentarios
+  se agrega **al final de la cola** (`docs/cola-de-pruebas.md`); cuando vuelve a decir «avanzá», se toma la siguiente. Nunca encadenar dos
+  tareas sin su ok.
 - **Videos de las animaciones, no capturas** (2026-11-10, dueño: «si pudieras mandarme videítos de las animaciones en lugar de capturas, sería
   genial»). Para todo lo que se mueve (pulsos, duelos que se despliegan, vaquita, lava, rayos…), grabar con Playwright
   (`newContext({recordVideo: {dir, size: {width: 1280, height: 720}}, viewport: {width: 1280, height: 720}})`, cerrar el contexto para que se

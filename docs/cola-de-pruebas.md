@@ -12,6 +12,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## 🛠 Cola de programación (de a una por vez; dueño, 2026-11-10)
 
+> **Cómo se avanza (dueño, 2026-11-22):** una tarea por vez y **solo cuando el dueño dice «avanzá»**. Al terminarla se le pasan los
+> resultados y se espera; sus comentarios que correspondan se agregan al final de esta cola. Ya no se encadena sola (ver `memoria-claude.md`).
+
 - **✅ hecho (2026-11-20) — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
   botón para poder pasarle a un aliado»). La ventanita «💰 DDE y despojos» de la ficha tiene abajo el botón **🤝 Pasar a un aliado**: cierra la ventanita y abre
   la misma ventana de siempre («Pasarle algo a otro personaje», la del 🤝 Pasar de la Mochila; `comun/intercambio.js`, sin tocar): a quién, cuántos DDE, qué

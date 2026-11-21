@@ -333,18 +333,11 @@ async function guardarIniciativa(cambios){
   }
 }
 
-// De mayor a menor; con el mismo valor queda el orden en que estaban. 💨 Prisa (2026-10-15, dueño): los que la tienen van primero, antes que
-// todos; entre ellos (aliados o rivales) decide la tirada de iniciativa, como siempre.
+// De mayor a menor; con el mismo valor queda el orden en que estaban. (💨 Hasta el 2026-11-20 los que tenían Prisa iban primero; desde ese día
+// —dueño: «en lugar de que te mande siempre primero a la lista de iniciativas, te dé +5 a la tirada de iniciativa»— la Prisa suma 5 a la tirada y el
+// orden lo decide solo el resultado.)
 function ordenarIniciativa(lista){
-  return lista.map((o, i) => ({o, i, p: tokenTienePrisa(o.id) ? 1 : 0})).sort((a, b) => (b.p - a.p) || (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
-}
-function tokenTienePrisa(id){
-  const t = tokens.get(id);
-  if(!t) return false;
-  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return !!(sc && num(CreepCalculo.modTotal(sc, 'prisa')) > 0); }   // la pasiva Prisa (o lo que la dé)
-  if(String(t.fichaId || '').includes(SEP_INVOCACION)) return false;
-  const f = fichasPub.get(t.fichaId);
-  return !!(f && f.resumen && num(f.resumen.prisa) > 0);
+  return lista.map((o, i) => ({o, i})).sort((a, b) => (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
 }
 
 function iniciativaPonerTodos(){
@@ -425,7 +418,7 @@ async function iniciativaTirar(){
   }
   const nuevos = new Map(), sinDato = [];
   for(const [id, t] of propios){
-    const base = t.tipo === 'creep' ? creepIniMapa(creepPrivadoDe(t.fichaId)) : (() => { const f = fichasPub.get(t.fichaId); const r = f && f.resumen; return r && r.ini !== undefined ? num(r.ini) : null; })();
+    const base = t.tipo === 'creep' ? creepIniMapa(creepPrivadoDe(t.fichaId)) : (() => { const f = fichasPub.get(t.fichaId); const r = f && f.resumen; return r && r.ini !== undefined ? num(r.ini) + Combatiente.PRISA_INI * Math.max(0, num(r.prisa)) : null; })();   // (💨 `r.prisa`: solo lo trae un resumen publicado ANTES del 2026-11-20, con la Prisa vieja y la Iniciativa sin su +5; al volver a guardarse el personaje ya no viene)
     if(base === null){ sinDato.push(nombreDe(t)); continue; }
     const fo = formulaParaValor(base);
     const r = (fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0};
@@ -1143,7 +1136,7 @@ function renderIniciativa(){
       const libre = !!libreArriba;
       return `<div class="ini-fila${(lib ? libre : i === iniciativa.turno) ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${ya && i > base ? ' — ya jugó esta ronda: si le vuelve a tocar, el GM decide si actúa de nuevo' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${tokenTienePrisa(o.id) ? '<span title="Prisa: va primero en el orden de turnos, antes que los que no la tienen">🏃</span> ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
+        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
@@ -1264,7 +1257,7 @@ function conectarIniciativa(){
   const traer = $('#ini-traer');
   if(traer) traer.onclick = iniciativaPonerTodos;
   const ordenar = $('#ini-ordenar');
-  if(ordenar) ordenar.onclick = () => prisaOrdenar();   // 🏃 con Prisa, el GM elige Aplicar o Resolver a mano (js/86)
+  if(ordenar) ordenar.onclick = () => iniciativaOrdenar();   // (js/86; hasta el 2026-11-20 acá salía el cartel de la Prisa)
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = () => iniciativaSiguienteBoton();
   const iniciar = $('#ini-iniciar');

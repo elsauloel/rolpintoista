@@ -556,7 +556,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     igual y avisa (ADN: avisar, no bloquear). Tiene que funcionar con el jugador desconectado (lo recibe y ve el cartel al entrar) y aplicarse desde el
     mapa o desde la ficha (como `comun/recibidos.js`). Reglas de Firebase: si hace falta una colección nueva, avisar que hay que pegarlas.
   · Sin definir (anotar como pregunta): ¿una casilla «en secreto» para que la línea de la Mesa no la vean los demás?
-- **⬜ en cola — 💨 Prisa pasa a ser +5 a la tirada de iniciativa** (dueño, 2026-11-20: «cambiar la habilidad Prisa para que en lugar de que te
+- **✅ hecho (2026-11-20) — 💨 Prisa pasa a ser +5 a la tirada de iniciativa** (dueño, 2026-11-20: «cambiar la habilidad Prisa para que en lugar de que te
   mande siempre primero a la lista de iniciativas, te dé +5 a la tirada de iniciativa. En El origen de las especies, el personaje Rocardo la tiene,
   así que habría que cambiársela a él también»). La pasiva `prisa` de `comun/pasivas.js` deja de poner primero en el orden de turnos y da **+5 a
   Iniciativa** (stat `ini`), con el texto nuevo. Sacar lo de «va primero» (el orden en `ordenarIniciativa`, js/04; el cartel de `vtt-hexgrid/js/86-prisa.js`;
@@ -564,6 +564,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la copia vieja: `mods: [{stat: 'prisa', val: 1}]`) tiene que pasar solo a la versión nueva al cargarse (una conversión por `poolId: 'prisa'`, como
   las otras migraciones): así Rocardo queda cambiado sin que nadie toque a mano la partida del dueño (que NO se abre ni se escribe para probar).
   Revisar también los creeps esenciales / de fábrica y los ítems que den `prisa`. Mismo costo de Job (1) salvo que el dueño diga otra cosa.
+  **Cómo quedó (2026-11-20):** la pasiva Prisa (1 Job) dice «+5 a la tirada de Iniciativa» y suma 5 a la Iniciativa; ya no pone primero a nadie. El
+  botón Ordenar ordena solo por la tirada, sin el cartel «Aplicar / Resolver a mano» de la Prisa, y sigue ofreciendo «▶ Iniciar combate» como antes;
+  se fue la 🏃 de la lista de turnos. **Quien ya la tenía** pasa solo a la versión nueva al cargarse (personajes, invocaciones y creeps), y mientras su
+  ficha no se vuelva a guardar el mapa igual le suma el +5 al tirar la iniciativa. No había creeps de fábrica ni ítems con Prisa.
+  **Probado con clics:** en «El origen · CLON de pruebas», Rockardo (Jugador 2) tenía guardada la Prisa vieja: al abrir su Botonera en el mapa quedó
+  «Prisa: +5 a la tirada de Iniciativa», Iniciativa 11 (7 de Agilidad − 1 del peto + 5 de Prisa) y su tirada de iniciativa fue 1d10+1 (antes, 1d6);
+  al Ordenar, sin cartel de Prisa y con «▶ Iniciar combate». En «Claude · pruebas 2», Blanco J1 con la Prisa nueva del catálogo: Iniciativa 6 → 11,
+  tirada 1d10+1. **Sin probar con clics:** un creep y una invocación con la Prisa vieja (sí en las pruebas automáticas); la ficha suelta de Rockardo
+  (se probó desde el mapa). En la partida real no se entró: allá se convierte sola. 958 pruebas automáticas en verde (1 nueva).
+  **Para que lo sepas:** con +5, quien tiene Prisa ya no va primero seguro; contra alguien de Iniciativa parecida gana casi siempre, pero puede perder.
 - **⬜ en cola — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
   que no se probó, anotalo en la cola»). Sin programar nada nuevo: probar con clics en «Claude · pruebas 2» (GM, J1, J2) lo que cada informe dejó
   sin ver (también está en docs/pruebas-en-el-mapa.md; tachar ahí lo que se vea) y arreglar solo lo que falle:

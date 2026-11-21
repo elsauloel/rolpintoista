@@ -363,6 +363,8 @@ const FichaGuardado = (() => {
     migrarDash(S);
     migrarOjoDeAsesino(S);
     migrarHabsDeClase(S);
+    // 💨 Prisa (2026-11-20, dueño): la copia vieja (ir primero) pasa sola a la nueva (+5 a Iniciativa), en el personaje y en sus invocaciones.
+    if(typeof Combatiente !== 'undefined' && Combatiente.pasivasAlDia){ Combatiente.pasivasAlDia(S.pasivas); (S.invocaciones || []).forEach(i => i && Combatiente.pasivasAlDia(i.pasivas)); }
     if(typeof Combatiente !== 'undefined' && Combatiente.ponerAlDiaItemsFabrica) Combatiente.ponerAlDiaItemsFabrica(S.inventario);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
     // 🛡 Armadura rota (dueño, 2026-10-29): en un personaje es de las piezas (`armRota`) y el estado se ve derivado de ellas (FichaResumen). El estado
     // guardado de antes (de cuando era del personaje) se va: si no, seguía restando Defensa después de reparar el equipo.

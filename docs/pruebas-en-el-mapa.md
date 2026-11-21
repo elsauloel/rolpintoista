@@ -3275,3 +3275,13 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [ ] **Sin ver en pantalla:** una invocación con la pasiva; un crítico contra alguien que la tiene (no tiene que sumar); una trampa o una zona; la
   ficha lite (📜) con el renglón; la declaración de un hechizo con el texto (se sumó después de la prueba: la cuenta sí se vio).
 
+## 💨 Prisa pasa a ser +5 a la tirada de Iniciativa (2026-11-20)
+
+- [x] **«El origen · CLON de pruebas», Rockardo (Jugador 2), con la Prisa vieja guardada**: al abrir su Botonera en el mapa, la pasiva queda «+5 a la
+  tirada de Iniciativa», la Iniciativa dice 11 y su 🔍 «Agi 7 · Peto −1 · Prisa (pasiva) +5». «🎲 Tirar iniciativa»: 1d10+1. Ordenar: sin cartel de
+  Prisa, con «▶ Iniciar combate», y al jugador le llega «quedaste en el puesto 1» (por la tirada, no por la Prisa). El orden se vació después.
+- [x] **«Claude · pruebas 2», Blanco J1 con la Prisa nueva**: Iniciativa 6 → 11, tirada 1d10+1 contra 1d6 de Blanco J2; Ordenar sin cartel, con
+  «▶ Iniciar combate».
+- [ ] **Sin ver en pantalla:** un creep o una invocación con la Prisa vieja (el creep suma 5 al tirar el GM); la ficha suelta de un personaje con la
+  Prisa vieja (el texto nuevo y que al guardarse quede convertida); la partida real de El origen (no se entra: se convierte sola).
+

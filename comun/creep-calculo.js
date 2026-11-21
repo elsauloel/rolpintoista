@@ -185,7 +185,7 @@ const CreepCalculo = (() => {
     });
     // Pasivas (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps, no hacemos una excepción»): las mismas del catálogo de los
     // personajes, con sus compras.
-    (sc.pasivas||[]).forEach(p => { const c = pasivaComprasCreep(p); (p.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * c; }); });
+    (sc.pasivas||[]).forEach(p => { const c = pasivaComprasCreep(p); Combatiente.modsPasiva(p).forEach(m => { if(m.stat === statId) total += num(m.val) * c; }); });   // (modsPasiva: la Prisa vieja ya cuenta como +5 a Iniciativa)
     return total;
   }
   const pasivaComprasCreep = p => Math.max(1, Math.round(num(p && p.compras)) || 1);
@@ -321,7 +321,7 @@ const CreepCalculo = (() => {
       if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v, tipo: 'estado alterado'});
     });
     // Las pasivas (2026-11-18: la 🔍 del PdG del Hunter 4 decía «Sin modificadores» con la Puntería sumada; modTotal ya las cuenta).
-    (sc.pasivas||[]).forEach(p => { const v = (p.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0) * pasivaComprasCreep(p); if(v) out.push({nombre: p.nombre || '(sin nombre)', val: v, tipo: 'pasiva'}); });
+    (sc.pasivas||[]).forEach(p => { const v = Combatiente.modsPasiva(p).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0) * pasivaComprasCreep(p); if(v) out.push({nombre: p.nombre || '(sin nombre)', val: v, tipo: 'pasiva'}); });
     return out;
   }
   // Nombres de los estados activos que aportan un mod a ese stat, para
@@ -725,6 +725,7 @@ const CreepCalculo = (() => {
     sc.equipo.forEach(it => { if(it && typeof it === 'object' && (it.id === undefined || it.id === null || it.id === '')) it.id = 'eq' + Math.random().toString(36).slice(2, 9); });
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
+    Combatiente.pasivasAlDia(sc.pasivas);   // 💨 la Prisa vieja → +5 a Iniciativa (2026-11-20)
     Combatiente.migrarArmasElementales(sc.habilidades);   // 🔥 las cinco Armas elementales de antes → una «Arma elemental» (2026-10-31)
     Combatiente.migrarArmaElementalAzar(sc.habilidades);
     Combatiente.migrarGritoEspeluznante(sc.habilidades);   // 😱 «Grito de pánico» → «Grito espeluznante», con Pánico (2026-11-01)

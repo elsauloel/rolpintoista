@@ -48,7 +48,7 @@ const InvCalculo = (() => {
       if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
     });
     (inv.pasivas||[]).forEach(p => {   // (2026-10-16)
-      const c = Math.max(1, Math.round(num(p && p.compras)) || 1), v = (p.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * c, 0);
+      const c = Math.max(1, Math.round(num(p && p.compras)) || 1), v = Combatiente.modsPasiva(p).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * c, 0);
       if(v) out.push({nombre: (p.nombre || '(sin nombre)') + (c > 1 ? ' ×' + c : ''), val: v});
     });
     return out;
@@ -197,6 +197,7 @@ const InvCalculo = (() => {
     inv.estados = Array.isArray(inv.estados) ? inv.estados : [];
     inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
     inv.pasivas = Array.isArray(inv.pasivas) ? inv.pasivas : [];   // (2026-10-16) como las de un creep; la que da un estado lo mantiene puesto
+    Combatiente.pasivasAlDia(inv.pasivas);   // 💨 la Prisa vieja → +5 a Iniciativa (2026-11-20)
     if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
     if(inv.defensa === undefined) inv.defensa = 0;
     Combatiente.pasarEquipoVivo(inv, {crit: false});   // 🛡 paso 3: la Defensa del equipo en vivo (la Res. a crítico nunca se le había sumado)

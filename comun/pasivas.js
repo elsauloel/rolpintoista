@@ -61,10 +61,11 @@ const PASIVAS_BASE = [
    detalle: '+1 Crg.Max (carga máxima).', mods: [{stat: 'crgmax', val: 1}]},
   {poolId: 'pies-ligeros', nombre: 'Pies ligeros', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Eva (evasión).', mods: [{stat: 'eva', val: 1}]},
-  // 💨 Prisa (2026-10-15, dueño: reemplaza a «Reflejos de gato», +1 Iniciativa): va primero en el orden de turnos; entre dos con Prisa (de bandos
-  // rivales o no), decide la tirada de iniciativa (vtt-hexgrid/js/04, ordenarIniciativa).
+  // 💨 Prisa (2026-10-15, dueño: reemplaza a «Reflejos de gato», +1 Iniciativa). Desde el 2026-11-20 (dueño: «en lugar de que te mande siempre primero a la
+  // lista de iniciativas, te dé +5 a la tirada de iniciativa») ya no pone primero: suma 5 a la Iniciativa. Quien tenía la copia vieja (stat `prisa`) pasa
+  // sola a esta al cargarse (Combatiente.pasivasAlDia). El texto está también en Combatiente.PRISA_DETALLE (el mapa no carga este archivo).
   {poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, etiquetas: ['utilidad'],
-   detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa. Si otro también la tiene (un aliado o un creep), entre ustedes decide la tirada de iniciativa. ⚙ Automatizado: el mapa te pone arriba al ordenar los turnos.', mods: [{stat: 'prisa', val: 1}]},
+   detalle: '+5 a la tirada de Iniciativa: arrancás el combate con ventaja para jugar antes. No te pone primero por sí sola: se suma a tu tirada y el orden lo decide el resultado, como con cualquiera. ⚙ Automatizado: se suma sola a tu Iniciativa.', mods: [{stat: 'ini', val: 5}]},
   // 👣 Pasos silenciosos (2026-10-15, dueño: «puede ser una pasiva de job, que además te da un +1 adicional a la pdg»): un sigilo suave.
   // 2026-10-21 (dueño): se llama «Paso ligero» (el id y el stat siguen igual).
   {poolId: 'pasos-silenciosos', nombre: 'Paso ligero', jobCosto: 1, etiquetas: ['utilidad'],

@@ -8141,6 +8141,33 @@ prueba('🔨 Maestría en armas pesadas (dueño, 2026-11-20): +2 PdG y +1 Parry 
     creep, fCreep, invocacion, FichaCalculo.MOD_TARGETS.some(x => x.id === 'parryt10'), CreepCalculo.STAT_LABEL.parryt10],
     [[2, 1, 0, 0, 0], true, true, true, true, [2, 1, 0, 0, 0], [true, true, true, true], [2, 1, true], true, 'Parry con contundentes']);
 });
+prueba('💨 Prisa pasa a ser +5 a la tirada de Iniciativa (dueño, 2026-11-20): la pasiva nueva, y la copia vieja (ir primero) se convierte sola en personajes, creeps e invocaciones', () => {
+  const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'prisa');
+  igual([pas.nombre, pas.jobCosto, pas.mods, /\+5 a la tirada de Iniciativa/.test(pas.detalle), /primero en el orden/.test(pas.detalle), pas.detalle === C.PRISA_DETALLE], ['Prisa', 1, [{stat: 'ini', val: 5}], true, false, true]);
+  const vieja = () => ({id: 'p1', poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, compras: 1, detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa.', mods: [{stat: 'prisa', val: 1}]});
+  const otra = () => ({id: 'p2', poolId: 'robustez', nombre: 'Robustez', compras: 1, detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]});
+  // La cuenta pura: reconoce la vieja, la convierte una sola vez y no toca nada más.
+  const l = [vieja(), otra()], n1 = C.pasivasAlDia(l), n2 = C.pasivasAlDia(l);
+  igual([C.esPrisaVieja(vieja()), C.esPrisaVieja(pas), C.esPrisaVieja(otra()), C.modsPasiva(vieja()), C.modsPasiva(otra()), n1, n2, l[0].mods, l[0].detalle === pas.detalle, l[0].poolId, l[0].id, l[1]], 
+    [true, false, false, [{stat: 'ini', val: 5}], [{stat: 'hpmax', val: 5}], 1, 0, [{stat: 'ini', val: 5}], true, 'prisa', 'p1', otra()]);
+  // Personaje: al cargarse (FichaGuardado.completar) queda con la nueva y su Iniciativa suma 5; la tirada también.
+  const pj = pasivas => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.pasivas = pasivas; return S; };
+  const S0 = pj([]), Sv = pj([vieja()]), iniSin = FichaCalculo.calcular(S0).final.ini, iniViejaSinCargar = FichaCalculo.calcular(Sv).final.ini;
+  FichaGuardado.completar(Sv);
+  const tir = FichaBotonera.tiradaStat(Sv, 'ini'), tir0 = FichaBotonera.tiradaStat(S0, 'ini');
+  igual([iniViejaSinCargar - iniSin, FichaCalculo.calcular(Sv).final.ini - iniSin, Sv.pasivas[0].mods, /\+5 a la tirada de Iniciativa/.test(Sv.pasivas[0].detalle), FichaCalculo.calcular(Sv).final.prisa || 0, FichaResumen.resumen(Sv, {}).prisa,
+    FichaResumen.resumen(Sv, {}).ini - FichaResumen.resumen(S0, {}).ini, !!(tir && tir.r) && formulaParaValor(iniSin + 5).formula === tir.r.formula.replace(/ ÷2/g, ''), /Prisa/.test(FichaLupa.contenido(Sv, 'stat:ini').html)],
+    [5, 5, [{stat: 'ini', val: 5}], true, 0, undefined, 5, true, true]);
+  // Creep: tal como está guardado (el mapa lo lee así) ya suma 5; al normalizarse queda convertido.
+  const crudo = {nombre: 'Lobo', con: 4, fue: 5, agl: 6, des: 4, esp: 2, hp: 20, hpMax: 20, pasivas: [vieja()], equipo: [], estados: [], habilidades: []};
+  const iniCrudo = CreepCalculo.modTotal(crudo, 'ini'), sc = creepPrueba({pasivas: [vieja()]}), sc0 = creepPrueba();
+  igual([iniCrudo, CreepCalculo.modTotal(crudo, 'prisa'), sc.pasivas[0].mods, CreepCalculo.statValor(sc, 'ini') - CreepCalculo.statValor(sc0, 'ini'), CreepCalculo.aportesMod(sc, 'ini').map(a => a.nombre + a.val)],
+    [5, 0, [{stat: 'ini', val: 5}], 5, ['Prisa5']]);
+  // Invocación: lo mismo (guardada adentro del personaje).
+  const invCruda = {id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [vieja()]};
+  const Si = pj([]); Si.invocaciones = [structuredClone(invCruda)]; FichaGuardado.completar(Si);
+  igual([FichaResumen.invModTotal(invCruda, 'ini'), InvCalculo.migrar(structuredClone(invCruda)).pasivas[0].mods, Si.invocaciones[0].pasivas[0].mods], [5, [{stat: 'ini', val: 5}], [{stat: 'ini', val: 5}]]);
+});
 prueba('🛡 Aguante de trinchera (dueño, 2026-11-20): +1 Defensa y +1 Defensa especial por cada enemigo pegado, sin tope; 2 de job; personaje, creep e invocación', () => {
   const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'aguante-de-trinchera');
   igual([!!pas, pas.nombre, pas.jobCosto, pas.mods.map(m => m.stat + m.val).join(' '), /Automatizado en el mapa/.test(pas.detalle), FichaCalculo.STAT_LABEL.trinchera, CreepCalculo.STAT_LABEL.trinchera, categoriaDePasiva(pas)],

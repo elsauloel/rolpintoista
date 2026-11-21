@@ -112,7 +112,7 @@ const FichaCalculo = (() => {
     {id:'trinchera', label:'Aguante de trinchera', full:'Aguante de trinchera: + ese número a la Defensa y a la Defensa especial por cada enemigo pegado a vos cuando te llega el golpe (lo suma el mapa)'},
     {id:'sedbatalla', label:'Sed de batalla', full:'Sed de batalla: cuando un rival cae por tu golpe, ganás ese número de No2 (aunque pases de tu máximo)'},
     {id:'sedsangre', label:'Sed de sangre', full:'Sed de sangre: cuando un rival cae por tu golpe, subís ese número de lugares en el orden de turnos'},
-    {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},
+    {id:'prisa', label:'Prisa (versión vieja)', full:'Prisa, versión vieja: ya no hace nada. Desde el 2026-11-20 la pasiva Prisa da +5 a Iniciativa (la copia vieja se convierte sola)'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},
     {id:'alforja', label:'Alforja compartida', full:'En combate, un aliado al lado puede sacar un consumible de tu mochila por 1 No2'},
@@ -247,7 +247,7 @@ const FichaCalculo = (() => {
     });
     (S.pasivas || []).forEach(p => {
       const compras = pasivaCompras(p);
-      (p.mods||[]).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));
+      (typeof Combatiente !== 'undefined' && Combatiente.modsPasiva ? Combatiente.modsPasiva(p) : (p.mods||[])).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));   // (la Prisa vieja ya cuenta como +5 a Iniciativa)
     });
     (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(S.efectos || []) : (S.efectos || [])).filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       const stacks = Math.max(1, num(e.stacks) || 1);

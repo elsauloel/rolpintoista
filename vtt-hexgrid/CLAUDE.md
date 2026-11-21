@@ -2477,4 +2477,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Botonera si cambió la cuenta; lo llama el dibujo, js/05). **La suma está en el daño**: `danioPj` / `danioCreep` / `danioInv` (js/10) cuentan de
   nuevo y la agregan a la Defensa, o a la Defensa especial si el duelo dice `o.frenaEsp` (js/13); sale en `defensaPartes` como un renglón propio.
   La 🔍 de Defensa la completa `lupaContenido` (js/11, sección «En el mapa, ahora»). Lo provisorio: P261.
+- **💨 La Prisa ya no ordena** (2026-11-20, dueño: +5 a la tirada de Iniciativa): `ordenarIniciativa` (js/04) ordena solo por el valor; se fueron
+  `tokenTienePrisa`, la 🏃 de la lista y el cartel «Aplicar / Resolver a mano». `js/86-prisa.js` conserva el nombre pero ahora es el botón Ordenar
+  (`iniciativaOrdenar`, que deja listo «▶ Iniciar combate» con `OrdenTurnos.marcasAlOrdenar`) y el aviso de los puestos (`iniciativaAvisarPuestos`).
+  `iniciativaTirar` suma el +5 a un personaje cuyo resumen todavía trae `prisa` (publicado antes del cambio, con la Iniciativa sin el +5).
 

@@ -175,7 +175,7 @@ ficha suelta y GM Tools con un escondido. De «Claude · pruebas 2»: «✋ No l
 por el **rayo en cadena**, el **elemental de un arma** y dos carteles a la vez; **Pegar fuerte** con una maestría y la ballesta con Perfora
 hasta el final; el chip de un creep arrastrado en GM Tools; «Ver detalle» de una trampa que deja zona, una zona de curación, un portal común y
 el Acelerador; la ficha suelta en una pestaña dormida; +N de vida con la vida llena en un personaje o una invocación; las **animaciones de
-resurrección** con el duelo abierto o desde lejos; el Foco con Dash / Salto / Parpadeo y en un creep o una invocación; y el cartel «todavía no
+resurrección** con el duelo abierto o desde lejos; el Foco en una invocación (Dash / Salto / Parpadeo y el creep: hechos, cola 2026-11-21); y el cartel «todavía no
 está en este mapa» con dos personajes propios (no se puede en las partidas de prueba).
 
 ## 🎁 Dar a un jugador (2026-11-21)
@@ -485,6 +485,9 @@ está en este mapa» con dos personajes propios (no se puede en las partidas de 
   automáticas); que el **Dash, el Salto, la Carga, el Takle, el Parpadeo e interponerse** apaguen el bono (Bizzante no tiene ninguno); un **creep**
   o una **invocación** con el anillo; el cartel con **el cuadro del duelo abierto** (tiene que esperar a que se cierre); un **empujón** (no tiene
   que apagarlo, P258); y el caso **sin orden de turnos**. Probado con clics: caminar (jugador y GM con 🎮), recargar la página, Ctrl+Z, 🦶 Mover libre.
+  *2026-11-21 (cola, «Claude · pruebas 2»):* hechos con clics el Foco (área de personaje y Lanza arcana de un creep, +2 PdG.Esp), y Dash, Salto,
+  Takle, Carga que derriba, Parpadeo y la Varita del blink apagando los dos anillos, con el aviso nuevo antes de usarlas. Siguen sin ver:
+  **interponerse**, una **invocación** con el anillo (y su aviso antes de una habilidad que mueve), el cartel con el duelo abierto, el empujón y sin orden.
 
 - [ ] **✨ Animaciones de resurrección (2026-11-20, `vtt-hexgrid/js/125-resurreccion-fx.js`): lo que quedó sin ver en el mapa** — una
   **invocación** que revive con el ✚; la **Llama de Fénix de un creep**; volver (Pacto o Fénix) por un golpe **con el cuadro del duelo abierto**

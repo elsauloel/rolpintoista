@@ -1488,8 +1488,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   a la ronda 5 el cartel salió solo a J1 (empezaba su turno), no a J2, que también estaba encima; a J2 recién al empezar el suyo. Por datos: darle
   la habilidad a Arcano 3 (en el formato viejo, para ver la puesta al día), acercarlo y sumarlo al orden. La Varita del muro de fuego no se tocó
   (P272); los que se saltean con «Pasar de ronda» no se queman (P269). 1 prueba automática nueva (972).
-- **⬜ en cola — 🔮 Foco Arcano y movimientos especiales con Puntería certera, con clics** (dueño, 2026-11-21: «probalo en Claude pruebas»):
+- **✅ hecho (2026-11-21) — 🔮 Foco Arcano y movimientos especiales con Puntería certera, con clics** (dueño, 2026-11-21: «probalo en Claude pruebas»):
   Dash, Salto, Carga, Takle, Parpadeo con los dos anillos; el Foco con un área de personaje y en un creep o una invocación.
+  *Resultado:* probado con clics en «Claude · pruebas 2» (GM, J1, J2), con los dos anillos puestos por datos a Blanco J1, Blanco J2 y cuatro creeps.
+  **Los cinco movimientos apagan los dos anillos** como caminar, en todas las pantallas: Dash (J1), Varita del blink (J2), y en creeps Parpadeo
+  (Arcano 3), Salto (Protector 3), Takle (Blanco creep) y Carga que derriba (Peleador 5). **Faltaba el aviso antes (arreglado):** ahora, con el
+  anillo activo, al tocar Ejecutar (o Atacar con la varita) sale «Tenés Puntería certera activa (+2 a PdG) y Foco activo (+2 a PdG.Esp). Si te
+  movés con Dash, los perdés.» [Usarla igual] [Cancelar], antes de cobrar: Cancelar no gasta ni mueve (visto con el Dash, el Parpadeo, el Takle y la
+  Carga); Usarla igual sigue como siempre (Dash, Varita del blink, Salto). **El Foco**: con el Orbe arcano de J2 (área de personaje) y la Lanza
+  arcana de Arcano 3 (creep) el cuadro dice «💍 Foco: +2 PdG.Esp» y la tirada suma «+2 quieto». La Carga del Warrior (personaje) es caminar: ya
+  avisaba. Sin ver: una invocación con el anillo (va por el mismo aviso). Duda nueva: P273. 1 prueba automática nueva.
+  **🔥 Muro de fuego, la sospecha:** sí pega al empezar el turno — J1 50 → 41 (3d4 = 9, lo tiró el GM por Arcano 3) y J2 50 → 45, más la Quemadura.
+  Lo engañoso era el cartel («No hay nada que tirar: se aplica lo que deja la zona»): ahora dice «No hay tirada para resistirla: le entra 3d4 de
+  daño de fuego y Quemadura (3 turnos). El daño lo tira Arcano 3.» (vale para toda zona sin tirada). 1 prueba automática nueva (974).
 
 ## En cola
 

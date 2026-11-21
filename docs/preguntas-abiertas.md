@@ -1914,3 +1914,11 @@ Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas
 El Muro de fuego (la habilidad de los magos creep) ya quema al empezar el turno de quien está parado encima (P259). La **Varita del muro de fuego**
 (Buena Calidad, 1d4 de fuego, 3 casillas) dice otra cosa en su texto: «a cada rival que entra y, en cada Mantenimiento, al que sigue adentro», y así
 sigue (no se tocó: el pedido era el Muro). ¿La paso al mismo comportamiento (y cambio su texto), o queda distinta a propósito?
+
+### P273 — 💍 El aviso de los anillos antes de una habilidad que mueve: ¿cuándo sobra? (2026-11-21, Claude)
+Con Puntería certera o Foco activos, el Dash, el Salto, el Takle, la Carga que derriba, el Parpadeo y la Varita del blink apagan el anillo como
+caminar (ya lo hacían) y ahora, además, avisan **al tocar Ejecutar, antes de cobrar**: «Si te movés con Dash, los perdés. [Usarla igual] [Cancelar]».
+Se pregunta ahí porque después ya está cobrado. Dos casos en los que el aviso puede sobrar:
+1. **La Varita del blink sobre un aliado**: el aviso sale igual (todavía no se eligió a quién); si teletransportás a otro, tu anillo no se apaga.
+2. **El Salto, el Takle o la Carga con el objetivo ya pegado**: no se mueve (ataca sin saltar ni correr) y el anillo sigue, pero el aviso salió.
+¿Está bien así (el aviso dice «si te movés…»), o preferís que en esos casos no avise?

@@ -153,7 +153,7 @@ const ZonaDetalle = (() => {
     const sola = ctx.sola !== undefined ? !!ctx.sola : true;
     const est = estadoTxt(e, ctx), pct = pctDe(e);
     const dano = el.trampaDano ? `${el.trampaDano} de daño${elem ? ` de ${ctx.elementoNombre || elem}` : ''}` : '';
-    const efecto = [dano, est ? `${pct ? `${pct} % de chance de ` : ''}${est}` : '', el.trampaDestino ? 'lo teletransporta a otro punto' : ''].filter(Boolean).join(' y ');
+    const efecto = [dano, est ? `${pct ? `${pct} % de chance de ` : ''}${est}` : '', el.trampaDestino ? 'lo teletransporta a otro punto' : (e.portal ? `lo lleva por un portal a otra casilla${Number(e.portal.rango) > 0 ? ` (hasta ${Number(e.portal.rango)} de distancia)` : ''}` : '')].filter(Boolean).join(' y ');
     const aQuien = sola ? 'a quien la pisa' : 'a todos los que estén en su área';
     let esencial;
     if(el.disparada) esencial = `Ya se disparó: como trampa no hace nada más${el.zona ? ' (lo que dejó puesto se cuenta abajo)' : ''}.`;

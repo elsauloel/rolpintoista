@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261120zd1"></script>
+<script src="zona-detalle.js?v=20261121zd2"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261120volver"></script>
@@ -9324,6 +9324,11 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     igual(m.descripcion, 'Muerde la pierna.');
     ok(/^Ya se disparó/.test(ZonaDetalle.armar({...t, disparada: true}, {autor: {}}).esencial));
     igual([ZonaDetalle.tiene({tipo: 'flor', solido: true}), ZonaDetalle.tiene(muro), ZonaDetalle.tiene({niebla: true}), ZonaDetalle.armar({tipo: 'flor'}, {})], [false, true, true, null]);
+  });
+  prueba('el Portal trampa de un creep (el destino va adentro de su estado): la tarjeta dice que lo lleva por un portal', () => {
+    const t = {trampa: true, trampaNombre: 'Portal', trampaEstado: JSON.stringify({nombre: 'Expuesto', turnos: 1, portal: {rango: 4, destino: '13,6'}, magica: true})};
+    const m = ZonaDetalle.armar(t, {estadoTexto: sp => `${sp.nombre} (${sp.turnos} turno)`, autor: {nombre: 'Arcano'}, sola: true});
+    igual(m.esencial, 'Expuesto (1 turno) y lo lleva por un portal a otra casilla (hasta 4 de distancia) a quien la pisa, cuando la pisa un rival de quien la puso.');
   });
 })();
 

@@ -1136,8 +1136,9 @@ function elementoQueEs(e){
     return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
   }
   if(e.zona){
-    const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
-    return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
+    const q = num(e.turnos) > 0 && typeof zonaTurnosQuedan === 'function' ? zonaTurnosQuedan(e) : null;   // la misma cuenta que «Ver detalle» (js/127)
+    const t = q ? q.quedan : (num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0);
+    return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
       ` · <span class="es-libre">la sufre quien entra y quien sigue adentro en el Mantenimiento</span>`;
   }
   // ☁ La nube y 🔥 el terreno en llamas también dicen qué son (2026-11-20, con el «Ver detalle»; antes salían como «Flor · TRANSITABLE»).
@@ -1148,7 +1149,8 @@ function elementoQueEs(e){
   if(e.trampa){
     // Quién la dispara y a quién alcanza (dueño, 2026-10-19: «al seleccionar una trampa, arriba a la derecha, también se debe aclarar esto»).
     const mag = trampaEsMagica(e), ef = trampaEfectoDe(e), sola = (ef ? ef.area : (celdasDeElemento(e).length > 1 ? 'trampa' : 'pisador')) === 'pisador';
-    const quien = mag ? '✨ mágica: la disparan solo los rivales de quien la puso' : '⚙ mecánica: la dispara cualquiera que la pise, también los aliados';
+    // (2026-11-21: desde el 2026-11-03 las dos las disparan solo los rivales de quien la puso —`trampaDispara`, js/08—; el cartel seguía diciendo lo viejo de la mecánica.)
+    const quien = `${mag ? '✨ mágica' : '⚙ mecánica'}: la disparan solo los rivales de quien la puso`;
     const estado = e.disparada ? '<span class="es-solido">💥 DETONADA</span>'
       : `<span class="es-trampa">⚠ ARMADA · ${quien} · ${sola ? 'afecta a quien la pisa' : 'afecta a todos los del área'}</span>`;
     return `<b>🪤 TRAMPA · ${esc(e.trampaNombre || 'sin nombre')}</b> <span>${de}</span> · ${estado}${det(e.trampaDetalle)}`;

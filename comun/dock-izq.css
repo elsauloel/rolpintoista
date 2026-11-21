@@ -1,0 +1,24 @@
+/* El menú de botones de la izquierda (2026-10-12, dueño: «gm tools debería tener a la izquierda una línea de botones en este mismo estilo,
+   para mantener la coherencia»). Lo usan la ficha y GM Tools: <aside class="dock-izq"> con botones .dock-btn (.dock-ico + .dock-txt); se
+   abre al pasar el mouse. Usa las variables de color de cada página (--panel, --panel2, --line, --paper, --copper, --brass). */
+/* 📐 Columna fija (2026-11-21, dueño, con captura: «este menú lateral en la ficha queda desprolijo. Qué tal dejar directamente una columna de ese
+   ancho que efectivamente desplace el resto de la ficha. Que la columna quede fija y la ficha sí scrollee si fuera necesario»). Antes flotaba
+   encima de la página y le tapaba el borde izquierdo. Ahora es una columna de alto completo, fija, y la página empieza a su derecha
+   (`body` corrido con --dock-ancho). Embebida en el mapa (modo-botonera / modo-acciones: el menú no se muestra) no queda el hueco. */
+:root{--dock-ancho:56px}
+body:has(> .dock-izq){padding-left:var(--dock-ancho)}
+html.modo-botonera body,html.modo-acciones body,html.modo-mantenimiento body{padding-left:0}
+.dock-izq{position:fixed;left:0;top:0;bottom:0;width:var(--dock-ancho);box-sizing:border-box;z-index:40;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;padding:58px 0 12px 5px;background:var(--paper);border-right:2px solid var(--copper);box-shadow:2px 0 14px rgba(0,0,0,.5)} /* 🖼 en claro (2026-11-18, dueño: «el botón del mapa se pierde con tanto estímulo») */
+.dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:40px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;flex:none;color:var(--paper);text-decoration:none;
+  cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 4px 12px rgba(0,0,0,.45);transition:width .18s,border-color .15s,background .15s}
+.dock-btn .dock-ico{font-size:19px;line-height:1;flex:none;width:18px;text-align:center}
+/* El rótulo, entero o nada (antes asomaba media letra al lado del ícono): se ve recién cuando el botón se abre. */
+.dock-btn .dock-txt{white-space:nowrap;opacity:0;transition:opacity .12s}
+.dock-izq:hover .dock-btn .dock-txt,.dock-btn:focus-visible .dock-txt,.dock-btn[aria-expanded="true"] .dock-txt{opacity:1}
+.dock-izq:hover .dock-btn,.dock-btn:focus-visible{width:176px}
+.dock-btn:hover{border-color:var(--copper);background:var(--panel2);color:var(--brass)}
+/* Un botón apagado (Despojos sin botín, Vendedor sin tienda): opaco, para que al abrirse no se le vea la ficha por detrás. */
+#dock-izq .dock-btn:disabled,.dock-izq .dock-btn:disabled{opacity:1;background:color-mix(in srgb,var(--panel) 72%,var(--paper));color:var(--muted);cursor:not-allowed;box-shadow:none}
+.dock-izq .dock-btn:disabled .dock-ico{opacity:.45}

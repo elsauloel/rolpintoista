@@ -1,0 +1,277 @@
+# Plan del sistema nuevo — Rol Pintoísta en vivo
+
+Documento vivo: decisiones tomadas con el usuario y estado de cada paso.
+Leerlo antes de trabajar en esta rama. Cómo está armado Firebase:
+[`workflow-firebase.md`](workflow-firebase.md).
+
+## Objetivo
+
+Un "Roll20 propio" con solo lo que el grupo usaba, jugando cada uno desde
+su casa:
+
+- Mapa de hexágonos compartido. El GM puede ponerle una imagen de fondo
+  (opcional, solo si sale simple).
+- Tokens: cada jugador mueve los suyos, el GM mueve los de los creeps.
+  Todos ven los movimientos al instante.
+- Cada token conectado a su ficha: barra de vida, barra de SP (hoy
+  "Bonos" en la ficha, ya renombrado en la Iteración 2) e íconos de estados alterados.
+- Chat de tiradas compartido desde los botones de ficha y gm-tools.
+- Fichas y herramienta del GM en vivo: nada de "Subir datos"/"Bajar datos".
+
+## Contexto y alcance
+
+- **Rol Pintoísta** es el sistema/proyecto. **Piratas en el espacio** es
+  la campaña que se juega hoy con la versión vieja (carpeta `rol`, rama
+  `main`, sync por GitHub) y queda como archivo histórico. **No se migran
+  sus personajes ni sus datos** y no hace falta convivir con ella.
+- Trabajo en la carpeta `rol-nueva-version` (git worktree, rama
+  `nueva-version`). **La plataforma vieja (sync de datos de partida por
+  GitHub) ya no se usa ni hace falta preservarla**: no quedan botones ni
+  código de "Traer última versión"/Subir/Bajar datos para personajes,
+  tablero, tienda o creeps — todo eso es Firebase. Desde 2026-09-29 el
+  catálogo de ítems tampoco va por la rama `main`: la copia de fábrica es
+  `comun/catalogo.js` (código del sitio) y lo que sube el grupo vive en
+  Firebase (ver `docs/plan-subida-unificada.md`, paso 5). Por GitHub (con
+  token) solo escriben las herramientas del dueño que editan archivos de
+  fábrica (`datos/catalogo-editor.html`, `datos/auditoria-skills.html`) y
+  `gestor.html` (actualiza el *código* de las herramientas, no datos).
+- Sin backend propio ni build step: cada herramienta sigue siendo un
+  `.html` que se abre con doble clic. Firebase (proyecto `rol-pintoista`,
+  plan Spark gratis, sin tarjeta) es el backend en vivo.
+- **Imágenes: solo las necesarias, y siempre que no compliquen**: retrato
+  en la cabecera de la ficha, imagen propia de cada creep, miniatura de
+  esas en el token vinculado, e imagen de fondo del mapa. Las de ítems,
+  habilidades y catálogo quedan afuera por ahora.
+- Catálogo, manual y `herramientas/*.py` quedan como están por ahora. La
+  tienda pasó a Firebase (Paso 5).
+- El usuario no es técnico: explicarle en palabras simples y con pasos
+  concretos en la consola de Firebase.
+
+## Decisiones tomadas
+
+- **Firestore** (no Realtime Database). SDK compat por `<script>`.
+- **Entrada** (desde el Paso 4): cuenta de Google, o email y contraseña con
+  confirmación por link. El sitio arranca pidiendo iniciar sesión; después
+  muestra **todas las partidas** (grupo cerrado de 4 amigos: cualquiera ve
+  todas y se une con un clic) y permite crear una. **Quien crea la partida
+  es su GM**; los que se unen son jugadores. **El nombre se elige al entrar
+  a cada partida.** Se arrancó de cero: los datos de prueba anteriores
+  (identidades anónimas) no se migran. Antes: sesión anónima + código de
+  campaña (Pasos 0–3).
+- **Datos agrupados por campaña**: `campanas/{id}/...`.
+  `piratas-en-el-espacio` es por ahora solo espacio de pruebas.
+- **Permisos** (impuestos en `firebase/firestore.rules`, no solo en la UI):
+  - Cada ficha de PJ tiene dueño (`duenoUid`). Solo el dueño la modifica;
+    todos los miembros la ven. Un jugador puede tener **varios personajes**.
+  - El GM ve todas las fichas de PJ pero **no las modifica**; solo puede
+    reasignar el dueño (para cuando alguien cambia de compu).
+  - **La ficha de personaje es solo de jugadores.** El GM usa gm-tools para
+    sus creeps y sus propios personajes (que son creeps con otro nombre:
+    PNJ aliados, comerciantes…). Si el GM abre la ficha, solo mira.
+  - **Stats iniciales en 1** (Con, Fue, Agi, Des, Int) para personajes,
+    creeps e invocaciones nuevos; la vida arranca llena. En creeps y en
+    invocaciones, Hp.Max = Con×5 + mods de Hp.Max (equipo y estados),
+    igual que en la ficha (se recalcula al terminar de editar Con).
+  - Rol visible en la cajita Mesa ("· GM" / "· jugador"). Es por navegador.
+  - Fichas de creeps: solo el GM las ve y modifica. Los jugadores ven de
+    cada creep solo el token, la barra de vida y los estados.
+  - El daño recibido lo aplica el dueño en su propia ficha.
+  - Tiradas del GM: visibles para todos (tiradas secretas, más adelante).
+  - **Historial de tiradas solo de la sesión**: el GM lo borra a mano (🗑
+    en la Mesa) y se borra solo lo de más de 48 h cuando el GM entra a
+    una herramienta (no hay servidor que lo haga a hora fija).
+  - **Vida de los creeps**: los jugadores solo ven cuán llena está la barra
+    (se publica el porcentaje, no los números). Los creeps no tienen SP.
+  - Barras: **vida roja, SP azul** (en tokens y Tablero).
+- **Fichas en vivo, guardadas por partes** (recursos, estados, inventario,
+  atributos…), con escrituras espaciadas (~1 s) por el tope diario del
+  plan gratis.
+- **Solo compu, no celular** (decidido 2026-09-17): no se adapta ni se
+  prueba nada para pantallas de celular, ni en programación ni en diseño.
+  Queda como pendiente: si el usuario lo pide más adelante, se trabaja
+  aparte (hoy no está bien resuelto). Lo que ya existe para pantallas
+  angostas se deja como está, pero no se sigue sumando.
+- **Dados en el navegador de cada uno** (sin servidor que tire): aceptado
+  entre amigos.
+- **Sitio web con GitHub Pages** (gratis, repo público): se publica la rama
+  `nueva-version` desde la raíz, en `https://elsauloel.github.io/rolpintoista/`
+  (`index.html` con links a cada herramienta; `.nojekyll` para que GitHub
+  sirva los archivos tal cual). Cada push a `nueva-version` se publica solo
+  en 1–2 minutos, así que **solo se sube lo ya probado**. Cuando empiecen
+  las partidas de verdad se puede pasar a publicar desde otra rama. Abrir
+  por la web y abrir con doble clic son identidades distintas en Firebase:
+  al pasar a la web cada uno vuelve a entrar con el código (el GM se
+  remarca en la consola y reasigna los personajes si hace falta). La ficha
+  ya no tiene el menú ⚙ Ajustes (Cambiar token, Actualizar gestor): la
+  navegación es el menú ☰ (`comun/menu-sitio.js`). Abrir con doble clic
+  sigue funcionando.
+- **Botones y código de GitHub para datos de partida: eliminados**, no
+  solo desactivados (2026-09-17) — el modal "Antes de arrancar…" con
+  "Traer última versión" nunca se abría en `nueva-version`, así que se
+  sacó entero de la ficha y gm-tools, junto con las funciones que solo
+  servían para eso. `gestor.html` (actualizaba el *código* desde `main`) se
+  retiró el 2026-10-25.
+  "Guardar ficha"/"Cargar archivo" local se conserva como respaldo.
+
+## Pasos
+
+| Paso | Qué | Estado |
+|---|---|---|
+| 0 | Firebase: proyecto, auth anónima, código, reglas, página de prueba | ✅ Hecho y probado |
+| 1 | Mesa: tiradas compartidas en vivo (cajita flotante en ficha y gm-tools) | ✅ Hecho y probado |
+| 2 | Mapa de hexágonos (`vtt-hexgrid/mapa.html`) con tokens movibles en vivo y la Mesa al costado | ✅ Hecho y probado |
+| 3 | Fichas y creeps en vivo: barras y estados en los tokens; se eliminan Subir/Bajar datos, Personajes y Tablero vía GitHub | ✅ Hecho y probado |
+| 3a | Ficha guardada sola en Firebase por partes; Personajes lista los de la mesa (propios / de otros en solo lectura); se van Subir/Bajar datos | ✅ Hecho y probado |
+| 3b | Creeps de gm-tools en vivo (con su imagen); se va "Subir datos" de gm-tools | ✅ Hecho y probado |
+| 3c | Mapa: token vinculado a ficha/creep con barras de HP y SP, estados y miniatura; imagen de fondo del mapa; Tablero en vivo | ✅ Hecho y probado |
+| 4 | Cuentas y partidas: login con Google o email confirmado, inicio con la lista de partidas, crear (GM) o unirse (jugador), herramientas por partida (`?partida=`), sesión compartida en `comun/sesion.js` | Hecho, falta probar |
+| 4c | Manejo de la partida para el GM: ver jugadores (con sus personajes), sacar a alguien, renombrar o borrar la partida (escribiendo el nombre, ofreciendo antes el respaldo); "Irme de esta partida" para jugadores. Decidido: los personajes del que se va quedan y el GM los reasigna; sacar no bloquea volver a unirse; borrar es de verdad (hay que cambiar reglas para que el GM borre fichas); el GM no se va ni pasa el rol | Hecho, falta probar (y pegar las reglas nuevas en la consola) |
+| 5 | Tienda en vivo: el GM arma la tienda en el generador (se guarda sola), rerolea ítems sueltos, la publica o la cierra; guarda tiendas con nombre (una por lugar) para reabrirlas, modificarlas o regenerarlas; los jugadores la abren con 🏪 Vendedor en la ficha. Se van el token y los botones de GitHub del generador | Hecho, falta probar (y pegar las reglas nuevas en la consola) |
+
+**Sitio web:** https://elsauloel.github.io/rolpintoista/ (GitHub Pages desde
+`nueva-version`, activo desde el 14/9/2026).
+
+**Más adelante:** versión para celular (solo si se pide), GM oculta tokens/tiradas, tiradas secretas, alcance y
+movimiento en el mapa, niebla de guerra, imágenes (retratos, fondo),
+publicar en una web, pasar catálogo/tienda/manual a Firebase.
+
+**Hecho aparte (2026-09-15):** respaldo de la partida para todos (💾 en la ficha y en
+gm-tools; un .json que se recarga con "Cargar archivo"); imagen de fondo
+del mapa separada de su posición. **Siguiente:** dados 3D en el mapa
+(animación con el resultado real de cada tirada, sin escrituras extra;
+con opción de apagarla y tope de dados).
+
+## Sigilo (en diseño)
+
+Un personaje o un creep entra en sigilo desde el mapa. Decisiones del
+2026-09-19 (marcadas *a debatir* cuando el usuario las dejó abiertas); el
+juego sigue en modo "entre amigos": nadie va a mirar el código para hacer
+trampa, así que **todo el ocultamiento es visual** (ver "Antes de abrirlo al
+público").
+
+**Qué es:**
+- **Es una habilidad estándar** (se tiene por clase u otros mecanismos) que
+  aplica un **estado alterado "Sigilo"** sobre uno mismo (en principio sí,
+  P12). Entrar cuesta **1 No2** *(a revisar)*; moverse en sigilo **cuesta lo
+  mismo** que moverse normal *(a debatir)*. Encaja con las habilidades
+  automatizadas de la ficha (costo + estado sobre uno mismo).
+  **Quién puede entrar en sigilo** (2026-09-19): quien tiene la habilidad
+  "Sigilo" cargada en sus habilidades. Un ítem, la clase o cualquier
+  circunstancia solo tiene que agregársela; el botón directo de la Botonera
+  aparece con solo tenerla (no importa cómo llegó).
+- **Se rompe**: (1) automáticamente si el token **entra en el campo de
+  detección automática** (el cono) de un enemigo; (2) al hacer una **acción
+  hostil**: cualquier acción con efecto directo sobre un enemigo (un ataque,
+  una skill individual; invocar una nube tóxica en área, no — *a debatir*).
+  **La acción hostil es una regla, pero no se puede automatizar su detección:
+  queda entre los jugadores** (quien la hace sale del sigilo a mano con el
+  botón de la Botonera; el GM saca el estado del creep).
+  Cuando se lo detecta, **aparece donde lo detectaron** (P9).
+
+**Quién ve qué** (todo visual):
+
+| En sigilo | Lo ven | No lo ve |
+|---|---|---|
+| Personaje | su dueño y los demás jugadores (semitransparente) | el GM |
+| Creep | el GM (semitransparente) | los jugadores |
+
+- **El GM no ve la ficha ni el token** de un personaje en sigilo, pero tiene
+  un **botón con un ojo 👁** que revela todos los ítems y personajes
+  ocultos (pronto habrá trampas). Al apretarlo tiene que haber un **aviso muy
+  evidente a los jugadores**: un mensaje en la Mesa con fondo rojo y un
+  efecto parecido al filtro rojo de cuando un personaje muere, con un
+  **ojo grande en el centro** (idea: un PNG con fondo transparente, tipo ojo
+  de Sauron) que aparece de golpe y a los 1–2 segundos se apaga con fade.
+- Las **tiradas** del que está en sigilo **se ven en la Mesa** (P11).
+- **Clima**: el jugador que entra en sigilo ve el mapa **a través de un
+  filtro violáceo tenue**.
+
+**Orientación y campo de visión:**
+- ✅ **Hecho en el mapa**: la grilla es "de lado arriba" y cada token es un
+  hexágono que mira hacia **uno de los 6 lados**; por defecto mira abajo.
+  Se gira arrastrando un handle celeste. **Girar NO cuesta No2** (2026-09-24: se sacó la regla de
+  1 No2 por giro de 60° en combate, P14).
+- **Al moverse, el token queda mirando hacia donde caminó**, salvo que gaste
+  más No2 en girarse (P15).
+- **Tienen orientación, cono, alerta y punto ciego atrás**: los personajes,
+  **los creeps y las invocaciones** por igual (P20).
+- **Cono = campo de detección automática**: los **16 hexágonos azules** del
+  diagrama de la niebla, un rombo de 4 × 4 que arranca en el hexágono de
+  justo delante del token (filas de 1, 2, 3, 4, 3, 2 y 1; 7 columnas de
+  ancho; hasta 4 hexágonos al frente por el eje).
+- **Zona de alerta** (naranja **y rojo**: los dos hexágonos rojos del
+  costado también son alerta): el anillo alrededor del cono más los vecinos
+  del token, **salvo el de atrás**.
+- Sigilo frente a un enemigo: entrar **en su cono** rompe el sigilo solo;
+  **cada paso que da dentro de su zona de alerta** provoca una **tirada de
+  detección** (P5), que es **manual**: el mapa cuenta los pasos y avisa, la
+  resuelve la mesa (en principio Destreza del que se esconde contra Especial
+  del que vigila, *a debatir*, P3).
+- **El jugador puede arrastrar el token para evaluar rutas**, pero nada se
+  efectiviza (ni se rompe el sigilo) hasta que lo suelta en una ubicación
+  (P18).
+- **Cuando alguien en sigilo ve su cono y su alerta**: apenas está en
+  sigilo se le dibujan automáticamente, semitransparentes (P19).
+- **El cono y la superficie de visión se pueden modificar** con efectos de
+  distintas fuentes (ítems, skills, estados…) (P21).
+- **Obstáculos**: se prueba que los **elementos sólidos tapen la vista**
+  (P17 y P52).
+
+**Cómo lo vamos a construir, paso a paso:**
+1. ✅ (2026-09-19) El estado "Sigilo" y quién ve qué (visual), con el filtro violáceo, más el botón directo "Entrar en sigilo" en la Botonera de la ficha.
+2. ✅ (2026-09-19) El botón 👁 del GM y su aviso a los jugadores (fila roja en la Mesa y destello con ojo en todas las pantallas).
+3. ✅ (2026-09-19) Cono y alerta dibujados (con el frente automático al moverse, el punto
+   ciego y los sólidos que tapan la vista); también para creeps e
+   invocaciones.
+4. ✅ (2026-09-19) Ruptura automática por entrar al cono, y el aviso de tiradas por pasos
+   en la alerta.
+5. ✅ (2026-09-19) Costo de girar: 1 No2 por giro de 60°, solo en combate. **Sacado 2026-09-24: girar es gratis.**
+
+**Detección (decidido 2026-09-19):** la tirada es manual y **tiran los dos,
+cada uno con su stat** (P4, en principio Destreza contra Especial); también
+se puede **buscar a propósito** (P6), igual de manual. **Pendiente de probar:**
+las invocaciones en el sigilo.
+
+**Ya sin preguntas abiertas del sigilo** (2026-09-19): el costo de entrar queda en 1 No2 (P1, a revisar con los colegas) y quien se esconde a la vista deja una marca de última posición por **dos turnos** (P8, construido). Pendiente solo de probar: las invocaciones.
+
+## Antes de abrirlo al público
+
+Hoy el sistema es para jugar **entre amigos de confianza**: nadie va a
+tocar el código ni la base para hacer trampa. Por eso algunas decisiones
+se toman de forma relajada para avanzar con el diseño. **Si algún día se
+decide lanzarlo al público, hay que revisar esta lista antes** (y cada
+decisión relajada nueva se agrega acá al tomarla).
+
+| Decisión relajada hoy | Qué habría que resolver para el público |
+|---|---|
+| Los dados se tiran en el navegador de cada uno | Un servidor que tire (o que verifique las tiradas); hoy cualquiera podría publicar el resultado que quiera |
+| Cualquier cuenta ve todas las partidas y se une con un clic | Partidas privadas: invitación, código o aprobación del GM |
+| "Sacar" a alguien no le impide volver a unirse | Lista de bloqueados o partida cerrada a nuevos jugadores |
+| Cualquiera de la partida puede sacar del mapa una trampa (Desarmar trampas, 2026-10-08) | Que solo la saque quien la desarmó de verdad (una tirada verificada) o el GM |
+| El GM puede borrar las fichas de los jugadores (lo usa "Borrar la partida") | Limitarlo a ese caso, o que las fichas no se borren sin el dueño |
+| El dueño del proyecto de Firebase ve todo desde la consola (incluido lo oculto: vida de creeps, sigilo, tiradas secretas) | Separar el rol de administrador del de GM |
+| Plan Spark gratis, sin límites por usuario (partidas, tiradas, escrituras) | Plan pago y topes/controles contra abuso |
+| El borrado de tiradas viejas corre cuando el GM entra a una herramienta | Borrado del lado del servidor (TTL o función programada) |
+| Lo que cada uno escribe en su ficha (vida, SP, No2, stats) no se valida | Validar en el servidor lo que afecta a los demás |
+| **Sigilo** (en diseño): el bando contrario no ve el token, pero el resto de la info (ficha, tiradas) queda a decidir | Revisar que ningún dato filtre la posición o las acciones del que está en sigilo |
+| **Ocultar tokens** (GM, ya en el mapa): un jugador que mire la base de datos directamente podría ver igual el token oculto — el filtro es del lado del cliente, no de las reglas | Mover los tokens ocultos a una subcolección que solo lea el GM |
+| **Biblioteca (subida unificada, 2026-09-29)**: cualquier cuenta confirmada sube a la biblioteca compartida y puede **corregir** cualquier entrada (queda sin auditar, con versión +1 y quién la corrigió) — confianza entre los cuatro | Que corregir lo ajeno pase por una propuesta que apruebe el autor o el dueño; tope de subidas por cuenta |
+| **Fórmulas de stats evaluadas como código (2026-09-30, anotado en el paso 5)**: cada ficha puede editar las fórmulas de sus stats y se evalúan como código (`FichaCalculo.evalFormula`) en el navegador de quien abre la ficha — hoy el dueño y quien la mira; con la etapa 3 del paso 4, también el mapa. Entre amigos no es un problema | Limitar las fórmulas a números, atributos y operaciones (un evaluador propio en vez de `new Function`) |
+| **🎮 Tomar el control (2026-09-30)**: el GM toma el control de la ficha de un jugador sin pedirle permiso (lo avisa en la Mesa y el jugador queda en solo lectura hasta que se la devuelve) | Pedirle al jugador que acepte (o que pueda recuperarlo cuando quiera), y que las reglas de Firebase respeten la marca de control |
+| **Orden de turnos**: cualquier miembro puede reescribir el `orden` entero de `mapa/iniciativa` (no solo el valor de su propia fila) — las reglas no pueden revisar un elemento suelto de una lista | Partir `orden` en un documento por token, para que las reglas sí puedan limitar cada uno a su dueño |
+| **Niebla y fuego del mapa (2026-10-08, Varita del vendaval)**: cualquier miembro puede borrar un elemento de niebla o de fuego (las reglas no saben si lo tocó el viento) | Que el borrado lo haga quien tiene permiso (el GM o un servidor), a pedido del que tiró el vendaval |
+| **🎭 Acción incierta (2026-10-09)**: lo que hace un creep escondido y las trampas que coloca cada bando se guardan enteros en la Mesa; el mapa de cada jugador decide qué mostrar (un creep sin revelar no aparece, uno conocido sale como «acción incierta»). Alguien que mire la base, o la ficha suelta, ve el detalle | Que la línea secreta la escriba el servidor o vaya a una colección que solo lea su bando, y la Mesa pública reciba solo la versión incierta |
+| **✊ Piedra, papel o tijera (2026-10-08)**: las dos jugadas viajan en el mismo documento (`ppt`): la pantalla no muestra la del otro hasta que eligieron los dos, pero alguien que mire la base podría verla antes de elegir | Guardar cada jugada en un documento que solo lea su dueño y revelarlas cuando estén las dos (las reglas verifican que la revelada sea la guardada) |
+
+## Pendientes chicos
+
+- En `miembros` quedan documentos repetidos de pruebas en incógnito
+  ("Pepe"): se pueden borrar desde la consola.
+- Borrar desde la consola `campanas/piratas-en-el-espacio` (datos de prueba
+  anónimos) y desactivar el proveedor Anónimo en Authentication.
+
+## Cómo se prueba cada paso
+
+Desde el sitio web, con dos cuentas distintas (dos perfiles de Chrome, o
+una ventana normal y una de incógnito): una como GM y otra como jugador.
+Cada push a `nueva-version` se publica solo.

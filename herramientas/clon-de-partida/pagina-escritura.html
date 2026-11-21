@@ -1,0 +1,52 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>clon · escritura</title>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script>
+// CANDADO POR RUTA: desde esta página solo se puede escribir ADENTRO de la partida clon.
+//  · Hasta que se fija el destino (Candado.fijar), no sale ninguna escritura.
+//  · Fijado el destino, cualquier escritura a una ruta que no empiece por «campanas/<clon>/» se rechaza.
+//  · El destino no puede ser la partida original: Candado.fijar aborta si los dos ids son iguales.
+//  · El documento de la partida (campanas/<clon>) tampoco se toca; las transacciones están apagadas.
+(function(){
+  const F = firebase.firestore;
+  let destino = '', origen = '';
+  const rechazar = (que, ruta) => { const m = 'BLOQUEADO ' + que + ': la ruta no es de la partida clon'; console.log(m); throw new Error(m); };
+  function permitida(ruta){
+    if(!destino || !origen || destino === origen) return false;
+    ruta = String(ruta || '');
+    if(ruta.split('/').includes(origen)) return false;   // nada que nombre a la partida original
+    return ruta.startsWith('campanas/' + destino + '/') && ruta.length > ('campanas/' + destino + '/').length;
+  }
+  const envolver = (proto, nombre, rutaDe) => {
+    const original = proto[nombre];
+    proto[nombre] = function(...args){
+      const ruta = rutaDe(this, args);
+      if(!permitida(ruta)) rechazar(nombre, ruta);
+      return original.apply(this, args);
+    };
+  };
+  envolver(F.DocumentReference.prototype, 'set', t => t.path);
+  envolver(F.DocumentReference.prototype, 'update', t => t.path);
+  envolver(F.DocumentReference.prototype, 'delete', t => t.path);
+  envolver(F.CollectionReference.prototype, 'add', t => t.path + '/x');
+  envolver(F.WriteBatch.prototype, 'set', (t, a) => a[0] && a[0].path);
+  envolver(F.WriteBatch.prototype, 'update', (t, a) => a[0] && a[0].path);
+  envolver(F.WriteBatch.prototype, 'delete', (t, a) => a[0] && a[0].path);
+  F.Firestore.prototype.runTransaction = function(){ rechazar('runTransaction', ''); };
+  window.Candado = {
+    fijar(idDestino, idOrigen){
+      if(destino) throw new Error('El destino ya estaba fijado');
+      if(!idDestino || !idOrigen) throw new Error('Faltan los ids de destino u origen');
+      if(idDestino === idOrigen) throw new Error('ABORTO: el destino es la partida original');
+      destino = idDestino; origen = idOrigen;
+    },
+    permitida,
+    get destino(){ return destino; },
+  };
+  window.CANDADO = 'por-ruta';
+})();
+</script>
+<script src="comun/sesion.js"></script>
+<script src="clon-pagina.js"></script>
+</head><body>clon · escritura (solo adentro del clon)</body></html>

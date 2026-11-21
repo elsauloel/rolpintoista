@@ -819,12 +819,12 @@
   el ave del Fénix se lee como ave, si el latido del Revive «parece un corazón que arranca», si el polvo del Ankh se lee como una espiral, y si
   molesta que a las otras pantallas la animación les llegue alrededor de un segundo después que a la de quien revive.
 
-- [ ] **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
+- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
   el GM cambie SOLO el campo `nombre` de un token de personaje (dos lugares: los tokens del primer mapa y los de los mapas guardados). Mientras no
   estén pegadas no se rompe nada: la pantalla del GM lo intenta y, si no puede, calla (sin error); los nombres los corrige igual la pantalla del
   jugador dueño al abrir el mapa o su ficha.
 
-- [ ] **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
+- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
   `descubierta` en una trampa (dos lugares: los elementos del mapa de siempre y los de los mapas guardados). Mientras no estén pegadas, «Volver a
   ocultar» y «✋ No la detectó» andan igual por un camino de respaldo (el mapa vuelve a colocar la misma trampa, tarda unos segundos más) si la
   trampa es del GM o la puso una habilidad / un consumible; con una trampa hecha a mano por un jugador avisa «faltan pegar las reglas».

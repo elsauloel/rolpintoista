@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261120enj"></script>
+<script src="duelo.js?v=20261121foco"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261120hasta"></script>
@@ -133,7 +133,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261120a"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
-<script src="quieto.js?v=20261120quieto"></script>
+<script src="quieto.js?v=20261121foco"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -9161,7 +9161,8 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     igual([Quieto.cartel(p[0]), Quieto.cartel(dos[1])], ['🎯 Puntería certera', '🔮 Foco']);
     igual(Quieto.aviso(p, 'Bizzante', true), 'Tenés Puntería certera activa (+2 a PdG). Si te movés, la perdés.');
     igual(Quieto.aviso(p, 'Bizzante', false), 'Bizzante tiene Puntería certera activa (+2 a PdG). Si lo movés, la pierde.');
-    cierto(Quieto.aviso(dos, 'X', true).includes('Foco activa (+2 a PdG.Esp)') && Quieto.aviso(dos, 'X', true).endsWith('las perdés.'));
+    cierto(Quieto.aviso(dos, 'X', true).includes('Foco activo (+2 a PdG.Esp)') && Quieto.aviso(dos, 'X', true).endsWith('los perdés.'));
+    igual(Quieto.aviso(dos.filter(b => b.stat === 'foco'), 'X', true), 'Tenés Foco activo (+2 a PdG.Esp). Si te movés, lo perdés.');
   });
   // El archivo del mapa (js/126) con un tablero armado a mano: dos pantallas que comparten lo anotado en la partida.
   const mundo = async (o) => {

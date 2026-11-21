@@ -37,7 +37,7 @@ const Quieto = (() => {
   };
   // Los anillos: qué stat, cómo se llama el bono y a qué suma.
   const ANILLOS = [
-    {stat: 'pulso', icono: '🎯', nombre: 'Puntería certera', a: 'PdG'},
+    {stat: 'pulso', icono: '🎯', nombre: 'Puntería certera', a: 'PdG', fem: true},
     {stat: 'foco', icono: '🔮', nombre: 'Foco', a: 'PdG.Esp'},
   ];
   // De los valores de un token ({pulso, foco}) → los bonos que tiene: [{stat, icono, nombre, a, val}].
@@ -45,8 +45,8 @@ const Quieto = (() => {
   const cartel = b => `${b.icono} ${b.nombre}`;
   // El aviso antes de moverse con el bono activo.
   const aviso = (lista, nombre, propio) => {
-    const que = lista.map(b => `${b.nombre} activa (+${b.val} a ${b.a})`).join(' y ');
-    const la = lista.length > 1 ? 'las' : 'la';
+    const que = lista.map(b => `${b.nombre} ${b.fem ? 'activa' : 'activo'} (+${b.val} a ${b.a})`).join(' y ');   // (2026-11-21: «Foco activo», no «Foco activa»)
+    const la = lista.length > 1 ? (lista.every(b => b.fem) ? 'las' : 'los') : (lista[0] && lista[0].fem ? 'la' : 'lo');
     return propio !== false ? `Tenés ${que}. Si te movés, ${la} perdés.` : `${nombre || 'Este token'} tiene ${que}. Si lo movés, ${la} pierde.`;
   };
   return {movio, activo, marcar, podar, unir, ANILLOS, bonos, cartel, aviso};

@@ -1372,6 +1372,9 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
     const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId) : null;
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
+      // 💍 El Foco también en un área, una línea y los misiles (2026-11-21, visto en el mapa: la Varita de misiles no lo sumaba). Solo cuando el
+      // casteador tira acá (con la tirada compartida ya viene sumado desde el primer objetivo). quietoDe solo lo da si la habilidad tira PdG.Esp.
+      quieto: pdgZona || a.pdgCompartido ? 0 : (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? quietoDe({...c, id: a.casteador.tokenId}, {hab: a.hab}) : 0; }catch(err){ return 0; } })(),
       presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
       carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');

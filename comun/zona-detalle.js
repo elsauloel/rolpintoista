@@ -163,7 +163,7 @@ const ZonaDetalle = (() => {
       : 'NO. La disparan los rivales de quien la puso y solo les pega a ellos (y a quien la pisó).'});
     else filas.push({k: 'Fuego amigo', v: 'NO. Los aliados de quien la puso no la disparan: pasan por encima sin que les haga nada.'});
     filaAutor(el, ctx, filas);
-    filas.push({k: 'Cuándo se dispara', v: `Al pisarla un rival de quien la puso (corta su movimiento ahí).${e.disparo === 'centro' ? ' Solo si pisa la casilla del centro.' : ''} Es de un solo uso.`});
+    filas.push({k: 'Cuándo se dispara', v: `Al pisarla un rival de quien la puso (corta su movimiento ahí).${e.disparo === 'centro' || e.dc ? ' Solo si pisa la casilla del centro: las demás no la activan, aunque el efecto las alcanza.' : ''} Es de un solo uso.`});
     const sv = ctx.salva || (e.salva && e.salva.stat ? e.salva : null);
     if(sv) filas.push({k: 'Tirada para evitarla', v: `Quien la pisa tira ${sv.etq || lbl(sv.stat)} y tiene que llegar a ${sv.dif}. Si llega, ${sv.que === 'mitad' ? 'recibe la mitad del daño' : sv.que === 'efecto' ? 'recibe el daño pero no el estado' : 'no le pasa nada'}${sv.logra ? ` (${sv.logra})` : ''}.`});
     else if(!el.disparada) filas.push({k: 'Tirada para evitarla', v: efecto ? 'No tiene: entra directo.' : `No está cargada en la trampa (${A_MANO}).`, aMano: !efecto});

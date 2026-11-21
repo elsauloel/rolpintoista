@@ -1732,6 +1732,8 @@ pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAl
   van los estados. ¿O eso no debería contar como resucitar?
 
 ### P257 — ▶ «Iniciar combate»: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-21):** «un caído queda como estaba al caer. Mismos nitros, no hay recarga ni regeneración de nada. También al momento de morir se le eliminan todos los estados alterados». Se programa en la cola («🔁 Turnos, caídos y resurrección»).
 El botón del orden de turnos (dueño, 2026-11-20). Dudas chicas, con lo elegido:
 - (a) **Los estados del primero:** su turno empieza como cualquier otro (regeneración, recarga, lo que se dispara al empezar); los turnos de sus
   estados bajan al TERMINAR su turno, como siempre. No se hizo nada distinto por ser el primer turno del combate.
@@ -1768,6 +1770,8 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
   problema que tenía el anillo. ¿Las paso al mismo mecanismo?
 
 ### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+> ✅ **Muro de fuego decidido (dueño, 2026-11-21):** «debería hacer daño a un personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Se corrige el mapa (cola: «🔥 Muro de fuego al empezar el turno»). Lo demás de P259 sigue abierto.
 
 Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detalle.js`, `comun/zona-detalle.js`). Para que el dueño decida:
 

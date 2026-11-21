@@ -1445,6 +1445,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   paneles (Exp y Job, DDE, Personajes) se siguen abriendo a la derecha; los botones apagados quedan opacos. Embebidas en el mapa no queda el
   hueco. Probado con clics en la ficha suelta de Blanco J1 (ventana de 900 px y de 1920; arriba, al medio y al fondo; paneles Exp y Job, DDE y
   la ventana de Equipo) y en GM Tools (1100 px, scrolleado, con Personajes abierto). Capturas de antes y después. No se adaptó a celular.
+- **⬜ en cola — 🔁 Turnos, caídos y resurrección (pedidos del dueño, 2026-11-21)**. Todo se prueba en «Claude · pruebas 2».
+  1. **«⏭ Pasar de ronda» en el orden de turnos (solo GM)**: «me gustaría, en el menú de iniciativa y orden, agregar un botón para el GM que diga
+     PASAR DE RONDA, que se saltee todos los turnos pendientes de la ronda y vuelva al primero. Sobre todo me sirve para cuando estoy haciendo
+     pruebas, pero podría llegar a suceder que lo necesite durante un juego».
+  2. **Turno libre**: con clic en un nombre del orden se le puede dar un turno libre. «Cuando esa persona pone "terminar turno", ¿el juego te
+     llevaría al que está inmediatamente después del del turno libre, o retoma la ronda de turnos como venía antes de otorgarle el turno libre?
+     Debería ser la segunda». Ver cómo está y dejarlo así.
+  3. **P257 decidida**: «un caído queda como estaba al caer. Mismos nitros, no hay recarga ni regeneración de nada» (también en «▶ Iniciar
+     combate»). «También al momento de morir se le eliminan todos los estados alterados».
+  4. **Resurrección con dos formas** (p. ej. Ankh y Pacto): «el juego te pregunta cuál preferís usar. Al seleccionar uno, recién ahí se muestra
+     la animación». Verificar que la animación no salga antes de elegir; probar con clics «¿Con qué volvés?» eligiendo entre dos formas.
+  5. **Invocaciones** (dato del dueño, no tarea): «no se reviven porque al caer se desinvocan». Que la doc lo diga y sacar de los pendientes la
+     prueba «invocación revivida con su ✚».
+- **⬜ en cola — 🎯 Apuntada de las ballestas, compartida entre pantallas** (dueño, 2026-11-21: «arreglalo también»): tiene la misma «memoria de
+  una sola pantalla» que tenía la Puntería certera; dejarla como quedó esa (lo que se movió, compartido; que te muevan no cuenta).
+- **⬜ en cola — 🔥 Muro de fuego al empezar el turno (P259 decidida)** (dueño, 2026-11-21): «el muro de fuego debería hacer daño a un
+  personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Hoy el mapa lo dispara al pasar de ronda: corregir el mapa,
+  y que el texto de la habilidad, el «Ver detalle» y el cartel de arriba digan lo mismo.
+- **⬜ en cola — 🔮 Foco Arcano y movimientos especiales con Puntería certera, con clics** (dueño, 2026-11-21: «probalo en Claude pruebas»):
+  Dash, Salto, Carga, Takle, Parpadeo con los dos anillos; el Foco con un área de personaje y en un creep o una invocación.
 
 ## En cola
 

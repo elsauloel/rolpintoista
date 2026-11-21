@@ -337,6 +337,7 @@ function bnInvAca(b){
     // En Silencio, primero el cartel del juego (async); lo demás sigue igual cuando contesta.
     (async () => {
       if(!(await InvHabilidades.confirmarSilencio(inv, h, bn.fichaId + SEP_INVOCACION + inv.id))){ toast(`${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }
+      if(typeof quietoAvisoHab === 'function' && !(await quietoAvisoHab(quietoTokenDeFicha(bn.fichaId + SEP_INVOCACION + inv.id), h))) return;   // 💍 una habilidad que mueve, con el anillo activo (js/126)
       const ui = bnInvHabUi();   // antes de cobrar: así guarda solo lo que cambió
       const p = InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), ui.dueloDisponible(), true);
       if(p.modo === 'manual'){ ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
@@ -740,7 +741,14 @@ function bnCombateAca(b){
   const S = bn.S, ui = bnCombateUi();
   if(a === 'atacar' || a === 'otroataque'){
     if(b.dataset.arma === undefined) return false;   // (la Botonera siempre lo trae con su arma; si no, que lo haga la ficha)
-    bnPreguntarTipoAtaque(S.inventario.find(x => x.id === b.dataset.arma) || FichaAcciones.armasEspeciales(S).find(x => x.id === b.dataset.arma) || null, a === 'otroataque');   // (un modo de una varita: en las armas especiales)
+    const armaA = S.inventario.find(x => x.id === b.dataset.arma) || FichaAcciones.armasEspeciales(S).find(x => x.id === b.dataset.arma) || null;   // (un modo de una varita: en las armas especiales)
+    // 💍 La Varita del blink con Puntería certera / Foco activos: el aviso antes (js/126, 2026-11-21).
+    if(armaA && typeof quietoAvisoHab === 'function' && Quieto.habMueve(armaA)){
+      const fid = bn.fichaId;
+      quietoAvisoHab(quietoTokenDeFicha(fid), armaA, armaA.nombre).then(si => { if(si && bn && bn.fichaId === fid) bnPreguntarTipoAtaque(armaA, a === 'otroataque'); });
+      return true;
+    }
+    bnPreguntarTipoAtaque(armaA, a === 'otroataque');
   }
   else if(a === 'esquivar') FichaAcciones.tirarValorStat(S, 'Evasión', FichaCalculo.calcular(S).final.eva, 'eva', undefined, undefined, undefined, ui);
   else if(a === 'danio'){
@@ -945,6 +953,12 @@ function bnAccionAca(b){
     if(it && it.desarmar && typeof window.abrirDesarmar === 'function'){ cerrarBotonera(); window.abrirDesarmar(); return true; }   // 🤺 Desarmar (Warrior, 2026-10-21): como el botón instantáneo
     if(!bnHabAca(it) || !bnPuedeGuardar()) return false;
     if(typeof elegirDestinoCb !== 'undefined' && elegirDestinoCb) elegirDestinoCancelar();   // ↩ otra habilidad esperando el objetivo: se cancela (y se devuelve) antes (2026-11-09)
+    // 💍 Una habilidad que mueve (Dash…) con Puntería certera / Foco activos: el aviso antes de cobrar (js/126, 2026-11-21).
+    if(typeof quietoAvisoHab === 'function' && Quieto.habMueve(it)){
+      const fid = bn.fichaId;
+      quietoAvisoHab(quietoTokenDeFicha(fid), it).then(si => { if(si && bn && bn.fichaId === fid) FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi()); });
+      return true;
+    }
     FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
     return true;
   }

@@ -86,6 +86,21 @@ const ZonaDetalle = (() => {
     return '';
   }
 
+  /* 🔥 El texto del cartel de una zona SIN tirada para resistir (vtt-hexgrid/js/08, `renderZonaBanner`; 2026-11-21, visto en el mapa con el Muro de
+     fuego: decía «No hay nada que tirar: se aplica lo que deja la zona» y después quien la puso tiraba 3d4 de daño). Dice qué entra y, si el daño
+     tiene dados, quién lo tira. o = {estadoTexto(spec), quienTira (nombre de quien tira el daño; '' si no se nombra; null = el daño sale solo, sin cuadro)}. */
+  function sinTiradaTexto(el, o){
+    o = o || {};
+    const sp = json(el.zonaEstado), est = estadoTxt(sp, o), pct = pctDe(sp);
+    const tipoD = String(el.zonaDanoTipo || '').toLowerCase().replace(/^de\s+/, '');
+    const danoTipo = !tipoD ? '' : /^(t[oó]xico|arcano|f[ií]sico|[aá]cido|siniestro|sagrado|m[aá]gico|directo|el[eé]ctrico)/.test(tipoD) ? ` ${tipoD}` : ` de ${tipoD}`;
+    const dano = el.zonaDano && !el.zonaDanoDif ? `${el.zonaDano} de daño${danoTipo}` : '';
+    const que = [dano, est ? `${pct ? `${pct} % de chance de ` : ''}${est}` : ''].filter(Boolean).join(' y ');
+    if(!que) return 'No hay nada que tirar para resistirla: se aplica lo que deja la zona.';
+    const tira = dano && /d/i.test(String(el.zonaDano)) && o.quienTira !== null ? (o.quienTira ? ` El daño lo tira ${o.quienTira}.` : ' El daño se tira en el cuadro del duelo.') : '';
+    return `No hay tirada para resistirla: le entra ${que}.${tira}`;
+  }
+
   function armarZona(el, ctx){
     const sp = json(el.zonaEstado), filas = [];
     const lbl = id => (typeof ctx.statLabel === 'function' && ctx.statLabel(id)) || id;
@@ -236,6 +251,6 @@ const ZonaDetalle = (() => {
     return null;
   }
 
-  return {tiene, armar, cuandoEtiqueta, A_MANO};
+  return {tiene, armar, cuandoEtiqueta, sinTiradaTexto, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

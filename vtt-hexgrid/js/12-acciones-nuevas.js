@@ -728,6 +728,8 @@ async function acEjecutarHab(sc, habId){
     if(!e[1].bajoTierra){ await acExcavarMeterse(sc, h, e[0]); return; }
   }
   if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
+  // 💍 Una habilidad que mueve (Dash, Salto, Takle, Carga, Parpadeo) con Puntería certera / Foco activos: el aviso antes de cobrar (js/126, 2026-11-21).
+  if(typeof quietoAvisoHab === 'function' && Quieto.habMueve(h)){ const e = tokenEntradaCreep(sc.id); if(e && !(await quietoAvisoHab(e[0], h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; } }
   // ⚔ Dos al hilo (dueño, 2026-10-30: «tiene que haber al menos dos adyacentes al atacante»): avisa y deja seguir.
   if(h.duelo && h.duelo.sigue && typeof golpeQueSigueRivalesPegados === 'function'){
     const n = golpeQueSigueRivalesPegados(sc);

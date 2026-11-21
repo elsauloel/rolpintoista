@@ -788,7 +788,12 @@ function renderZonaBanner(){
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
       botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: 'No hay nada que tirar: se aplica lo que deja la zona.',
+    // 🔥 Qué le entra y quién tira el daño (2026-11-21: antes decía «No hay nada que tirar» y después se tiraba el 3d4 del Muro de fuego).
+    let quienTira = '';
+    try{ const q = zonaDanoQuien(el), tq = q.deTokenId ? tokens.get(q.deTokenId) : null; quienTira = tq && tq.oculto && !soyGM ? '' : q.yo.nombre; }catch(err){}
+    const textoZ = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira})
+      : 'No hay nada que tirar: se aplica lo que deja la zona.';
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: textoZ,
       botones: [{texto: 'Aplicar', id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }
 }

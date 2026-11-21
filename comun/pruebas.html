@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261121muro"></script>
+<script src="zona-detalle.js?v=20261121muro2"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261121muro"></script>
@@ -133,7 +133,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261120a"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
-<script src="quieto.js?v=20261121apunta"></script>
+<script src="quieto.js?v=20261121mueve"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -9216,7 +9216,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const fbDb = {doc: () => ({update: async x => { escritos.push(x); if(o.sinPermiso) throw {code: 'permission-denied'}; Object.keys(x).forEach(k => { const id = k.slice(8), l = (o.ini.movidos[id] = o.ini.movidos[id] || []); if(x[k].mas !== undefined){ if(!l.includes(x[k].mas)) l.push(x[k].mas); } else o.ini.movidos[id] = l.filter(r => r !== x[k].menos); }); }})};
     const f = new Function('iniciativa', 'tokens', 'modoMapa', 'soyGM', 'fbUsuario', 'fbDb', 'firebase', 'fbRutaCampana', 'rutaMapaEstado', 'num', 'statPiesDe', 'seMovioEsteTurno', 'seMovioTurnoAnterior',
       'manejoEsteToken', 'iniciativaFueraDeJuego', 'ganchoEvaEmpezar', 'AvisoCombate', 'nombreDe', 'SEP_INVOCACION', 'mapaMostrado', 'setInterval', 'window', 'Quieto', 'enDodge',
-      src + '\nreturn {quietoMovio, quietoActivo, quietoMarcar, quietoRevisar, quietoAvisoAntes, quietoMovidos, modo: m => { modoMapa = m; }};');
+      src + '\nreturn {quietoMovio, quietoActivo, quietoMarcar, quietoRevisar, quietoAvisoAntes, quietoAvisoHab, quietoTokenDeFicha, quietoMovidos, modo: m => { modoMapa = m; }};');
     const api = f(o.ini, o.tokens, o.modo || 'combate', !!o.gm, {uid: o.uid || 'yo'}, fbDb, {firestore: {FieldValue: FV}}, r => r, r => r, v => Number(v) || 0,
       (t, st) => Number(t[st]) || 0, id => !!(o.movLocal || {})[id + '@0'], id => !!(o.movLocal || {})[id + '@1'],
       t => t.duenoUid === (o.uid || 'yo'), () => false, d => carteles.push(d.texto), {preguntar: async (txt, op) => { preguntas.push([txt, op.si, op.no]); return !!o.responde; }},
@@ -9234,6 +9234,32 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     // La ronda siguiente tampoco (se movió en la anterior); la otra, sí.
     ini.ronda = 4; igual([gm.quietoActivo('biz'), gm.quietoMovio('biz', 1), gm.quietoMovio('biz', 0)], [false, true, false]);
     ini.ronda = 5; igual(gm.quietoActivo('biz'), true);
+  });
+  prueba('🏃 las habilidades que mueven (Dash, Salto, Takle, Carga, Parpadeo / Varita del blink) avisan ANTES de usarlas, con el anillo activo (2026-11-21)', async () => {
+    // Qué cuenta como «mueve»: las formas guardadas de verdad (personaje y creep).
+    igual([{dashMapa: {casillas: 3}}, {dash: {casillas: 3}}, {blink: {distancia: 3, soloYo: true}}, {especial: {blink: {distancia: 3}}}, {duelo: {modo: 'arma', salto: 3}},
+      {duelo: {objetivo: 'enemigo', salto: 2, corre: true}}, {duelo: {modo: 'arma', embestida: true, cargaDerriba: 4}}].map(Quieto.habMueve), [true, true, true, true, true, true, true]);
+    igual([{duelo: {modo: 'arma', arma: {pdg: 2}}}, {nombre: 'Orbe arcano', duelo: {objetivo: 'area', radio: 1}}, null, {}].map(Quieto.habMueve), [false, false, false, false]);
+    const p = Quieto.bonos({pulso: 2, foco: 2});
+    igual(Quieto.aviso(p, 'J1', true, 'Dash'), 'Tenés Puntería certera activa (+2 a PdG) y Foco activo (+2 a PdG.Esp). Si te movés con Dash, los perdés.');
+    igual(Quieto.aviso(p.slice(1), 'Arcano 3', false, 'Parpadeo'), 'Arcano 3 tiene Foco activo (+2 a PdG.Esp). Si se mueve con Parpadeo, lo pierde.');
+    // En el mapa: pregunta solo con el bono activo, en combate y si la habilidad mueve; Cancelar → false.
+    const ini = {orden: [{id: 'biz'}, {id: 'rata'}], ronda: 2, movidos: {}};
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', pulso: 2, foco: 2}], ['rata', {tipo: 'creep', fichaId: 'c1', nombre: 'Rata'}]]);
+    const no = await mundo({ini, tokens}), si = await mundo({ini, tokens, responde: true});
+    igual(await no.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {casillas: 3}}), false);
+    igual(no.preguntas[0], ['Tenés Puntería certera activa (+2 a PdG) y Foco activo (+2 a PdG.Esp). Si te movés con Dash, los perdés.', 'Usarla igual', 'Cancelar']);
+    igual(await si.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {casillas: 3}}), true);
+    igual(await no.quietoAvisoHab('biz', {nombre: 'Orbe arcano', duelo: {objetivo: 'area'}}), true);   // no mueve: ni pregunta
+    igual(await no.quietoAvisoHab('rata', {nombre: 'Salto', duelo: {salto: 3}}), true);   // sin anillo
+    igual(no.quietoTokenDeFicha('f1'), 'biz');
+    ini.movidos.biz = [2];
+    igual([await no.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), no.preguntas.length], [true, 1]);   // ya se movió: no hay nada que perder
+    const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
+    igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
+    // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js', {cache: 'no-store'})).text();
+    cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
     const ini = {orden: [{id: 'biz'}], ronda: 4, movidos: {}};
@@ -9339,6 +9365,16 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     igual([vieja[0].duelo.zonaEstado, vieja[0].ataqueTxt], [{nombre: 'Quemadura', alEmpezar: true}, '… a quien lo cruza o empieza su turno adentro']);
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t04 = await (await fetch('../vtt-hexgrid/js/04-mantenimiento-e-iniciativa.js', {cache: 'no-store'})).text();
     ok(/function zonasAlEmpezarTurno\(\)/.test(t08) && /desdeMantenimiento && porTurno && zonaAlEmpezar\(el\)/.test(t08) && /zonasAlEmpezarTurno\(\); \}/.test(t04));
+  });
+  prueba('🔥 el cartel de una zona sin tirada dice qué le entra y quién tira el daño (2026-11-21: decía «No hay nada que tirar» y se tiraba el 3d4 del Muro)', async () => {
+    const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: 'Arcano 3'}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura. El daño lo tira Arcano 3.');
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: ''}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura. El daño se tira en el cuadro del duelo.');
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: null}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura.');   // (un token oculto: el daño sale solo)
+    igual(ZonaDetalle.sinTiradaTexto({zona: true, zonaDano: '4', zonaDanoTipo: 'tóxico'}, {quienTira: 'GM'}), 'No hay tirada para resistirla: le entra 4 de daño tóxico.');
+    igual(ZonaDetalle.sinTiradaTexto({zona: true}, {}), 'No hay nada que tirar para resistirla: se aplica lo que deja la zona.');
+    const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
+    ok(/ZonaDetalle\.sinTiradaTexto\(el, /.test(t08));
   });
   prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
     const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,

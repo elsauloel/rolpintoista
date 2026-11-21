@@ -115,6 +115,24 @@ function quietoRevisar(){
 }
 setInterval(() => { try{ quietoRevisar(); }catch(err){ console.error('💍 Quieto:', err); } }, 700);
 
+/* 🏃 Antes de usar una habilidad que mueve (Dash, Salto, Takle, Carga, Parpadeo / Varita del blink; Quieto.habMueve) — 2026-11-21, cola de pruebas:
+   apagaban el anillo como caminar, pero sin el aviso. Se pregunta al tocar Ejecutar (o Atacar con la varita), ANTES de cobrar: Cancelar no usa nada.
+   Personajes y sus invocaciones (js/11) y creeps (js/12). `id` = el token de quien la usa. → true = sigue. */
+async function quietoAvisoHab(id, h, nombre){
+  try{
+    if(!id || !Quieto.habMueve(h) || typeof modoMapa === 'undefined' || modoMapa !== 'combate' || !quietoHayOrden()) return true;
+    const t = tokens.get(id);
+    if(!t || !quietoActivo(id)) return true;
+    const bonos = quietoBonos(t);
+    if(!bonos.length || typeof AvisoCombate === 'undefined') return true;
+    const propio = t.tipo !== 'creep' && !!fbUsuario && t.duenoUid === fbUsuario.uid && !String(t.fichaId || '').includes(SEP_INVOCACION);
+    return !!(await AvisoCombate.preguntar(Quieto.aviso(bonos, nombreDe(t), propio, nombre || h.nombre || 'la habilidad'),
+      {icono: bonos[0].icono, titulo: bonos.map(b => b.nombre).join(' y '), si: 'Usarla igual', no: 'Cancelar'}));
+  }catch(err){ console.error('💍 Quieto: el aviso antes de una habilidad que mueve', err); return true; }
+}
+// El token de un personaje (o de una invocación, `fichaId~invId`) en el mapa que se está viendo.
+function quietoTokenDeFicha(fichaId){ for(const [id, t] of tokens) if(t.tipo !== 'creep' && String(t.fichaId || '') === String(fichaId || '')) return id; return ''; }
+
 // Antes de mover un token caminando (confirmarRuta, js/08): si tiene el bono activo, en combate, se pregunta. → true = se mueve.
 async function quietoAvisoAntes(id, o){
   try{

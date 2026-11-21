@@ -48,12 +48,23 @@ const Quieto = (() => {
   // De los valores de un token ({pulso, foco}) → los bonos que tiene: [{stat, icono, nombre, a, val}].
   const bonos = valores => ANILLOS.map(a => ({...a, val: Math.max(0, n(valores && valores[a.stat]))})).filter(a => a.val > 0);
   const cartel = b => `${b.icono} ${b.nombre}`;
-  // El aviso antes de moverse con el bono activo.
-  const aviso = (lista, nombre, propio) => {
+  // El aviso antes de moverse con el bono activo. `con` (2026-11-21): el nombre de la habilidad o el ítem que lo mueve (Dash, Salto, Takle, Carga,
+  // Parpadeo…): el aviso sale al usarla, antes de cobrar, y no al caminar.
+  const aviso = (lista, nombre, propio, con) => {
     const que = lista.map(b => `${b.nombre} ${b.fem ? 'activa' : 'activo'} (+${b.val} a ${b.a})`).join(' y ');   // (2026-11-21: «Foco activo», no «Foco activa»)
     const la = lista.length > 1 ? (lista.every(b => b.fem) ? 'las' : 'los') : (lista[0] && lista[0].fem ? 'la' : 'lo');
+    if(con) return propio !== false ? `Tenés ${que}. Si te movés con ${con}, ${la} perdés.` : `${nombre || 'Este token'} tiene ${que}. Si se mueve con ${con}, ${la} pierde.`;
     return propio !== false ? `Tenés ${que}. Si te movés, ${la} perdés.` : `${nombre || 'Este token'} tiene ${que}. Si lo movés, ${la} pierde.`;
   };
-  return {movio, activo, apuntada, apuntadaFirme, marcar, podar, unir, ANILLOS, bonos, cartel, aviso};
+  /* 🏃 ¿Esta habilidad (o arma especial) mueve a quien la usa? (2026-11-21, cola: «Dash, Salto, Carga, Takle y Parpadeo: ¿apagan el anillo como
+     caminar?, ¿avisa antes?»: apagaban el anillo pero no avisaban). El Dash (personaje `dashMapa`, creep `dash`), el Parpadeo / blink (habilidad o la
+     Varita del blink, `especial.blink`) y las Ejecuciones que saltan o corren hasta el objetivo (`duelo.salto`: el Salto y el Takle; `duelo.embestida`
+     y `duelo.cargaDerriba`: tomar carrera y la Carga que derriba). */
+  const habMueve = h => {
+    if(!h || typeof h !== 'object') return false;
+    const d = h.duelo || (h.especial && h.especial.duelo) || null;
+    return !!(h.dashMapa || h.dash || h.blink || (h.especial && h.especial.blink) || (d && (n(d.salto) > 0 || d.embestida || n(d.cargaDerriba) > 0)));
+  };
+  return {movio, activo, apuntada, apuntadaFirme, marcar, podar, unir, ANILLOS, bonos, cartel, aviso, habMueve};
 })();
 if(typeof window !== 'undefined') window.Quieto = Quieto;

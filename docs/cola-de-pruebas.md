@@ -1445,7 +1445,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   paneles (Exp y Job, DDE, Personajes) se siguen abriendo a la derecha; los botones apagados quedan opacos. Embebidas en el mapa no queda el
   hueco. Probado con clics en la ficha suelta de Blanco J1 (ventana de 900 px y de 1920; arriba, al medio y al fondo; paneles Exp y Job, DDE y
   la ventana de Equipo) y en GM Tools (1100 px, scrolleado, con Personajes abierto). Capturas de antes y después. No se adaptó a celular.
-- **⬜ en cola — 🔁 Turnos, caídos y resurrección (pedidos del dueño, 2026-11-21)**. Todo se prueba en «Claude · pruebas 2».
+- **✅ hecho (2026-11-21) — 🔁 Turnos, caídos y resurrección (pedidos del dueño, 2026-11-21)**. Todo se prueba en «Claude · pruebas 2».
   1. **«⏭ Pasar de ronda» en el orden de turnos (solo GM)**: «me gustaría, en el menú de iniciativa y orden, agregar un botón para el GM que diga
      PASAR DE RONDA, que se saltee todos los turnos pendientes de la ronda y vuelva al primero. Sobre todo me sirve para cuando estoy haciendo
      pruebas, pero podría llegar a suceder que lo necesite durante un juego».
@@ -1458,6 +1458,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      la animación». Verificar que la animación no salga antes de elegir; probar con clics «¿Con qué volvés?» eligiendo entre dos formas.
   5. **Invocaciones** (dato del dueño, no tarea): «no se reviven porque al caer se desinvocan». Que la doc lo diga y sacar de los pendientes la
      prueba «invocación revivida con su ✚».
+  *Resultado:* (1) **«⏭ Pasar de ronda»** en el pie del orden de turnos, solo el GM: si quedan turnos sin jugar pregunta nombrándolos («Queda 1 turno
+  sin jugar en la ronda 1 (Protector 3)…»); los que faltaban pasan su turno sin jugar (como un caído que se saltea), se pasa el Mantenimiento y empieza
+  el primero, con su «▶ Empieza tu turno»; Mesa «⏭ El GM pasó de ronda: se saltearon los turnos de …». También en medio de un turno libre. Lo de
+  «al terminar tu turno» de los salteados: se aplica (lo más parecido a pasar esos turnos), pregunta P269. (2) **Turno libre**: ya retomaba la ronda
+  como venía; probado (J1 con turno libre en el de Protector 3, «✅ Terminar turno» → vuelve Protector 3, misma ronda). (3) **Caídos**: «Iniciar
+  combate» no les llena los No2; al empezar su turno, al saltearlos y al pasar de ronda no recargan ni regeneran nada ni bajan sus cooldowns (solo la
+  cuenta para morir; también el ⟳ de narrativo y los creeps); **al caer se les van los estados** (personajes y creeps desde el mapa), con línea en la
+  Mesa. Se tomó «morir» = caer: P270. (4) **«¿Con qué volvés?»** con Pacto y Ankh: la animación sale recién después de elegir (video). (5) La doc lo
+  dice y salió de los pendientes. Probado con clics (GM, J1, J2); por datos: los estados, No2, Pacto y Ankh de J2, el Sangrado del creep, el orden de
+  turnos «por iniciar» y la vida a 0 (con la función del «HP directo»). 3 pruebas automáticas nuevas (969).
 - **⬜ en cola — 🎯 Apuntada de las ballestas, compartida entre pantallas** (dueño, 2026-11-21: «arreglalo también»): tiene la misma «memoria de
   una sola pantalla» que tenía la Puntería certera; dejarla como quedó esa (lo que se movió, compartido; que te muevan no cuenta).
 - **⬜ en cola — 🔥 Muro de fuego al empezar el turno (P259 decidida)** (dueño, 2026-11-21): «el muro de fuego debería hacer daño a un

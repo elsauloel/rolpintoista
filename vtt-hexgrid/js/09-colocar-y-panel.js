@@ -658,7 +658,14 @@ async function modificarCreep(creepId, cambiar){
     const [priv, pub] = await Promise.all([tx.get(privRef), tx.get(base)]);
     if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
     const sc = CreepCalculo.normalizar(JSON.parse(priv.data().json || '{}'));   // 🗡 convertido (paso 8): lo que se guarda queda en la forma nueva
+    const hpAntes = num(sc.hp);
     const resultado = cambiar(sc);
+    // 💀 Si con este cambio cayó (la vida pasó a 0), se le van los estados (P257, 2026-11-21: «al momento de morir se le eliminan todos los estados
+    // alterados»; queda lo del equipo y la Llama de Fénix sin usar, el criterio de Combatiente.quedaAlVolver).
+    if(hpAntes > 0 && num(sc.hp) <= 0 && num(sc.hpMax) > 0){
+      const sac = Combatiente.caerLimpio(sc, 'estados');
+      if(sac.length) setTimeout(() => creepCaidaContar(creepId, sc.nombre, sac), 0);
+    }
     CreepCalculo.vidaAlDia(sc);   // ❤ si el cambio tocó el equipo o un estado con Vida +N (2026-11-06)
     const hpMax = num(sc.hpMax);
     const json = JSON.stringify(sc);
@@ -693,6 +700,15 @@ async function modificarCreep(creepId, cambiar){
   });
 }
 
+// 💀 El creep que cayó y perdió sus estados: lo cuenta en la Mesa (si los jugadores lo ven) o solo en esta pantalla (P257).
+function creepCaidaContar(creepId, nombre, sacados){
+  const txt = Combatiente.caidaTxt(nombre, sacados);
+  if(!txt) return;
+  let t = null; for(const x of tokens.values()) if(x.tipo === 'creep' && x.fichaId === creepId){ t = x; break; }
+  const publico = !!t && !t.oculto && (typeof creepConocido !== 'function' || creepConocido(t)) && !(typeof enSigilo === 'function' && enSigilo(t));
+  if(publico){ try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }
+  else toast(txt);
+}
 async function cambiarVidaCreep(creepId, texto, clave){
   await modificarCreep(creepId, sc => {
     if(clave === 'sp'){   // 💧 el SP de un creep en modo SP, a mano desde el token (2026-10-29): entre 0 y su máximo

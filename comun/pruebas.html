@@ -50,10 +50,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261121zd5"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261120volver"></script>
+<script src="combatiente.js?v=20261121caido"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
-<script src="creep-acciones.js?v=20261120volver"></script>
+<script src="creep-acciones.js?v=20261121caido"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261120enj"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
@@ -82,9 +82,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261120invocar"></script>
-<script src="orden-turnos.js?v=20261120iniciar"></script>
-<script src="ficha-mantenimiento.js?v=20261114sang"></script>
+<script src="ficha-acciones.js?v=20261121caido"></script>
+<script src="orden-turnos.js?v=20261121caido"></script>
+<script src="ficha-mantenimiento.js?v=20261121caido"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -2776,7 +2776,7 @@ prueba('☥ Al volver se van los estados: las cuatro formas de un personaje pasa
   const rl = FichaAcciones.revisarAnkh(L); const vl = Combatiente.vueltaTomar(L);
   // ✚ Revivir (el del token, el de la ficha y el consumible Revive terminan en FichaAcciones.revivir): estaba caído
   const R = nueva(); R.hp = 0; FichaAcciones.revisarMuerte(R);
-  const caidoCon = R.efectos.length;   // caer no saca nada: se van al VOLVER
+  const caidoCon = R.efectos.length;   // (desde el 2026-11-21, P257: al CAER ya se van, salvo lo del equipo)
   FichaAcciones.revivir(R, 5); const vr = Combatiente.vueltaTomar(R);
   // Elegida con «¿Con qué volvés?» estando caído: volverCon + revisarMuerte no la cuentan dos veces y conserva la forma
   const E = nueva(); E.meta.pacto = true; E.cinturon = [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]; E.hp = 0;
@@ -2788,7 +2788,7 @@ prueba('☥ Al volver se van los estados: las cuatro formas de un personaje pasa
   igual([rp, nombres(P), vp.forma, vp.sacados.map(x => x.nombre), ra, nombres(A), va.forma, va.sacados.length, rl, nombres(L), vl.forma, vl.sacados.map(x => x.nombre),
     caidoCon, nombres(R), vr.forma, vr.sacados.length, sigueCaido, nombres(E), ve.forma, ve.sacados.map(x => x.nombre), Combatiente.vueltaTomar(E), Combatiente.vueltaTomar(N), N.efectos.length],
     ['El Pacto', esperado, 'pacto', idos, 'Ankh de Reencarnación', esperado, 'ankh', 2, 'Llama de Fénix', esperado, 'llama', idos,
-     3, esperado, 'revive', 2, 3, esperado, 'pacto', idos, null, null, 3]);
+     1, esperado, 'revive', 0, 1, esperado, 'pacto', [], null, null, 3]);   // (desde el 2026-11-21, P257: los estados se van ya al CAER)
 });
 prueba('☥ Al volver se van los estados: un creep (la Llama en su Mantenimiento) y una invocación', () => {
   const sc = {id: 'c', nombre: 'Rata', hp: 0, hpMax: 12, estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 3, activo: true}, {nombre: 'Llama de Fénix', fenix: true, turnos: 3, activo: true}, {nombre: 'Vuela', volador: true, permanente: true, activo: true}]};
@@ -2798,6 +2798,24 @@ prueba('☥ Al volver se van los estados: un creep (la Llama en su Mantenimiento
   const si = Combatiente.volverLimpio(inv, 'estados', 'revive');
   igual([sacados.map(x => x.nombre), sc.estados.map(e => e.titilando ? 'Titilando' : e.nombre).sort(), v.forma, si.map(x => x.nombre), inv.estados, Combatiente.volverLimpio(null, 'estados'), Combatiente.volverLimpio({}, 'estados').length],
     [['Veneno'], ['Titilando', 'Vuela'], 'llama', ['Rengo'], [], [], 0]);
+});
+prueba('💀 Al caer se van los estados (P257, 2026-11-21): un personaje que queda inconsciente y el texto de la Mesa; queda lo del equipo y la Llama', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], cinturon: [], hp: 0, efectos: [{id: 'v', nombre: 'Veneno', polaridad: 'debuff', turnos: 3, activo: true},
+    {id: 'b', nombre: 'Bendecido', polaridad: 'buff', turnos: 2, activo: true}, {id: 'q', nombre: 'Anillo puesto', origenItem: 'a1', permanente: true, activo: true},
+    {id: 'f', nombre: 'Llama de Fénix', fenix: true, turnos: 3, activo: true}]};
+  const r = FichaAcciones.revisarMuerte(S), otra = FichaAcciones.revisarMuerte(S);
+  const sc = {nombre: 'Rata', hp: 0, hpMax: 10, estados: [{nombre: 'Sangrado', turnos: 2}, {nombre: 'Vuela', volador: true}]};
+  const sac = Combatiente.caerLimpio(sc, 'estados');
+  igual([r.cayo, r.sacados.map(x => x.nombre), S.efectos.map(e => e.nombre).sort(), otra.cayo, Combatiente.vueltaTomar(S), sac.map(x => x.nombre), sc.estados.map(e => e.nombre),
+    Combatiente.caidaTxt('Rata', sac), Combatiente.caidaTxt('Rata', []), Combatiente.caerLimpio(null, 'estados')],
+    [true, ['Veneno', 'Bendecido'], ['Anillo puesto', 'Llama de Fénix'], false, null, ['Sangrado'], ['Vuela'], '💀 Rata cayó: se le fue 1 estado (Sangrado)', '', []]);
+});
+prueba('⏭ Pasar de ronda (2026-11-21): quiénes faltan en la ronda (sin los que ya jugaron ni los caídos; en un turno libre, desde quien lo tenía)', () => {
+  const orden = ['a', 'b', 'c', 'd', 'e'].map(id => ({id}));
+  const ids = l => l.map(x => x.id), fuera = id => id === 'd';
+  igual([ids(OrdenTurnos.pendientesRonda({orden, turno: 1}, fuera)), ids(OrdenTurnos.pendientesRonda({orden, turno: 1, actuaron: ['c']})), ids(OrdenTurnos.pendientesRonda({orden, turno: 4})),
+    ids(OrdenTurnos.pendientesRonda({orden, turno: 3, libre: {id: 'd', vuelve: 'a'}})), OrdenTurnos.pendientesRonda({orden: [], turno: 0}), OrdenTurnos.pendientesRonda(null)],
+    [['c', 'e'], ['d', 'e'], [], ['b', 'c', 'd', 'e'], [], []]);
 });
 prueba('▶ Iniciar combate (2026-11-20): cuándo se ofrece el botón, cuándo no, y quién es el primero que juega', () => {
   const O = OrdenTurnos, orden = [{id: 'a', valor: 9}, {id: 'b', valor: 5}, {id: 'c', valor: 1}];
@@ -3276,7 +3294,7 @@ prueba('curar a quien estaba inconsciente lo despierta; quedar en 0 lo desmaya (
   FichaAcciones.fijarHp(S, 0); const cae = FichaAcciones.revisarMuerte(S);
   const T = fichaBotonera({hp: 0, cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', consumible: true, unidades: 1}]});
   const ankh = FichaAcciones.revisarAnkh(T);
-  igual([despierto, cae, S.muerto.turnos, ankh, T.hp > 0, T.cinturon.length], [{vivo: true, revivio: true}, {vivo: false, cayo: true}, 5, 'Ankh de Reencarnación', true, 0]);
+  igual([despierto, cae, S.muerto.turnos, ankh, T.hp > 0, T.cinturon.length], [{vivo: true, revivio: true}, {vivo: false, cayo: true, sacados: []}, 5, 'Ankh de Reencarnación', true, 0]);
 });
 prueba('✚ Revivir: con un % del HP máximo (para abajo, mínimo 1) o un valor neto; deja de estar inconsciente', () => {
   const S = fichaBotonera({hp: 0, muerto: {activo: true, turnos: 3, definitivo: false}});
@@ -3892,6 +3910,22 @@ prueba('Regeneración de vida del equipo (2026-10-07, piel de troll): cura al em
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, nitros: 0, efectos: [], inventario: [chal]}).S);
   FichaMantenimiento.inicioTurno(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)}, 'k1', '', [], 5);
   igual([sc.hp, caido.hp, S.hp, FichaCalculo.calcular(S).final.hpregen], [12, 0, 12, 2]);
+});
+prueba('💀 Un caído queda como cayó (P257): al empezar su turno y al pasar de ronda no recarga No2 ni SP, no regenera ni bajan sus cooldowns; la cuenta para morir sigue', () => {
+  const chal = {id: 't', nombre: 'Chaleco de piel de troll', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'hpregen', val: 2}]};
+  const pj = () => { const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 0, nitros: 1, spGastado: 3, efectos: [], inventario: [chal]}).S);
+    S.hp = 0; S.nitros = 1; S.spGastado = 3; S.muerto = {activo: true, turnos: 5, definitivo: false}; return S; };
+  const A = pj(), rA = FichaMantenimiento.inicioTurno(A, {fijarHp: v => FichaAcciones.fijarHp(A, v)}, 'k1', '', [], 5);
+  FichaMantenimiento.finTurno(A, {fijarHp: v => FichaAcciones.fijarHp(A, v)}, 'k1', '', [], 5);
+  const B = pj(); FichaMantenimiento.aplicar(B, {fijarHp: v => FichaAcciones.fijarHp(B, v)});
+  const de = {nombre: 'Golpe', cd: 3, cdActual: 2};
+  const sc = creepPrueba({equipo: [chal]}); sc.hp = 0; sc.nitros = 1; sc.habilidades = [{...de}];
+  CreepAcciones.inicioTurno(sc, 'r1', 1); CreepAcciones.finTurno(sc, 'r1', 1);
+  const sc2 = creepPrueba({}); sc2.hp = 0; sc2.nitros = 0; sc2.habilidades = [{...de}]; CreepAcciones.mantenimiento(sc2);
+  const vivo = creepPrueba({}); vivo.hp = 5; vivo.nitros = 0; vivo.habilidades = [{...de}]; CreepAcciones.inicioTurno(vivo, 'r1', 1);
+  igual([A.hp, A.nitros, A.spGastado, A.muerto.turnos, rA.caido, B.nitros, B.spGastado, B.muerto.turnos, sc.hp, sc.nitros, sc.habilidades[0].cdActual,
+    sc2.nitros, sc2.habilidades[0].cdActual, vivo.habilidades[0].cdActual, vivo.nitros > 0, Combatiente.estaCaido(0, 10), Combatiente.estaCaido(0, 0), Combatiente.estaCaido(3, 10)],
+    [0, 1, 3, 4, true, 1, 3, 4, 0, 1, 2, 0, 2, 1, true, true, false, false]);
 });
 prueba('los stats suman lo que sube el atributo y lo que apunta al stat; el jefe tiene +1 Res.Esp', () => {
   const sc = creepPrueba({equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', mods: [{stat: 'con', val: 1}, {stat: 'resmg', val: 2}]}]});

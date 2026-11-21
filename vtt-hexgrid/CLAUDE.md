@@ -2486,3 +2486,19 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   invocación), solo para el GM, «🎁» (`darJugadorPuede`, `darJugadorAbrir`; `icono('dar')` en js/10) abre la ventana común `DarJugador.abrir`
   (comun/dar-jugador.js) con ese personaje ya marcado; carga antes `bnCargarPiezas` (catálogo, filtro), `acCargarPiezas` (el Ver) y el asistente de
   ítems. Quien recibe: `recibidosAplicar` (js/11) muestra `DarJugador.cartel` en vez de «Botín concluido» cuando la recompensa es un regalo.
+
+- **⏭ Pasar de ronda** (2026-11-21, dueño: «un botón para el GM que diga PASAR DE RONDA, que se saltee todos los turnos pendientes de la ronda y
+  vuelva al primero»; js/04): en el pie del orden de turnos, solo el GM, cuando hay orden y el combate no está «por iniciar» (`#ini-pasar-ronda`).
+  `iniciativaPasarRonda()`: si quedan turnos sin jugar (`OrdenTurnos.pendientesRonda(iniciativa, iniciativaFueraDeJuego)`) pregunta con
+  `Confirmar.preguntar` nombrándolos; después `iniciativaSiguiente({pasarRonda: true})`: termina el turno en curso (en un turno libre, el de quien lo
+  tenía), los que faltaban (`saltaRonda`, también los caídos) pasan su turno sin jugar (inicio y fin con la clave `mapa:paso:ronda:id`, sus zonas un
+  turno menos; quien demoró con ▼ no repite el inicio), el Mantenimiento de la ronda y el turno queda en el primero que puede jugar, con su «▶ Empieza tu
+  turno». Mesa: «⏭ El GM pasó de ronda: se saltearon los turnos de …» (sin nombrar a los que no se ven). Lo elegido «mientras tanto»: P269.
+- **Turno libre, revisado** (2026-11-21, dueño: «¿retoma la ronda de turnos como venía antes de otorgarle el turno libre? Debería ser la segunda»):
+  ya era así. Con «✅ Terminar turno» del jugador (o «↩ Volver a…» del GM) el turno vuelve a quien lo tenía (`iniciativaVolverDeLibre`), sin cambiar
+  de ronda ni recargar. Probado con clics.
+- **💀 Un caído queda como cayó** (P257, dueño, 2026-11-21; la cuenta en comun/: `FichaMantenimiento`, `CreepAcciones`, `Combatiente.estaCaido`):
+  «▶ Iniciar combate» no le llena los No2 (`combateNo2Llenos` saltea a `iniciativaFueraDeJuego`); al empezar su turno, al saltearlo y al pasar de ronda
+  no recarga ni regenera nada (solo la cuenta para morir; un creep con la Llama de Fénix sí revive). **Al caer se le van los estados**: un personaje en
+  `FichaAcciones.revisarMuerte` (js/98 `vidaCeroRevisar` lo cuenta en la Mesa), un creep en `modificarCreep` (js/09: si la vida pasó a 0,
+  `Combatiente.caerLimpio` y `creepCaidaContar`). Las invocaciones no se reviven: al caer se desinvocan (dueño). Dudas: P270.

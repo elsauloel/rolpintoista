@@ -92,6 +92,7 @@ const FichaMantenimiento = (() => {
   function invInicio(inv, mant){
     InvCalculo.migrar(inv);
     if(inv.activa === false) return [];
+    if(Combatiente.estaCaido(inv.hp, inv.hpMax)) return [];   // 💀 caída: queda como cayó (P257; al caer se desinvoca)
     inv.descargada = num(inv.ataquesTurno) > 0;
     inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros, inv.estados);
     inv.ataquesTurno = 0;
@@ -139,6 +140,21 @@ const FichaMantenimiento = (() => {
     const c = FichaCalculo.calcular(S);
     const log = [], rep = [];
     const hpAntes = num(S.hp);
+    // 💀 Caído (P257, dueño, 2026-11-21: «un caído queda como estaba al caer. Mismos nitros, no hay recarga ni regeneración de nada»): solo corre la
+    // cuenta para morir; sus invocaciones (de pie) siguen con lo suyo.
+    if(Combatiente.estaCaido(S.hp, c.final.hpmax)){
+      contarMuerte(S, ui, log, rep);
+      S.turno = turnoAntes + 1;
+      (S.invocaciones || []).forEach(inv => {
+        if(!inv || inv.activa === false) return;
+        if(numero !== undefined && !Combatiente.estadosEnMantenimiento(inv.finTurnoEn, numero)) return;
+        invInicio(inv, true); invFin(inv, true);
+      });
+      log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
+      log.push('Caído: no recarga ni regenera nada.');
+      S.log = log;
+      return {rep, avisos: [], spRegen: 0, spRecuperado: 0};
+    }
     // SP Regen AL PRINCIPIO, con los números de antes de que venza o cambie ningún estado.
     const {spRegen, spRecuperado} = regenerarSp(S, c, rep);
     // 🛡 Aguante (sin orden de turnos): los golpes pasan a su próximo ataque y el estado se va (como el turno propio).
@@ -223,6 +239,12 @@ const FichaMantenimiento = (() => {
     S.inicioTurnoClave = clave; S.finTurnoEn = turno;
     const c = FichaCalculo.calcular(S);
     const log = [], rep = [], hpAntes = num(S.hp);
+    // 💀 Caído (P257): ni SP, ni vida, ni No2, ni estados, ni cooldowns: solo la cuenta para morir. Sus invocaciones sin turno propio, sí.
+    if(Combatiente.estaCaido(S.hp, c.final.hpmax)){
+      contarMuerte(S, ui, log, rep);
+      (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+      return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: [], caido: true};
+    }
     regenerarSp(S, c, rep);
     // Meditar (pies, 2026-10-06): si no se movió desde que empezó su turno anterior, recupera SP (el mapa anota `movidoPaso` al cobrar el movimiento).
     const paso = Number(String(clave || '').split(':')[1]);
@@ -279,6 +301,11 @@ const FichaMantenimiento = (() => {
     if(S.finTurnoClave === clave) return null;
     S.finTurnoClave = clave; S.finTurnoEn = turno;
     const c = FichaCalculo.calcular(S);
+    if(Combatiente.estaCaido(S.hp, c.final.hpmax)){   // 💀 caído (P257): nada al terminar (ni la Calma); sus invocaciones sin turno propio, sí
+      const rep = [];
+      (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+      return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
+    }
     Combatiente.terminarTurnoEstados(S.efectos);   // P177: los turnos ya no bajan acá (bajan al empezar el próximo); lo recién puesto deja de serlo
     if(num(S.aguanteListo) > 0) S.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante (como los creeps)
     const rep = [];

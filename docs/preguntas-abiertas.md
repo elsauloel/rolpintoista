@@ -1880,3 +1880,22 @@ resistencia a ese elemento **y la Defensa especial** del que la pisa (como cualq
 AL FUEGO», una de fuego se dibuja como fuego y una tóxica cuenta como nube (el viento la despeja). Las «arcanas» y las físicas siguen igual.
 1. ¿Las zonas hechas a mano por el GM tienen que restar la Defensa especial (como quedó), o su daño elemental tendría que ser directo (solo la
    resistencia al elemento), como el de las varitas y el Muro de fuego?
+
+### P269 — ⏭ Pasar de ronda: qué les pasa a los que se saltean (2026-11-21, Claude)
+El botón nuevo «⏭ Pasar de ronda» (orden de turnos, solo el GM) hace lo mismo que apretar ▶ Siguiente con cada uno que faltaba. Quedó elegido
+«mientras tanto» (lo más parecido a pasar esos turnos uno por uno, como ya se hacía con los caídos que se saltean):
+1. **Cada uno que se saltea pasa su turno sin jugar**: le empieza (recarga No2 y SP, bajan sus cooldowns, pegan su Veneno o su Quemadura) y le
+   termina (lo de «al terminar tu turno»: la Calma le devuelve No2 si no atacó, un estado que explota al vencer explota) y sus zonas pierden un turno.
+   ¿Está bien, o preferís que se salteen «congelados» (sin recargar ni que les pase nada)?
+2. **Un caído que se saltea** solo baja su cuenta para morir (como con ▶ Siguiente).
+
+### P270 — 💀 «Al morir se van los estados»: ¿al caer o al morir del todo? (2026-11-21, Claude)
+P257 dice «al momento de morir se le eliminan todos los estados alterados». Se tomó **morir = caer** (la vida a 0, inconsciente o derrotado), porque
+la decisión venía con «un caído queda como estaba al caer». Así quedó:
+1. **Al caer** se le van todos los estados, menos lo del equipo, lo derivado y la Llama de Fénix sin usar (el mismo criterio que al volver de la
+   muerte). La Mesa lo cuenta («💀 X cayó: se le fueron 2 estados (…)»). ¿O tendría que ser recién al morir del todo (cuando se le acaban los turnos)?
+2. **Un creep** que cae desde el mapa (un golpe, la vida a mano en el token) también los pierde. Si se le baja la vida a 0 desde GM Tools suelto,
+   todavía no (ahí no se tocó nada).
+3. **Caído = queda como cayó** al empezar su turno, al pasar de ronda y al «Iniciar combate»: no recarga No2 ni SP, no regenera vida, no bajan sus
+   cooldowns. Sus invocaciones que siguen de pie, sí. Lo único que corre es la cuenta para morir (y la Llama de Fénix de un creep, que lo revive al
+   empezar su turno).

@@ -710,7 +710,11 @@ const CreepAcciones = (() => {
   }
   // Lo de un creep al empezar su vuelta: ataques, armas especiales y su espera, Saque rápido, cooldowns, lo que se dispara y No2 al máximo.
   // `mant` = el ⟳ Mantenimiento de la ronda: solo dispara (el fin cuenta), como antes. Sin él, el turno propio (P177: cuenta y dispara).
+  // 💀 Derrotado (la vida en 0, P257, dueño, 2026-11-21: «un caído queda como estaba al caer… no hay recarga ni regeneración de nada»): no recarga No2 ni
+  // SP, no bajan cooldowns ni estados, no regenera. Solo la Llama de Fénix (que lo revive al empezar su turno) sigue andando.
+  const caidoSinFenix = sc => Combatiente.estaCaido(sc.hp, sc.hpMax) && !Combatiente.fenixActivo(sc.estados);
   function inicioCreep(sc, mant){
+    if(caidoSinFenix(sc)) return {rep: [], enCooldown: 0, hpAplicado: 0, caido: true};
     sc.descargada = num(sc.ataquesTurno) > 0;   // llega cargada (2026-10-10): si disparó este turno, el próximo no es gratis
     sc.ataquesTurno = 0;
     sc.ataquesArma = {}; delete sc.armaActiva;   // ⚔⚔ dos armas: cada una vuelve a su primer ataque, y en la mano, la primera (2026-11-03)
@@ -762,6 +766,7 @@ const CreepAcciones = (() => {
     return true;
   }
   function finCreep(sc, mant){
+    if(Combatiente.estaCaido(sc.hp, sc.hpMax)) return {rep: [], vencidos: 0};   // 💀 derrotado: nada al terminar (P257)
     if(!mant) sc.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante
     if(!mant) sc.golpeListo = null;   // 🪓 lo mismo con el golpe anunciado
     const k = mant ? Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'}) : Combatiente.terminarTurnoEstados(sc.estados);
@@ -775,6 +780,7 @@ const CreepAcciones = (() => {
   // ⟳ Mantenimiento de la ronda (fuera de combate, o si no está en el orden de turnos). Con turno propio reciente no hace nada (lo hace su turno).
   function mantenimiento(sc, numero){   // `numero` = el de ese Mantenimiento (sin él, se aplica siempre, como antes)
     if(numero !== undefined && !Combatiente.estadosEnMantenimiento(sc.finTurnoEn, numero)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, enTurno: true};
+    if(caidoSinFenix(sc)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, caido: true};   // 💀 derrotado: queda como cayó (P257)
     // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
     const previo = num(sc.nitros), deuda = Math.min(0, previo);
     const a = inicioCreep(sc, true), b = finCreep(sc, true), max = C().nitrosMax(sc);

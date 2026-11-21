@@ -275,7 +275,8 @@ const FichaAcciones = (() => {
     if(!S.muerto.activo && !S.muerto.definitivo){
       S.muerto.activo = true;
       S.muerto.turnos = 5;
-      return {vivo: false, cayo: true};
+      const sacados = Combatiente.caerLimpio(S, 'efectos');   // 💀 al caer se van los estados (P257, 2026-11-21)
+      return {vivo: false, cayo: true, sacados};
     }
     return {vivo: false, cayo: false};
   }

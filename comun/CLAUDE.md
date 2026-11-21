@@ -2164,3 +2164,8 @@ versión parecida en más de una, es candidato a juntar.
   ranuras se da igual y `pasada = {usada, cap}`. El mapa (js/11, `recibidosAplicar`) y la ficha (js/02) muestran `DarJugador.cartel({nombre, de,
   lineas, pasada})` (al centro, con «✔ Aceptar» que solo lo cierra; si llega otro con el cartel abierto, se suma abajo) y, si quedó pasada, una
   línea en la Mesa. **Se carga con la página en el mapa, la ficha y GM Tools** (el que recibe lo necesita siempre). Lo que no está decidido: P262.
+- **💀 Caídos** (P257, 2026-11-21): `Combatiente.caerLimpio(quien, campo)` (al caer se van los estados, con el criterio de `quedaAlVolver`, sin anotar
+  una vuelta), `caidaTxt(nombre, sacados)` y `estaCaido(hp, hpMax)`. `FichaAcciones.revisarMuerte` devuelve `sacados` al caer. Un caído no recarga ni
+  regenera nada: `FichaMantenimiento.inicioTurno` / `finTurno` / `aplicar` (solo `contarMuerte`; sus invocaciones de pie siguen) e `invInicio` (una
+  invocación caída, nada); `CreepAcciones` `inicioCreep` / `finCreep` / `mantenimiento` (salvo la Llama de Fénix). `OrdenTurnos.pendientesRonda(ini,
+  fuera)` (⏭ Pasar de ronda: quiénes faltan en la ronda).

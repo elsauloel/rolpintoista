@@ -16,7 +16,7 @@ async function vidaCeroRevisar(fichaId){
   if(vidaCeroEnCurso.has(fichaId) || Date.now() - (vidaCeroIntento.get(fichaId) || 0) < 30000) return;
   vidaCeroEnCurso.add(fichaId);
   vidaCeroIntento.set(fichaId, Date.now());
-  let salvado = '', cayo = false, nombre = '', elige = false;
+  let salvado = '', cayo = false, nombre = '', elige = false, sacados = [];
   try{
     await editarPersonajeMapa(fichaId, S => {
       nombre = ((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje';
@@ -24,7 +24,7 @@ async function vidaCeroRevisar(fichaId){
       salvado = FichaAcciones.revisarAnkh(S) || '';   // con una sola forma de volver, sola; con más de una, no revive: elige (más abajo)
       elige = !salvado && FichaAcciones.volverPendiente(S).length > 1;
       const r = FichaAcciones.revisarMuerte(S);
-      cayo = !!(r && r.cayo);
+      cayo = !!(r && r.cayo); sacados = (r && r.sacados) || [];   // 💀 al caer se le van los estados (P257)
       return true;
     });
   }catch(err){ console.error('La vida en 0: no se pudo revisar', err); }
@@ -36,6 +36,7 @@ async function vidaCeroRevisar(fichaId){
     try{ momentoAbrir({tipo: 'buff', icono: Combatiente.volverIcono(salvado), titulo: `${nombre} no cae`, resultado: txt, estado: 'listo'}); }catch(e){}
   }else if(cayo){
     try{ mesaLinea(elige ? Combatiente.volverPendienteTxt(nombre) : `💔 ${nombre} quedó en 0 de vida: inconsciente (5 turnos para morir)`, 'recordatorio'); }catch(e){}
+    if(sacados.length){ try{ mesaLinea(Combatiente.caidaTxt(nombre, sacados), 'recordatorio'); }catch(e){} }
   }
 }
 

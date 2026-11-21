@@ -88,8 +88,8 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
   **❌ Falló una cosa, arreglada:** si el Extenuado llegaba con el Equipo ya abierto, los botones seguían diciendo el precio viejo («2 No2») y
   cobraba 4 (el cartel de «no te alcanzan» sí decía bien). Ahora el Equipo abierto se redibuja cuando cambian los estados
   (`vtt-hexgrid/js/11-botonera-nueva.js`, `bnDibujar`). Capturas de antes y después.
-- [ ] **➖ Una invocación revivida con el ✚ de su token:** no se pudo así: cuando la Abeja de prueba quedó en 0 «desaparece: murió» y su token
-  se va del mapa, así que no queda un ✚ que apretar. Queda por ver si una invocación puede quedar caída con el token puesto.
+- [x] **➖ Una invocación revivida con el ✚ de su token:** sacada de los pendientes (dueño, 2026-11-21: las invocaciones «no se reviven porque al
+  caer se desinvocan»). Cuando la Abeja de prueba quedó en 0 «desaparece: murió» y su token se va del mapa: es lo esperado.
 
 ### Tanda 4 (segunda parte de la pasada, mismo día) · el clon de El origen, «Ver detalle», carteles de inmunidad y las reglas de Firebase
 
@@ -3407,8 +3407,11 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
   cinturón y la Llama de Fénix (al recibir un golpe de 999), el Revive que usa el Jugador 2 sobre el Jugador 1 caído, el ✚ del GM sobre el personaje
   caído y el ✚ del GM sobre un creep caído: en los seis quedó solo «Invulnerable», con el cartelito, la línea de la Mesa («☥ … volvió: se le fueron 2
   estados (…)») y el Aviso al jugador.
-- [ ] **Sin ver en pantalla:** «¿Con qué volvés?» eligiendo entre dos formas (mismo lugar del código; cubierto por las pruebas automáticas); un creep
-  que revive con la Llama de Fénix (por un golpe y en su Mantenimiento); una invocación revivida con el ✚ de su token; revivir un creep desde GM Tools
+- [x] (2026-11-21, Claude, «Claude · pruebas 2») **«¿Con qué volvés?» eligiendo entre dos formas** (Pacto y Ankh en el cinturón): el cartel sale sin
+  animación; recién al tocar «😇 El Pacto» (y guardarse, ~2 s) sale la animación del Pacto; el Ankh quedó en el cinturón. Video del Jugador 2.
+  (Las invocaciones no se reviven: al caer se desinvocan — dueño, 2026-11-21.)
+- [ ] **Sin ver en pantalla:** un creep
+  que revive con la Llama de Fénix (por un golpe y en su Mantenimiento); revivir un creep desde GM Tools
   suelto; revivir desde la ficha suelta (toast y línea en la Mesa); que un estado del equipo puesto (un anillo, «Inmune a …») siga después de volver.
 
 ## ▶ Iniciar combate (2026-11-20)

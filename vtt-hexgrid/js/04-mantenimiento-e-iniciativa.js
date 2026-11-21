@@ -471,16 +471,19 @@ function iniciativaFueraDeJuego(id){
 // `o` (Degollar, 2026-10-10): {orden (el orden nuevo, con quien termina ya al final), termina (su id), desde (el lugar donde estaba: sigue el que
 // quedó ahí)}. `o.a` (dueño, 2026-10-15): el GM le da un turno normal a ese (clic derecho en su nombre): termina el turno del que jugaba y
 // empieza el suyo, como con ▶ Siguiente, pero salta directo a él (sin cambiar de ronda); el orden sigue desde ahí. Sin `o`, el ▶ Siguiente de siempre.
+// `o.pasarRonda` (⏭ Pasar de ronda, dueño, 2026-11-21): termina el turno en curso, los que faltaban en la ronda pasan su turno sin jugar (como un caído
+// que se saltea: su inicio y su fin, sus zonas un turno menos), se pasa el Mantenimiento de la ronda y empieza el primero del orden.
 async function iniciativaSiguiente(o){
-  o = o && (o.orden || o.a) ? o : {};
-  if(!o.a && !o.orden && iniciativa.libre) return iniciativaVolverDeLibre();   // terminó el turno libre: vuelve a quien lo tenía
+  o = o && (o.orden || o.a || o.pasarRonda) ? o : {};
+  if(!o.a && !o.orden && !o.pasarRonda && iniciativa.libre) return iniciativaVolverDeLibre();   // terminó el turno libre: vuelve a quien lo tenía
   const orden = o.orden || iniciativa.orden, n = orden.length;
   if(!n) return;
   // En un turno libre, el turno «de verdad» es el de quien lo tenía antes: ese es el que termina.
   const real = iniciativa.libre ? orden.find(x => x.id === iniciativa.libre.vuelve) : null;
   const termina = o.termina ? orden.find(x => x.id === o.termina) : real || iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
   let i = o.orden ? num(o.desde) - 1 : iniciativa.turno, ronda = iniciativa.ronda;
-  const salteados = [];
+  if(o.pasarRonda && real) i = Math.max(0, orden.indexOf(real));   // en un turno libre, la ronda sigue desde quien lo tenía
+  const salteados = [], saltaRonda = [];
   const ya = new Set(iniciativa.actuaron || []);   // los que ya jugaron esta ronda
   // 🔁 Un turno de más (`repite`): el que termina ya había jugado esta ronda, así que su fin de turno ya se contó (dueño, 2026-10-29: «la
   // regeneración, el contador de turnos, etc. pasa solamente una vez por ronda»).
@@ -491,7 +494,10 @@ async function iniciativaSiguiente(o){
     i = orden.findIndex(x => x.id === o.a);
     if(i < 0) return;
     repite = ya.has(o.a) && o.a !== (termina && termina.id);   // el GM le da el turno a uno que ya jugó: juega, sin volver a contar nada
-  }else for(let paso = 0; paso < 2 * n; paso++){
+  }else{
+   // ⏭ Pasar de ronda: los que todavía no jugaron esta ronda (después del que juega) pasan su turno sin jugar; la vuelta empieza en el primero.
+   if(o.pasarRonda){ for(let j = i + 1; j < n; j++) if(!ya.has(orden[j].id)) saltaRonda.push(orden[j].id); i = n - 1; }
+   for(let paso = 0; paso < 2 * n; paso++){
     i++;
     if(i >= n){ i = 0; ronda++; ya.clear(); }
     if(ya.has(orden[i].id)){
@@ -502,7 +508,8 @@ async function iniciativaSiguiente(o){
       break;
     }
     if(!iniciativaFueraDeJuego(orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
-    salteados.push(orden[i].id);
+    if(!saltaRonda.includes(orden[i].id)) salteados.push(orden[i].id);   // (un caído que ya pasó su turno al pasar de ronda no lo pasa dos veces)
+   }
   }
   // ▶ Si el que terminaba nunca tocó «Aplicar» al empezar su turno, se aplica ahora, antes de terminarlo (no se pierde; js abajo).
   if(termina && !terminaRepetido) await inicioTurnoForzar(termina.id, `${mapaFin}:${pasoFin}`);
@@ -564,6 +571,23 @@ async function iniciativaSiguiente(o){
     const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);
     lineas.push(...ini2, ...fin2);
   }
+  // ⏭ Los que se saltearon al pasar de ronda: su turno pasa igual, sin jugar (lo más parecido a apretar ▶ Siguiente con cada uno: P269). Quien demoró
+  // su turno con ▼ ya lo había empezado (no se repite el inicio).
+  for(const id of saltaRonda){
+    const k = `${mapaFin}:${pasoFin}:ronda:${id}`;
+    const ini2 = (iniciativa.empezados || []).includes(id) ? [] : await inicioDeTurno(id, k);
+    const fin2 = await finDeTurno(id, k);
+    const z2 = iniciativaFueraDeJuego(id) ? [] : await zonasDelQueLaTiro(id, null);
+    lineas.push(...ini2, ...fin2, ...z2);
+  }
+  if(o.pasarRonda){
+    const nomP = id => { const tk = tokens.get(id), fila = orden.find(x => x.id === id); return tk && publico(fila, tk) ? nombreDe(tk) : ''; };
+    const vivos = saltaRonda.filter(id => !iniciativaFueraDeJuego(id)), nombres = vivos.map(nomP).filter(Boolean), otros = vivos.length - nombres.length;
+    const quien = [...nombres, ...(otros ? [otros === 1 ? 'alguien más' : `${otros} más`] : [])].join(', ');
+    const txt = `⏭ El GM pasó de ronda${quien ? `: se saltearon los turnos de ${quien}` : ''}`;
+    lineas.unshift(txt + '.');
+    try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
+  }
   const mantNuevo = nuevaRonda ? await pasarMantenimiento(`Ronda ${ronda}`) : null;   // lo que es de la ronda (P161)
   const lineasZonas = sig.id && !sinInicio ? await zonasDelQueLaTiro(sig.id, mantNuevo) : [];   // P172: sus zonas, un turno menos (js/07)
   // ▶ Un personaje o una invocación (2026-10-17, dueño): lo de empezar su turno espera su «✔ Aplicar» (inicioTurnoPendiente); un creep, como siempre.
@@ -610,6 +634,7 @@ async function combateNo2Llenos(alPaso){
     if(alPaso) alPaso(++hechos, total);
     const t = tokens.get(o.id);
     if(!t || !t.fichaId) continue;
+    if(iniciativaFueraDeJuego(o.id)) continue;   // 💀 un caído queda como cayó: sin No2 llenos (P257, dueño, 2026-11-21)
     if(t.tipo === 'creep'){
       try{
         const sc = creepPrivadoDe(t.fichaId);
@@ -692,6 +717,28 @@ async function iniciativaSiguienteBoton(){
     if(!(await guardarIniciativa({iniciado: true, porIniciar: false}))) return;
   }
   return iniciativaSiguiente();
+}
+/* ⏭ PASAR DE RONDA (dueño, 2026-11-21: «en el menú de iniciativa y orden, agregar un botón para el GM que diga PASAR DE RONDA, que se saltee todos los
+   turnos pendientes de la ronda y vuelva al primero. Sobre todo me sirve para cuando estoy haciendo pruebas, pero podría llegar a suceder que lo
+   necesite durante un juego»). Solo el GM, en el pie del orden de turnos. Si quedan turnos sin jugar, pide una confirmación corta; después hace lo
+   mismo que pasar todos esos turnos con ▶ Siguiente (iniciativaSiguiente con `pasarRonda`): termina el turno en curso, los que faltaban pasan su
+   turno sin jugar, el Mantenimiento de la ronda y el turno queda en el primero del orden. En un turno libre, lo termina y sigue igual. */
+let pasandoRonda = false;
+const iniciativaPendientesRonda = () => OrdenTurnos.pendientesRonda(iniciativa, iniciativaFueraDeJuego);
+async function iniciativaPasarRonda(){
+  if(!soyGM || pasandoRonda || !iniciativa.orden.length) return;
+  if(iniciandoCombate){ toast('⏳ El combate se está iniciando: esperá unos segundos'); return; }
+  const pend = iniciativaPendientesRonda();
+  if(pend.length){
+    const nombres = pend.map(x => { const t = tokens.get(x.id); return t ? nombreDe(t) : '?'; });
+    const ok = await Confirmar.preguntar(`${pend.length === 1 ? 'Queda 1 turno' : `Quedan ${pend.length} turnos`} sin jugar en la ronda ${fmt(iniciativa.ronda)} (${nombres.join(', ')}). Pasan su turno sin jugar, se pasa el Mantenimiento de la ronda y empieza el primero del orden.`,
+      {titulo: 'Pasar de ronda', icono: '⏭', si: 'Pasar de ronda', no: 'Cancelar'});
+    if(!ok) return;
+  }
+  pasandoRonda = true; renderIniciativa();
+  try{ await iniciativaSiguiente({pasarRonda: true}); }
+  catch(err){ console.error('Pasar de ronda:', err); toast('No se pudo pasar de ronda — mirá la consola'); }
+  finally{ pasandoRonda = false; renderIniciativa(); }
 }
 /* ▶ Es su turno (dueño, 2026-10-15: «poder desde el máster cambiar el turno de a quién le toca… botón derecho sobre el nombre en la tabla de
    iniciativa… que te pregunte si se descuentan los cooldowns, si es como un turno normal de la ronda o es su turno de manera libre sin
@@ -1183,6 +1230,7 @@ function renderIniciativa(){
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
       (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`
         : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +
+      (iniciativa.orden.length && !OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn" id="ini-pasar-ronda"${pasandoRonda ? ' disabled aria-busy="true"' : ''} title="Saltea los turnos que faltan en esta ronda (pasan sin jugar), pasa el Mantenimiento de la ronda y vuelve al primero del orden">${pasandoRonda ? '⏳ Pasando de ronda…' : '⏭ Pasar de ronda'}</button>` : '') +
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>' +
       // ▶ Iniciar combate (dueño, 2026-11-20): aparece al apretar Ordenar y pulsa hasta que se aprieta; con el combate en curso no se ofrece.
       (OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn ini-iniciar" id="ini-iniciar"${iniciandoCombate ? ' disabled aria-busy="true"' : ''} title="Empieza el combate: todos los del orden con los No2 llenos y arranca el turno del primero de la lista (su inicio de turno de siempre)">${iniciandoCombate ? `⏳ Iniciando combate…${iniciandoTxt ? ' ' + esc(iniciandoTxt) : ''}` : '▶ Iniciar combate'}</button>` : '')
@@ -1281,6 +1329,8 @@ function conectarIniciativa(){
   if(ordenar) ordenar.onclick = () => iniciativaOrdenar();   // (js/86; hasta el 2026-11-20 acá salía el cartel de la Prisa)
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = () => iniciativaSiguienteBoton();
+  const pasarRonda = $('#ini-pasar-ronda');
+  if(pasarRonda) pasarRonda.onclick = () => iniciativaPasarRonda();
   const iniciar = $('#ini-iniciar');
   if(iniciar) iniciar.onclick = () => iniciativaIniciarCombate();
   const limpiar = $('#ini-limpiar');

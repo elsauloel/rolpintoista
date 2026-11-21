@@ -92,6 +92,17 @@ const OrdenTurnos = (() => {
     return 0;
   }
   const SIN_INICIAR = {iniciado: false, porIniciar: false};
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR};
+  /* ⏭ Pasar de ronda (dueño, 2026-11-21): los que todavía no jugaron en esta ronda, después del que tiene el turno (en un turno libre, después de quien
+     lo tenía), sin los que ya jugaron (`actuaron`) ni los caídos (`fuera(id)`). → [{id, …}] (las filas del orden). */
+  function pendientesRonda(ini, fuera){
+    const orden = ini && Array.isArray(ini.orden) ? ini.orden : [];
+    if(!orden.length) return [];
+    const lib = ini.libre, k = lib ? orden.findIndex(x => x && x.id === lib.vuelve) : Math.round(num(ini.turno));
+    const base = k >= 0 ? k : Math.round(num(ini.turno));
+    const ya = new Set(Array.isArray(ini.actuaron) ? ini.actuaron : []);
+    if(orden[base]) ya.add(orden[base].id);
+    return orden.slice(base + 1).filter(x => x && !ya.has(x.id) && !(fuera && fuera(x.id)));
+  }
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

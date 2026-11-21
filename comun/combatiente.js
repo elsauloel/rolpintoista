@@ -2975,6 +2975,13 @@ const Combatiente = (() => {
     if(!Array.isArray(habs)) return false;
     let cambio = false;
     habs.forEach(h => {
+      // 🔥 El Muro de fuego quema al empezar el turno de quien está encima, no al pasar de ronda (P259, dueño, 2026-11-21): la copia guardada en un creep
+      // se pone al día (`alEmpezar` adentro de su zonaEstado; el texto ya decía «empieza su turno adentro»).
+      if(h && h.nombre === 'Muro de fuego' && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona' && h.duelo.zonaEstado && typeof h.duelo.zonaEstado === 'object' && !h.duelo.zonaEstado.alEmpezar){
+        h.duelo.zonaEstado = {...h.duelo.zonaEstado, alEmpezar: true};
+        if(typeof h.ataqueTxt === 'string') h.ataqueTxt = h.ataqueTxt.replace('a quien lo cruza o se queda', 'a quien lo cruza o empieza su turno adentro');
+        cambio = true;
+      }
       // 💨 La Ráfaga de viento despeja nubes y gases (dueño, 2026-11-01): la que ya estaba guardada en un creep se pone al día.
       if(h && h.nombre === 'Ráfaga de viento' && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'cono' && !h.duelo.despeja){
         h.duelo.despeja = true;

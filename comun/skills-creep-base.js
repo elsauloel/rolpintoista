@@ -582,9 +582,9 @@
       detalleGolpe: 'Su PdG.Esp contra la Evasión; 4d6 de daño arcano.',
       duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '4d6', tipoDano: 'arcano'}}});
   H('Muro de fuego', 'DA', 'ega', 'g', 3, {detalle: 'Levanta un muro de llamas en línea, que empieza dentro de su Rango: 4 casillas o más (hasta 8: cada casilla de más cuesta 1 No2 y 1 SP más), durante 3 turnos. Quien lo cruza o empieza su turno adentro recibe 3d4 de daño de fuego directo (no lo frena la Defensa especial; sí la resistencia al fuego) y queda con Quemadura.',
-    no2: 1, spCosto: 3, auditada: true, largoVariable: {min: 4, max: 8, sp: 1, no2: 1}, ataqueTxt: 'muro de fuego en línea (4 casillas o más), 3 turnos: 3d4 de fuego directo y Quemadura a quien lo cruza o se queda',
+    no2: 1, spCosto: 3, auditada: true, largoVariable: {min: 4, max: 8, sp: 1, no2: 1}, ataqueTxt: 'muro de fuego en línea (4 casillas o más), 3 turnos: 3d4 de fuego directo y Quemadura a quien lo cruza o empieza su turno adentro',
     duelo: {objetivo: 'zona', tira: '', contra: [], dano: true, danoFormula: '3d4', danoDirecto: true, tipoDano: 'fuego', zonaTurnos: 3, zonaForma: 'linea', zonaLargo: 4, zonaAltura: 'ambos',
-      zonaColor: '#E8632B', zonaAlcance: 'rango', zonaCadaPaso: true, zonaEstado: {nombre: 'Quemadura'}}}, 'terreno y formas');
+      zonaColor: '#E8632B', zonaAlcance: 'rango', zonaCadaPaso: true, zonaEstado: {nombre: 'Quemadura', alEmpezar: true}}}, 'terreno y formas');   // 🔥 `alEmpezar` (P259, dueño, 2026-11-21): quema al empezar el turno de quien está encima, no al pasar de ronda
   H('Lanza de hielo', 'DX', 'e', 'g', 3, zO('Un carámbano que ralentiza: el objetivo pierde 1 No2 (a mano).', 2, 'M'));
   H('Dardo venenoso', 'DX', 'hdp', 'r', 2, aT('Un dardo cubierto de veneno: tirá 1d4, con 1 el objetivo queda Envenenado (a mano).', 'L'));
   H('Explosión psíquica', 'D', 'a', 'g', 4, zO('Un pulso mental que ignora la armadura.', 3, 'H'));

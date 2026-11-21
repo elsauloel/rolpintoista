@@ -96,7 +96,8 @@ function zonaEstadoDetalle(el, t){
   if((sup && sup.tiraPaso) || spec.tiraPaso) cuando = 'En cada paso que dé adentro';
   else {
     const partes = [el.trampa ? 'al detonar y al entrar' : el.zonaCadaPaso ? 'al entrar (aunque solo la cruce)' : 'al entrar'];
-    if(el.zonaEnMantenimiento !== false) partes.push('en cada Mantenimiento (al pasar de ronda) mientras siga adentro');
+    if(el.zonaEnMantenimiento !== false && spec.alEmpezar) partes.push('al empezar su turno adentro');   // 🔥 el Muro de fuego (P259, 2026-11-21)
+    else if(el.zonaEnMantenimiento !== false) partes.push('en cada Mantenimiento (al pasar de ronda) mientras siga adentro');
     else partes.push('no mientras se queda quieto adentro');
     cuando = partes.join(' y ');
     cuando = cuando[0].toUpperCase() + cuando.slice(1);

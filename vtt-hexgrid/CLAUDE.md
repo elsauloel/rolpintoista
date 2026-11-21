@@ -2508,3 +2508,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   desde la ronda 2). Las usan js/13 (la Apuntada, al apuntar) y js/35 (`arcoBonos`, la firme). Cuenta lo que el token hace (caminar, Salto, Dash…);
   que lo muevan (empujón, Mover libre) no. Sin orden de turnos, como antes. Sin cartel ni aviso antes de moverse (P271). Probado con clics: J1 camina
   en su pantalla y el GM con 🎮 el control dispara desde la suya → sin Apuntada; ronda nueva, quieto (y con un Mover libre del GM) → «+2 PdG».
+- **🔥 El Muro de fuego quema al empezar el turno** (P259, dueño, 2026-11-21: «debería hacer daño a un personaje/token al iniciar el turno del mismo, si
+  este está parado sobre el muro»; js/08): una zona con `alEmpezar` adentro del JSON de `zonaEstado` (sin regla nueva de Firestore) no pega en el
+  Mantenimiento a quien está en el orden de turnos (`zonaPorTurno`) sino al EMPEZAR SU TURNO: `zonasAlEmpezarTurno()` (llamada desde
+  `escucharIniciativa`, js/04, cuando cambia el turno; una vez por token y ronda, `zonaTurnoVisto`; no en un turno libre ni en uno repetido) revisa
+  solo esas zonas para el token del turno, en la pantalla que lo resuelve (`zonaResuelvoYo`), con el cartel de siempre. Sin orden de turnos (o un
+  token que no está en la lista), como antes: en cada Mantenimiento. Al entrar o cruzarlo, igual que siempre. «Ver detalle», el cartel de arriba
+  (`ZonaDetalle.cuandoZona`) y el globo de estados (js/103) dicen «al empezar su turno adentro». Las copias guardadas en creeps se ponen al día solas
+  (`Combatiente.migrarLuzSanadora`). Probado con clics: lanzado desde las Acciones de un creep; al pasar de ronda le salió el cartel solo al que
+  empezaba su turno (J1) y no a J2, también encima; a J2, recién al empezar el suyo. La Varita del muro de fuego quedó como estaba (P272).

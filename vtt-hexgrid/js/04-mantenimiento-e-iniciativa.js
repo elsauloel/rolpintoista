@@ -285,7 +285,7 @@ function escucharIniciativa(){
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda || (iniciativa.iniciado === true && !antesIniciado);   // (iniciar el combate también anuncia de quién es el turno)
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
     renderIniciativa();
-    if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); }   // 🔓 js/54
+    if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); if(typeof zonasAlEmpezarTurno === 'function') zonasAlEmpezarTurno(); }   // 🔓 js/54 · 🔥 el Muro de fuego (js/08)
     iniciativaCargada = true;
   }, err => console.error('Error escuchando la iniciativa:', err));
 }

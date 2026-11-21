@@ -441,13 +441,33 @@ const tocaElPiso = el => alturaDe(el) !== 'aire';
 // chequean acá — solo al caminar (ver zonaRevisarEntrada). `flotando`: terminó el movimiento levitando (las del piso, todavía no);
 // `soloPiso`: al aterrizar, solo las del piso (las del aire ya las vio al moverse).
 // `desde`: la casilla de la que salió el movimiento (para saber si ENTRÓ a la zona o ya estaba adentro).
-function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde){
+/* 🔥 «Al empezar su turno adentro» (P259, dueño, 2026-11-21: «el muro de fuego debería hacer daño a un personaje/token al iniciar el turno del mismo, si
+   este está parado sobre el muro»): una zona con `alEmpezar` en su zonaEstado (el Muro de fuego) no pega al pasar de ronda sino al EMPEZAR EL TURNO de
+   cada uno que esté encima (zonasAlEmpezarTurno, desde js/04 cuando cambia el turno). Solo con orden de turnos y en combate, y si ese token está en el
+   orden; sin orden (narrativo, o un token que no está en la lista), como siempre: en cada Mantenimiento. */
+const zonaAlEmpezar = el => !!zonaSpecDe(el).alEmpezar;
+const zonaPorTurno = t => typeof modoMapa !== 'undefined' && modoMapa === 'combate' && (iniciativa.orden || []).some(o => o.id === zonaIdDe(t));
+const zonaTurnoVisto = new Set();   // `mapa:token@ronda`: una vez por turno (un turno libre, uno demorado o el que vuelve no lo repiten)
+function zonasAlEmpezarTurno(){
+  if(typeof modoMapa === 'undefined' || modoMapa !== 'combate' || iniciativa.libre) return;
+  const o = iniciativa.orden[iniciativa.turno];
+  if(!o || iniciativa.repite === o.id) return;
+  const k = `${mapaMostrado}:${o.id}@${iniciativa.ronda}`;
+  if(zonaTurnoVisto.has(k)) return;
+  zonaTurnoVisto.add(k);
+  const t = tokens.get(o.id);
+  if(t && zonaResuelvoYo(t)) zonaRevisarToken(t, true, false, false, null, true);
+}
+// `soloAlEmpezar`: solo las zonas de «al empezar su turno» (lo llama zonasAlEmpezarTurno).
+function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, soloAlEmpezar){
   if(!t || !zonaEsMia(t) || etereoDe(t)) return;
   if(iniciativaFueraDeJuego(zonaIdDe(t))) return;   // 💀 un caído es un cuerpo: las zonas no le hacen nada (P225, 2026-10-27)
+  const porTurno = zonaPorTurno(t);
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t)) return;
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
     if(sup && sup.tiraPaso) return;   // el hielo: al aparecer y por cada paso (zonaRevisarEntrada), no por estar parado
+    if(soloAlEmpezar ? !zonaAlEmpezar(el) : (desdeMantenimiento && porTurno && zonaAlEmpezar(el))) return;   // 🔥 la de «al empezar su turno», en su turno
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
     if((flotando || (typeof vuelaToken === 'function' && vuelaToken(t))) && alturaDe(el) === 'piso') return;   // 🕊 quien vuela (Levitando, Vuela) no toca lo del piso, tampoco parado (2026-10-26)
     if(soloPiso && alturaDe(el) !== 'piso') return;

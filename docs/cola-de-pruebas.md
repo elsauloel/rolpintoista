@@ -1475,9 +1475,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   suya → sin Apuntada (la memoria vieja de la pantalla del GM decía «quieto» y daba el +2); ronda nueva, sin caminar y con un 🦶 Mover libre del GM →
   «apuntada (no se movió): +2 PdG». La firme no se probó con clics (las dos ballestas con firme están archivadas; misma regla que el anillo, con
   pruebas automáticas). Sin cartel ni aviso antes de moverse: P271. Por datos: la ballesta equipada y el orden de turnos. 2 pruebas nuevas (971).
-- **⬜ en cola — 🔥 Muro de fuego al empezar el turno (P259 decidida)** (dueño, 2026-11-21): «el muro de fuego debería hacer daño a un
+- **✅ hecho (2026-11-21) — 🔥 Muro de fuego al empezar el turno (P259 decidida)** (dueño, 2026-11-21): «el muro de fuego debería hacer daño a un
   personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Hoy el mapa lo dispara al pasar de ronda: corregir el mapa,
   y que el texto de la habilidad, el «Ver detalle» y el cartel de arriba digan lo mismo.
+  *Resultado:* con orden de turnos, el muro ya no pega al pasar de ronda: al empezar el turno de cada uno que esté encima le sale el cartel «🔥 Muro de
+  fuego: le toca a …» (al entrar o cruzarlo, como siempre). Sin orden de turnos, como antes. El texto de la habilidad, «Ver detalle» y el cartel de
+  arriba dicen «al entrar o cruzarla y al empezar su turno adentro». Las copias guardadas en los creeps se ponen al día solas. Probado con clics en
+  «Claude · pruebas 2»: el GM lo lanzó desde las Acciones de Arcano 3 (4 casillas, sobre Blanco J1); J2 entró caminando (cartel al entrar); al pasar
+  a la ronda 5 el cartel salió solo a J1 (empezaba su turno), no a J2, que también estaba encima; a J2 recién al empezar el suyo. Por datos: darle
+  la habilidad a Arcano 3 (en el formato viejo, para ver la puesta al día), acercarlo y sumarlo al orden. La Varita del muro de fuego no se tocó
+  (P272); los que se saltean con «Pasar de ronda» no se queman (P269). 1 prueba automática nueva (972).
 - **⬜ en cola — 🔮 Foco Arcano y movimientos especiales con Puntería certera, con clics** (dueño, 2026-11-21: «probalo en Claude pruebas»):
   Dash, Salto, Carga, Takle, Parpadeo con los dos anillos; el Foco con un área de personaje y en un creep o una invocación.
 

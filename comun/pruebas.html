@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261121zd5"></script>
+<script src="zona-detalle.js?v=20261121muro"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261121caido"></script>
+<script src="combatiente.js?v=20261121muro"></script>
 <script src="creep-calculo.js?v=20261120maestria"></script>
 <script src="creep-botonera.js?v=20261120maestria"></script>
 <script src="creep-acciones.js?v=20261121caido"></script>
@@ -126,7 +126,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
-<script src="skills-creep-base.js?v=20261118ia"></script>
+<script src="skills-creep-base.js?v=20261121muro"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -9325,6 +9325,20 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     igual(fila(m, 'Tirada para evitarla'), 'No tiene: entra directo.');
     ok(/va directo/.test(fila(m, 'Qué frena el daño')) && /resistencia al fuego/.test(fila(m, 'Qué frena el daño')));
     igual(m.descripcion, 'Levanta un muro.');
+  });
+  prueba('🔥 el Muro de fuego quema AL EMPEZAR EL TURNO adentro (P259, 2026-11-21): la habilidad, su copia guardada, «Ver detalle» y el cartel de arriba dicen lo mismo', async () => {
+    const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
+    const m = ZonaDetalle.armar(nuevo, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, autor: {nombre: 'Mago'}, habilidad: 'Muro de fuego', altura: 'ambos', rivalesTxt: 'los personajes'});
+    igual(m.esencial, '3d4 de daño de fuego y Quemadura a los personajes: al entrar o cruzarla y al empezar su turno adentro.');
+    ok(/Al empezar su turno adentro \(con orden de turnos; sin orden de turnos, cada vez que se pasa de ronda\)/.test(fila(m, 'Cuándo se dispara')));
+    igual(ZonaDetalle.cuandoEtiqueta(nuevo, {}), 'se dispara al entrar o cruzarla y al empezar su turno adentro');
+    const hb = HABILIDADES_CREEP_BASE.find(h => h.nombre === 'Muro de fuego').datos.sp;
+    ok(hb.duelo.zonaEstado.alEmpezar === true && /empieza su turno adentro/.test(hb.detalle) && /empieza su turno adentro/.test(hb.ataqueTxt));
+    const vieja = [{nombre: 'Muro de fuego', ataqueTxt: '… a quien lo cruza o se queda', duelo: {objetivo: 'zona', zonaEstado: {nombre: 'Quemadura'}}}];
+    Combatiente.migrarLuzSanadora(vieja);
+    igual([vieja[0].duelo.zonaEstado, vieja[0].ataqueTxt], [{nombre: 'Quemadura', alEmpezar: true}, '… a quien lo cruza o empieza su turno adentro']);
+    const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t04 = await (await fetch('../vtt-hexgrid/js/04-mantenimiento-e-iniciativa.js', {cache: 'no-store'})).text();
+    ok(/function zonasAlEmpezarTurno\(\)/.test(t08) && /desdeMantenimiento && porTurno && zonaAlEmpezar\(el\)/.test(t08) && /zonasAlEmpezarTurno\(\); \}/.test(t04));
   });
   prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
     const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,

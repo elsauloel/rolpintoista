@@ -1772,6 +1772,7 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
 ### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
 > ✅ **Muro de fuego decidido (dueño, 2026-11-21):** «debería hacer daño a un personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Se corrige el mapa (cola: «🔥 Muro de fuego al empezar el turno»). Lo demás de P259 sigue abierto.
+> ✅ **Hecho (2026-11-21):** el mapa, el texto de la habilidad, «Ver detalle» y el cartel de arriba dicen «al empezar su turno adentro». Queda P272 (la Varita del muro de fuego).
 
 Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detalle.js`, `comun/zona-detalle.js`). Para que el dueño decida:
 
@@ -1888,6 +1889,8 @@ El botón nuevo «⏭ Pasar de ronda» (orden de turnos, solo el GM) hace lo mis
    termina (lo de «al terminar tu turno»: la Calma le devuelve No2 si no atacó, un estado que explota al vencer explota) y sus zonas pierden un turno.
    ¿Está bien, o preferís que se salteen «congelados» (sin recargar ni que les pase nada)?
 2. **Un caído que se saltea** solo baja su cuenta para morir (como con ▶ Siguiente).
+3. **El Muro de fuego** (que desde el 2026-11-21 quema al empezar el turno de quien está parado encima) **no les quema** a los que se saltean con
+   «⏭ Pasar de ronda»: solo al que empieza a jugar. ¿Les tendría que quemar también?
 
 ### P270 — 💀 «Al morir se van los estados»: ¿al caer o al morir del todo? (2026-11-21, Claude)
 P257 dice «al momento de morir se le eliminan todos los estados alterados». Se tomó **morir = caer** (la vida a 0, inconsciente o derrotado), porque
@@ -1906,3 +1909,8 @@ Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas
 **Apuntada firme** quedó como el anillo: recién desde la ronda 2 (en la 1 no hay «turno anterior» quieto); la Apuntada simple vale desde la ronda 1.
 1. ¿Les sumo el cartel y el aviso?
 2. ¿La Apuntada firme en la ronda 1, sí o no?
+
+### P272 — 🔥 La Varita del muro de fuego: ¿también al empezar el turno? (2026-11-21, Claude)
+El Muro de fuego (la habilidad de los magos creep) ya quema al empezar el turno de quien está parado encima (P259). La **Varita del muro de fuego**
+(Buena Calidad, 1d4 de fuego, 3 casillas) dice otra cosa en su texto: «a cada rival que entra y, en cada Mantenimiento, al que sigue adentro», y así
+sigue (no se tocó: el pedido era el Muro). ¿La paso al mismo comportamiento (y cambio su texto), o queda distinta a propósito?

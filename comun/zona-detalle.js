@@ -39,6 +39,10 @@ const ZonaDetalle = (() => {
     if(paso) return {corto: 'en cada paso que dan adentro', largo: 'En cada paso que se da adentro (entrando o caminando por ella). Quedarse quieto no la dispara.'};
     const entra = el.zonaCadaPaso || el.trampa ? 'al entrar o cruzarla' : 'al entrar';
     const mant = el.zonaEnMantenimiento !== false;
+    // 🔥 «Al empezar su turno adentro» (P259, 2026-11-21: el Muro de fuego): con orden de turnos, en el turno de cada uno; sin orden, al pasar de ronda.
+    if(sp.alEmpezar && mant) return {corto: `${entra} y al empezar su turno adentro`,
+      largo: [el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '', el.zonaCadaPaso || el.trampa ? 'Al entrar, aunque solo se la cruce de paso' : 'Al entrar (terminando el movimiento adentro)',
+        'Al empezar su turno adentro (con orden de turnos; sin orden de turnos, cada vez que se pasa de ronda)', 'Moverse por adentro no la vuelve a disparar'].filter(Boolean).join('. ') + '.'};
     const largo = [el.trampa ? 'Al detonar la trampa (a los que están adentro)' : '', el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '',
       el.zonaCadaPaso || el.trampa ? 'Al entrar, aunque solo se la cruce de paso' : 'Al entrar (terminando el movimiento adentro)',
       mant ? 'Mientras se siga adentro, cada vez que se pasa de ronda (el Mantenimiento)' : 'Quedarse quieto adentro NO la vuelve a disparar',

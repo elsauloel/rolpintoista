@@ -206,6 +206,13 @@ function bnDibujar(){
   if(!bn) return;
   const cuerpo = bn.raiz.querySelector('#bn-contenido');
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
+  // 🛡 El Equipo abierto: si cambiaron los estados del personaje (le llega un Extenuado…), se redibuja para que sus botones digan lo que cuesta
+  // ahora (2026-11-21, pasada de pruebas: con el Equipo abierto el botón seguía diciendo «2 No2» y cobraba 4).
+  try{
+    const firmaEf = JSON.stringify((bn.S.efectos || []).map(e => [e && e.nombre, e && e.stacks, e && e.activo]));
+    if(bn.firmaEfEquipo !== undefined && bn.firmaEfEquipo !== firmaEf && bn.raiz.querySelector('#bn-equipo.open')) bnEquipoDibujar();
+    bn.firmaEfEquipo = firmaEf;
+  }catch(e){ console.error('El Equipo abierto no se pudo poner al día:', e); }
   if(bn.invId){ bnDibujarInv(cuerpo); return; }
   const r = FichaBotonera.html(bn.S, {modoMapa, atajos: true, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
   // 🗿 Estoicismo (js/85): la Defensa del encabezado con lo de este momento.

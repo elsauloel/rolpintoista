@@ -594,7 +594,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirada 1d10+1. **Sin probar con clics:** un creep y una invocación con la Prisa vieja (sí en las pruebas automáticas); la ficha suelta de Rockardo
   (se probó desde el mapa). En la partida real no se entró: allá se convierte sola. 958 pruebas automáticas en verde (1 nueva).
   **Para que lo sepas:** con +5, quien tiene Prisa ya no va primero seguro; contra alguien de Iniciativa parecida gana casi siempre, pero puede perder.
-- **⬜ en cola — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
+- **🟡 a medias (2026-11-21: hecha la parte que puede romper una partida; falta lo del clon y lo visual — ver el resultado abajo) — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
   que no se probó, anotalo en la cola»). Sin programar nada nuevo: probar con clics en «Claude · pruebas 2» (GM, J1, J2) lo que cada informe dejó
   sin ver (también está en docs/pruebas-en-el-mapa.md; tachar ahí lo que se vea) y arreglar solo lo que falle:
   · **Arrastrar / Desequilibrado / primer ataque** (96edd265): una invocación arrastrada; un creep arrastrando a un personaje; cerrar con
@@ -610,6 +610,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   · De antes: enjambre en contraataque / oportunidad / habilidad con arma; Llama de Fénix como tercera opción de «¿Con qué volvés?»; el camino
     Avanzar de la XP en «Batalla terminada».
   Informe: tabla caso → visto / falló / no se pudo, con capturas.
+  *Resultado (2026-11-21):* con clics en «Claude · pruebas 2» (GM, Jugador 1 y Jugador 2 en tres pantallas), en orden de importancia. El detalle,
+  caso por caso, en `pruebas-en-el-mapa.md` («🧪 Pasada de pruebas del 2026-11-21», tres tandas). **Visto y anda (unos 45 casos):** Iniciar
+  combate (invocación primera, sin cambiar el modo, «Pasar el turno sin iniciar», un caído primero); la Táctica de enjambre en oportunidad,
+  contraataque y habilidad con arma; Arrastrar hecho por un creep a una invocación y a un personaje; Finalizar combate → Avanzar → Publicar con
+  el GM mirando otro mapa y con orden armado (XP en «Batalla terminada», vuelta a narrativo, la pantalla del Jugador 2), y otro combate después
+  (costo del primer ataque, ballesta que llega cargada); el botín minimizado con dos jugadores y en medio de una disputa; «¿Con qué volvés?» con
+  la Llama de Fénix como tercera opción; un creep con la Llama de Fénix; el cartel INVULNERABLE en un creep, la Protección de jefe y un token
+  oculto; debuffs tras el Pacto con el GM teniendo el control; pasar ítems (Rechazar / Cancelar / aceptar en combate), DDE, despojos y un
+  despojo especial entre J1 y J2; Dar a un jugador (con el control, apilando un consumible, dos regalos seguidos); el carcaj adentro del mapa
+  (precios en combate, Extenuado, «Realizar de cualquier modo», «¿Qué flecha?»). **Fallaron tres cosas chicas, las tres arregladas y vueltas a
+  probar:** (1) al cerrar el combate con el GM mirando otro mapa, a los creeps no se les liberaba lo de «una vez por combate»; (2) al tomar o
+  devolver el control con el token ya seleccionado, los círculos de vida / SP / No2 quedaban apagados para el GM y prendidos para el jugador;
+  (3) con el Equipo abierto, si llegaba un Extenuado los botones del carcaj decían el precio viejo. **Una cosa rara vista una sola vez**, sin
+  poder repetirla: quedó como entrada nueva al final de esta cola. **No se pudo:** revivir una invocación con su ✚ (al morir, su token se va) y
+  dar a un personaje del propio GM (no hay). **Falta (no se llegó):** todo lo del clon de El origen (sigilo y lo que no se nombra, niebla,
+  Puntería certera / Foco, Prisa vieja de un creep), «Ver detalle» de una zona, Revelar por el camino nuevo de las reglas, las animaciones de
+  resurrección con el duelo abierto, maestrías y Aguante de trinchera en casos raros, cerrar desde GM Tools, la ficha suelta dormida y el
+  cartel de inmunidad por elemento. La partida quedó como estaba (comparada contra la foto del principio; a la Abeja de prueba hubo que
+  volver a ponerle el token). 963 pruebas automáticas en verde.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las
@@ -1342,6 +1361,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 2. **✅ hecho (2026-11-11) — Durabilidad: 6 por punto de Peso para todo** (armas, escudos y armaduras), mínimo 6 (dueño, 2026-11-11: «la durabilidad está ok»).
    «Resistente ×N» / «Frágil ×N» siguen sumando/restando encima; las piezas ya gastadas conservan lo gastado y ganan el margen nuevo. Revisar
    el precio de reparar.
+
+- **⬜ en cola — 🐞 A veces, después de «▶ Iniciar combate», el combate queda como sin iniciar** (visto una vez en la pasada de pruebas del
+  2026-11-21; no se pudo repetir en tres intentos). Qué pasó: el GM venía de mirar otro mapa («Prueba · L7 L8») y volvió al publicado; armó el
+  orden con un **creep primero** (Peleador 5, Blanco J1, Blanco J2), apretó Ordenar → «▶ Iniciar combate» → «⚔ Pasar a Combate e iniciar» →
+  «Empezar registro nuevo». La Mesa dijo «▶ Empieza el combate · todos arrancan con los No2 llenos» **sin nombrar de quién era el turno**, y
+  unos segundos después el botón «▶ Iniciar combate» estaba otra vez a la vista y ▶ Siguiente avisaba «el combate todavía no se inició».
+  Apretando de nuevo, anduvo. Sospecha (sin confirmar): el orden de turnos se guarda entero cada vez (`guardarIniciativa`, vtt-hexgrid/js/04), y
+  una pantalla que guarda con lo que tenía de antes puede pisar lo que otra acaba de guardar; o la pantalla del GM, recién cambiada de mapa,
+  todavía no tenía cargado el token del primero. Qué mirar: que cada guardado del orden toque solo lo suyo (o que revise antes de pisar), y
+  probarlo cambiando de mapa justo antes de iniciar. No es grave (se vuelve a apretar), pero recarga los No2 dos veces.
 
 ## En cola
 

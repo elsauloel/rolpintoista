@@ -75,13 +75,38 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
 - [ ] **Sin ver todavía del cartel de inmunidad:** el daño de un elemento al que es inmune desde una zona, una trampa, el Escudo elemental, el
   rayo en cadena y el elemental de un arma; «INMUNE A LO SINIESTRO»; Vuela, Arma natural y Coagulación; dos carteles distintos a la vez.
 
+### Tanda 3 · Dar a un jugador y el carcaj adentro del mapa
+
+- [x] **🎁 Dar a un jugador, lo que faltaba:** (a) con el **GM teniendo 🎮 el control** del personaje, el cartel «El GM te dio algo» le salió al
+  GM y no al jugador; (b) un **consumible que se apila** (Revive ×2 y después ×3): quedó una sola pila «Revive ×5»; (c) **dos regalos seguidos
+  sin aceptar el primero**: un solo cartel con los dos renglones. (d) A un personaje del propio GM: ➖ no se probó (en la partida de pruebas el
+  GM no tiene personaje, y quedó pedido no sumar personajes ahí).
+- [x] **🏹 El recuadro del carcaj adentro del mapa** (🛡 del token), **en combate**: las dos partes («Carcaj básico» y «✨ Proyectiles especiales»)
+  y cada botón con su precio («→ Carcaj (3) · 1 No2», «Cargar todo lo que entre · 2 No2»). Con **Extenuado**: 2 No2 por clase y 4 el «Cargar
+  todo», y cobró eso (6 → 4). **Sin No2 suficientes:** «No te alcanzan los Nitros… cuesta 4 y tenés 1» → **«Realizar de cualquier modo»**: lo
+  hizo, quedó en 0 y la Mesa lo anotó en rojo. El cartel **«¿Qué flecha?»** dice «3 en el Carcaj básico · 1 clase».
+  **❌ Falló una cosa, arreglada:** si el Extenuado llegaba con el Equipo ya abierto, los botones seguían diciendo el precio viejo («2 No2») y
+  cobraba 4 (el cartel de «no te alcanzan» sí decía bien). Ahora el Equipo abierto se redibuja cuando cambian los estados
+  (`vtt-hexgrid/js/11-botonera-nueva.js`, `bnDibujar`). Capturas de antes y después.
+- [ ] **➖ Una invocación revivida con el ✚ de su token:** no se pudo así: cuando la Abeja de prueba quedó en 0 «desaparece: murió» y su token
+  se va del mapa, así que no queda un ✚ que apretar. Queda por ver si una invocación puede quedar caída con el token puesto.
+
+### Lo que esta pasada NO llegó a ver (sigue pendiente)
+
+Lo del clon de El origen (**sigilo y lo que no se nombra**, la **niebla** en las Zonas de riesgo, **Puntería certera / Foco**, la **Prisa vieja**
+de un creep), **«Ver detalle» de una zona** (trampa a la vista, zona de un personaje, curación, hielo, portal), **Revelar y resolver a mano** por
+el camino nuevo de las reglas, las **animaciones de resurrección** con el duelo abierto o desde lejos, las **maestrías** y **Aguante de trinchera**
+en una invocación / con crítico / con trampa o zona, cerrar el combate **desde GM Tools**, la ficha suelta en una pestaña dormida, el cartel
+de inmunidad por elemento (zona, trampa, Escudo elemental, rayo en cadena, arma), el cartel «todavía no está en este mapa» con dos personajes
+propios (no se puede en las partidas de prueba) y la **ballesta con carcaj integrado**.
+
 ## 🎁 Dar a un jugador (2026-11-21)
 
 - [x] (2026-11-21, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, todo restaurado después) **🎁 El GM le da un ítem, DDE o despojos a un
   jugador** (comun/dar-jugador.js): desde el «⋯» del token, desde la fila de 👥 Personajes y desde el Ver de un ítem de GM Tools; un ítem ×1, ×3 y
   ×25, DDE, los tres despojos, un ítem nuevo; a uno y a los dos; conectado (cartel al instante), desconectado (al entrar al mapa y, aparte, a la
   ficha suelta); con mapa y ficha abiertos a la vez entró una sola vez; mochila pasada (29 de 20: se dio igual, con aviso en el cartel y en la Mesa).
-- [ ] **🎁 Dar a un jugador, lo que falta ver:** (a) con el GM teniendo 🎮 el control del personaje (el cartel le tendría que salir al GM, que es quien
+- [ ] **🎁 Dar a un jugador, lo que falta ver** (2026-11-21: (a), (b) y (c) ya se vieron — ver la pasada de arriba; queda (d))**:** (a) con el GM teniendo 🎮 el control del personaje (el cartel le tendría que salir al GM, que es quien
   lo aplica); (b) un consumible del catálogo ×N que se apile con los que ya tiene (está en las pruebas automáticas, no con clics); (c) el cartel
   cuando llegan dos regalos seguidos sin aceptar el primero (se suman en el mismo cartel); (d) a un personaje que es del propio GM.
 
@@ -359,7 +384,7 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
 
 ## Pendientes
 
-- [ ] **🏹 El recuadro del carcaj en dos partes, adentro del mapa** (2026-11-20; `comun/ficha-equipo.js`, `carcajHtml`): en 🛡 Equipo del mapa, que se
+- [x] (2026-11-21, visto en la pasada de pruebas de arriba) **🏹 El recuadro del carcaj en dos partes, adentro del mapa** (2026-11-20; `comun/ficha-equipo.js`, `carcajHtml`): en 🛡 Equipo del mapa, que se
   vea igual que en la ficha («Carcaj básico» arriba, «✨ Proyectiles especiales» abajo); **en combate**, los precios en No2 de cada botón; y el
   cartel «¿Qué flecha?» diciendo «N en el Carcaj básico». En la ficha y fuera de combate está probado con clics.
 
@@ -367,7 +392,7 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
   que salga un botón por personaje («🎭 Poner a X») y que al poner uno se cierre. No se probó con clics porque las partidas de prueba tienen un
   solo personaje por jugador (a pedido del dueño). Lo demás (un personaje: cartel, «Ahora no», el botón de 👥 Personajes, el GM sin cartel) está probado.
 
-- [ ] **🎁 El botín minimizado: lo que no se probó con clics** (2026-11-20; `comun/ficha-botin.js`): con **dos jugadores a la vez** (uno lo
+- [x] (2026-11-21, visto en la pasada de pruebas de arriba) **🎁 El botín minimizado: lo que no se probó con clics** (2026-11-20; `comun/ficha-botin.js`): con **dos jugadores a la vez** (uno lo
   minimiza, el otro reclama: que al volver se vea lo reclamado), en medio de una **disputa** de piedra, papel o tijera, y pasando de la ventana
   del botín a «🎒 Mochila y equipo» y volviendo. Lo demás (Cerrar, Esc, afuera, la pastilla, el 🎁, recargar, el cierre del GM) está probado.
 
@@ -399,13 +424,13 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
   cartelito de abajo (es el mismo código, no se volvió a recorrer); (b) un jugador que **entra más tarde** (más de 10 minutos después) y cobra ahí
   su recompensa: su cartel no tiene que hablar del modo del mapa; (c) el cartel «Cómo quedó el grupo» que sale **al pasar a combate**, mirado
   abierto (no lleva la franja por código; se revisó recién después de cerrarlo); (d) el Jugador 2 en su pantalla (se miró solo el Jugador 1).
-- [ ] **🌿 Al terminar «Finalizar combate», el mapa vuelve a narrativo: lo que no se vio** (2026-11-20; `TokensAuto.volverANarrativo`,
+- [x] (2026-11-21, visto en la pasada de pruebas de arriba: (a), (b) y (c), con un arreglo en (c)) **🌿 Al terminar «Finalizar combate», el mapa vuelve a narrativo: lo que no se vio** (2026-11-20; `TokensAuto.volverANarrativo`,
   `comun/combate-fin.js`). Visto con clics en «Claude · pruebas 2» («Prueba · R4 M4», GM y Jugador 1), desde el mapa y desde GM Tools, con botín y sin
   ítems: el mapa pasa solo a Narrativo en las dos pantallas, y Simular no lo cambia. **Falta ver**: (a) el GM **mirando otro mapa** que el publicado al
   cerrar el botín (tiene que cambiar el publicado y no el que mira); (b) con un **orden de turnos armado**: queda como estaba, igual que con el
   interruptor (P252); (c) que lo de «una vez por combate» (Primera sangre, Emboscada, la Campana, la poción de emergencia…) se libere igual que al
   tocar el interruptor (es el mismo aviso de modo que le llega a cada pantalla; no se miró ítem por ítem).
-- [ ] **🤝 «Pasar a un aliado» de la ventanita «💰 DDE y despojos», con el mapa en Combate** (2026-11-20; `#btn-pasar-dde`, ficha js/08). Visto con clics
+- [x] (2026-11-21, visto desde «Equipo y mochila» del mapa en la pasada de pruebas de arriba; el botón de la ventanita de la ficha suelta abre la misma ventana y no se volvió a recorrer) **🤝 «Pasar a un aliado» de la ventanita «💰 DDE y despojos», con el mapa en Combate** (2026-11-20; `#btn-pasar-dde`, ficha js/08). Visto con clics
   en «Claude · pruebas 2», fuera de combate: el botón abre la ventana de siempre y pasar 20 DDE y 2 despojos normales cambió bien los números de los dos
   (aceptó el otro personaje del mismo Jugador 1). **Falta ver**: con el mapa en Combate, que la ventana que abre muestre el aviso «⚔ En combate, solo
   ítems…» y no ofrezca DDE ni despojos (es la regla de siempre de `comun/intercambio.js`, no se tocó). ~~Que acepte **otra persona**~~ **visto

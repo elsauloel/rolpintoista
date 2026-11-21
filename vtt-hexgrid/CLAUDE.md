@@ -2502,3 +2502,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   no recarga ni regenera nada (solo la cuenta para morir; un creep con la Llama de Fénix sí revive). **Al caer se le van los estados**: un personaje en
   `FichaAcciones.revisarMuerte` (js/98 `vidaCeroRevisar` lo cuenta en la Mesa), un creep en `modificarCreep` (js/09: si la vida pasó a 0,
   `Combatiente.caerLimpio` y `creepCaidaContar`). Las invocaciones no se reviven: al caer se desinvocan (dueño). Dudas: P270.
+- **🎯 Las Apuntadas de las ballestas, compartidas entre pantallas** (2026-11-21, dueño: «arreglalo también»; js/126 + `Quieto.apuntada` /
+  `Quieto.apuntadaFirme` en comun/quieto.js): con orden de turnos, «se movió» sale de lo anotado en la partida (`iniciativa.movidos`), como Puntería
+  certera: `apuntadaActiva(id)` (Apuntada: no se movió en esta ronda; desde la ronda 1) y `apuntadaFirmeActiva(id)` (ni en esta ni en la anterior,
+  desde la ronda 2). Las usan js/13 (la Apuntada, al apuntar) y js/35 (`arcoBonos`, la firme). Cuenta lo que el token hace (caminar, Salto, Dash…);
+  que lo muevan (empujón, Mover libre) no. Sin orden de turnos, como antes. Sin cartel ni aviso antes de moverse (P271). Probado con clics: J1 camina
+  en su pantalla y el GM con 🎮 el control dispara desde la suya → sin Apuntada; ronda nueva, quieto (y con un Mover libre del GM) → «+2 PdG».

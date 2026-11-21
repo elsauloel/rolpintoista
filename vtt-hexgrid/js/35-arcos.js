@@ -60,7 +60,7 @@ function arcoBonos(mio, t, ataque, tiro){
   // 🎯 Las de ballesta (2026-10-11): alcance con caída, apuntada firme, tirador de apoyo, remate y el primer disparo del combate.
   const ca = Combatiente.caidaDano(ataque, d, ataque.alcance);
   if(ca) tiro = arcoSumar(tiro, {fijo: ca.fijo}, `caída (${ca.extra} de más)`);
-  if(num(ataque.apuntadaFirme) > 0 && !seMovioEsteTurno(mio.id) && !seMovioTurnoAnterior(mio.id)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.apuntadaFirme))}, 'apuntada firme');
+  if(num(ataque.apuntadaFirme) > 0 && (typeof apuntadaFirmeActiva === 'function' ? apuntadaFirmeActiva(mio.id) : !seMovioEsteTurno(mio.id) && !seMovioTurnoAnterior(mio.id))) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.apuntadaFirme))}, 'apuntada firme');
   if(num(ataque.tiradorApoyo) > 0 && arcoAliadoPegado(mio, t)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.tiradorApoyo))}, 'tirador de apoyo');
   if(num(ataque.remate) > 0 && arcoQuieto(t)) tiro = arcoSumar(tiro, {crit: Math.round(num(ataque.remate))}, 'remate');
   // 🏹 Las de los arcos Comunes (2026-10-11).

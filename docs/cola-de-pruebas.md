@@ -1468,8 +1468,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Mesa. Se tomó «morir» = caer: P270. (4) **«¿Con qué volvés?»** con Pacto y Ankh: la animación sale recién después de elegir (video). (5) La doc lo
   dice y salió de los pendientes. Probado con clics (GM, J1, J2); por datos: los estados, No2, Pacto y Ankh de J2, el Sangrado del creep, el orden de
   turnos «por iniciar» y la vida a 0 (con la función del «HP directo»). 3 pruebas automáticas nuevas (969).
-- **⬜ en cola — 🎯 Apuntada de las ballestas, compartida entre pantallas** (dueño, 2026-11-21: «arreglalo también»): tiene la misma «memoria de
+- **✅ hecho (2026-11-21) — 🎯 Apuntada de las ballestas, compartida entre pantallas** (dueño, 2026-11-21: «arreglalo también»): tiene la misma «memoria de
   una sola pantalla» que tenía la Puntería certera; dejarla como quedó esa (lo que se movió, compartido; que te muevan no cuenta).
+  *Resultado:* la Apuntada y la Apuntada firme leen lo anotado en la partida, como el anillo (js/126, `Quieto.apuntada` / `apuntadaFirme`). Probado
+  con clics con la Ballesta de guerra (Apuntada +2) de Blanco J1: J1 caminó una casilla en su pantalla y el GM, con 🎮 el control, disparó desde la
+  suya → sin Apuntada (la memoria vieja de la pantalla del GM decía «quieto» y daba el +2); ronda nueva, sin caminar y con un 🦶 Mover libre del GM →
+  «apuntada (no se movió): +2 PdG». La firme no se probó con clics (las dos ballestas con firme están archivadas; misma regla que el anillo, con
+  pruebas automáticas). Sin cartel ni aviso antes de moverse: P271. Por datos: la ballesta equipada y el orden de turnos. 2 pruebas nuevas (971).
 - **⬜ en cola — 🔥 Muro de fuego al empezar el turno (P259 decidida)** (dueño, 2026-11-21): «el muro de fuego debería hacer daño a un
   personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Hoy el mapa lo dispara al pasar de ronda: corregir el mapa,
   y que el texto de la habilidad, el «Ver detalle» y el cartel de arriba digan lo mismo.

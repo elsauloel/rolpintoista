@@ -47,6 +47,19 @@ function quietoActivo(id){
   return Quieto.activo(quietoMovidos(), id, quietoRonda());
 }
 window.mapaQuietoActivo = quietoActivo;
+/* 🎯 Las Apuntadas de las ballestas (2026-11-21, dueño: «arreglalo también»), con lo anotado en la partida como el anillo: lo que se movió (caminar, Salto,
+   Carga, Dash, Parpadeo…) cuenta en todas las pantallas; que te muevan (empujón, arrastre, trampa, Mover libre) no. Sin orden de turnos, como antes
+   (la memoria de esta pantalla, por Mantenimiento). Apuntada: no se movió en esta ronda. Apuntada firme: ni en esta ni en la anterior (desde la ronda 2). */
+function apuntadaActiva(id){
+  if(!id) return false;
+  if(!quietoHayOrden()) return !seMovioEsteTurno(id);
+  return Quieto.apuntada(quietoMovidos(), id, quietoRonda());
+}
+function apuntadaFirmeActiva(id){
+  if(!id) return false;
+  if(!quietoHayOrden()) return !seMovioEsteTurno(id) && !seMovioTurnoAnterior(id);
+  return Quieto.apuntadaFirme(quietoMovidos(), id, quietoRonda());
+}
 
 // Anota (o, con `si === false`, desanota: se deshizo su primer movimiento de la ronda) que el token se movió en esta ronda.
 function quietoMarcar(id, si){

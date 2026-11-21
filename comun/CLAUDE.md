@@ -2169,3 +2169,5 @@ versión parecida en más de una, es candidato a juntar.
   regenera nada: `FichaMantenimiento.inicioTurno` / `finTurno` / `aplicar` (solo `contarMuerte`; sus invocaciones de pie siguen) e `invInicio` (una
   invocación caída, nada); `CreepAcciones` `inicioCreep` / `finCreep` / `mantenimiento` (salvo la Llama de Fénix). `OrdenTurnos.pendientesRonda(ini,
   fuera)` (⏭ Pasar de ronda: quiénes faltan en la ronda).
+- **🎯 `Quieto.apuntada(movidos, id, ronda)` y `Quieto.apuntadaFirme`** (2026-11-21, `comun/quieto.js`): las Apuntadas de las ballestas con lo anotado
+  en la partida (la primera, no se movió en esta ronda; la firme, la misma regla que el anillo). Las usa el mapa (js/126).

@@ -133,7 +133,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261120a"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
-<script src="quieto.js?v=20261121foco"></script>
+<script src="quieto.js?v=20261121apunta"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -9176,6 +9176,16 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     igual(Quieto.bonos({pulso: 2, foco: 0}).map(x => [x.stat, x.val, x.a]), [['pulso', 2, 'PdG']]);
     igual(Quieto.bonos({pulso: 0, foco: 3}).map(x => [x.nombre, x.a]), [['Foco', 'PdG.Esp']]);
     igual(Quieto.bonos({}), []);
+  });
+  prueba('🎯 las Apuntadas de las ballestas (2026-11-21): Apuntada = no se movió en esta ronda (desde la ronda 1); Apuntada firme = como el anillo', () => {
+    igual([Quieto.apuntada({}, 'a', 1), Quieto.apuntada({a: [1]}, 'a', 1), Quieto.apuntada({a: [2]}, 'a', 3), Quieto.apuntada({a: [3]}, 'a', 3), Quieto.apuntada(null, 'a', 2)],
+      [true, false, true, false, true]);
+    igual([Quieto.apuntadaFirme({}, 'a', 1), Quieto.apuntadaFirme({}, 'a', 2), Quieto.apuntadaFirme({a: [1]}, 'a', 2), Quieto.apuntadaFirme({a: [1]}, 'a', 3), Quieto.apuntadaFirme({b: [2, 3]}, 'a', 3)],
+      [false, true, false, true, true]);
+  });
+  prueba('🎯 el mapa ya no usa la memoria de una sola pantalla para las Apuntadas (js/13 y js/35 pasan por js/126)', async () => {
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t35 = await (await fetch('../vtt-hexgrid/js/35-arcos.js', {cache: 'no-store'})).text();
+    igual([/num\(ataque\.apuntada\) > 0 && mio && \(typeof apuntadaActiva === 'function'/.test(t13), /num\(ataque\.apuntadaFirme\) > 0 && \(typeof apuntadaFirmeActiva === 'function'/.test(t35)], [true, true]);
   });
   prueba('el bono: ni en esta ronda ni en la anterior; moverse en cualquiera de las dos lo apaga', () => {
     igual([Quieto.activo({}, 'a', 3), Quieto.activo({a: [3]}, 'a', 3), Quieto.activo({a: [2]}, 'a', 3), Quieto.activo({a: [1]}, 'a', 3), Quieto.activo({b: [2, 3]}, 'a', 3)],

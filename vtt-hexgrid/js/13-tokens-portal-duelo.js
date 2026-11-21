@@ -1126,8 +1126,9 @@ function dueloElegirObjetivoMapa(msg){
       if(mio && ataque && ataque.rango && !ataque.hab){
         try{ const rt = await tiroRevisar(mio, t, ataque, yo); if(!rt.seguir){ pedir(); return; } tiro = rt.tiro; }
         catch(err){ console.error('No se pudo revisar la línea de tiro:', err); }   // nunca traba el ataque
-        // 🎯 Apuntada (2026-10-10, ballestas): +N PdG si no se movió en este turno (el francotirador quieto).
-        if(num(ataque.apuntada) > 0 && mio && !seMovioEsteTurno(mio.id)){
+        // 🎯 Apuntada (2026-10-10, ballestas): +N PdG si no se movió en este turno (el francotirador quieto). Desde el 2026-11-21, con lo anotado en la
+        // partida (js/126 apuntadaActiva): lo que se movió en otra pantalla también cuenta.
+        if(num(ataque.apuntada) > 0 && mio && (typeof apuntadaActiva === 'function' ? apuntadaActiva(mio.id) : !seMovioEsteTurno(mio.id))){
           tiro = tiro || {motivo: ''};
           tiro.pdg = num(tiro.pdg) + num(ataque.apuntada);
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y apuntada` : 'apuntada (no se movió)';

@@ -1766,7 +1766,7 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
   arrastrar, pregunta de nuevo; después de «Moverme igual» ya no hay bono que perder). Solo al caminar: el Salto, el Dash, la Carga y el Parpadeo
   no preguntan (son habilidades que ya elegiste usar). El dodge roll tampoco. ¿Alguno de esos debería preguntar?
 - (g) **Sin orden de turnos** (narrativo, o combate sin lista) sigue como antes: lo recuerda solo la pantalla que movió, sin cartel ni aviso.
-- (h) La **Apuntada** y la **Apuntada firme** de las ballestas («si no te moviste…») siguen con la memoria de una sola pantalla: tienen el mismo
+- (h) ✅ (dueño, 2026-11-21: «arreglalo también»; hecho, ver P271) La **Apuntada** y la **Apuntada firme** de las ballestas («si no te moviste…») siguen con la memoria de una sola pantalla: tienen el mismo
   problema que tenía el anillo. ¿Las paso al mismo mecanismo?
 
 ### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
@@ -1899,3 +1899,10 @@ la decisión venía con «un caído queda como estaba al caer». Así quedó:
 3. **Caído = queda como cayó** al empezar su turno, al pasar de ronda y al «Iniciar combate»: no recarga No2 ni SP, no regenera vida, no bajan sus
    cooldowns. Sus invocaciones que siguen de pie, sí. Lo único que corre es la cuenta para morir (y la Llama de Fénix de un creep, que lo revive al
    empezar su turno).
+
+### P271 — 🎯 Las Apuntadas de las ballestas: ¿cartel y aviso como el anillo? (2026-11-21, Claude)
+Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas las pantallas; que te muevan, no), como pediste. Lo que NO se les sumó
+(no estaba en el pedido): el cartel dorado cuando se activa y el aviso «si te movés, la perdés» que tienen Puntería certera y Foco. Además, la
+**Apuntada firme** quedó como el anillo: recién desde la ronda 2 (en la 1 no hay «turno anterior» quieto); la Apuntada simple vale desde la ronda 1.
+1. ¿Les sumo el cartel y el aviso?
+2. ¿La Apuntada firme en la ronda 1, sí o no?

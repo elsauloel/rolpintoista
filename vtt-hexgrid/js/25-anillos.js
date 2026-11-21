@@ -452,6 +452,21 @@ async function unaVezAlTerminar(){
     try{ await modificarCreep(id, sc => { (sc.habilidades || []).forEach(h => { if(h) delete h.unaVezUsada; }); }); }
     catch(err){ console.error('No se pudo liberar el «una vez por combate»:', err); }
   }
+  // 🗺 El GM mirando otro mapa que el publicado (2026-11-21, pasada de pruebas): `creepsPriv` solo tiene los creeps del mapa que se mira, y los del
+  // combate (los del mapa publicado) quedaban sin liberar. Se buscan por los tokens del mapa publicado y se liberan igual.
+  try{
+    if(typeof mapaActivo === 'undefined' || typeof mapaMostrado === 'undefined' || !mapaActivo || mapaMostrado === mapaActivo || typeof TokensAuto === 'undefined') return;
+    const snap = await fbDb.collection(fbRutaCampana(TokensAuto.rutaTokens(mapaActivo))).get();
+    const otros = new Set();
+    snap.forEach(d => { const t = d.data(); if(t && t.tipo === 'creep' && t.fichaId && !creepsPriv.has(t.fichaId)) otros.add(t.fichaId); });
+    for(const id of otros){
+      try{
+        const p = await fbDb.doc(fbRutaCampana(`creeps/${id}/privado/ficha`)).get();
+        if(!p.exists || !String(p.data().json || '').includes('"unaVezUsada"')) continue;
+        await modificarCreep(id, sc => { (sc.habilidades || []).forEach(h => { if(h) delete h.unaVezUsada; }); });
+      }catch(err){ console.error('No se pudo liberar el «una vez por combate» (creep del mapa publicado):', err); }
+    }
+  }catch(err){ console.error('No se pudo revisar el «una vez por combate» del mapa publicado:', err); }
 }
 let finCombateEnCurso = null, finCombateHecho = false;
 const finCombateVistos = new Set();

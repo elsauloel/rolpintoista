@@ -8,6 +8,45 @@
 > Cómo: partida «Claude · pruebas» (`?partida=YWjRbx7eJlqQpL1wtCKH`), las dos cuentas de Chrome (jugador y GM), la Botonera nueva del mapa y
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
+## 🧪 Pasada de pruebas del 2026-11-21: lo que había quedado sin ver de las tareas del 20 y el 21
+
+(Claude, con clics de verdad en «Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1 + Jugador 2 en tres pantallas. Lo que se armó por datos
+—dar una pasiva, acomodar tokens, dejar un orden de turnos sin iniciar, elegir el número de una tirada con «✍ Elegir manualmente»— está dicho en
+cada renglón. Capturas fuera del repo, en `cola38/`.)
+
+### Tanda 1 · turnos, ataques, fin de combate y botín
+
+- [x] **▶ Iniciar combate, lo que faltaba:** con una **invocación** primera en la lista (Abeja de prueba, con 1 No2): arrancó con 4 / 4 y a su dueño le
+  salió «▶ Empieza tu turno»; **«▶ Iniciar sin cambiar el modo»**: el mapa siguió en narrativo y el orden arrancó igual; **«⏭ Pasar el turno sin
+  iniciar»** (desde ▶ Siguiente): pasó al segundo, nadie recargó No2 y el botón «Iniciar combate» no volvió a salir; **un caído primero en la lista**
+  (Blanco creep con vida 0, puesta por datos): el combate empezó con el siguiente («turno de Blanco J1»). El orden se armó por datos; los botones,
+  con clics.
+- [x] **🐝 Táctica de enjambre** (la pasiva se le dio por datos al Peleador 5, con Blanco creep pegado): en el **ataque de oportunidad** («🐝 Táctica
+  de enjambre +1: 1 aliado al lado», tirada «1d10 +1 enjambre»), en el **contraataque** (Devolver gentileza, también dada por datos: «1d8+1 +1
+  enjambre») y en una **habilidad que pega con el arma** (Puño de roca: la declaración lo dice).
+- [x] **🪝 Arrastrar hecho por un creep** (Peleador 5; su tirada elegida a mano en 20): a una **invocación** (la Abeja: quedó pegada y «Desequilibrado
+  hasta el fin del turno de Peleador 5») y a un **personaje** (Blanco J1, 2 casillas); al apretar ▶ Siguiente se les fue a los dos.
+- [x] **🏁 Finalizar combate → ▶ Avanzar → 📢 Publicar, con el GM mirando otro mapa** («Prueba · L7 L8») y con el orden de turnos armado: la ventana
+  contó los creeps del mapa publicado; a los dos jugadores les salió «Batalla terminada» con **+351 XP** (el paso 4 del GM decía «⬆ con estos 351
+  sube a nivel 3»); al cerrar el botín, el mapa **publicado** volvió a narrativo y el que miraba el GM no cambió; el orden de turnos quedó como
+  estaba (P252); a cada jugador (también al **Jugador 2**) le salió «🎁 Botín concluido» con el renglón «🌿 Modo narrativo». Sin ítems en el botín:
+  la XP se cargó sola y pasó lo mismo.
+- [x] **🩺 «Cómo quedó el grupo» al pasar a Combate**, mirado abierto: no lleva la franja de «volvió a narrativo».
+- [x] **Lo de «una vez por combate» al cerrar el combate:** a Blanco J1 se le liberaron sus habilidades. **❌ Falló una cosa, arreglada:** con el GM
+  mirando otro mapa que el publicado, a los **creeps** del combate no se les liberaba (la pantalla del GM solo conoce los creeps del mapa que
+  mira). Ahora los busca por los tokens del mapa publicado (`vtt-hexgrid/js/25-anillos.js`, `unaVezAlTerminar`); repetido con clics después del
+  arreglo: se liberó.
+- [x] **Otro combate después de Publicar:** el primer ataque del combate nuevo volvió a costar como primero (Peleador 5: 5 No2; Blanco J1: «1.º
+  ataque»). Con una **Ballesta del sereno** («llega cargada», dada por datos): el primer disparo «gratis», el segundo 4 No2, y en el primer turno
+  del combate nuevo otra vez «0 No2 · 1.º ataque».
+- [x] **🎁 El botín minimizado, con dos jugadores:** el Jugador 1 lo minimizó (pastilla «Botín abierto · tocá para volver» y el 🎁 del costado), el
+  Jugador 2 reclamó; al volver, el Jugador 1 vio «Blanco J2 1» y el botón «⚔ Disputar». De la ventana del botín a «🎒 Mochila y equipo» y Esc: volvió
+  al botín. **En medio de una disputa:** con el botín minimizado, el piedra, papel o tijera siguió a la vista; lo ganó el Jugador 1 y al volver el
+  ítem decía «es tuyo».
+- [ ] **⚠ Visto una sola vez, sin poder repetirlo (3 intentos):** después de «▶ Iniciar combate → ⚔ Pasar a Combate e iniciar → Empezar registro
+  nuevo», con un creep primero en la lista y el GM recién vuelto de mirar otro mapa, el combate quedó **como sin iniciar** (volvió a salir el botón
+  «▶ Iniciar combate», y la Mesa decía «▶ Empieza el combate» sin nombrar de quién era el turno). Anotado en la cola para mirarlo.
+
 ## 🎁 Dar a un jugador (2026-11-21)
 
 - [x] (2026-11-21, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, todo restaurado después) **🎁 El GM le da un ítem, DDE o despojos a un

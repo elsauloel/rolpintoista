@@ -2482,3 +2482,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`iniciativaOrdenar`, que deja listo «▶ Iniciar combate» con `OrdenTurnos.marcasAlOrdenar`) y el aviso de los puestos (`iniciativaAvisarPuestos`).
   `iniciativaTirar` suma el +5 a un personaje cuyo resumen todavía trae `prisa` (publicado antes del cambio, con la Iniciativa sin el +5).
 
+- **🎁 Dar un ítem (o DDE, o despojos) desde el token** (2026-11-21, dueño; `js/128-dar-jugador.js`): en el menú «⋯» del token de un personaje (no una
+  invocación), solo para el GM, «🎁» (`darJugadorPuede`, `darJugadorAbrir`; `icono('dar')` en js/10) abre la ventana común `DarJugador.abrir`
+  (comun/dar-jugador.js) con ese personaje ya marcado; carga antes `bnCargarPiezas` (catálogo, filtro), `acCargarPiezas` (el Ver) y el asistente de
+  ítems. Quien recibe: `recibidosAplicar` (js/11) muestra `DarJugador.cartel` en vez de «Botín concluido» cuando la recompensa es un regalo.

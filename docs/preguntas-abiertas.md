@@ -1813,3 +1813,16 @@ La pasiva (dueño: «+1 la defensa y +1 la defensa especial por cada enemigo ady
 5. **Comprada dos veces**, +2 por enemigo.
 6. **Fuera del mapa** (la ficha suelta) no suma: se suma a mano.
 
+
+### P262 — 🎁 Dar a un jugador: ¿una casilla «en secreto»? y lo que quedó elegido «mientras tanto» (2026-11-21, Claude)
+La ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`) deja siempre una línea en la Mesa que ven todos («🎁 El GM le dio a Fulano: …»).
+1. **¿Una casilla «en secreto»?** Para que esa línea no la vean los demás (un ítem que el GM le pasa a uno solo por la historia). No se programó:
+   falta decidir si la línea directamente no sale, o si sale solo para el GM y para quien lo recibe.
+2. **Los consumibles nuevos:** «✎ Ítem nuevo» usa el asistente de ítems, que no arma consumibles; para dar un consumible hay que elegir uno del
+   catálogo. ¿Hace falta poder inventar un consumible en el momento?
+3. **El ítem nuevo no se sube al catálogo:** queda solo en la mochila de quien lo recibe (desde ahí lo puede subir con «⬆ Subir al catálogo»).
+   ¿Querés un botón para subirlo en el mismo paso?
+4. **Hasta 50 unidades** de un mismo ítem por vez (cada unidad viaja escrita en el aviso). ¿Alcanza?
+5. **La mochila llena** se mide por ranuras (el peso solo cuenta para lo equipado): se da igual, lo avisa el cartel del jugador y una línea en la Mesa.
+   El GM no lo ve antes de dar. ¿Querés que la ventana le avise de antemano?
+6. **Experiencia:** la ventana no da XP (no estaba en el pedido). ¿La sumo?

@@ -140,6 +140,20 @@ function verItemGM(idx){ verItemDatos(CATALOGO_EQUIPO[idx]); }
 // "✎ Editar y subir" arma una copia y la sube al catálogo compartido (comun/editar-item.js); no toca lo que se está viendo.
 let verItemActual = null;
 function catalogoGMCompleto(){ return ItemsSubidos.mezclar(structuredClone(CATALOGO_BASE), itemsSubidosGM); }
+/* 🎁 Dar a un jugador (2026-11-21, dueño): la ventana común (comun/dar-jugador.js, la misma del mapa). `o.marcados` = los personajes ya tildados
+   (el 🎁 de una fila de 👥 Personajes); `o.item` = el ítem del catálogo que se estaba viendo, ya en la lista (el «🎁 Dar a un jugador» del Ver de un ítem). */
+// El ítem del catálogo que se está viendo (los del ⚔ Catálogo vienen en la forma de creep, sin su id: se lo busca por nombre y tipo). null si no es del catálogo.
+function itemDelCatalogoGM(item, catalogo){
+  if(!item || !item.nombre) return null;
+  catalogo = catalogo || catalogoGMCompleto();
+  return (item.id && catalogo.find(c => c.id === item.id)) || catalogo.find(c => sinAviso(c.nombre) === sinAviso(item.nombre) && c.tipoItem === item.tipoItem) || null;
+}
+function abrirDarJugadorGM(o){
+  o = o || {};
+  const catalogo = catalogoGMCompleto();
+  const item = o.item ? itemDelCatalogoGM(o.item, catalogo) : null;
+  DarJugador.abrir({marcados: o.marcados || [], item, catalogo: () => catalogo, toast: t => toast(t), verItem: it => CreepLupa.verItem(it)});
+}
 function editarYSubirItemGM(item){
   if(!item) return;
   EditarItem.abrir({item, catalogo: catalogoGMCompleto(), contexto: 'creep', stats: cfgItemGM().stats,
@@ -156,7 +170,9 @@ function verItemDatos(item){
   $('#veritem-body').innerHTML = v.html;
   // Solicitar eliminar solo tiene sentido si esto es de verdad un ítem del catálogo (no el arma de un creep, una pieza,
   // o una plantilla de botín, que no tienen id ahí).
-  $('#veritem-baja').style.display = (item.id && catalogoGMCompleto().some(c => c.id === item.id)) ? '' : 'none';
+  const delCatalogo = !!(item.id && catalogoGMCompleto().some(c => c.id === item.id));
+  $('#veritem-baja').style.display = delCatalogo ? '' : 'none';
+  $('#veritem-dar').style.display = itemDelCatalogoGM(item) && fbMiembro && fbMiembro.gm ? '' : 'none';   // 🎁 (comun/dar-jugador.js, 2026-11-21)
   $('#scrim-ver-item').classList.add('open');
 }
 

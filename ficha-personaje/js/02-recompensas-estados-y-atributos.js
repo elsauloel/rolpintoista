@@ -23,8 +23,16 @@ async function recompensasRevisar(){
       renderExp();
       $('#f-dde').value = fmt(S.meta.dde);
       $('#f-loot-normal').value = S.loot.normal;
+      if(r.regalo){ $('#f-loot-magico').value = S.loot.magico; renderLootEspecial(); }
       if(r.vueltas || (r.items && r.items.length)){ renderInventario(); renderList('cinturon'); }
       refresh();
+      // 🎁 Lo que el GM dio a mano (comun/dar-jugador.js, 2026-11-21): ya entró; el cartel al centro con «Aceptar» es el «enterado».
+      if(r.regalo){
+        const nombre = ((S.meta && S.meta.nombre) || '').trim();
+        DarJugador.cartel({nombre, de: r.regalo.de, lineas: r.regalo.lineas, pasada: r.regalo.pasada});
+        if(r.regalo.pasada) mesaLinea(`⚠ ${nombre || 'Un personaje'} recibió ${r.partes.join(', ')} y su mochila quedó pasada (${r.regalo.pasada.usada} de ${r.regalo.pasada.cap} ranuras)`, 'recordatorio', nombre);
+        continue;
+      }
       if(r.partes.length) toast(`🎁 ${r.partes.join(' · ')}`);
       const vueltas = Recibidos.textoVueltas(r.vueltas);
       if(vueltas) toast(vueltas);

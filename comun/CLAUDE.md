@@ -2152,3 +2152,15 @@ versión parecida en más de una, es candidato a juntar.
   nuevo está también en `Combatiente.PRISA_DETALLE` (el mapa no carga `pasivas.js`). El stat `prisa` quedó sin efecto («versión vieja») y el resumen
   público ya no lo lleva. **Una pasiva que cambie de efecto se convierte en `pasivasAlDia`**, por su `poolId`.
 
+- **`dar-jugador.js`** (`DarJugador`, 2026-11-21, dueño: «que el GM pueda darle un ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa
+  como desde GM Tools… directo a la mochila, pero que sí le aparezca una notificación, que uno ponga aceptar») — **🎁 Dar a un jugador**, UNA ventana para
+  el mapa y GM Tools: `abrir({catalogo(), marcados: [fichaId], item, toast, verItem})` (a quién: los personajes de la partida con casillas; qué:
+  ítems del catálogo con `FiltroCatalogo`, «Ver» y cuántos —hasta `MAX_UNIDADES`—, DDE, despojos normales / mágicos / especiales con nombre, o un
+  ítem nuevo con `AsistenteItem`, sin consumibles). **Sin colección ni reglas nuevas:** `enviar(fichas, que)` deja un aviso por personaje en
+  `recompensas` (el camino del fin del combate) marcado `regalo: true` (`aviso(ficha, que, de)`: `items` = una plantilla por unidad, como el botín;
+  `despojosMagicos`, `despojosEsp: [{nombre, cantidad}]`) y escribe la línea de la Mesa (`mesaTexto`). Quien maneja al personaje lo aplica una sola
+  vez con lo de siempre (`Recibidos.tomar` → `Recibidos.recompensa`, que para un regalo llama a `DarJugador.recibir(S, r)` y lo devuelve en
+  `r.regalo` = `{partes, lineas, items, pasada, de}`): los consumibles se apilan, lo demás entra de a uno con `catId`; si la mochila queda pasada de
+  ranuras se da igual y `pasada = {usada, cap}`. El mapa (js/11, `recibidosAplicar`) y la ficha (js/02) muestran `DarJugador.cartel({nombre, de,
+  lineas, pasada})` (al centro, con «✔ Aceptar» que solo lo cierra; si llega otro con el cartel abierto, se suma abajo) y, si quedó pasada, una
+  línea en la Mesa. **Se carga con la página en el mapa, la ficha y GM Tools** (el que recibe lo necesita siempre). Lo que no está decidido: P262.

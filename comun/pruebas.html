@@ -59,7 +59,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
-<script src="recibidos.js?v=20261120cola18"></script>
+<script src="recibidos.js?v=20261121dar"></script>
+<script src="dar-jugador.js?v=20261121dar"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -6276,6 +6277,46 @@ prueba('lo reclamado del botín llega a la mochila al cerrarlo (2026-10-08): los
   const hacha = S.inventario.find(i => i.nombre === 'Hacha');
   igual([r.partes, !!hacha && hacha.equipado === false && hacha.unidades === 1 && !!hacha.id, S.inventario.find(i => i.id === 't').unidades, S.inventario.length],
     [['🎁 Hacha, Colmillo → mochila'], true, 2, 2]);
+});
+// 🎁 Dar a un jugador (comun/dar-jugador.js, 2026-11-21): el GM deja un aviso en `recompensas` marcado `regalo`; lo aplica quien maneja al personaje.
+prueba('🎁 dar a un jugador: el aviso lleva cada unidad escrita (como el botín), DDE y los tres tipos de despojos, y va marcado como regalo', () => {
+  const hacha = {id: 'cat-hacha', nombre: '⚠️ Hacha', tipoItem: 'arma_1m', _bib: {id: 'x'}, equipado: true};
+  const a = DarJugador.aviso({id: 'F', duenoUid: 'u1', nombre: 'Tita'}, {items: [{item: hacha, n: 3}], dde: 50, despojos: 2, magico: 1, especiales: [{nombre: 'Escama', cantidad: 2}, {nombre: '', cantidad: 5}]}, 'El GM');
+  const it = JSON.parse(a.items[0]);
+  igual([a.fichaId, a.duenoUid, a.regalo, a.aplicada, a.xp, a.dde, a.despojos, a.despojosMagicos, a.despojosEsp, a.items.length, it.nombre, it.id, '_bib' in it, 'equipado' in it],
+    ['F', 'u1', true, false, 0, 50, 2, 1, [{nombre: 'Escama', cantidad: 2}], 3, 'Hacha', 'cat-hacha', false, false]);
+});
+prueba('🎁 dar a un jugador: el texto de la Mesa (a uno y a varios) y «nada para dar»', () => {
+  const que = {items: [{item: {nombre: 'Hacha'}, n: 3}, {item: {nombre: 'Yelmo'}, n: 1}], dde: 50, despojos: 1, magico: 2};
+  igual([DarJugador.mesaTexto(['Tita'], que), DarJugador.mesaTexto(['Tita', 'Beto'], {dde: 10}), DarJugador.vacio({items: [{item: {nombre: 'x'}, n: 0}], dde: 0}), DarJugador.vacio({dde: 1})],
+    ['🎁 El GM le dio a Tita: Hacha ×3, Yelmo, 50 DDE, 1 despojo, 2 despojos mágicos', '🎁 El GM les dio a Tita y Beto (a cada uno): 10 DDE', true, false]);
+});
+prueba('🎁 lo que da el GM entra directo: ítems a la mochila (los consumibles se apilan), DDE, despojos normales, mágicos y especiales (se suman al del mismo nombre)', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 2, exp: 10, dde: 5}, loot: {normal: 2, magico: 1, especial: [{id: 'e', nombre: 'Escama', cantidad: 1}]},
+    inventario: [{id: 'p', nombre: 'Poción', consumible: true, tipoItem: 'consumibles', unidades: 1}]}).S;
+  const pocion = {id: 'cat-pocion', nombre: 'Poción', consumible: true, tipoItem: 'consumibles', unidades: 1, ranuras: 1};
+  const que = {items: [{item: {id: 'cat-hacha', nombre: 'Hacha', tipoItem: 'arma_1m'}, n: 3}, {item: pocion, n: 2}], dde: 50, despojos: 4, magico: 2, especiales: [{nombre: 'escama', cantidad: 2}, {nombre: 'Diente', cantidad: 1}]};
+  const r = Recibidos.recompensa(S, {data: () => DarJugador.aviso({id: 'F', duenoUid: 'u', nombre: 'Tita'}, que, 'El GM')});
+  const hachas = S.inventario.filter(i => i.nombre === 'Hacha');
+  igual([!!r.regalo, r.subio, S.meta.nivel, S.meta.exp, S.meta.dde, S.loot.normal, S.loot.magico, S.loot.especial.map(l => [l.nombre, l.cantidad]),
+      hachas.length, hachas.every(h => h.equipado === false && h.catId === 'cat-hacha' && h.unidades === 1), new Set(hachas.map(h => h.id)).size,
+      S.inventario.filter(i => i.nombre === 'Poción').map(i => i.unidades), r.partes, r.regalo.lineas.map(l => l.texto), r.regalo.pasada],
+    [true, false, 2, 10, 55, 6, 3, [['Escama', 3], ['Diente', 1]], 3, true, 3, [3],
+      ['Hacha ×3', 'Poción ×2', '50 DDE', '4 despojos', '2 despojos mágicos', '2 × escama (despojo especial)', '1 × Diente (despojo especial)'],
+      ['Hacha ×3', 'Poción ×2', '+50 DDE', '+4 despojos', '+2 despojos mágicos', '+2 × escama', '+1 × Diente'], null]);
+});
+prueba('🎁 con la mochila llena se da igual y avisa (no se bloquea): `pasada` dice cuánto quedó', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita'}, caps: {mochila: 2}, inventario: [{id: 'a', nombre: 'Soga', tipoItem: 'otros'}, {id: 'b', nombre: 'Pala', tipoItem: 'otros'}]}).S;
+  const cap = FichaEquipo.capMochila(S);
+  const r = Recibidos.recompensa(S, {data: () => DarJugador.aviso({id: 'F'}, {items: [{item: {nombre: 'Yelmo', tipoItem: 'cabeza'}, n: 1}]}, 'El GM')});
+  const soloDde = Recibidos.recompensa(S, {data: () => DarJugador.aviso({id: 'F'}, {dde: 3}, 'El GM')});
+  igual([S.inventario.some(i => i.nombre === 'Yelmo'), r.regalo.pasada, DarJugador.pasadaTexto(r.regalo.pasada).includes(`${cap + 1} de ${cap} ranuras`), soloDde.regalo.pasada],
+    [true, {usada: cap + 1, cap}, true, null]);
+});
+prueba('🎁 una recompensa del combate (sin la marca de regalo) sigue como siempre: XP, sin cartel', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 1, exp: 0}}).S;
+  const r = Recibidos.recompensa(S, {data: () => ({fichaId: 'F', xp: 20, dde: 1, despojos: 0})});
+  igual([r.regalo === undefined, r.partes, S.meta.exp], [true, ['+20 XP', '+1 DDE'], 20]);
 });
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});

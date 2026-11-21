@@ -8,6 +8,16 @@
 > Cómo: partida «Claude · pruebas» (`?partida=YWjRbx7eJlqQpL1wtCKH`), las dos cuentas de Chrome (jugador y GM), la Botonera nueva del mapa y
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
+## 🎁 Dar a un jugador (2026-11-21)
+
+- [x] (2026-11-21, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, todo restaurado después) **🎁 El GM le da un ítem, DDE o despojos a un
+  jugador** (comun/dar-jugador.js): desde el «⋯» del token, desde la fila de 👥 Personajes y desde el Ver de un ítem de GM Tools; un ítem ×1, ×3 y
+  ×25, DDE, los tres despojos, un ítem nuevo; a uno y a los dos; conectado (cartel al instante), desconectado (al entrar al mapa y, aparte, a la
+  ficha suelta); con mapa y ficha abiertos a la vez entró una sola vez; mochila pasada (29 de 20: se dio igual, con aviso en el cartel y en la Mesa).
+- [ ] **🎁 Dar a un jugador, lo que falta ver:** (a) con el GM teniendo 🎮 el control del personaje (el cartel le tendría que salir al GM, que es quien
+  lo aplica); (b) un consumible del catálogo ×N que se apile con los que ya tiene (está en las pruebas automáticas, no con clics); (c) el cartel
+  cuando llegan dos regalos seguidos sin aceptar el primero (se suman en el mismo cartel); (d) a un personaje que es del propio GM.
+
 ## De la sesión en «El origen de las especies» (2026-10-22)
 
 - [x] (2026-10-22, Claude, dos pantallas en «Claude · pruebas»: juan con una copia de los Pedos de Larry contra dos goblins) **🎲 La tirada extra de una zona la tira quien la creó** (Pedos Tóxicos de Larry): cuando el daño de la zona entra a un goblin, el cartel del GM dice

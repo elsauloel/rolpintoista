@@ -15,6 +15,7 @@
    - `estado(S, doc, ui)`: al personaje (FichaAcciones.aplicarEstadoRecibido) o a su invocación (InvHabilidades.ponerEstado).
      ui = {presets, toast, cambio(lista)}. → {inv?} (la invocación que cambió).
    - `recompensa(S, doc)`: XP (con la subida de nivel), DDE, despojos y trampas devueltas. → {partes: ['+52 XP', …], subio, vueltas}.
+     Un aviso con `regalo: true` (🎁 lo que el GM dio a mano, comun/dar-jugador.js) lo aplica DarJugador.recibir y vuelve además en `regalo`.
    - `aplicarExp(S, exp)` (la ficha la usa también al escribir la XP a mano) y `devolverTrampas(S, items)`.
    Necesita sesion.js, ficha-acciones.js, ficha-calculo.js, ficha-equipo.js, ficha-tienda.js e (invocaciones) inv-habilidades.js.
    ========================================================= */
@@ -203,6 +204,12 @@ const Recibidos = (() => {
   }
   function recompensa(S, d){
     const r = d.data() || {};
+    // 🎁 Lo que el GM le dio a mano (comun/dar-jugador.js, 2026-11-21): mismo aviso, marcado `regalo`. Directo a la mochila / DDE / despojos;
+    // `regalo` lleva lo que muestra el cartel de quien lo recibe (DarJugador.cartel).
+    if(r.regalo === true && typeof DarJugador !== 'undefined'){
+      const g = DarJugador.recibir(S, r);
+      return {partes: g.partes, subio: false, vueltas: null, items: g.items, regalo: g};
+    }
     let subio = false, vueltas = null, items = [];
     if(num(r.xp) > 0) subio = aplicarExp(S, num(S.meta.exp) + num(r.xp));
     if(num(r.dde) > 0) S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100;

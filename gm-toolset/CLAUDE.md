@@ -525,3 +525,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   solo se redibuja si cambia quién tiene token). «🎯 Poner en el tablero los que faltan (N)» crea solo los que no tienen token (sin ninguno:
   «✔ Todos en el tablero»). «Ver en el tablero ↗» abre el mapa en otra pestaña mirando ese mapa (`verMapaEnTablero`, sin publicar). Título:
   «Creeps de la partida»; «Todos los creeps».
+- **🎁 Dar a un jugador** (2026-11-21, dueño): `abrirDarJugadorGM({marcados, item})` (js/04) abre la ventana común (comun/dar-jugador.js, la misma del
+  mapa). Puertas: el 🎁 de cada fila de 👥 Personajes (js/10, `data-dar-personaje`) y «🎁 Dar a un jugador» en el Ver de un ítem (`#veritem-dar`; se
+  ve si el ítem es del catálogo: `itemDelCatalogoGM` lo busca por id o por nombre y tipo, porque los del ⚔ Catálogo vienen sin id).

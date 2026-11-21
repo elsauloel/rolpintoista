@@ -542,7 +542,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Decidido por Claude mientras tanto (P261):** sin tope; cuentan los enemigos que se ven y están en pie (ni escondidos, ni bajo tierra, ni caídos,
   ni tótems o estandartes): la misma cuenta que ya usa el Estoicismo para «enemigo pegado», y no la del enjambre, que sí cuenta escondidos y tótems.
   957 pruebas automáticas en verde (1 nueva).
-- **⬜ en cola — 🎁 El GM le da un ítem (o DDE, o despojos) a un jugador, fácil, desde el mapa y desde GM Tools** (dueño, 2026-11-20: «me gustaría
+- **✅ hecho (2026-11-21) — 🎁 El GM le da un ítem (o DDE, o despojos) a un jugador, fácil, desde el mapa y desde GM Tools** (dueño, 2026-11-20: «me gustaría
   que el GM pueda darle un ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa como desde GM Tools»; y «que sea directo a la mochila,
   pero que sí le aparezca una notificación, que uno ponga aceptar, que no aparezca simplemente en la Mesa, porque eso pasa un poco desapercibido.
   También doblones del espacio, despojos y ítems custom, ítems que uno puede crear en el momento»). UNA sola ventana común «🎁 Dar a un jugador»:
@@ -556,6 +556,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     igual y avisa (ADN: avisar, no bloquear). Tiene que funcionar con el jugador desconectado (lo recibe y ve el cartel al entrar) y aplicarse desde el
     mapa o desde la ficha (como `comun/recibidos.js`). Reglas de Firebase: si hace falta una colección nueva, avisar que hay que pegarlas.
   · Sin definir (anotar como pregunta): ¿una casilla «en secreto» para que la línea de la Mesa no la vean los demás?
+  **Cómo quedó (2026-11-21):** una sola ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`), la misma en el mapa y en GM Tools. Arriba, **a quién**
+  (los personajes de la partida con casillas y «Todos»); en el medio, **qué**, en cuatro pestañas: 📦 Ítem del catálogo (el buscador y los filtros
+  de las tiendas, con «Ver» y «+ Agregar»; incluye lo subido por el grupo), 💰 DDE, 🦴 Despojos (normales, mágicos y especiales con nombre) y ✎ Ítem
+  nuevo (el asistente de ítems de siempre); abajo, **«Lo que vas a dar»** con la cantidad de cada ítem (− / número / +) y el botón «🎁 Dar».
+  **Puertas:** en el mapa, 🎁 en el «⋯» del token de un personaje (ya viene marcado); en GM Tools, 🎁 en cada fila de 👥 Personajes y «🎁 Dar a un
+  jugador» en el Ver de un ítem del catálogo (ya viene en la lista). **Cómo llega:** por el mismo camino que las recompensas del fin del combate
+  (**sin reglas nuevas de Firebase**): entra directo a la mochila / DDE / despojos, una sola vez, lo aplique el mapa o la ficha, y al jugador le salta
+  el cartel al centro «🎁 El GM te dio algo» con «✔ Aceptar» (solo lo cierra). Queda la línea en la Mesa. Si la mochila queda pasada de ranuras se da
+  igual: lo avisa el cartel y una línea en la Mesa.
+  **Probado con clics** («Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1 + Jugador 2): desde el token (Misericordia ×1 a Blanco J1,
+  conectado: cartel al instante, la Mesa y la mochila); a los dos a la vez (Yelmo de hierro ×3 + 25 DDE + 4 despojos + 2 mágicos + 2 «Escama de
+  dragón»), con el Jugador 1 con el mapa y la ficha abiertos a la vez (entró una sola vez: lo tomó el mapa, la ficha quedó igual) y el Jugador 2
+  desconectado (al entrar a su **ficha suelta** vio el cartel y tenía todo); desde la fila de Personajes de GM Tools, un **ítem nuevo** («Anillo de
+  prueba del GM») al Jugador 2 desconectado (al entrar al **mapa** vio el cartel); desde el Ver de un ítem de GM Tools, Facón de paisano ×25 a Blanco
+  J1 (**mochila pasada**, 29 de 20: lo recibió igual, con el aviso rojo en el cartel y la línea en la Mesa). Los dos personajes quedaron como estaban.
+  **Sin probar con clics:** con el GM teniendo 🎮 el control del personaje; un consumible ×N que se apila (sí en las automáticas); dos regalos seguidos
+  sin aceptar el primero; un personaje del propio GM (anotado en `docs/pruebas-en-el-mapa.md`). 963 pruebas automáticas en verde (5 nuevas).
+  **Para que lo sepas:** la casilla «en secreto» no se programó (P262, con otras cinco cosas chicas que elegí «mientras tanto»). El «✎ Ítem nuevo»
+  no arma consumibles. De paso: en el Ver de un ítem del ⚔ Catálogo de GM Tools el botón «🗑 Solicitar eliminar» no aparece (los ítems llegan ahí sin
+  su id; ya pasaba antes): no lo toqué.
 - **✅ hecho (2026-11-20) — 💨 Prisa pasa a ser +5 a la tirada de iniciativa** (dueño, 2026-11-20: «cambiar la habilidad Prisa para que en lugar de que te
   mande siempre primero a la lista de iniciativas, te dé +5 a la tirada de iniciativa. En El origen de las especies, el personaje Rocardo la tiene,
   así que habría que cambiársela a él también»). La pasiva `prisa` de `comun/pasivas.js` deja de poner primero en el orden de turnos y da **+5 a

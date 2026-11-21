@@ -1613,6 +1613,13 @@ async function recibidosAplicar(fichaId){
       for(const d of de('recompensas')){
         if(!await Recibidos.tomar(d, borrar)) continue;
         const r = Recibidos.recompensa(S, d);
+        // 🎁 Lo que el GM dio a mano (comun/dar-jugador.js, 2026-11-21): ya entró; el cartel al centro con «Aceptar» es el «enterado».
+        if(r.regalo){
+          DarJugador.cartel({nombre, de: r.regalo.de, lineas: r.regalo.lineas, pasada: r.regalo.pasada});
+          if(r.regalo.pasada) mesaLinea(`⚠ ${nombre || 'Un personaje'} recibió ${r.partes.join(', ')} y su mochila quedó pasada (${r.regalo.pasada.usada} de ${r.regalo.pasada.cap} ranuras)`, 'recordatorio', nombre);
+          hubo = true;
+          continue;
+        }
         if(r.partes.length) aviso(`🎁 ${r.partes.join(' · ')}`);
         const vueltas = Recibidos.textoVueltas(r.vueltas);
         if(vueltas) aviso(vueltas);

@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261121zd3"></script>
+<script src="zona-detalle.js?v=20261121zd4"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261120volver"></script>
@@ -9315,6 +9315,13 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const puas = ZonaDetalle.armar({zona: true, zonaNombre: 'Púas', zonaDano: '1d6', zonaEnMantenimiento: false, zonaCadaPaso: true, zonaCasteadorTipo: 'creep'}, {autor: {nombre: 'El GM'}});
     igual(puas.esencial, '1d6 de daño a los personajes (y sus invocaciones): al entrar o cruzarla.'); ok(/NO la vuelve a disparar/.test(fila(puas, 'Cuándo se dispara')));
     igual(fila(puas, 'Qué frena el daño'), 'Le resta la Defensa. El daño lo tira quien la puso (o el GM por él).');
+  });
+  prueba('el cartel de arriba de una zona dice cuándo afecta de verdad (lo mismo que «Ver detalle»)', () => {
+    const E = ZonaDetalle.cuandoEtiqueta;
+    ok(/quien entra y quien sigue adentro al pasar de ronda/.test(E({zona: true, zonaDano: '1d4'})));
+    ok(/da un paso adentro/.test(E({zona: true, zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})})) && !/Mantenimiento/.test(E({zona: true, zonaEstado: JSON.stringify({tiraPaso: true})})));
+    igual(E({zona: true, zonaDano: '1d6', zonaEnMantenimiento: false, zonaCadaPaso: true}), 'la sufre quien entra o la cruza; quedarse quieto adentro no la vuelve a disparar');
+    ok(/^cura a los aliados/.test(E({zona: true}, {cura: {cura: '4', pulsos: 3}}))); ok(/^ilumina/.test(E({zona: true, zonaLuz: true})));
   });
   prueba('trampa a la vista: armada dice qué hace y a quién; disparada, que ya saltó; una forma común no tiene detalle', () => {
     const t = {trampa: true, trampaNombre: 'Trampa de oso', trampaDano: '2d6', trampaEstado: JSON.stringify({nombre: 'Inmovilizado', turnos: 2, salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'efecto'}}), trampaDetalle: 'Muerde la pierna.'};

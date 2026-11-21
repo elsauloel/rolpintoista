@@ -808,7 +808,8 @@ async function trampaDanoCalcular(dt, x, simular){
       const resTxt = [...(dt.elemento && rr.res ? [Combatiente.ELEMENTOS[dt.elemento] ? Combatiente.ELEMENTOS[dt.elemento].etq : 'Resistencia al elemento'] : []), ...(suela ? ['Suela gruesa'] : [])].join(' + ');   // (el renglón de la cuenta)
       if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);
-      const oT = {magico: !!dt.elemento, ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {}), ...(resTxt ? {resTxt} : {}), ...(simular ? {simular: true} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
+      const frenaEspT = !!(dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento));   // 🛡 Aguante de trinchera: si lo frena la Defensa especial, el bono va ahí (js/10; 2026-11-21, visto en el mapa: la Mina no lo sumaba)
+      const oT = {magico: !!dt.elemento, ...(frenaEspT ? {frenaEsp: true} : {}), ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {}), ...(resTxt ? {resTxt} : {}), ...(simular ? {simular: true} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res, oT); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
     }catch(err){ if(!simular) console.error('No se pudo aplicar el daño de la trampa:', err); else console.warn('La cuenta del daño de la trampa (vista previa):', err); }

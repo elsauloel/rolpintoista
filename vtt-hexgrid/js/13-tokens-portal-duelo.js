@@ -814,6 +814,7 @@ function abrirAsistenteZonaNueva(){
       const radio = Math.max(1, Math.min(6, Math.round(num(r.radio)) || 1));
       elegirDestino(h => crearElementoZona(h, {
         radio, turnos: r.turnos, nombre: r.nombre, color: r.color, alfa: r.alfa, amiga: r.amiga, dano: r.dano, ignoraDef: r.ignoraDef,
+        danoTipo: r.dano ? ({toxico: 'tóxico', rayo: 'eléctrico', fisico: 'físico'})[r.tipoDano] || r.tipoDano || '' : '',   // 🔥 el elemento elegido en el asistente (2026-11-21, visto en el mapa: no se guardaba, y una zona «de fuego» hecha a mano no tenía elemento: ni resistencia, ni «INMUNE AL FUEGO»)
         estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso, altura: r.altura,
         casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
       }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);

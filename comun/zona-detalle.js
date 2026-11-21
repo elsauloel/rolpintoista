@@ -46,6 +46,20 @@ const ZonaDetalle = (() => {
     return {corto: mant ? `${entra} y, mientras sigan adentro, cada vez que se pasa de ronda` : entra, largo};
   }
 
+  /* La frase corta del cartel de arriba de una zona (vtt-hexgrid/js/10, `etiquetaElemento`): cuándo afecta, con la misma lógica que la fila
+     «Cuándo se dispara» de la tarjeta (2026-11-21, visto en el mapa: el cartel decía siempre «la sufre quien entra y quien sigue adentro en el
+     Mantenimiento», también para el hielo de una varita —que solo se dispara al caminar—, una zona de curación o una que solo importa al entrar). */
+  function cuandoEtiqueta(el, ctx){
+    ctx = ctx || {};
+    const sp = json(el.zonaEstado), sup = typeof sp.superficie === 'string' ? sp.superficie : '';
+    if(ctx.cura) return 'cura a los aliados de quien la puso que estén adentro, en cada pulso';
+    if(sup === 'agua' && !sp.nombre) return 'no hace daño por sí sola: a quien está parado acá, el rayo le pega más';
+    if(el.zonaLuz && !sp.nombre && !el.zonaDano && !el.zonaDanoDif) return 'ilumina: deja ver lo que hay adentro';
+    if(sp.tiraPaso) return 'la sufre quien da un paso adentro (entrando o caminando); quedarse quieto no la dispara';
+    const entra = el.zonaCadaPaso ? 'quien entra o la cruza' : 'quien entra';
+    return el.zonaEnMantenimiento !== false ? `la sufre ${entra} y quien sigue adentro al pasar de ronda (el Mantenimiento)` : `la sufre ${entra}; quedarse quieto adentro no la vuelve a disparar`;
+  }
+
   function filaAutor(el, ctx, filas){
     const a = ctx.autor || {};
     const hab = ctx.habilidad || '';
@@ -218,6 +232,6 @@ const ZonaDetalle = (() => {
     return null;
   }
 
-  return {tiene, armar, A_MANO};
+  return {tiene, armar, cuandoEtiqueta, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

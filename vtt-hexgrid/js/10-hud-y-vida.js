@@ -1139,7 +1139,7 @@ function elementoQueEs(e){
     const q = num(e.turnos) > 0 && typeof zonaTurnosQuedan === 'function' ? zonaTurnosQuedan(e) : null;   // la misma cuenta que «Ver detalle» (js/127)
     const t = q ? q.quedan : (num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0);
     return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
-      ` · <span class="es-libre">la sufre quien entra y quien sigue adentro en el Mantenimiento</span>`;
+      ` · <span class="es-libre">${esc(typeof ZonaDetalle !== 'undefined' && ZonaDetalle.cuandoEtiqueta ? ZonaDetalle.cuandoEtiqueta(e, {cura: typeof zonaCuraDe === 'function' ? zonaCuraDe(e) : null}) : 'la sufre quien entra y quien sigue adentro al pasar de ronda')}</span>`;   // (2026-11-21) lo mismo que dice «Ver detalle»
   }
   // ☁ La nube y 🔥 el terreno en llamas también dicen qué son (2026-11-20, con el «Ver detalle»; antes salían como «Flor · TRANSITABLE»).
   if(e.niebla){ const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;

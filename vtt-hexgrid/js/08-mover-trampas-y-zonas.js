@@ -702,6 +702,8 @@ function zonaDanoCuenta(monto, r, o){
   const defBase = num(r.defensa) - num(o.resElem) - num(o.suela) - (o.ignoraDef ? num(o.armadmg) : 0);
   if(!o.ignoraDef && defBase > 0) resta.push(`Defensa ${fmt(defBase)}`);
   if(o.ignoraDef && num(o.armadmg) > 0) resta.push(`Defensa especial ${fmt(o.armadmg)}`);
+  const trinZ = o.ignoraDef ? (r.defPartes || []).find(p => p && /Aguante de trinchera/.test(p.txt || '')) : null;   // 🛡 (2026-11-21) lo que sumó a la Defensa especial
+  if(trinZ && num(trinZ.v) > 0) resta.push(`${trinZ.txt} ${fmt(trinZ.v)}`);
   if(num(o.resElem) && o.elZ) resta.push(Combatiente.resElementalTxt(o.elZ, num(o.resElem)));
   if(num(o.suela) > 0) resta.push(`Suela gruesa ${fmt(o.suela)}`);
   if(num(r.arcano) > 0) resta.push(`Armadura arcana ${fmt(r.arcano)}`);
@@ -881,7 +883,8 @@ async function zonaResolverBanner(){
     if(monto > 0){
       try{
         let res = null;
-        const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef))};   // el Orbe de absorción (js/26)
+        const frenaEspZ = !!(el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ));   // 🛡 Aguante de trinchera: va a la Defensa especial cuando es lo que frena (js/10; 2026-11-21)
+        const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef)), ...(frenaEspZ ? {frenaEsp: true} : {})};   // el Orbe de absorción (js/26)
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         const suelaZ = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;

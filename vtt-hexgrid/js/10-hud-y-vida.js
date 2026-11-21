@@ -280,7 +280,8 @@ function defEstadosNota(estados, porStack){
 }
 function defensaPartes(c){
   const p = [];
-  if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)}); }
+  if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)});
+    if(c.trinchera && num(c.trincheraEsp) > 0) p.push({txt: `${Combatiente.trincheraTxt(c.trinchera).replace(/ \+\d+/, '')} (a la Defensa especial)`, v: num(c.trincheraEsp)}); }
   else{
     const nota = defEstadosNota(c.estados, c.porStack);
     p.push({txt: 'Defensa', v: num(c.base), ...(nota ? {nota} : {})});
@@ -288,6 +289,7 @@ function defensaPartes(c){
     if(c.o && c.o.distancia && Math.max(0, num(c.valor('defdist'))) > 0) p.push({txt: 'Defensa contra armas a distancia', v: Math.max(0, num(c.valor('defdist')))});
     if(c.guarda) p.push({txt: `Guardián: ${c.guarda.nombre} al lado`, v: num(c.guarda.val)});
     if(c.muro) p.push({txt: `Muro de escudos con ${c.muro.nombre}`, v: num(c.muro.val)});
+    if(c.trinchera) p.push({txt: Combatiente.trincheraTxt(c.trinchera).replace(/ \+\d+/, ''), v: num(c.trinchera.def)});   // 🛡 Aguante de trinchera (2026-11-20)
     if(c.estoico) p.push({txt: `Estoicismo: ${c.estoico.n} enemigo${c.estoico.n === 1 ? '' : 's'} pegado${c.estoico.n === 1 ? '' : 's'}`, v: num(c.estoico.val)});
   }
   if(num(c.restaExtra)) p.push({txt: (c.o && c.o.resTxt) || 'Resistencia al elemento', v: num(c.restaExtra)});
@@ -300,6 +302,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const trinN = typeof estoicoRivales === 'function' ? estoicoRivales(t).length : 0;   // 🛡 Aguante de trinchera (js/65): los mismos rivales pegados, si tiene la pasiva
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 el Escudo humano (2026-10-27): otro creep que se lleva la mitad
   /* 🧮 `o.simular` (2026-11-04, dueño: «la cuenta del daño debe aparecer antes del botón aplicar el daño»): la misma cuenta sobre una COPIA del creep,
      sin escribir nada ni avisar (la vista previa del duelo, dueloAplicarDano con simular). */
@@ -308,9 +311,10 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const estoico = estoicoDe(sc.estados, estoN);
-    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
-    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro, estoico});
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
+    const trin = Combatiente.trincheraBono((st => CreepCalculo.modTotal(sc, st))('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
     r.max = num(sc.hpMax);   // ❤ para mostrar la vida «X/máx» (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     // 🛡 Interpuesto (2026-10-27): el +2 a la Defensa era para este golpe; se va con él.
@@ -465,6 +469,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const trinN = typeof estoicoRivales === 'function' ? estoicoRivales(t).length : 0;   // 🛡 Aguante de trinchera (js/65): los mismos rivales pegados, si tiene la pasiva
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -486,9 +491,10 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     datos.meta = datos.meta || {};
     const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
     const estoico = estoicoDe(efectos, estoN);
-    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
-    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro, estoico});
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
+    const trin = Combatiente.trincheraBono((st => rs[st])('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
     r.max = num(rs.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
@@ -595,6 +601,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const trinN = typeof estoicoRivales === 'function' ? estoicoRivales(t).length : 0;   // 🛡 Aguante de trinchera (js/65): los mismos rivales pegados, si tiene la pasiva
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
@@ -611,9 +618,10 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
     const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
     const estoico = estoicoDe(inv.estados, estoN);
-    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
-    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro, estoico});
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
+    const trin = Combatiente.trincheraBono((st => FichaResumen.invModTotal(inv, st))('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
     r.max = num(inv.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
@@ -731,7 +739,8 @@ function hudHpPrevia(t, d, texto){
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
   if(d.def === null || d.def === undefined) return '—';
   const est = estoicoDe(estadosPrevia(t, d), estoicoRivales(t).length);   // 🗿 Estoicismo (js/85): lo que suman los enemigos pegados
-  const def = num(d.def) + (est ? est.val : 0);
+  const trinP = typeof trincheraAhora === 'function' ? trincheraAhora(t) : null;   // 🛡 Aguante de trinchera (js/65)
+  const def = num(d.def) + (est ? est.val : 0) + (trinP ? trinP.def : 0);
   const r = resolverGolpe(golpe, def, estadosPrevia(t, d));
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);

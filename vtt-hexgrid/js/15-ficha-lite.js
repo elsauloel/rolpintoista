@@ -121,6 +121,9 @@ function flDibujar(){
     const est = typeof estoicoAhora === 'function' ? estoicoAhora(estoicoToken(fl.tipo === 'creep' ? 'creep' : 'pj', fl.tipo === 'creep' ? fl.creepId : fl.clave)) : null;
     if(est && modelo.defensa) modelo.defensa = {valor: num(modelo.defensa.valor) + est.val,
       lineas: [...modelo.defensa.lineas, {txt: `Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'}, ahora`, val: est.val, nota: 'estado'}]};
+    // 🛡 Aguante de trinchera (js/65): lo de este momento, a la Defensa (y a la Defensa especial, que la ficha lite no desglosa).
+    const trinL = typeof trincheraLineaTxt === 'function' ? trincheraLineaTxt(estoicoToken(fl.tipo === 'creep' ? 'creep' : 'pj', fl.tipo === 'creep' ? fl.creepId : fl.clave)) : null;
+    if(trinL && modelo.defensa) modelo.defensa = {valor: num(modelo.defensa.valor) + trinL.val, lineas: [...modelo.defensa.lineas, {txt: `${trinL.txt} (también a la Defensa especial)`, val: trinL.val, nota: 'pasiva'}]};
     // 🚩 Los estados de las áreas donde está parado (js/103): derivados de la posición, no se guardan.
     if(typeof estadosDeAreaRef === 'function' && Array.isArray(modelo.estados)){
       const ref = fl.tipo === 'creep' ? fl.creepId : fl.clave;

@@ -3261,3 +3261,17 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
   una Defensa alta); una habilidad «con tu arma» (Pegar fuerte) con una maestría; el contraataque mostrando «⚔ Maestría en armas cortantes» en la
   declaración (se sumó después de la prueba; la tirada sí se vio con el +1); el arcabuz contando como ballesta.
 
+## 🛡 Aguante de trinchera (2026-11-20)
+(«Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1; Blanco J1 con la pasiva, Defensa 1 y Defensa especial 0.)
+
+- [x] **0, 1 y 2 enemigos pegados**: la cabecera de la Botonera pasa sola de «Def 1 · Def.Esp 0» a «Def 2 · Def.Esp 1» y «Def 3 · Def.Esp 2» al
+  acercarle creeps; la 🔍 de Defensa y de Defensa especial suman la sección «En el mapa, ahora» («ningún enemigo pegado ahora» / «2 enemigos pegados,
+  ahora +2»).
+- [x] **Golpe de un creep con 2 pegados**: la declaración dice «🛡 Aguante de trinchera +2: 2 enemigos pegados — Blanco J1 suma eso a su Defensa y a
+  su Defensa especial»; la cuenta, «10 − Defensa 1 − Aguante de trinchera 2 = 7», y al aplicarlo la vida bajó 50 → 43. Con 1 pegado: 8 − 1 − 1 = 6.
+- [x] **Daño especial (Andanada arcana de un creep) con 2 pegados**: «Daño especial: no se resta la Defensa; se resta la Defensa especial − Aguante
+  de trinchera: 2 enemigos pegados (a la Defensa especial) 2» → 7 queda en 5.
+- [x] **Un creep con la pasiva, golpeado por el Jugador 1**: en la pantalla del GM, «10 − Defensa 5 − Aguante de trinchera 1 = 4».
+- [ ] **Sin ver en pantalla:** una invocación con la pasiva; un crítico contra alguien que la tiene (no tiene que sumar); una trampa o una zona; la
+  ficha lite (📜) con el renglón; la declaración de un hechizo con el texto (se sumó después de la prueba: la cuenta sí se vio).
+

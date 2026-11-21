@@ -86,6 +86,11 @@ const PASIVAS_BASE = [
   {poolId: 'tactica-de-enjambre', nombre: 'Táctica de enjambre', jobCosto: 2, etiquetas: ['ofensiva'],
    detalle: '+1 a la Probabilidad de Golpe por cada aliado que tengas pegado (a 1 casilla tuya) en el momento de atacar con tu arma, sin tope: solo sos uno más, en enjambre sos un problema. ⚙ Automatizado en el mapa: al atacar cuenta a tus aliados pegados (los de tu bando que están en pie; vos no te contás) y se ve «🐝 Táctica de enjambre +2: 2 aliados al lado» en el cuadro del duelo y en la tirada. Vale también en el contraataque y en el ataque de oportunidad. ✋ Fuera del mapa (la ficha suelta) no suma: ahí se suma a mano.',
    mods: [{stat: 'enjambre', val: 1}]},
+  // 🛡 Aguante de trinchera (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la defensa y +1 la defensa especial por cada enemigo
+  // adyacente»; el nombre lo eligió él). El espejo de la Táctica de enjambre: lo cuenta el mapa cuando le llega el golpe (vtt-hexgrid/js/65 y js/10).
+  {poolId: 'aguante-de-trinchera', nombre: 'Aguante de trinchera', jobCosto: 2, etiquetas: ['defensiva'],
+   detalle: '+1 a la Defensa y +1 a la Defensa especial por cada enemigo que tengas pegado (a 1 casilla tuya) en el momento en que te llega el golpe, sin tope: cuanto más te rodean, más aguantás. ⚙ Automatizado en el mapa: al recibir daño cuenta a los enemigos pegados que se ven (no los escondidos ni los caídos; un tótem o un estandarte no cuenta) y se ve «🛡 Aguante de trinchera +2: 2 enemigos pegados» en el cuadro del duelo y en la cuenta del daño; la 🔍 de Defensa dice cuánto suma en ese momento. Un golpe crítico ignora la Defensa, como siempre. ✋ Fuera del mapa (la ficha suelta) no suma: ahí se suma a mano.',
+   mods: [{stat: 'trinchera', val: 1}]},
   // 🛡 Resistencia a crítico (2026-11-05, dueño: «si no existe ninguna pasiva… que interactúe con la resistencia del crítico, ya diseñaría alguno»;
   // docs/propuesta-pasivas-consumibles-res-critico.md). Las de la vida las suma el duelo al calcular el crítico (Combatiente.resCritPorVida).
   {poolId: 'callo-de-batalla', nombre: 'Callo de batalla', jobCosto: 1, etiquetas: ['stat', 'defensiva'],

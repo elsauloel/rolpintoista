@@ -525,12 +525,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Decidido por Claude mientras tanto (P260):** el Bloqueo de cortantes y de hachas vale al bloquear CON esa arma (no con un escudo teniendo el arma
   en la otra mano); «ballesta» = el arma de rango con Recarga (entran los arcabuces); una ballesta de Tipo 6 no es un arma cortante; las armas
   naturales (garras, colmillos) no cuentan para ninguna maestría. 956 pruebas automáticas en verde (1 nueva).
-- **⬜ en cola — 🛡 Pasiva nueva «Aguante de trinchera»** (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la
+- **✅ hecho (2026-11-20) — 🛡 Pasiva nueva «Aguante de trinchera»** (dueño, 2026-11-20: «un skill pasiva por 2 puntos de Job que te dé +1 la
   defensa y +1 la defensa especial por cada enemigo adyacente. Busquémosle un nombre y publiquémosla»). 2 Job; **+1 Defensa y +1 Defensa especial por
   cada enemigo pegado** al que la tiene. Es el espejo de «Táctica de enjambre» (`comun/pasivas.js`, stat `enjambre`, `Combatiente.aliadosPegados`):
   misma forma de contar (del lado del mapa, al abrirse el duelo / al recibir el daño), pero contando rivales. Para jugadores y creeps. Se tiene que
   ver en el cuadro del duelo y en la 🔍. Mismas dudas que P249 (¿tope?, ¿cuentan tótems y objetos inertes?, ¿rivales escondidos?): resolver igual que
   en el enjambre y anotar lo provisorio en preguntas-abiertas. Nombre elegido por el dueño (2026-11-20): «Aguante de trinchera».
+  **Cómo quedó (2026-11-20):** está en el catálogo de pasivas (2 Job, jugadores y creeps; también las invocaciones). Cuando le llega un golpe, el
+  mapa cuenta los enemigos que tiene pegados y le suma +1 por cada uno a la Defensa (o a la Defensa especial, si el daño es especial). Se ve en el
+  cuadro del duelo («🛡 Aguante de trinchera +2: 2 enemigos pegados — Fulano suma eso a su Defensa y a su Defensa especial»), en la cuenta del daño
+  renglón por renglón, en la 🔍 de Defensa y de Defensa especial («En el mapa, ahora») y en la cabecera de la Botonera (Def y Def.Esp de ese momento).
+  **Probado con clics** en «Claude · pruebas 2» (Jugador 1 con la pasiva): con 0, 1 y 2 enemigos pegados la cabecera pasó de «Def 1 · Def.Esp 0» a
+  «2 · 1» y «3 · 2»; un golpe del creep con dos pegados: 10 − Defensa 1 − Aguante 2 = 7 (y se aplicó: vida 50 → 43); con uno, 8 − 1 − 1 = 6; un
+  hechizo (Andanada arcana) con dos pegados: 7 − 2 a la Defensa especial = 5; y un creep con la pasiva golpeado por el jugador: 10 − 5 − 1 = 4.
+  **Sin probar con clics:** una invocación con la pasiva; un crítico (ignora la Defensa: no tendría que sumar); el daño de una trampa o una zona.
+  **Decidido por Claude mientras tanto (P261):** sin tope; cuentan los enemigos que se ven y están en pie (ni escondidos, ni bajo tierra, ni caídos,
+  ni tótems o estandartes): la misma cuenta que ya usa el Estoicismo para «enemigo pegado», y no la del enjambre, que sí cuenta escondidos y tótems.
+  957 pruebas automáticas en verde (1 nueva).
 - **⬜ en cola — 🎁 El GM le da un ítem (o DDE, o despojos) a un jugador, fácil, desde el mapa y desde GM Tools** (dueño, 2026-11-20: «me gustaría
   que el GM pueda darle un ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa como desde GM Tools»; y «que sea directo a la mochila,
   pero que sí le aparezca una notificación, que uno ponga aceptar, que no aparezca simplemente en la Mesa, porque eso pasa un poco desapercibido.

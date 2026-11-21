@@ -2141,4 +2141,8 @@ versión parecida en más de una, es candidato a juntar.
   en …», `maestriaTxt`; lo muestra el cuadro del duelo). Las 🔍: `ficha-lupa.js` (`filasMaestria`, `lupaMaestria`, `lupaParryPorArma(S, c, 'bloqueo')`),
   `creep-lupa.js` e `inv-lupa.js` (`familia(x, 'maestria' | 'dmgfam' | 'bloqueo')`). **Una maestría nueva = un renglón en `MAESTRIA_STATS`, su stat
   en `ficha-calculo.js` / `creep-calculo.js` y la pasiva.** Lo provisorio: P260.
+- **🛡 Aguante de trinchera** (2026-11-20, dueño; pasiva de 2 Job, stat `trinchera`): +1 a la Defensa y a la Defensa especial por cada enemigo pegado,
+  el espejo de la Táctica de enjambre del lado de quien defiende. Acá vive solo lo puro: `Combatiente.trincheraBono(val, rivales)` → `{def, n}` o
+  null, `trincheraTxt(b)` y `rivalesPegados(…)` (para las pruebas). El resumen público lleva `trinchera` (personaje e invocaciones); la cuenta y la
+  suma las hace el mapa (ver vtt-hexgrid/CLAUDE.md). `Duelo.crear` anota `ataque.trinchera` solo para decirlo en la declaración (`trincheraDueloTxt`).
 

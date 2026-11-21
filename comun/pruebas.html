@@ -8141,6 +8141,27 @@ prueba('🔨 Maestría en armas pesadas (dueño, 2026-11-20): +2 PdG y +1 Parry 
     creep, fCreep, invocacion, FichaCalculo.MOD_TARGETS.some(x => x.id === 'parryt10'), CreepCalculo.STAT_LABEL.parryt10],
     [[2, 1, 0, 0, 0], true, true, true, true, [2, 1, 0, 0, 0], [true, true, true, true], [2, 1, true], true, 'Parry con contundentes']);
 });
+prueba('🛡 Aguante de trinchera (dueño, 2026-11-20): +1 Defensa y +1 Defensa especial por cada enemigo pegado, sin tope; 2 de job; personaje, creep e invocación', () => {
+  const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'aguante-de-trinchera');
+  igual([!!pas, pas.nombre, pas.jobCosto, pas.mods.map(m => m.stat + m.val).join(' '), /Automatizado en el mapa/.test(pas.detalle), FichaCalculo.STAT_LABEL.trinchera, CreepCalculo.STAT_LABEL.trinchera, categoriaDePasiva(pas)],
+    [true, 'Aguante de trinchera', 2, 'trinchera1', true, 'Aguante de trinchera', 'Aguante de trinchera', 'defensiva']);
+  igual([C.trincheraBono(1, 0), C.trincheraBono(0, 3), C.trincheraBono(1, 1), C.trincheraBono(1, 2), C.trincheraBono(1, 6), C.trincheraBono(2, 3)],
+    [null, null, {def: 1, n: 1}, {def: 2, n: 2}, {def: 6, n: 6}, {def: 6, n: 3}]);
+  igual([C.trincheraTxt(C.trincheraBono(1, 2)), C.trincheraTxt(C.trincheraBono(1, 1)), C.trincheraTxt(null)], ['🛡 Aguante de trinchera +2: 2 enemigos pegados', '🛡 Aguante de trinchera +1: 1 enemigo pegado', '']);
+  // Los rivales pegados: los del otro bando, con ficha, a 1 casilla; ni los aliados, ni los que están lejos, ni ocultos, ni bajo tierra, ni caídos.
+  const dist = (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(a.fila - b.fila)), ids = l => l.map(x => x.id).join(',');
+  const mio = {id: 'yo', col: 5, fila: 5, tipo: 'pj', fichaId: 'f0'};
+  const lista = [mio, {id: 'c1', col: 5, fila: 6, tipo: 'creep', fichaId: 'c1'}, {id: 'c2', col: 6, fila: 5, tipo: 'creep', fichaId: 'c2'}, {id: 'lejos', col: 8, fila: 5, tipo: 'creep', fichaId: 'c3'},
+    {id: 'aliado', col: 4, fila: 5, tipo: 'pj', fichaId: 'f1'}, {id: 'oculto', col: 4, fila: 4, tipo: 'creep', fichaId: 'c4', oculto: true}, {id: 'abajo', col: 6, fila: 6, tipo: 'creep', fichaId: 'c5', bajoTierra: true},
+    {id: 'caido', col: 5, fila: 4, tipo: 'creep', fichaId: 'c6'}, {id: 'adorno', col: 6, fila: 4, tipo: 'creep'}];
+  igual([ids(C.rivalesPegados(mio, mio, lista, dist, id => id === 'caido')), ids(C.rivalesPegados(lista[1], lista[1], lista, dist)), ids(C.rivalesPegados(mio, mio, [mio], dist))], ['c1,c2', 'yo,aliado', '']);
+  // La pasiva llega a los tres: el resumen del personaje, el creep y la invocación.
+  const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.pasivas = [{...structuredClone(pas), id: 'p1', compras: 1}];
+  const pasC = pasivaParaCombatiente(pas, 'p1'), sc = creepPrueba({pasivas: [pasC]});
+  const inv = InvCalculo.migrar({id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [pasC, {...pasC, id: 'p2'}]});
+  igual([FichaResumen.resumen(S, {}).trinchera, FichaCalculo.calcular(S).final.def === FichaCalculo.calcular(FichaGuardado.normalizar({}, {mezclarCatalogo: false}).S).final.def, CreepCalculo.modTotal(sc, 'trinchera'), FichaResumen.invModTotal(inv, 'trinchera')],
+    [1, true, 1, 2]);
+});
 prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortantes, hachas, arcos y ballestas — cada bono solo con un arma de esa familia; personaje, creep e invocación; la 🔍 y el costo', () => {
   const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);
   const pun = P('maestria-armas-punzantes'), cor = P('maestria-armas-cortantes'), hac = P('maestria-hachas'), arc = P('maestria-arcos'), bal = P('maestria-ballestas');

@@ -2471,4 +2471,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `espaldaBono(atq, def, ataque)` (js/13) suma `ataque.espaldaMas` (el +1 PdG por la espalda de la Maestría en armas punzantes, que trae el ataque);
   y los lugares que arman un ataque (js/11 `bnAtacar`, js/12, js/17 oportunidad, js/58 vigilancia, js/78) le pasan a `Combatiente.ataqueDeArma` /
   `ataqueConSuArma` los bonos de quien ataca (`valorDe`), para la Perfora de la ballesta y el texto del cuadro del duelo.
+- **🛡 Aguante de trinchera** (2026-11-20, `js/65-patota.js` + `js/10`): `trincheraValor(t)` (la pasiva del token: creep = ficha privada, solo el GM;
+  personaje e invocación = el resumen), `trincheraAhora(t)` → `{def, n}` con los rivales de `estoicoRivales` (js/85: los que se ven, en pie, sin
+  estructuras), `trincheraDeToken(id)` (lo llama `Duelo.crear`), `trincheraLineaTxt(t)` (🔍 y ficha lite) y `trincheraRevisar()` (redibuja la
+  Botonera si cambió la cuenta; lo llama el dibujo, js/05). **La suma está en el daño**: `danioPj` / `danioCreep` / `danioInv` (js/10) cuentan de
+  nuevo y la agregan a la Defensa, o a la Defensa especial si el duelo dice `o.frenaEsp` (js/13); sale en `defensaPartes` como un renglón propio.
+  La 🔍 de Defensa la completa `lupaContenido` (js/11, sección «En el mapa, ahora»). Lo provisorio: P261.
 

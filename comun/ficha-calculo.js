@@ -109,6 +109,7 @@ const FichaCalculo = (() => {
     {id:'escurridizo', label:'Escurridizo', full:'Escurridizo: si ganás la Evasión contra un golpe cuerpo a cuerpo, podés moverte 1 casilla sin dar ataques de oportunidad (pagando su No2)'},
     {id:'ojocarancho', label:'Ojo de carancho', full:'Ojo de carancho: + ese número a la Probabilidad de Golpe (PdG o PdG.Esp, armas y hechizos) contra un rival que tenga algún estado malo encima'},
     {id:'enjambre', label:'Táctica de enjambre', full:'Táctica de enjambre: + ese número a la Probabilidad de Golpe por cada aliado pegado a vos al atacar con tu arma (lo suma el mapa)'},
+    {id:'trinchera', label:'Aguante de trinchera', full:'Aguante de trinchera: + ese número a la Defensa y a la Defensa especial por cada enemigo pegado a vos cuando te llega el golpe (lo suma el mapa)'},
     {id:'sedbatalla', label:'Sed de batalla', full:'Sed de batalla: cuando un rival cae por tu golpe, ganás ese número de No2 (aunque pases de tu máximo)'},
     {id:'sedsangre', label:'Sed de sangre', full:'Sed de sangre: cuando un rival cae por tu golpe, subís ese número de lugares en el orden de turnos'},
     {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},

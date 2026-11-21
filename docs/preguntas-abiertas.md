@@ -1798,3 +1798,18 @@ con estas decisiones conservadoras. **Para el dueño**, cuando quieras:
    vale 1 (la regla que ya había).
 7. **Comprada dos veces**, cada bono se duplica (como cualquier pasiva): la de hachas llegaría a 4 No2 menos. ¿Tope de una compra para las maestrías?
 
+### P261 — 🛡 Aguante de trinchera: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+La pasiva (dueño: «+1 la defensa y +1 la defensa especial por cada enemigo adyacente», 2 de Job; `comun/pasivas.js`, stat `trinchera`) quedó así:
+1. **Sin tope**, como la Táctica de enjambre. ¿Le ponés uno?
+2. **Qué cuenta como enemigo pegado:** los rivales que se ven y están en pie — ni los escondidos (ocultos, en sigilo, bajo tierra, etéreos), ni los
+   caídos, ni los tótems o estandartes. Es la cuenta que ya aprobaste para el **Estoicismo** («+Defensa por cada enemigo adyacente»), y no la del
+   enjambre (que cuenta a los aliados escondidos y a los tótems). Me pareció más coherente que las dos cosas que dicen «enemigo pegado» cuenten
+   igual, y además así la Defensa de más no delata a un rival escondido. ¿Preferís que cuente como el enjambre?
+3. **Cuándo se cuenta:** en el momento en que le llega el golpe (si entre el ataque y el daño alguien se movió, vale lo del momento del daño). El
+   cuadro del duelo lo anuncia al abrirse cuando esa pantalla puede saberlo; si un jugador ataca a un creep que la tiene, recién se ve en la cuenta
+   del daño (la pasiva de un creep solo la ve el GM).
+4. **Qué daño:** todo el que aplica el mapa con la Defensa (duelos, trampas, zonas). La **Defensa especial** de más, por ahora, solo en los duelos
+   (un hechizo, una habilidad): el daño especial de una zona o una trampa no la suma. Un **crítico** ignora la Defensa entera, también esta.
+5. **Comprada dos veces**, +2 por enemigo.
+6. **Fuera del mapa** (la ficha suelta) no suma: se suma a mano.
+

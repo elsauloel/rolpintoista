@@ -786,6 +786,13 @@ const Duelo = (() => {
       if(enj === undefined && miTokenId && typeof enjambreDeToken === 'function'){ try{ enj = enjambreDeToken(miTokenId); }catch(err){ console.error('No se pudo contar el enjambre:', err); } }
       if(enj && _num(enj.pdg) > 0) inicial.ataque.enjambre = {pdg: Math.min(30, Math.round(_num(enj.pdg))), n: Math.min(30, Math.max(1, Math.round(_num(enj.n))))};
     }
+    // 🛡 Aguante de trinchera (2026-11-20, dueño: «+1 la defensa y +1 la defensa especial por cada enemigo adyacente»): la pasiva de quien DEFIENDE. El
+    // mapa la cuenta (`trincheraDeToken`, vtt-hexgrid/js/65) y acá queda solo para decirlo en el cuadro: la suma la hace el mapa al aplicar el daño (js/10),
+    // contando de nuevo en ese momento. Si esta pantalla no puede saberlo (un jugador contra un creep), no se dice acá: sale en la cuenta del daño.
+    if(tokDef && tokDef.id && typeof trincheraDeToken === 'function' && (!hab || hab.dano) && !cfg.ataque.danoSuelto){
+      try{ const tr = trincheraDeToken(tokDef.id, miTokenId); if(tr && _num(tr.def) > 0) inicial.ataque.trinchera = {def: Math.min(30, Math.round(_num(tr.def))), n: Math.min(30, Math.max(1, Math.round(_num(tr.n))))}; }
+      catch(err){ console.error('No se pudo contar el Aguante de trinchera:', err); }
+    }
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
     if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
     if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
@@ -865,6 +872,8 @@ const Duelo = (() => {
      los efectos; si no, «se resistió». Sin oposición (buffs, curas): el cuadro se abre directo en los efectos, con su botón «Aplicar». */
   const nombreAtq = d => d.hab ? d.hab.nombre : (d.ataque.tipo === 'habilidad-arma' && d.ataque.habNombre ? d.ataque.habNombre : (NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque'));
   // Ataque con un arma hecho con una habilidad (Golpe brutal, Carga, Takle…): lo que la habilidad le suma al ataque, en palabras.
+  // 🛡 Aguante de trinchera (2026-11-20): lo que suma quien defiende por los enemigos que tiene pegados, para la declaración (ataque o habilidad).
+  const trincheraDueloTxt = d => d.ataque && d.ataque.trinchera && _num(d.ataque.trinchera.def) > 0 ? _esc(`${typeof Combatiente !== 'undefined' && Combatiente.trincheraTxt ? Combatiente.trincheraTxt(d.ataque.trinchera) : '🛡 Aguante de trinchera +' + _fmt(d.ataque.trinchera.def)} — ${d.defensor.nombre} suma eso a su Defensa y a su Defensa especial`) : '';
   const modsTxt = d => {
     const m = (d.ataque && d.ataque.mods) || {}, t = [];
     if(_num(m.pdg)) t.push(`${_num(m.pdg) > 0 ? '+' : ''}${_fmt(m.pdg)} PdG`);
@@ -885,6 +894,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`${d.ataque.malviaje ? '🌺 malviajando' : '😱 con miedo'}: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
+    if(trincheraDueloTxt(d)) t.push(trincheraDueloTxt(d));
     if(d.ataque && d.ataque.maestria) t.push(_esc(String(d.ataque.maestria)));   // ⚔ las maestrías (2026-11-20)
     if(d.ataque && d.ataque.enjambre && _num(d.ataque.enjambre.pdg) > 0) t.push(typeof Combatiente !== 'undefined' && Combatiente.enjambreTxt ? Combatiente.enjambreTxt(d.ataque.enjambre) : `🐝 Táctica de enjambre +${_fmt(d.ataque.enjambre.pdg)}`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
@@ -3436,7 +3446,7 @@ const Duelo = (() => {
         ${d.defensor && d.defensor.interpuesto ? `<div class="duelo-interpuesto">🛡 Ahora le pega a <b>${_esc(d.defensor.nombre)}</b>: se interpuso${d.defensor.interpuesto.aliado ? ` por ${_esc(d.defensor.interpuesto.aliado)}` : ''}</div>` : ''}
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
-            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') + (_num(d.ataque && d.ataque.carancho) > 0 ? ` · 🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)` : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
+            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') + (_num(d.ataque && d.ataque.carancho) > 0 ? ` · 🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)` : '') + (trincheraDueloTxt(d) ? ' · ' + trincheraDueloTxt(d) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
             <div class="vs">VS</div>
             <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
           </div></div>

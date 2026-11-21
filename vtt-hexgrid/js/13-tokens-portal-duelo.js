@@ -2109,6 +2109,10 @@ async function dueloAplicarDano(d, o){
   }
   else if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
   else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? Combatiente.pisoDefensa(num(f.resumen.armadmg || 0), f.resumen.estados) : 0; }   // 🛡 piso 0 también para un resumen viejo (2026-11-03)
+  // 🛡 Aguante de trinchera (js/65, 2026-11-20): para las cuentas de acá (la Perfora, el Bloqueo perdido), la Defensa con lo de los enemigos pegados. La
+  // suma de verdad la hace el daño (js/10), a la Defensa o a la Defensa especial (`frenaEsp`).
+  const trinD = typeof trincheraAhora === 'function' ? trincheraAhora(t, invLeida) : null;
+  if(trinD) def += trinD.def;
   // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Defensa especial (Paso 3) en vez de nada.
   // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
@@ -2175,7 +2179,7 @@ async function dueloAplicarDano(d, o){
     else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa; se resta la Defensa especial');
     if(dn.defensaManual === 'no') R('', 'Defensa: no se resta (elegido a mano)');
     else if(manualNum){ R('−', 'Defensa escrita a mano', Math.max(0, num(dn.defensaManual))); if(base.mitad) R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
-    else if(base.mitad){ R('−', 'Defensa', def); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
+    else if(base.mitad){ R('−', 'Defensa', def, trinD ? Combatiente.trincheraTxt(trinD) : ''); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
     else if(perfora && !crit) R('', `La Defensa (${def}) frenaba más: pasan ${perfora} por la Perfora`);
     if(!crit && (base.mitad || perfora || manualNum)) R('=', 'pasa', aplicarSinAgua);
     if(aplicar !== aplicarSinAgua) R('=', '💧 en el agua, el rayo ×1,5', aplicar);
@@ -2193,7 +2197,7 @@ async function dueloAplicarDano(d, o){
     return cuenta;
   };
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: [...(resElem ? [`${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(frenaAm ? {frenaEsp: true} : {}), ...(resEl ? {resTxt: [...(resElem ? [`${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     if(simular) oD.simular = true;
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);

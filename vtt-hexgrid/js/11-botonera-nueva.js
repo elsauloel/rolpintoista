@@ -117,8 +117,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120basico2', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120mae7', '../comun/ficha-combate.js?v=20261120mae7', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
-  '../comun/catalogo.js?v=20261120basico', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120hasta', '../comun/inv-calculo.js?v=20261120mae7', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261120mae7', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261120mae7', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261120mae7',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120basico2', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261114av', '../comun/ficha-calculo.js?v=20261120tri3', '../comun/ficha-combate.js?v=20261120mae7', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
+  '../comun/catalogo.js?v=20261120basico', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261111dur6', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261111sob', '../comun/ficha-resumen.js?v=20261120tri3', '../comun/inv-calculo.js?v=20261120mae7', '../comun/inv-botonera.js?v=20261120maestria', '../comun/inv-acciones.js?v=20261120mae7', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261120mae7', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261120mae7',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261120mae7', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261120mae7'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -210,8 +210,10 @@ function bnDibujar(){
   const r = FichaBotonera.html(bn.S, {modoMapa, atajos: true, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
   // 🗿 Estoicismo (js/85): la Defensa del encabezado con lo de este momento.
   const est = typeof estoicoAhora === 'function' ? estoicoAhora(tokenDePj(bn.fichaId)) : null;
-  const def = est ? r.def.replace(/^Def (-?\d+)/, (x, d) => `Def ${num(d) + est.val}`) : r.def;
-  const defTit = est ? `Defensa (con +${est.val} de Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'})` : 'Defensa';
+  const trin = typeof trincheraAhora === 'function' ? trincheraAhora(tokenDePj(bn.fichaId)) : null;   // 🛡 Aguante de trinchera (js/65): lo mismo
+  const defMas = (est ? est.val : 0) + (trin ? trin.def : 0);
+  const def = (defMas ? r.def.replace(/^Def (-?\d+)/, (x, d) => `Def ${num(d) + defMas}`) : r.def).replace(/Def\.Esp (-?\d+)/, (x, d) => `Def.Esp ${num(d) + (trin ? trin.def : 0)}`);
+  const defTit = defMas ? `Defensa (con ${[est ? `+${est.val} de Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'}` : '', trin ? `+${trin.def} de Aguante de trinchera: ${trin.n} enemigo${trin.n === 1 ? '' : 's'} pegado${trin.n === 1 ? '' : 's'}` : ''].filter(Boolean).join(' y ')})` : 'Defensa';
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
     <header>
@@ -966,6 +968,21 @@ function bnAccionAca(b){
    contenido con lupaContenido (acá, solo para el personaje de la Botonera nueva). El "Ver" se muestra adentro del recuadro;
    Eliminar lo hace el mapa (si puede guardar al personaje) y Editar abre el editor de la ficha escondida ('editar-en-ficha'). */
 function lupaContenido(clave){
+  const r = lupaContenido0(clave);
+  // 🛡 Aguante de trinchera (js/65): en la 🔍 de Defensa y de Defensa especial, lo que suman AHORA los enemigos pegados (no está en la ficha: lo cuenta el mapa).
+  try{
+    const m = /(?:^|[:|])defensa[:|](def|armadmg)$/.exec(String(clave));
+    if(m && r && r.html && typeof trincheraLineaTxt === 'function' && typeof lupaSeccion === 'function'){
+      const esCreep = String(clave).includes('|'), esInv = String(clave).startsWith('inv:');
+      const t = esCreep ? [...tokens.values()].find(x => x && x.tipo === 'creep' && x.fichaId === String(clave).split('|')[0])
+        : esInv ? [...tokens.values()].find(x => x && x.fichaId === bn.fichaId + SEP_INVOCACION + String(clave).split(':')[1]) : (bn ? tokenDePj(bn.fichaId) : null);
+      const l = trincheraLineaTxt(t);
+      if(l) r.html += lupaSeccion('En el mapa, ahora', lupaFila(`🛡 ${esc(l.txt)} <span class="lupa-gris">(pasiva: +1 por cada enemigo pegado; se suma al recibir el golpe)</span>`, l.val ? lupaSigno(l.val) : '–'));
+    }
+  }catch(err){ console.error('No se pudo sumar el Aguante de trinchera a la 🔍:', err); }
+  return r;
+}
+function lupaContenido0(clave){
   // La de una invocación de la Botonera nueva ("inv:invId:tipo:ref"): comun/inv-lupa.js, sobre una copia migrada (4e, tanda 6).
   if(String(clave).startsWith('inv:')){
     const cruda = bn && bn.S ? (bn.S.invocaciones || []).find(x => x && x.id === String(clave).split(':')[1]) : null;

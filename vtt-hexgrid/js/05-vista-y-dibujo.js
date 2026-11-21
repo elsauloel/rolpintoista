@@ -905,6 +905,7 @@ function dibujarLienzo(){
   if(typeof flechitasRevisar === 'function') flechitasRevisar();   // ⬆⬇ los estados nuevos de cada token, para las flechitas (js/75)
   if(typeof iconosLimpiar === 'function') iconosLimpiar();   // 🫧 el orden de los íconos de estados de los tokens que ya no están (js/88)
   if(typeof estoicoRevisar === 'function') estoicoRevisar();   // 🗿 Estoicismo: cuántos enemigos pegados tiene cada uno (js/85)
+  if(typeof trincheraRevisar === 'function') trincheraRevisar();   // 🛡 Aguante de trinchera: la Defensa «de ahora» de la Botonera abierta (js/65)
   if(typeof dibujarTuneles === 'function' && dibujarTuneles(z)) animando = true;   // 🕳 la estela del túnel, que aparece y se va de a una casilla (js/46)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
   if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, false)) animando = true;   // ☁ las nubes que se van disipando, debajo de los tokens (js/91)

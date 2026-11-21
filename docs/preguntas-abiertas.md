@@ -1845,3 +1845,34 @@ tirando el Muro de fuego desde la niebla: mientras elegía el largo, a los jugad
 pasó a decir «Goblin Alquimista ⚡ Muro de fuego…» (lo vio enseguida) y al otro le quedó «Alguien…».
 1. ¿Poner una zona delata al creep (como hoy) o tendría que seguir escondido, y solo verse la zona?
 2. Si lo delata: ¿la línea de la Mesa tiene que nombrarlo en todas las pantallas por igual (hoy depende de cuántos segundos tardó cada una en verlo)?
+
+### P265 — 🏹 Los arcabuces del catálogo no tienen Recarga: la Maestría en ballestas no les suma (2026-11-21, Claude)
+En P260 quedó escrito que «ballesta» es el arma de rango con Recarga y que ahí «entran también los arcabuces». Visto con clics en la pasada de
+pruebas: con la Maestría en ballestas y un **Arcabuz de cubierta**, la 🔍 de Atacar no suma nada. El motivo: los dos arcabuces del catálogo
+(Arcabuz de cubierta y Arcabuz de mecha, los dos archivados) no tienen el dato de Recarga, así que el juego no los cuenta como ballesta (cobran
+como un arma común: Tipo ÷ 2 y después el Tipo). No se tocó nada.
+1. ¿Los arcabuces tienen que llevar Recarga (y entonces reciben la maestría y usan virotes), o quedan afuera de la maestría?
+
+### P266 — 💍 Puntería certera y Foco: el ataque de oportunidad se pregunta antes que el aviso «si te movés, lo perdés» (2026-11-21, Claude)
+Visto con clics (Blanco J1 con el Anillo de Foco Arcano, pegado a un creep): al arrastrar el token, primero sale «⚔ Te alejás de … esperando a
+ver si aprovecha el ataque de oportunidad» y el GM decide; recién después le aparece al jugador «Tenés Foco activo (+2 a PdG.Esp). Si te
+movés, lo perdés. [Moverme igual] [Cancelar]». Si el GM ya atacó y el jugador elige Cancelar, el token se queda donde estaba pero el ataque
+de oportunidad ya se jugó. Pasa igual con Puntería certera (es la misma pieza). No se tocó.
+1. ¿El aviso del anillo tiene que salir primero (antes de ofrecerle al rival el ataque de oportunidad)?
+
+### P267 — 🔮 Foco arcano: lo que quedó elegido «mientras tanto» (2026-11-21, Claude)
+El Anillo de Foco Arcano quedó como el de Puntería certera (ronda 1 sin bono, «se movió» anotado en la partida, cartel «🔮 Foco», aviso antes de
+moverse, que te muevan no lo apaga). Lo propio de un anillo de casteo:
+1. **Vale para toda tirada de PdG.Esp de una habilidad o una varita**, también la Varita de misiles (cada misil suma su +2) y las áreas o
+   líneas (ahí el casteador tira una sola vez para todos: se suma una vez). Antes solo lo sumaba la habilidad de un solo objetivo. ¿Está bien, o
+   en un área no tendría que valer?
+2. **No vale para lo que tira Ef.Esp** (una zona como la Nube tóxica) ni para lo que no tira nada. ¿Tendría que sumar también al Ef.Esp?
+3. **Castear no cuenta como moverse**; el Parpadeo / teletransporte propio sí (como en Puntería certera).
+
+### P268 — 🌫 Una zona hecha a mano «de fuego» ahora es de fuego de verdad (2026-11-21, Claude)
+El asistente de «Zonas con efectos persistentes» dejaba elegir el tipo de daño (fuego, hielo, eléctrico, tóxico, luz, siniestro), pero la zona se
+guardaba sin ese dato: el daño entraba siempre directo. Se arregló (se guarda), y eso cambia cómo pegan esas zonas: ahora le restan la
+resistencia a ese elemento **y la Defensa especial** del que la pisa (como cualquier daño especial que no es «directo»), sale el cartel «INMUNE
+AL FUEGO», una de fuego se dibuja como fuego y una tóxica cuenta como nube (el viento la despeja). Las «arcanas» y las físicas siguen igual.
+1. ¿Las zonas hechas a mano por el GM tienen que restar la Defensa especial (como quedó), o su daño elemental tendría que ser directo (solo la
+   resistencia al elemento), como el de las varitas y el Muro de fuego?

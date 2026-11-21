@@ -129,16 +129,54 @@ vieja en un creep y un nombre viejo en un token; lo demás, con sus botones.)
 - [ ] **▶ «Iniciar combate» que queda como sin iniciar:** 6 intentos más (creep primero, el GM recién vuelto de otro mapa, también después de un
   «Finalizar combate → Publicar» hecho mirando el otro mapa): **no se repitió**. Lo visto está en la entrada de la cola.
 
+### Tanda 5 (tercera parte de la pasada, mismo día) · cerrar desde GM Tools, maestrías y Aguante en casos raros, zonas e inmunidades
+
+(Claude, con clics, en «Claude · pruebas 2», mapa «Prueba · R4 M4», GM + Jugador 1 + Jugador 2. Capturas fuera del repo, en `cola40/`. Por
+datos: las pasivas y las armas de cada caso (también a la invocación), acomodar tokens al lado de alguien, las resistencias de 99, el Anillo
+de Foco Arcano, un orden de turnos ya ordenado y el número de algunas tiradas con «✍ Elegir manualmente». Lo demás, con sus botones.)
+
+- [x] **🏁 Cerrar el combate desde GM Tools** (🏁 Finalizar Combate → ▶ Avanzar → 5. Publicar → 📢, sin ítems): al Jugador 1 le salió «🎁 Botín
+  concluido» con el renglón «🌿 Modo narrativo»; el mapa del GM pasó solo a narrativo (el cartelito verde) y GM Tools avisó «Publicado ✓ … el
+  mapa volvió a modo narrativo». **Un jugador que entra más tarde** (el Jugador 2 abrió el mapa 11 minutos después): le salió su «Botín
+  concluido» con la XP, **sin** el renglón del modo del mapa (como tiene que ser).
+- [x] **⚔ Maestrías, casos raros:** una **invocación** con Maestría en armas punzantes (la Abeja, con su Cuchillo): 🔍 de Daño «1d4 + 6» con
+  el renglón de la maestría, y 🔍 de Atacar con «Maestría con esta arma»; el **contraataque** con cortantes (Devolver gentileza) dice en la
+  declaración «⚔ Maestría en armas cortantes: +1 PdG por ser contraataque»; el **arcabuz** con la Maestría en ballestas: no suma nada (los
+  arcabuces del catálogo no tienen Recarga → P265). ➖ Sin ver: Pegar fuerte con una maestría (no se llegó a darle la habilidad al creep) y el
+  golpe de ballesta con Perfora aplicado hasta el final.
+- [x] **🛡 Aguante de trinchera, casos raros:** una **invocación** con la pasiva y 2 creeps pegados: la declaración lo dice y la cuenta resta
+  «🛡 Aguante de trinchera: 2 enemigos pegados 2»; un **crítico** contra ella: «Crítico: no se resta la Defensa» (no suma, bien); la **ficha
+  lite** (F) trae el renglón «Aguante de trinchera: 2 enemigos pegados, ahora (también a la Defensa especial) +2»; la declaración de un
+  **hechizo** (Andanada arcana de un creep) lo dice; en una **zona** de fuego del GM, la cuenta resta «(a la Defensa especial) 2».
+  **❌ Falló una cosa, arreglada:** en una **trampa** (la Mina del cazador, que frena la Defensa especial) no sumaba nada: «8 de daño (ignora la
+  Defensa) = 8». Ahora «11 de daño − 🛡 Aguante de trinchera: 3 enemigos pegados (a la Defensa especial) 3 = 8» (`vtt-hexgrid/js/19` y, para
+  las zonas de número fijo, `js/08`: esas últimas, cambiadas por código y sin ver en el mapa).
+- [x] **⏳ «Hasta el fin del turno de…»:** arrastrado por un creep, en la **ficha suelta** el chip dice «Desequilibrado · hasta el fin del
+  turno de Peleador 5» y su «Ver», «Duración: Hasta el fin del turno de Peleador 5 (se va solo)»; el **Tablero de GM Tools** lo dice igual.
+  ➖ Sin ver: el chip y el «Ver» de un **creep** arrastrado en GM Tools.
+- [x] **🏹 Ballesta con carcaj integrado** (Ballesta virotera, dada por datos): el recuadro dice «0 / 8 · 8 lugares (5 del carcaj + 3 de tu
+  arma)»; en combate, «→ Carcaj (6) · 1 No2» cobró 1 No2 y quedó «6 / 8».
+- [x] **🛡 Cartel de inmunidad desde una zona:** «INMUNE AL FUEGO» (zona de fuego del GM) e «INMUNE A LO SINIESTRO» (zona siniestra), en las
+  tres pantallas, al cerrarse el cuadro. **❌ Falló una cosa, arreglada:** el asistente de zonas dejaba elegir «Fuego» pero la zona se guardaba
+  sin elemento, así que no había ni resistencia ni cartel (→ P268). ➖ Sin ver: dos carteles a la vez (se intentó dos veces; salieron uno
+  después del otro) y el elemental de un arma.
+- [x] **🌫 El cartel de arriba de una zona** decía siempre «la sufre quien entra y quien sigue adentro en el Mantenimiento»: arreglado (dice
+  lo mismo que «Ver detalle»); visto en una zona común, una de «solo al entrar» y el hielo de la Varita de la ventisca.
+- [ ] **⚠ Visto una vez, sin confirmar:** con el cartel del resultado de una zona todavía abierto en la pantalla de un jugador («… entraron 0
+  · Listo»), al pasar de ronda a ese jugador no le llegó el «le toca» de esa ronda (al otro, sí); en la ronda siguiente, con la pantalla
+  limpia, le llegó. Para mirar: si un pedido de zona se pierde cuando el cartel anterior sigue abierto.
+- [x] **Encargos del dueño del 2026-11-21, hechos en esta tanda** (el detalle, en la cola): «⏳ Iniciando combate…», el Anillo de Foco Arcano
+  (con la Varita de misiles) y la columna fija del menú de la ficha y de GM Tools.
+
 ### Lo que esta pasada NO llegó a ver (sigue pendiente)
 
-(Actualizado al cerrar la tanda 4.) Del clon: una **invocación en sigilo** y la niebla de una varita o un Sólido en las Zonas de riesgo; el
-**Anillo de Foco Arcano** y las habilidades de movimiento que apagan el bono; la ficha suelta y GM Tools con un escondido. De «Claude · pruebas
-2»: «✋ No la detectó» por el camino nuevo de las reglas; el cartel de inmunidad desde una **zona**, el **rayo en cadena**, el **elemental de un
-arma**, «INMUNE A LO SINIESTRO» y dos carteles a la vez; las **maestrías** y **Aguante de trinchera** en una invocación / con crítico / con
-trampa o zona; cerrar el combate **desde GM Tools** y un jugador que entra más tarde; la **ballesta con carcaj integrado**; el «hasta el fin del
-turno de…» en GM Tools y en la 🔍 de la ficha; la ficha suelta en una pestaña dormida; +N de vida con la vida llena en un personaje o una
-invocación; las **animaciones de resurrección** con el duelo abierto o desde lejos; y el cartel «todavía no está en este mapa» con dos
-personajes propios (no se puede en las partidas de prueba).
+(Actualizado al cerrar la tanda 5.) Del clon: una **invocación en sigilo** y la niebla de una varita o un Sólido en las Zonas de riesgo; la
+ficha suelta y GM Tools con un escondido. De «Claude · pruebas 2»: «✋ No la detectó» por el camino nuevo de las reglas; el cartel de inmunidad
+por el **rayo en cadena**, el **elemental de un arma** y dos carteles a la vez; **Pegar fuerte** con una maestría y la ballesta con Perfora
+hasta el final; el chip de un creep arrastrado en GM Tools; «Ver detalle» de una trampa que deja zona, una zona de curación, un portal común y
+el Acelerador; la ficha suelta en una pestaña dormida; +N de vida con la vida llena en un personaje o una invocación; las **animaciones de
+resurrección** con el duelo abierto o desde lejos; el Foco con Dash / Salto / Parpadeo y en un creep o una invocación; y el cartel «todavía no
+está en este mapa» con dos personajes propios (no se puede en las partidas de prueba).
 
 ## 🎁 Dar a un jugador (2026-11-21)
 

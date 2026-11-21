@@ -120,6 +120,8 @@
   «Claude · pruebas 2» y en el clon de El origen cada uno se llama como la parte de su email anterior a la arroba (se cambia en el inicio, «✎ Mis
   nombres»). **Ese nombre no va al repo** (ni en docs, ni en commits, ni en nombres de archivos): acá se sigue diciendo «Jugador 1 / Jugador 2» y
   «GM de pruebas». Las capturas lo muestran: quedan fuera del repo.
+- **Dónde se prueba** (2026-11-21, dueño): las pruebas generales van siempre en «Claude · pruebas 2»; el clon de El origen queda solo para
+  las pruebas específicas que él pida.
 - **Ojo con los respaldos «restaurar todo» de una partida de prueba** (2026-11-05: se borraron los 17 tokens y el estado de «Mapa 1» de
   «Claude · pruebas»): el primer mapa puede tener un documento en `mapas/_principal` (solo el nombre, si se lo renombró), pero sus tokens y su
   estado viven en `tokens/` y `mapa/`. Un script que recorre `mapas/*` y guarda `mapas/<id>/tokens` bajo la clave `_principal` pisa lo de

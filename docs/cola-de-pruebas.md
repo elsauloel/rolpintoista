@@ -594,7 +594,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirada 1d10+1. **Sin probar con clics:** un creep y una invocación con la Prisa vieja (sí en las pruebas automáticas); la ficha suelta de Rockardo
   (se probó desde el mapa). En la partida real no se entró: allá se convierte sola. 958 pruebas automáticas en verde (1 nueva).
   **Para que lo sepas:** con +5, quien tiene Prisa ya no va primero seguro; contra alguien de Iniciativa parecida gana casi siempre, pero puede perder.
-- **🟡 a medias (2026-11-21: hecha la parte que puede romper una partida y lo del clon; falta parte de lo visual — ver el resultado y la segunda parte, abajo) — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
+- **🟡 a medias (2026-11-21: hecha la parte que puede romper una partida, lo del clon y la tanda 5; falta parte de lo visual — ver el resultado y las partes segunda y tercera, abajo) — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
   que no se probó, anotalo en la cola»). Sin programar nada nuevo: probar con clics en «Claude · pruebas 2» (GM, J1, J2) lo que cada informe dejó
   sin ver (también está en docs/pruebas-en-el-mapa.md; tachar ahí lo que se vea) y arreglar solo lo que falle:
   · **Arrastrar / Desequilibrado / primer ataque** (96edd265): una invocación arrastrada; un creep arrastrando a un personaje; cerrar con
@@ -644,6 +644,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Aguante de trinchera en casos raros, cerrar el combate desde GM Tools, la ballesta con carcaj integrado, el «hasta el fin del turno de…» en
   GM Tools y en la ficha, la ficha suelta dormida y las animaciones de resurrección. Las dos partidas quedaron como estaban (en el clon venció
   sola una zona temporal que ya estaba puesta, al pasar rondas). 965 pruebas automáticas en verde (2 nuevas).
+  *Tercera parte (2026-11-21, tanda 5; el detalle en `pruebas-en-el-mapa.md`, «Tanda 5»):* **visto y anda:** cerrar el combate desde GM
+  Tools (el jugador ve su «🎁 Botín concluido» con el renglón «🌿 Modo narrativo»; el mapa del GM vuelve a narrativo) y un jugador que entra 11
+  minutos después (ve su Botín concluido, sin hablar del modo del mapa); una invocación con una maestría y con Aguante de trinchera; un crítico
+  contra alguien con Aguante (no suma); el renglón en la ficha lite; la declaración de un hechizo y la de un contraataque con cortantes; el
+  «hasta el fin del turno de…» en la ficha suelta (chip y «Ver») y en el Tablero de GM Tools; la ballesta con carcaj integrado (8 lugares);
+  los carteles «INMUNE AL FUEGO» e «INMUNE A LO SINIESTRO» desde una zona. **Fallaron tres cosas, arregladas y vueltas a probar:** el Aguante de
+  trinchera no sumaba contra el daño de una trampa (la Mina) que frena la Defensa especial; una zona hecha a mano «de fuego» se guardaba sin
+  elemento (P268); el cartel de arriba de una zona decía siempre lo mismo. **Dudas nuevas:** P265 (los arcabuces no tienen Recarga: la
+  Maestría en ballestas no les suma). **Sigue sin ver:** Pegar fuerte con una maestría y el golpe de ballesta con Perfora hasta el final; dos
+  carteles de inmunidad a la vez y el elemental de un arma; la ficha suelta dormida; «Ver detalle» de una trampa que deja zona, una zona de
+  curación, un portal común y el Acelerador; «✋ No la detectó»; las Zonas de riesgo que faltaban; las animaciones de resurrección. La tanda se
+  cortó ahí porque entraron cuatro encargos del dueño (las cuatro entradas del final de esta cola). La partida quedó como estaba. 966 pruebas.
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las
@@ -1395,6 +1407,44 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   iniciar (js/04, el escucha del modo); eso solo lo escribe el cierre de «Finalizar combate», y no se logró que llegue tarde. (3) Que la Mesa no
   nombre de quién es el turno pasa cuando el primero es un creep que los jugadores todavía no conocen (es a propósito). Queda en cola: si
   vuelve a pasar, anotar si el mapa quedó en narrativo o en combate (eso dice cuál de las dos sospechas es).
+  *2026-11-21, tanda 5:* para lo de (1) quedó el «⏳ Iniciando combate…» (la entrada de abajo): en esos segundos el botón está apagado y dice qué
+  hace, y ▶ Siguiente no se puede apretar. En 4 inicios más de esta tanda no se repitió.
+- **✅ hecho (2026-11-21) — ⏳ Cartel «iniciando…» en «▶ Iniciar combate»** (dueño, 2026-11-21: «poné un cartel de iniciando durante esos segundos
+  que tarda»). Entre «Empezar registro nuevo» y que el combate figure iniciado pasan 7 a 10 s; en ese rato el botón seguía a la vista y
+  «▶ Siguiente» avisaba que no se había iniciado.
+  *Resultado:* desde que se elige cómo empezar, el botón queda apagado, con una franja que corre, y dice qué está haciendo: «⏳ Iniciando
+  combate… pasando el mapa a Combate», «…llenando los No2 (3 de 5)», «…empezando el turno del primero». Los otros botones del orden de turnos
+  quedan apagados y, si igual se llega a ▶ Siguiente, avisa «el combate se está iniciando». Un segundo clic no hace nada (una sola línea «▶
+  Empieza el combate» en la Mesa). Si falla, avisa («No se pudo iniciar el combate… probá de nuevo») y el botón vuelve a quedar apretable.
+  Solo lo ve el GM (los jugadores no tienen ese botón). Probado con clics en «Claude · pruebas 2» (GM, J1, J2): con «Pasar a Combate e
+  iniciar» y con «Iniciar sin cambiar el modo»; la falla se forzó por código (el guardado del orden devolvió «no se pudo» una vez) y el segundo
+  intento anduvo. 966 pruebas automáticas en verde. `vtt-hexgrid/js/04`, `mapa.css`.
+- **✅ hecho (2026-11-21) — 🌫 El cartel de arriba de una zona, más preciso** (dueño, 2026-11-21: «habría que ajustarlo para que sea más
+  preciso»). Decía siempre «la sufre quien entra y quien sigue adentro en el Mantenimiento», también para el hielo de la Varita de la ventisca.
+  *Resultado:* el cartel saca la frase de la misma cuenta que la tarjeta de «Ver detalle» (`ZonaDetalle.cuandoEtiqueta`, comun/zona-detalle.js):
+  «se dispara al entrar y, mientras sigan adentro, cada vez que se pasa de ronda»; el hielo de la varita, «se dispara en cada paso que dan
+  adentro (quedarse quieto no la dispara)»; una que solo importa al entrar, «se dispara al entrar o cruzarla (quedarse quieto adentro no la
+  vuelve a disparar)»; una de curación, «cura a los aliados de quien la puso que estén adentro, en cada pulso»; una luz, «ilumina…». Visto con
+  clics en una zona común del GM, una de «solo al entrar» y el hielo de la varita (con la primera redacción; la frase final, igual a la de la
+  tarjeta, quedó cubierta por la prueba automática nueva y no se volvió a mirar en el mapa). 1 prueba automática nueva.
+- **✅ hecho (2026-11-21) — 🔮 Anillo de Foco Arcano igual que el de Puntería certera** (dueño, 2026-11-21: «habría que programarlo igual que el
+  de puntería certera»).
+  *Resultado:* ya compartía la pieza (comun/quieto.js, js/126). Probado con clics en «Claude · pruebas 2» (el anillo y una Varita de misiles
+  dados a Blanco J1 por datos, y sacados al final): ronda 1 sin bono; al empezar la ronda 2, el cartel «🔮 Foco» sobre el token (jugador y GM);
+  el aviso antes de moverse y Cancelar (se queda y no gasta); que lo mueva el GM con Mover libre no lo apaga; «Moverme igual» lo apaga en las
+  tres pantallas (queda anotado en la partida). **Faltaban tres cosas, arregladas:** la Varita de misiles y las áreas no sumaban el +2; la
+  declaración del cuadro no lo decía (ahora «💍 Foco: +2 PdG.Esp»); el aviso decía «Foco activa… la perdés». Dudas: P266 (el ataque de
+  oportunidad se pregunta antes que el aviso) y P267 (qué tiradas cuentan). Sin ver: una habilidad de área de un personaje, un creep o una
+  invocación con el anillo, Dash / Salto / Parpadeo.
+- **✅ hecho (2026-11-21) — 📐 El menú de la izquierda de la ficha, como columna fija** (dueño, 2026-11-21, con captura: «este menú lateral en la
+  ficha queda desprolijo. Qué tal dejar directamente una columna de ese ancho que efectivamente desplace el resto de la ficha. Que la columna
+  quede fija y la ficha sí scrollee si fuera necesario»).
+  *Resultado:* en la ficha y en GM Tools (comparten comun/dock-izq.css) el menú es una columna de 56 px, de alto completo, fija; la página
+  empieza a su derecha y scrollea normal (ya no tapa «Puntos de vida», Constitución ni la foto; en GM Tools tapaba el borde de la primera
+  tarjeta de creep). Los botones muestran solo el ícono y, al pasar el mouse, se abren con el rótulo entero (antes asomaba media letra); los
+  paneles (Exp y Job, DDE, Personajes) se siguen abriendo a la derecha; los botones apagados quedan opacos. Embebidas en el mapa no queda el
+  hueco. Probado con clics en la ficha suelta de Blanco J1 (ventana de 900 px y de 1920; arriba, al medio y al fondo; paneles Exp y Job, DDE y
+  la ventana de Equipo) y en GM Tools (1100 px, scrolleado, con Personajes abierto). Capturas de antes y después. No se adaptó a celular.
 
 ## En cola
 

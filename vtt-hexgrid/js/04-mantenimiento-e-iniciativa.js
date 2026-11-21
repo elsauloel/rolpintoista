@@ -592,10 +592,22 @@ async function iniciativaSiguiente(o){
    4) la ronda vuelve a 1, nadie «ya jugó», y queda `iniciado` (no se vuelve a ofrecer: no se pueden recargar los No2 a mitad de combate por accidente);
    5) Crónica y Mesa: «▶ Empieza el combate: turno de X». */
 let iniciandoCombate = false;
-async function combateNo2Llenos(){
+/* ⏳ «Iniciando combate…» (dueño, 2026-11-21: «poné un cartel de iniciando durante esos segundos que tarda»). Entre el clic y que el combate figure
+   iniciado pasan 7 a 10 s (se llenan los No2 de todos, uno por uno): en ese rato el botón queda apagado y dice qué está haciendo, los otros botones
+   del orden de turnos quedan apagados (▶ Siguiente avisaba «el combate todavía no se inició» y parecía que no había andado) y no se puede apretar dos
+   veces. Si falla, el botón vuelve a quedar apretable, con un aviso. Solo lo ve el GM (los jugadores no tienen el botón). */
+let iniciandoTxt = '';
+function iniciandoPaso(txt){
+  iniciandoTxt = txt || '';
+  const b = document.getElementById('ini-iniciar');
+  if(b && iniciandoCombate) b.textContent = `⏳ Iniciando combate…${iniciandoTxt ? ' ' + iniciandoTxt : ''}`;
+}
+async function combateNo2Llenos(alPaso){
   const porFicha = new Map();   // fichaId → {pj: bool, invs: Set}
   const fallas = [];
+  let hechos = 0; const total = iniciativa.orden.length;
   for(const o of iniciativa.orden){
+    if(alPaso) alPaso(++hechos, total);
     const t = tokens.get(o.id);
     if(!t || !t.fichaId) continue;
     if(t.tipo === 'creep'){
@@ -629,21 +641,28 @@ async function iniciativaIniciarCombate(){
   if(!soyGM || iniciandoCombate) return;
   if(!iniciativa.orden.length){ toast('Primero armá el orden de turnos (Traer tokens, tirar y Ordenar)'); return; }
   if(OrdenTurnos.enCurso(iniciativa, modoMapa)){ toast('El combate ya está en curso'); return; }
+  let pasarACombate = false;
   if(modoMapa !== 'combate'){
     const r = await Confirmar.elegir('El mapa está en modo narrativo: moverse no gasta No2. ¿Lo pasás a Combate para empezar?', {titulo: 'Iniciar combate', icono: '▶', no: 'Cancelar', opciones: [
       {valor: 'combate', texto: '⚔ Pasar a Combate e iniciar', detalle: 'Lo mismo que el interruptor de arriba, y después empieza el combate.'},
       {valor: 'igual', texto: '▶ Iniciar sin cambiar el modo', detalle: 'El mapa sigue en narrativo; el orden de turnos arranca igual.'}]});
     if(!r) return;
-    if(r === 'combate' && !(await modoPasarA('combate'))) return;
+    pasarACombate = r === 'combate';
   }
-  iniciandoCombate = true; renderIniciativa();
+  if(iniciandoCombate) return;   // (dos clics seguidos mientras se elegía)
+  iniciandoCombate = true; iniciandoTxt = pasarACombate ? 'pasando el mapa a Combate' : ''; renderIniciativa();
+  let listo = false;
   try{
+    if(pasarACombate && !(await modoPasarA('combate'))) return;   // (si falla, modoPasarA ya avisa; el botón vuelve a quedar apretable)
+    iniciandoPaso('preparando');
     await bnCargarPiezas(); await acCargarPiezas();
-    const fallas = await combateNo2Llenos();
+    const fallas = await combateNo2Llenos((k, n) => iniciandoPaso(`llenando los No2 (${k} de ${n})`));
+    iniciandoPaso('empezando el turno del primero');
     if(fallas.length) toast(`No se pudieron llenar los No2 de: ${fallas.join(', ')} — hacelo a mano`);
     const orden = iniciativa.orden, k = OrdenTurnos.primero(orden, iniciativaFueraDeJuego), sig = orden[k];
     const paso = Math.round(num(iniciativa.paso)) + 1, mapa = mapaMostrado;
-    if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false, movidos: {}}))) return;
+    if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false, movidos: {}}))){ toast('No se pudo iniciar el combate (no se guardó el orden de turnos) — probá de nuevo'); return; }
+    listo = true;
     const tSig = tokens.get(sig.id);
     const publico = !!tSig && !tSig.oculto && !sig.oculto && (tSig.tipo === 'creep' ? creepConocido(tSig) : !enSigilo(tSig));
     const nomSig = publico ? nombreDe(tSig) : '';
@@ -658,11 +677,12 @@ async function iniciativaIniciarCombate(){
     const lineasInicio = pendiente ? [] : await inicioDeTurno(sig.id, clave);
     const todas = [...lineasZonas, ...lineasInicio];
     if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': ['Todos los del orden de turnos arrancan con los No2 llenos.', ...todas].slice(0, 14)});
-  }catch(err){ console.error('Iniciar combate:', err); toast('No se pudo iniciar el combate — mirá la consola'); }
-  finally{ iniciandoCombate = false; renderIniciativa(); }
+  }catch(err){ console.error('Iniciar combate:', err); toast(listo ? 'El combate se inició, pero falló el inicio del turno del primero — mirá la consola' : 'No se pudo iniciar el combate — probá de nuevo (el botón sigue ahí)'); }
+  finally{ iniciandoCombate = false; iniciandoTxt = ''; renderIniciativa(); }
 }
 // ▶ Siguiente, el botón: si se ordenó y el combate todavía no se inició, avisa y ofrece iniciarlo (o seguir sin iniciar: no vuelve a preguntar).
 async function iniciativaSiguienteBoton(){
+  if(iniciandoCombate){ toast('⏳ El combate se está iniciando: esperá unos segundos'); return; }
   if(soyGM && OrdenTurnos.porIniciar(iniciativa) && !iniciativa.libre){
     const r = await Confirmar.elegir('El combate todavía no se inició: nadie tiene los No2 recargados y al primero de la lista no le empezó el turno.', {titulo: '▶ Siguiente', icono: '▶', no: 'Cancelar', opciones: [
       {valor: 'iniciar', texto: '▶ Iniciar combate', detalle: 'Todos con los No2 llenos y empieza el turno del primero de la lista.'},
@@ -1165,8 +1185,9 @@ function renderIniciativa(){
         : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>' +
       // ▶ Iniciar combate (dueño, 2026-11-20): aparece al apretar Ordenar y pulsa hasta que se aprieta; con el combate en curso no se ofrece.
-      (OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn ini-iniciar" id="ini-iniciar"${iniciandoCombate ? ' disabled' : ''} title="Empieza el combate: todos los del orden con los No2 llenos y arranca el turno del primero de la lista (su inicio de turno de siempre)">${iniciandoCombate ? '⏳ Iniciando…' : '▶ Iniciar combate'}</button>` : '')
+      (OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn ini-iniciar" id="ini-iniciar"${iniciandoCombate ? ' disabled aria-busy="true"' : ''} title="Empieza el combate: todos los del orden con los No2 llenos y arranca el turno del primero de la lista (su inicio de turno de siempre)">${iniciandoCombate ? `⏳ Iniciando combate…${iniciandoTxt ? ' ' + esc(iniciandoTxt) : ''}` : '▶ Iniciar combate'}</button>` : '')
     : (fbMiembro ? '<button type="button" class="btn primary" id="ini-tirar" title="Tirar la iniciativa de tu personaje y cargarla junto a su nombre">🎲 Tirar iniciativa</button>' : '');
+  $('#iniciativa-pie').classList.toggle('iniciando', !!iniciandoCombate);   // ⏳ los demás botones, apagados mientras inicia
   conectarIniciativa();
   iniciativaEncuadrar();
 }

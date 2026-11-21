@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261121zd4"></script>
+<script src="zona-detalle.js?v=20261121zd5"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261120volver"></script>
@@ -9318,9 +9318,12 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
   });
   prueba('el cartel de arriba de una zona dice cuándo afecta de verdad (lo mismo que «Ver detalle»)', () => {
     const E = ZonaDetalle.cuandoEtiqueta;
-    ok(/quien entra y quien sigue adentro al pasar de ronda/.test(E({zona: true, zonaDano: '1d4'})));
-    ok(/da un paso adentro/.test(E({zona: true, zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})})) && !/Mantenimiento/.test(E({zona: true, zonaEstado: JSON.stringify({tiraPaso: true})})));
-    igual(E({zona: true, zonaDano: '1d6', zonaEnMantenimiento: false, zonaCadaPaso: true}), 'la sufre quien entra o la cruza; quedarse quieto adentro no la vuelve a disparar');
+    const comun = {zona: true, zonaDano: '1d4', zonaCasteadorTipo: 'creep'}, hielo = {zona: true, zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})};
+    igual(E(comun), 'se dispara al entrar y, mientras sigan adentro, cada vez que se pasa de ronda');
+    igual(E(hielo), 'se dispara en cada paso que dan adentro (quedarse quieto no la dispara)');
+    igual(E({zona: true, zonaDano: '1d6', zonaEnMantenimiento: false, zonaCadaPaso: true}), 'se dispara al entrar o cruzarla (quedarse quieto adentro no la vuelve a disparar)');
+    // la misma frase que usa la tarjeta de «Ver detalle»
+    ok(ZonaDetalle.armar(comun, {autor: {}}).esencial.includes(E(comun).replace('se dispara ', ''))); ok(ZonaDetalle.armar(hielo, {autor: {}, estadoTexto: sp => sp.nombre}).esencial.includes('en cada paso que dan adentro'));
     ok(/^cura a los aliados/.test(E({zona: true}, {cura: {cura: '4', pulsos: 3}}))); ok(/^ilumina/.test(E({zona: true, zonaLuz: true})));
   });
   prueba('trampa a la vista: armada dice qué hace y a quién; disparada, que ya saltó; una forma común no tiene detalle', () => {

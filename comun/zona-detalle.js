@@ -55,9 +55,9 @@ const ZonaDetalle = (() => {
     if(ctx.cura) return 'cura a los aliados de quien la puso que estén adentro, en cada pulso';
     if(sup === 'agua' && !sp.nombre) return 'no hace daño por sí sola: a quien está parado acá, el rayo le pega más';
     if(el.zonaLuz && !sp.nombre && !el.zonaDano && !el.zonaDanoDif) return 'ilumina: deja ver lo que hay adentro';
-    if(sp.tiraPaso) return 'la sufre quien da un paso adentro (entrando o caminando); quedarse quieto no la dispara';
-    const entra = el.zonaCadaPaso ? 'quien entra o la cruza' : 'quien entra';
-    return el.zonaEnMantenimiento !== false ? `la sufre ${entra} y quien sigue adentro al pasar de ronda (el Mantenimiento)` : `la sufre ${entra}; quedarse quieto adentro no la vuelve a disparar`;
+    // Lo demás sale de la MISMA cuenta que la tarjeta (cuandoZona): así el cartel y «Ver detalle» no pueden decir cosas distintas.
+    const c = cuandoZona(el, sp, ctx).corto;
+    return `se dispara ${c}${sp.tiraPaso ? ' (quedarse quieto no la dispara)' : el.zonaEnMantenimiento === false ? ' (quedarse quieto adentro no la vuelve a disparar)' : ''}`;
   }
 
   function filaAutor(el, ctx, filas){

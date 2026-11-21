@@ -1826,3 +1826,22 @@ La ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`) deja siempre una l
 5. **La mochila llena** se mide por ranuras (el peso solo cuenta para lo equipado): se da igual, lo avisa el cartel del jugador y una línea en la Mesa.
    El GM no lo ve antes de dar. ¿Querés que la ventana le avise de antemano?
 6. **Experiencia:** la ventana no da XP (no estaba en el pedido). ¿La sumo?
+
+
+### P263 — 🙈 Cuando un jugador le pega con un área a alguien que no ve, el cuadro del duelo lo nombra (2026-11-21, Claude)
+Visto en el clon de El origen: la rata estaba en sigilo, pegada a Rockardo, y él usó el Shockwave (la onda alcanza a los enemigos pegados). A los
+dos jugadores se les abrió el cuadro del duelo con «Rockardo Pedruscko VS **Rata de la grieta. 2**», aunque ninguno la veía. Después todo salió bien:
+la Mesa dijo «le hizo Shockwave a **Alguien**», el «Ver detalle del duelo» también, y la rata siguió en sigilo. La regla escrita hoy dice que
+«atacar saca del sigilo y abre el cuadro con el nombre», pero eso es cuando ataca el escondido; acá el escondido es el que recibe.
+1. ¿El cuadro del duelo tiene que decir «Alguien» (o «algo que no ves») en lugar del nombre mientras el objetivo siga escondido?
+2. ¿O que un área que le pega a un escondido lo delate (como cuando un creep ataca desde la niebla)?
+3. ¿O queda así (el jugador se entera del nombre porque «sintió que le pegó a algo»)?
+
+### P264 — 🔦 Un creep que pone una zona desde la niebla: ¿se lo nombra o no? (2026-11-21, Claude)
+Dos reglas tuyas se cruzan. La del 28/10: un creep que afecta a un rival con un área o una zona **queda delatado** (se lo ve en su casilla hasta
+que se mueva o pase la ronda). La del 20/11: lo que hace alguien que no se ve, **no lo nombra**. Probado en el clon con el Goblin Alquimista
+tirando el Muro de fuego desde la niebla: mientras elegía el largo, a los jugadores les salió «🎭 Alguien está realizando una acción incierta»
+(bien); al aparecer el muro, el goblin quedó delatado y a la vista. Pero la línea de la Mesa quedó distinta en cada pantalla: a un jugador le
+pasó a decir «Goblin Alquimista ⚡ Muro de fuego…» (lo vio enseguida) y al otro le quedó «Alguien…».
+1. ¿Poner una zona delata al creep (como hoy) o tendría que seguir escondido, y solo verse la zona?
+2. Si lo delata: ¿la línea de la Mesa tiene que nombrarlo en todas las pantallas por igual (hoy depende de cuántos segundos tardó cada una en verlo)?

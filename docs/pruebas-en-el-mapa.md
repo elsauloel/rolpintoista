@@ -91,14 +91,54 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
 - [ ] **➖ Una invocación revivida con el ✚ de su token:** no se pudo así: cuando la Abeja de prueba quedó en 0 «desaparece: murió» y su token
   se va del mapa, así que no queda un ✚ que apretar. Queda por ver si una invocación puede quedar caída con el token puesto.
 
+### Tanda 4 (segunda parte de la pasada, mismo día) · el clon de El origen, «Ver detalle», carteles de inmunidad y las reglas de Firebase
+
+(Claude, con clics. En «El origen · CLON de pruebas» —GM, Bizzante con el Jugador 1, Rockardo con el Jugador 2— y en «Claude · pruebas 2». Capturas
+fuera del repo, en `cola39/`. Por datos: acercar o alejar un token, armar un orden de turnos ya ordenado, una resistencia al fuego de 99, la Prisa
+vieja en un creep y un nombre viejo en un token; lo demás, con sus botones.)
+
+- [x] **🙈 Lo que no se nombra (clon):** (a) el Shockwave de Rockardo a la rata en sigilo: la Mesa y «Ver detalle del duelo» dicen «Alguien» y la
+  rata sigue escondida; **pero el cuadro del duelo, mientras se tira, la nombra** (→ P263); (b) el Ojo de asesino de la rata desde el sigilo, jugado
+  hasta el final: sale del sigilo y el resumen la nombra (es la regla); (c) con la rata en sigilo y envenenada, al empezar su turno a los jugadores
+  no les sale nada (ni tarjeta ni línea); (d) el Muro de fuego del Goblin Alquimista desde la niebla: «Alguien está realizando una acción
+  incierta» mientras lo arma; al aparecer el muro el goblin queda delatado y la línea queda distinta en cada pantalla (→ P264); (e) Bizzante en
+  sigilo: el GM no lo ve sin el 👁 y sus aliados sí (no cambió nada).
+- [x] **🕵 Zonas de riesgo con la niebla prendida (clon):** el Jugador 1 con Bizzante en sigilo: pintan solo los rivales que ve (ni el Arquero
+  tapado por la niebla ni la rata en sigilo), con la nota «solo de los rivales que ves». El GM con 🎮 el control de Bizzante en sigilo: pinta los
+  de todos los rivales, sin la nota. ➖ Sin ver: una invocación en sigilo, adentro de la niebla de una varita y con un Sólido tapando el cono.
+- [x] **💍 Puntería certera (clon, Bizzante):** con orden de turnos y un duelo abierto, al pasar a la ronda 2 el cartel «🎯 Puntería certera» le
+  salió al GM y, al jugador, esperó (reintenta hasta 25 s y sale igual); **un arrastre** (el gancho del Goblin rompehuesos) **no apaga el bono**
+  ni lo anota como movido; **sin orden de turnos:** en combate, caminar lo apaga y no hay cartel ni aviso; en narrativo, caminar no cuenta (no
+  gasta ni anota: el bono sigue). ➖ Sin ver: el Anillo de Foco Arcano, Dash / Salto / Carga / Takle / Parpadeo / interponerse, y un creep o una
+  invocación con el anillo.
+- [x] **💨 Prisa vieja en un creep (clon):** a la rata se le puso la pasiva con el formato viejo: su Iniciativa pasó de 11 a 16 y tiró 2d8.
+- [x] **🔍 «Ver detalle» («Claude · pruebas 2»):** una **trampa a la vista** armada (GM y jugador) y ya disparada («Ya se disparó: como trampa no
+  hace nada más»); el **Portal trampa** de un creep; el **hielo** de la Varita de la ventisca puesta por un personaje, con orden de turnos («1
+  turno (son turnos de Blanco J1…)», «De quién es: Blanco J1 (personaje)», «puede venir de un ítem (a mano)»).
+  **❌ Fallaron cuatro cosas chicas, las cuatro arregladas y vueltas a mirar:** (1) el cartel de arriba de una trampa mecánica decía «la dispara
+  cualquiera que la pise, también los aliados» (desde el 3/11 la disparan solo los rivales); (2) el cartel de una zona decía «quedan 2 turnos» y
+  la tarjeta «1 turno» (contaban distinto; ahora usan la misma cuenta, y «queda 1 turno»); (3) la tarjeta del Portal trampa no decía que te lleva
+  por un portal; (4) la tarjeta de la Mina del cazador no decía que solo se dispara pisando el centro (pisar el borde no la activa, y parecía una
+  falla). ➖ Sin ver: una trampa que deja zona, una zona de curación, un portal común y el Acelerador.
+- [x] **🛡 Cartel de inmunidad por elemento:** Blanco J1 con resistencia al fuego 99 pisa la Mina del cazador → «INMUNE AL FUEGO» en las tres
+  pantallas (espera a que se cierre el cartel de la trampa) y, por la Inmunidad a CC, «INMUNE A PAJARITOS» después; atacando a un creep con
+  Escudo ígneo → «INMUNE AL FUEGO» al cerrar el duelo. ➖ Sin ver: una zona, el rayo en cadena, el elemental de un arma, «INMUNE A LO
+  SINIESTRO» y dos carteles a la vez (salieron uno después del otro).
+- [x] **🔑 Las reglas de Firebase pegadas (2026-11-21):** «🙈 Volver a ocultar» una trampa a la vista quedó en 0,7 s y es la misma trampa (camino
+  nuevo); el mapa del GM le corrigió solo el nombre a un token de personaje. Sin errores de permisos en la consola.
+- [ ] **▶ «Iniciar combate» que queda como sin iniciar:** 6 intentos más (creep primero, el GM recién vuelto de otro mapa, también después de un
+  «Finalizar combate → Publicar» hecho mirando el otro mapa): **no se repitió**. Lo visto está en la entrada de la cola.
+
 ### Lo que esta pasada NO llegó a ver (sigue pendiente)
 
-Lo del clon de El origen (**sigilo y lo que no se nombra**, la **niebla** en las Zonas de riesgo, **Puntería certera / Foco**, la **Prisa vieja**
-de un creep), **«Ver detalle» de una zona** (trampa a la vista, zona de un personaje, curación, hielo, portal), **Revelar y resolver a mano** por
-el camino nuevo de las reglas, las **animaciones de resurrección** con el duelo abierto o desde lejos, las **maestrías** y **Aguante de trinchera**
-en una invocación / con crítico / con trampa o zona, cerrar el combate **desde GM Tools**, la ficha suelta en una pestaña dormida, el cartel
-de inmunidad por elemento (zona, trampa, Escudo elemental, rayo en cadena, arma), el cartel «todavía no está en este mapa» con dos personajes
-propios (no se puede en las partidas de prueba) y la **ballesta con carcaj integrado**.
+(Actualizado al cerrar la tanda 4.) Del clon: una **invocación en sigilo** y la niebla de una varita o un Sólido en las Zonas de riesgo; el
+**Anillo de Foco Arcano** y las habilidades de movimiento que apagan el bono; la ficha suelta y GM Tools con un escondido. De «Claude · pruebas
+2»: «✋ No la detectó» por el camino nuevo de las reglas; el cartel de inmunidad desde una **zona**, el **rayo en cadena**, el **elemental de un
+arma**, «INMUNE A LO SINIESTRO» y dos carteles a la vez; las **maestrías** y **Aguante de trinchera** en una invocación / con crítico / con
+trampa o zona; cerrar el combate **desde GM Tools** y un jugador que entra más tarde; la **ballesta con carcaj integrado**; el «hasta el fin del
+turno de…» en GM Tools y en la 🔍 de la ficha; la ficha suelta en una pestaña dormida; +N de vida con la vida llena en un personaje o una
+invocación; las **animaciones de resurrección** con el duelo abierto o desde lejos; y el cartel «todavía no está en este mapa» con dos
+personajes propios (no se puede en las partidas de prueba).
 
 ## 🎁 Dar a un jugador (2026-11-21)
 

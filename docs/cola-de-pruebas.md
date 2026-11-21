@@ -594,7 +594,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirada 1d10+1. **Sin probar con clics:** un creep y una invocación con la Prisa vieja (sí en las pruebas automáticas); la ficha suelta de Rockardo
   (se probó desde el mapa). En la partida real no se entró: allá se convierte sola. 958 pruebas automáticas en verde (1 nueva).
   **Para que lo sepas:** con +5, quien tiene Prisa ya no va primero seguro; contra alguien de Iniciativa parecida gana casi siempre, pero puede perder.
-- **🟡 a medias (2026-11-21: hecha la parte que puede romper una partida; falta lo del clon y lo visual — ver el resultado abajo) — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
+- **🟡 a medias (2026-11-21: hecha la parte que puede romper una partida y lo del clon; falta parte de lo visual — ver el resultado y la segunda parte, abajo) — 🧪 Pasada de pruebas: lo que quedó sin probar en el mapa de las tareas del 2026-11-20** (dueño, 2026-11-20: «lo que me dijiste
   que no se probó, anotalo en la cola»). Sin programar nada nuevo: probar con clics en «Claude · pruebas 2» (GM, J1, J2) lo que cada informe dejó
   sin ver (también está en docs/pruebas-en-el-mapa.md; tachar ahí lo que se vea) y arreglar solo lo que falle:
   · **Arrastrar / Desequilibrado / primer ataque** (96edd265): una invocación arrastrada; un creep arrastrando a un personaje; cerrar con
@@ -629,6 +629,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   resurrección con el duelo abierto, maestrías y Aguante de trinchera en casos raros, cerrar desde GM Tools, la ficha suelta dormida y el
   cartel de inmunidad por elemento. La partida quedó como estaba (comparada contra la foto del principio; a la Abeja de prueba hubo que
   volver a ponerle el token). 963 pruebas automáticas en verde.
+  *Segunda parte (2026-11-21, tanda 4; el detalle en `pruebas-en-el-mapa.md`, «Tanda 4»):* **visto y anda**, en el clon de El origen: lo que
+  no se nombra (el Shockwave a una rata en sigilo, el Ojo de asesino jugado hasta el final, el inicio de turno de una rata escondida y
+  envenenada, el Muro de fuego desde la niebla, un personaje en sigilo visto por el GM), las Zonas de riesgo con la niebla prendida (jugador y
+  GM con 🎮 el control), Puntería certera (el cartel con el duelo abierto, el arrastre que no la apaga, sin orden de turnos) y la Prisa vieja
+  en un creep (+5); en «Claude · pruebas 2»: «Ver detalle» de una trampa a la vista (armada y disparada), del Portal trampa y del hielo de una
+  varita con orden de turnos; el cartel «INMUNE AL FUEGO» por una trampa y por el Escudo ígneo; y, con las reglas de Firebase ya pegadas,
+  «Volver a ocultar» una trampa y el nombre de un token corregido por el GM. **Fallaron cuatro cosas chicas de textos, arregladas y vueltas a
+  mirar:** el cartel de una trampa mecánica decía que la dispara cualquiera; el cartel de una zona contaba los turnos distinto que su tarjeta;
+  la tarjeta del Portal trampa no decía que teletransporta; la de la Mina del cazador no decía que solo se dispara pisando el centro.
+  **Dos dudas de reglas nuevas:** P263 (el cuadro del duelo nombra a un escondido cuando un jugador le pega con un área) y P264 (un creep que
+  pone una zona desde la niebla queda delatado, y la Mesa lo nombra en una pantalla y en otra no). **Sigue sin ver** (no se llegó): una
+  invocación en sigilo, el Anillo de Foco Arcano, el cartel de inmunidad desde una zona / un arma / lo siniestro / dos a la vez, maestrías y
+  Aguante de trinchera en casos raros, cerrar el combate desde GM Tools, la ballesta con carcaj integrado, el «hasta el fin del turno de…» en
+  GM Tools y en la ficha, la ficha suelta dormida y las animaciones de resurrección. Las dos partidas quedaron como estaban (en el clon venció
+  sola una zona temporal que ya estaba puesta, al pasar rondas). 965 pruebas automáticas en verde (2 nuevas).
 - **✅ hecho (2026-11-20) — 🛡 Cartel flotante desde el token cuando algo no le entra por una inmunidad** (dueño, 2026-11-20: «me gustaría que también salte
   el cartel flotante desde el token, en un azul-plateado que diga "INVULNERABLE"… o también "INMUNE A TÓXICO", por ejemplo»).
   *Resultado:* además de la línea «🛡 … no le hizo nada (motivo)» de la Mesa, del token sale un cartel que flota ~2 s, en azul-plateado, y lo ven todas las
@@ -1362,7 +1377,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
    «Resistente ×N» / «Frágil ×N» siguen sumando/restando encima; las piezas ya gastadas conservan lo gastado y ganan el margen nuevo. Revisar
    el precio de reparar.
 
-- **⬜ en cola — 🐞 A veces, después de «▶ Iniciar combate», el combate queda como sin iniciar** (visto una vez en la pasada de pruebas del
+- **⬜ en cola (2026-11-21: 6 intentos más, no se repitió; sin tocar código — ver abajo) — 🐞 A veces, después de «▶ Iniciar combate», el combate queda como sin iniciar** (visto una vez en la pasada de pruebas del
   2026-11-21; no se pudo repetir en tres intentos). Qué pasó: el GM venía de mirar otro mapa («Prueba · L7 L8») y volvió al publicado; armó el
   orden con un **creep primero** (Peleador 5, Blanco J1, Blanco J2), apretó Ordenar → «▶ Iniciar combate» → «⚔ Pasar a Combate e iniciar» →
   «Empezar registro nuevo». La Mesa dijo «▶ Empieza el combate · todos arrancan con los No2 llenos» **sin nombrar de quién era el turno**, y
@@ -1371,6 +1386,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   una pantalla que guarda con lo que tenía de antes puede pisar lo que otra acaba de guardar; o la pantalla del GM, recién cambiada de mapa,
   todavía no tenía cargado el token del primero. Qué mirar: que cada guardado del orden toque solo lo suyo (o que revise antes de pisar), y
   probarlo cambiando de mapa justo antes de iniciar. No es grave (se vuelve a apretar), pero recarga los No2 dos veces.
+  *Segundo intento (2026-11-21, sin tocar código):* **no se repitió** en 6 intentos más (creep primero, el GM recién vuelto de «Prueba · L7 L8»,
+  con esperas distintas, y una vez con todo el antecedente: «Finalizar combate → Publicar» mirando el otro mapa y enseguida un combate nuevo).
+  En todos arrancó bien, con «turno de Peleador 5» en la Mesa y un solo guardado del orden. Lo que se vio: (1) desde que se aprieta «Empezar
+  registro nuevo» hasta que el combate figura iniciado pasan **entre 7 y 10 segundos** (llena los No2 de todos, uno por uno); en ese rato el
+  botón sigue a la vista y ▶ Siguiente avisa que no se inició: si se mira ahí, parece que no anduvo. (2) Leyendo el código hay un camino que da
+  exactamente lo que se vio: si al mapa le llega un «volvió a narrativo» después de iniciado, la pantalla del GM marca el combate como sin
+  iniciar (js/04, el escucha del modo); eso solo lo escribe el cierre de «Finalizar combate», y no se logró que llegue tarde. (3) Que la Mesa no
+  nombre de quién es el turno pasa cuando el primero es un creep que los jugadores todavía no conocen (es a propósito). Queda en cola: si
+  vuelve a pasar, anotar si el mapa quedó en narrativo o en combate (eso dice cuál de las dos sospechas es).
 
 ## En cola
 

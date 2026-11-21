@@ -47,6 +47,34 @@ cada renglón. Capturas fuera del repo, en `cola38/`.)
   nuevo», con un creep primero en la lista y el GM recién vuelto de mirar otro mapa, el combate quedó **como sin iniciar** (volvió a salir el botón
   «▶ Iniciar combate», y la Mesa decía «▶ Empieza el combate» sin nombrar de quién era el turno). Anotado en la cola para mirarlo.
 
+### Tanda 2 · resurrección, carteles de inmunidad, debuffs tras el Pacto y pasar cosas
+
+- [x] **☥ «¿Con qué volvés?» con tres formas** (Pacto + Ankh en el cinturón + Llama de Fénix, puestos por datos; el golpe de 999, con el menú de
+  vida del token): salieron las tres opciones; al elegir **🔥 la Llama de Fénix** volvió con toda la vida, quedó solo «Invulnerable», se le fueron
+  Veneno y Bendecido (cartel «☥ Volviste: se te fueron los estados» y línea en la Mesa) y el Pacto y el Ankh quedaron guardados.
+- [x] **🔥 Un creep con la Llama de Fénix, por un golpe** (el estado se le puso por datos): revivió con 60 de vida, Titilando, y se le fueron los
+  otros estados.
+- [x] **🛡 «INVULNERABLE» en un golpe a un creep invulnerable:** el Jugador 1 le disparó (antes, el cartel «✨ Es invulnerable… ¿Atacarlo
+  igual?»); al cerrar el duelo, el cartel azul-plateado sobre el creep en las tres pantallas, y en la Mesa «Invulnerable, el golpe no hizo nada».
+- [x] **🛡 Protección de jefe** (creep marcado como jefe por datos; el Stun, con «+ Estado» a mano): con **«Aplicar igual»** no salió cartel y el
+  Stun entró; con **«Aplicar la regla»** salió «INMUNE A STUN» en las tres pantallas y no entró.
+- [x] **🛡 Un token que esa pantalla no ve:** con el creep oculto por el GM (su botón 👁), el «INVULNERABLE» lo vio el GM y al Jugador 1 no le
+  apareció nada.
+- [x] **🎮 Debuffs después del Pacto con el GM teniendo el control:** el GM tomó el control de Blanco J1, lo tiró a 0 (lo salvó el Pacto), pasó la
+  ronda (el «▶ Empieza tu turno» le salió al GM) y, ya sin Invulnerable, le entraron un Veneno «de una zona» y un Miedo «de una trampa» (los dos
+  puestos en la cola de avisos por datos, que es lo que dejan una zona y una trampa) y un Pajaritos con «+ Estado» a mano.
+  **❌ Falló una cosa, arreglada:** con el token ya seleccionado, al tomar el control los círculos de Vida / SP / No2 del menú del token le quedaban
+  **apagados al GM** («solo lo cambia su dueño») y **prendidos al jugador**, hasta que cambiara otra cosa. Ahora se actualizan en el momento
+  (`vtt-hexgrid/js/10-hud-y-vida.js`, `hudUbicar`). Capturas de antes y después.
+- [x] **🤝 Pasar cosas entre el Jugador 1 y el Jugador 2** (cada uno en su pantalla): **en Combate**, la ventana dice «⚔ En combate, solo
+  ítems…» y no ofrece DDE ni despojos; un ítem ofrecido → **Rechazar** (vuelve, nadie paga) → ofrecido de nuevo y **Cancelar** (al otro se le va
+  el aviso) → ofrecido y aceptado (2 No2 cada uno, y la Mesa lo cuenta). **Fuera de combate:** 10 DDE, 2 despojos normales y 1 **despojo
+  especial** (una «Escama de prueba» cargada por datos): cambiaron bien los números de los dos. (Los números de la ventana se escribieron por
+  script; los botones, con clics.)
+- [x] **🛡 El Equipo abierto con el 🛡 del token** (⋯ → 🛡), en combate: abre «Equipo y mochila» adentro del mapa.
+- [ ] **Sin ver todavía del cartel de inmunidad:** el daño de un elemento al que es inmune desde una zona, una trampa, el Escudo elemental, el
+  rayo en cadena y el elemental de un arma; «INMUNE A LO SINIESTRO»; Vuela, Arma natural y Coagulación; dos carteles distintos a la vez.
+
 ## 🎁 Dar a un jugador (2026-11-21)
 
 - [x] (2026-11-21, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, todo restaurado después) **🎁 El GM le da un ítem, DDE o despojos a un

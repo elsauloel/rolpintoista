@@ -1178,7 +1178,9 @@ function hudUbicar(){
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
-  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
+  // (2026-11-21: también quién puede tocar la vida y los estados — al tomar o devolver 🎮 el control el HUD quedaba con los círculos como estaban,
+  // apagados para el GM y prendidos para el jugador, hasta que cambiara otra cosa.)
+  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion, puedoCambiarVida(t), puedoCambiarEstados(t)]);
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);

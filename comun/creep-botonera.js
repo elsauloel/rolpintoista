@@ -60,7 +60,7 @@ const CreepBotonera = (() => {
     const cualAtaque = num(sc.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
 
     const tileStat = d => `
-    <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
+    <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}${d.id === 'ini' && C().iniFijo(sc).val ? ` — al tirar, +${fmt(C().iniFijo(sc).val)} fijo al resultado (${esc(C().iniFijo(sc).de)})` : ''}">
       ${lupaBotonHtml(`${sc.id}|stat|${d.id}`)}
       <span class="bt-label">${esc(d.label)}</span>
       <span class="bt-value">${fmt(statValor(sc, d.id))}</span>

@@ -50,7 +50,7 @@ const InvLupa = (() => {
     h += lupaFila(esc(FichaCalculo.STAT_LABEL[statId]||statId), fmt(valor), 'lupa-total');
     let out = lupaSeccion('De dónde sale', h);
     if(sinTirada) return out;
-    out += lupaTirada(valor);
+    out += lupaTirada(valor, statId === 'ini' ? I.iniFijo(inv) : null);   // 💨 la Prisa, al resultado (2026-11-22)
     return out;
   }
 

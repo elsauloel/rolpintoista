@@ -50,12 +50,12 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261121muro2"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261121muro"></script>
-<script src="creep-calculo.js?v=20261120maestria"></script>
-<script src="creep-botonera.js?v=20261120maestria"></script>
-<script src="creep-acciones.js?v=20261121caido"></script>
+<script src="combatiente.js?v=20261122prisa5"></script>
+<script src="creep-calculo.js?v=20261122prisa5"></script>
+<script src="creep-botonera.js?v=20261122prisa5"></script>
+<script src="creep-acciones.js?v=20261122prisa5"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js?v=20261120enj"></script>
+<script src="ficha-calculo.js?v=20261122prisa5"></script>
 <script src="ficha-combate.js?v=20261120maestria"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
@@ -74,15 +74,15 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261120hasta"></script>
+<script src="ficha-resumen.js?v=20261122prisa5"></script>
 <script src="ficha-sesion.js"></script>
-<script src="inv-calculo.js?v=20261120invocar"></script>
-<script src="inv-botonera.js?v=20261120maestria"></script>
+<script src="inv-calculo.js?v=20261122prisa5"></script>
+<script src="inv-botonera.js?v=20261122prisa5"></script>
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
-<script src="inv-lupa.js?v=20261120maestria"></script>
-<script src="ficha-acciones.js?v=20261121caido"></script>
+<script src="inv-lupa.js?v=20261122prisa5"></script>
+<script src="ficha-acciones.js?v=20261122prisa5"></script>
 <script src="orden-turnos.js?v=20261121caido"></script>
 <script src="ficha-mantenimiento.js?v=20261121caido"></script>
 <script src="estado-preguntas.js"></script>
@@ -114,15 +114,15 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261121foco"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261120hasta"></script>
+<script src="ficha-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-editor.js"></script>
-<script src="creep-lupa.js?v=20261120maestria"></script>
+<script src="creep-lupa.js?v=20261122prisa5"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js"></script>
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261120hasta"></script>
-<script src="pasivas.js?v=20261120enj"></script>
+<script src="pasivas.js?v=20261122prisa5"></script>
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
@@ -8245,32 +8245,61 @@ prueba('🔨 Maestría en armas pesadas (dueño, 2026-11-20): +2 PdG y +1 Parry 
     creep, fCreep, invocacion, FichaCalculo.MOD_TARGETS.some(x => x.id === 'parryt10'), CreepCalculo.STAT_LABEL.parryt10],
     [[2, 1, 0, 0, 0], true, true, true, true, [2, 1, 0, 0, 0], [true, true, true, true], [2, 1, true], true, 'Parry con contundentes']);
 });
-prueba('💨 Prisa pasa a ser +5 a la tirada de Iniciativa (dueño, 2026-11-20): la pasiva nueva, y la copia vieja (ir primero) se convierte sola en personajes, creeps e invocaciones', () => {
-  const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'prisa');
-  igual([pas.nombre, pas.jobCosto, pas.mods, /\+5 a la tirada de Iniciativa/.test(pas.detalle), /primero en el orden/.test(pas.detalle), pas.detalle === C.PRISA_DETALLE], ['Prisa', 1, [{stat: 'ini', val: 5}], true, false, true]);
-  const vieja = () => ({id: 'p1', poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, compras: 1, detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa.', mods: [{stat: 'prisa', val: 1}]});
-  const otra = () => ({id: 'p2', poolId: 'robustez', nombre: 'Robustez', compras: 1, detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]});
-  // La cuenta pura: reconoce la vieja, la convierte una sola vez y no toca nada más.
-  const l = [vieja(), otra()], n1 = C.pasivasAlDia(l), n2 = C.pasivasAlDia(l);
-  igual([C.esPrisaVieja(vieja()), C.esPrisaVieja(pas), C.esPrisaVieja(otra()), C.modsPasiva(vieja()), C.modsPasiva(otra()), n1, n2, l[0].mods, l[0].detalle === pas.detalle, l[0].poolId, l[0].id, l[1]], 
-    [true, false, false, [{stat: 'ini', val: 5}], [{stat: 'hpmax', val: 5}], 1, 0, [{stat: 'ini', val: 5}], true, 'prisa', 'p1', otra()]);
-  // Personaje: al cargarse (FichaGuardado.completar) queda con la nueva y su Iniciativa suma 5; la tirada también.
-  const pj = pasivas => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.pasivas = pasivas; return S; };
-  const S0 = pj([]), Sv = pj([vieja()]), iniSin = FichaCalculo.calcular(S0).final.ini, iniViejaSinCargar = FichaCalculo.calcular(Sv).final.ini;
-  FichaGuardado.completar(Sv);
-  const tir = FichaBotonera.tiradaStat(Sv, 'ini'), tir0 = FichaBotonera.tiradaStat(S0, 'ini');
-  igual([iniViejaSinCargar - iniSin, FichaCalculo.calcular(Sv).final.ini - iniSin, Sv.pasivas[0].mods, /\+5 a la tirada de Iniciativa/.test(Sv.pasivas[0].detalle), FichaCalculo.calcular(Sv).final.prisa || 0, FichaResumen.resumen(Sv, {}).prisa,
-    FichaResumen.resumen(Sv, {}).ini - FichaResumen.resumen(S0, {}).ini, !!(tir && tir.r) && formulaParaValor(iniSin + 5).formula === tir.r.formula.replace(/ ÷2/g, ''), /Prisa/.test(FichaLupa.contenido(Sv, 'stat:ini').html)],
-    [5, 5, [{stat: 'ini', val: 5}], true, 0, undefined, 5, true, true]);
-  // Creep: tal como está guardado (el mapa lo lee así) ya suma 5; al normalizarse queda convertido.
-  const crudo = {nombre: 'Lobo', con: 4, fue: 5, agl: 6, des: 4, esp: 2, hp: 20, hpMax: 20, pasivas: [vieja()], equipo: [], estados: [], habilidades: []};
-  const iniCrudo = CreepCalculo.modTotal(crudo, 'ini'), sc = creepPrueba({pasivas: [vieja()]}), sc0 = creepPrueba();
-  igual([iniCrudo, CreepCalculo.modTotal(crudo, 'prisa'), sc.pasivas[0].mods, CreepCalculo.statValor(sc, 'ini') - CreepCalculo.statValor(sc0, 'ini'), CreepCalculo.aportesMod(sc, 'ini').map(a => a.nombre + a.val)],
-    [5, 0, [{stat: 'ini', val: 5}], 5, ['Prisa5']]);
+// 💨 La Prisa, +5 fijo al resultado de la Iniciativa (2026-11-22): las pasivas de prueba.
+const prisaPas = () => PASIVAS_BASE.find(p => p.poolId === 'prisa');
+const prisaPj = pasivas => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.pasivas = pasivas; return S; };
+const PRISA_vieja = () => ({id: 'p1', poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, compras: 1, detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa.', mods: [{stat: 'prisa', val: 1}]});
+const PRISA_de1120 = () => ({id: 'p3', poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, compras: 1, detalle: '+5 a la tirada de Iniciativa…', mods: [{stat: 'ini', val: 5}]});
+const PRISA_otra = () => ({id: 'p2', poolId: 'robustez', nombre: 'Robustez', compras: 1, detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]});
+const PRISA_agil = () => ({id: 'p4', poolId: 'reflejos', nombre: 'Reflejos', compras: 1, detalle: '+1 Iniciativa.', mods: [{stat: 'ini', val: 1}]});
+prueba('💨 Prisa: +5 FIJO al resultado de la tirada de Iniciativa (dueño, 2026-11-22): la pasiva nueva y las dos copias viejas (ir primero, y +5 al número del dado) se convierten solas; la cuenta pura y el resumen publicado', () => {
+  const C = Combatiente, pas = prisaPas();
+  igual([pas.nombre, pas.jobCosto, pas.mods, /\+5 fijo al resultado/.test(pas.detalle), /primero en el orden/.test(pas.detalle), pas.detalle === C.PRISA_DETALLE], ['Prisa', 1, [{stat: 'inifijo', val: 5}], true, false, true]);
+  // La cuenta pura: reconoce las dos viejas, las convierte una sola vez y no toca nada más (una pasiva que no es Prisa con +Iniciativa sigue igual).
+  const l = [PRISA_vieja(), PRISA_de1120(), PRISA_otra(), PRISA_agil()], n1 = C.pasivasAlDia(l), n2 = C.pasivasAlDia(l);
+  igual([C.esPrisaVieja(PRISA_vieja()), C.esPrisaVieja(PRISA_de1120()), C.esPrisaVieja(pas), C.esPrisaVieja(PRISA_otra()), C.esPrisaVieja(PRISA_agil()), C.modsPasiva(PRISA_vieja()), C.modsPasiva(PRISA_de1120()), C.modsPasiva(PRISA_otra()), n1, n2,
+    l[0].mods, l[1].mods, l[0].detalle === pas.detalle, l[1].detalle === pas.detalle, l[0].poolId, l[0].id, l[2], l[3]],
+    [true, true, false, false, false, [{stat: 'inifijo', val: 5}], [{stat: 'inifijo', val: 5}], [{stat: 'hpmax', val: 5}], 2, 0,
+     [{stat: 'inifijo', val: 5}], [{stat: 'inifijo', val: 5}], true, true, 'prisa', 'p1', PRISA_otra(), PRISA_agil()]);
+  // conIniFijo: suma al resultado, no al dado; dice «+5 Prisa» en la fórmula y en los estados; sin fijo, la misma tirada.
+  const r0 = {formula: '1d6', rolls: [4], mod: 0, total: 4, estados: []}, r5 = C.conIniFijo(r0, {val: 5, de: 'Prisa'});
+  const rv = C.conIniFijo({formula: '1d6', rolls: [2], mod: 0, total: 5, ventaja: {rolls: [2], total: 2, elegido: 5}}, {val: 5, de: 'Prisa'});
+  igual([r5.formula, r5.total, r5.mod, r5.rolls, r5.estados, C.conIniFijo(r0, {val: 0, de: ''}) === r0, C.conIniFijo(r0, null) === r0, rv.ventaja, C.iniFijoDe([{nombre: 'Prisa', val: 5}, {nombre: 'Bota', val: 0}])],
+    ['1d6 +5 Prisa', 9, 5, [4], [{n: 'Prisa +5', p: 'buff'}], true, true, {rolls: [2], total: 7, elegido: 10}, {val: 5, de: 'Prisa'}]);
+  // Un resumen publicado: el nuevo trae iniFijo; uno de antes del 2026-11-20 trae `prisa` (sin el +5 adentro); uno del medio no dice nada (se lee la ficha).
+  igual([C.iniFijoDeResumen({ini: 6, iniFijo: 5, iniFijoDe: 'Prisa'}), C.iniFijoDeResumen({ini: 6, iniFijo: 0}), C.iniFijoDeResumen({ini: 6, prisa: 1}), C.iniFijoDeResumen({ini: 11}), C.iniFijoDeResumen(null)],
+    [{val: 5, de: 'Prisa'}, {val: 0, de: 'Prisa'}, {val: 5, de: 'Prisa'}, null, null]);
+});
+prueba('💨 Prisa (2026-11-22), personaje: la Iniciativa no suma 5 (el dado no cambia) y la tirada de la ficha y del mapa es 1dN+5; la 🔍 lo dice', () => {
+  const C = Combatiente, pas = prisaPas();
+  // Personaje: al cargarse (FichaGuardado.completar) las dos viejas quedan con la nueva; la Iniciativa NO suma 5 (el dado no cambia) y la tirada es 1dN+5.
+  const S0 = prisaPj([]), Sv = prisaPj([PRISA_vieja()]), Sm = prisaPj([PRISA_de1120()]), Sn = prisaPj([structuredClone(pas)]), iniSin = FichaCalculo.calcular(S0).final.ini;
+  const sinCargar = [FichaCalculo.calcular(Sv).final.ini - iniSin, FichaCalculo.calcular(Sm).final.ini - iniSin, FichaCalculo.iniFijo(Sv).val, FichaCalculo.iniFijo(Sm).val];
+  FichaGuardado.completar(Sv); FichaGuardado.completar(Sm);
+  const tir = FichaBotonera.tiradaStat(Sn, 'ini'), tir0 = FichaBotonera.tiradaStat(S0, 'ini'), dado = formulaParaValor(iniSin).formula;
+  const rs = FichaResumen.resumen(Sn, {}), rs0 = FichaResumen.resumen(S0, {}), lupa = FichaLupa.contenido(Sn, 'stat:ini').html;
+  igual([sinCargar, Sv.pasivas[0].mods, Sm.pasivas[0].mods, FichaCalculo.calcular(Sv).final.ini - iniSin, FichaCalculo.calcular(Sm).final.ini - iniSin, FichaCalculo.calcular(Sn).final.inifijo,
+    rs.ini - rs0.ini, rs.iniFijo, rs.iniFijoDe, rs0.iniFijo, rs0.iniFijoDe, rs.prisa,
+    tir.r.formula, tir.r.total - tir.r.rolls.reduce((a, b) => a + b, 0) - formulaParaValor(iniSin).mod, tir.r.estados.map(e => e.n), tir0.r.formula, /Prisa/.test(lupa), lupa.includes(`${dado} +5 Prisa`)],
+    [[0, 0, 5, 5], [{stat: 'inifijo', val: 5}], [{stat: 'inifijo', val: 5}], 0, 0, 5, 0, 5, 'Prisa', 0, undefined, undefined, `${dado} +5 Prisa`, 5, ['Prisa +5'], dado, true, true]);
+  // La tirada de la ficha (Botonera, el botón 🎲 del stat): FichaAcciones.tirarValorStat también suma el fijo.
+  let anotada = null;
+  FichaAcciones.tirarValorStat(Sn, 'Iniciativa', FichaCalculo.calcular(Sn).final.ini, 'ini', undefined, undefined, undefined, {toast: () => {}, cambio: () => {}, registrarTirada: (o, r) => { anotada = r; }});
+  igual([anotada && anotada.formula, anotada && anotada.estados.some(e => e.n === 'Prisa +5')], [`${dado} +5 Prisa`, true]);
+});
+prueba('💨 Prisa (2026-11-22), creep e invocación: la Prisa vieja se lee como fija y las Acciones / la Botonera tiran 1dN+5', () => {
+  // Creep: tal como está guardado (el mapa lo lee así) ya lee la Prisa como fija; al normalizarse queda convertido. Las Acciones tiran 1dN+5.
+  const crudo = {nombre: 'Lobo', con: 4, fue: 5, agl: 6, des: 4, esp: 2, hp: 20, hpMax: 20, pasivas: [PRISA_de1120()], equipo: [], estados: [], habilidades: []};
+  const sc = creepPrueba({pasivas: [PRISA_vieja()]}), sc0 = creepPrueba(), tc = CreepAcciones.tiradaStat(sc, 'ini');
+  igual([CreepCalculo.modTotal(crudo, 'ini'), CreepCalculo.iniFijo(crudo), sc.pasivas[0].mods, CreepCalculo.statValor(sc, 'ini') - CreepCalculo.statValor(sc0, 'ini'), CreepCalculo.iniFijo(sc),
+    tc.r.formula, CreepAcciones.tiradaStat(sc0, 'ini').r.formula, /Prisa/.test(CreepLupa.contenido(sc, 'x|stat|ini').html)],
+    [0, {val: 5, de: 'Prisa'}, [{stat: 'inifijo', val: 5}], 0, {val: 5, de: 'Prisa'}, `${formulaParaValor(CreepCalculo.statValor(sc0, 'ini')).formula} +5 Prisa`, formulaParaValor(CreepCalculo.statValor(sc0, 'ini')).formula, true]);
   // Invocación: lo mismo (guardada adentro del personaje).
-  const invCruda = {id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [vieja()]};
-  const Si = pj([]); Si.invocaciones = [structuredClone(invCruda)]; FichaGuardado.completar(Si);
-  igual([FichaResumen.invModTotal(invCruda, 'ini'), InvCalculo.migrar(structuredClone(invCruda)).pasivas[0].mods, Si.invocaciones[0].pasivas[0].mods], [5, [{stat: 'ini', val: 5}], [{stat: 'ini', val: 5}]]);
+  const invCruda = {id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [PRISA_vieja()]};
+  const Si = prisaPj([]); Si.invocaciones = [structuredClone(invCruda)]; FichaGuardado.completar(Si);
+  const inv = InvCalculo.migrar(structuredClone(invCruda)), ti = InvAcciones.tirada(inv, 'Iniciativa', InvCalculo.statValor(inv, 'ini'), 'ini');
+  igual([FichaResumen.invModTotal(invCruda, 'ini'), inv.pasivas[0].mods, Si.invocaciones[0].pasivas[0].mods, InvCalculo.iniFijo(inv), / \+5 Prisa$/.test(ti.r.formula)],
+    [0, [{stat: 'inifijo', val: 5}], [{stat: 'inifijo', val: 5}], {val: 5, de: 'Prisa'}, true]);
 });
 prueba('🛡 Aguante de trinchera (dueño, 2026-11-20): +1 Defensa y +1 Defensa especial por cada enemigo pegado, sin tope; 2 de job; personaje, creep e invocación', () => {
   const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'aguante-de-trinchera');

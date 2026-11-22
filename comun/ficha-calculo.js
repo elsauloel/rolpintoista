@@ -112,7 +112,10 @@ const FichaCalculo = (() => {
     {id:'trinchera', label:'Aguante de trinchera', full:'Aguante de trinchera: + ese número a la Defensa y a la Defensa especial por cada enemigo pegado a vos cuando te llega el golpe (lo suma el mapa)'},
     {id:'sedbatalla', label:'Sed de batalla', full:'Sed de batalla: cuando un rival cae por tu golpe, ganás ese número de No2 (aunque pases de tu máximo)'},
     {id:'sedsangre', label:'Sed de sangre', full:'Sed de sangre: cuando un rival cae por tu golpe, subís ese número de lugares en el orden de turnos'},
-    {id:'prisa', label:'Prisa (versión vieja)', full:'Prisa, versión vieja: ya no hace nada. Desde el 2026-11-20 la pasiva Prisa da +5 a Iniciativa (la copia vieja se convierte sola)'},
+    {id:'prisa', label:'Prisa (versión vieja)', full:'Prisa, versión vieja: ya no hace nada. Desde el 2026-11-22 la pasiva Prisa da +5 fijo al resultado de la Iniciativa (la copia vieja se convierte sola)'},
+    // 💨 Iniciativa fija (2026-11-22, dueño: la Prisa «+5 al resultado de la tirada. Fijo»): se suma al RESULTADO de la tirada de Iniciativa, no al número
+    // que da el tamaño del dado (Combatiente.conIniFijo). La da la Prisa (+5).
+    {id:'inifijo', label:'Iniciativa fija', full:'Iniciativa fija: + ese número al resultado de tu tirada de Iniciativa (el dado no cambia). La Prisa da +5'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},
     {id:'alforja', label:'Alforja compartida', full:'En combate, un aliado al lado puede sacar un consumible de tu mochila por 1 No2'},
@@ -343,7 +346,12 @@ const FichaCalculo = (() => {
     penalidadSobrecargaDefinida: false,
   };
 
-  return {IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
+  // 💨 Lo fijo que se suma al resultado de la tirada de Iniciativa (la Prisa: +5), con de dónde sale → {val, de} (Combatiente.iniFijoDe).
+  function iniFijo(S, c){
+    c = c || calcular(S);
+    return Combatiente.iniFijoDe(((c.mods || {}).inifijo || []).map(m => ({nombre: m.origen, val: m.val})));
+  }
+  return {iniFijo, IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
     SLOT_MAP, SLOT_LABEL, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, esEscudoItem, pierdeDefPorRotura, durMax, durActual, itemRoto, armRotaDe,
     pasivaCompras, jobTotal, modsDe, evalFormula, calcular};
 })();

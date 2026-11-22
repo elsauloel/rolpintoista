@@ -16,15 +16,18 @@ const lupaSeccion = (titulo, html) => `<div class="lupa-sec"><div class="lupa-se
 const lupaSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
 
 // Cómo se reparte un valor en dados reales.
-function lupaTirada(valor){
+// `fijo` (opcional, 2026-11-22): {val, de} lo que se suma al RESULTADO, sin cambiar el dado (la Prisa en la Iniciativa: «1d6 +5 Prisa»).
+function lupaTirada(valor, fijo){
   const n = Math.round(num(valor));
   const f = formulaParaValor(n);
-  if(!f) return lupaSeccion('Tirada', lupaNota(`Con ${fmt(n)} no se puede tirar: hace falta al menos 1.`));
+  const fv = fijo ? Math.round(num(fijo.val)) : 0;
+  const filaFijo = fv ? lupaFila(`${esc(fijo.de || 'Fijo')} <span class="lupa-gris">(al resultado de la tirada: no cambia el dado)</span>`, lupaSigno(fv)) : '';
+  if(!f) return lupaSeccion('Tirada', lupaNota(`Con ${fmt(n)} no se puede tirar: hace falta al menos 1.`) + filaFijo);
   let nota;
   if(f.combo.length === 1 && f.combo[0] === n && !DADOS_REALES.includes(n)) nota = `Valor chico: se tira un dado de ${fmt(n)} caras.`;
   else if(f.mod) nota = `Impar: se reparte ${fmt(n - 1)} en dados reales y se suma +1.`;
   else nota = `Se reparte ${fmt(n)} en la menor cantidad de dados reales, lo más parejos posible.`;
-  return lupaSeccion('Tirada', lupaFila(`${fmt(n)} →`, esc(f.formula)) + lupaNota(nota));
+  return lupaSeccion('Tirada', lupaFila(`${fmt(n)} →`, esc(f.formula)) + filaFijo + (fv ? lupaFila('Se tira', esc(`${f.formula} ${fv > 0 ? '+' : ''}${fv} ${fijo.de || ''}`.trim()), 'lupa-total') : '') + lupaNota(nota));
 }
 
 /* Un nombre con globo (dueño, 2026-10-29: «que el nombre de los items que muestra como "origen" funcionaran con hover para poder ver desde ahí

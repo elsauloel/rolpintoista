@@ -534,7 +534,8 @@ const FichaAcciones = (() => {
     const ronda = typeof window !== 'undefined' && typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : null;
     const usadoG = ronda !== null && ronda !== undefined ? (S.meta && S.meta.gauchitoRonda) === ronda : num((S.ataquesArma || {})._gauchito) > 0;
     const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, usadoG);
-    const r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
+    let r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
+    if(r && statId === 'ini') r = Combatiente.conIniFijo(r, FichaCalculo.iniFijo(S));   // 💨 la Prisa: +5 fijo al resultado (2026-11-22)
     if(conG && r){
       S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1};
       if(ronda !== null && ronda !== undefined) S.meta = {...(S.meta || {}), gauchitoRonda: ronda};

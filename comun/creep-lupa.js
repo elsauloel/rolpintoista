@@ -56,7 +56,7 @@ const CreepLupa = (() => {
     h += lupaFila(esc(d.label), fmt(valor), 'lupa-total');
     let out = lupaSeccion('De dónde sale', h);
     if(sinTirada) return out;
-    out += lupaTirada(valor);
+    out += lupaTirada(valor, statId === 'ini' ? K.iniFijo(sc) : null);   // 💨 la Prisa, al resultado (2026-11-22)
     const afortunado = ['pdg', 'parry', 'eva'].includes(statId) && (sc.estados || []).find(e => e.activo !== false && e.afortunado);
     if(afortunado) out += lupaNota(`Ventaja por ${esc(afortunado.nombre)}: se tira dos veces y queda la mejor.`);
     return out;

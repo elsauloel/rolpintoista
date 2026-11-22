@@ -144,7 +144,7 @@ const FichaLupa = (() => {
     let out = lupaSeccion('De dónde sale', h);
     if(sinTirada) return out;
     const afortunado = ['pdg', 'parry', 'eva'].includes(id) && activos.find(e => e.afortunado);
-    out += lupaTirada(valor);
+    out += lupaTirada(valor, id === 'ini' ? FichaCalculo.iniFijo(S, c) : null);   // 💨 la Prisa, al resultado (2026-11-22)
     if(afortunado) out += lupaNota(`Ventaja por ${esc(afortunado.nombre)}: se tira dos veces y queda la mejor.`);
     return out;
   }

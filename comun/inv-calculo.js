@@ -221,7 +221,9 @@ const InvCalculo = (() => {
     return inv;
   }
 
-  return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
+  // 💨 Lo fijo que se suma al resultado de la tirada de Iniciativa (la Prisa: +5), con de dónde sale → {val, de} (2026-11-22).
+  function iniFijo(inv){ return Combatiente.iniFijoDe(aportesMod(inv, Combatiente.INI_FIJO)); }
+  return {iniFijo, defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
     nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, parryExtra, pdgExtra, famExtra, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, invocar, migrar, regenPasivas};

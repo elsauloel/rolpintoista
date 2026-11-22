@@ -311,6 +311,8 @@ function renderAll(){
   // Cualquier ficha que llegue (archivo, mesa, otra ventana) pasa por acá.
   migrarEstadoIt2(S);
   migrarEstadoEspecial(S);
+  // 💨 La Prisa de antes (ir primero, o +5 al número del dado) pasa sola a la de ahora (+5 fijo al resultado, 2026-11-22); se guarda sola.
+  if(typeof Combatiente !== 'undefined' && Combatiente.pasivasAlDia){ Combatiente.pasivasAlDia(S.pasivas); (S.invocaciones || []).forEach(i => i && Combatiente.pasivasAlDia(i.pasivas)); }
   { const alDia = FichaGuardado.migrarHabsDeClase(S);   // 🔄 P222: las de clase siguen a su clase (se guarda sola, como cualquier cambio)
     if(alDia.length && !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura)) toast(`🔄 Se pusieron al día con su clase: ${alDia.join(', ')}`); }
   if(typeof Combatiente !== 'undefined' && Combatiente.ponerAlDiaItemsFabrica && Combatiente.ponerAlDiaItemsFabrica(S.inventario)

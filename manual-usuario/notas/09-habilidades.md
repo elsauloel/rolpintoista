@@ -87,7 +87,7 @@ Podés **comprar la misma pasiva varias veces** y los bonos se suman. El **tope 
 | **Ojo avizor**, **Vista de halcón** | Más visión |
 | **Golpe fuerte**, **Puntería**, **Ojo crítico** | Más Daño, PdG, Crítico |
 | **Pies ligeros**, **Impulso** | Evasión, Nitros |
-| **Prisa** | +5 a la tirada de Iniciativa (no te pone primero por sí sola: el orden lo decide el resultado) |
+| **Prisa** | +5 fijo al resultado de la tirada de Iniciativa: el dado no cambia (con Iniciativa 6 tirás 1d6+5). No te pone primero por sí sola: el orden lo decide el resultado |
 | **Maestrías** (una por familia de arma, 1 Job cada una) | Bonos que valen solo con un arma de esa familia en la mano: **punzantes** (Tipo 4 cuerpo a cuerpo: +1 al daño, +1 PdG en ataque de oportunidad y por la espalda), **cortantes** (Tipo 6: +1 Parry y Bloqueo con esa arma, +1 PdG en contraataque), **hachas** (Tipo 8: desde el segundo ataque del turno, 2 No2 menos; +1 Bloqueo), **pesadas** (Tipo 10: +2 PdG, +1 Parry), **arcos** (+1 PdG, +2 Crítico potente) y **ballestas** (+1 PdG, Perfora +1) |
 | **Táctica de enjambre** (2 Job) | +1 PdG por cada aliado pegado a vos al atacar con tu arma |
 | **Aguante de trinchera** (2 Job) | +1 Defensa y +1 Defensa especial por cada enemigo pegado a vos cuando te llega el golpe |

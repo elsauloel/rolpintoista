@@ -359,6 +359,22 @@ function creepModTotalMapa(sc, statId){ return CreepCalculo.modTotal(sc, statId)
 // Iniciativa de un creep: Agilidad + lo que la sube (Agilidad o Iniciativa directa). null si todavía no se leyó el creep.
 function creepIniMapa(sc){ return sc ? CreepCalculo.statValor(sc, 'ini') : null; }
 
+// 💨 Lo que hace falta para tirar la Iniciativa (2026-11-22): {base (el número que da el dado, sin la Prisa), fijo ({val, de}: lo que se suma al
+// resultado)} o null. Creep: tal como está guardado (CreepCalculo ya lee la Prisa vieja como fija). Personaje: lo publicado en su resumen; un resumen
+// del 2026-11-20 al 2026-11-22 no dice si su Iniciativa trae el +5 adentro, así que ahí se lee la ficha (FichaGuardado.cargar la pone al día).
+function iniciativaDeCreep(sc){ return sc ? {base: CreepCalculo.statValor(sc, 'ini'), fijo: CreepCalculo.iniFijo(sc)} : null; }
+async function iniciativaDePj(fichaId){
+  const f = fichasPub.get(fichaId), r = f && f.resumen;
+  if(!r || r.ini === undefined) return null;
+  const fijo = Combatiente.iniFijoDeResumen(r);
+  if(fijo) return {base: num(r.ini), fijo};
+  try{
+    await cargarPiezas(BN_PIEZAS);   // (FichaGuardado y FichaCalculo no se cargan de entrada: js/11)
+    const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${fichaId}`), {mezclarCatalogo: typeof bnMezclarCatalogo === 'function' ? bnMezclarCatalogo : undefined});
+    if(l && l.S){ const c = FichaCalculo.calcular(l.S); return {base: num(c.final.ini), fijo: FichaCalculo.iniFijo(l.S, c)}; }
+  }catch(err){ console.error('No se pudo leer la ficha para la Iniciativa:', err); }
+  return {base: num(r.ini), fijo: null};
+}
 // 🎲 Tirar iniciativa (2026-09-24, pedido del dueño): un jugador tira la de sus personajes; el GM, la de todos los creeps de la
 // lista. El resultado se carga solo junto al nombre (no agrega ni saca filas: los tokens los trae el GM con "Traer tokens").
 // La tirada de un jugador queda en la Mesa; las de los creeps no, para no mostrar a los jugadores creeps que no ven (queda un aviso).
@@ -374,10 +390,11 @@ async function iniciativaTirar(){
   }
   const nuevos = new Map(), sinDato = [];
   for(const [id, t] of propios){
-    const base = t.tipo === 'creep' ? creepIniMapa(creepPrivadoDe(t.fichaId)) : (() => { const f = fichasPub.get(t.fichaId); const r = f && f.resumen; return r && r.ini !== undefined ? num(r.ini) + Combatiente.PRISA_INI * Math.max(0, num(r.prisa)) : null; })();   // (💨 `r.prisa`: solo lo trae un resumen publicado ANTES del 2026-11-20, con la Prisa vieja y la Iniciativa sin su +5; al volver a guardarse el personaje ya no viene)
-    if(base === null){ sinDato.push(nombreDe(t)); continue; }
-    const fo = formulaParaValor(base);
-    const r = (fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0};
+    // 💨 La Prisa (2026-11-22, dueño: «+5 al resultado de la tirada. Fijo»): el dado sale de la Iniciativa SIN la Prisa y el +5 se suma al resultado.
+    const dato = t.tipo === 'creep' ? iniciativaDeCreep(creepPrivadoDe(t.fichaId)) : await iniciativaDePj(t.fichaId);
+    if(!dato){ sinDato.push(nombreDe(t)); continue; }
+    const fo = formulaParaValor(dato.base);
+    const r = Combatiente.conIniFijo((fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0}, dato.fijo);
     nuevos.set(id, r.total);
     if(!soyGM) mesaPublicar(`Iniciativa · ${nombreDe(t)}`, r);
   }
@@ -1182,7 +1199,7 @@ function renderIniciativa(){
   }
   $('#iniciativa-pie').innerHTML = soyGM
     ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +
-      '<button type="button" class="btn" id="ini-tirar" title="Tirar la iniciativa de todos los creeps de la lista y cargarla junto a cada nombre">🎲 Tirar iniciativa</button>' +
+      '<button type="button" class="btn" id="ini-tirar" title="Con un solo botón tirás la iniciativa de TODOS los creeps de la lista y se carga junto a cada nombre (los jugadores tiran la de sus personajes con su propio botón)">🎲 Tirar iniciativa de los creeps</button>' +
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
       (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`
         : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +

@@ -231,7 +231,8 @@ const FichaBotonera = (() => {
   function tiradaStat(S, statId){
     const c = FichaCalculo.calcular(S);
     const nombre = FichaCalculo.STAT_LABEL[statId] || statId, valor = c.final[statId];
-    const r = Combatiente.tirarStat(valor, S.efectos, statId, {extra: undefined});   // en 0 o negativo: el valor, sin dados
+    let r = Combatiente.tirarStat(valor, S.efectos, statId, {extra: undefined});   // en 0 o negativo: el valor, sin dados
+    if(r && statId === 'ini') r = Combatiente.conIniFijo(r, FichaCalculo.iniFijo(S, c));   // 💨 la Prisa: +5 fijo al resultado (2026-11-22)
     return r ? {origen: nombre, r} : {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
   }
   // Percepción (de Destreza): con Percepción aumentada, cada dado sube un escalón (d6 → d8, d8 → d10…). azar: para las pruebas.
@@ -462,12 +463,14 @@ const FichaBotonera = (() => {
           const origins = c.mods[s.id] || [];
           const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
           const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
+          const fijo = s.id === 'ini' ? FichaCalculo.iniFijo(S, c) : null;   // 💨 la Prisa: +5 al resultado, no al número del dado (2026-11-22)
+          const tituloFijo = fijo && fijo.val ? ` — al tirar, ${fijo.val>0?'+':''}${fmt(fijo.val)} fijo al resultado (${esc(fijo.de)})` : '';
           return `
-          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
+          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}${tituloFijo}">
             ${lupaBotonHtml(`stat:${s.id}`)}
             <span class="bt-label">${esc(s.label)}</span>
             <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
-            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
+            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : tituloFijo ? `<span class="bt-mod">🎲${fijo.val>0?'+':''}${fmt(fijo.val)}</span>` : ''}
           </button>`;
         }).join('')}</div>`).join('')}
       </div>

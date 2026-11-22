@@ -995,6 +995,12 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   un reloj de 450 ms). Lo que la pantalla no ve no se dibuja. Probado con clics en «Claude · pruebas 2» (GM, J1, J2): las cuatro, el ✚ del GM a un
   personaje y a un creep, y la vida a mano. Sin probar: una invocación, el Fénix de un creep, con un duelo abierto. A las otras pantallas les llega
   ~1 s después que a la que revive (lo que tarda el aviso).
+- **💨 La Prisa al tirar la iniciativa y «🎲 Tirar iniciativa de los creeps»** (2026-11-22, dueño): `iniciativaTirar` (js/04) tira el dado de la Iniciativa
+  SIN la Prisa y le suma el fijo al resultado (`Combatiente.conIniFijo`): creep → `iniciativaDeCreep(sc)` (`CreepCalculo.statValor` + `iniFijo`);
+  personaje → `iniciativaDePj(fichaId)`, con `resumen.iniFijo`; un resumen de antes del 2026-11-20 trae `prisa` (+5 por cada una) y uno del 2026-11-20 al
+  2026-11-22 no dice nada (su `ini` puede traer el +5 adentro): ahí se lee la ficha (`cargarPiezas(BN_PIEZAS)` + `FichaGuardado.cargar`), así no se duplica.
+  El botón del GM dice **«🎲 Tirar iniciativa de los creeps»** (el globo explica que con uno tira la de todos los creeps; el de los jugadores sigue «🎲 Tirar
+  iniciativa»). Probado con clics en «Claude · pruebas 2».
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

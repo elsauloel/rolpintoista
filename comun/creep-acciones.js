@@ -17,8 +17,9 @@ const CreepAcciones = (() => {
   // La tirada de un stat del creep es la misma que la de un personaje o una invocación (comun/combatiente.js): Afortunado
   // (dos veces, queda la mejor), mitades y Evasión mínimo 1.
   function tirada(nombre, valor, sc, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
-    const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId, extra ? {extra} : undefined);
+    let r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId, extra ? {extra} : undefined);
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
+    if(sc && statId === 'ini') r = Combatiente.conIniFijo(r, C().iniFijo(sc));   // 💨 la Prisa: +5 fijo al resultado (2026-11-22)
     return {origen: nombre, r};
   }
   // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; la Potencia del Support —antes «Empuje»—, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje

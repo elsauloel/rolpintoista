@@ -27,7 +27,7 @@ const InvBotonera = (() => {
     const titulo = inv.nombre, badge = `No2 ${fmt(num(inv.nitros))}/${fmt(I.nitrosMax(inv))}`;
 
     const tileStat = id => `
-      <button type="button" class="botonera-tile" data-invtirarstat="${inv.id}:${id}" title="${esc(FichaCalculo.STAT_LABEL[id]||id)}">
+      <button type="button" class="botonera-tile" data-invtirarstat="${inv.id}:${id}" title="${esc(FichaCalculo.STAT_LABEL[id]||id)}${id === 'ini' && I.iniFijo(inv).val ? ` — al tirar, +${fmt(I.iniFijo(inv).val)} fijo al resultado (${esc(I.iniFijo(inv).de)})` : ''}">
         ${lupaBotonHtml(`inv:${inv.id}:stat:${id}`)}
         <span class="bt-label">${esc(FichaCalculo.STAT_LABEL[id]||id)}</span>
         <span class="bt-value">${fmt(I.statValor(inv, id))}</span>

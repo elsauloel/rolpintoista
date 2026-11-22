@@ -1987,3 +1987,10 @@ un aliado» de cada ítem de la mochila sirve para no buscar el ítem en la list
 👥 Personajes (GM Tools) abren «Dar a un jugador» con ese personaje ya marcado (atajo; se queda); (d) «🎁 Dar a un jugador» en el Ver de un ítem de GM
 Tools, con el ítem ya puesto (se queda); (e) el 🤝 de mano a mano del token pegado también deja **pedir** (se queda). ¿Saco (a)? ¿Y el 🎁 del «⋯» y de
 👥 Personajes pasan a ser 🤝, para que el 🎁 sea siempre y solo el botín?
+
+### P279 — 💨 La Prisa con la tirada partida a la mitad o con Afortunado: ¿el +5 se suma antes o después? (2026-11-22, Claude)
+La Prisa pasó a ser +5 fijo al RESULTADO de la tirada de Iniciativa (el dado sale de la Iniciativa sin la Prisa: 1d6+5). Si un estado partiera la tirada de
+Iniciativa a la mitad (hoy ninguno lo hace: Pajaritos, Lisiado, Parálisis y Sentado tocan PdG, Evasión o Parry) o con Afortunado, **elegí sumar el +5
+después**, entero: primero el dado (con su mitad o su segunda tirada) y al final el +5. Con Afortunado, las dos tiradas llevan su +5. ¿Va así, o el +5
+también tendría que partirse? Además, «Iniciativa fija» quedó como un bono más (stat `inifijo`): cualquier ítem o estado podría dar un fijo a la
+Iniciativa con ese mismo mecanismo (hoy solo la Prisa lo usa).

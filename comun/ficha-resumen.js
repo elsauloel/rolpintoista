@@ -128,7 +128,9 @@ const FichaResumen = (() => {
       agl: n(c.final.agl), des: n(c.final.des), con: n(c.final.con),   // (2026-10-17) el hielo se resiste con Agilidad
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
       sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
-      // (💨 `prisa` ya no viaja: desde el 2026-11-20 la Prisa es +5 a Iniciativa y no ordena nada)
+      // 💨 La Prisa (2026-11-22): +5 FIJO al resultado de la tirada de Iniciativa (`ini` ya no la trae). `iniFijo` viaja siempre (aunque sea 0): así el mapa
+      // sabe que el resumen es de los nuevos (Combatiente.iniFijoDeResumen); `prisa` ya no viaja desde el 2026-11-20.
+      ...(() => { const f = FichaCalculo.iniFijo(S, c); return {iniFijo: f.val, ...(f.val ? {iniFijoDe: f.de} : {})}; })(),
       ritmo: n(c.final.ritmo), sedSangre: n(c.final.sedsangre), sedBatalla: n(c.final.sedbatalla), escurridizo: n(c.final.escurridizo), ojoCarancho: n(c.final.ojocarancho), enjambre: n(c.final.enjambre), trinchera: n(c.final.trinchera), curaMas: n(c.final.curamas), curaMasArea: n(c.final.curamasarea),   // 🥁🩸 orden de turnos (2026-11-05, vtt-hexgrid/js/102)
       pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.

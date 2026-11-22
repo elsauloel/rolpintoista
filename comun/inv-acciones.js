@@ -17,8 +17,9 @@ const InvAcciones = (() => {
   /* ---------- Tiradas ---------- */
   // La misma tirada que el personaje y los creeps (comun/combatiente.js): con Afortunado también tira dos veces (P100).
   function tirada(inv, nombre, valor, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
-    const r = Combatiente.tirarStat(valor, inv.estados, statId, extra ? {extra} : undefined);
+    let r = Combatiente.tirarStat(valor, inv.estados, statId, extra ? {extra} : undefined);
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
+    if(statId === 'ini') r = Combatiente.conIniFijo(r, I().iniFijo(inv));   // 💨 la Prisa: +5 fijo al resultado (2026-11-22)
     return {origen: `${inv.nombre} · ${nombre}`, r};
   }
   // Una tirada de stat de la Botonera (también Esquivar, Parry y Bloqueo). o: {parryPendiente (¿tiene un Parry esperando su

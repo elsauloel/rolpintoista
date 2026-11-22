@@ -1669,7 +1669,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la 🔍, el botón nuevo del GM (6 tiradas del creep con Prisa, todas entre 7 y 10 = 1d4+1+5) y las Acciones del creep. **Sin probar con clics:** una
   invocación con la Prisa (sí en las pruebas automáticas). 991 pruebas automáticas en verde. Duda nueva: P279 (¿el +5 antes o después de una mitad?).
 
-- **⬜ en cola (el dueño ya dio el ok para hacerla después de la Prisa) — 📋 Respuestas a P252, P256, P259, P260 y P262** (dueño, 2026-11-22):
+- **✅ hecho (2026-11-22) — 📋 Respuestas a P252, P256, P259, P260 y P262** (dueño, 2026-11-22):
   1. **P252:** «la lista de iniciativa se limpia al terminar el combate» (cuando el fin del combate pasa el mapa a narrativo).
   2. **P256 (i):** «si le subís la vida a mano [a un caído], te debe aparecer una notificación que diga: el personaje está caído, ¿querés
      resucitarlo con esa cantidad de vida? Sí / No». Con No, elegir lo más simple (no se le sube la vida) y decirlo.
@@ -1680,6 +1680,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      está así; si no, hacerlo.
   7. **P262 (5):** la ventana «Dar a un jugador» le avisa al GM, antes de dar, si a alguien le va a quedar la mochila llena.
   Al terminar, decirle al dueño cuál es la siguiente tarea de la cola.
+  *Resultado* (probado con clics en «Claude · pruebas 2», GM + Jugador 1 + Jugador 2; 998 pruebas automáticas en verde; sin reglas nuevas de Firestore):
+  1. ✅ Al terminar «🏁 Finalizar combate» (cuando pasa el mapa a narrativo) se vacía también el orden de turnos, como «Limpiar»
+     (`TokensAuto.volverANarrativo` → `limpiarIniciativa`). El interruptor a mano no lo toca. Probado en un mapa vacío armado para la prueba (y borrado).
+  2. ✅ Subirle la vida a mano a un caído (HP directo o +N, desde el token) pregunta «X está caído. ¿Querés resucitarlo con N de vida?» Sí/No. **Sí** = el
+     mismo ✚ Revivir con esa vida (se van los estados, Titilando, línea en la Mesa «…subiéndole la vida a mano», animación corta); **No** = no le
+     sube la vida y sigue caído. Probado con un personaje (J1) y un creep (GM). Duda: P280.
+  3. ✅ La nube (Bomba de humo, Polvareda, varita de niebla, virote de humo) guarda quién la puso y con qué; «Ver detalle» y el cartel de arriba lo
+     muestran, y a la pantalla que no ve a quien la puso le dice «Alguien» (sin «con qué»). **No hicieron falta reglas**: esos campos ya estaban
+     permitidos. Probado con la Bomba de humo de J1 (en Sigilo): el GM ve «Alguien», J2 y J1 lo ven nombrado.
+  4. ✅ «🔍 Ver detalle» de los tótems y estandartes, en el cartel del token: qué hace, a quién, de quién es, con qué se clavó, cuánto dura, cómo se
+     rompe. Probado con el Tótem de silencio de un creep (GM y J1; con el creep oculto, J1 ve «Alguien»). Duda: P281.
+  5. ✅ Las armas naturales y el puño (Tipo 4) cuentan para la maestría de su Tipo, en personajes, invocaciones y creeps. Probado en el mapa con un
+     creep con garras (por datos) y la Maestría en armas punzantes: la 🔍 de Daño y de Atacar la muestran. Duda: P282.
+  6. ✅ No estaba: cada copia costaba lo mismo. Ahora la copia N cuesta N − 1 de Job más que la primera (1, 2, 3…; ×3 de una de 1 = 6) y se ve «la próxima
+     copia: N» en la pasiva y en el catálogo. GM Tools no aplica (los creeps no tienen Job). El tope de «la mitad del nivel» sigue igual.
+  7. ✅ La ventana avisa abajo «A X le va a quedar la mochila pasada: 30 de 20 ranuras» y «🎁 Dar» pregunta «¿Dar igual?». Probado desde el mapa y desde GM
+     Tools (se canceló: no se dio nada).
+  Lo que quedó sin probar, en `docs/pruebas-en-el-mapa.md`. La siguiente de la cola: «🛡 Aguante de trinchera con cualquier daño».
 
 ## En cola
 

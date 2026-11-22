@@ -3498,3 +3498,26 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [ ] **Sin ver en pantalla:** un creep o una invocación con la Prisa vieja (el creep suma 5 al tirar el GM); la ficha suelta de un personaje con la
   Prisa vieja (el texto nuevo y que al guardarse quede convertida); la partida real de El origen (no se entra: se convierte sola).
 
+
+## 📋 Respuestas a P252, P256, P259, P260 y P262 (2026-11-22)
+
+- [x] **P252, fin del combate**: con dos personajes en el orden de turnos y el mapa en combate, el interruptor a narrativo **no** vacía el orden; «🏁
+  Finalizar combate» → «📢 Publicar despojos» lo pasa a narrativo y deja «Sin orden todavía». (En un mapa vacío armado para la prueba, con una copia
+  viva de un creep, y borrado después.)
+- [x] **P256 (i), la vida a mano a un caído**: J1 a 0 y después «12» directo: cartel «Blanco J1 está caído. ¿Querés resucitarlo con 12 de vida?»; No =
+  sigue en 0; Sí = vuelve con 12, Titilando, línea en la Mesa. Lo mismo el GM con un creep (5 de 60).
+- [ ] **Sin ver:** la animación corta de esa vuelta (no se miró en pantalla); una invocación caída; el +N del modo «Recibe daño».
+- [x] **P259 (3), la nube**: la Bomba de humo de J1 (en Sigilo): «Ver detalle» y el cartel de arriba dicen «Alguien» / «(alguien)» al GM y «Blanco J1
+  (personaje) · Bomba de humo» a J1 y J2.
+- [ ] **Sin ver:** la Polvareda de un creep escondido vista por un jugador; la varita de niebla; el virote de humo; una nube puesta antes de hoy (dice
+  «a mano»).
+- [x] **P259 (4), «Ver detalle» del tótem**: el Tótem de silencio de un creep, visto por el GM y por J1; con el creep oculto, J1 ve «Alguien».
+- [ ] **Sin ver:** el Estandarte de guerra (bonus); un tótem o estandarte clavado antes de hoy (sin «con qué»).
+- [x] **P260 (4)**: un creep con garras (Tipo 4, natural; armado por datos) y la Maestría en armas punzantes: la 🔍 de Daño suma +1 y la de Atacar
+  muestra la maestría.
+- [ ] **Sin ver:** el puño de un personaje en un duelo; una invocación con colmillos; un duelo de verdad con el arma natural.
+- [x] **P260 (7)**: J1 agrega la Maestría en armas punzantes: el catálogo dice «ya la tenés ×1: la próxima copia cuesta 2 Job»; con ×3 (desde Editar)
+  el Job gastado sube 6 y la pasiva dice «6 Job · la próxima copia: 4». (Se sacó después.)
+- [x] **P262 (5)**: «Dar a un jugador» con 30 ítems para J1 (mochila de 20): aviso abajo y «¿Dar igual?» al tocar Dar; desde el mapa y desde GM Tools.
+  Se canceló (no se dio nada).
+- [ ] **Sin ver:** «🎁 Dar igual» de verdad (el jugador recibe, con su cartel de mochila pasada, como antes).

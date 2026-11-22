@@ -1639,6 +1639,7 @@ avisa que hay alguien eligiendo); (e) con una sola forma **no se pregunta** (ni 
 ### P252 — 🌿 Al terminar «Finalizar combate», ¿se limpia también el orden de turnos? (2026-11-20, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** «sí, la lista de iniciativa se limpia al terminar el combate» (en la cola).
+> ✅ **Hecho (2026-11-22):** al terminar el combate se vacía el orden de turnos (`TokensAuto.limpiarIniciativa`); el interruptor a mano no lo toca.
 Desde el 2026-11-20, cuando el proceso de «🏁 Finalizar combate» termina (se cierra el botín, o se publica sin ítems), el mapa publicado vuelve solo a
 modo narrativo, igual que si el GM tocara el interruptor. **El interruptor no limpia el orden de turnos** (si había uno armado, la lista queda como
 estaba y el GM la borra con «Limpiar»), así que el cambio automático **tampoco lo limpia**: se eligió lo más conservador, no borrar nada que el GM no
@@ -1714,6 +1715,7 @@ correcto. Lo de «percibís algo raro» por habilidades ruidosas: «por ahora af
 ### P256 — ☥ Al resucitar se van los estados: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (a), (c), (e) y (g) «correcto», como están. (i): «si le subís la vida a mano, te debe aparecer una notificación que diga: el personaje está caído, ¿querés resucitarlo con esa cantidad de vida? Sí / No» (en la cola). El resto, como está.
+> ✅ **(i) hecho (2026-11-22):** Sí = el ✚ Revivir con esa vida (estados, Titilando, Mesa, animación corta); No = no se le sube y sigue caído. Duda: P280.
 El dueño: «al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna poción o algún
 pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAlVolver`, comun/combatiente.js); estas son las dudas, con lo elegido:
 - (a) **La Llama de Fénix que no se usó** (volvió con el Ankh o el Pacto teniendo las dos): **queda**, porque el cartel «¿Con qué volvés?» promete
@@ -1780,6 +1782,7 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
 ### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (3) «sí vale la pena»: que la nube guarde quién la puso y con qué (sin delatar al que está escondido); (4) «Ver detalle» de los tótems y estandartes, también (los dos en la cola). (2) como está.
+> ✅ **(3) y (4) hechos (2026-11-22):** la nube guarda quién y con qué (no hicieron falta reglas nuevas) y lo muestra salvo a quien no ve a quien la puso («Alguien»); los tótems y estandartes tienen su «🔍 Ver detalle». Duda: P281.
 
 > ✅ **Muro de fuego decidido (dueño, 2026-11-21):** «debería hacer daño a un personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Se corrige el mapa (cola: «🔥 Muro de fuego al empezar el turno»). Lo demás de P259 sigue abierto.
 > ✅ **Hecho (2026-11-21):** el mapa, el texto de la habilidad, «Ver detalle» y el cartel de arriba dicen «al empezar su turno adentro». Queda P272 (la Varita del muro de fuego).
@@ -1798,6 +1801,7 @@ Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detal
 ### P260 — ⚔ Las cinco maestrías: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (4) «las armas naturales sí se ven afectadas por las maestrías del mismo tipo de arma»; (7) «volver a cargar una misma pasiva que uno ya tiene cuesta un punto de Job más que la carga anterior: si cuesta 1, la segunda copia cuesta 2 y la tercera 3» (verificar si ya está así). Los dos en la cola. El resto, como está.
+> ✅ **(4) y (7) hechos (2026-11-22):** lo natural y el puño cuentan por su Tipo (duda: P282); la copia N de una pasiva cuesta N − 1 más (no estaba así: cada copia costaba lo mismo).
 Las maestrías de punzantes, cortantes, hachas, arcos y ballestas (`comun/pasivas.js`; la cuenta, `Combatiente.familiaDeArma` / `MAESTRIA_STATS`) quedaron
 con estas decisiones conservadoras. **Para el dueño**, cuando quieras:
 1. **El Bloqueo de cortantes y de hachas vale al bloquear CON esa arma** (como el Parry de las armas pesadas: no con un escudo). Dijiste «+1 al
@@ -1836,6 +1840,7 @@ La pasiva (dueño: «+1 la defensa y +1 la defensa especial por cada enemigo ady
 ### P262 — 🎁 Dar a un jugador: ¿una casilla «en secreto»? y lo que quedó elegido «mientras tanto» (2026-11-21, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (5) «está bien que la ventana le avise al GM» si la mochila queda llena (en la cola). El resto, como está.
+> ✅ **(5) hecho (2026-11-22):** la ventana lo dice abajo y «🎁 Dar» pregunta «¿Dar igual?» (no bloquea).
 La ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`) deja siempre una línea en la Mesa que ven todos («🎁 El GM le dio a Fulano: …»).
 1. **¿Una casilla «en secreto»?** Para que esa línea no la vean los demás (un ítem que el GM le pasa a uno solo por la historia). No se programó:
    falta decidir si la línea directamente no sale, o si sale solo para el GM y para quien lo recibe.
@@ -1996,3 +2001,19 @@ Iniciativa a la mitad (hoy ninguno lo hace: Pajaritos, Lisiado, Parálisis y Sen
 después**, entero: primero el dado (con su mitad o su segunda tirada) y al final el +5. Con Afortunado, las dos tiradas llevan su +5. ¿Va así, o el +5
 también tendría que partirse? Además, «Iniciativa fija» quedó como un bono más (stat `inifijo`): cualquier ítem o estado podría dar un fijo a la
 Iniciativa con ese mismo mecanismo (hoy solo la Prisa lo usa).
+
+### P280 — ☥ La vida subida a mano a un caído: ¿queda Titilando? (2026-11-22, Claude)
+Con el «Sí» del cartel nuevo (P256 (i)) el caído vuelve como con ✚ Revivir: se le van los estados y **queda Titilando** (Invulnerable hasta que empieza
+su próximo turno), con la línea «✚ X vuelve con N de vida, Titilando… (lo revivió el GM, subiéndole la vida a mano)» y la animación corta. Antes, la
+vida a mano lo levantaba **sin** Titilando. Además, ese cambio no se deshace con Ctrl+Z (es una resurrección, no un número). ¿Va con Titilando, o la
+vida a mano lo levanta sin él?
+
+### P281 — 🤐 El nombre del tótem o del estandarte delata a quien lo clavó (2026-11-22, Claude)
+El «Ver detalle» nuevo (P259 (4)) no nombra a quien clavó el tótem si esa pantalla no lo ve («Alguien»), pero **el token** se llama «Tótem de silencio
+de <creep>» / «Estandarte de <creep>» (así se crea desde el 2026-10-24), y ese nombre se ve debajo del token y en el cartel de arriba. ¿Se le saca
+el nombre del creep al token («Tótem de silencio», a secas)?
+
+### P282 — 👊 El puño cuenta como punzante (2026-11-22, Claude)
+Desde P260 (4) las armas naturales y el puño cuentan por su Tipo. El puño es Tipo 4, así que **suma la Maestría en armas punzantes** (+1 al daño, +1
+PdG de oportunidad y por la espalda). Lo elegí así porque el pedido decía «y el puño si tiene Tipo». ¿Está bien, o el puño queda afuera? (Los guantes
+de «PdG con punzantes» siguen como antes: al puño de un personaje no le suman; al de un creep sin arma, sí.)

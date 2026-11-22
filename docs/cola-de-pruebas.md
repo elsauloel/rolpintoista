@@ -1753,6 +1753,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: un consumible propio en el editor del catálogo (`datos/catalogo-editor.html`)** (2026-11-22): no se abrió; ver que se
   guarde como consumible con su marca ✋.
 
+- **⬜ en cola — 🎒 Aviso equivocado al pasar al cinturón** (visto en la tarea de consumibles propios, 2026-11-22): al mover 1 unidad con
+  «→ Cinturón», el aviso dice «el cinturón está lleno (1/5)» aunque no lo está. Revisar y corregir el texto.
+- **⬜ en cola — 🤝 Revisar el botón «Dar un ítem» del «⋯» del token** (visto en la misma tarea): con un clic el ayudante no encontró el botón y
+  abrió la ventana por función. Ver si el botón está y se puede tocar (se cruza con el cambio de 🎁 a 🤝).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

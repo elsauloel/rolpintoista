@@ -214,9 +214,11 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
   `mesa-historial.js`, `grilla-dados.js`, `dados3d.js`, `respaldo.js`,
   `efectos-golpe.js`, `asistente-item.js`. Si algo se repite en dos
   herramientas, va ahí — ver [`comun/CLAUDE.md`](comun/CLAUDE.md).
-- Crear o editar ítems (menos consumibles) en la ficha, gm-tools, el
-  generador de tiendas y el editor de catálogo pasa por un solo asistente
-  paso a paso compartido: `comun/asistente-item.js`.
+- Crear o editar ítems en la ficha, gm-tools, el generador de tiendas y el
+  editor de catálogo pasa por un solo asistente paso a paso compartido:
+  `comun/asistente-item.js`. Desde el 2026-11-22 incluye los **consumibles
+  propios, a mano** (`consumoAMano`: sin efectos automáticos, la mesa lo
+  resuelve); los consumibles de fábrica con efectos siguen en el formulario.
 - Los efectos de arma que se aplican al personaje **golpeado** (Rompe
   armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma: al tirar
   el Daño se **recuerdan** resaltados en la Mesa y, si tienen porcentaje,

@@ -1553,8 +1553,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pegado al rival, con la orientación que traía: si se aleja desde donde estaba (el caso común), sigue mirando al rival y no cuenta. *Propuesta:*
   **A:** toda oportunidad cuenta como por la espalda; **C (recomendada):** cuenta si el paso con el que se iba lo alejaba del rival (le da la
   espalda); si se iba de costado, no; **B:** dejarlo como está.
-- **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué
+- **✅ explicado (2026-11-22) — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué
   son, y retomar P265 con eso.
+  *Resultado:* un arcabuz es un arma de fuego antigua, larga, de pólvora y mecha (la abuela del mosquete y del rifle). En el catálogo hay
+  cinco armas de pólvora: Arcabuz de cubierta, Arcabuz de mecha, Pistola de chispa, Pistola de duelo de plata y Trabuco del contrabandista; las
+  cinco están **archivadas** (del catálogo viejo: no salen en las tiendas) y ninguna tiene Recarga, por eso la maestría de ballestas no les suma.
+  La pólvora quedó pendiente en `docs/rework-armas-rango.md` («no se esquiva, se apunta»). Propuesta: P265 espera a que toque la pólvora en el
+  rework. Espera el ok del dueño.
 - **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
   esas defensas, independientemente si es trampa, ataque u otra cosa»). Ya se sumó en trampas y zonas de número fijo (tanda 5); revisar que
   no falte ningún camino y probarlo.

@@ -2154,6 +2154,9 @@ versión parecida en más de una, es candidato a juntar.
   el espejo de la Táctica de enjambre del lado de quien defiende. Acá vive solo lo puro: `Combatiente.trincheraBono(val, rivales)` → `{def, n}` o
   null, `trincheraTxt(b)` y `rivalesPegados(…)` (para las pruebas). El resumen público lleva `trinchera` (personaje e invocaciones); la cuenta y la
   suma las hace el mapa (ver vtt-hexgrid/CLAUDE.md). `Duelo.crear` anota `ataque.trinchera` solo para decirlo en la declaración (`trincheraDueloTxt`).
+  **2026-11-22 (con cualquier daño):** `trincheraDelGolpe(val, rivales, {ignoraDef, frenaEsp})` → `{trin, def, esp}` es la regla única de a dónde
+  va (sin ignorar la Defensa → a la Defensa; ignorándola y frenado por la Defensa especial → a esa; si no → a nada); `trincheraEnPartes(defPartes)` →
+  `{v, esp}` lee lo que sumó en un golpe y `trincheraCorto(v)` lo dice («+2 de Aguante de trinchera»).
 - **💨 Prisa = +5 a la tirada de Iniciativa** (2026-11-20, dueño; antes ponía primero en el orden de turnos): la pasiva de `pasivas.js` da
   `{stat: 'ini', val: 5}`. La copia vieja (`mods: [{stat: 'prisa', val: 1}]`) se convierte sola: `Combatiente.pasivasAlDia(lista)` (la llaman
   `FichaGuardado.completar` —personaje e invocaciones—, `CreepCalculo.normalizar` e `InvCalculo.migrar`) y `Combatiente.modsPasiva(p)` da los bonos ya

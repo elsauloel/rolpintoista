@@ -2021,3 +2021,15 @@ el nombre del creep al token («Tótem de silencio», a secas)?
 Desde P260 (4) las armas naturales y el puño cuentan por su Tipo. El puño es Tipo 4, así que **suma la Maestría en armas punzantes** (+1 al daño, +1
 PdG de oportunidad y por la espalda). Lo elegí así porque el pedido decía «y el puño si tiene Tipo». ¿Está bien, o el puño queda afuera? (Los guantes
 de «PdG con punzantes» siguen como antes: al puño de un personaje no le suman; al de un creep sin arma, sí.)
+
+### P283 — 🛡 Aguante de trinchera con cualquier daño: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+
+Pedido del dueño (2026-11-22): «debería contemplarse para cualquier daño que tenga en cuenta esas defensas, independientemente si es trampa, ataque u
+otra cosa». Ahora la regla de a dónde va el bono está en un solo lugar (`Combatiente.trincheraDelGolpe`) y todo daño del mapa pasa por ahí. Quedan dos
+cosas chicas para decidir:
+1. **GM Tools no lo cuenta.** El cuadro «daño» de un creep en GM Tools resta la Defensa pero no sabe quién lo tiene pegado (eso lo sabe el mapa).
+   Mientras tanto, si el creep tiene la pasiva, el aviso del daño dice «el Aguante de trinchera no se cuenta acá (lo cuenta el mapa): si tiene enemigos
+   pegados, sumalo a mano» (lo mismo que la ficha suelta, P261 punto 6). ¿Alcanza así, o querés que GM Tools mire el mapa?
+2. **Las Armas perforantes contra la Defensa especial.** «Pasan N siempre» se cuenta contra la Defensa especial del equipo; el +N del Aguante se resta
+   después, así que puede frenar parte de lo que «pasaba siempre». (Contra la Defensa común sí está bien: la Perfora se cuenta con el Aguante incluido.)
+   Mientras tanto queda así (es un caso muy raro). ¿Lo emparejo?

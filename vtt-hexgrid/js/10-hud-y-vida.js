@@ -219,8 +219,9 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   if(Array.isArray(r.escudosFuera) && r.escudosFuera.length) extra.push(`se gastó ${r.escudosFuera.join(', ')}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
-  if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
-  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(Combatiente.danoAVida(r))} de daño (vida ${Combatiente.vidaCambioTxt(previo, nuevo, r)})${suf}`;   // la Vida extra cuenta como vida (P227; dueño, 2026-11-18: «104/35 → 100/35»)
+  const trinG = Combatiente.trincheraEnPartes(r.defPartes), defTxt = `${trinG && trinG.esp ? 'Defensa especial' : 'Defensa'} ${fmt(r.defensa)}${trinG ? ` (con ${Combatiente.trincheraCorto(trinG.v)})` : ''}`;   // 🛡 (2026-11-22)
+  if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · ${defTxt} lo frenó entero`;
+  return `${nombre}: ${fmt(golpe)} − ${defTxt} → ${fmt(Combatiente.danoAVida(r))} de daño (vida ${Combatiente.vidaCambioTxt(previo, nuevo, r)})${suf}`;   // la Vida extra cuenta como vida (P227; dueño, 2026-11-18: «104/35 → 100/35»)
 }
 
 // ignoraDef: daño directo (un crítico, una trampa que ignora la Defensa, casteo…):
@@ -315,8 +316,8 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const estoico = estoicoDe(sc.estados, estoN);
-    const trin = Combatiente.trincheraBono((st => CreepCalculo.modTotal(sc, st))('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
-    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const tg = Combatiente.trincheraDelGolpe((st => CreepCalculo.modTotal(sc, st))('trinchera'), trinN, {ignoraDef, frenaEsp: !!(o && o.frenaEsp)}), trin = tg.trin, trinEsp = tg.esp;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena (la regla, en comun/combatiente.js)
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + tg.def;
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
     r.max = num(sc.hpMax);   // ❤ para mostrar la vida «X/máx» (Combatiente.vidaCambioTxt)
@@ -495,8 +496,8 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     datos.meta = datos.meta || {};
     const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
     const estoico = estoicoDe(efectos, estoN);
-    const trin = Combatiente.trincheraBono((st => rs[st])('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
-    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const tg = Combatiente.trincheraDelGolpe((st => rs[st])('trinchera'), trinN, {ignoraDef, frenaEsp: !!(o && o.frenaEsp)}), trin = tg.trin, trinEsp = tg.esp;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena (la regla, en comun/combatiente.js)
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + tg.def;
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
     r.max = num(rs.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
@@ -622,8 +623,8 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
     const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
     const estoico = estoicoDe(inv.estados, estoN);
-    const trin = Combatiente.trincheraBono((st => FichaResumen.invModTotal(inv, st))('trinchera'), trinN), trinEsp = ignoraDef && o && o.frenaEsp && trin ? trin.def : 0;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena
-    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + (!ignoraDef && trin ? trin.def : 0);
+    const tg = Combatiente.trincheraDelGolpe((st => FichaResumen.invModTotal(inv, st))('trinchera'), trinN, {ignoraDef, frenaEsp: !!(o && o.frenaEsp)}), trin = tg.trin, trinEsp = tg.esp;   // 🛡 a la Defensa, o a la Defensa especial si es lo que frena (la regla, en comun/combatiente.js)
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0) + tg.def;
     const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro, estoico, trinchera: trin, trincheraEsp: trinEsp});
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) + trinEsp : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
     r.max = num(inv.hpMax);   // ❤ (Combatiente.vidaCambioTxt)
@@ -748,7 +749,8 @@ function hudHpPrevia(t, d, texto){
   const r = resolverGolpe(golpe, def, estadosPrevia(t, d));
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);
-  return `${fmt(golpe)} − Def ${fmt(def)}${est ? ` (${fmt(num(d.def))} + ${est.val} de Estoicismo)` : ''} = ${fmt(Math.max(0, golpe - def))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+  const sumas = [est ? `${est.val} de Estoicismo` : '', trinP ? `${trinP.def} de Aguante de trinchera` : ''].filter(Boolean);   // 🛡 (2026-11-22: a la vista)
+  return `${fmt(golpe)} − Def ${fmt(def)}${sumas.length ? ` (${fmt(num(d.def))} + ${sumas.join(' + ')})` : ''} = ${fmt(Math.max(0, golpe - def))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
 }
 
 /* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------

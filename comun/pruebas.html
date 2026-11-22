@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261122cola47"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261122cola47"></script>
+<script src="combatiente.js?v=20261122cola48"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -8344,6 +8344,18 @@ prueba('🛡 Aguante de trinchera (dueño, 2026-11-20): +1 Defensa y +1 Defensa 
   const inv = InvCalculo.migrar({id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: [pasC, {...pasC, id: 'p2'}]});
   igual([FichaResumen.resumen(S, {}).trinchera, FichaCalculo.calcular(S).final.def === FichaCalculo.calcular(FichaGuardado.normalizar({}, {mezclarCatalogo: false}).S).final.def, CreepCalculo.modTotal(sc, 'trinchera'), FichaResumen.invModTotal(inv, 'trinchera')],
     [1, true, 1, 2]);
+});
+prueba('🛡 Aguante de trinchera con cualquier daño (dueño, 2026-11-22): a la Defensa, a la Defensa especial o a nada, con una sola regla; y se ve en la cuenta', async () => {
+  const C = Combatiente;
+  // Físico (no ignora la Defensa): a la Defensa. Especial que frena la Defensa especial: a esa. Crítico / directo / a mano (ignora sin frenar): a nada.
+  igual([C.trincheraDelGolpe(1, 2, {}), C.trincheraDelGolpe(1, 2, {ignoraDef: true, frenaEsp: true}), C.trincheraDelGolpe(1, 2, {ignoraDef: true}), C.trincheraDelGolpe(2, 3, {ignoraDef: false}), C.trincheraDelGolpe(0, 3, {}), C.trincheraDelGolpe(1, 0, {ignoraDef: true, frenaEsp: true})],
+    [{trin: {def: 2, n: 2}, def: 2, esp: 0}, {trin: {def: 2, n: 2}, def: 0, esp: 2}, {trin: null, def: 0, esp: 0}, {trin: {def: 6, n: 3}, def: 6, esp: 0}, {trin: null, def: 0, esp: 0}, {trin: null, def: 0, esp: 0}]);
+  igual([C.trincheraEnPartes([{txt: 'Defensa', v: 1}, {txt: '🛡 Aguante de trinchera: 2 enemigos pegados', v: 2}]), C.trincheraEnPartes([{txt: '🛡 Aguante de trinchera: 3 enemigos pegados (a la Defensa especial)', v: 3}]), C.trincheraEnPartes([{txt: 'Defensa', v: 4}]), C.trincheraEnPartes(null), C.trincheraCorto(2), C.trincheraCorto(0)],
+    [{v: 2, esp: false}, {v: 3, esp: true}, null, null, '+2 de Aguante de trinchera', '']);
+  // Los tres caminos del daño del mapa (creep, personaje, invocación) usan esa regla; el aviso del golpe, la cuenta de una zona / un daño directo y la vista previa del token lo dicen aparte.
+  const [t10, t08, g01] = await Promise.all(['../vtt-hexgrid/js/10-hud-y-vida.js', '../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', '../gm-toolset/js/01-dados-reglas-y-nitros.js'].map(async u => (await fetch(u, {cache: 'no-store'})).text()));
+  igual([(t10.match(/Combatiente\.trincheraDelGolpe\(/g) || []).length, (t10.match(/\+ tg\.def;/g) || []).length, /trinEsp = ignoraDef && o && o\.frenaEsp/.test(t10), /trincheraEnPartes\(r\.defPartes\), defTxt/.test(t10), /de Aguante de trinchera` : ''\]/.test(t10)], [3, 3, false, true, true]);
+  igual([/const trinZ = Combatiente\.trincheraEnPartes\(r\.defPartes\)/.test(t08), /- trinV;/.test(t08), /Aguante de trinchera no se cuenta acá/.test(g01)], [true, true, true]);
 });
 prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortantes, hachas, arcos y ballestas — cada bono solo con un arma de esa familia; personaje, creep e invocación; la 🔍 y el costo', () => {
   const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);

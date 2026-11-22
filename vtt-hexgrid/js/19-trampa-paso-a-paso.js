@@ -844,8 +844,10 @@ async function trampaPasoDanoAplicar(id, dt, mano){
   if(monto <= 0) texto += ' → sin daño';
   else if(res){
     const g = res.r;
+    // 🛡 Aguante de trinchera (2026-11-22): aparte (antes iba sumado adentro de «Defensa N», y en la Defensa especial no se decía)
+    const trinT = Combatiente.trincheraEnPartes(g.defPartes), trinTxt = trinT ? ` − 🛡 Aguante de trinchera${trinT.esp ? ' (a la Defensa especial)' : ''} ${fmt(trinT.v)}` : '';
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
-      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${g.perfora ? ` (pasa${g.perfora > 1 ? 'n' : ''} ${fmt(g.perfora)} por la Perfora)` : ''}${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño`) + (num(g.absorbido) - num(g.vida) > 0 ? ` (el escudo absorbió ${fmt(num(g.absorbido) - num(g.vida))})` : '');
+      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''}${trinTxt} → ${fmt(num(g.recibido) + num(g.vida))} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno - (trinT ? trinT.v : 0))}${trinTxt}${g.perfora ? ` (pasa${g.perfora > 1 ? 'n' : ''} ${fmt(g.perfora)} por la Perfora)` : ''}${freno ? ` − ${freno}` : ''} → ${fmt(num(g.recibido) + num(g.vida))} de daño`) + (num(g.absorbido) - num(g.vida) > 0 ? ` (el escudo absorbió ${fmt(num(g.absorbido) - num(g.vida))})` : '');
     if(!g.invulnerable) texto += ` · ✔ ya se descontó de la vida${x && x.tipo !== 'creep' && Number.isFinite(Number(res.previo)) && Number.isFinite(Number(res.nuevo)) ? ` (vida ${Combatiente.vidaCambioTxt(res.previo, res.nuevo, res.r)})` : ''}`;
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const entro = monto <= 0 ? 0 : res ? Combatiente.danoAVida(res.r) : monto;   // lo que llegó a la vida, con la Vida extra (es vida; sin poder aplicarlo, se da por hecho)

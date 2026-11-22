@@ -724,11 +724,12 @@ function zonaGmHooksDuelo(lado){
 function zonaDanoCuenta(monto, r, o){
   if(r.invulnerable) return {entro: 0, cuenta: 'Invulnerable: no entró nada', frenoAlgo: true};
   const entro = Combatiente.danoAVida(r), resta = [];
-  const defBase = num(r.defensa) - num(o.resElem) - num(o.suela) - (o.ignoraDef ? num(o.armadmg) : 0);
+  // 🛡 Aguante de trinchera (2026-11-21 a la Defensa especial; 2026-11-22 también a la Defensa, que antes iba sumado adentro de «Defensa N»): aparte.
+  const trinZ = Combatiente.trincheraEnPartes(r.defPartes), trinV = trinZ ? trinZ.v : 0;
+  const defBase = num(r.defensa) - num(o.resElem) - num(o.suela) - (o.ignoraDef ? num(o.armadmg) : 0) - trinV;
   if(!o.ignoraDef && defBase > 0) resta.push(`Defensa ${fmt(defBase)}`);
   if(o.ignoraDef && num(o.armadmg) > 0) resta.push(`Defensa especial ${fmt(o.armadmg)}`);
-  const trinZ = o.ignoraDef ? (r.defPartes || []).find(p => p && /Aguante de trinchera/.test(p.txt || '')) : null;   // 🛡 (2026-11-21) lo que sumó a la Defensa especial
-  if(trinZ && num(trinZ.v) > 0) resta.push(`${trinZ.txt} ${fmt(trinZ.v)}`);
+  if(trinV > 0) resta.push(`🛡 Aguante de trinchera${trinZ.esp ? ' (a la Defensa especial)' : ''} ${fmt(trinV)}`);
   if(num(o.resElem) && o.elZ) resta.push(Combatiente.resElementalTxt(o.elZ, num(o.resElem)));
   if(num(o.suela) > 0) resta.push(`Suela gruesa ${fmt(o.suela)}`);
   if(num(r.arcano) > 0) resta.push(`Armadura arcana ${fmt(r.arcano)}`);

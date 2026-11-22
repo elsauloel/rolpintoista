@@ -386,6 +386,8 @@ function aplicarDanioCreep(input){
 
   const extra = [];
   detalleAbs.forEach(d => extra.push(d));
+  // 🛡 Aguante de trinchera (2026-11-22): acá no se sabe quién lo tiene pegado (lo cuenta el mapa, P261 y P283): se avisa para sumarlo a mano.
+  if(Math.round(Number(CreepCalculo.modTotal(sc, 'trinchera')) || 0) > 0) extra.push('🛡 el Aguante de trinchera no se cuenta acá (lo cuenta el mapa): si tiene enemigos pegados, sumalo a mano');
   const sufijo = extra.length ? ` · ${extra.join(' · ')}` : '';
 
   if(recibido <= 0){

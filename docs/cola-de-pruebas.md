@@ -1560,9 +1560,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cinco están **archivadas** (del catálogo viejo: no salen en las tiendas) y ninguna tiene Recarga, por eso la maestría de ballestas no les suma.
   La pólvora quedó pendiente en `docs/rework-armas-rango.md` («no se esquiva, se apunta»). Propuesta: P265 espera a que toque la pólvora en el
   rework. **Ok del dueño (2026-11-22):** «me parece bien».
-- **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
+- **✅ hecho (2026-11-22) — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
   esas defensas, independientemente si es trampa, ataque u otra cosa»). Ya se sumó en trampas y zonas de número fijo (tanda 5); revisar que
   no falte ningún camino y probarlo.
+  *Resultado:* todo daño del mapa pasa por tres funciones (personaje, creep, invocación) y las tres ya lo sumaban; ahora la regla de a dónde va (a la
+  Defensa, a la Defensa especial o a nada) está en un solo lugar, `Combatiente.trincheraDelGolpe`. Lo que faltaba era **que se viera**: en una trampa
+  común, en una zona de número fijo y en el aviso del golpe se sumaba escondido adentro de «Defensa 3»; ahora dice «Defensa 1 − 🛡 Aguante de
+  trinchera 2». También la vista previa de «Recibe daño» del token («10 − Def 3 (1 + 2 de Aguante de trinchera)»). No suma (a propósito) en lo que
+  no resta ninguna defensa: un crítico, el daño directo (fuego del terreno, escudo elemental, rayo en cadena, Espinas, Espejo, Maldición tormentosa,
+  Tendón cortado), el elemental de un arma, lo escrito a mano. En GM Tools no se cuenta (no sabe quién está pegado): avisa para sumarlo a mano (P283).
+  Probado con clics en «Claude · pruebas 2» con la pasiva en Blanco J1 y dos creeps pegados: un ataque con arma, un hechizo (Defensa especial), una
+  trampa física, una zona con daño tirado, una de número fijo física y una de fuego, «Recibe daño» del token, el Terreno incendiado (no suma, bien) y
+  un creep escondido pegado (no cuenta: siguen siendo 2). 999 pruebas automáticas en verde (1 nueva). Dudas: P283.
 - **✅ explicado (2026-11-22; lo que se decidió va al final de la cola) — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
   comparar y evaluar»).
   *Resultado:* no hay otra pasiva de jugador que suba la Iniciativa (la Prisa reemplazó a «Reflejos de gato», +1). La suben ítems: 27 con +1, 10
@@ -1714,6 +1723,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22: «revisar el sobrepeso y evaluar que
   la mochila sobrecargada también se sume al de sobrepeso»). Hoy la mochila llena se mide por ranuras y el peso solo cuenta lo equipado (P262).
   Contarle cómo está el sobrepeso hoy (qué lo dispara, qué hace) y proponer cómo sumar la mochila pasada de ranuras; programar lo que elija.
+- **⬜ en cola — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
+  creep con la pasiva, recibir daño desde el cuadro de daño de GM Tools y ver que el aviso dice que el Aguante se suma a mano (P283).
+- **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
+  (son directos); se revisó el código y se probó solo con el Terreno incendiado.
 
 ## En cola
 

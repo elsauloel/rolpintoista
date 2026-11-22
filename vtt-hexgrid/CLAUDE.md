@@ -2509,6 +2509,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Botonera si cambió la cuenta; lo llama el dibujo, js/05). **La suma está en el daño**: `danioPj` / `danioCreep` / `danioInv` (js/10) cuentan de
   nuevo y la agregan a la Defensa, o a la Defensa especial si el duelo dice `o.frenaEsp` (js/13); sale en `defensaPartes` como un renglón propio.
   La 🔍 de Defensa la completa `lupaContenido` (js/11, sección «En el mapa, ahora»). Lo provisorio: P261.
+  **Con cualquier daño** (2026-11-22, dueño): la regla de a dónde va (Defensa / Defensa especial / nada) es `Combatiente.trincheraDelGolpe`, que
+  usan las tres funciones del daño; los que llaman solo dicen `o.frenaEsp` cuando lo frena la Defensa especial (el duelo js/13, la zona js/08, la
+  trampa js/19). Lo que el bono sumó se lee de `r.defPartes` con `Combatiente.trincheraEnPartes` y se muestra aparte en el aviso del golpe
+  (`golpeTexto`), la cuenta de una zona o de un daño directo (`zonaDanoCuenta`, js/08), la línea de la trampa (js/19) y la vista previa de «Recibe
+  daño». No suma en lo que no resta defensas (crítico, daño directo, el elemental del arma, lo escrito a mano). GM Tools no lo cuenta: avisa (P283).
 - **💨 La Prisa ya no ordena** (2026-11-20, dueño: +5 a la tirada de Iniciativa): `ordenarIniciativa` (js/04) ordena solo por el valor; se fueron
   `tokenTienePrisa`, la 🏃 de la lista y el cartel «Aplicar / Resolver a mano». `js/86-prisa.js` conserva el nombre pero ahora es el botón Ordenar
   (`iniciativaOrdenar`, que deja listo «▶ Iniciar combate» con `OrdenTurnos.marcasAlOrdenar`) y el aviso de los puestos (`iniciativaAvisarPuestos`).

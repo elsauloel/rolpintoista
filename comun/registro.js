@@ -67,7 +67,7 @@ const Registro = (() => {
   // 🆕 Empezar un registro nuevo (solo el GM). → true si lo hizo.
   async function nuevo(o){
     if(!esGM()) return false;
-    if(!(o && o.preguntar === false) && !(await Confirmar.preguntar('Lo que se registró hasta ahora (tiradas, duelos, movimientos, vida y estados) pasa a ser «el combate anterior» y se sigue viendo. Lo de antes de ese se borra para todos.',
+    if(!(o && o.preguntar === false) && !(await Confirmar.preguntar('Lo que se registró hasta ahora (tiradas, duelos, movimientos, vida y estados, mensajes secretos 🕊️) pasa a ser «el combate anterior» y se sigue viendo. Lo de antes de ese se borra para todos.',
       {titulo: '🆕 Empezar registro nuevo', icono: '🗂', si: 'Empezar registro nuevo', no: 'Cancelar'}))) return false;
     await leerDoc();
     const viejoDesde = doc && doc.desde ? doc.desde : null;
@@ -85,6 +85,8 @@ const Registro = (() => {
     for(const col of ['tiradas', 'historial', 'historial_jugadores']){
       try{ n += await borrarAntes(col, hasta); }catch(err){ console.error('Registro: no se pudo borrar lo viejo de', col, err); }
     }
+    // 🕊️ Los mensajes secretos siguen al registro (comun/mensajes.js, 2026-11-22): los de antes del combate anterior, como las tiradas.
+    if(typeof Mensajes !== 'undefined') n += await Mensajes.borrar(hasta);
     avisar(`🗂 Registro nuevo${n ? ` · se borraron ${n} líneas de antes del combate anterior` : ''}`);
     return true;
   }

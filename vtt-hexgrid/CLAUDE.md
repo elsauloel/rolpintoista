@@ -1020,6 +1020,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   confirma, apaga `S.meta.pacto`, línea en la Mesa (`Combatiente.pactoQuitadoTxt`: «El GM le quitó el Pacto a…» / «… dejó su Pacto») y el Aviso al jugador
   (`Combatiente.pactoQuitadoAviso`).
 
+- **🕊️ Mensajes secretos en la Crónica** (2026-11-22, dueño; la pieza es `comun/mensajes.js`): `window.mensajesCronica(m)` (js/16) pone en
+  `momentosFeed` una tarjeta `tipo: 'mensaje'` (clave `msj:<id>`, ~20 s, solo en esta pantalla, no escribe nada) que `renderMomentosFeed` dibuja
+  con `Mensajes.cronicaHtml` (entra con un fogonazo, borde y fondo que brillan; las animaciones arrancan en negativo según la edad porque la
+  Crónica se redibuja cada medio segundo). Tocarla abre la conversación (`data-mensaje-abrir`). El 🕊️ flotante va abajo a la derecha del lienzo.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

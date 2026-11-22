@@ -387,6 +387,7 @@ function renderMomentosFeed(){
     feed.addEventListener('click', ev => {
       const bam = ev.target.closest('[data-detectar-amano]'); if(bam){ if(typeof revelarAManoDeMomento === 'function') revelarAManoDeMomento(bam.dataset.detectarAmano); return; }   // ✋ (js/122)
       const bx = ev.target.closest('[data-momento-cerrar]'); if(bx){ momentosCerrados.add(bx.dataset.momentoCerrar); renderMomentosFeed(); return; }
+      const bmsj = ev.target.closest('[data-mensaje-abrir]'); if(bmsj){ momentosCerrados.add(bmsj.dataset.mensajeClave); renderMomentosFeed(); if(typeof Mensajes !== 'undefined') Mensajes.abrirConversacion(bmsj.dataset.mensajeAbrir); return; }   // 🕊️ (comun/mensajes.js)
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
       const bm = ev.target.closest('[data-mal-de-ojo]'); if(bm){ const v = momentosFeed.get(bm.dataset.malDeOjo); if(v && typeof malDeOjoTirar === 'function'){ bm.disabled = true; malDeOjoTirar(bm.dataset.malDeOjo, v.d, true); } }   // 🧿 (js/60)
       const bz = ev.target.closest('[data-zona-extra]'); if(bz){ const v = momentosFeed.get(bz.dataset.zonaExtra); if(v && typeof zonaExtraTirar === 'function'){ bz.disabled = true; zonaExtraTirar(bz.dataset.zonaExtra, v.d, true); } }   // 🎲 (js/66)
@@ -407,6 +408,7 @@ function renderMomentosFeed(){
   const lista = [...momentosFeed.entries()].filter(([k]) => !momentosCerrados.has(k)).sort((a, b) => b[1].orden - a[1].orden).slice(0, 4);
   feed.innerHTML = lista.map(([k, v]) => {
     const d = v.d, queda = v.hasta - ahora, lineas = d.lineas || (d.datos && d.datos.lineas);
+    if(d.tipo === 'mensaje' && typeof Mensajes !== 'undefined') return Mensajes.cronicaHtml(k, d.mensaje, ahora - (v.desde || ahora), queda);   // 🕊️ un mensaje secreto que me llegó
     return `<div style="position:relative;pointer-events:auto;background:rgba(21,26,38,.94);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:8px;padding:8px 10px;color:#e9ecf4;font-size:13px;line-height:1.35;box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:${queda < 1500 ? Math.max(0.15, queda / 1500) : 1};transition:opacity .4s">
       <button type="button" class="momento-x" data-momento-cerrar="${esc(k)}" title="Cerrar (solo en tu pantalla)">✕</button>
       <div style="padding-right:18px"><span style="font-size:15px">${esc(d.icono || '•')}</span> <b>${esc(d.titulo || '')}</b></div>
@@ -424,6 +426,15 @@ function renderMomentosFeed(){
   clearTimeout(momentosFeedTimer);
   if(momentosFeed.size) momentosFeedTimer = setTimeout(renderMomentosFeed, 500);
 }
+
+// 🕊️ Un mensaje secreto que me llegó (comun/mensajes.js, 2026-11-22, dueño: «en la Crónica con animación, fondo y borde brillante, algo que llame
+// mucho la atención»): su tarjeta, solo en esta pantalla (no es un momento: no se escribe nada). Al irse queda el 🕊️ flotante con el globito.
+window.mensajesCronica = m => {
+  const k = 'msj:' + m.id;
+  if(momentosFeed.has(k)) return;
+  momentosFeed.set(k, {d: {tipo: 'mensaje', mensaje: m, estado: 'listo'}, hasta: Date.now() + (typeof Mensajes !== 'undefined' ? Mensajes.CRONICA_MS : 20000), orden: ++momentosOrden, desde: Date.now()});
+  renderMomentosFeed();
+};
 
 /* ---------- Un duelo que esta pantalla no tiene abierto (P151, dueño 2026-10-03) ----------
    comun/duelo.js avisa cada paso (contacto, Bloqueo, crítico, daño, efectos, fin) recién cuando los dados quedaron quietos: una tarjeta por

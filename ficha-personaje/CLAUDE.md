@@ -726,6 +726,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   La pasiva muestra «N Job · la próxima copia: M» (js/04) y el catálogo de «+ Pasiva», si ya la tenés, «ya la tenés ×k: la próxima copia cuesta M Job»
   (`pasivaYaComprada`, js/10); el toast del «Agregar» lo dice. El tope de la mitad del nivel no cambió.
 
+- **🕊️ Mensajes secretos** (2026-11-22): la ficha carga `comun/mensajes.js` (después de `mesa.js`): el 🕊️ al pie de la Mesa, el `/m` y el 🕊️
+  flotante a la izquierda de la Mesa. Dentro del mapa (modo Botonera) no hace nada. Ver `comun/CLAUDE.md`.
 - **✋ Consumibles propios, a mano** (2026-11-22, dueño): «+ Ítem» de la mochila → Crear ítem nuevo → Consumible: el asistente común arma uno sin
   efectos automáticos (`consumoAMano`, ver `comun/CLAUDE.md`); va a la mochila, «→ Cinturón» lo pasa al cinturón y se consume como cualquiera (la Mesa
   dice qué hace, ✋ a mano). Su «Editar» vuelve al asistente; los consumibles de fábrica siguen con el formulario completo. Una invocación no lleva

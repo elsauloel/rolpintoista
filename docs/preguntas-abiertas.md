@@ -2048,3 +2048,20 @@ queda marcado «✋ A mano: el efecto lo resuelve la mesa.». Quedan tres cosas 
    opcional (ej. «tira 1d6») que salga sola al consumirlo, como el «✋ A mano» de las varitas?
 3. **Mismo nombre que uno del catálogo**: el cinturón junta las pilas por nombre; un consumible propio que se llame igual que uno de fábrica
    (ej. «Poción de vida») se apilaría con él. Mientras tanto queda así (es raro); ¿avisamos al crearlo?
+
+### P285 — 🕊️ Mensajes secretos: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+
+Pedido del dueño (2026-11-22, «✉ Mensajes secretos entre usuarios», decisiones (a)–(g) en `docs/cola-de-pruebas.md`). Está hecho
+(`comun/mensajes.js`); quedan cosas chicas para decidir:
+1. **Qué es «limpiar el registro general».** Elegí los dos botones del GM que ya limpian la Mesa: el **🗑 de la Mesa** borra *todos* los mensajes
+   secretos (junto con todas las tiradas) y el **🆕 Registro nuevo** (📜 Historial, y el recordatorio al pasar a combate) borra los de *antes del
+   combate anterior*, igual que las tiradas. La limpieza automática (lo de más de 30 días o de antes del combate anterior, cuando entra el GM) **no**
+   los toca: no se borran solos. ¿Está bien así?
+2. **`/r` hace lo mismo que `/m`.** En otros juegos `/r` es «responder al último que me escribió» (sin poner el nombre). ¿Lo querés así?
+3. **El 🕊️ flotante aparece recién cuando hay algún mensaje** (mandado o recibido) en el registro; sin mensajes no se ve (para mandar está el 🕊️ de la
+   Mesa). ¿O preferís que esté siempre?
+4. **La paloma en todos lados** (dueño, 2026-11-22: «el botoncito flotante… podría tener el icono de una paloma blanca, como si fuera una paloma
+   mensajera. El emoji»): la usé también en el botón del pie de la Mesa, en la fila de la Mesa, en la tarjeta de la Crónica y en las ventanas, para
+   que todo lo de los mensajes se reconozca igual. ¿Te gusta así o la dejamos solo en el flotante?
+5. **Un mensaje a varios**: cada uno lo ve en la conversación con quien lo mandó, con «También para: …»; si responde, le contesta solo a quien lo
+   mandó (no a todos). ¿Hace falta «responder a todos»?

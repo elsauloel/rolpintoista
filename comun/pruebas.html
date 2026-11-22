@@ -134,6 +134,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="no-visto.js?v=20261120a"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261121mueve"></script>
+<script src="mensajes.js?v=20261122msj"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -9814,6 +9815,80 @@ grupo('Empieza tu turno con la zona adentro');
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
     cierto(/if\(zonaJuntar\)\{ zonaJuntar\.push\(el\.id\); return; \}/.test(t08) && /zonaInicioOfrecer\(o\.id, junta\)/.test(t08) && /t\.tipo !== 'creep' && typeof inicioTurnoTarjetaSobra/.test(t08) && /15000/.test(t08));
     cierto(/if\(zonaBanner\.enInicio\)\{/.test(t08));
+  });
+})();
+
+/* ---------- ✉ Mensajes secretos (comun/mensajes.js, 2026-11-22) ---------- */
+grupo('✉ Mensajes secretos');
+(() => {
+  const M = Mensajes;
+  const miembros = [{uid: 'yo', nombre: 'Yo', gm: false}, {uid: 'j2', nombre: 'Jugador Dos'}, {uid: 'gm', nombre: 'Máster', gm: true}, {uid: 'j1', nombre: 'Ana'}];
+  const fichas = [{duenoUid: 'j1', nombre: 'Blanco J1'}, {duenoUid: 'j2', nombre: 'Blanco J2'}, {duenoUid: 'yo', nombre: 'Mío'}, {duenoUid: 'j2', nombre: 'Rata Ñandú'}];
+  const P = M.personas(miembros, fichas, 'yo');
+  prueba('personas: sin uno mismo, el GM primero, cada uno con sus personajes', () => igual(P.map(p => [p.uid, p.gm, p.personajes.join('|')]), [['gm', true, ''], ['j1', false, 'Blanco J1'], ['j2', false, 'Blanco J2|Rata Ñandú']]));
+  prueba('sugerencias: por las primeras letras, del personaje o del usuario, y por cualquier palabra', () => {
+    igual(M.sugerencias(P, 'bl').map(c => [c.nombre, c.uid, c.tipo]), [['Blanco J1', 'j1', 'personaje'], ['Blanco J2', 'j2', 'personaje']]);
+    igual(M.sugerencias(P, 'j2').map(c => c.nombre), ['Blanco J2']);
+    igual(M.sugerencias(P, 'nan').map(c => c.nombre), ['Rata Ñandú']);   // sin tildes ni eñes
+    igual(M.sugerencias(P, 'mas').map(c => [c.nombre, c.uid]), [['Máster', 'gm']]);
+    igual(M.sugerencias(P, '').length, 6);
+  });
+  prueba('comando: /m y /r (mayúscula o minúscula); una tirada o «/mapa» no lo son', () => igual(
+    ['/m hola', '/R x', '  /r', '/mapa', '2d6+3', 'm hola', '/m'].map(t => !!M.comando(t)), [true, true, true, false, false, false, true]));
+  prueba('parsear: elige a la persona por el nombre más largo que calce, del personaje o del usuario', () => {
+    const a = M.parsear('/m Blanco J1 hola che', P), b = M.parsear('/R blanco j2: dale', P), c = M.parsear('/m Ana  ¿venís?', P), d = M.parsear('/m Máster', P);
+    igual([a.persona.uid, a.texto, a.por.tipo, b.persona.uid, b.texto, c.persona.uid, c.texto, d.persona.uid, d.texto], ['j1', 'hola che', 'personaje', 'j2', 'dale', 'j1', '¿venís?', 'gm', '']);
+    igual([M.parsear('/m Nadie hola', P).persona, M.parsear('/m Blanco hola', P).persona, M.parsear('2d6', P)], [null, null, null]);
+    const amb = M.personas([{uid: 'yo'}, {uid: 'a', nombre: 'Pepe'}, {uid: 'b', nombre: 'Pepe'}], [], 'yo');
+    cierto(M.parsear('/m Pepe hola', amb).ambiguo, 'dos personas con el mismo nombre: ambiguo');
+  });
+  prueba('fragmento (autocompletado): lo que se escribe del nombre; nada si ya eligió y sigue con el mensaje', () => igual(
+    [M.fragmento('/m bl', P), M.fragmento('/m ', P), M.fragmento('/m Blanco J1', P), M.fragmento('/m Blanco J1 hola', P), M.fragmento('/m', P), M.fragmento('2d6', P)],
+    ['bl', '', 'Blanco J1', null, null, null]));
+  prueba('armarDoc: lectores = quien manda + quienes reciben; leído solo por quien lo manda; sin repetir ni mandarse a sí mismo', () => {
+    const d = M.armarDoc('yo', 'Yo', [{uid: 'j1', nombre: 'Ana'}, {uid: 'yo', nombre: 'Yo'}, {uid: 'j1', nombre: 'Ana'}, {uid: 'gm', nombre: 'Máster'}], '  hola  ');
+    igual(d, {de: 'yo', deNombre: 'Yo', para: ['j1', 'gm'], paraNombres: ['Ana', 'Máster'], lectores: ['yo', 'j1', 'gm'], texto: 'hola', leidoPor: ['yo']});
+    const motivo = f => { try{ f(); return ''; }catch(e){ return e.message; } };
+    cierto(/Escribí/.test(motivo(() => M.armarDoc('yo', 'Yo', [{uid: 'j1'}], '   '))));
+    cierto(/a quién/.test(motivo(() => M.armarDoc('yo', 'Yo', [{uid: 'yo'}], 'hola'))));
+    cierto(/largo/.test(motivo(() => M.armarDoc('yo', 'Yo', [{uid: 'j1'}], 'x'.repeat(M.TEXTO_MAX + 1)))));
+  });
+  const m = (id, de, para, t, leidoPor) => ({id, de, deNombre: de, para, paraNombres: para.map(u => u.toUpperCase()), texto: 'm' + id, cuando: t, leidoPor: leidoPor || [de]});
+  const lst = [m('1', 'j1', ['yo'], 100), m('2', 'yo', ['j1', 'gm'], 200), m('3', 'j1', ['yo', 'j2'], 300, ['j1', 'yo']), m('4', 'gm', ['yo'], 50), m('5', 'j1', ['j2'], 400)];
+  prueba('conversaciones: una por persona, de más viejo a más nuevo; lo que mandé va en la de cada uno; lo ajeno no entra', () => {
+    const cv = M.conversaciones(lst, 'yo', P);
+    igual(cv.map(c => [c.uid, c.msgs.map(x => x.id).join(','), c.noLeidos]), [['j1', '1,2,3', 1], ['gm', '4,2', 1]]);
+    igual([M.noLeidos(lst, 'yo'), M.sinLeer(lst[2], 'yo'), M.sinLeer(lst[1], 'yo')], [2, false, false]);
+  });
+  prueba('mezclarEnMesa: solo lo que ME llegó, por hora con las tiradas; con la Mesa llena, desde la tirada más vieja que se ve', () => {
+    const doc = (id, t) => ({id, data: () => ({cuando: t, desde: 'mapa'})});
+    const r = M.mezclarEnMesa([doc('a', 350), doc('b', 150)], lst, 'yo', 30);
+    igual(r.map(d => d.id), ['a', 'msj-3', 'b', 'msj-1', 'msj-4']);
+    igual([r[1]._mensaje, r[1].data().desde], [true, 'mensaje']);
+    igual(M.mezclarEnMesa([doc('a', 350), doc('b', 150)], lst, 'yo', 2).map(d => d.id), ['a', 'msj-3', 'b']);
+  });
+  prueba('mesaHtml y cronicaHtml: escapan el texto; la tarjeta abre la conversación con quien lo mandó y su animación sigue según la edad', () => {
+    const x = {...m('9', 'j1', ['yo', 'j2'], 1), texto: '<b>ojo</b>', deNombre: 'Ana'};
+    const h = M.mesaHtml(x, 'yo'), c = M.cronicaHtml('msj:9', x, 1200, 9000);
+    cierto(/&lt;b&gt;ojo/.test(h) && !/<b>ojo/.test(h) && /y J2/.test(h) && /Mensaje secreto de <b>Ana/.test(h));
+    cierto(/data-mensaje-abrir="j1"/.test(c) && /animation-delay:-1200ms/.test(c) && /data-momento-cerrar="msj:9"/.test(c));
+  });
+  prueba('las reglas: solo leen los lectores, el GM borra sin leer por el índice, y quien recibe solo se suma a leidoPor', async () => {
+    const r = await (await fetch('../firebase/firestore.rules', {cache: 'no-store'})).text();
+    const bloque = (r.split('match /mensajes/{id}')[1] || '').split('match /mensajes_indice')[0];
+    cierto(/allow read: if esMiembro\(c\) && request\.auth\.uid in resource\.data\.lectores;/.test(bloque), 'leer: solo lectores');
+    cierto(/allow delete: if esGM\(c\);/.test(bloque) && !/allow read[^;]*esGM/.test(bloque), 'el GM borra pero no lee');
+    cierto(/lectores == \[request\.auth\.uid\]\.concat\(request\.resource\.data\.para\)/.test(bloque) && /existsAfter\(.*mensajes_indice/.test(bloque));
+    cierto(/affectedKeys\(\)\.hasOnly\(\['leidoPor'\]\)/.test(bloque));
+    const ind = r.split('match /mensajes_indice/{id}')[1] || '';
+    cierto(/allow read, delete: if esGM\(c\);/.test(ind) && /hasOnly\(\['cuando'\]\)/.test(ind));
+  });
+  prueba('la Mesa, el registro y la Crónica los usan (mesa.js, mesa-historial.js, registro.js, js/16)', async () => {
+    const t = async u => (await fetch(u, {cache: 'no-store'})).text();
+    const [mesa, hist, reg, m16] = await Promise.all([t('mesa.js'), t('mesa-historial.js'), t('registro.js'), t('../vtt-hexgrid/js/16-momentos.js')]);
+    cierto(/Mensajes\.mesa\(snap\.docs, MESA_MAX\)/.test(mesa) && /t\.desde === 'mensaje'/.test(mesa) && /Mensajes\.iniciar\(\)/.test(mesa) && /"mensaje"\]/.test(mesa));
+    cierto(/Mensajes\.borrar\(null\)/.test(hist) && /Mensajes\.borrar\(hasta\)/.test(reg));
+    cierto(/window\.mensajesCronica = /.test(m16) && /Mensajes\.cronicaHtml\(k, d\.mensaje/.test(m16) && /data-mensaje-abrir/.test(m16));
   });
 })();
 

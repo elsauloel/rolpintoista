@@ -1617,7 +1617,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   uno de 2 unidades desde su ficha, lo pasó al cinturón, lo consumió fuera de combate (ficha) y en combate (Botonera del mapa) y desapareció; el GM
   armó uno con «✎ Ítem nuevo» de Dar a un jugador y se lo dio al Jugador 2, que lo consumió desde la mochila. También la 🔍, el Ver y la tienda (sin
   guardar). En GM Tools no se le equipa a un creep (avisa; se sube o se da). Dudas: P284. Pruebas automáticas: 1003 en verde.
-- **⬜ en cola (decidido, en curso 2026-11-22) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
+- **✅ hecho (2026-11-22; falta pegar las reglas) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
   jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
   *Propuesta (2026-11-22):* **mandar** con un botón ✉ al pie de la Mesa (ventanita: «Para» con una casilla por persona —el GM y cada jugador,
@@ -1633,6 +1633,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   las notificaciones; (d) **el GM no puede leer** los mensajes privados entre jugadores; (e) se manda **al jugador** (no al personaje), pero
   se lo puede elegir por el nombre de su personaje o por el suyo; (f) **queda un registro** de los mensajes, que **se limpia al limpiar el
   registro general** (no a las 48 h); (g) el **sonido** queda para cuando se haga la música (anotado en `docs/pendientes.md`).
+  **Y la paloma** (dueño, 2026-11-22: «el botoncito flotante… podría tener el icono de una paloma blanca, como si fuera una paloma mensajera. El
+  emoji»): el flotante es 🕊️, y también el botón del pie de la Mesa, la fila de la Mesa, la Crónica y las ventanas (P285 punto 4).
+  *Resultado:* una sola pieza, `comun/mensajes.js`, que usan el mapa, la ficha y GM Tools. **Mandar:** el 🕊️ al pie de la Mesa abre la ventanita con
+  una casilla por persona (el usuario y sus personajes; «Marcar a todos») y el mensaje; o en la caja de la Mesa `/m` (o `/r`) + nombre + texto, con
+  autocompletado desde la primera letra (personajes 🎭 y usuarios 👤/👑; ↑↓ y Enter o Tab; elegir cualquiera lleva a la persona); `/m Nombre` sin texto
+  abre la ventanita con esa persona marcada. **Recibir:** en la Mesa, una fila fucsia que brilla y destella («🕊️ Mensaje secreto de X»; tocarla abre
+  la conversación); en la Crónica del mapa, una tarjeta que entra con un fogonazo, borde y fondo brillantes, ~20 s; después queda el 🕊️ flotante abajo
+  a la derecha (en el mapa, en la esquina del lienzo; en la ficha y GM Tools, a la izquierda de la Mesa) con el globito rojo de los sin leer, que late
+  al llegar uno. Tocándolo: las conversaciones (una por persona, de más viejo a más nuevo, lo propio a la derecha) y una caja para responder (Enter).
+  **Privacidad y registro:** colección nueva `mensajes` (la leen solo quien manda y quienes reciben, en las reglas) y `mensajes_indice` (solo la fecha,
+  para que el GM los borre sin leerlos); se borran con el 🗑 de la Mesa (todos) y con 🆕 Registro nuevo (los de antes del combate anterior), no solos.
+  **Reglas de Firestore nuevas: hay que pegarlas**; sin ellas, la ventanita, la conversación y el comando dicen «Faltan pegar las reglas de Firestore
+  de los mensajes…» y no se manda nada. **Probado con clics** en «Claude · pruebas 2» (sin las reglas): la ventanita del GM con las dos casillas, el
+  aviso de las reglas al mandar, el autocompletado del Jugador 1 en el mapa (`/m bl`) y del GM en GM Tools (dos sugerencias, y por el nombre del
+  usuario), el `/m` sin reglas (avisa, no sale ninguna tirada) y una tirada libre que sigue andando; y, **con mensajes armados en memoria** (no se
+  escribió nada): la fila de la Mesa, la tarjeta de la Crónica (video), el 🕊️ con el globito en el mapa, la ficha y GM Tools (al lado de la Mesa, sin
+  taparla), la conversación (marca leído, el globito baja) y Esc. **Falta con las reglas pegadas:** lo de abajo («Probar: …»). Dudas: P285.
+  Pruebas automáticas: 1014 en verde.
 - **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
   expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
 - **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
@@ -1779,6 +1797,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   2026-11-22: «vamos a dejar al final de la cola probar este sistema en el mapa con los clics una vez que estén pegadas las reglas de Firebase…
   cuando llegue el turno de esa tarea, vamos a chequear que las reglas estén actualizadas y vamos a proceder con las pruebas»). Primer paso:
   verificar que las reglas pegadas sean las del repo (que mandar un mensaje no dé «faltan pegar las reglas»); si no, avisarle al dueño y esperar.
+  Los casos, uno por renglón, son los «Probar: 🕊️ …» de abajo.
+
+- **⬜ en cola — Probar: 🕊️ mandar un mensaje secreto de verdad** (2026-11-22, de los mensajes secretos; con las reglas pegadas): el Jugador 1 le
+  manda al Jugador 2 con la ventanita; al Jugador 2 le aparece en la Mesa (fila fucsia), en la Crónica del mapa y en el 🕊️ con el globito.
+- **⬜ en cola — Probar: 🕊️ el GM no lee lo de dos jugadores** (2026-11-22, con las reglas pegadas): el Jugador 1 le escribe al Jugador 2; en la
+  pantalla del GM no aparece nada (ni Mesa, ni Crónica, ni 🕊️), y una lectura directa del GM por la API la rechaza.
+- **⬜ en cola — Probar: 🕊️ un mensaje a varios** (2026-11-22, con las reglas pegadas): el GM le escribe a los dos jugadores a la vez; cada uno lo ve
+  con «También para…» y su respuesta le llega solo al GM.
+- **⬜ en cola — Probar: 🕊️ el comando /m y /r de verdad** (2026-11-22, con las reglas pegadas): `/m Blanco J2 hola` (por el personaje) y `/r` + el
+  nombre del usuario; que salga, que no aparezca en la Mesa de nadie más y que `/m Nombre` sin texto abra la ventanita con esa persona marcada.
+- **⬜ en cola — Probar: 🕊️ leído / sin leer en dos pantallas** (2026-11-22, con las reglas pegadas): el Jugador 2 con el mapa y la ficha abiertos;
+  al abrir la conversación en una, el globito baja en las dos.
+- **⬜ en cola — Probar: 🕊️ el GM borra con el 🗑 de la Mesa y con 🆕 Registro nuevo** (2026-11-22, con las reglas pegadas): que desaparezcan de la
+  Mesa y de las conversaciones de los jugadores (el 🗑, todos; el Registro nuevo, los de antes del combate anterior).
+- **⬜ en cola — Probar: 🕊️ «Borrar la partida» se lleva los mensajes** (2026-11-22, con las reglas pegadas): en una partida de prueba descartable.
 
 ## En cola
 

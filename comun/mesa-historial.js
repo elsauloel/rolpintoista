@@ -4,7 +4,8 @@
    sesion.js). Las tiradas solo hacen falta durante la sesión de juego:
 
    - 🗑 en la cabecera de la Mesa (solo el GM): borra todas las tiradas
-     de la partida. A todos se les vacía la Mesa al instante.
+     de la partida (y los mensajes secretos 🕊️, comun/mensajes.js). A todos
+     se les vacía la Mesa al instante.
    - Borrado automático: cuando el GM entra a cualquiera de las tres
      herramientas, se borran las tiradas de antes del combate anterior
      (comun/registro.js, 2026-11-04; antes, las de más de 48 h).
@@ -66,11 +67,13 @@ function mesaHistorialAlEntrar(){
     b.hidden = false;
     b.onclick = async e => {
       e.stopPropagation();
-      if(!(await Confirmar.preguntar('¿Borrar todo el historial de tiradas de la Mesa?\n\nSe borra para todos y no se puede deshacer. Si querés guardarlo, bajá antes el respaldo 💾.', {titulo: 'Borrar historial de la Mesa', si: 'Borrar', peligro: true}))) return;
+      if(!(await Confirmar.preguntar('¿Borrar todo el historial de tiradas de la Mesa?\n\nSe borra para todos (también los mensajes secretos 🕊️) y no se puede deshacer. Si querés guardarlo, bajá antes el respaldo 💾.', {titulo: 'Borrar historial de la Mesa', si: 'Borrar', peligro: true}))) return;
       b.disabled = true;
       try{
         const n = await mesaBorrarTiradas(null);
-        if(typeof toast === 'function') toast(n ? `Historial borrado (${n} tiradas)` : 'No había tiradas para borrar');
+        // 🕊️ Limpiar el registro de la Mesa borra también los mensajes secretos (comun/mensajes.js: por el índice, sin leerlos).
+        const nm = typeof Mensajes !== 'undefined' ? await Mensajes.borrar(null) : 0;
+        if(typeof toast === 'function') toast(n || nm ? `Historial borrado (${n} tiradas${nm ? ` y ${nm} mensajes secretos` : ''})` : 'No había tiradas para borrar');
       }catch(err){
         console.error('No se pudo borrar el historial de la Mesa:', err);
         if(typeof toast === 'function') toast('No se pudo borrar el historial — revisá la consola');

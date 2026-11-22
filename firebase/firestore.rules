@@ -256,6 +256,42 @@ service cloud.firestore {
         allow delete: if esGM(c);
       }
 
+      // ✉ Mensajes secretos entre usuarios (comun/mensajes.js, 2026-11-22): {de, deNombre, para: [uid], paraNombres, lectores, texto,
+      // leidoPor, cuando}. Lo leen SOLO `lectores` (quien lo manda + quienes lo reciben): el GM no puede leer lo que se mandan dos jugadores.
+      // Lo crea quien lo manda (siempre junto con su línea del índice, abajo). Quien lo recibe solo se suma a `leidoPor`. No se edita.
+      // Lo borra el GM al limpiar el registro (🗑 de la Mesa / 🆕 Registro nuevo), sin leerlo: el id lo saca del índice.
+      match /mensajes/{id} {
+        allow read: if esMiembro(c) && request.auth.uid in resource.data.lectores;
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['de', 'deNombre', 'para', 'paraNombres', 'lectores', 'texto', 'leidoPor', 'cuando'])
+          && request.resource.data.de == request.auth.uid
+          && request.resource.data.deNombre is string && request.resource.data.deNombre.size() <= 40
+          && request.resource.data.para is list && request.resource.data.para.size() > 0 && request.resource.data.para.size() <= 20
+          && !(request.auth.uid in request.resource.data.para)
+          && request.resource.data.paraNombres is list && request.resource.data.paraNombres.size() == request.resource.data.para.size()
+          && request.resource.data.lectores == [request.auth.uid].concat(request.resource.data.para)
+          && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 1000
+          && request.resource.data.leidoPor == [request.auth.uid]
+          && request.resource.data.cuando == request.time
+          && existsAfter(/databases/$(database)/documents/campanas/$(c)/mensajes_indice/$(id));
+        allow update: if esMiembro(c)
+          && request.auth.uid in resource.data.para
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leidoPor'])
+          && request.resource.data.leidoPor is list && request.resource.data.leidoPor.size() <= 21
+          && request.resource.data.leidoPor.toSet().difference(resource.data.leidoPor.toSet()).hasOnly([request.auth.uid])
+          && resource.data.leidoPor.toSet().difference(request.resource.data.leidoPor.toSet()).size() == 0;
+        allow delete: if esGM(c);
+      }
+      // ✉ El índice de los mensajes: {cuando}, nada más (ni quién ni qué). Con el mismo id que el mensaje: así el GM los borra sin leerlos.
+      match /mensajes_indice/{id} {
+        allow read, delete: if esGM(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['cuando'])
+          && request.resource.data.cuando == request.time
+          && existsAfter(/databases/$(database)/documents/campanas/$(c)/mensajes/$(id));
+        allow update: if false;
+      }
+
       // Fichas de personaje en vivo (ficha-personaje/ficha.html).
       // Documento principal: {duenoUid, nombre, resumen, miniatura, creado,
       // actualizado}; contenido en partes/{parte}: {json, actualizado}.

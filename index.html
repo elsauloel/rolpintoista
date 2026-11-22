@@ -1045,6 +1045,12 @@ $('#btn-borrar-definitivo').onclick = async () => {
       for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));
       await borrarDocumentos(snap.docs.map(d => d.ref));
     }
+    // 🕊️ Los mensajes secretos (comun/mensajes.js): el GM no los puede leer; los borra por su índice. Sin las reglas pegadas no hay nada.
+    estado('Borrando mensajes secretos…');
+    try{
+      const indice = await base.collection('mensajes_indice').get();
+      await borrarDocumentos(indice.docs.flatMap(d => [base.collection('mensajes').doc(d.id), d.ref]));
+    }catch(err){ console.warn('Mensajes secretos: no se pudieron borrar (¿faltan las reglas?)', err); }
     for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['historial', 'historial del GM'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas'], ['ajustes', 'ajustes']]){
       estado(`Borrando ${texto}…`);
       await borrarDocumentos((await base.collection(col).get()).docs.map(d => d.ref));

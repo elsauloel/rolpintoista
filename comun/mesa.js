@@ -225,7 +225,7 @@ function mesaPonerTurno(n){
 
 // Líneas del sistema: no son una tirada real (ni la propia ni la de nadie), así que no cuentan
 // como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
-const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep"];
+const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep", "mensaje"];
 
 // 🔍 El recuadro con el detalle de un duelo (2026-11-03, dueño): título, la frase y el paso a paso; se cierra con Aceptar, la ✕, Esc o un clic afuera.
 function mesaDueloDetalle(origen, frase, lineas){
@@ -273,6 +273,18 @@ function mesaRender(docs){
     const t = d.data({serverTimestamps: 'estimate'});
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && fbUsuario && t.uid !== fbUsuario.uid) hayAjena = true;
+    // 🕊️ Un mensaje secreto que ME llegó (comun/mensajes.js, 2026-11-22): solo en mi Mesa, con su color y su brillo; tocarlo abre la conversación.
+    if(t.desde === 'mensaje'){
+      if(nueva) hayAjena = true;
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-mensaje' + (nueva ? ' nueva' : '');
+      div.title = 'Mensaje secreto: tocá para abrir la conversación y responder';
+      div.innerHTML = Mensajes.mesaHtml(t, fbUsuario ? fbUsuario.uid : '');
+      div.addEventListener('click', () => Mensajes.abrirConversacion(t.de));
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
     // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
     if(EfectosGolpe.esLineaMesa(t)){
       const div = document.createElement('div');
@@ -366,17 +378,17 @@ function mesaRender(docs){
   // Aviso opcional a la herramienta de que llegaron tiradas nuevas (el mapa lo
   // usa para cerrar el "giro gratis" cuando alguien hace algo).
   if(!primeraVez && typeof mesaAlAccionNueva === 'function'){
-    const nuevas = docs.filter(d => nuevasIds.has(d.id));
+    const nuevas = docs.filter(d => nuevasIds.has(d.id) && !d._mensaje);   // 🕊️ un mensaje secreto no es una acción
     if(nuevas.length) mesaAlAccionNueva(nuevas);
   }
   // Lo que llegó de esta misma pantalla (2026-10-24: el mapa suelta ahí el aviso «fuera de turno» de una acción que escribió en la Mesa por su cuenta).
   if(!primeraVez && typeof window !== 'undefined' && typeof window.mesaLlegaronMias === 'function' && fbUsuario){
-    const mias = docs.filter(d => nuevasIds.has(d.id) && d.data().uid === fbUsuario.uid).map(d => d.data());
+    const mias = docs.filter(d => nuevasIds.has(d.id) && !d._mensaje && d.data().uid === fbUsuario.uid).map(d => d.data());
     if(mias.length){ try{ window.mesaLlegaronMias(mias); }catch(e){ console.error(e); } }
   }
   // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
   if(!primeraVez && typeof dadosAnimarTirada === 'function'){
-    docs.filter(d => nuevasIds.has(d.id) && !mesaAnimadas.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
+    docs.filter(d => nuevasIds.has(d.id) && !d._mensaje && !mesaAnimadas.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
   }
   // Cajita flotante achicada: avisa que llegó una tirada de otro.
   const mesa = document.getElementById('mesa');
@@ -390,10 +402,12 @@ function mesaProcesar(snap){
   mesaUltimoSnap = snap;
   // 🎭 El mapa filtra lo que cada uno no tiene que ver (vtt-hexgrid/js/29: creeps sin revelar, acciones inciertas).
   if(typeof mesaFiltrar === 'function') snap = {docs: mesaFiltrar(snap.docs)};
+  // 🕊️ Los mensajes secretos que me llegaron, mezclados por hora (comun/mensajes.js; no pasan por el filtro ni se animan).
+  if(typeof Mensajes !== 'undefined') snap = {docs: Mensajes.mesa(snap.docs, MESA_MAX)};
   const docs = snap.docs;
   const primeraVez = mesaIdsVistos === null;
   const puedeEsperar = !primeraVez && typeof dadosAnimarTirada === 'function' && typeof dadosAnimara === 'function';
-  const nuevas = puedeEsperar ? docs.filter(d => !mesaIdsVistos.has(d.id) && !mesaAnimadas.has(d.id)) : [];
+  const nuevas = puedeEsperar ? docs.filter(d => !d._mensaje && !mesaIdsVistos.has(d.id) && !mesaAnimadas.has(d.id)) : [];
   const animables = nuevas.filter(d => { try{ return dadosAnimara(d.data()); }catch(e){ return false; } });
   if(!animables.length && !mesaRetenida){ mesaRender(docs); return; }
   const lanzar = () => animables.reverse().forEach(d => { mesaAnimadas.add(d.id); dadosAnimarTirada(d.data()); });
@@ -421,6 +435,7 @@ function mesaProcesar(snap){
 function mesaRefiltrar(){ if(mesaUltimoSnap && !mesaRetenida) mesaProcesar(mesaUltimoSnap); }
 
 function mesaEscuchar(){
+  if(typeof Mensajes !== 'undefined') Mensajes.iniciar();   // 🕊️ mensajes secretos (comun/mensajes.js): el 🕊️ de la Mesa, el comando /m y el 🕊️ flotante
   $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
   fbDb.collection(fbRutaCampana('tiradas'))
     .orderBy('cuando', 'desc').limit(MESA_MAX)

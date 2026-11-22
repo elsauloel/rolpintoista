@@ -78,7 +78,20 @@ versión parecida en más de una, es candidato a juntar.
 - **`mesa-historial.js`** — el GM ve 🗑 en la cabecera de la Mesa para
   borrar todo el historial de tiradas; además, cada vez que el GM entra a
   una herramienta se borran solas las de más de 48 h (como mucho una vez
-  por hora por navegador). Nadie más puede borrar.
+  por hora por navegador). Nadie más puede borrar. El 🗑 borra también los
+  mensajes secretos (`Mensajes.borrar(null)`).
+- **`mensajes.js`** (`Mensajes`, 2026-11-22) — 🕊️ **mensajes secretos entre usuarios** (persona a persona, por uid). Lo arranca
+  `mesaEscuchar` (en los iframes del mapa no hace nada). Mandar: el 🕊️ que suma al `#mesa-tirar` de cualquier Mesa (`abrirMandar`: una
+  casilla por persona, el usuario y sus personajes) o `/m` / `/r` + nombre + texto en `#mesa-formula`, con autocompletado (`sugerencias`,
+  `fragmento`; el `submit` se toma en captura antes que la tirada libre; `parsear` elige el nombre más largo que calce, de personaje o de usuario).
+  Recibir: `Mensajes.mesa(docs, tope)` mezcla en `mesaProcesar` las filas de lo que ME llegó (`desde: 'mensaje'`, `_mensaje: true`; `mesaRender`
+  las dibuja con `mesaHtml`, fucsia con brillo, y no cuentan como acción, tirada ni dado 3D); al llegar uno nuevo llama a `window.mensajesCronica(m)`
+  si la página lo define (el mapa, js/16: tarjeta `cronicaHtml`); el 🕊️ flotante (`#msj-flotante`; en el mapa dentro de `#lienzo-caja`, en la ficha
+  y GM Tools fijo y corrido a la izquierda de la Mesa si la tapa) con el globito de los sin leer, y la ventana de conversaciones
+  (`abrirConversacion(uid)`: marca leído con `arrayUnion` en `leidoPor`). `borrar(antesDe|null)` (solo GM, por `mensajes_indice`, sin leer) lo
+  llaman el 🗑 de la Mesa y `Registro.nuevo`. Sin las reglas pegadas: `faltanReglas()` y el aviso `AVISO_REGLAS`. `_cargar(lista, {nuevos})`
+  carga mensajes en memoria para pruebas y capturas (no escribe). Lo puro (`personas`, `parsear`, `armarDoc`, `conversaciones`, `mezclarEnMesa`…)
+  probado en `pruebas.html`. Colecciones y reglas: `docs/workflow-firebase.md`. Sin sonido (queda para la música). Dudas: P285.
 - **`grilla-dados.js`** — la grilla de dados estilo Roll20 (D4…D100 × 1–6)
   que se abre al costado del botón "🎲 Dados"; cada clic es una tirada
   libre que se publica en la Mesa.

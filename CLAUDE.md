@@ -212,7 +212,7 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
   partida), `menu-sitio.js` (☰), `mesa.js` (Mesa de tiradas),
   `tiradas.js` (fórmulas de dados), `lupa.js` (cuadro 🔍),
   `mesa-historial.js`, `grilla-dados.js`, `dados3d.js`, `respaldo.js`,
-  `efectos-golpe.js`, `asistente-item.js`. Si algo se repite en dos
+  `efectos-golpe.js`, `asistente-item.js`, `mensajes.js` (🕊️ mensajes secretos). Si algo se repite en dos
   herramientas, va ahí — ver [`comun/CLAUDE.md`](comun/CLAUDE.md).
 - Crear o editar ítems en la ficha, gm-tools, el generador de tiendas y el
   editor de catálogo pasa por un solo asistente paso a paso compartido:

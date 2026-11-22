@@ -50,7 +50,7 @@ que verse en vivo entre jugadores.
      lado de cada uno; renombrar; y borrar la partida (ofrece bajar el
      respaldo y pide escribir el nombre). Borrar recorre cada colección
      (fichas/partes, creeps/privado, tokens, tiradas, mapa, gm, tienda,
-     tiendas, miembros) y al final borra la partida y el miembro del GM.
+     tiendas, miembros; los mensajes secretos, por su índice) y al final borra la partida y el miembro del GM.
      Si se corta, se vuelve a tocar.
    - **Jugador, "Irme de esta partida"**: borra su miembro; sus personajes
      quedan a nombre de su cuenta.
@@ -136,6 +136,15 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   botón 🎲 Dados (al pie de la Mesa flotante; en el mapa, en la barra de
   arriba) que despliega D4…D100 × 1–6; cada clic es una "Tirada libre"
   común (no escribe nada distinto).
+- `campanas/{id}/mensajes/{auto}` — 🕊️ **mensajes secretos** (2026-11-22, [`../comun/mensajes.js`](../comun/mensajes.js)):
+  `{de, deNombre, para: [uid] (1–20), paraNombres, lectores: [de, ...para], texto (≤1000), leidoPor: [uid], cuando}`. **Lo leen solo los
+  `lectores`** (quien lo manda y quienes lo reciben; la consulta es `where('lectores', 'array-contains', uid)`): el GM no puede leer lo que se
+  mandan dos jugadores. Lo crea quien lo manda (en el mismo lote que su índice, `existsAfter`); quien lo recibe solo se suma a `leidoPor`
+  (`arrayUnion`); nadie lo edita. Lo borra solo el GM.
+- `campanas/{id}/mensajes_indice/{mismo id}` — `{cuando}`, nada más: lo lee y lo borra solo el GM. Sirve para que el GM borre los mensajes **sin
+  leerlos** (saca el id de acá y borra `mensajes/<id>` y esta línea): con el 🗑 de la Mesa (todos), con 🆕 Registro nuevo (los de antes del
+  combate anterior, como las tiradas) y al borrar la partida (`index.html`). No se borran solos. Sin estas reglas pegadas, el juego avisa
+  «Faltan pegar las reglas de Firestore de los mensajes…».
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente, detalle,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, nitros, nitrosMax,

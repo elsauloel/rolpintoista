@@ -262,6 +262,7 @@ decisión relajada nueva se agrega acá al tomarla).
 | **Niebla y fuego del mapa (2026-10-08, Varita del vendaval)**: cualquier miembro puede borrar un elemento de niebla o de fuego (las reglas no saben si lo tocó el viento) | Que el borrado lo haga quien tiene permiso (el GM o un servidor), a pedido del que tiró el vendaval |
 | **🎭 Acción incierta (2026-10-09)**: lo que hace un creep escondido y las trampas que coloca cada bando se guardan enteros en la Mesa; el mapa de cada jugador decide qué mostrar (un creep sin revelar no aparece, uno conocido sale como «acción incierta»). Alguien que mire la base, o la ficha suelta, ve el detalle | Que la línea secreta la escriba el servidor o vaya a una colección que solo lea su bando, y la Mesa pública reciba solo la versión incierta |
 | **✊ Piedra, papel o tijera (2026-10-08)**: las dos jugadas viajan en el mismo documento (`ppt`): la pantalla no muestra la del otro hasta que eligieron los dos, pero alguien que mire la base podría verla antes de elegir | Guardar cada jugada en un documento que solo lea su dueño y revelarlas cuando estén las dos (las reglas verifican que la revelada sea la guardada) |
+| 🕊️ Mensajes secretos (2026-11-22): las reglas no comprueban que cada destinatario (`para`) sea miembro de la partida, ni que `deNombre` / `paraNombres` sean los nombres de verdad (los escribe quien manda), ni ponen un tope de cuántos se pueden mandar. | Validar cada uid de `para` contra `miembros` (o armar los nombres del lado del servidor) y limitar la frecuencia. |
 
 ## Pendientes chicos
 

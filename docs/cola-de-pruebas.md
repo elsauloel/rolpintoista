@@ -1502,6 +1502,59 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Lo engañoso era el cartel («No hay nada que tirar: se aplica lo que deja la zona»): ahora dice «No hay tirada para resistirla: le entra 3d4 de
   daño de fuego y Quemadura (3 turnos). El daño lo tira Arcano 3.» (vale para toda zona sin tirada). 1 prueba automática nueva (974).
 
+- **⬜ en cola — 🎨 Color de la columna de la izquierda** (dueño, 2026-11-22: «el fondo blanco no me gusta. Quisiera que fuera un fondo
+  similar al del resto de la ficha, solo que un poco más claro»). Se le mandaron tres muestras (A suave `#261E23`, B media `#30262C`,
+  C marcada `#3C3037`, en `.dock-izq` de `comun/dock-izq.css`); **espera su elección**.
+- **⬜ en cola — 🪟 Carteles encimados al empezar el turno** (dueño, 2026-11-22, con dos capturas: «esta superposición de menús no me gusta. No
+  entiendo bien en qué contexto suceden, así que para corregirlo debería entender eso»). Pasa cuando al empezar tu turno salen dos cosas a la
+  vez: el «▶ Empieza tu turno» (No2, regeneración…) y el cartel de una zona en la que estás parado (Muro de fuego). Explicarle el contexto
+  y proponer (por ejemplo, que la zona sea un paso más adentro de «Empieza tu turno», o que salgan uno después del otro); programar lo que elija.
+- **⬜ en cola — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
+  opiniones y sugerencias»). Mirar qué hace cada uno y proponer.
+- **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
+  está y, si no cuentan, proponer.
+- **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué
+  son, y retomar P265 con eso.
+- **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
+  esas defensas, independientemente si es trampa, ataque u otra cosa»). Ya se sumó en trampas y zonas de número fijo (tanda 5); revisar que
+  no falte ningún camino y probarlo.
+- **⬜ en cola — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
+  comparar y evaluar»).
+- **⬜ en cola — 🎁 «Dar a un jugador» desde el menú de la izquierda** (dueño, 2026-11-22): «que la opción de dar ítems también se pueda acceder,
+  como máster, desde el botón de regalo del menú lateral izquierdo del mapa. También agregar ese botón en GM Tools».
+- **⬜ en cola — 🤝 Compartir con un colega desde el menú de la izquierda** (dueño, 2026-11-22): «que los jugadores tengan en ese mismo menú
+  izquierdo un botón con dos manos estrechadas para poder compartir con cualquier colega ítems, DDE o despojos. Que si está en modo combate y no
+  está adyacente te advierta que la regla no lo permite en modo combate (con opción de dar igual)».
+- **⬜ en cola — 🧪 Consumibles propios, a mano** (dueño, 2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización. Que le
+  puedas poner nombre, descripción, configurarlos como consumibles, poder equiparlos en la mochila, consumirlos y que desaparezcan, pero que los
+  efectos de los consumibles custom se resuelvan a mano». Vale también para «Ítem nuevo» de «Dar a un jugador».
+- **⬜ en cola — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
+  jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
+  flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
+- **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
+  expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
+- **⬜ en cola — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
+  y cuál sigue abierta.
+- **⬜ en cola — 🕵 Área contra alguien escondido (P263)** (dueño, 2026-11-22): «me parece que no se debería abrir el duelo para el atacante. Al
+  personaje en sigilo sí se le debe ofrecer la oportunidad de esquivar, si correspondiera, y en el caso de que lo logre, todo eso debería pasar
+  desapercibido por el equipo rival. Habría que contemplarlo».
+- **⬜ en cola — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
+  la inventaste y me dejé llevar, pero no estoy seguro de entender exactamente cómo funciona. Vamos a tener que conversar de esto para
+  definirlo»). Preparar una explicación de cómo funciona hoy y las preguntas para decidir; no programar hasta conversarlo.
+- **⬜ en cola — 📺 ¿El Portal trampa tiene la animación de la tele?** (dueño, 2026-11-22: «imagino que la teletransportación tiene la animación de
+  la tele encendiendo/apagando, ¿no?»). Verificar y, si no, sumarla (con video).
+- **⬜ en cola — 🐀 Inicio de turno de alguien escondido** (dueño, 2026-11-22: «en realidad a los rivales no les debería salir nada, a sus aliados
+  sí»). Revisar que sus aliados sí vean su inicio de turno (veneno, etc.).
+- **⬜ en cola — 🎲 «Tirar iniciativa» mete tokens que no van** (dueño, 2026-11-22: «acabo de probar "tirar iniciativa" y metió al tótem y al
+  estandarte. No deberían ir»).
+- **⬜ en cola — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
+  lo entienda»). Explicarlas con un ejemplo.
+- **⬜ en cola — 💀 Un creep que cae desde GM Tools también pierde sus estados (P270)** (dueño, 2026-11-22: «no debería ser así»; P270 decidida:
+  caer en 0 = se borran los estados).
+- **⬜ en cola — 🎯 Repasar la Apuntada de las ballestas (P271)** (dueño, 2026-11-22: «necesitaría repasar cómo está anotada la Apuntada para
+  entender esto»). Explicarle cómo está y qué preguntaba P271.
+- **⬜ en cola — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

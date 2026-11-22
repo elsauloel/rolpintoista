@@ -1883,6 +1883,8 @@ AL FUEGO», una de fuego se dibuja como fuego y una tóxica cuenta como nube (el
    resistencia al elemento), como el de las varitas y el Muro de fuego?
 
 ### P269 — ⏭ Pasar de ronda: qué les pasa a los que se saltean (2026-11-21, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «correcto»: a los que se saltean se les aplica lo de «al terminar tu turno» y el Muro de fuego no los quema.
 El botón nuevo «⏭ Pasar de ronda» (orden de turnos, solo el GM) hace lo mismo que apretar ▶ Siguiente con cada uno que faltaba. Quedó elegido
 «mientras tanto» (lo más parecido a pasar esos turnos uno por uno, como ya se hacía con los caídos que se saltean):
 1. **Cada uno que se saltea pasa su turno sin jugar**: le empieza (recarga No2 y SP, bajan sus cooldowns, pegan su Veneno o su Quemadura) y le
@@ -1893,6 +1895,8 @@ El botón nuevo «⏭ Pasar de ronda» (orden de turnos, solo el GM) hace lo mis
    «⏭ Pasar de ronda»: solo al que empieza a jugar. ¿Les tendría que quemar también?
 
 ### P270 — 💀 «Al morir se van los estados»: ¿al caer o al morir del todo? (2026-11-21, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «sí»: al caer en 0 se borran los estados. «Si un creep cae desde GM Tools… no debería ser así»: tiene que perderlos también (en la cola).
 P257 dice «al momento de morir se le eliminan todos los estados alterados». Se tomó **morir = caer** (la vida a 0, inconsciente o derrotado), porque
 la decisión venía con «un caído queda como estaba al caer». Así quedó:
 1. **Al caer** se le van todos los estados, menos lo del equipo, lo derivado y la Llama de Fénix sin usar (el mismo criterio que al volver de la
@@ -1911,6 +1915,8 @@ Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas
 2. ¿La Apuntada firme en la ronda 1, sí o no?
 
 ### P272 — 🔥 La Varita del muro de fuego: ¿también al empezar el turno? (2026-11-21, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «sí»: la Varita del muro de fuego también pega al empezar el turno (en la cola).
 El Muro de fuego (la habilidad de los magos creep) ya quema al empezar el turno de quien está parado encima (P259). La **Varita del muro de fuego**
 (Buena Calidad, 1d4 de fuego, 3 casillas) dice otra cosa en su texto: «a cada rival que entra y, en cada Mantenimiento, al que sigue adentro», y así
 sigue (no se tocó: el pedido era el Muro). ¿La paso al mismo comportamiento (y cambio su texto), o queda distinta a propósito?

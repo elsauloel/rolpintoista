@@ -1546,7 +1546,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   traer un creep, «Poner a todos los que faltan», un token suelto de J1 con imagen y nombre que J2 y el GM ven, que J2 no puede borrar ni editar, que el
   GM renombra y que J1 saca. Sin ver de verdad: la descripción con las reglas pegadas (`docs/pruebas-en-el-mapa.md`). Dudas: P276 y P277. 5 pruebas
   automáticas nuevas (984).
-- **🟡 explicado, espera decisión (2026-11-22) — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
+- **⏸ en pausa (2026-11-22: «dejarlo como está hasta que lo charle con mis colegas») — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
   está y, si no cuentan, proponer.
   *Cómo está (2026-11-22):* el ataque de oportunidad usa la regla general de la espalda (+1 PdG si quien ataca está en el punto ciego de quien se
   aleja; desde el sigilo, su defensa vale 1), mirando hacia dónde mira el token en ese momento. Pero el movimiento se frena en el último casillero

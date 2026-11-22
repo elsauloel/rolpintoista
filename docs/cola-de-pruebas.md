@@ -1617,7 +1617,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   uno de 2 unidades desde su ficha, lo pasó al cinturón, lo consumió fuera de combate (ficha) y en combate (Botonera del mapa) y desapareció; el GM
   armó uno con «✎ Ítem nuevo» de Dar a un jugador y se lo dio al Jugador 2, que lo consumió desde la mochila. También la 🔍, el Ver y la tienda (sin
   guardar). En GM Tools no se le equipa a un creep (avisa; se sube o se da). Dudas: P284. Pruebas automáticas: 1003 en verde.
-- **🟡 propuesta enviada, espera decisión (2026-11-22) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
+- **⬜ en cola (decidido, en curso 2026-11-22) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
   jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
   *Propuesta (2026-11-22):* **mandar** con un botón ✉ al pie de la Mesa (ventanita: «Para» con una casilla por persona —el GM y cada jugador,
@@ -1626,6 +1626,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   con esa persona y una caja para responder. La Mesa no muestra nada. Preguntas: (1) ¿el GM puede leer los mensajes entre dos jugadores?;
   (2) ¿a la persona (cuenta) o al personaje?; (3) ¿se pueden mandar a varios a la vez?; (4) ¿se borran solos (por ejemplo, a las 48 h como la
   Mesa)?; (5) ¿un sonido al llegar? Necesita reglas nuevas de Firestore.
+  **Decidido (dueño, 2026-11-22):** (a) el botón ✉ al pie de la Mesa abre la ventanita con casillas para mandar a **uno o varios a la vez**;
+  (b) el comando en la Mesa (dictado «/R»; aceptar `/m` y `/r`) con **autocompletado al escribir las primeras letras**, con nombres de personajes
+  y de usuarios; (c) al que lo recibe le aparece **en la Mesa con un color muy distintivo y algún brillo**, y **también en la Crónica** con
+  animación, fondo y borde brillante, «algo que llame mucho la atención»; cuando se va de la Crónica queda el botón ✉ flotante tipo WhatsApp con
+  las notificaciones; (d) **el GM no puede leer** los mensajes privados entre jugadores; (e) se manda **al jugador** (no al personaje), pero
+  se lo puede elegir por el nombre de su personaje o por el suyo; (f) **queda un registro** de los mensajes, que **se limpia al limpiar el
+  registro general** (no a las 48 h); (g) el **sonido** queda para cuando se haga la música (anotado en `docs/pendientes.md`).
 - **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
   expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
 - **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple

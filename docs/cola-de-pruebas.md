@@ -1605,7 +1605,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
 - **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
   expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
-- **⬜ en cola — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
+- **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
   y cuál sigue abierta.
 - **⬜ en cola — 🕵 Área contra alguien escondido (P263)** (dueño, 2026-11-22): «me parece que no se debería abrir el duelo para el atacante. Al
   personaje en sigilo sí se le debe ofrecer la oportunidad de esquivar, si correspondiera, y en el caso de que lo logre, todo eso debería pasar

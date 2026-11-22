@@ -1604,6 +1604,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada de iniciativa»). Ver cómo está hoy (hay invocaciones
   con turno propio y otras fuera del orden, como la abeja); lo dudoso, como pregunta.
 
+- **⬜ en cola — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
+  reglas pegadas: que otro jugador y el GM lean una descripción guardada de verdad (mouse y 🪪), un token suelto creado por el GM, y el
+  «🎭 Ponerlo en el mapa» de una invocación que no está en el mapa.
+- **⬜ en cola — 📦 Token suelto paso a paso: iniciativa y vida** (dueño, 2026-11-22, dictado; «esto es para objetos inanimados»): que crear un
+  token suelto sea una serie de pasos: nombre y descripción; «¿Ocupa lugar en la iniciativa? Sí / No»; «¿El token tiene HP? Sí / No», y si
+  tiene HP, que se lo pueda elegir como objetivo de ataques («y hasta ahí nomás»). Resuelve también P277. *Duda de dictado:* el mensaje dice
+  «agregar tener» al final — preguntarle qué quiso decir antes de programar.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

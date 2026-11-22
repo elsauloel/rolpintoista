@@ -1658,6 +1658,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirada. Fijo. Porque no es tan relevante. Está bien que sea un bono grande»). Hoy suma 5 al número de Iniciativa (el tamaño del dado: 6 → 1d6,
   11 → 1d10+1); pasa a sumarse 5 al resultado (1d6 → 1d6+5), en la tirada del mapa («🎲 Tirar iniciativa»), en la de la ficha y en lo que se vea
   (la 🔍, el texto de la pasiva, `Combatiente.PRISA_DETALLE`). Ojo con las fichas que ya tienen la Prisa (y la copia vieja `prisa`).
+  **Y además** (dueño, 2026-11-22, dictado «de los scripts» = de los creeps): en el orden de turnos, el botón «🎲 Tirar iniciativa» del GM
+  pasa a decir **«🎲 Tirar iniciativa de los creeps»**, para que se entienda que con un botón tira la de todos los creeps.
 
 ## En cola
 

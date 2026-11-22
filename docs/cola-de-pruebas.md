@@ -1535,6 +1535,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **A (recomendada):** un solo botón «👥 Personajes y tokens» con una fila por personaje (📜 abrir ficha · en este mapa ✔ / 🎭 ponerlo ·
   GM: ✕) y, abajo, solo para el GM, «👹 Traer creeps…» y «＋ Token suelto (NPC u objeto)»; se saca el 🎭 del borde. **B:** dejar los dos
   pero cada uno con lo suyo: 👥 = solo fichas; 🎭 = solo tokens.
+  **Elegido (dueño, 2026-11-22): A, con dos cambios:** «que el botón esté en el menú lateral izquierdo» (no en la cabecera) y «que a los
+  jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan cargar una imagen, un nombre y una descripción».
 - **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
   está y, si no cuentan, proponer.
 - **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué

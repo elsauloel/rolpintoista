@@ -1654,12 +1654,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   token (mapa), el de cada fila de 👥 Personajes (GM Tools), el del Ver de un ítem y donde más aparezca para dar, pasan a 🤝; el cartel «🎁 El GM te
   dio algo» también. El 🎁 queda solo en Despojos / botín.
 
-- **⬜ en cola — 💨 Prisa: +5 fijo al resultado de la tirada de iniciativa** (dueño, 2026-11-22: «la Prisa quiero que sea +5 al resultado de la
+- **✅ hecho (2026-11-22) — 💨 Prisa: +5 fijo al resultado de la tirada de iniciativa** (dueño, 2026-11-22: «la Prisa quiero que sea +5 al resultado de la
   tirada. Fijo. Porque no es tan relevante. Está bien que sea un bono grande»). Hoy suma 5 al número de Iniciativa (el tamaño del dado: 6 → 1d6,
   11 → 1d10+1); pasa a sumarse 5 al resultado (1d6 → 1d6+5), en la tirada del mapa («🎲 Tirar iniciativa»), en la de la ficha y en lo que se vea
   (la 🔍, el texto de la pasiva, `Combatiente.PRISA_DETALLE`). Ojo con las fichas que ya tienen la Prisa (y la copia vieja `prisa`).
   **Y además** (dueño, 2026-11-22, dictado «de los scripts» = de los creeps): en el orden de turnos, el botón «🎲 Tirar iniciativa» del GM
   pasa a decir **«🎲 Tirar iniciativa de los creeps»**, para que se entienda que con un botón tira la de todos los creeps.
+  *Resultado:* la Prisa suma +5 al resultado y el dado sale de la Iniciativa sin ella (Agilidad 6 → **1d6+5**; antes 1d10+1), en el mapa, la ficha, la
+  Botonera, las Acciones de un creep y las invocaciones. La Mesa dice «1d6 +5 Prisa» con «Afectada por Prisa +5»; la 🔍 de Iniciativa muestra 6 → 1d6,
+  «Prisa +5 (al resultado: no cambia el dado)» y «Se tira 1d6 +5 Prisa»; el botón de la Botonera, «🎲+5». Quien ya tenía la Prisa (las dos copias viejas)
+  pasa solo a la nueva, y un resumen publicado con el +5 adentro no lo duplica (el mapa lee la ficha). El botón del GM dice «🎲 Tirar iniciativa de los
+  creeps» (el de los jugadores sigue igual). **Probado con clics** en «Claude · pruebas 2» (la Prisa se le dio por datos a Blanco J1 y a «Blanco creep»,
+  y se les sacó al final): tirada del Jugador 1 desde el mapa (con el resumen viejo y con el nuevo) y desde la ficha (el 🎲 del stat y la Botonera),
+  la 🔍, el botón nuevo del GM (6 tiradas del creep con Prisa, todas entre 7 y 10 = 1d4+1+5) y las Acciones del creep. **Sin probar con clics:** una
+  invocación con la Prisa (sí en las pruebas automáticas). 991 pruebas automáticas en verde. Duda nueva: P279 (¿el +5 antes o después de una mitad?).
 
 - **⬜ en cola (el dueño ya dio el ok para hacerla después de la Prisa) — 📋 Respuestas a P252, P256, P259, P260 y P262** (dueño, 2026-11-22):
   1. **P252:** «la lista de iniciativa se limpia al terminar el combate» (cuando el fin del combate pasa el mapa a narrativo).

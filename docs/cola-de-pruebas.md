@@ -1555,6 +1555,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no falte ningún camino y probarlo.
 - **⬜ en cola — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
   comparar y evaluar»).
+- **⬜ en cola — 🤝🎁 Dar y compartir: las dos tareas de abajo se superponen** (dueño, 2026-11-22: «me parece que son un poco redundantes o al
+  menos se superponen. Evaluemos esta tarea»). *Propuesta enviada, espera decisión:* **A (recomendada):** un solo botón «🤝 Dar» en el menú de la
+  izquierda (mapa, ficha y GM Tools) que abre una ventana distinta según quién lo toca: el GM, la de «Dar a un jugador» (catálogo, DDE, despojos,
+  ítem nuevo; llega directo); un jugador, la de pasar algo de su mochila a otro (ofrecer / aceptar, con el aviso de combate y no adyacente). El 🎁
+  sigue siendo solo el del botín (Despojos). **B:** como pidió al principio: el GM, en el 🎁; los jugadores, en un 🤝 aparte.
 - **⬜ en cola — 🎁 «Dar a un jugador» desde el menú de la izquierda** (dueño, 2026-11-22): «que la opción de dar ítems también se pueda acceder,
   como máster, desde el botón de regalo del menú lateral izquierdo del mapa. También agregar ese botón en GM Tools».
 - **⬜ en cola — 🤝 Compartir con un colega desde el menú de la izquierda** (dueño, 2026-11-22): «que los jugadores tengan en ese mismo menú
@@ -1609,8 +1614,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «🎭 Ponerlo en el mapa» de una invocación que no está en el mapa.
 - **⬜ en cola — 📦 Token suelto paso a paso: iniciativa y vida** (dueño, 2026-11-22, dictado; «esto es para objetos inanimados»): que crear un
   token suelto sea una serie de pasos: nombre y descripción; «¿Ocupa lugar en la iniciativa? Sí / No»; «¿El token tiene HP? Sí / No», y si
-  tiene HP, que se lo pueda elegir como objetivo de ataques («y hasta ahí nomás»). Resuelve también P277. *Duda de dictado:* el mensaje dice
-  «agregar tener» al final — preguntarle qué quiso decir antes de programar.
+  tiene HP, que se lo pueda elegir como objetivo de ataques («y hasta ahí nomás»). Resuelve también P277. (El «agregar tener» del dictado
+  era «agregarlo a la lista de pendientes», dueño 2026-11-22.)
 
 ## En cola
 

@@ -1960,6 +1960,8 @@ cualquier token del mapa (como ya pasa con los NPC; está en la cola el pedido d
 jugador debería quedar fuera del orden de turnos siempre? ¿Y el GM debería poder ocultarlo (hoy sí puede: 👁 en su HUD)?
 
 ### P278 — 🤝 Las otras puertas de «Dar» y «Pasar»: ¿se dejan o se sacan? (2026-11-22, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «reemplazá el emoji del regalito por el emoji de las manos… que el regalo quede solo para el botín» (en la cola). Las puertas se quedan; cambia el ícono.
 Con el botón **🤝 Dar** del menú de la izquierda (mapa, ficha y GM Tools) quedan varias puertas que llevan a las mismas dos ventanas. **Elegí no sacar
 ninguna** y anotarlas: (a) en la ficha, «🤝 Pasar» arriba de la mochila y «🤝 Pasar a un aliado» en la ventanita «💰 DDE y despojos» abren
 exactamente lo mismo que el 🤝 Dar del jugador (las más redundantes; la de la ventanita de DDE es la candidata a irse); (b) el «🤝 Dar» / «🤝 Pasar a

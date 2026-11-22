@@ -1546,8 +1546,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   traer un creep, «Poner a todos los que faltan», un token suelto de J1 con imagen y nombre que J2 y el GM ven, que J2 no puede borrar ni editar, que el
   GM renombra y que J1 saca. Sin ver de verdad: la descripción con las reglas pegadas (`docs/pruebas-en-el-mapa.md`). Dudas: P276 y P277. 5 pruebas
   automáticas nuevas (984).
-- **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
+- **🟡 explicado, espera decisión (2026-11-22) — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
   está y, si no cuentan, proponer.
+  *Cómo está (2026-11-22):* el ataque de oportunidad usa la regla general de la espalda (+1 PdG si quien ataca está en el punto ciego de quien se
+  aleja; desde el sigilo, su defensa vale 1), mirando hacia dónde mira el token en ese momento. Pero el movimiento se frena en el último casillero
+  pegado al rival, con la orientación que traía: si se aleja desde donde estaba (el caso común), sigue mirando al rival y no cuenta. *Propuesta:*
+  **A:** toda oportunidad cuenta como por la espalda; **C (recomendada):** cuenta si el paso con el que se iba lo alejaba del rival (le da la
+  espalda); si se iba de costado, no; **B:** dejarlo como está.
 - **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué
   son, y retomar P265 con eso.
 - **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
@@ -1633,6 +1638,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   token suelto sea una serie de pasos: nombre y descripción; «¿Ocupa lugar en la iniciativa? Sí / No»; «¿El token tiene HP? Sí / No», y si
   tiene HP, que se lo pueda elegir como objetivo de ataques («y hasta ahí nomás»). Resuelve también P277. (El «agregar tener» del dictado
   era «agregarlo a la lista de pendientes», dueño 2026-11-22.)
+
+- **⬜ en cola — 🤝 El 🎁 queda solo para el botín (P278 decidida)** (dueño, 2026-11-22: «reemplazá el emoji del regalito por el emoji de las
+  manos para que se entienda que esas manos son para pasar objetos y otras cosas. Que el regalo quede solo para el botín»): el 🎁 del «⋯» del
+  token (mapa), el de cada fila de 👥 Personajes (GM Tools), el del Ver de un ítem y donde más aparezca para dar, pasan a 🤝; el cartel «🎁 El GM te
+  dio algo» también. El 🎁 queda solo en Despojos / botín.
 
 ## En cola
 

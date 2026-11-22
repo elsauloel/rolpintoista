@@ -149,9 +149,9 @@ estado: borrador
 Un **token** es la ficha del tablero: el dibujito de un personaje, enemigo, objeto o trampa.
 
 - **Vinculado:** un token de personaje se conecta a su [[La ficha|ficha]] (y uno de enemigo a su [[Creeps|creep]]). Muestra HP, SP y estados en vivo, y la foto de la ficha.
-- **Sin vincular:** para un NPC, una puerta o un objeto: tiene nombre, color e imagen propios.
+- **Sin vincular (token suelto):** para un NPC, una puerta, un cofre o un objeto: tiene nombre, imagen, color y una **descripción** que cualquiera lee al pasar el mouse o en su tarjeta 🪪. Lo puede poner cualquiera; lo editan y lo sacan quien lo puso y el GM.
 - **Dueño:** cada jugador mueve **los suyos**; el GM mueve **todos**.
-- **Se crean con "+ Token"**: elegís qué es, dónde y hacia dónde mira. El GM puede crear uno a nombre de un jugador.
+- **El botón 👥 «Personajes y tokens»** (a la izquierda del mapa): una fila por personaje de la partida — 📜 abre su ficha, «✔ en el mapa» o «🎭 Ponerlo en el mapa» (elegís la casilla y hacia dónde mira; el GM lo pone a nombre del jugador) — y abajo «＋ Token suelto». El GM además tiene «Poner a todos los que faltan…» y «👹 Traer creeps…».
 - **Varios en la misma casilla** se acomodan en ronda.
 - El GM puede **ocultar** tokens ([[Ocultar y revelar]]).
 

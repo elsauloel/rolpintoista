@@ -1,7 +1,8 @@
 /* ---------- 👆 Los estados de un token al pasar el mouse (2026-10-09, pedido del dueño: «un detalle de los estados con hover sobre los tokens») ----------
    Con el mouse quieto un momento sobre un token que se ve (no arrastrando), un cartelito al lado del puntero lista sus estados alterados: el
    nombre en su color (verde beneficio, violeta perjuicio), los turnos que le quedan, el escudo y los stacks, y la descripción corta. Los datos
-   son los mismos que ya ve cada uno (el resumen público; el escudo de un creep, solo el GM). Sin estados, no aparece nada. */
+   son los mismos que ya ve cada uno (el resumen público; el escudo de un creep, solo el GM). Sin estados, no aparece nada (salvo la descripción de un
+   token suelto, 2026-11-22). */
 let hoverEstados = {id: null, timer: 0, x: 0, y: 0};
 function hoverEstadosCaja(){
   let c = document.getElementById('hover-estados');
@@ -23,7 +24,10 @@ function hoverEstadosOcultar(){
 function hoverEstadosHtml(t){
   const est = estadoDe(t);
   const lista = est ? est.estados.filter(e => e && e.nombre) : [];
-  if(!lista.length) return '';
+  // ＋ Token suelto (2026-11-22, dueño: un NPC u objeto con «una imagen, un nombre y una descripción»): la descripción se lee al pasar el mouse.
+  const desc = TokensAuto.esSuelto(t) ? String(t.descripcion || '').trim() : '';
+  const descHtml = desc ? `<div style="margin-top:4px;white-space:pre-wrap;color:#EDE6DF">${esc(desc.length > 400 ? desc.slice(0, 397) + '…' : desc)}</div>` : '';
+  if(!lista.length) return descHtml ? `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}` : '';
   const veEscudo = soyGM || t.tipo !== 'creep';
   const filas = lista.map(e => {
     const color = ESTADO_COLOR[e.polaridad] || ESTADO_COLOR[''];
@@ -38,7 +42,7 @@ function hoverEstadosHtml(t){
       + `<b>${esc(e.nombre)}</b>${extras ? ` <span style="color:#B7A99F">· ${esc(extras)}</span>` : ''}`
       + (det ? `<div style="color:#B7A99F;font-size:11px;margin-left:14px">${esc(det.length > 160 ? det.slice(0, 157) + '…' : det)}</div>` : '') + '</div>';
   }).join('');
-  return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${filas}`;
+  return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}${filas}`;
 }
 function hoverEstadosMostrar(){
   const t = tokens.get(hoverEstados.id);

@@ -28,12 +28,12 @@ function hudDatos(t){
   const n = valoresNo2(t);
   const invocacion = !!(v && v.invocacion);
   const secreto = t.tipo === 'creep' && !soyGM;  // los jugadores no ven números de creeps
-  const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : num(r.hp));
+  const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : v ? num(r.hp) : null);   // (un token suelto no tiene vida: sin el «0» gris, 2026-11-22)
   const {sp, spMax} = spDeResumen(r);
   const conSp = t.tipo === 'pj' && !invocacion && spMax > 0;
   const spCreep = !secreto && sc && CreepCalculo.modoSP(sc);   // 💧 un creep en modo SP: su círculo de SP, editable por el GM (2026-10-29)
   return {
-    hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
+    hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : v ? num(r.hpMax) : null,
     sp: conSp ? sp : spCreep ? CreepCalculo.spActual(sc) : null, spMax: conSp ? spMax : spCreep ? CreepCalculo.spMax(sc) : null,
     no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
@@ -94,8 +94,10 @@ function hudHtml(t){
   // del combate (vida, SP, No2, estados, Botonera); con el ⋯, todo lo demás; el ↩ vuelve. (El clic derecho sigue siendo ping y cancelar.)
   // 🚩 Un objeto inerte (estandarte, tótem; js/73, dueño 2026-11-05): sin la ficha lite y con el carnet 🪪 en el primer anillo.
   const inerteHud = typeof esInerte === 'function' && esInerte(t);
+  // ＋ Token suelto (NPC, objeto; 2026-11-22): su tarjeta 🪪 (imagen, nombre y descripción) va en el primer anillo, para todos.
+  const sueltoHud = TokensAuto.esSuelto(t) && !inerteHud;
   if(hudNivel === 'resto') return '<div class="hud-anillo">' +
-    (t.tipo === 'creep' ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
+    (t.tipo === 'creep' || sueltoHud ? icono('tarjeta', '🪪', sueltoHud ? 'Ver tarjeta: imagen y descripción' : 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) && !inerteHud ? icono('ficha', '📜', 'Ver la ficha del creep (la misma ventana «Ver» de GM Tools)') : '') +
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
@@ -113,17 +115,17 @@ function hudHtml(t){
     '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
-    (hudGlobo === 'tarjeta' && t.tipo === 'creep' ? '<div class="hud-globos">' + hudTarjetaHtml(t, d) + '</div>'
+    (hudGlobo === 'tarjeta' && (t.tipo === 'creep' || sueltoHud) ? '<div class="hud-globos">' + hudTarjetaHtml(t, d) + '</div>'
       : hudGlobo === 'ajustes' && (puedoMover(t) || soyGM) ? '<div class="hud-globos">' + hudAjustesHtml(t, d) + '</div>' : '');
   // Un creep visto por un jugador (dueño, 2026-10-16): tiene pocos botones, así que la tarjeta 🪪 va en este primer menú y no hace falta el ⋯
   // (los dos niveles eran para la ficha propia, que tenía demasiados).
-  const creepJugador = t.tipo === 'creep' && (!soyGM || inerteHud);   // (un inerte, también para el GM: carnet arriba)
+  const creepJugador = (t.tipo === 'creep' && (!soyGM || inerteHud)) || sueltoHud;   // (un inerte, también para el GM: carnet arriba; un token suelto, para todos)
   let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (typeof revelarHudIcono === 'function' ? revelarHudIcono(t, icono) : '') +
     (typeof zonasRiesgoHudIcono === 'function' ? zonasRiesgoHudIcono(t, icono) : '') +   // 🕵 Zonas de riesgo: en sigilo, lo que miran los rivales (js/124, 2026-11-20)   // 👁 Revelar a mano lo oculto / en sigilo (js/122, 2026-11-20)
-    (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
+    (creepJugador ? icono('tarjeta', '🪪', sueltoHud ? 'Ver tarjeta: imagen y descripción' : 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     // ✚ Revivir (2026-11-04, dueño: «cuando hay un token caído, el GM al seleccionarlo vea entre sus botones uno para revivirlo; tanto para creeps como
     // para jugadores»): js/98, gmRevivirToken.
     // Desde el 2026-11-04 también el jugador, con su propio personaje o una invocación suya (puedeRevivirToken).
@@ -973,6 +975,7 @@ function hudEstadosHtml(t, estados, puede){
 // abra desde el token sin tener que preguntarle al GM. Todo de solo
 // lectura — para editar sigue siendo GM Tools.
 function hudTarjetaHtml(t, d){
+  if(TokensAuto.esSuelto(t) && !(typeof esInerte === 'function' && esInerte(t))) return hudSueltoTarjetaHtml(t);
   const v = vinculo(t);
   const mini = v && (v.tarjeta || v.miniatura);   // la tarjeta usa una imagen más grande (400 px) si el GM ya la publicó
   // 👁 Ver completa (dueño, 2026-10-30: «esa imagen es solo el encuadre que uno elige… que el usuario pueda hacer clic y verla completa»).
@@ -1006,6 +1009,20 @@ function hudTarjetaHtml(t, d){
     '<div class="hud-seccion"><h3>Estados alterados</h3>' + estados + '</div>' +
     (typeof debilTarjetaHtml === 'function' ? debilTarjetaHtml(t) : '') +   // 🎯 débil / resistente (js/89)
     (nota ? '<div class="hud-seccion"><h3>Nota</h3><p class="hud-tarjeta-nota">' + esc(nota) + '</p></div>' : '') +
+  '</div>';
+}
+
+// ＋ Token suelto (2026-11-22): la tarjeta 🪪 de un token sin ficha — la imagen más grande, el nombre, quién lo puso y la descripción, para cualquiera.
+function hudSueltoTarjetaHtml(t){
+  const desc = String(t.descripcion || '').trim();
+  const quien = t.tipo === 'creep' ? 'el GM' : nombreMiembro(t.duenoUid);
+  const puede = fbUsuario && TokensAuto.sueltoPuedeEditar(t, fbUsuario.uid, soyGM) && !pausaSoloMirar();
+  return '<div class="hud-globo hud-tarjeta hud-suelto">' +
+    `<h3>${esc(t.nombre || '?')}</h3>` +
+    (t.imagen ? `<img src="${esc(t.imagen)}" alt="" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin:0 auto 10px">` : '') +
+    `<div class="hud-seccion" style="padding-top:0;border-top:none"><h3>Descripción</h3>${desc ? '<p class="hud-tarjeta-nota">' + esc(desc) + '</p>' : '<span style="color:var(--muted)">Sin descripción.</span>'}</div>` +
+    `<div class="hud-seccion"><span style="color:var(--muted);font-size:12px">Token suelto · lo puso ${esc(quien)}</span>` +
+    (puede ? '<div class="hud-pie" style="margin-top:6px"><button type="button" class="hud-mini" data-hud-editar="1">✎ Editar</button></div>' : '') + '</div>' +
   '</div>';
 }
 
@@ -1650,6 +1667,7 @@ function abrirFichaDeToken(t){
   // «que ese botón siempre muestre la ficha lite; desde la lite se puede ir a la completa») — abren encima del mapa lo esencial del combate.
   // La de otro jugador, para un jugador, se abre en otra pestaña como antes.
   if(t.tipo === 'creep' && typeof esInerte === 'function' && esInerte(t)){ hudGlobo = 'tarjeta'; pedirDibujo(); return; }   // 🚩 un inerte no lleva ficha lite: su carnet
+  if(TokensAuto.esSuelto(t)){ hudGlobo = 'tarjeta'; pedirDibujo(); return; }   // ＋ un token suelto no tiene ficha: su tarjeta (2026-11-22)
   if(t.tipo === 'creep' && t.fichaId && soyGM){ abrirFichaLite({tipo: 'creep', creepId: t.fichaId}); return; }
   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   if(!fichaId) return;

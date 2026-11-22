@@ -92,43 +92,13 @@ async function publicarPaseDeTurno(turno, titulo){
   }catch(err){ console.error('No se pudo anunciar el pase de turno en la Mesa:', err); }
 }
 
-/* ---------- Personajes: lista de las fichas de la partida ----------
-   Cada una abre en una pestaña nueva (las de otros jugadores, en solo lectura).
-   El GM además tiene un ✕ para borrar cualquiera. */
+/* ---------- Personajes de la partida: quién está inactivo y borrar uno (el GM) ----------
+   La lista vive en el panel «👥 Personajes y tokens» del borde izquierdo (js/13, renderTokensMenu; 2026-11-22: antes era el 👥 de la cabecera). */
 let personajesInactivos = new Set();   // 💤 (CombateFin.fuera, gm/personajes: solo el GM)
 async function personajesInactivosLeer(){
   if(!soyGM) return;
   try{ await cargarPiezas(VG_PIEZAS); personajesInactivos = new Set(await CombateFin.fuera()); }catch(err){ console.error('No se pudo leer quién está inactivo:', err); }
-  if(!$('#personajes-lista').hidden) renderListaPersonajes(true);
-}
-function renderListaPersonajes(sinLeer){
-  if(!sinLeer) personajesInactivosLeer();
-  const lista = [...fichasPub.entries()].sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
-  $('#personajes-lista').innerHTML = lista.length
-    ? lista.map(([id, f]) => {
-        const dueno = miembros.get(f.duenoUid);
-        const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : `<span class="pj-mini"></span>`;
-        const enlace = `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
-          `${mini}<span class="pj-nombre">${esc(f.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</a>`;
-        // 🎭 Tu personaje no tiene token en el mapa que estás viendo: se pone desde acá (lo mismo que el 🎭; js/09, 2026-11-20).
-        const falta = fbMiembro && fbUsuario && f.duenoUid === fbUsuario.uid && escucharTokens.listo && ![...tokens.values()].some(t => t.fichaId === id);
-        const poner = falta ? `<button type="button" class="pj-poner" data-poner-personaje="${esc(id)}" title="Todavía no tiene token en este mapa. Tocá y elegí la casilla con un clic">🎭 Ponerlo en el mapa</button>` : '';
-        if(!soyGM) return poner ? `<div class="pj-fila">${enlace}${poner}</div>` : enlace;
-        const inactivo = personajesInactivos.has(id);
-        return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">${enlace}${poner}<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button><button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
-      }).join('')
-    : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
-  $('#personajes-lista').querySelectorAll('[data-borrar-personaje]').forEach(b => {
-    b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
-  });
-  $('#personajes-lista').querySelectorAll('[data-poner-personaje]').forEach(b => {
-    b.onclick = () => { abrirListaPersonajes(false); ponerPersonajeEnMapa(b.dataset.ponerPersonaje); };
-  });
-  $('#personajes-lista').querySelectorAll('[data-inactivo-personaje]').forEach(b => {
-    b.onclick = async () => { const id = b.dataset.inactivoPersonaje; b.disabled = true;
-      try{ await cargarPiezas(VG_PIEZAS); personajesInactivos = new Set(await CombateFin.fueraCambiar(id, !personajesInactivos.has(id))); }catch(err){ console.error(err); toast('No se pudo cambiar — mirá la consola'); }
-      renderListaPersonajes(true); };
-  });
+  renderTokensMenu(true);
 }
 
 // Mismo criterio que "Borrar personaje" de la ficha (confirmar + escribir el
@@ -160,7 +130,7 @@ async function borrarPersonajeGM(id, nombre, boton){
     await lote.commit();
     fichasPub.delete(id);
     toast(`${nombre} borrado de la partida`);
-    renderListaPersonajes();
+    renderTokensMenu();
     renderPanel();
     pedirDibujo();
   }catch(err){
@@ -169,20 +139,6 @@ async function borrarPersonajeGM(id, nombre, boton){
     boton.disabled = false;
   }
 }
-
-function abrirListaPersonajes(abrir){
-  $('#personajes-lista').hidden = !abrir;
-  $('#btn-personajes').setAttribute('aria-expanded', abrir ? 'true' : 'false');
-  if(abrir) renderListaPersonajes();
-}
-
-$('#btn-personajes').onclick = () => abrirListaPersonajes($('#personajes-lista').hidden);
-// Se cierra al elegir una ficha, al tocar afuera o con Escape.
-$('#personajes-lista').addEventListener('click', e => { if(e.target.closest('a')) abrirListaPersonajes(false); });
-document.addEventListener('pointerdown', e => {
-  if(!$('#personajes-lista').hidden && !e.target.closest('#personajes-caja')) abrirListaPersonajes(false);
-});
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#personajes-lista').hidden) abrirListaPersonajes(false); });
 
 // ⟳ Mantenimiento (el GM): fuera de combate lo pasa a mano; con orden de turnos lo pasa solo el cambio de ronda (P161). `titulo`: lo que se
 // anuncia en la Mesa (sin él, «Mantenimiento · Turno N»).

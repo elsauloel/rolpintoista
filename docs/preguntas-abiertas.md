@@ -1946,3 +1946,15 @@ la zona le pega al pasar de ronda, con su cartel de siempre, en la pantalla de s
 del personaje, sale «▶ Empieza tu turno» y se ven los dos a la vez (son de dos fichas distintas). Si el jugador toca el de la abeja y se abre el
 cuadro del daño, la ventana del turno ya se aparta (no lo tapa). ¿Querés que la zona de una invocación sin turno propio también vaya como renglón del
 «Empieza tu turno» de su dueño (pegaría al empezar el turno del dueño en vez de al pasar de ronda), o está bien así?
+
+### P276 — 🔗 Un token suelto, ¿se puede vincular después a una ficha o a un creep? (2026-11-22, Claude)
+Con el panel «👥 Personajes y tokens», «✎ Editar token» de un token sin ficha abre la ventana del token suelto (nombre, descripción, imagen, color) y
+ya no la de antes, que dejaba elegir «Vinculado a…». **Elegí lo más simple: un suelto queda suelto.** Para un creep, el GM lo trae con «👹 Traer
+creeps…» (y saca el suelto); para un personaje, «🎭 Ponerlo en el mapa». Los tokens **vinculados** siguen con su «✎ Editar token» de siempre
+(cambiar el vínculo y el dueño). ¿Hace falta poder convertir un suelto en el token de un creep (por ejemplo, un NPC que se vuelve enemigo), o así está bien?
+
+### P277 — 🪨 El token suelto de un jugador: ¿cómo se comporta en combate? (2026-11-22, Claude)
+El de un jugador es un token «de personaje» sin ficha (lo mueve él, borde de los suyos); el del GM, un NPC (borde gris). **Elegí no cambiar nada de lo
+que ya hacía un token sin ficha**: se mueve sin costo de No2, no tiene vida ni estados, y entra en «Traer tokens» del orden de turnos igual que
+cualquier token del mapa (como ya pasa con los NPC; está en la cola el pedido de que «Tirar iniciativa» no meta lo que no va). ¿Un token suelto de
+jugador debería quedar fuera del orden de turnos siempre? ¿Y el GM debería poder ocultarlo (hoy sí puede: 👁 en su HUD)?

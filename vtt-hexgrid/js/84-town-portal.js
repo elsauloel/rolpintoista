@@ -7,7 +7,7 @@
    El consumible (`townPortal` en el ítem; FichaAcciones.consumir → ui.townPortal) pide una casilla al lado de tu token; si se cancela, no se
    gasta. El elemento lleva `townPortal: true`: lo ven todos, no es una trampa (no se dispara ni se gasta) y queda hasta que el GM lo borra.
    La pisada la revisa la pantalla que mueve el token (moverToken, js/07): el token se va del mapa (su ficha, su creep o su invocación quedan
-   intactos; el GM lo pone en el mapa de la aldea con «Traer tokens de jugadores» o «+ Token»). Al entrar alguien, los pulsos en todas las
+   intactos; el GM lo pone en el mapa de la aldea con «👥 Poner a todos los que faltan…» o «🎭 Ponerlo en el mapa» del panel 👥). Al entrar alguien, los pulsos en todas las
    pantallas (`usoEn`, como los portales del Mago).
    ========================================================= */
 function townPortalColocar(msg){   // → Promise<bool>: true si quedó colocado

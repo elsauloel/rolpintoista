@@ -336,7 +336,7 @@ const TokensAuto = (() => {
   }
   // 🎭 Los personajes de `uid` que todavía no tienen token en el mapa que se está viendo (2026-11-20, dueño: «lo del botón de personajes y el
   // botón de tokens es poco claro»). `fichas`: pares [id, {nombre, duenoUid}]; `tokens`: los tokens de ese mapa. Devuelve los pares, por nombre.
-  // Lo usan el 🎭 («Traer a … ya»), la lista 👥 Personajes («🎭 Ponerlo en el mapa») y el cartel al entrar al mapa.
+  // Lo usan el panel 👥 Personajes y tokens del mapa («🎭 Ponerlo en el mapa», filasPersonajes) y el cartel al entrar al mapa.
   function sinToken(fichas, tokens, uid){
     if(!uid) return [];
     const enMapa = new Set([...(tokens || [])].map(t => t && t.fichaId).filter(Boolean));
@@ -349,5 +349,33 @@ const TokensAuto = (() => {
     if(!n.length) return '';
     return n.length === 1 ? `${n[0]} todavía no está en este mapa.` : 'Tus personajes todavía no están en este mapa. ¿A cuál ponés?';
   }
-  return {sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
+  // 👥 Personajes y tokens (2026-11-22, dueño, opción A: un solo botón en el menú de la izquierda del mapa): una fila por personaje de la
+  // partida, con sus invocaciones debajo. `fichas`: pares [id, {nombre, duenoUid, resumen}]; `tokens`: los del mapa que se está viendo;
+  // `o`: {uid, gm}. Cada fila: {id, nombre, duenoUid, propio, enMapa, puedePoner, invocaciones: [{ref, nombre, enMapa, puedePoner}]}.
+  // Ponerlo en el mapa: su dueño o el GM (que lo trae a nombre del jugador); las invocaciones solo se listan para quien las puede poner.
+  function filasPersonajes(fichas, tokens, o){
+    const uid = (o && o.uid) || '', gm = !!(o && o.gm);
+    const enMapa = new Set([...(tokens || [])].map(t => t && t.fichaId).filter(Boolean));
+    return [...(fichas || [])].filter(([id, f]) => f && !String(id).includes('~'))
+      .sort((a, b) => String(a[1].nombre || '').localeCompare(String(b[1].nombre || ''), 'es'))
+      .map(([id, f]) => {
+        const propio = !!uid && f.duenoUid === uid, puede = !!uid && (propio || gm);
+        const invs = puede ? ((f.resumen && f.resumen.invocaciones) || []).filter(i => i && i.id) : [];
+        return {id, nombre: String(f.nombre || 'Personaje'), duenoUid: f.duenoUid || '', propio, enMapa: enMapa.has(id), puedePoner: puede && !enMapa.has(id),
+          invocaciones: invs.map(i => { const ref = id + '~' + i.id; return {ref, nombre: String(i.nombre || 'Invocación'), enMapa: enMapa.has(ref), puedePoner: !enMapa.has(ref)}; })};
+      });
+  }
+  // ＋ Token suelto (2026-11-22, dueño: «que a los jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan cargar una
+  // imagen, un nombre y una descripción»): un token sin ficha ni creep (un NPC, un cofre, un objeto). Lo edita y lo borra quien lo puso y el GM.
+  const DESCRIPCION_MAX = 600;
+  const esSuelto = t => !!t && !t.fichaId && !t.trampa;
+  const sueltoPuedeEditar = (t, uid, gm) => esSuelto(t) && !!uid && (gm || t.duenoUid === uid);
+  // Lo que se guarda: nombre (1–40), descripción (hasta 600, sin espacios de más) e imagen. Devuelve {nombre, descripcion} o {falta: '…'}.
+  function sueltoNorm(d){
+    const nombre = String((d && d.nombre) || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+    const descripcion = String((d && d.descripcion) || '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, DESCRIPCION_MAX);
+    if(!nombre) return {falta: 'Ponele un nombre.'};
+    return {nombre, descripcion};
+  }
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
 })();

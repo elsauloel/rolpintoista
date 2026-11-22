@@ -878,3 +878,25 @@ body.con-ruta .toast{bottom:auto;top:74px}
 .desplegable-lista .pj-poner{flex:0 0 auto;border:1px solid var(--brass);background:rgba(200,160,80,.14);color:var(--paper);border-radius:8px;padding:3px 8px;cursor:pointer;font-size:12px;white-space:nowrap;margin-right:4px}
 .desplegable-lista .pj-poner:hover{background:var(--brass);color:#180F08}
 #personajes-lista{max-width:min(440px,calc(100vw - 24px))}
+/* 👥 Personajes y tokens (2026-11-22, js/13 renderTokensMenu): una fila por personaje, en el panel del borde izquierdo (antes 👥 de la cabecera + 🎭). */
+#tokens-menu{max-width:420px;width:400px;bottom:auto;max-height:calc(100% - 32px);background:#1A1418}
+#tokens-menu .pt-lista{display:flex;flex-direction:column;gap:2px;overflow:auto;min-height:0;flex:0 1 auto}
+#tokens-menu .pt-pie{display:flex;flex-direction:column;gap:6px;padding-top:8px;border-top:1px solid var(--line-soft)}
+#tokens-menu .pt-fila{display:flex;align-items:center;gap:4px;padding:2px 0}
+#tokens-menu .pt-fila.pt-inv{padding-left:22px}
+#tokens-menu .pt-ficha{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r);color:var(--paper);text-decoration:none}
+#tokens-menu a.pt-ficha:hover{background:rgba(63,111,176,.25)}
+#tokens-menu .pt-txt{display:flex;flex-direction:column;min-width:0}
+#tokens-menu .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+#tokens-menu .pj-nombre{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tokens-menu .pj-dueno{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+#tokens-menu .pt-en{flex:none;font-size:11.5px;color:#7FCB8F;white-space:nowrap;padding:0 4px}
+#tokens-menu .pt-falta{flex:none;color:var(--muted);padding:0 6px}
+#tokens-menu .pt-poner{flex:none;border:1px solid var(--brass);background:rgba(200,160,80,.14);color:var(--paper);border-radius:8px;padding:3px 8px;cursor:pointer;font-size:12px;white-space:nowrap}
+#tokens-menu .pt-poner:hover{background:var(--brass);color:#180F08}
+#tokens-menu .pj-inactivar{flex:none;border:1px solid var(--line);background:transparent;color:inherit;border-radius:8px;padding:2px 7px;cursor:pointer;font-size:13px}
+#tokens-menu .pj-inactivar:hover{border-color:#5fd08a}
+#tokens-menu .pj-inactivo .pt-ficha{opacity:.5}
+#tokens-menu .pj-inactivo .pj-nombre{text-decoration:line-through}
+#tokens-menu .pj-borrar{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#tokens-menu .pj-borrar:hover{background:var(--danger);border-color:var(--danger);color:#fff}

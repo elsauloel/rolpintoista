@@ -8,6 +8,32 @@ nuevo de Rol Pintoísta. Paso 2 de
 
 ## Estado actual
 
+**👥 Personajes y tokens: un solo botón** (2026-11-22, dueño, opción A: «¿no son medio redundantes? ¿No podrían unificarse?»; «que el botón esté en
+el menú lateral izquierdo»; «que a los jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan cargar una imagen, un
+nombre y una descripción»). **Reemplaza** al 👥 Personajes de la cabecera (`#personajes-caja`, retirado), al 🎭 del borde izquierdo y a la ventana
+«＋ Token nuevo» (`abrirTokenNuevo`, `#btn-nuevo`, retirados, con su «⬇ Traer a … ya»). Las secciones viejas de más abajo («👥 Personajes», «🎭
+Poner tu personaje en el mapa: tres entradas», «Tokens: botón 🎭», «"+ Token" abre una ventana propia», «⬇ Traer mi token al mapa») quedan como
+historia.
+- **El botón**: `#toolkit-tokens` (el mismo lugar del 🎭, ahora 👥) abre `#tokens-menu` (`renderTokensMenu`, js/13). **Una fila por personaje**
+  (`TokensAuto.filasPersonajes`, comun/tokens-auto.js): 📜 su nombre abre la ficha en otra pestaña · «✔ en el mapa» (el que se está viendo) o
+  «🎭 Ponerlo en el mapa» (su dueño, o el GM, que lo trae **a nombre del jugador**: `ponerPersonajeEnMapa` pone `duenoUid` = el del personaje) · el GM,
+  ✓/💤 (inactivo) y la ✕ de borrar (`borrarPersonajeGM`, js/04, con sus dos confirmaciones). Debajo de cada personaje, **sus invocaciones** (solo para
+  quien las puede poner), con el mismo «🎭 Ponerlo» (`fichaId~invId`: era el único camino que había, por «＋ Token nuevo»). Abajo: **«＋ Token suelto
+  (NPC, objeto…)»** para todos y, para el GM, **«👥 Poner a todos los que faltan…»** (`traerTokensDeJugadores`, apagado si no falta nadie) y **«👹
+  Traer creeps…»** (`traerCreepsElegidos`). Se cierra con Esc, tocando afuera o con el mismo botón; se redibuja solo si cambian los tokens o las fichas.
+  El cartel al entrar («X todavía no está en este mapa») sigue igual; su «Ahora no» recuerda el 👥 del borde.
+- **＋ Token suelto** (`abrirTokenSuelto(editId?)`, js/09): un paso (nombre, **descripción** hasta 600, imagen recortada con `recortarImagen`, color)
+  y después la casilla y hacia dónde mira. El de un jugador es tipo `pj` **sin ficha** (lo mueve él); el del GM, tipo `creep` sin ficha (un NPC, borde
+  gris, como siempre). Campo nuevo del token: **`descripcion`** (`escucharTokens` lo copia; `TokensAuto.sueltoNorm` limpia nombre y descripción).
+  **Se lee** al pasar el mouse por el token (`hoverEstadosHtml`, js/30: el nombre y la descripción, y debajo los estados si tiene) y en su **tarjeta 🪪**
+  (`hudSueltoTarjetaHtml`, js/10: imagen grande, descripción, «Token suelto · lo puso X» y ✎ Editar), que va en el primer anillo del HUD para todos; la
+  F/📜 de un token suelto abre esa tarjeta. **Lo edita y lo borra quien lo puso y el GM** (`TokensAuto.sueltoPuedeEditar`; `puedoBorrar`); «✎ Editar
+  token» de un suelto abre esta ventana (con «Sacar del mapa»), así que un suelto ya no se vincula a una ficha o un creep desde ahí (P276). Un token
+  sin ficha ya no muestra el «0» gris de vida (`hudDatos`).
+- **Reglas de Firestore** (hay que pegarlas): `descripcion` (texto ≤ 600) en `tokenValido`, y el GM puede cambiar `nombre`, `descripcion`, `imagen`
+  y `color` de un token `pj` **sin ficha** de un jugador. Sin pegarlas: crear o guardar un suelto **con descripción** avisa «faltan pegar las reglas
+  nuevas de Firestore (descripción de los tokens sueltos). Avisale al GM» y no se crea; sin descripción anda igual.
+
 **Desde el 2026-10-02 está partido en archivos** (paso 5 nivel A, como la ficha y GM Tools): `mapa.html` es solo la pantalla
 (~260 líneas) y carga `mapa.css` (los estilos) y los 14 tramos de su código en `js/`, en este orden:
 `01-base-y-mapas` (cabecera, Firebase, geometría de hexágonos, estado, lápiz, terreno y formas, varios mapas guardados) ·
@@ -351,7 +377,7 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   que el GM abre GM Tools. La imagen es `tarjeta` (400 px) o la
   `miniatura`; la original sigue siendo del GM (`privado/imagen`).
   Estados fuera de la tabla (2026-11-01, dueño): `ICONOS_FAMILIAS` les da el ícono de su familia por palabra del nombre (cuero/piel/coraza → 🪨 buff, veneno → 🤢, sangr → 🩸, fuego → 🔥, hielo → ❄️, rayo → ⚡, miedo → 😱, sueño → 💤, cura → ✚, marca → 🎯, maldi → 💀, lent → 🐌, veloz → ⏩, fuerza → 💪, suerte → 🍀, bendi → ✨), con la polaridad de la familia si el estado no trae la suya; «Cuero duro» está en la tabla. Solo cae en la inicial si no matchea nada. ✋ Nada en la mano (2026-11-01, dueño: «que la mano se ubique como el resto de los estados»): ya no es una marca grande de js/05, es un circulito más de la ronda, borde gris, al final, solo en modo combate (`__mano` en la tabla). 💉 Adrenalina, 🔋 Pila pila; `Baja cooldowns` con `spRecupera` (Pila pila) le da SP a un creep en modo SP (js/13).
-- **"+ Token" abre una ventana propia** (`#nuevo-token-capa`/
+- **"+ Token" abre una ventana propia** (**retirada el 2026-11-22**: la reemplaza «＋ Token suelto» del panel 👥, ver arriba; `#nuevo-token-capa`/
   `#nuevo-token-ventana`, centrada con el fondo oscurecido; antes se armaba
   en la barra lateral, decidido 2026-09-19), ordenada por campos (tipo,
   vínculo, dueño, nombre, imagen, color) con Cancelar / Poner en el mapa
@@ -661,7 +687,7 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   con `sinCache()` (agrega `_v=Date.now()` a la URL, antes del `#` si trae
   uno) para que el sitio publicado no sirva una ficha o gm-tools vieja
   desde la caché de 10 minutos de GitHub Pages.
-- **👥 Personajes** (cabecera, azul, todos los miembros): despliega las
+- **👥 Personajes** (cabecera, azul, todos los miembros; **retirado el 2026-11-22**: la lista pasó al panel «👥 Personajes y tokens» del borde izquierdo, ver arriba): despliega las
   fichas de la partida (`fichasPub`, `renderListaPersonajes`); cada una abre
   `ficha.html?partida=…#<fichaId>` en otra pestaña. El GM además ve un ✕
   por fila para borrar ese personaje (`borrarPersonajeGM`: confirmar +
@@ -669,7 +695,7 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   usan — ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)).
   **⟳ Mantenimiento** (solo GM) va en verde arriba de todo en la barra lateral
   (`#caja-mantenimiento`).
-- **🎭 Poner tu personaje en el mapa: tres entradas, un solo camino** (2026-11-20, dueño: «lo del botón de personajes y el botón de tokens es
+- **🎭 Poner tu personaje en el mapa: tres entradas, un solo camino** (desde el 2026-11-22 son dos: «🎭 Ponerlo en el mapa» del panel 👥 y el cartel al entrar; 2026-11-20, dueño: «lo del botón de personajes y el botón de tokens es
   poco claro»; js/09 `ponerPersonajeEnMapa`, `misPersonajesSinToken`; quiénes faltan: `TokensAuto.sinToken`, `comun/tokens-auto.js`). (1) El 🎭 →
   «⬇ Traer a … ya» de siempre. (2) En la lista **👥 Personajes**, al lado de cada personaje PROPIO sin token en el mapa que se está viendo, el
   botón **«🎭 Ponerlo en el mapa»** (`.pj-poner`; la lista se redibuja sola si está abierta cuando cambian los tokens). (3) **El cartel al entrar**
@@ -1134,7 +1160,7 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
 
 - **Tokens automáticos y fin de combate en el mapa** (2026-09-20, solo GM, en `#caja-mantenimiento`): **📥 Importar tokens** (elige un grupo de creeps de GM Tools; crea sus tokens ocultos), **👥 Tokens de jugadores** (los personajes de la partida, visibles) — ambos en fila al centro de lo que se ve (`mapa-centro` en `localStorage`, `guardarVista`), en el mapa mostrado y salteando los que ya tienen token (`comun/tokens-auto.js`); **🏁 Finalizar combate** y **🎁 Botín** abren GM Tools en un iframe (`abrirModoGM`).
 
-- **Tokens: botón 🎭 del borde izquierdo** (2026-09-21): la gestión de tokens salió de la cabecera (el "+ Token" quedó oculto, lo sigue usando el código; el (?) de la guía de colores quedó suelto en la cabecera) y de la barra lateral (ya no están "Importar tokens" ni "Tokens de jugadores"). Ahora hay un tercer botón junto a los dados y la caja de herramientas (`#toolkit-tokens`, `#tokens-menu`): **jugador** → abre directo la ventana de "Nuevo token"; **GM** → menú con "＋ Token nuevo", "👥 Traer tokens de jugadores" y "👹 Traer tokens de creeps" (submenú de grupos; los grupos vinculados a este mapa van marcados ★ y hay un botón para traerlos todos juntos). **Grupos ↔ mapas** (`campanas/<id>/gm/gruposMapas = {enlaces: [{grupo, mapaId}]}`, `TokensAuto.enlacesEscuchar/enlacesGuardar/vincular`): en el panel **🗺 Mapas** cada mapa muestra sus grupos vinculados (chips con ✕ y "＋ vincular grupo…"), y en GM Tools cada grupo tiene su selector "🗺 mapa"; ambos editan el mismo dato. Un grupo tiene a lo sumo un mapa; un mapa puede tener varios grupos. "Finalizar combate" y "Botín" siguen en la barra lateral.
+- **Tokens: botón 🎭 del borde izquierdo** (2026-09-21; **desde el 2026-11-22 es el 👥 «Personajes y tokens»**, ver arriba): la gestión de tokens salió de la cabecera (el "+ Token" quedó oculto, lo sigue usando el código; el (?) de la guía de colores quedó suelto en la cabecera) y de la barra lateral (ya no están "Importar tokens" ni "Tokens de jugadores"). Ahora hay un tercer botón junto a los dados y la caja de herramientas (`#toolkit-tokens`, `#tokens-menu`): **jugador** → abre directo la ventana de "Nuevo token"; **GM** → menú con "＋ Token nuevo", "👥 Traer tokens de jugadores" y "👹 Traer tokens de creeps" (submenú de grupos; los grupos vinculados a este mapa van marcados ★ y hay un botón para traerlos todos juntos). **Grupos ↔ mapas** (`campanas/<id>/gm/gruposMapas = {enlaces: [{grupo, mapaId}]}`, `TokensAuto.enlacesEscuchar/enlacesGuardar/vincular`): en el panel **🗺 Mapas** cada mapa muestra sus grupos vinculados (chips con ✕ y "＋ vincular grupo…"), y en GM Tools cada grupo tiene su selector "🗺 mapa"; ambos editan el mismo dato. Un grupo tiene a lo sumo un mapa; un mapa puede tener varios grupos. "Finalizar combate" y "Botín" siguen en la barra lateral.
 
 - **Ventana del botín para los jugadores** (2026-09-21): cuando el GM confirma el fin del combate y aparece botín nuevo (`escucharBotinParaJugador`, solo jugadores; ignora el botín que ya estaba al entrar), se abre sola la ventana del botín de la ficha propia (`fichaPrincipalId`, mismo iframe de la Botonera con el mensaje `abrir-botin`): lista de equipos y trofeos para "Sumar a la mochila" o Comparar. En la barra lateral del GM, **🧰 Despojar** reemplaza al viejo "🎁 Botín".
 
@@ -1210,7 +1236,7 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
 
 - **👹 Visión de los creeps** (2026-09-24, pedido del dueño; solo GM): botón nuevo en el menú del ojo 👁 (junto a Niebla, Como jugador, Revelar lo oculto). Prendido, se ve lo que ven los creeps del mapa: una **niebla semitransparente** (no la negra opaca de los jugadores) sobre las casillas que ningún creep alcanza a ver, y en **naranja** las que verían si los objetos **Sólidos** no les taparan la vista (cuánta visión les bloquean, para pensar objetivos de ataques a distancia). Usa el mismo cono que los personajes (`celdasVisionDe`: radio, punto ciego y sólidos que tapan) para todos los tokens de tipo creep, ocultos incluidos (`visionCreepsCalcular`, cacheada por posición/giro de los creeps y sólidos; `celdasVisionDe(t, true)` ignora los sólidos). Es un estado por navegador (`localStorage` `vision-creeps`) y no cambia la niebla real de los jugadores.
 
-- **⬇ Traer mi token al mapa** (2026-09-24, jugadores): botón arriba en la ventana "Nuevo token"; pone en el mapa al primer personaje propio que todavía no tiene token, ya vinculado a su ficha (mismo paso de elegir casilla y orientación de siempre). Si todos sus personajes ya están, cierra la ventana y centra la vista en ellos.
+- **⬇ Traer mi token al mapa** (2026-09-24, jugadores; **retirado el 2026-11-22**, lo hace «🎭 Ponerlo en el mapa» del panel 👥): botón arriba en la ventana "Nuevo token"; pone en el mapa al primer personaje propio que todavía no tiene token, ya vinculado a su ficha (mismo paso de elegir casilla y orientación de siempre). Si todos sus personajes ya están, cierra la ventana y centra la vista en ellos.
 
 - **Tabla de iniciativa: Tirar, mover y seleccionar** (2026-09-24, pedido del dueño): (1) **🎲 Tirar iniciativa** abajo de la lista, para todos (`iniciativaTirar`): un jugador tira la de su personaje (Iniciativa publicada en `resumen.ini` de su ficha; la tirada queda en la Mesa) y el GM tira la de **todos los creeps** de la lista (Agilidad + modificadores, `creepIniMapa`; no publica cada tirada a la Mesa, solo un aviso, para no mostrar creeps que los jugadores no ven); el número se carga solo junto al nombre, sin agregar ni sacar filas (los tokens los trae "Traer tokens"); **Ordenar** sigue siendo manual. (2) **▲ ▼** por fila (solo GM, `iniciativaMover`): cambia el lugar a mano y el turno sigue con quien lo tenía. (3) **Clic en un nombre**: selecciona el token como si se hubiera tocado (se despliega su menú alrededor), centra la vista y un **anillo pulsante** (`iniResaltado`) lo marca 3 segundos. Las tiradas de creeps visibles/no visibles para los jugadores quedó como tarea aparte en "A desarrollar".
 

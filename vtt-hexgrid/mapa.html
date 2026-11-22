@@ -8,21 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mapa.css?v=20261121iniciando2">
+<link rel="stylesheet" href="mapa.css?v=20261122suelto">
 </head>
 <body>
 <header>
   <h1>⬡ Mapa</h1>
   <span id="estado">conectando…</span>
-  <button type="button" class="btn primary" id="btn-nuevo" disabled hidden>+ Token</button>
   <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <button type="button" class="btn" id="btn-tablero" title="Tablero: el estado de todos los que tienen token en el mapa publicado">📋 Tablero</button>
   <button type="button" class="btn" id="btn-botonera-nueva" hidden title="Prueba (solo en este navegador): la Botonera de tu personaje la dibuja el mapa, sin cargar la ficha adentro — abre más rápido. Si algo no anda, apagala y vuelve la de siempre.">⚗ Botonera nueva: no</button>
-  <div class="desplegable" id="personajes-caja" hidden>
-    <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
-    <div class="desplegable-lista" id="personajes-lista" hidden></div>
-  </div>
   <input type="file" id="fondo-archivo" accept="image/*" hidden>
   <input type="file" id="token-imagen-archivo" accept="image/*" hidden>
   <input type="file" id="elemento-imagen-archivo" accept="image/*" hidden>
@@ -131,7 +126,7 @@
       <div id="toolkit-dock">
         <button type="button" id="toolkit-pestana" aria-expanded="false" aria-controls="toolkit-panel" title="Abrir las herramientas">☭</button>
         <button type="button" id="toolkit-dados" title="Grilla de dados: elegí dado y cantidad (atajo: D)">🎲</button>
-        <button type="button" id="toolkit-tokens" title="Tokens: poner uno nuevo (y, si sos GM, traer los de los jugadores y los de los creeps)">🎭</button>
+        <button type="button" id="toolkit-tokens" aria-expanded="false" title="Personajes y tokens: las fichas de la partida, poner tu personaje en el mapa y un token suelto (NPC u objeto); el GM, además, traer creeps">👥</button>
         <button type="button" id="toolkit-tienda" hidden title="Tienda: abrir la tienda que publicó el GM y comprar o vender (cerrada, se puede mirar, pero no comprar ni vender)">🏪</button>
         <button type="button" id="toolkit-botin" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate">🎁</button>
         <button type="button" id="toolkit-mapas" hidden title="Mapas: ver, publicar, crear o borrar mapas guardados, y el fondo">🗺</button>
@@ -164,7 +159,6 @@
       </div>
     </div>
     <div class="seccion" id="panel-token"></div>
-    <!-- (la ventana de "Nuevo token" está más abajo, fuera del aside) -->
     <div id="mesa">
       <h2><span>Mesa</span><span id="mesa-historial"></span></h2>
       <div id="mesa-cuerpo"><div class="mesa-vacia">Conectando…</div></div>
@@ -251,7 +245,7 @@
 <script src="../comun/tip-ejecutar.js?v=20261109tip3"></script>
 <script src="../comun/item-corto.js?v=20261112sind2"></script>
 <script src="../comun/biblioteca.js?v=20261103ref"></script>
-<script src="../comun/tokens-auto.js?v=20261120poner"></script>
+<script src="../comun/tokens-auto.js?v=20261122suelto"></script>
 <script src="../comun/creeps-mapas.js?v=20261105sync"></script>
 <script src="../comun/orden-turnos.js?v=20261121caido"></script>   <!-- 🎺 el orden de turnos a favor o en contra: las reglas (2026-11-05) -->
 <script src="../comun/asistente-mapa.js?v=20261002a"></script>
@@ -279,16 +273,16 @@
 <script src="js/01-base-y-mapas.js?v=20261119no2max"></script>
 <script src="js/02-modo-niebla-sigilo.js?v=20261120zr"></script>
 <script src="js/03-asistente-trampa.js?v=20261120zr"></script>
-<script src="js/04-mantenimiento-e-iniciativa.js?v=20261121muro"></script>
+<script src="js/04-mantenimiento-e-iniciativa.js?v=20261122suelto"></script>
 <script src="js/05-vista-y-dibujo.js?v=20261120tri3"></script>
 <script src="js/06-mouse.js?v=20261114dod"></script>
 <script src="js/07-tokens-y-elementos.js?v=20261120rev2"></script>
 <script src="js/08-mover-trampas-y-zonas.js?v=20261122inicio"></script>
-<script src="js/09-colocar-y-panel.js?v=20261121caido"></script>
-<script src="js/10-hud-y-vida.js?v=20261121cartelzona"></script>
+<script src="js/09-colocar-y-panel.js?v=20261122suelto"></script>
+<script src="js/10-hud-y-vida.js?v=20261122suelto"></script>
 <script src="js/11-botonera-nueva.js?v=20261121mueve"></script>
 <script src="js/12-acciones-nuevas.js?v=20261121mueve"></script>
-<script src="js/13-tokens-portal-duelo.js?v=20261121apunta"></script>
+<script src="js/13-tokens-portal-duelo.js?v=20261122suelto"></script>
 <script src="js/14-herramientas-y-arranque.js?v=20261119orb"></script>
 <script src="js/15-ficha-lite.js?v=20261120tri3"></script>
 <script src="js/16-momentos.js?v=20261122inicio4"></script>
@@ -305,7 +299,7 @@
 <script src="js/27-armas-en-el-piso.js?v=20261103t14"></script>
 <script src="js/28-desarmar-trampas.js?v=20261019y"></script>
 <script src="js/29-accion-incierta.js?v=20261120nv3"></script>
-<script src="js/30-hover-estados.js?v=20261120hasta"></script>
+<script src="js/30-hover-estados.js?v=20261122suelto"></script>
 <script src="js/31-copiar-token.js?v=20261030ch1"></script>
 <script src="js/32-linea-de-tiro.js?v=20261030ga1"></script>
 <script src="js/33-flechas.js?v=20261118rayo"></script>
@@ -359,7 +353,7 @@
 <script src="js/81-estado-del-grupo.js?v=20261120hasta"></script>
 <script src="js/82-delatado.js?v=20261028x2"></script>
 <script src="js/83-pacto.js?v=20261119quita"></script>
-<script src="js/84-town-portal.js?v=20261120esc"></script>
+<script src="js/84-town-portal.js?v=20261122suelto"></script>
 <script src="js/85-estoicismo.js?v=20261030es6"></script>
 <script src="js/86-prisa.js?v=20261120prisa3"></script>
 <script src="js/87-sueno.js?v=20261103t4"></script>

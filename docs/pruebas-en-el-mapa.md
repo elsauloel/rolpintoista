@@ -178,6 +178,15 @@ el Acelerador; la ficha suelta en una pestaña dormida; +N de vida con la vida l
 resurrección** con el duelo abierto o desde lejos; el Foco en una invocación (Dash / Salto / Parpadeo y el creep: hechos, cola 2026-11-21); y el cartel «todavía no
 está en este mapa» con dos personajes propios (no se puede en las partidas de prueba).
 
+## 👥 Personajes y tokens · ＋ Token suelto (2026-11-22)
+
+- [ ] **Con las reglas nuevas pegadas** (campo `descripcion` de los tokens): un jugador crea un token suelto **con descripción**; el otro jugador y el
+  GM la leen al pasar el mouse y en la tarjeta 🪪; el jugador la cambia desde «✎ Editar» y el GM también (nombre, descripción, imagen, color). Sin las
+  reglas, crear o guardar con descripción avisa y no se hace (visto con clics); sin descripción anda (visto con clics). Lo que se ve con descripción se
+  miró solo en una pantalla, poniéndola en la memoria del navegador (capturas «SIMULADO»): falta verlo de verdad.
+- [ ] El GM crea un **token suelto** (queda como NPC, tipo creep sin ficha) y un jugador lee su descripción.
+- [ ] **«🎭 Ponerlo en el mapa» de una invocación** desde el panel (la Abeja ya estaba en el mapa: se vio «✔ en el mapa», no se la puso).
+
 ## ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22)
 
 - [ ] **Lo que no se vio con clics** (lo demás, en la cola: `docs/cola-de-pruebas.md`, «🪟 Carteles encimados al empezar el turno»): (a) una zona de

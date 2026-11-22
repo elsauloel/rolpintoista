@@ -77,6 +77,7 @@ async function crearToken(datos){
     };
     if(datos.fichaId) doc.fichaId = datos.fichaId;
     if(datos.imagen) doc.imagen = datos.imagen;
+    if(datos.descripcion && !datos.fichaId) doc.descripcion = String(datos.descripcion).slice(0, TokensAuto.DESCRIPCION_MAX);   // ＋ Token suelto (2026-11-22)
     if(Number.isFinite(datos.rotacion) && datos.rotacion !== 0) doc.rotacion = datos.rotacion;
     const ref = await coleccionTokens().add(doc);
     creando = false;
@@ -84,7 +85,8 @@ async function crearToken(datos){
     if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
   }catch(err){
     console.error('No se pudo crear el token:', err);
-    toast('No se pudo crear el token' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+    // ＋ Token suelto (2026-11-22): con descripción, si las reglas publicadas son viejas Firestore rechaza el token entero.
+    toast('No se pudo crear el token' + (err.code !== 'permission-denied' ? '' : datos.descripcion ? ': faltan pegar las reglas nuevas de Firestore (descripción de los tokens sueltos). Avisale al GM, o probá sin descripción' : ' (sin permiso)'));
   }
 }
 
@@ -169,6 +171,7 @@ function escucharTokens(){
         aura: d.aura && typeof d.aura === 'object' ? d.aura : null,
         barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
+        descripcion: typeof d.descripcion === 'string' ? d.descripcion : '',   // ＋ Token suelto (2026-11-22)
         rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
         oculto: d.oculto === true,
         revelado: d.revelado === true,   // 🎭 los jugadores ya vieron a este creep (js/29)
@@ -184,7 +187,7 @@ function escucharTokens(){
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
     avisoSinTokenRevisar();   // 🎭 ¿tu personaje no tiene token en este mapa? (2026-11-20)
-    if(!$('#personajes-lista').hidden) renderListaPersonajes(true);
+    renderTokensMenu(true);   // 👥 el panel, al día si está abierto (js/13)
     renderPanel();
     // Ojo (2026-09-22): la ruptura de sigilo vivía solo adentro de dibujar(), que se
     // dispara con requestAnimationFrame — en una pestaña de fondo (minimizada, otra
@@ -309,7 +312,7 @@ function escucharVinculables(){
     });
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
     if(coleccion === 'fichas') actualizarCabecera();   // el nombre del personaje principal
-    if(coleccion === 'fichas'){ escucharVinculables.fichasListas = true; avisoSinTokenRevisar(); if(!$('#personajes-lista').hidden) renderListaPersonajes(true); }   // 🎭 ¿falta tu token? (2026-11-20)
+    if(coleccion === 'fichas'){ escucharVinculables.fichasListas = true; avisoSinTokenRevisar(); renderTokensMenu(true); }   // 🎭 ¿falta tu token? (2026-11-20)
     try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
@@ -851,12 +854,10 @@ function renderPanel(forzar){
     if(mismoPanel && (creando || panel.contains(document.activeElement))) return;
   }
   firmaPanel = firma;
-  $('#btn-nuevo').disabled = !fbMiembro;
   actualizarAyudaToken();
   renderNiebla();
   renderOjo();
   $('#caja-mantenimiento').hidden = !soyGM;
-  $('#personajes-caja').hidden = !fbMiembro;
   $('#toolkit-tienda').hidden = !fbMiembro;   // jugadores: comprar y vender; GM: abre el generador de tiendas
   $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (cerrada, se puede mirar, pero no comprar ni vender)';
   actualizarBotonMapas();
@@ -872,6 +873,7 @@ let editarTokenPap = null;
 function abrirEditarToken(id){
   const t = tokens.get(id);
   if(!t) return;
+  if(TokensAuto.esSuelto(t) && fbUsuario && TokensAuto.sueltoPuedeEditar(t, fbUsuario.uid, soyGM)){ abrirTokenSuelto(id); return; }   // ＋ Token suelto: nombre, descripción, imagen (2026-11-22)
   if(editarTokenPap) editarTokenPap.cerrar();
   editandoToken = true;
   const v = vinculo(t), editable = puedoMover(t);
@@ -1042,26 +1044,28 @@ $('#mapas-menu').addEventListener('click', e => e.stopPropagation());
 // Solo se cierra con el mismo botón o con Esc: mientras se acomoda el fondo hay que poder tocar el mapa con el menú abierto.
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && mapasMenuAbierto && !editandoElemento && !moverLibre && !herramientaActiva && !colocando && !creando) abrirMapasMenu(false); });
 
-/* ---------- ＋ Token nuevo, paso a paso (2026-10-02, tanda 6 de docs/plan-paso-a-paso.md) ----------
-   En la ventana común (comun/paso-a-paso.js). GM: Qué es (creep de la lista / NPC u objeto / personaje) → Cuál (el creep o la ficha) →
-   Cómo se ve (nombre, imagen si no está vinculado, color) → Dueño (solo un personaje) → Listo. Jugador: Cuál (sus personajes e invocaciones,
-   o sin vincular) → Cómo se ve → Listo. Al terminar se elige la casilla y hacia dónde mira (iniciarColocacion). */
 /* ---------- 🎭 Poner tu personaje en el mapa: un solo camino (2026-11-20) ----------
-   Dueño: «lo del botón de personajes y el botón de tokens es poco claro». El «Traer a … ya» del 🎭, el botón «🎭 Ponerlo en el mapa» de la lista
-   👥 Personajes (js/04) y el cartel que sale al entrar a un mapa donde tu personaje no tiene token hacen LO MISMO: `ponerPersonajeEnMapa`
+   Dueño: «lo del botón de personajes y el botón de tokens es poco claro». El botón «🎭 Ponerlo en el mapa» del panel 👥 Personajes y tokens
+   (js/13; desde el 2026-11-22 es la única lista: se fueron el 👥 de la cabecera y el «⬇ Traer a … ya» del 🎭) y el cartel que sale al entrar a un mapa donde tu personaje no tiene token hacen LO MISMO: `ponerPersonajeEnMapa`
    (elegís la casilla con un clic y hacia dónde mira). Quiénes faltan: `TokensAuto.sinToken` (comun/tokens-auto.js).
    Lo único que hoy limita a un jugador para poner su token es ser miembro de la partida (`fbMiembro`): si no lo es, no se ofrece nada. */
 function misPersonajesSinToken(){
   if(!fbMiembro || !fbUsuario) return [];
   return TokensAuto.sinToken(fichasPub.entries(), tokens.values(), fbUsuario.uid);
 }
+// `fichaId` puede ser una invocación (`<fichaId>~<invId>`). El token queda del dueño del personaje: si lo pone el GM, a nombre del jugador
+// (2026-11-22, panel 👥 Personajes y tokens). Un jugador solo pone los suyos (las reglas de Firestore no le dejan otra cosa).
 function ponerPersonajeEnMapa(fichaId, color){
-  const f = fichasPub.get(fichaId);
-  if(!f || !fbMiembro) return false;
-  if([...tokens.values()].some(t => t.fichaId === fichaId)){ toast(`${f.nombre} ya está en este mapa`); return false; }
-  if(tokenNuevoPap){ const v = tokenNuevoPap; tokenNuevoPap = null; v.cerrar(); }
+  const base = String(fichaId || '').split(SEP_INVOCACION)[0];
+  const f = fichasPub.get(base);
+  const v = vinculo({tipo: 'pj', fichaId});
+  if(!f || !v || !fbMiembro || !fbUsuario) return false;
+  if(!soyGM && f.duenoUid !== fbUsuario.uid){ toast(`${f.nombre} no es tuyo: lo pone su jugador o el GM`); return false; }
+  if([...tokens.values()].some(t => t.fichaId === fichaId)){ toast(`${v.nombre} ya está en este mapa`); return false; }
+  if(tokenNuevoPap){ const w = tokenNuevoPap; tokenNuevoPap = null; w.cerrar(); }
   avisoSinTokenCerrar();
-  iniciarColocacion({nombre: String(f.nombre || 'Personaje').slice(0, 40), color: color || COLORES[Math.floor(Math.random() * COLORES.length)], tipo: 'pj', fichaId, imagen: ''});
+  iniciarColocacion({nombre: String(v.nombre || 'Personaje').slice(0, 40), color: color || COLORES[Math.floor(Math.random() * COLORES.length)], tipo: 'pj', fichaId, imagen: '',
+    duenoUid: f.duenoUid || fbUsuario.uid});
   return true;
 }
 // El cartel: sale solo al ENTRAR al mapa (una vez por mapa en cada entrada: si dijo «Ahora no» no insiste hasta que vuelva a entrar), nunca al GM, y se va solo si
@@ -1089,7 +1093,7 @@ function avisoSinTokenRevisar(){
 document.addEventListener('click', e => {
   const b = e.target.closest('#sin-token-aviso button'); if(!b) return;
   if(b.dataset.staPoner) ponerPersonajeEnMapa(b.dataset.staPoner);
-  else{ avisoSinTokenCerrar(); toast('Cuando quieras: 👥 Personajes → «🎭 Ponerlo en el mapa», o el 🎭 del borde izquierdo'); }
+  else{ avisoSinTokenCerrar(); toast('Cuando quieras: el 👥 del borde izquierdo → «🎭 Ponerlo en el mapa»'); }
 });
 
 let tokenNuevoPap = null;
@@ -1099,80 +1103,50 @@ function cancelarNuevoToken(){
   if(tokenNuevoPap){ const v = tokenNuevoPap; tokenNuevoPap = null; v.cerrar(); }
   renderPanel(true); pedirDibujo();
 }
-function abrirTokenNuevo(){
-  if(!fbMiembro) return;
+/* ---------- ＋ Token suelto (2026-11-22, dueño: «que a los jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan
+   cargar una imagen, un nombre y una descripción») ----------
+   Un token sin ficha ni creep: un NPC, un cofre, un objeto. Para todos (jugadores y GM), desde el panel 👥 Personajes y tokens (js/13). Un paso:
+   nombre, descripción, imagen y color; al crear, se elige la casilla y hacia dónde mira (iniciarColocacion). El de un jugador es tipo 'pj' sin
+   ficha (lo mueve él, borde de los suyos); el del GM, tipo 'creep' sin ficha (un NPC, borde gris), como siempre. La descripción la lee cualquiera:
+   al pasar el mouse por el token (js/30) y en su tarjeta 🪪 (js/10). `editId`: editar uno que ya está (lo edita y lo borra quien lo puso y el GM:
+   TokensAuto.sueltoPuedeEditar; las reglas de Firestore dejan al GM tocar nombre, descripción, imagen y color de uno de un jugador). */
+function abrirTokenSuelto(editId){
+  if(!fbMiembro || !fbUsuario) return;
+  const t0 = editId ? tokens.get(editId) : null;
+  if(editId && !(t0 && TokensAuto.sueltoPuedeEditar(t0, fbUsuario.uid, soyGM))){ toast('Ese token no lo podés editar: lo editan quien lo puso y el GM'); return; }
   if(tokenNuevoPap) tokenNuevoPap.cerrar();
-  creando = true; seleccion = null; moverFondo = false;
-  renderPanel(true); pedirDibujo();
-  const st = {tipo: soyGM ? 'creep' : 'pj', vinculo: '', nombre: '', nombreTocado: false, color: COLORES[Math.floor(Math.random() * COLORES.length)], imagen: '', dueno: ''};
-  const tipoDato = () => st.tipo === 'npc' ? 'creep' : st.tipo;
-  const vinc = () => st.vinculo ? vinculo({tipo: tipoDato(), fichaId: st.vinculo}) : null;
-  // Mis personajes que todavía no tienen token en el mapa (jugador: el atajo "Traer a …").
-  const libre = () => {
-    if(soyGM) return null;
-    return misPersonajesSinToken()[0] || null;
-  };
-  const TIPOS = [
-    ['creep', '👹', 'Un creep de tu lista', 'Toma el nombre, la imagen, la vida y los estados del creep (borde rojo). Lo mueve el GM.'],
-    ['npc', '🪨', 'Un NPC o un objeto', 'Sin ficha: un personaje de la historia, un cofre, una marca (borde gris). Lo mueve el GM.'],
-    ['pj', '🧙', 'Un personaje o una invocación', 'Vinculado a la ficha de un jugador: lo mueve su dueño. Sirve para dejar listo el token de cada uno en un mapa que todavía no se publicó.'],
-  ];
-  const pasos = () => [
-    ...(soyGM ? [{id: 'que', nombre: 'Qué es', ayuda: '<b>¿Qué vas a poner en el mapa?</b> Define quién lo mueve y de dónde saca sus datos.', html: () => TIPOS.map(([id, ico, t, d]) =>
-      `<button type="button" class="pap-boton tn-op${st.tipo === id ? ' on' : ''}" data-tn-tipo="${id}"><span class="tn-ico">${ico}</span><span><b>${t}</b><small>${d}</small></span></button>`).join('')}] : []),
-    ...(st.tipo !== 'npc' ? [{id: 'cual', nombre: 'Cuál', ayuda: st.tipo === 'creep' ? '<b>¿Qué creep?</b> Primero los de este mapa; si elegís uno de la Reserva o de otro mapa, se muda a este.'
-      : soyGM ? '<b>¿La ficha de quién?</b> Vinculado, toma el nombre, la imagen, las barras y los estados de la ficha.' : '<b>¿Cuál de tus personajes?</b> Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha. Sin vincular sirve para una marca o un objeto.',
-      html: () => {
-        const l = libre();
-        return (l ? `<button type="button" class="pap-boton primario" data-tn-traer="1" style="margin-bottom:12px">⬇ Traer a ${esc(l[1].nombre)} ya (vinculado a su ficha)</button>` : '') +
-          `<div class="pap-campo"><label>${st.tipo === 'creep' ? 'Creep' : 'Personaje o invocación'}</label><select id="tn-vinculo" size="12">${opcionesVinculo(tipoDato(), st.vinculo, soyGM)}</select></div>`;
-      }}] : []),
-    {id: 've', nombre: 'Cómo se ve', ayuda: '<b>Nombre y aspecto.</b> El color se ve si no tiene imagen.', html: () => {
-      const v = vinc();
-      return `<div class="pap-campo"><label>Nombre</label><input id="tn-nombre" maxlength="40" placeholder="Ej: Aurelio" value="${esc(st.nombre)}"></div>` +
-        (v ? '<p class="pap-nota">Vinculado: la imagen sale de su ficha.</p>' : `<div class="pap-campo"><label>Imagen (opcional)</label><div class="pap-fila" style="align-items:center">` +
-          (st.imagen ? `<img src="${esc(st.imagen)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid ${esc(st.color)}">` : '') +
-          `<button type="button" class="pap-boton" data-tn-img="elegir">${st.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
-          (st.imagen ? '<button type="button" class="pap-boton" data-tn-img="quitar">Quitar</button>' : '') + '</div></div>') +
-        `<div class="pap-campo"><label>Color</label>${htmlColores(st.color, true)}</div>`;
-    }, alMontar: (c, a) => { conectarColores(a.raiz, col => { st.color = col; }); const n = a.raiz.querySelector('#tn-nombre'); if(n) setTimeout(() => n.focus(), 30); }},
-    ...(soyGM && st.tipo === 'pj' ? [{id: 'dueno', nombre: 'Dueño', ayuda: '<b>¿Quién lo mueve?</b> El token queda de quien elijas acá, no de quien lo crea.',
-      html: () => `<div class="pap-campo"><label>Dueño</label><select id="tn-dueno">${opcionesDueno(st.dueno)}</select></div>`}] : []),
-    {id: 'listo', nombre: 'Listo', ayuda: '<b>Así queda.</b> Al tocar «✔ Poner en el mapa» elegís la casilla con un clic y después hacia dónde mira.', html: () => {
-      const t = TIPOS.find(x => x[0] === st.tipo);
-      const v = vinc();
-      return `<div class="tn-resumen"><span class="tn-punto" style="background:${esc(st.color)}">${st.imagen ? `<img src="${esc(st.imagen)}" alt="">` : ''}</span><div>
-        <b>${esc(st.nombre || '—')}</b><br><small>${soyGM ? t[2] : 'Tu token'}${v ? ' · vinculado a ' + esc(v.nombre) : ' · sin vincular'}${soyGM && st.tipo === 'pj' ? ' · lo mueve ' + esc(nombreMiembro(st.dueno)) : ''}</small></div></div>`;
-    }},
-  ];
-  const leerVinculo = id => {
-    st.vinculo = id;
-    const v = vinc();
-    if(v && !st.nombreTocado) st.nombre = String(v.nombre || '').slice(0, 40);
-    if(v && v.duenoUid) st.dueno = v.duenoUid;
-    if(v) st.imagen = '';
-  };
-  if(soyGM) st.dueno = fbUsuario.uid;
-  const falta = id => {
-    if(id === 'cual' && st.tipo === 'creep' && !st.vinculo) return 'Elegí qué creep (o volvé y elegí «NPC u objeto»).';
-    if(id === 've' && !st.nombre.trim()) return 'Ponele un nombre.';
-    return '';
-  };
+  if(!t0){ creando = true; seleccion = null; moverFondo = false; renderPanel(true); pedirDibujo(); }
+  const st = {nombre: t0 ? t0.nombre : '', descripcion: t0 ? (t0.descripcion || '') : '', imagen: t0 ? (t0.imagen || '') : '', color: t0 ? t0.color : COLORES[Math.floor(Math.random() * COLORES.length)]};
+  const MAX = TokensAuto.DESCRIPCION_MAX;
+  const pasos = [{id: 've', nombre: 'Cómo es', ayuda: '<b>Un token sin ficha:</b> un NPC, un cofre, un objeto, una marca. La descripción la puede leer cualquiera de la mesa: al pasar el mouse por el token y en su tarjeta 🪪.',
+    html: () => `<div class="pap-campo"><label>Nombre</label><input type="text" id="ts-nombre" maxlength="40" placeholder="Ej: Cofre de la bodega" value="${esc(st.nombre)}"></div>` +
+      `<div class="pap-campo"><label>Descripción (opcional)</label><textarea id="ts-desc" rows="4" maxlength="${MAX}" placeholder="Qué es, cómo se ve, qué se nota al mirarlo…">${esc(st.descripcion)}</textarea><p class="pap-nota" id="ts-cuenta">${st.descripcion.length} / ${MAX}</p></div>` +
+      '<div class="pap-campo"><label>Imagen (opcional)</label><div class="pap-fila" style="align-items:center">' +
+        (st.imagen ? `<img src="${esc(st.imagen)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid ${esc(st.color)}">` : '') +
+        `<button type="button" class="pap-boton" data-ts-img="elegir">${st.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
+        (st.imagen ? '<button type="button" class="pap-boton" data-ts-img="quitar">Quitar</button>' : '') + '</div></div>' +
+      `<div class="pap-campo"><label>Color (se ve si no tiene imagen)</label>${htmlColores(st.color, true)}</div>`,
+    alMontar: (c, a) => { conectarColores(a.raiz, col => { st.color = col; }); const n = a.raiz.querySelector('#ts-nombre'); if(n && !t0) setTimeout(() => n.focus(), 30); }}];
+  const cerrado = () => { tokenNuevoPap = null; if(!t0){ creando = false; renderPanel(true); } pedirDibujo(); };
+  async function guardar(){
+    const n = TokensAuto.sueltoNorm(st);
+    if(n.falta){ api.aviso(n.falta); return false; }
+    const cambios = {nombre: n.nombre, color: st.color, descripcion: n.descripcion || firebase.firestore.FieldValue.delete(), imagen: st.imagen || firebase.firestore.FieldValue.delete()};
+    try{ await coleccionTokens().doc(editId).update(cambios); toast('Token guardado'); }
+    catch(err){
+      console.error('No se pudo guardar el token suelto:', err);
+      toast(err.code === 'permission-denied' ? 'No se pudo guardar: faltan pegar las reglas nuevas de Firestore (descripción de los tokens sueltos). Avisale al GM' : 'No se pudo guardar');
+      return false;
+    }
+    cerrado();
+  }
   const api = tokenNuevoPap = PasoAPaso.abrir({
-    titulo: '➕ Token nuevo', crear: true, z: 95, textoCrear: '✔ Poner en el mapa',
+    titulo: t0 ? `Editar token suelto · ${t0.nombre}` : '＋ Token suelto', crear: !t0, z: 95, ancho: 760, textoCrear: '✔ Poner en el mapa',
     pasos,
-    puedeIr: i => { const ps = pasos(); for(let k = 0; k < Math.min(i, ps.length); k++){ const f = falta(ps[k].id); if(f) return f; } return ''; },
     alClic: e => {
       const b = e.target.closest('button'); if(!b) return;
-      if(b.dataset.tnTipo){ st.tipo = b.dataset.tnTipo; st.vinculo = ''; if(!st.nombreTocado) st.nombre = ''; st.dueno = fbUsuario.uid; api.redibujar(); return; }
-      if(b.dataset.tnTraer){
-        const l = libre(); if(!l) return;
-        api.cerrar(); tokenNuevoPap = null;
-        ponerPersonajeEnMapa(l[0], st.color);
-        return;
-      }
-      if(b.dataset.tnImg === 'quitar'){ st.imagen = ''; api.redibujar(); return; }
-      if(b.dataset.tnImg === 'elegir'){
+      if(b.dataset.tsImg === 'quitar'){ st.imagen = ''; api.redibujar(); return; }
+      if(b.dataset.tsImg === 'elegir'){
         const entrada = $('#token-imagen-archivo');
         entrada.onchange = async ev => {
           const file = ev.target.files[0];
@@ -1188,31 +1162,25 @@ function abrirTokenNuevo(){
         entrada.click();
       }
     },
-    alInput: e => { if(e.target.id === 'tn-nombre'){ st.nombre = e.target.value; st.nombreTocado = true; } },
-    alCambio: e => {
-      if(e.target.id === 'tn-vinculo') leerVinculo(e.target.value);
-      else if(e.target.id === 'tn-dueno') st.dueno = e.target.value;
+    alInput: e => {
+      if(e.target.id === 'ts-nombre') st.nombre = e.target.value;
+      if(e.target.id === 'ts-desc'){ st.descripcion = e.target.value; const c = api.raiz.querySelector('#ts-cuenta'); if(c) c.textContent = `${st.descripcion.length} / ${MAX}`; }
     },
     alTecla: e => {
-      if(e.key !== 'Enter' || e.target.tagName === 'BUTTON') return;
+      if(e.key !== 'Enter' || e.target.id !== 'ts-nombre') return;
       e.preventDefault();
-      if(api.paso() < pasos().length - 1) api.irA(api.paso() + 1);
-      else{ const f = falta('cual') || falta('ve'); if(f) api.aviso(f); else{ api.cerrar(); poner(); } }
+      if(t0){ guardar(); return; }
+      const n = TokensAuto.sueltoNorm(st); if(n.falta) api.aviso(n.falta); else{ api.cerrar(); poner(n); }
     },
     confirmarCancelar: '',
-    alCrear: () => { const f = falta('cual') || falta('ve'); if(f){ api.aviso(f); return false; } poner(); },
-    alCancelar: () => { tokenNuevoPap = null; creando = false; renderPanel(true); pedirDibujo(); },
+    alCrear: () => { const n = TokensAuto.sueltoNorm(st); if(n.falta){ api.aviso(n.falta); return false; } poner(n); },
+    alGuardar: () => guardar(),
+    alCancelar: () => cerrado(),
+    extras: t0 && puedoBorrar(t0) ? [{id: 'borrar', texto: 'Sacar del mapa', alClic: () => { api.cerrar(); cerrado(); borrarToken(editId); }}] : [],
   });
-  function poner(){
+  function poner(n){
     tokenNuevoPap = null;
-    iniciarColocacion({nombre: st.nombre.trim().slice(0, 40), color: st.color, tipo: tipoDato(), fichaId: st.vinculo, imagen: st.vinculo ? '' : st.imagen,
-      duenoUid: soyGM && st.tipo === 'pj' ? st.dueno : undefined});
+    iniciarColocacion({nombre: n.nombre, color: st.color, tipo: soyGM ? 'creep' : 'pj', fichaId: '', imagen: st.imagen, descripcion: n.descripcion});
   }
 }
-
-
-$('#btn-nuevo').onclick = e => {
-  if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token
-  abrirTokenNuevo();
-};
 

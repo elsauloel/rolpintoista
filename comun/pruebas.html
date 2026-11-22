@@ -9487,6 +9487,42 @@ grupo('Tu personaje todavía no está en este mapa');
       ['Blanco todavía no está en este mapa.', 'Tus personajes todavía no están en este mapa. ¿A cuál ponés?', '']));
 })();
 
+/* ---------- 👥 Personajes y tokens + ＋ Token suelto (comun/tokens-auto.js, 2026-11-22, dueño, opción A) ---------- */
+grupo('Personajes y tokens: una fila por personaje, y el token suelto');
+(() => {
+  const fichas = [['f2', {nombre: 'Zulma', duenoUid: 'yo', resumen: {invocaciones: [{id: 'a1', nombre: 'Abeja'}]}}], ['f1', {nombre: 'Ana', duenoUid: 'otro'}], ['f1~x', {nombre: 'no va'}]];
+  prueba('una fila por personaje (por nombre, sin invocaciones sueltas); en el mapa ✔, si no y es tuyo «Ponerlo»; el de otro jugador no', () => {
+    const r = TokensAuto.filasPersonajes(fichas, [{fichaId: 'f1'}], {uid: 'yo', gm: false});
+    igual(r.map(x => [x.id, x.enMapa, x.puedePoner, x.propio]), [['f1', true, false, false], ['f2', false, true, true]]);
+    igual(TokensAuto.filasPersonajes(fichas, [], {uid: 'yo'}).find(x => x.id === 'f1').puedePoner, false);
+  });
+  prueba('el GM pone a cualquiera (a nombre del jugador); las invocaciones se listan solo para quien las puede poner', () => {
+    const gm = TokensAuto.filasPersonajes(fichas, [{fichaId: 'f2~a1'}], {uid: 'gm', gm: true});
+    igual(gm.map(x => x.puedePoner), [true, true]);
+    igual(gm.find(x => x.id === 'f2').invocaciones, [{ref: 'f2~a1', nombre: 'Abeja', enMapa: true, puedePoner: false}]);
+    igual(TokensAuto.filasPersonajes(fichas, [], {uid: 'otro'}).find(x => x.id === 'f2').invocaciones, []);
+    igual([TokensAuto.filasPersonajes(null, null, {}), TokensAuto.filasPersonajes(fichas, [], {}).some(x => x.puedePoner)], [[], false]);
+  });
+  prueba('token suelto: sin ficha; lo edita quien lo puso y el GM, no otro jugador', () => {
+    const t = {nombre: 'Cofre', duenoUid: 'j1', fichaId: ''};
+    igual([TokensAuto.esSuelto(t), TokensAuto.esSuelto({fichaId: 'f1'}), TokensAuto.esSuelto(null)], [true, false, false]);
+    igual([TokensAuto.sueltoPuedeEditar(t, 'j1', false), TokensAuto.sueltoPuedeEditar(t, 'j2', false), TokensAuto.sueltoPuedeEditar(t, 'gm', true), TokensAuto.sueltoPuedeEditar(t, '', true)], [true, false, true, false]);
+  });
+  prueba('nombre obligatorio (1–40) y la descripción limpia, hasta 600', () => {
+    igual(TokensAuto.sueltoNorm({nombre: '  ', descripcion: 'x'}), {falta: 'Ponele un nombre.'});
+    igual(TokensAuto.sueltoNorm({nombre: ' Cofre   viejo ', descripcion: '  Huele  a\r\n\n\n\nhumedad  '}), {nombre: 'Cofre viejo', descripcion: 'Huele a\n\nhumedad'});
+    igual([TokensAuto.sueltoNorm({nombre: 'x'.repeat(50)}).nombre.length, TokensAuto.sueltoNorm({nombre: 'a', descripcion: 'y'.repeat(900)}).descripcion.length], [40, 600]);
+  });
+  prueba('el mapa: sin el 👥 de la cabecera ni el «+ Token»; el 👥 del borde abre el panel y el token suelto tiene su descripción en el hover y en la tarjeta', async () => {
+    const [html, t13, t09, t30, t10] = await Promise.all(['../vtt-hexgrid/mapa.html', '../vtt-hexgrid/js/13-tokens-portal-duelo.js', '../vtt-hexgrid/js/09-colocar-y-panel.js', '../vtt-hexgrid/js/30-hover-estados.js', '../vtt-hexgrid/js/10-hud-y-vida.js']
+      .map(async u => (await fetch(u, {cache: 'no-store'})).text()));
+    cierto(!/id="btn-personajes"/.test(html) && !/id="btn-nuevo"/.test(html) && /id="toolkit-tokens"[^>]*>👥</.test(html));
+    cierto(/TokensAuto\.filasPersonajes/.test(t13) && /data-tm="suelto"/.test(t13) && /data-tm="creeps"/.test(t13) && /data-tm="jugadores"/.test(t13));
+    cierto(/function abrirTokenSuelto/.test(t09) && /descripcion: typeof d\.descripcion === 'string'/.test(t09) && !/function abrirTokenNuevo/.test(t09));
+    cierto(/TokensAuto\.esSuelto\(t\)/.test(t30) && /function hudSueltoTarjetaHtml/.test(t10));
+  });
+})();
+
 /* ---------- ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22, dueño, opción A) ---------- */
 grupo('Empieza tu turno con la zona adentro');
 (() => {

@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-11-21T03:24:42Z",
+ "actualizado": "2026-11-22T10:54:06Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1973,7 +1973,7 @@
    ],
    "estado": "borrador",
    "capitulo": "herramientas",
-   "cuerpo": "Un **token** es la ficha del tablero: el dibujito de un personaje, enemigo, objeto o trampa.\n\n- **Vinculado:** un token de personaje se conecta a su [[La ficha|ficha]] (y uno de enemigo a su [[Creeps|creep]]). Muestra HP, SP y estados en vivo, y la foto de la ficha.\n- **Sin vincular:** para un NPC, una puerta o un objeto: tiene nombre, color e imagen propios.\n- **Dueño:** cada jugador mueve **los suyos**; el GM mueve **todos**.\n- **Se crean con \"+ Token\"**: elegís qué es, dónde y hacia dónde mira. El GM puede crear uno a nombre de un jugador.\n- **Varios en la misma casilla** se acomodan en ronda.\n- El GM puede **ocultar** tokens ([[Ocultar y revelar]])."
+   "cuerpo": "Un **token** es la ficha del tablero: el dibujito de un personaje, enemigo, objeto o trampa.\n\n- **Vinculado:** un token de personaje se conecta a su [[La ficha|ficha]] (y uno de enemigo a su [[Creeps|creep]]). Muestra HP, SP y estados en vivo, y la foto de la ficha.\n- **Sin vincular (token suelto):** para un NPC, una puerta, un cofre o un objeto: tiene nombre, imagen, color y una **descripción** que cualquiera lee al pasar el mouse o en su tarjeta 🪪. Lo puede poner cualquiera; lo editan y lo sacan quien lo puso y el GM.\n- **Dueño:** cada jugador mueve **los suyos**; el GM mueve **todos**.\n- **El botón 👥 «Personajes y tokens»** (a la izquierda del mapa): una fila por personaje de la partida — 📜 abre su ficha, «✔ en el mapa» o «🎭 Ponerlo en el mapa» (elegís la casilla y hacia dónde mira; el GM lo pone a nombre del jugador) — y abajo «＋ Token suelto». El GM además tiene «Poner a todos los que faltan…» y «👹 Traer creeps…».\n- **Varios en la misma casilla** se acomodan en ronda.\n- El GM puede **ocultar** tokens ([[Ocultar y revelar]])."
   },
   {
    "id": "terreno-y-dibujo",

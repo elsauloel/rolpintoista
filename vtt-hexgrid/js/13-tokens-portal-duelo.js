@@ -1,6 +1,6 @@
 // js/13-tokens-portal-duelo.js — tramo 13 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): botón de tokens, portal, zonas de habilidad, duelo, hechizos de área, dodge, muerte.
-/* ---------- Tokens: botón del borde izquierdo (🎭) ----------
-   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer jugadores" y "Traer creeps". Los dos «Traer»
+/* ---------- 👥 Personajes y tokens: botón del borde izquierdo (antes 🎭; desde el 2026-11-22 el panel de abajo, renderTokensMenu) ----------
+   Los dos «Traer» del GM («👥 Poner a todos los que faltan…» y «👹 Traer creeps…»)
    abren una lista para marcar cuáles (dueño, 2026-10-30: «hay jugadores que a veces están y a veces no… que te aparezca una planilla y
    selecciones este, este y este»): los jugadores de la partida; los creeps de este mapa, de la Reserva y de los otros mapas (los que vienen
    de otro lado se mudan acá, como piedritas: no se duplican — comun/creeps-mapas.js). Los tokens salen en fila, en el centro de lo que se
@@ -81,7 +81,7 @@ async function traerTokensDeJugadores(){
   const items0 = fichas.map(([id, f]) => ({valor: id, texto: f.nombre || 'Personaje', fijo: conToken.has(id), detalle: conToken.has(id) ? 'ya tiene su token en este mapa' : ''}))
     .sort((a, b) => (a.fijo - b.fijo) || a.texto.localeCompare(b.texto, 'es'));
   const elegidos = await Confirmar.marcar('Marcá los personajes que traés a este mapa. Sus tokens salen visibles, en fila, en el centro de lo que ves.',
-    {titulo: 'Traer jugadores', icono: '👥', grupos: [{titulo: 'Personajes de la partida', items: items0}], si: 'Traer tokens ({n})'});
+    {titulo: 'Poner a todos los que faltan', icono: '👥', grupos: [{titulo: 'Personajes de la partida', items: items0}], si: 'Traer tokens ({n})'});
   if(!elegidos || !elegidos.length) return;
   try{
     const items = fichas.filter(([id]) => elegidos.includes(id)).map(([id, f], i) => ({nombre: f.nombre, color: COLORES[i % COLORES.length], tipo: 'pj', fichaId: id, duenoUid: f.duenoUid, oculto: false}));
@@ -92,32 +92,73 @@ async function traerTokensDeJugadores(){
     toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
   }
 }
-function renderTokensMenu(){
+/* ---------- 👥 Personajes y tokens: un solo botón en el menú de la izquierda (2026-11-22, dueño, opción A) ----------
+   Dueño: «¿no son medio redundantes? ¿No podrían unificarse?» (el 👥 Personajes de la cabecera y el 🎭 del borde). Eligió: «que el botón esté en
+   el menú lateral izquierdo» y «que a los jugadores también se les ofrezca la opción de agregar un token suelto». Una fila por personaje de la
+   partida (TokensAuto.filasPersonajes): 📜 su ficha · «✔ en el mapa» o «🎭 Ponerlo en el mapa» (su dueño, o el GM a nombre del jugador: el mismo
+   camino de siempre, ponerPersonajeEnMapa) · el GM, ✓/💤 y la ✕ de borrar. Debajo, sus invocaciones (para quien las puede poner). Abajo:
+   «＋ Token suelto» para todos (js/09, abrirTokenSuelto) y, para el GM, «👥 Poner a todos los que faltan…» y «👹 Traer creeps…». */
+function renderTokensMenu(sinLeer){
+  const menu = $('#tokens-menu');
+  if(!menu || menu.hidden) return;
+  if(soyGM && !sinLeer) personajesInactivosLeer();
+  const filas = TokensAuto.filasPersonajes(fichasPub.entries(), tokens.values(), {uid: fbUsuario && fbUsuario.uid, gm: soyGM});
+  const listo = escucharTokens.listo && fbMiembro;
+  const enlace = (id, f) => `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}`;
+  const estado = (enMapa, puede, ref, quien) => !listo ? '' : enMapa
+    ? '<span class="pt-en" title="Ya tiene su token en el mapa que estás viendo">✔ en el mapa</span>'
+    : puede ? `<button type="button" class="pt-poner" data-pt-poner="${esc(ref)}" title="${esc(quien)}">🎭 Ponerlo en el mapa</button>` : '<span class="pt-falta" title="No está en este mapa">—</span>';
+  const html = filas.map(r => {
+    const f = fichasPub.get(r.id) || {};
+    const dueno = miembros.get(r.duenoUid);
+    const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : '<span class="pj-mini"></span>';
+    const inactivo = soyGM && personajesInactivos.has(r.id);
+    const quien = soyGM && !r.propio ? `Lo ponés a nombre de ${dueno ? dueno.nombre : 'su jugador'}: elegís la casilla con un clic y hacia dónde mira` : 'Elegís la casilla con un clic y hacia dónde mira';
+    return `<div class="pt-fila${inactivo ? ' pj-inactivo' : ''}">` +
+      `<a class="pt-ficha" href="${enlace(r.id, f)}" target="_blank" rel="noopener" title="📜 Abrir la ficha en una pestaña nueva${r.propio || soyGM ? '' : ' (solo lectura)'}">${mini}<span class="pt-txt"><span class="pj-nombre">📜 ${esc(r.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</span></a>` +
+      estado(r.enMapa, r.puedePoner, r.id, quien) +
+      (soyGM ? `<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(r.id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button>` +
+        `<button type="button" class="pj-borrar" data-borrar-personaje="${esc(r.id)}" data-nombre="${esc(r.nombre)}" title="Borrar a ${esc(r.nombre)} de la partida (pide confirmar dos veces)">✕</button>` : '') +
+      '</div>' +
+      r.invocaciones.map(i => `<div class="pt-fila pt-inv"><span class="pt-ficha"><span class="pt-txt"><span class="pj-nombre">↳ ${esc(i.nombre)}</span><span class="pj-dueno">invocación</span></span></span>${estado(i.enMapa, i.puedePoner, i.ref, 'Elegís la casilla con un clic y hacia dónde mira')}</div>`).join('');
+  }).join('');
+  const faltan = filas.filter(r => !r.enMapa).length;
   const n = creepsPub.size;
-  $('#tokens-menu').innerHTML =
-    `<div class="tm-tit"><span>🎭 Tokens</span></div>` +
-    '<button type="button" class="btn primary chico" data-tm="nuevo" style="text-align:left">＋ Token nuevo</button>' +
-    '<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Marcás qué personajes traés a este mapa">👥 Traer jugadores…</button>' +
-    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Marcás qué creeps traés: de este mapa, de la Reserva o de otro mapa (los de otro lado se mudan acá)"${n ? '' : ' disabled'}>👹 Traer creeps…</button>` +
-    (n ? '' : '<div class="hint" style="margin-top:4px">La partida todavía no tiene creeps: crealos en GM Tools.</div>');
+  menu.innerHTML =
+    '<div class="tm-tit"><span>👥 Personajes y tokens</span></div>' +
+    `<div class="pt-lista">${html || '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>'}</div>` +
+    '<div class="pt-pie">' +
+      '<button type="button" class="btn primary chico" data-tm="suelto" style="text-align:left" title="Un token sin ficha: un NPC, un cofre, un objeto. Le ponés imagen, nombre y una descripción que todos pueden leer">＋ Token suelto (NPC, objeto…)</button>' +
+      (soyGM ? `<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Marcás qué personajes traés a este mapa, todos juntos"${faltan ? '' : ' disabled'}>👥 Poner a todos los que faltan…</button>` +
+        `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Marcás qué creeps traés: de este mapa, de la Reserva o de otro mapa (los de otro lado se mudan acá)"${n ? '' : ' disabled'}>👹 Traer creeps…</button>` +
+        (n ? '' : '<div class="hint" style="margin-top:4px">La partida todavía no tiene creeps: crealos en GM Tools.</div>') : '') +
+    '</div>';
 }
 function abrirTokensMenu(abrir){
   const menu = $('#tokens-menu');
   menu.hidden = !abrir;
   $('#toolkit-tokens').classList.toggle('activo', abrir);
+  $('#toolkit-tokens').setAttribute('aria-expanded', abrir ? 'true' : 'false');
   if(abrir){ renderTokensMenu(); if(mapasMenuAbierto) abrirMapasMenu(false); }
 }
 $('#toolkit-tokens').onclick = e => {
   e.stopPropagation();
-  if(!soyGM){ $('#btn-nuevo').click(); return; }   // jugador: directo a "Nuevo token"
+  if(!fbMiembro) return;
   abrirTokensMenu($('#tokens-menu').hidden);
 };
-$('#tokens-menu').addEventListener('click', e => {
+$('#tokens-menu').addEventListener('click', async e => {
   e.stopPropagation();
-  const b = e.target.closest('[data-tm]');
-  if(!b) return;
+  if(e.target.closest('a.pt-ficha')){ abrirTokensMenu(false); return; }   // la ficha se abre en otra pestaña
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.ptPoner){ abrirTokensMenu(false); ponerPersonajeEnMapa(b.dataset.ptPoner); return; }
+  if(b.dataset.borrarPersonaje){ abrirTokensMenu(false); borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b); return; }
+  if(b.dataset.inactivoPersonaje){
+    const id = b.dataset.inactivoPersonaje; b.disabled = true;
+    try{ await cargarPiezas(VG_PIEZAS); personajesInactivos = new Set(await CombateFin.fueraCambiar(id, !personajesInactivos.has(id))); }catch(err){ console.error(err); toast('No se pudo cambiar — mirá la consola'); }
+    renderTokensMenu(true); return;
+  }
   const que = b.dataset.tm;
-  if(que === 'nuevo'){ abrirTokensMenu(false); $('#btn-nuevo').click(); }
+  if(que === 'suelto'){ abrirTokensMenu(false); abrirTokenSuelto(); }
   else if(que === 'jugadores'){ abrirTokensMenu(false); traerTokensDeJugadores(); }
   else if(que === 'creeps'){ abrirTokensMenu(false); traerCreepsElegidos(); }
 });

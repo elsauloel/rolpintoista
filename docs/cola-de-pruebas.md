@@ -1529,6 +1529,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   automáticas nuevas (979).
 - **⬜ en cola — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
   opiniones y sugerencias»). Mirar qué hace cada uno y proponer.
+  *Propuesta enviada (2026-11-22), espera decisión:* hoy 👥 (cabecera) lista las fichas (abrir, ✕ del GM) y suma «🎭 Ponerlo en el mapa»
+  a los personajes propios sin token; 🎭 (borde izquierdo) al jugador le abre «Nuevo token» (con «⬇ Traer mi token») y al GM un menú
+  (＋ Token nuevo, 👥 Traer jugadores…, 👹 Traer creeps…). Lo repetido: poner tu personaje en el mapa (dos lugares) y «traer jugadores».
+  **A (recomendada):** un solo botón «👥 Personajes y tokens» con una fila por personaje (📜 abrir ficha · en este mapa ✔ / 🎭 ponerlo ·
+  GM: ✕) y, abajo, solo para el GM, «👹 Traer creeps…» y «＋ Token suelto (NPC u objeto)»; se saca el 🎭 del borde. **B:** dejar los dos
+  pero cada uno con lo suyo: 👥 = solo fichas; 🎭 = solo tokens.
 - **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
   está y, si no cuentan, proponer.
 - **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué

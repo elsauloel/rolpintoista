@@ -1711,6 +1711,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🪧 El nombre del tótem y del estandarte no delata al creep (P281 decidida)** (dueño, 2026-11-22: «correcto, sacale el nombre
   del creep»): el token se llama solo «Tótem de silencio» / «Estandarte de guerra», sin «de <creep>». Los ya clavados, también.
 
+- **⬜ en cola — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22: «revisar el sobrepeso y evaluar que
+  la mochila sobrecargada también se sume al de sobrepeso»). Hoy la mochila llena se mide por ranuras y el peso solo cuenta lo equipado (P262).
+  Contarle cómo está el sobrepeso hoy (qué lo dispara, qué hace) y proponer cómo sumar la mochila pasada de ranuras; programar lo que elija.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

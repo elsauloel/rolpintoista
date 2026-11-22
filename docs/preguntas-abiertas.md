@@ -1637,6 +1637,8 @@ avisa que hay alguien eligiendo); (e) con una sola forma **no se pregunta** (ni 
 ¿Los turnos para morir tendrían que esperar mientras elige?
 
 ### P252 — 🌿 Al terminar «Finalizar combate», ¿se limpia también el orden de turnos? (2026-11-20, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** «sí, la lista de iniciativa se limpia al terminar el combate» (en la cola).
 Desde el 2026-11-20, cuando el proceso de «🏁 Finalizar combate» termina (se cierra el botín, o se publica sin ítems), el mapa publicado vuelve solo a
 modo narrativo, igual que si el GM tocara el interruptor. **El interruptor no limpia el orden de turnos** (si había uno armado, la lista queda como
 estaba y el GM la borra con «Limpiar»), así que el cambio automático **tampoco lo limpia**: se eligió lo más conservador, no borrar nada que el GM no
@@ -1710,6 +1712,8 @@ desde donde no se ve: está bien, «al atacar se revela su posición». (c) El o
 correcto. Lo de «percibís algo raro» por habilidades ruidosas: «por ahora afuera». (d) y (e) sin responder; quedan como están.
 
 ### P256 — ☥ Al resucitar se van los estados: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** (a), (c), (e) y (g) «correcto», como están. (i): «si le subís la vida a mano, te debe aparecer una notificación que diga: el personaje está caído, ¿querés resucitarlo con esa cantidad de vida? Sí / No» (en la cola). El resto, como está.
 El dueño: «al resucitar se le borran todos los estados alterados, los temporales, circunstanciales, los de alguna habilidad o alguna poción o algún
 pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAlVolver`, comun/combatiente.js); estas son las dudas, con lo elegido:
 - (a) **La Llama de Fénix que no se usó** (volvió con el Ankh o el Pacto teniendo las dos): **queda**, porque el cartel «¿Con qué volvés?» promete
@@ -1733,6 +1737,8 @@ pergamino. Tanto los buenos como los malos». Se hizo así (`Combatiente.quedaAl
 
 ### P257 — ▶ «Iniciar combate»: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-22):** «todo es correcto», como está.
+
 > ✅ **Decidida (dueño, 2026-11-21):** «un caído queda como estaba al caer. Mismos nitros, no hay recarga ni regeneración de nada. También al momento de morir se le eliminan todos los estados alterados». Se programa en la cola («🔁 Turnos, caídos y resurrección»).
 El botón del orden de turnos (dueño, 2026-11-20). Dudas chicas, con lo elegido:
 - (a) **Los estados del primero:** su turno empieza como cualquier otro (regeneración, recarga, lo que se dispara al empezar); los turnos de sus
@@ -1748,6 +1754,8 @@ El botón del orden de turnos (dueño, 2026-11-20). Dudas chicas, con lo elegido
 
 
 ### P258 — 💍 Puntería certera y Foco: qué cuenta como «moverse» y qué pasa en la ronda 1 (2026-11-20, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** «es correcto, así como lo planteás».
 
 El ítem dice «si no te moviste ni en esta ronda ni en la anterior». Al arreglar que el bono saliera de más (ahora «quién se movió» se anota en la
 partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto no dice. Quedó así, «mientras tanto» (se cambia fácil):
@@ -1771,6 +1779,8 @@ partida y lo ven todas las pantallas) hubo que elegir algunas cosas que el texto
 
 ### P259 — 🔍 «Ver detalle» de una zona: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-22):** (3) «sí vale la pena»: que la nube guarde quién la puso y con qué (sin delatar al que está escondido); (4) «Ver detalle» de los tótems y estandartes, también (los dos en la cola). (2) como está.
+
 > ✅ **Muro de fuego decidido (dueño, 2026-11-21):** «debería hacer daño a un personaje/token al iniciar el turno del mismo, si este está parado sobre el muro». Se corrige el mapa (cola: «🔥 Muro de fuego al empezar el turno»). Lo demás de P259 sigue abierto.
 > ✅ **Hecho (2026-11-21):** el mapa, el texto de la habilidad, «Ver detalle» y el cartel de arriba dicen «al empezar su turno adentro». Queda P272 (la Varita del muro de fuego).
 
@@ -1786,6 +1796,8 @@ Contexto: la tarjeta «Ver detalle» de una zona (`vtt-hexgrid/js/127-zona-detal
 4. **Tótems y estandartes.** Son tokens, no zonas: su cartel es otro y no llevan el botón. ¿Se les suma un «Ver detalle» propio?
 
 ### P260 — ⚔ Las cinco maestrías: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** (4) «las armas naturales sí se ven afectadas por las maestrías del mismo tipo de arma»; (7) «volver a cargar una misma pasiva que uno ya tiene cuesta un punto de Job más que la carga anterior: si cuesta 1, la segunda copia cuesta 2 y la tercera 3» (verificar si ya está así). Los dos en la cola. El resto, como está.
 Las maestrías de punzantes, cortantes, hachas, arcos y ballestas (`comun/pasivas.js`; la cuenta, `Combatiente.familiaDeArma` / `MAESTRIA_STATS`) quedaron
 con estas decisiones conservadoras. **Para el dueño**, cuando quieras:
 1. **El Bloqueo de cortantes y de hachas vale al bloquear CON esa arma** (como el Parry de las armas pesadas: no con un escudo). Dijiste «+1 al
@@ -1804,6 +1816,8 @@ con estas decisiones conservadoras. **Para el dueño**, cuando quieras:
 7. **Comprada dos veces**, cada bono se duplica (como cualquier pasiva): la de hachas llegaría a 4 No2 menos. ¿Tope de una compra para las maestrías?
 
 ### P261 — 🛡 Aguante de trinchera: lo que quedó elegido «mientras tanto» (2026-11-20, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** «correcta como está planteada».
 La pasiva (dueño: «+1 la defensa y +1 la defensa especial por cada enemigo adyacente», 2 de Job; `comun/pasivas.js`, stat `trinchera`) quedó así:
 1. **Sin tope**, como la Táctica de enjambre. ¿Le ponés uno?
 2. **Qué cuenta como enemigo pegado:** los rivales que se ven y están en pie — ni los escondidos (ocultos, en sigilo, bajo tierra, etéreos), ni los
@@ -1820,6 +1834,8 @@ La pasiva (dueño: «+1 la defensa y +1 la defensa especial por cada enemigo ady
 
 
 ### P262 — 🎁 Dar a un jugador: ¿una casilla «en secreto»? y lo que quedó elegido «mientras tanto» (2026-11-21, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-22):** (5) «está bien que la ventana le avise al GM» si la mochila queda llena (en la cola). El resto, como está.
 La ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`) deja siempre una línea en la Mesa que ven todos («🎁 El GM le dio a Fulano: …»).
 1. **¿Una casilla «en secreto»?** Para que esa línea no la vean los demás (un ítem que el GM le pasa a uno solo por la historia). No se programó:
    falta decidir si la línea directamente no sale, o si sale solo para el GM y para quien lo recibe.

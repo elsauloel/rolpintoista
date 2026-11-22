@@ -1661,6 +1661,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Y además** (dueño, 2026-11-22, dictado «de los scripts» = de los creeps): en el orden de turnos, el botón «🎲 Tirar iniciativa» del GM
   pasa a decir **«🎲 Tirar iniciativa de los creeps»**, para que se entienda que con un botón tira la de todos los creeps.
 
+- **⬜ en cola (el dueño ya dio el ok para hacerla después de la Prisa) — 📋 Respuestas a P252, P256, P259, P260 y P262** (dueño, 2026-11-22):
+  1. **P252:** «la lista de iniciativa se limpia al terminar el combate» (cuando el fin del combate pasa el mapa a narrativo).
+  2. **P256 (i):** «si le subís la vida a mano [a un caído], te debe aparecer una notificación que diga: el personaje está caído, ¿querés
+     resucitarlo con esa cantidad de vida? Sí / No». Con No, elegir lo más simple (no se le sube la vida) y decirlo.
+  3. **P259 (3):** la nube (Polvareda, Bomba de humo…) guarda quién la puso y con qué, sin delatar al que está escondido (reglas de Firestore).
+  4. **P259 (4):** «Ver detalle» para los tótems y los estandartes.
+  5. **P260 (4):** «las armas naturales sí se ven afectadas por las maestrías del mismo tipo de arma» (garras de Tipo 4 → punzantes, etc.).
+  6. **P260 (7):** «volver a cargar una misma pasiva que uno ya tiene cuesta un punto de Job más que la carga anterior» (1, 2, 3…). Verificar si ya
+     está así; si no, hacerlo.
+  7. **P262 (5):** la ventana «Dar a un jugador» le avisa al GM, antes de dar, si a alguien le va a quedar la mochila llena.
+  Al terminar, decirle al dueño cuál es la siguiente tarea de la cola.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2070,6 +2070,8 @@ Pedido del dueño (2026-11-22, «✉ Mensajes secretos entre usuarios», decisio
 
 ### P286 — 📖 Glosario en «Ver detalle»: los textos nuevos y qué se marca (2026-11-22, Claude)
 
+> ✅ **Respondida en parte (dueño, 2026-11-22):** (1) los textos de las resistencias quedan «como ok hasta que te diga lo contrario» (los va a ver en el mapa); (4) «una marca por tarjeta está bien». (2) y (3) siguen como están, sin respuesta todavía.
+
 Pedido del dueño (2026-11-22: «en el menú de "Ver detalle" de las trampas y las zonas… le agregaría el glosario con hover»). Está hecho
 (`comun/zona-detalle.js` → `ZonaDetalle.html`, `comun/glosario.js`); quedan cosas chicas para mirar:
 1. **Las tres resistencias.** Antes su globo decía solo el nombre largo («Resistencia especial»). Les escribí un texto sacado de la nota

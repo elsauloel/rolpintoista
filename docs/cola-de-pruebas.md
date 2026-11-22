@@ -1728,6 +1728,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
   (son directos); se revisó el código y se probó solo con el Terreno incendiado.
 
+- **⬜ en cola — 🏷 Conversación de diseño: etiquetas y filtros para las pasivas** (dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
+  filtros. Por ejemplo, Aguante de trinchera es buena para warrior y para tanque y para melee en general, entonces pueden estar esos tags. Buscar
+  cierto universo de tags para poder crear filtros a la hora de elegir pasivas»). Hoy `etiquetas` sueltas (ofensiva, defensiva, stat, utilidad,
+  resistencia, regeneración, visión, percepción, racial). Preparar una propuesta (rol: warrior, tanque, liviano, rango, mago, support, debuffer;
+  estilo: cuerpo a cuerpo, distancia, mágico; función: daño, defensa, movilidad, control, curación, sigilo…) y los filtros del catálogo de
+  «+ Pasiva»; conversarlo con el dueño antes de programar.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

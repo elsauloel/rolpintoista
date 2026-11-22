@@ -93,11 +93,32 @@ const Glosario = (() => {
     {titulo: 'Derribar', texto: 'Derribar: cae al suelo y queda Sentado (Evasión a la mitad, no puede atacar). Levantarse cuesta 1 No2.'},
     {titulo: 'Salto', re: 'salta', texto: 'Salto (rayo): pasa al rival más cercano del mismo bando, a 3 casillas o menos, una vez por objetivo. Si lleva daño, salta con la mitad (para abajo): quien recibe 1 es el último.'},
     {titulo: 'Flecha especial', texto: 'Flecha especial: va en el carcaj y se elige al disparar con un arco. Se gasta al dispararla, pegue o no (si erra, queda en el piso y se puede levantar); su efecto entra siempre que pegue.'},
+    // 🔍 Para «Ver detalle» de zonas y trampas (2026-11-22, dueño: «le agregaría el glosario con hover… sumale glosario a otros términos que te
+    // parezcan pertinentes»). Las tres resistencias, del manual (nota «Resistencias»; siguen en pausa: P286); antes el globo decía solo el nombre largo.
+    {titulo: 'Res.Esp', re: 'Res\\.Esp|Resistencia especial', texto: 'Res.Esp: Resistencia especial (sale de la Constitución). Es la que se tira contra el daño y los efectos especiales (mágicos), por ejemplo contra el PdG.Esp o el Ef.Esp de quien lanza una maldición, una zona o una trampa mágica.'},
+    {titulo: 'Res.CC', re: 'Res\\.CC|Resistencia al crowd control', texto: 'Res.CC: Resistencia al control (sale de la Constitución). Es la que se tira contra los estados que te quitan el control de lo que hacés (Stun, Inmovilizado, Rengo, Lisiado, Pajaritos, Exhausto).'},
+    {titulo: 'Res.Mt', re: 'Res\\.Mt|Resistencia mental', texto: 'Res.Mt: Resistencia mental (sale del Especial). Es la que se tira contra el control mental y las maldiciones de la mente (por ejemplo, contra la Mala sombra).'},
+    // Los stats que la tarjeta nombra y que salen de comun/ficha-calculo.js (el mapa no lo carga de entrada: sin esto, el globo aparecía recién después
+    // de abrir una Botonera). Mismo texto que su `full` (o más claro donde era solo el nombre largo).
+    {titulo: 'Ef.Esp', re: 'Ef\\.Esp|Efecto especial', texto: 'Efecto especial: la potencia de los efectos del Especial (daño u otros), para habilidades y trampas mágicas.'},
+    {titulo: 'PdG.Esp', re: 'PdG\\.Esp|Probabilidad de golpe especial', texto: 'PdG.Esp: Probabilidad de golpe especial (sale del Especial). Es lo que tira quien usa una habilidad especial para que le entre, contra la Evasión o la resistencia del objetivo.'},
+    {titulo: 'Defensa especial', re: 'Defensa especial|Def\\. especial', texto: 'Defensa especial: se resta al daño especial (arcano, eléctrico, fuego, hielo, tóxico, ácido), como la Defensa al físico. No la frena: el daño directo (proyectiles chicos) ni el True Damage. No sale de ningún atributo: la da el equipo.'},
+    {titulo: 'Resistencia elemental', re: '[Rr]esistencia (?:al fuego|al hielo|al rayo|eléctrica|a lo tóxico|al ácido|a la luz|a lo siniestro)', texto: 'Resistencia a un elemento (fuego, hielo, rayo, tóxico, ácido, luz, siniestro): se resta a todo daño de ese elemento, además de la Defensa especial. Es lo único que frena el daño directo de ese elemento.'},
+    {titulo: 'Suela gruesa', texto: 'Suela gruesa: lo que pisás (zonas y trampas) te hace esta cantidad menos de daño.'},
+    {titulo: 'Fuego amigo', texto: 'Fuego amigo: si un área le pega también a los aliados de quien la puso. Una trampa la disparan solo los rivales de quien la puso (los aliados le pasan por encima); con fuego amigo, al dispararse su efecto alcanza a todos los que estén adentro. Una zona con fuego amigo le pega a cualquiera que entre, menos a quien la puso.'},
+    {titulo: 'Mantenimiento', texto: 'Mantenimiento: la fase que cierra cada ronda, cuando ya jugó el último del orden de turnos (el ⟳ del GM). Se recargan los No2, se recupera SP, pegan el veneno, el sangrado y lo que daña por turno, y bajan un turno los estados y lo que está puesto en el mapa con turnos contados.'},
     {titulo: 'Carcaj', re: 'carcaj', texto: 'Carcaj: guarda las flechas y los virotes especiales. Sin un carcaj puesto, cualquier arco o ballesta trae uno incluido de 5 lugares, que no pesa ni ocupa lugar.'},
   ];
   // Lo que se da por sabido (se usa en todos lados: marcarlo llenaría todo de vínculos).
   const BASICOS = new Set(['fuerza', 'destreza', 'especial', 'constitución', 'agilidad', 'pdg', 'dmg', 'evasión', 'parry', 'bloqueo', 'defensa', 'iniciativa',
     'alcance', 'rango', 'hp', 'sp', 'no2', 'vida', 'peso', 'percepción', 'visión', 'nitros', 'eva', 'def']);
+  // 🔍 Los básicos que SÍ se marcan en «Ver detalle» de zonas y trampas (2026-11-22, dueño: los términos de las tiradas y stats): en el resto del juego
+  // siguen sin marcarse (llenarían todo de vínculos); ahí se piden con marcar(texto, {basicos: true}). `re` evita pisar «PdG.Esp» y «Defensa especial».
+  const BASICOS_TXT = [
+    {titulo: 'PdG', re: 'PdG(?!\\.)|Probabilidad de [Gg]olpe(?! especial)', texto: 'PdG: Probabilidad de golpe. Es lo que tira quien ataca para pegar. Se compara con la Evasión (o el Parry) de quien se defiende: si la supera, pega. Lo que le sobra también decide si es crítico.'},
+    {titulo: 'Defensa', re: 'Defensa(?! especial)', texto: 'Defensa: se le resta al daño físico de cada golpe que te pega (la da sobre todo la armadura). Un crítico la ignora entera; el daño especial lo frena la Defensa especial, y el daño directo no lo frena ninguna.'},
+    {titulo: 'Evasión', texto: 'Evasión: lo que tirás para esquivar, contra el PdG (o el PdG.Esp) de quien te ataca: si no te supera, no te pega. La tirada nunca baja de 1.'},
+  ];
   // Efectos de arma que conviene explicar con el texto de arma (más preciso que el del estado).
   const EF_ARMA = {
     Rengo: 'Rengo: 3 turnos en que moverse le cuesta 2 No2 por casillero.',
@@ -130,23 +151,31 @@ const Glosario = (() => {
       });
     }
     const arr = [...defs.values()].sort((a, b) => b.re.length - a.re.length);
-    cache = {arr, porTitulo: defs, re: arr.length ? new RegExp(arr.map(d => `(?<![\\p{L}\\d])(${d.re})(?![\\p{L}\\d])`).join('|'), 'giu') : null};
+    const reDe = a => a.length ? new RegExp(a.map(d => `(?<![\\p{L}\\d])(${d.re})(?![\\p{L}\\d])`).join('|'), 'giu') : null;
+    const bas = BASICOS_TXT.map(b => ({titulo: b.titulo, texto: b.texto, re: b.re || reEsc(b.titulo)}));
+    const arrBas = [...arr, ...bas].sort((a, b) => b.re.length - a.re.length);
+    const basPorTitulo = new Map(bas.map(b => [b.titulo.toLowerCase(), b]));
+    cache = {arr, porTitulo: defs, re: reDe(arr), arrBas, reBas: reDe(arrBas), basPorTitulo};
     firma = f;
     return cache;
   }
-  function def(termino){ const d = lista().porTitulo.get(String(termino || '').trim().toLowerCase()); return d ? {titulo: d.titulo, texto: d.texto} : null; }
+  function def(termino){ const k = String(termino || '').trim().toLowerCase(), L = lista(); const d = L.porTitulo.get(k) || L.basPorTitulo.get(k); return d ? {titulo: d.titulo, texto: d.texto} : null; }
 
   // El texto, escapado, con cada término conocido marcado (la primera vez que aparece).
-  function marcar(texto){
+  // o = {usados: Set (compartido entre varios textos de una misma tarjeta: así un término se marca una sola vez en toda la tarjeta),
+  //      basicos: true (también PdG, Defensa y Evasión: BASICOS_TXT)}.
+  function marcar(texto, o){
+    o = o || {};
     const t = String(texto ?? '');
     const L = lista();
-    if(!t || !L.re) return esc(t);
-    const usados = new Set();
+    const re = o.basicos ? L.reBas : L.re, arr = o.basicos ? L.arrBas : L.arr;
+    if(!t || !re) return esc(t);
+    const usados = o.usados instanceof Set ? o.usados : new Set();
     let out = '', ultimo = 0;
-    L.re.lastIndex = 0;
-    for(let m; (m = L.re.exec(t));){
+    re.lastIndex = 0;
+    for(let m; (m = re.exec(t));){
       const i = m.slice(1).findIndex(x => x !== undefined);
-      const d = L.arr[i];
+      const d = arr[i];
       if(!d || usados.has(d.titulo)) continue;
       usados.add(d.titulo);
       out += esc(t.slice(ultimo, m.index)) + `<span class="glo" tabindex="0" data-glo="${esc(d.titulo)}">${esc(m[0])}</span>`;

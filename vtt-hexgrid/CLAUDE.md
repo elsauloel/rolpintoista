@@ -2332,6 +2332,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🔍 «Ver detalle» de una zona puesta en el mapa** (2026-11-20, dueño: «invoqué el Muro de fuego y después, cuando quería recordar bien qué hacía,
   tenía que ir a la ficha del personaje que lo invocó… arriba, donde aparece el título, a la derecha, un botoncito que diga "ver detalle"»; «siempre
   primero el detalle de cuánto daño hace y en qué contexto, y después todo lo demás»): `js/127-zona-detalle.js` + lo puro en `comun/zona-detalle.js`.
+  **📖 Con el glosario al pasar el mouse** (2026-11-22): `zonaDetalleHtml` e `inerteDetalleHtml` arman la tarjeta con `ZonaDetalle.html` (estados,
+  resistencias, PdG/Defensa/Evasión, fuego amigo, Mantenimiento…, una vez por tarjeta; ver comun/CLAUDE.md). El globo (`#glo-pop`, z-index 100200)
+  queda por encima de la tarjeta (26).
   El cartel del elemento seleccionado (`actualizarEtiquetaElemento`, js/10) suma el botón **🔍 Ver detalle** (`[data-zona-detalle]`, clase
   `con-detalle`) a todo lo que `ZonaDetalle.tiene(el)`: zonas, trampas que esa pantalla ve, terreno en llamas, nubes, portales, Acelerador. De paso,
   la nube y el terreno en llamas ahora dicen qué son en el cartel («☁ NUBE», «🔥 TERRENO EN LLAMAS»; antes «Flor · TRANSITABLE»). La tarjeta

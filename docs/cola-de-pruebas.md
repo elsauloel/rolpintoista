@@ -1651,8 +1651,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   escribió nada): la fila de la Mesa, la tarjeta de la Crónica (video), el 🕊️ con el globito en el mapa, la ficha y GM Tools (al lado de la Mesa, sin
   taparla), la conversación (marca leído, el globito baja) y Esc. **Falta con las reglas pegadas:** lo de abajo («Probar: …»). Dudas: P285.
   Pruebas automáticas: 1014 en verde.
-- **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
+- **✅ hecho (2026-11-22) — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
   expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
+  *Resultado:* la tarjeta (zonas, trampas, nubes, portales, tótems y estandartes) marca con el estilo del glosario cada término que tiene entrada, **una
+  vez en toda la tarjeta** (la primera: lo destacado de arriba, después las filas —también el título «Fuego amigo»— y la descripción); los nombres («De
+  quién es», «Con qué se puso») no se marcan. Ahí, además, PdG, Defensa y Evasión (en el resto del juego siguen sin marcarse). Entradas nuevas en
+  `comun/glosario.js`: Res.Esp, Res.CC, Res.Mt (antes el globo decía solo el nombre largo), Fuego amigo, Mantenimiento, PdG, Defensa, Evasión, y Ef.Esp,
+  PdG.Esp, Defensa especial, Resistencia elemental y Suela gruesa (el mapa no carga de entrada el cálculo de la ficha: sin esto no aparecían). Probado con
+  clics en «Claude · pruebas 2»: el Portal trampa de Arcano 5 (Expuesto, Res.Esp, Fuego amigo) como GM y, ya disparada por el Jugador 1, como jugador;
+  una zona puesta a mano con Pajaritos y Res.Mt (Pajaritos, Mantenimiento, Fuego amigo) como GM y jugador; el Tótem de silencio de Control mental 4
+  (Evasión, Defensa) como GM y jugador. El globo queda por encima de la tarjeta. Dudas: P286. Pruebas automáticas: 1018 en verde.
 - **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
   y cuál sigue abierta.
 - **⬜ en cola — 🕵 Área contra alguien escondido (P263)** (dueño, 2026-11-22): «me parece que no se debería abrir el duelo para el atacante. Al
@@ -1819,6 +1827,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   3. **La paloma flotante, siempre a la vista y la ruta principal** para abrir los mensajes («más que la Mesa; de última que sean ambas»):
      que se vea aunque no haya mensajes.
   (Respondido además: se borran con el 🗑 y con «Registro nuevo», bien; paloma en todos lados, bien; sin «responder a todos».)
+- **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de una zona con daño** (2026-11-22): el Muro de fuego (o una zona con daño de elemento) en el
+  mapa: que se marquen Defensa, Defensa especial y la resistencia al elemento en «Qué frena el daño», y Suela gruesa si es del piso.
+- **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de un estandarte y de una nube** (2026-11-22): el Estandarte de guerra (PdG / Probabilidad de
+  Golpe) y la nube de una Bomba de humo o de la varita.
 
 ## En cola
 

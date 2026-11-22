@@ -7,6 +7,7 @@
    descripción de la habilidad) lo decide el mapa (vtt-hexgrid/js/127-zona-detalle.js) y llega en `ctx`.
    ZonaDetalle.tiene(el) → ¿hay algo que contar? (zona, trampa, fuego, nube, portal, acelerador)
    ZonaDetalle.armar(el, ctx) → {icono, titulo, esencial, filas: [{k, v, aMano}], descripcion}
+   ZonaDetalle.html(m, {glosario, cargando}) → la tarjeta en HTML, con los términos del glosario marcados una sola vez (2026-11-22)
      ctx = {statLabel(id), estadoTexto(spec), elemento (del daño: 'fuego'…), elementoNombre ('fuego'), elementoRes ('al fuego'), quedan, quedanDe ('turnos de X' | ''), sinVencer,
             autor: {nombre, escondido, sinDato}, habilidad, descripcion, descripcionNo (por qué no se muestra), altura, cura: {cura, pulsos},
             superficie, magica (trampa), sola (trampa: afecta solo a quien la pisa), salva (trampa), rivalesTxt} */
@@ -275,6 +276,32 @@ const ZonaDetalle = (() => {
     return {icono: sil ? '🤐' : '🚩', titulo: (ctx.autor && ctx.autor.escondido ? '' : ctx.nombre) || (sil ? 'Tótem de silencio' : 'Estandarte de guerra'), esencial, filas, descripcion: '', descripcionNo: ''};
   }
 
-  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, A_MANO};
+  /* 📖 La tarjeta en HTML, con el glosario al pasar el mouse (2026-11-22, dueño: «en el menú de "Ver detalle" de las trampas y las zonas… le agregaría
+     el glosario con hover. Por ejemplo… dice que quedás expuesto, pero ni yo me acuerdo el detalle de expuesto»). Los términos que tienen entrada en
+     comun/glosario.js (estados, resistencias, PdG, Defensa, Evasión, fuego amigo, Mantenimiento…) se marcan UNA vez en toda la tarjeta (la primera en que
+     aparecen: lo destacado, después cada fila —también su título, como «Fuego amigo»— y al final la descripción). Sin Glosario, el texto escapado.
+     m = lo que devuelve armar() / armarInerte(); o = {glosario (el objeto Glosario), cargando (la descripción se está buscando)}. */
+  function html(m, o){
+    o = o || {};
+    if(!m) return '';
+    const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const G = o.glosario && typeof o.glosario.marcar === 'function' ? o.glosario : null;
+    const usados = new Set();
+    const mk = t => (G ? G.marcar(t, {usados, basicos: true}) : esc(t));
+    const esencial = mk(m.esencial);   // (primero lo destacado: ahí va la primera marca de cada término)
+    // (los nombres no se marcan: «Con qué se puso: Tótem de silencio» no es el estado Silencio, ni un creep que se llame como un término)
+    const SOLO_NOMBRE = ['De quién es', 'Con qué se puso'];
+    const filas = (m.filas || []).map(f => `<div class="zd-fila${f.aMano ? ' zd-amano' : ''}"><b>${mk(f.k)}</b><span>${SOLO_NOMBRE.includes(f.k) ? esc(f.v) : mk(f.v)}</span></div>`).join('');
+    const tituloDesc = '<b>📜 Descripción de la habilidad</b>';
+    const desc = m.descripcion ? `<div class="zd-desc">${tituloDesc}<div>${mk(m.descripcion)}</div></div>`
+      : m.descripcionNo ? `<div class="zd-desc zd-amano">${tituloDesc}<div>${esc(m.descripcionNo)}</div></div>`
+      : o.cargando ? `<div class="zd-desc zd-amano">${tituloDesc}<div>Buscándola…</div></div>` : '';
+    return `<div class="zd-cab"><b>${esc(m.icono)} ${esc(m.titulo)}</b><button type="button" class="zd-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>` +
+      `<div class="zd-esencial"><span class="zd-ico">${esc(m.icono)}</span><span>${esencial}</span></div>` +
+      `<div class="zd-filas">${filas}</div>${desc}` +
+      `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${A_MANO}» = ese dato no está guardado ahí.</div>`;
+  }
+
+  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, html, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

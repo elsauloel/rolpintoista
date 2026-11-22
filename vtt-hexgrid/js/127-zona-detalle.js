@@ -111,16 +111,8 @@ function zonaDetalleCtx(elId, el){
 
 function zonaDetalleHtml(elId, el){
   const m = ZonaDetalle.armar(el, zonaDetalleCtx(elId, el));
-  if(!m) return '';
-  const marcar = t => (typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(t) : esc(t));
-  const filas = m.filas.map(f => `<div class="zd-fila${f.aMano ? ' zd-amano' : ''}"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></div>`).join('');
-  const desc = m.descripcion ? `<div class="zd-desc"><b>📜 Descripción de la habilidad</b><div>${marcar(m.descripcion)}</div></div>`
-    : m.descripcionNo ? `<div class="zd-desc zd-amano"><b>📜 Descripción de la habilidad</b><div>${esc(m.descripcionNo)}</div></div>`
-    : zonaDetalleDesc.get(elId) === 'cargando' ? '<div class="zd-desc zd-amano"><b>📜 Descripción de la habilidad</b><div>Buscándola…</div></div>' : '';
-  return `<div class="zd-cab"><b>${esc(m.icono)} ${esc(m.titulo)}</b><button type="button" class="zd-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>` +
-    `<div class="zd-esencial"><span class="zd-ico">${esc(m.icono)}</span><span>${esc(m.esencial)}</span></div>` +
-    `<div class="zd-filas">${filas}</div>${desc}` +
-    `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${ZonaDetalle.A_MANO}» = ese dato no está guardado ahí.</div>`;
+  // 📖 Con el glosario al pasar el mouse (2026-11-22): la arma comun/zona-detalle.js (ZonaDetalle.html), cada término una sola vez en la tarjeta.
+  return m ? ZonaDetalle.html(m, {glosario: typeof Glosario !== 'undefined' ? Glosario : null, cargando: zonaDetalleDesc.get(elId) === 'cargando'}) : '';
 }
 function zonaDetalleCaja(){
   let c = $('#zona-detalle');
@@ -183,12 +175,7 @@ function inerteDetalleCtx(id, t){
 function inerteDetalleHtml(id, t){
   const {e, ctx} = inerteDetalleCtx(id, t);
   const m = e ? ZonaDetalle.armarInerte(e, ctx) : null;
-  if(!m) return '';
-  const filas = m.filas.map(f => `<div class="zd-fila${f.aMano ? ' zd-amano' : ''}"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></div>`).join('');
-  return `<div class="zd-cab"><b>${esc(m.icono)} ${esc(m.titulo)}</b><button type="button" class="zd-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>` +
-    `<div class="zd-esencial"><span class="zd-ico">${esc(m.icono)}</span><span>${esc(m.esencial)}</span></div>` +
-    `<div class="zd-filas">${filas}</div>` +
-    `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${ZonaDetalle.A_MANO}» = ese dato no está guardado ahí.</div>`;
+  return m ? ZonaDetalle.html(m, {glosario: typeof Glosario !== 'undefined' ? Glosario : null}) : '';
 }
 function inerteDetalleCerrar(){
   inerteDetalleId = null; inerteDetalleFirma = '';

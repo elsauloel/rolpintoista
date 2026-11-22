@@ -2067,3 +2067,18 @@ Pedido del dueño (2026-11-22, «✉ Mensajes secretos entre usuarios», decisio
    que todo lo de los mensajes se reconozca igual. ¿Te gusta así o la dejamos solo en el flotante?
 5. **Un mensaje a varios**: cada uno lo ve en la conversación con quien lo mandó, con «También para: …»; si responde, le contesta solo a quien lo
    mandó (no a todos). ¿Hace falta «responder a todos»?
+
+### P286 — 📖 Glosario en «Ver detalle»: los textos nuevos y qué se marca (2026-11-22, Claude)
+
+Pedido del dueño (2026-11-22: «en el menú de "Ver detalle" de las trampas y las zonas… le agregaría el glosario con hover»). Está hecho
+(`comun/zona-detalle.js` → `ZonaDetalle.html`, `comun/glosario.js`); quedan cosas chicas para mirar:
+1. **Las tres resistencias.** Antes su globo decía solo el nombre largo («Resistencia especial»). Les escribí un texto sacado de la nota
+   «Resistencias» del manual: **Res.Esp** (de la Constitución) contra el daño y los efectos especiales; **Res.CC** (de la Constitución) contra los
+   estados de control (Stun, Inmovilizado, Rengo, Lisiado, Pajaritos, Exhausto); **Res.Mt** (del Especial) contra el control mental y las maldiciones
+   de la mente (ejemplo: la Mala sombra). El manual dice que las tres están «en pausa, mezcladas». ¿Los textos te sirven así?
+2. **PdG, Defensa y Evasión se marcan solo en «Ver detalle».** En el resto del juego siguen sin globo a propósito (la regla de 2026-10-09: «llenarían
+   todo de vínculos»). ¿Los querés también en otros lados (el Ver de las habilidades, la Mesa)?
+3. **Fuego amigo y Mantenimiento** tienen entrada nueva, así que ahora llevan su globo **en todo el juego** (el Ver de las habilidades y los ítems, la
+   Mesa), no solo en la tarjeta. ¿Está bien?
+4. **Una marca por tarjeta:** un término se marca la primera vez que aparece en toda la tarjeta (lo destacado de arriba primero). Si aparece de nuevo
+   más abajo (por ejemplo, «Expuesto» en «Estado que deja»), ahí va sin marcar. ¿O preferís que se marque en cada fila?

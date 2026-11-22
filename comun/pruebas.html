@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261122cola47"></script>
+<script src="zona-detalle.js?v=20261122cola51c"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261122cola49"></script>
@@ -9652,6 +9652,48 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const t = {trampa: true, trampaNombre: 'Portal', trampaEstado: JSON.stringify({nombre: 'Expuesto', turnos: 1, portal: {rango: 4, destino: '13,6'}, magica: true})};
     const m = ZonaDetalle.armar(t, {estadoTexto: sp => `${sp.nombre} (${sp.turnos} turno)`, autor: {nombre: 'Arcano'}, sola: true});
     igual(m.esencial, 'Expuesto (1 turno) y lo lleva por un portal a otra casilla (hasta 4 de distancia) a quien la pisa, cuando la pisa un rival de quien la puso.');
+  });
+  // 📖 El glosario en «Ver detalle» (2026-11-22, dueño: «dice que quedás expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse»).
+  const cuenta = (h, t) => (h.match(new RegExp(`data-glo="${t.replace(/[.]/g, '\\.')}"`, 'g')) || []).length;
+  prueba('📖 Ver detalle con glosario: el Portal trampa marca Expuesto, Res.Esp, Ef.Esp y el «Fuego amigo» de la fila, cada uno UNA vez en toda la tarjeta', () => {
+    const t = {trampa: true, trampaNombre: 'Portal', trampaEstado: JSON.stringify({nombre: 'Expuesto', turnos: 1, portal: {rango: 4, destino: '13,6'}, magica: true,
+      salva: {stat: 'resmg', etq: 'Res.Esp', dif: 7}})};
+    const m = ZonaDetalle.armar(t, {estadoTexto: sp => `${sp.nombre} (${sp.turnos} turno)`, autor: {nombre: 'Arcano'}, sola: true, magica: true, statLabel: lbl});
+    const h = ZonaDetalle.html(m, {glosario: Glosario});
+    igual([cuenta(h, 'Expuesto'), cuenta(h, 'Res.Esp'), cuenta(h, 'Fuego amigo'), /Expuesto/.test(fila(m, 'Estado que deja')), cuenta(h, 'Efecto especial') + cuenta(h, 'Ef.Esp')],
+      [1, 1, 1, true, 1]);
+    // La marca va en lo destacado de arriba (la primera vez que aparece), no en la fila de abajo.
+    igual(/zd-esencial[^]*?data-glo="Expuesto"[^]*?<\/div>/.test(h.split('zd-filas')[0]), true);
+    // Sin glosario: el mismo texto, escapado, sin marcas.
+    const sin = ZonaDetalle.html(m, {});
+    igual([/class="glo"/.test(sin), /Expuesto/.test(sin), ZonaDetalle.html(null)], [false, true, '']);
+  });
+  prueba('📖 Ver detalle con glosario: en una zona se marcan PdG, Defensa, Evasión y el Mantenimiento; «Defensa especial» y «PdG.Esp» no se confunden con los básicos', () => {
+    const z = {...muro, zonaEstado: JSON.stringify({nombre: 'Pajaritos', turnos: 2}), zonaIgnoraDef: true, zonaDirecto: false};
+    const m = ZonaDetalle.armar(z, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', autor: {nombre: 'Mago'}, habilidad: 'Nube', rivalesTxt: 'los personajes'});
+    const h = ZonaDetalle.html(m, {glosario: Glosario});
+    igual([cuenta(h, 'Pajaritos'), cuenta(h, 'Mantenimiento'), cuenta(h, 'Defensa especial'), /data-glo="Defensa">[^<]*especial/i.test(h)], [1, 1, 1, false]);
+    const b = Glosario.marcar('PdG.Esp contra la Evasión; la Defensa, la Defensa especial y la Probabilidad de Golpe', {basicos: true});
+    igual([cuenta(b, 'PdG.Esp'), cuenta(b, 'Evasión'), cuenta(b, 'Defensa'), cuenta(b, 'Defensa especial'), cuenta(b, 'PdG')], [1, 1, 1, 1, 1]);
+    // En el resto del juego los básicos siguen sin marcarse.
+    igual([cuenta(Glosario.marcar('PdG contra la Evasión y la Defensa'), 'PdG'), cuenta(Glosario.marcar('la Evasión'), 'Evasión')], [0, 0]);
+  });
+  prueba('📖 Ver detalle con glosario: el tótem marca Evasión y Defensa, pero no el nombre de la habilidad («Tótem de silencio» no es el estado Silencio)', () => {
+    const m = ZonaDetalle.armarInerte({radio: 3, silencio: true}, {autor: {nombre: 'Mago (creep)', corto: 'Mago'}, habilidad: 'Tótem de silencio', nombre: 'Tótem', vida: '40 / 40', bando: 'creep'});
+    const h = ZonaDetalle.html(m, {glosario: Glosario});
+    igual([cuenta(h, 'Silencio'), cuenta(h, 'Evasión'), cuenta(h, 'Defensa'), /Tótem de silencio/.test(h)], [0, 1, 1, true]);
+  });
+  prueba('📖 el glosario: un término ya marcado en otro texto de la misma tarjeta no se vuelve a marcar (usados compartido); entradas nuevas con su texto', () => {
+    const usados = new Set();
+    const a = Glosario.marcar('Queda Expuesto', {usados}), b = Glosario.marcar('Expuesto otra vez', {usados});
+    igual([cuenta(a, 'Expuesto'), cuenta(b, 'Expuesto')], [1, 0]);
+    igual([/Constitución/.test(Glosario.def('Res.Esp').texto), /Constitución/.test(Glosario.def('Res.CC').texto), /Especial/.test(Glosario.def('Res.Mt').texto),
+      /aliados/.test(Glosario.def('Fuego amigo').texto), /cierra cada ronda/.test(Glosario.def('Mantenimiento').texto), /crítico/.test(Glosario.def('Defensa').texto),
+      !!Glosario.def('PdG') && !!Glosario.def('Evasión')], [true, true, true, true, true, true, true]);
+    // Lo que la tarjeta nombra tiene que estar aunque la pantalla no haya cargado comun/ficha-calculo.js (el mapa, de entrada): va en MECANICAS.
+    const enMec = ['Ef.Esp', 'PdG.Esp', 'Defensa especial', 'Resistencia elemental', 'Suela gruesa', 'Res.Esp', 'Res.CC', 'Res.Mt', 'Fuego amigo', 'Mantenimiento'];
+    igual(enMec.filter(t => !Glosario.MECANICAS.some(m => m.titulo === t)), []);
+    igual(cuenta(Glosario.marcar('Sí le resta la resistencia al fuego y la de a lo tóxico'), 'Resistencia elemental'), 1);
   });
 })();
 

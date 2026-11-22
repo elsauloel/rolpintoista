@@ -2131,6 +2131,15 @@ versión parecida en más de una, es candidato a juntar.
   evitarla, Estado que deja, Qué frena el daño, Altura. Lo que el elemento no trae dice «a mano» (`A_MANO`). `ctx` lo arma el mapa
   (`vtt-hexgrid/js/127-zona-detalle.js`: quién la puso y si se lo nombra, turnos que quedan, la descripción). **Un campo nuevo de las zonas que
   cambie lo que hacen se cuenta acá** (y en `HexInfo.describir`, el cartel de la casilla).
+  **📖 Con glosario** (2026-11-22, dueño: «le agregaría el glosario con hover»): `ZonaDetalle.html(m, {glosario, cargando})` arma la tarjeta en HTML
+  (la usa js/127 para zonas, trampas y tótems/estandartes) con `Glosario.marcar(t, {usados, basicos: true})`: un término se marca **una vez en toda la
+  tarjeta** (primero lo destacado, después las filas —también su título, como «Fuego amigo»— y la descripción); las filas «De quién es» y «Con qué se
+  puso» no se marcan (son nombres: «Tótem de silencio» no es el estado Silencio). Sin `glosario`, texto escapado. Dudas: P286.
+- **`glosario.js`: `marcar(texto, {usados, basicos})`** (2026-11-22): `usados` = un `Set` compartido entre varios textos (un término marcado en uno no se
+  vuelve a marcar en otro); `basicos: true` suma PdG (y «Probabilidad de Golpe»), Defensa y Evasión (`BASICOS_TXT`; en el resto del juego siguen sin
+  marcarse). `def()` también los encuentra. Entradas nuevas en `MECANICAS`: Res.Esp, Res.CC, Res.Mt, Fuego amigo, Mantenimiento, y Ef.Esp, PdG.Esp,
+  Defensa especial, Resistencia elemental, Suela gruesa (estas, porque el mapa no carga `ficha-calculo.js` de entrada y sus globos no aparecían).
+  Un texto que empieza con «Término: …» pierde ese «Término:» en el cuerpo del globo (el título ya lo dice).
 - **`tokens-auto.js`, 🏷 los tokens se llaman como su ficha** (2026-11-20): `TokensAuto.nombresCambios(docs, fichaId, nombre)` (qué tokens hay que
   renombrar: los `pj` de esa ficha con otro nombre; no invocaciones) y `nombresPonerAlDia({fichaId, nombre})` (recorre el primer mapa y los guardados
   y los renombra; una vez por nombre y por pantalla; si no puede, calla). Lo llama la pantalla del jugador dueño: el mapa (js/09), la ficha al

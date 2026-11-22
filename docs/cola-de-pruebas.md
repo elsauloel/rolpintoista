@@ -1620,6 +1620,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **🟡 propuesta enviada, espera decisión (2026-11-22) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
   jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
+  *Propuesta (2026-11-22):* **mandar** con un botón ✉ al pie de la Mesa (ventanita: «Para» con una casilla por persona —el GM y cada jugador,
+  con el nombre de su personaje— y el mensaje) o escribiendo en la Mesa `/m Nombre texto`. **Recibir:** un botón redondo ✉ flotante abajo a la
+  derecha del mapa y de la ficha (y GM Tools), con un globito rojo con la cantidad sin leer, que late al llegar uno; al tocarlo, la conversación
+  con esa persona y una caja para responder. La Mesa no muestra nada. Preguntas: (1) ¿el GM puede leer los mensajes entre dos jugadores?;
+  (2) ¿a la persona (cuenta) o al personaje?; (3) ¿se pueden mandar a varios a la vez?; (4) ¿se borran solos (por ejemplo, a las 48 h como la
+  Mesa)?; (5) ¿un sonido al llegar? Necesita reglas nuevas de Firestore.
 - **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
   expuesto, pero ni yo me acuerdo el detalle de expuesto, debería poder leerse. Sumale glosario a otros términos que te parezcan pertinentes»).
 - **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple

@@ -307,12 +307,17 @@ const FichaLupa = (() => {
   const ES_ARMA = catId => catId === 'arma_1m' || catId === 'arma_2m';
   const sinAvisoTxt = s => String(s ?? '').replace(/^⚠️\s*/, '');
   // Puntos de Job que costó (1 si no dice otra cosa).
+  /* 🔁 Volver a cargar una misma pasiva cuesta 1 de Job más que la carga anterior (P260 (7), dueño, 2026-11-22: «si cuesta 1, la segunda copia cuesta 2 y
+     la tercera 3»): con k compras de una que cuesta c, el total es c + (c+1) + … + (c+k−1). La copia N cuesta c + N − 1 (`jobCostoCopia`); la que
+     sigue, `jobCostoProxima`. Una habilidad (sin compras) cuesta lo suyo, una vez. */
+  const jobCostoUno = x => (!x || x.job === false) ? 0 : (x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, num(x.jobCosto)));
+  const jobCostoCopia = (x, n) => (!x || x.job === false) ? 0 : jobCostoUno(x) + Math.max(0, Math.round(num(n)) - 1);
   function jobCostoDe(x){
     if(!x || x.job === false) return 0;
-    const n = num(x.jobCosto);
-    const uno = x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
-    return uno * FichaCalculo.pasivaCompras(x);
+    const k = FichaCalculo.pasivaCompras(x), uno = jobCostoUno(x);
+    return uno * k + (k * (k - 1)) / 2;
   }
+  const jobCostoProxima = x => jobCostoCopia(x, FichaCalculo.pasivaCompras(x) + 1);
   const ranurasDe = i => (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);
   const precioVentaDe = i => Math.round((num(i.precioCompra) / 2) * 100) / 100;
   const defValorDe = i => (i.mods||[]).filter(m => m.stat === 'def').reduce((a,m) => a + num(m.val), 0);
@@ -401,5 +406,5 @@ const FichaLupa = (() => {
   `};
   }
 
-  return {contenido, ver, formulaSocial, jobCostoDe, narrativaDe, CATEGORIA_LABEL};
+  return {contenido, ver, formulaSocial, jobCostoDe, jobCostoUno, jobCostoCopia, jobCostoProxima, narrativaDe, CATEGORIA_LABEL};
 })();

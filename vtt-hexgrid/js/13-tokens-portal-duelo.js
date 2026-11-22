@@ -555,13 +555,18 @@ async function crearElementoZona(centro, cfg){
 }
 // 🌫 La niebla de una varita (2026-10-05): un elemento `niebla` con turnos. Adentro se ve a 1; desde afuera no se ve a través ni adentro
 // (salvo a los Marcados, que brillan) — ver tapadoPorNiebla y celdasVisionDe.
+// ☁ Guarda quién la puso y con qué (P259 (3), dueño, 2026-11-22: «sí vale la pena»): `zonaCasteadorRef`/`zonaCasteadorTipo` (msg.fichaId,
+// msg.casteadorTipo) y `zonaNombre` (msg.nombre). Son campos que las reglas ya aceptan en cualquier elemento: no hacen falta reglas nuevas. «Ver
+// detalle» (js/127) lo muestra, salvo a la pantalla que no ve a quien la puso («Alguien»).
 async function crearNiebla(centro, radio, msg){
   const n = Math.max(1, Math.round(num(msg.zonaTurnos)) || 3);
+  const de = msg.fichaId ? {zonaCasteadorRef: String(msg.fichaId).slice(0, 64), zonaCasteadorTipo: msg.casteadorTipo === 'creep' ? 'creep' : 'pj'} : {};
+  const con = msg.nombre ? {zonaNombre: String(msg.nombre).slice(0, 40)} : {};
   try{
     await coleccionElementos().add({
       tipo: 'flor', origen: {col: centro.col, fila: centro.fila}, celdas: celdasFlor(radio).flatMap(c => [c.dq, c.dr]), rotacion: 0,
       color: '#C9CED8', alfa: 70, solido: false, invisible: false, imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, niebla: true,
-      turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+      turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n, ...de, ...con,
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
     toast(`🌫 ${msg.nombre || 'Niebla'}: dura ${n} turno${n === 1 ? '' : 's'}`);

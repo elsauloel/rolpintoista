@@ -2190,3 +2190,13 @@ versión parecida en más de una, es candidato a juntar.
   fuera)` (⏭ Pasar de ronda: quiénes faltan en la ronda).
 - **🎯 `Quieto.apuntada(movidos, id, ronda)` y `Quieto.apuntadaFirme`** (2026-11-21, `comun/quieto.js`): las Apuntadas de las ballestas con lo anotado
   en la partida (la primera, no se movió en esta ronda; la firme, la misma regla que el anillo). Las usa el mapa (js/126).
+
+- **📋 Respuestas a P252, P256, P259, P260 y P262** (2026-11-22, cola): `TokensAuto.volverANarrativo` (el fin del combate) también vacía el orden de turnos
+  del mapa publicado (`limpiarIniciativa`, `rutaIniciativa`; el interruptor a mano, `ponerModo`, no). `Combatiente.resucitarAManoTxt` y `Revivir.texto(…,
+  {aMano})`: el cartel y la línea de la vida subida a mano a un caído (el mapa, js/10 y js/98). `Combatiente.familiaDeArma`: **lo natural y el puño cuentan
+  por su Tipo** (garras de Tipo 4 → punzantes; sin arma, el puño, Tipo 4: `ataqueDeArma` y `FichaCombate.statParaArma` lo usan cuando no hay arma).
+  `FichaLupa.jobCostoDe`: con k compras de una pasiva de costo c, c + (c+1) + … + (c+k−1); `jobCostoCopia(x, n)`, `jobCostoProxima(x)` (la ficha lo muestra
+  en la pasiva y en el subtítulo del catálogo). `ZonaDetalle.armarInerte(e, ctx)`: la tarjeta de «Ver detalle» de un tótem o un estandarte (y
+  `ctx.habilidadOculta`: «No se sabe» en «Con qué se puso»; quien la puso escondido = «Alguien»). `CreepCalculo.tarjetaPublica` suma `estandarteDe`,
+  `estandarteDeId` y `estandarteCon`. `DarJugador.mochilaTrasDar(S, que)` (prueba en una copia cómo queda la mochila) y `mochilaAvisoTxt`: la ventana
+  lee las fichas marcadas (`FichaGuardado.cargar`; si faltan las piezas, las carga sola) y avisa / pregunta «¿Dar igual?» antes de dar.

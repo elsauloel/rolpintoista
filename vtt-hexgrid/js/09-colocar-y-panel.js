@@ -305,7 +305,7 @@ function escucharVinculables(){
         o.percepcionAumentada = d.percepcionAumentada === true;   // 👁 sin punto ciego para el sigilo (js/02, 2026-11-09)   // 👣 Pasos silenciosos (js/02, 2026-10-15)
         o.masDanoElem = d.masDanoElem && typeof d.masDanoElem === 'object' ? {...d.masDanoElem} : {};   // 💍 sus anillos elementales (js/53, 2026-11-10)
         o.auraMiedo = num(d.auraMiedo); o.auraEfEsp = num(d.auraEfEsp);   // 💀 la Calavera con vela (js/52, 2026-10-18)
-        o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano); o.estandarteSilencio = num(d.estandarteSilencio);   // 🚩 el Estandarte de guerra y 🤐 el Tótem de silencio (js/73)
+        o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano); o.estandarteSilencio = num(d.estandarteSilencio); o.estandarteDe = String(d.estandarteDe || ''); o.estandarteDeId = String(d.estandarteDeId || ''); o.estandarteCon = String(d.estandarteCon || '');   // 🔍 (js/127)   // 🚩 el Estandarte de guerra y 🤐 el Tótem de silencio (js/73)
         o.meteoroCol = num(d.meteoroCol); o.meteoroFila = num(d.meteoroFila); o.meteoroRadio = num(d.meteoroRadio);   // ☄ la sombra del meteoro (js/74)
       }
       mapa.set(ch.doc.id, o);

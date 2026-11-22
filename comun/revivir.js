@@ -36,8 +36,9 @@ const Revivir = (() => {
   // La línea de la Mesa. `quien`: 'gm' (lo revivió el GM) o 'dueno' (su jugador); `titila`: si queda Titilando (personaje y creep, no invocación).
   function texto(nombre, val, o = {}){
     const tit = o.titila !== false ? ', Titilando hasta su próximo turno' : '';
-    const por = o.quien === 'gm' ? ' (lo revivió el GM)' : o.quien === 'dueno' ? ' (lo revivió su jugador)' : '';
-    return `✚ ${nombre} vuelve con ${f(val)} de vida${tit}${por}`;
+    const por = o.quien === 'gm' ? ' (lo revivió el GM' : o.quien === 'dueno' ? ' (lo revivió su jugador' : '';
+    const mano = o.aMano ? (por ? ', subiéndole la vida a mano)' : ' (vida subida a mano)') : (por ? ')' : '');   // P256 (i)
+    return `✚ ${nombre} vuelve con ${f(val)} de vida${tit}${por}${mano}`;
   }
 
   return {elegirVida, texto, pct};

@@ -849,6 +849,12 @@ body.con-ruta .toast{bottom:auto;top:74px}
 #elemento-etiqueta .ee-detalle{flex:none;pointer-events:auto;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:#1b1418;
   background:var(--brass);border:0;border-radius:999px;padding:4px 11px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 #elemento-etiqueta .ee-detalle:hover{filter:brightness(1.12)}
+/* 🚩🤐 El mismo botón en el cartel del token, para un tótem o un estandarte (P259 (4), 2026-11-22, js/127). */
+#token-etiqueta.con-detalle{display:flex;align-items:flex-start;gap:10px;white-space:normal;overflow:visible;max-width:min(620px,74%)}
+#token-etiqueta.con-detalle .ee-txt{flex:1;min-width:0}
+#token-etiqueta .ee-detalle{flex:none;pointer-events:auto;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;color:#1b1418;
+  background:var(--brass);border:0;border-radius:999px;padding:4px 11px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#token-etiqueta .ee-detalle:hover{filter:brightness(1.12)}
 #zona-detalle{position:absolute;right:12px;z-index:26;width:min(470px,calc(100% - 24px));max-height:calc(100% - 150px);overflow:auto;
   background:rgba(26,20,24,.96);backdrop-filter:blur(6px);border:1px solid rgba(255,200,60,.85);border-radius:var(--r);
   box-shadow:0 12px 30px rgba(0,0,0,.6);padding:10px 14px 10px;font-size:13px;color:var(--paper);line-height:1.4}

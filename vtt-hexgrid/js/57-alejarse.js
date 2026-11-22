@@ -52,7 +52,7 @@ async function bombaDeHumo(msg){
   const txt = txtDe('entra en Sigilo');
   try{ await mesaLinea(`💨 ${txt}`, 'recordatorio'); }catch(err){}
   try{ await momentoAbrir({tipo: 'humo', icono: '💨', titulo: `${nom}: ${quien} se esfuma`, resultado: txt, estado: 'listo'}); }catch(err){}
-  await crearNiebla({col: t.col, fila: t.fila}, radio, {nombre: nom, zonaTurnos: turnos});
+  await crearNiebla({col: t.col, fila: t.fila}, radio, {nombre: nom, zonaTurnos: turnos, fichaId: t.fichaId, casteadorTipo: creep ? 'creep' : 'pj'});   // ☁ quién y con qué (js/127)
   let sigilo = '';
   try{
     if(creep){

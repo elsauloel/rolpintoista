@@ -656,7 +656,10 @@ const CreepCalculo = (() => {
       estandarteRadio: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.radio))) : 0,
       estandartePdg: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.pdg))) : 0,
       estandarteDano: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.dano))) : 0,
-      estandarteSilencio: sc.estandarte && sc.estandarte.silencio ? 1 : 0,   // 🤐 un Tótem de silencio (2026-10-25): silencia a los rivales del aura
+      estandarteSilencio: sc.estandarte && sc.estandarte.silencio ? 1 : 0,
+      // 🔍 De quién es y con qué se clavó (2026-11-22, P259 (4): «Ver detalle» de los tótems y estandartes, vtt-hexgrid/js/127). '' si no es uno.
+      estandarteDe: sc.estandarte ? String(sc.estandarte.deNombre || '').slice(0, 60) : '', estandarteDeId: sc.estandarte ? String(sc.estandarte.de || '').slice(0, 64) : '',
+      estandarteCon: sc.estandarte ? String(sc.estandarte.con || '').slice(0, 60) : '',   // 🤐 un Tótem de silencio (2026-10-25): silencia a los rivales del aura
       // ☄ La sombra de el Meteoro que está por caer (2026-10-24, vtt-hexgrid/js/74): dónde y de qué tamaño (radio 0 = ninguna).
       meteoroCol: sc.meteoro ? Math.round(num(sc.meteoro.col)) : 0, meteoroFila: sc.meteoro ? Math.round(num(sc.meteoro.fila)) : 0, meteoroRadio: sc.meteoro ? Math.max(0, Math.round(num(sc.meteoro.radio))) : 0,
     };

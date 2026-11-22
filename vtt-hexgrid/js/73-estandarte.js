@@ -111,12 +111,12 @@ function plantarEstandarte(sc, h){
     const ocupada = [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila) || (typeof elementoSolidoEn === 'function' && elementoSolidoEn(c.col, c.fila));
     if(ocupada){ toast('Esa casilla no está libre (hay un token o un Sólido): elegí otra'); pedir(); return; }
     if(distanciaHex(c, {col: tOrig.col, fila: tOrig.fila}) > rng){ toast(`Esa casilla queda fuera del Rango de ${sc.nombre} (${rng}): elegí otra más cerca`); pedir(); return; }
-    try{ await estandarteCrear(sc, e, c, tOrig, origId); }
+    try{ await estandarteCrear(sc, e, c, tOrig, origId, h); }
     catch(err){ console.error('No se pudo clavar el estandarte:', err); toast(`No se pudo clavar ${que} — mirá la consola`); }
   }, `<b>${ic} ${esc(h.nombre || 'Estandarte de guerra')}: elegí dónde lo clava</b> <span>una casilla libre dentro de su Rango (${rng} casilla${rng === 1 ? '' : 's'}) · Esc o clic derecho cancelan</span>`, true);
   pedir();
 }
-async function estandarteCrear(sc, e, celda, tOrig){
+async function estandarteCrear(sc, e, celda, tOrig, origId, h){   // h: la habilidad (su nombre queda guardado: «Ver detalle», js/127)
   // Uno por creep (de cada clase: un estandarte y un tótem pueden convivir): el que ya tenía se va.
   const sil = !!e.silencio;
   for(const [id, t] of [...tokens.entries()]){
@@ -138,7 +138,7 @@ async function estandarteCrear(sc, e, celda, tOrig){
   const ficha = {id: nuevo.id, nombre, nivel: n, con: 1, fue: 1, agl: 1, des: 1, esp: 1, hp: vida, hpMax: vida, defensa: 0, armadmg: 0, crit: [0, 0, 0, 0, 0],
     equipo: [], habilidades: [], estados: [est], cinturon: [], pasivas: [], tipoCriatura: 'Otro', tipoCriaturaOtro: 'Estandarte', oroBase: 0, jefe: false,
     mapa: mapaMostrado, recompensado: true, escalaTipos: 2, notas: sil ? `Tótem de silencio de ${sc.nombre}: sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP mientras siga en pie.` : `Estandarte de guerra de ${sc.nombre}: sus aliados a ${radio} casillas o menos pegan mejor mientras siga en pie.`,
-    estandarte: {de: sc.id, deNombre: String(sc.nombre || '').slice(0, 60), radio, ...(sil ? {pdg: 0, dano: 0, silencio: true} : {pdg, dano})}};
+    estandarte: {de: sc.id, deNombre: String(sc.nombre || '').slice(0, 60), con: String((h && h.nombre) || '').slice(0, 60), radio, ...(sil ? {pdg: 0, dano: 0, silencio: true} : {pdg, dano})}};
   const imagen = sil ? totemImagen() : estandarteImagen();
   const json = JSON.stringify(ficha);
   const lote = fbDb.batch();

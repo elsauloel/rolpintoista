@@ -530,3 +530,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   ve si el ítem es del catálogo: `itemDelCatalogoGM` lo busca por id o por nombre y tipo, porque los del ⚔ Catálogo vienen sin id).
 - **🤝 Dar, en el menú de la izquierda** (2026-11-22, dueño, opción A): `#btn-dar-dock` (debajo de 👥 Personajes; el handler en js/04) abre
   `abrirDarJugadorGM({})` — «🎁 Dar a un jugador» sin nadie marcado. GM Tools es solo del GM: no tiene la ventana de pasar cosas de un jugador.
+
+- **🎒 «Dar a un jugador» avisa si la mochila se pasa** (2026-11-22, P262 (5); comun/dar-jugador.js): para medir la mochila, la ventana carga sola
+  `ficha-guardado.js`, `ficha-equipo.js` y `ficha-tienda.js` (GM Tools no los carga con la página) y lee la ficha de cada personaje marcado.

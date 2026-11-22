@@ -28,7 +28,7 @@ const FichaEditor = (() => {
   const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
     equipado:'Equipado', activo:'Activo', turnos:'Turnos restantes', hpturno:'HP por turno (por stack)',
     stacksturno:'Stacks por turno', permanente:'Permanente (no vence)', popup:'Pop-up al mantenimiento',
-    compras:'Compras (los efectos y el costo en Job se multiplican; tope por pasiva: mitad del nivel)', regenHp:'HP que recupera en cada Mantenimiento (por compra)',
+    compras:'Compras (los efectos se multiplican; cada copia cuesta 1 de Job más que la anterior: 1, 2, 3…; tope por pasiva: mitad del nivel)', regenHp:'HP que recupera en cada Mantenimiento (por compra)',
     job:'Adquirida con puntos de Job', jobCosto:'Puntos de Job que costó (si fue con Job)', origen:'Cómo se consiguió (si no fue con Job)', imagen:'Imagen',
     unidades:'Cantidad (unidades en la pila)', consumible:'Consumible', curahp:'HP al consumir (+ cura / − daña)',
     precioCompra:'Precio de compra', tipoItem:'Categoría de ítem', tipoDado:'Tipo de arma (caras del dado)', danoFijo:'Daño fijo',
@@ -736,7 +736,7 @@ const FichaEditor = (() => {
       const P = (id, corto, titulo, ayuda, bloques) => ({id, corto, titulo, ayuda, bloques});
       const lista = key === 'pasivas' ? [
         P('que', 'Qué es', '¿Qué es?', 'El nombre y qué hace, en palabras: es lo que se lee en la ficha.', ['nombre', 'detalle', 'imagen']),
-        P('numeros', 'Números', '¿Qué suma?', 'Los bonos que da mientras la tengas, la vida que recupera en cada Mantenimiento y cuántas veces la compraste (los efectos y el costo se multiplican).', ['mods', 'regenHp', 'compras']),
+        P('numeros', 'Números', '¿Qué suma?', 'Los bonos que da mientras la tengas, la vida que recupera en cada Mantenimiento y cuántas veces la compraste (los efectos se multiplican; cada copia cuesta 1 de Job más que la anterior).', ['mods', 'regenHp', 'compras']),
         P('job', 'Cómo se consiguió', '¿Cómo se consiguió?', 'Con puntos de Job (cuenta para el presupuesto del nivel) o de otra forma: un premio, la historia, un objeto.', ['job', 'jobCosto', 'origen']),
       ] : key === 'sociales' ? [
         P('que', 'Qué es', '¿Qué talento es?', 'Una habilidad social o de conocimiento (Persuadir, Historia, Trampas…). Su dado sale del nivel: se sube con «+ Nivel» en la lista.', ['nombre', 'detalle', 'imagen']),
@@ -762,7 +762,7 @@ const FichaEditor = (() => {
       const fila = (t, v) => v === '' || v === null || v === undefined ? '' : `<div class="resumen-fila"><span>${t}</span><b>${v}</b></div>`;
       const mods = (draft.mods || []).filter(m => m && m.stat && num(m.val)).map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${esc((FichaCalculo.STAT_LABEL || {})[m.stat] || m.stat)}`).join(' · ');
       let h = fila('Nombre', esc(draft.nombre || 'Sin nombre'));
-      if(key === 'pasivas') h += fila('Suma', mods || '—') + (num(draft.regenHp) ? fila('Vida por Mantenimiento', '+' + fmt(num(draft.regenHp))) : '') + fila('Compras', fmt(num(draft.compras) || 1))
+      if(key === 'pasivas') h += fila('Suma', mods || '—') + (num(draft.regenHp) ? fila('Vida por Mantenimiento', '+' + fmt(num(draft.regenHp))) : '') + fila('Compras', fmt(num(draft.compras) || 1) + (draft.job !== false ? ` · en total ${fmt(FichaLupa.jobCostoDe(draft))} de Job; la próxima copia, ${fmt(FichaLupa.jobCostoProxima(draft))}` : ''))
         + fila('Se consiguió', draft.job !== false ? `con Job (${fmt(num(draft.jobCosto))})` : esc(draft.origen || 'de otra forma'));
       else if(key === 'efectos') h += fila('Dura', draft.permanente ? 'no vence' : `${fmt(num(draft.turnos))} turno(s)`) + (num(draft.hpturno) ? fila('HP por turno', fmt(num(draft.hpturno)) + (num(draft.stacks) > 1 ? ` × ${fmt(num(draft.stacks))} stacks` : '')) : '')
         + (num(draft.escudoMagico) ? fila('Escudo', fmt(num(draft.escudoMagico)) + ' HP') : '') + (mods ? fila('Números', mods) : '') + (draft.activo === false ? fila('Activo', 'no') : '');

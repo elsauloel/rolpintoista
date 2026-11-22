@@ -81,7 +81,7 @@ const FichaCombate = (() => {
     c = calc(S, c);
     // 🔨 Parry con esa familia de armas (Maestría en armas pesadas, 2026-11-20): solo al parar con un arma de ese Tipo, nunca con un escudo.
     // ⚔ Las otras maestrías (2026-11-20): lo que suma la familia de ESA arma al daño, al Bloqueo, al Crítico potente y al PdG de oportunidad / contraataque.
-    const fam = statId === 'parry' ? parryExtra(S, arma, c) : STATS_FAMILIA.includes(statId) ? Combatiente.extraFamilia(st => c.final[st], statId, arma) : 0;
+    const fam = statId === 'parry' ? parryExtra(S, arma, c) : STATS_FAMILIA.includes(statId) ? Combatiente.extraFamilia(st => c.final[st], statId, arma || {tipoDado: TIPO_SIN_ARMA, sinArma: true}) : 0;   // (sin arma, el puño: P260 (4))
     const deOtro = STATS_DEFENSA_POR_ITEM.includes(statId) ? id => esEnMano(S, id) : id => esArmaEnMano(S, id);
     const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && deOtro(m.itemId));
     if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId] + fam;

@@ -47,20 +47,20 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261121muro2"></script>
+<script src="zona-detalle.js?v=20261122cola47"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261122prisa5"></script>
-<script src="creep-calculo.js?v=20261122prisa5"></script>
+<script src="combatiente.js?v=20261122cola47"></script>
+<script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261122prisa5"></script>
-<script src="ficha-combate.js?v=20261120maestria"></script>
+<script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261121dar"></script>
-<script src="dar-jugador.js?v=20261122dar"></script>
+<script src="dar-jugador.js?v=20261122cola47"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -98,7 +98,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
 <script src="confirmar.js"></script>
-<script src="revivir.js?v=20261105rv"></script>
+<script src="revivir.js?v=20261122cola47"></script>
 <script src="atajos.js"></script>
 <script src="pausa.js"></script>
 <script src="glosario.js"></script>
@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261121foco"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261122prisa5"></script>
+<script src="ficha-lupa.js?v=20261122cola47"></script>
 <script src="ficha-editor.js"></script>
 <script src="creep-lupa.js?v=20261122prisa5"></script>
 <script src="combate-fin.js"></script>
@@ -3939,7 +3939,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, masDanoElem: {}, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
+    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, masDanoElem: {}, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, estandarteDe: '', estandarteDeId: '', estandarteCon: '', meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
@@ -6208,6 +6208,20 @@ prueba('fin del combate: el mapa publicado vuelve a narrativo (solo si estaba en
       [true, ['narrativo', 'combate'], false, true, false, false, {modo: 'combate', actualizado: 'ahora'}, 'mapa/modo', 'mapas/m9/estado/modo']);
   });
 });
+prueba('fin del combate (P252): al volver a narrativo se limpia también el orden de turnos de ese mapa (como «Limpiar»); si ya estaba en narrativo no se toca; el interruptor (ponerModo) tampoco lo toca', () => {
+  const ordenViejo = {orden: [{id: 't1', valor: 9}], turno: 1, ronda: 3, iniciado: true, demoras: {t1: 1}};
+  const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapas/m2/estado/modo': {modo: 'combate'}, 'mapas/m2/estado/iniciativa': {...ordenViejo},
+    'mapa/modo': {modo: 'narrativo'}, 'mapa/iniciativa': {...ordenViejo}, 'mapas/m3/estado/iniciativa': {...ordenViejo}};
+  return conFbFalso(datos, async () => {
+    const a = await TokensAuto.volverANarrativo();
+    const m2 = datos['mapas/m2/estado/iniciativa'];
+    delete datos['mapa/activo'];
+    const b = await TokensAuto.volverANarrativo();           // el primero ya estaba en narrativo: su orden queda
+    await TokensAuto.ponerModo('m3', 'narrativo');           // el interruptor a mano: no limpia
+    igual([a, m2.orden, m2.turno, m2.ronda, m2.iniciado, m2.demoras, b, datos['mapa/iniciativa'].orden.length, datos['mapas/m3/estado/iniciativa'].orden.length, TokensAuto.rutaIniciativa('_principal'), TokensAuto.rutaIniciativa('m9')],
+      [true, [], 0, 1, false, {}, false, 1, 1, 'mapa/iniciativa', 'mapas/m9/estado/iniciativa']);
+  });
+});
 prueba('fin del combate: al cerrar el botín con el mapa en combate, la recompensa de cada jugador lleva `narrativo` (su cartel «Botín concluido» lo dice) y el resultado también (la franja del cartel del GM); con el mapa ya en narrativo, ninguno de los dos', () => {
   const correr = modo => { const datos = {'mapa/activo': {mapaId: 'm2'}, 'mapas/m2/estado/modo': {modo}};
     return conFbFalso(datos, async () => {
@@ -6346,6 +6360,15 @@ prueba('🎁 con la mochila llena se da igual y avisa (no se bloquea): `pasada` 
   const soloDde = Recibidos.recompensa(S, {data: () => DarJugador.aviso({id: 'F'}, {dde: 3}, 'El GM')});
   igual([S.inventario.some(i => i.nombre === 'Yelmo'), r.regalo.pasada, DarJugador.pasadaTexto(r.regalo.pasada).includes(`${cap + 1} de ${cap} ranuras`), soloDde.regalo.pasada],
     [true, {usada: cap + 1, cap}, true, null]);
+});
+prueba('🎒 P262 (5): antes de dar, la ventana sabe si a alguien le va a quedar la mochila pasada (se prueba en una copia: el personaje no cambia)', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita'}, caps: {mochila: 2}, inventario: [{id: 'a', nombre: 'Soga', tipoItem: 'otros'}]}).S;
+  const cap = FichaEquipo.capMochila(S), uno = {items: [{item: {nombre: 'Yelmo', tipoItem: 'cabeza'}, n: 1}]}, tres = {items: [{item: {nombre: 'Yelmo', tipoItem: 'cabeza'}, n: 3}]};
+  const m1 = DarJugador.mochilaTrasDar(S, uno), m3 = DarJugador.mochilaTrasDar(S, tres);
+  igual([cap, m1, m3, DarJugador.mochilaTrasDar(S, {dde: 5}), S.inventario.length,
+    DarJugador.mochilaAvisoTxt('Tita', m3), DarJugador.mochilaAvisoTxt('Tita', {usada: 5, cap: 2, antes: 3})],
+    [2, {usada: 2, cap: 2, antes: 1, pasada: false}, {usada: 4, cap: 2, antes: 1, pasada: true}, null, 1,
+      'A Tita le va a quedar la mochila pasada: 4 de 2 ranuras.', 'A Tita le va a quedar la mochila pasada: 5 de 2 ranuras (ya estaba pasada).']);
 });
 prueba('🎁 una recompensa del combate (sin la marca de regalo) sigue como siempre: XP, sin cartel', () => {
   const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 1, exp: 0}}).S;
@@ -8333,7 +8356,7 @@ prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortant
     ballesta = A('ballesta', 4, {tipoItem: 'arma_2m', armaDeRango: true, recarga: 2}), ballesta6 = A('ballesta6', 6, {tipoItem: 'arma_2m', armaDeRango: true, recarga: 2, perfora: 1}),
     honda = A('honda', 10, {armaDeRango: true, honda: true}), escudo = {id: 'esc', nombre: 'esc', tipoItem: 'escudo_1m', peso: 1, equipado: true, mods: []};
   igual([daga, sable, hacha, maza, arco, ballesta, ballesta6, honda, escudo, {...daga, natural: true}, {tipoDado: 4, sinArma: true}, null].map(C.familiaDeArma),
-    ['punzante', 'cortante', 'hacha', 'contundente', 'arco', 'ballesta', 'ballesta', '', '', '', '', '']);
+    ['punzante', 'cortante', 'hacha', 'contundente', 'arco', 'ballesta', 'ballesta', '', '', 'punzante', 'punzante', '']);   // (lo natural y el puño, por su Tipo: P260 (4), 2026-11-22)
   const todo = st => 1;   // alguien con todas las maestrías
   igual([['dmg', daga], ['dmg', arco], ['dmg', sable], ['pdgopor', daga], ['pdgopor', ballesta], ['espalda', daga], ['espalda', hacha], ['bloqueo', sable], ['bloqueo', hacha], ['bloqueo', maza], ['bloqueo', escudo], ['bloqueo', ballesta6],
     ['pdgcontra', sable], ['pdgcontra', ballesta6], ['ahorro', hacha], ['ahorro', sable], ['pdg', arco], ['pdg', ballesta], ['pdg', daga], ['critpot', arco], ['critpot', ballesta], ['perfora', ballesta], ['perfora', arco]]
@@ -8396,6 +8419,35 @@ prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortant
   const inv = pas => InvCalculo.migrar({id: 'i1', nombre: 'Golem', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i)), equipo: [{...structuredClone(sable), id: 'sb'}]});
   igual([InvCalculo.parryValor(inv([cor])) - InvCalculo.parryValor(inv()), InvCalculo.bloqueoValor(inv([cor])) - InvCalculo.bloqueoValor(inv()), InvCalculo.famExtra(inv([cor]), 'pdgcontra'), InvCalculo.famExtra(inv([pun, hac, arc, bal]), 'dmg'),
     InvCalculo.bloqueoValor(inv([hac])) - InvCalculo.bloqueoValor(inv())], [1, 1, 1, 0, 0]);
+});
+prueba('🐾 P260 (4): las armas naturales (garras, colmillos, aguijón) y el puño cuentan para la maestría de su Tipo — creep con garras, personaje sin arma, invocación con colmillos', () => {
+  const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);
+  const pun = P('maestria-armas-punzantes'), cor = P('maestria-armas-cortantes'), hac = P('maestria-hachas');
+  igual([C.familiaDeArma({nombre: 'Garras', tipoDado: 4, natural: true}), C.familiaDeArma({nombre: 'Colmillos', tipoDado: 6, natural: true}), C.familiaDeArma({nombre: 'Cuernos', tipoDado: 8, natural: true}),
+    C.familiaDeArma({nombre: 'Escupitajo', tipoDado: 4, natural: true, armaDeRango: true}), C.familiaDeArma({tipoDado: C.TIPO_SIN_ARMA, sinArma: true})], ['punzante', 'cortante', 'hacha', '', 'punzante']);
+  // Creep con garras (Tipo 4): +1 al daño y +1 PdG de oportunidad con la de punzantes; la de cortantes no le suma nada.
+  const cp = pas => creepPrueba({armaNombre: 'Garras', armaTipo: 4, armaPeso: 1, armaNatural: true, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i))});
+  const sc1 = cp([pun]), sc0 = cp([]), scC = cp([cor]);
+  const arma = C.armaEnMano(sc1);
+  igual([!!arma.natural, C.familiaDeArma(arma), CreepCalculo.famExtra(sc1, 'dmg'), CreepCalculo.famExtra(sc1, 'pdgopor'), CreepCalculo.famExtra(sc0, 'dmg'), CreepCalculo.famExtra(scC, 'pdgcontra'),
+    C.ataqueConSuArma(sc1, 'normal', 5, s => CreepCalculo.modTotal(sc1, s)).maestria], [true, 'punzante', 1, 1, 0, 0, '⚔ Maestría en armas punzantes: +1 al daño']);
+  // Personaje sin arma (el puño, Tipo 4): suma el daño de la de punzantes.
+  const pj = pas => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.inventario = []; S.pasivas = (pas || []).map((p, i) => ({...structuredClone(p), id: 'p' + i, compras: 1})); return S; };
+  igual(FichaCombate.dmgParaArma(pj([pun]), null) - FichaCombate.dmgParaArma(pj([]), null), 1);
+  // Invocación con colmillos de Tipo 8: la de hachas le baja el costo del segundo ataque.
+  const inv = pas => InvCalculo.migrar({id: 'i1', nombre: 'Lobo', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i)),
+    equipo: [{id: 'col', nombre: 'Colmillos', tipoItem: 'arma_1m', tipoDado: 8, peso: 2, equipado: true, natural: true, mods: []}]});
+  igual([InvCalculo.famExtra(inv([hac]), 'ahorro'), InvCalculo.famExtra(inv([]), 'ahorro')], [2, 0]);
+});
+prueba('🔁 P260 (7): volver a cargar una misma pasiva cuesta 1 de Job más que la carga anterior (1, 2, 3…); la copia siguiente se ve; una habilidad cuesta lo suyo', () => {
+  const L = FichaLupa;
+  const p = (c, k) => ({nombre: 'Pasiva', jobCosto: c, compras: k, job: true});
+  igual([L.jobCostoDe(p(1, 1)), L.jobCostoDe(p(1, 2)), L.jobCostoDe(p(1, 3)), L.jobCostoDe(p(2, 3)), L.jobCostoProxima(p(1, 1)), L.jobCostoProxima(p(1, 2)), L.jobCostoProxima(p(2, 3)),
+    L.jobCostoCopia(p(1, 1), 3), L.jobCostoDe({nombre: 'Habilidad', jobCosto: 2}), L.jobCostoDe({nombre: 'Sin dato'}), L.jobCostoDe({...p(3, 2), job: false})],
+    [1, 3, 6, 9, 2, 3, 5, 3, 2, 1, 0]);
+  // El presupuesto de Job de la ficha cuenta así: Prisa ×3 (1 + 2 + 3) + una habilidad de 2.
+  const S = fichaDePrueba({pasivas: [p(1, 3)], habilidades: [{id: 'h', nombre: 'Golpe', jobCosto: 2}]});
+  igual([...S.habilidades, ...S.pasivas].reduce((a, x) => a + L.jobCostoDe(x), 0), 8);
 });
 prueba('⚔⚔ Personaje: el Daño con un arma no suma el bono de daño de la otra (dueño, 2026-11-07); la Iniciativa de un arma cuenta siempre', () => {
   const S = fichaDePrueba({inventario: [
@@ -8821,6 +8873,19 @@ prueba('✚ Revivir igual en todos lados (2026-11-04, dueño: «el botón de rev
     S.hp, S.muerto.activo, (S.efectos || []).some(e => e && e.activo !== false && /Titilando|Invulnerable/.test(e.nombre))],
     [10, 40, null, null, ['25', '50', '100', 'num'], 1, '✚ Larry vuelve con 10 de vida, Titilando hasta su próximo turno (lo revivió su jugador)',
      '✚ Abeja vuelve con 3 de vida (lo revivió el GM)', 7, false, true]);
+});
+prueba('☥ P256 (i): la vida subida a mano a un caído pregunta «¿resucitarlo con esa cantidad?»; Sí = el mismo ✚ Revivir (con la vida ya elegida y la animación corta); No = nada', async () => {
+  igual([Combatiente.resucitarAManoTxt('Blanco', 12).split('\n')[0], Revivir.texto('Blanco', 12, {quien: 'gm', aMano: true}), Revivir.texto('Rata', 5, {quien: 'dueno', aMano: true}), Revivir.texto('X', 1, {aMano: true})],
+    ['Blanco está caído. ¿Querés resucitarlo con 12 de vida?', '✚ Blanco vuelve con 12 de vida, Titilando hasta su próximo turno (lo revivió el GM, subiéndole la vida a mano)',
+      '✚ Rata vuelve con 5 de vida, Titilando hasta su próximo turno (lo revivió su jugador, subiéndole la vida a mano)', '✚ X vuelve con 1 de vida, Titilando hasta su próximo turno (vida subida a mano)']);
+  // Con la forma «corta», volver anota la vuelta así (la animación de js/125 es la corta) y los estados se van igual.
+  const S = FichaGuardado.normalizar({}).S; S.hp = 0; S.muerto = {activo: true, turnos: 3, definitivo: false}; S.efectos = [{id: 'v', nombre: 'Veneno', activo: true, turnos: 2, polaridad: 'debuff'}];
+  Combatiente.volverLimpio(S, 'efectos', 'corta'); FichaAcciones.revivir(S, 12);
+  const v = Combatiente.vueltaTomar(S);
+  igual([S.hp, S.muerto.activo, v.forma, v.sacados.map(e => e.nombre), S.efectos.some(e => e.nombre === 'Veneno')], [12, false, 'corta', ['Veneno'], false]);
+  const t10 = await (await fetch('../vtt-hexgrid/js/10-hud-y-vida.js', {cache: 'no-store'})).text(), t98 = await (await fetch('../vtt-hexgrid/js/98-vida-en-cero.js', {cache: 'no-store'})).text();
+  igual(/Combatiente\.resucitarAManoTxt\(nombreDe\(t\), val\), \{icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'\}/.test(t10) && /revivirToken\(t, \{val, aMano: true\}\)/.test(t10), true);
+  igual(/const val = o\.val > 0 \? Math\.round\(o\.val\) : await Revivir\.elegirVida/.test(t98), true);
 });
 prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
   const pot = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');
@@ -9449,13 +9514,44 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     ok(/a mano/.test(vacia.esencial)); ok(/a mano/.test(fila(vacia, 'De quién es'))); ok(/a mano/.test(fila(vacia, 'Con qué se puso')));
     igual(fila(vacia, 'Cuánto le queda'), 'No tiene turnos contados: queda hasta que alguien la saque.');
     const esc2 = ZonaDetalle.armar(muro, {autor: {escondido: true, nombre: 'Rata'}, habilidad: 'Muro de fuego', quedan: 1});
-    igual(fila(esc2, 'De quién es'), 'No se sabe: quien la puso no está a la vista.');
+    igual(fila(esc2, 'De quién es'), 'Alguien (quien la puso no está a la vista).');
     ok(!JSON.stringify(esc2).includes('Rata'));
   });
   prueba('la nube (Polvareda / Bomba de humo): no hace daño, tapa la vista; y lo que no guarda, a mano', () => {
     const m = ZonaDetalle.armar({niebla: true, turnos: 2}, {quedan: 2, autor: {}});
     igual(m.icono, '☁'); ok(/^No hace daño: tapa la vista/.test(m.esencial));
     ok(/a mano/.test(fila(m, 'Con qué se puso'))); ok(/2 turnos/.test(fila(m, 'Cuánto le queda')));
+  });
+  prueba('☁ la nube que guarda quién la puso y con qué (P259 (3)): se nombra; si quien la puso no está a la vista, «Alguien» y sin decir con qué', async () => {
+    const nube = {niebla: true, turnos: 1, zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep', zonaNombre: 'Polvareda'};
+    const vista = ZonaDetalle.armar(nube, {quedan: 1, autor: {nombre: 'Rata de prueba (creep)'}, habilidad: 'Polvareda'});
+    igual([vista.titulo, fila(vista, 'De quién es'), fila(vista, 'Con qué se puso')], ['Polvareda', 'Rata de prueba (creep)', 'Polvareda']);
+    const oculta = ZonaDetalle.armar(nube, {quedan: 1, autor: {escondido: true}, habilidad: 'Polvareda', habilidadOculta: true});
+    igual([oculta.titulo, fila(oculta, 'De quién es'), fila(oculta, 'Con qué se puso')], ['Nube', 'Alguien (quien la puso no está a la vista).', 'No se sabe: quien la puso no está a la vista.']);
+    ok(!JSON.stringify(oculta).includes('Polvareda') && !JSON.stringify(oculta).includes('Rata'));
+    // el mapa la guarda al ponerla (las tres puertas: la habilidad o varita, la Bomba de humo y el virote de humo)
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
+    const t57 = await (await fetch('../vtt-hexgrid/js/57-alejarse.js', {cache: 'no-store'})).text();
+    const t33 = await (await fetch('../vtt-hexgrid/js/33-flechas.js', {cache: 'no-store'})).text();
+    ok(/zonaCasteadorRef: String\(msg\.fichaId\)/.test(t13) && /zonaNombre: String\(msg\.nombre\)/.test(t13));
+    ok(/crearNiebla\(\{col: t\.col, fila: t\.fila\}, radio, \{nombre: nom, zonaTurnos: turnos, fichaId: t\.fichaId/.test(t57));
+    ok(/crearNiebla\(celda, 1, \{nombre: fl\.nombre, zonaTurnos: 2, \.\.\.\(d\.atacante/.test(t33));
+  });
+  prueba('🚩🤐 «Ver detalle» de un estandarte y de un tótem (P259 (4)): qué hace, a quién, de quién es, con qué se clavó, cuánto dura; quien lo clavó escondido, «Alguien»', () => {
+    const est = ZonaDetalle.armarInerte({radio: 3, pdg: 3, dano: 5}, {autor: {nombre: 'Goblin jefe (creep)', corto: 'Goblin jefe'}, habilidad: 'Estandarte de guerra', vida: '30 / 30', bando: 'creep', nombre: 'Estandarte de Goblin jefe'});
+    igual([est.icono, est.titulo, est.esencial], ['🚩', 'Estandarte de Goblin jefe', 'Los aliados de Goblin jefe (los creeps) a 3 casillas o menos (diámetro 7) suman +3 a la Probabilidad de Golpe y +5 al daño, mientras siga en pie.']);
+    igual([fila(est, 'De quién es'), fila(est, 'Con qué se puso'), /hasta que lo rompan/.test(fila(est, 'Cuánto dura')), /30 \/ 30/.test(fila(est, 'Cómo se rompe')), /A los rivales, no/.test(fila(est, 'A quién afecta'))],
+      ['Goblin jefe (creep)', 'Estandarte de guerra', true, true, true]);
+    const tot = ZonaDetalle.armarInerte({radio: 3, silencio: true}, {autor: {escondido: true}, habilidadOculta: true, bando: 'creep', nombre: 'Tótem de silencio de Chamán'});
+    igual([tot.icono, tot.titulo, fila(tot, 'De quién es'), fila(tot, 'Con qué se puso'), /no pueden usar habilidades que cuestan SP/.test(tot.esencial)],
+      ['🤐', 'Tótem de silencio', 'Alguien (quien la puso no está a la vista).', 'No se sabe: quien la puso no está a la vista.', true]);
+    ok(!JSON.stringify(tot).includes('Chamán'));
+    const viejo = ZonaDetalle.armarInerte({radio: 2, pdg: 1, dano: 1}, {autor: {nombre: 'Orco (creep)'}, bando: 'creep'});
+    ok(/a mano/.test(fila(viejo, 'Con qué se puso')));   // (los clavados antes de hoy no guardan con qué)
+    igual(ZonaDetalle.armarInerte(null, {}), null);
+    // Lo público del creep-estandarte lleva de quién es y con qué (CreepCalculo.tarjetaPublica).
+    const tp = CreepCalculo.tarjetaPublica(creepPrueba({estandarte: {de: 'c9', deNombre: 'Goblin jefe', con: 'Estandarte de guerra', radio: 3, pdg: 3, dano: 5}}));
+    igual([tp.estandarteDe, tp.estandarteDeId, tp.estandarteCon, tp.estandarteRadio], ['Goblin jefe', 'c9', 'Estandarte de guerra', 3]);
   });
   prueba('hielo (cada paso), curación (pulsos), terreno en llamas y una zona sin Mantenimiento', () => {
     const hielo = ZonaDetalle.armar({zona: true, zonaNombre: 'Suelo congelado', zonaResistStat: 'agl', zonaResistValor: 8, zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})}, {statLabel: lbl, autor: {}, altura: 'piso'});

@@ -68,12 +68,13 @@ const ZonaDetalle = (() => {
     const a = ctx.autor || {};
     const hab = ctx.habilidad || '';
     let v;
-    if(a.escondido) v = 'No se sabe: quien la puso no está a la vista.';
+    if(a.escondido) v = 'Alguien (quien la puso no está a la vista).';
     else if(a.nombre) v = a.nombre;
     else v = '';
     if(v) filas.push({k: 'De quién es', v});
     else filas.push({k: 'De quién es', v: `La zona no guarda quién la puso (${A_MANO}).`, aMano: true});
-    if(hab) filas.push({k: 'Con qué se puso', v: hab});
+    if(ctx.habilidadOculta) filas.push({k: 'Con qué se puso', v: 'No se sabe: quien la puso no está a la vista.'});
+    else if(hab) filas.push({k: 'Con qué se puso', v: hab});
     else filas.push({k: 'Con qué se puso', v: `No lo guarda (${A_MANO}).`, aMano: true});
   }
   function filaQueda(el, ctx, filas){
@@ -237,7 +238,7 @@ const ZonaDetalle = (() => {
       filaAutor(el, ctx, filas); filaQueda(el, ctx, filas);
       filas.push({k: 'Cuándo se dispara', v: 'No se dispara: vale mientras esté puesta.'});
       filas.push({k: 'Estado que deja', v: 'Ninguno. (Si la habilidad que la puso además deja a alguien en Sigilo o le permite moverse, eso no queda guardado en la nube.)'});
-      return {icono: '☁', titulo: ctx.habilidad || 'Nube', esencial: 'No hace daño: tapa la vista. Quien está adentro no se ve desde afuera (solo lo ve quien está pegado), y no se puede ver a través de ella.', filas, descripcion: filaDescripcion(ctx), descripcionNo: ctx.descripcionNo || ''};
+      return {icono: '☁', titulo: (!ctx.habilidadOculta && ctx.habilidad) || 'Nube', esencial: 'No hace daño: tapa la vista. Quien está adentro no se ve desde afuera (solo lo ve quien está pegado), y no se puede ver a través de ella.', filas, descripcion: filaDescripcion(ctx), descripcionNo: ctx.descripcionNo || ''};
     }
     if(el.portal || el.townPortal){
       filas.push({k: 'Fuego amigo', v: 'No aplica: no hace daño.'});
@@ -251,6 +252,29 @@ const ZonaDetalle = (() => {
     return null;
   }
 
-  return {tiene, armar, cuandoEtiqueta, sinTiradaTexto, A_MANO};
+  /* 🚩🤐 «Ver detalle» de un tótem o un estandarte (P259 (4), dueño, 2026-11-22): son tokens (un creep quieto, vtt-hexgrid/js/73), no zonas, pero la
+     tarjeta es la misma. e = {radio, pdg, dano, silencio}; ctx = {autor: {nombre, corto, escondido}, habilidad, habilidadOculta, vida ('12 / 20' | '60 %' | ''),
+     bando: 'creep' | 'pj' (de qué lado está el tótem), nombre (el del token)}. → el mismo modelo que armar(). */
+  function armarInerte(e, ctx){
+    ctx = ctx || {};
+    if(!e || !(Number(e.radio) > 0)) return null;
+    const r = Math.round(Number(e.radio)), filas = [], sil = !!e.silencio;
+    const aliados = ctx.bando === 'pj' ? 'los personajes y sus invocaciones' : 'los creeps';
+    const rivales = ctx.bando === 'pj' ? 'los creeps' : 'los personajes y sus invocaciones';
+    const area = `a ${r} casilla${s(r)} o menos (diámetro ${2 * r + 1})`;
+    const quien = ctx.autor && ctx.autor.escondido ? 'quien lo clavó' : (ctx.autor && (ctx.autor.corto || ctx.autor.nombre)) || 'quien lo clavó';   // (corto: sin el «(creep)» de la fila)
+    const esencial = sil ? `Los rivales de ${quien} (${rivales}) ${area} no pueden usar habilidades que cuestan SP, mientras siga en pie.`
+      : `Los aliados de ${quien} (${aliados}) ${area} suman +${Math.round(Number(e.pdg) || 0)} a la Probabilidad de Golpe y +${Math.round(Number(e.dano) || 0)} al daño, mientras siga en pie.`;
+    filas.push({k: 'A quién afecta', v: sil ? `Solo a los rivales de ${quien} (${rivales}) que estén adentro del aura. A sus aliados, no.`
+      : `Solo a los aliados de ${quien} (${aliados}) que estén adentro del aura (él incluido). A los rivales, no. Si hay varios estandartes, vale el mejor (no se suman).`});
+    filaAutor({}, ctx, filas);
+    filas.push({k: 'Cuánto dura', v: 'No tiene turnos contados: queda hasta que lo rompan (al llegar a 0 de vida se va del mapa). Si quien lo clavó clava otro igual, el anterior se va.'});
+    filas.push({k: 'Cuándo vale', v: sil ? 'Todo el tiempo, mientras esté en pie: el mapa avisa al querer usar una habilidad que cuesta SP adentro del aura (y deja seguir si la mesa lo decide).'
+      : 'Todo el tiempo, mientras esté en pie: el bonus se suma solo al atacar desde adentro del aura (el cuadro del duelo lo muestra «🚩 bajo el estandarte»).'});
+    filas.push({k: 'Cómo se rompe', v: `Se le pega como a cualquier rival: no esquiva (Evasión 1), no tiene Defensa ni resistencias${ctx.vida ? ` · Vida: ${ctx.vida}` : ''}. No actúa ni entra al orden de turnos.`});
+    return {icono: sil ? '🤐' : '🚩', titulo: (ctx.autor && ctx.autor.escondido ? '' : ctx.nombre) || (sil ? 'Tótem de silencio' : 'Estandarte de guerra'), esencial, filas, descripcion: '', descripcionNo: ''};
+  }
+
+  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

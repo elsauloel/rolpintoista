@@ -139,7 +139,7 @@ async function flechaAlPegar(d, invulnerable){
 }
 async function virotEstalla(d, celda, pego){
   const fl = d.ataque.flecha, quien = (d.atacante && d.atacante.nombre) || 'Alguien', donde = pego ? `sobre ${d.defensor.nombre}` : 'donde cayó';
-  if(fl.humo){ await crearNiebla(celda, 1, {nombre: fl.nombre, zonaTurnos: 2}); mesaLinea(`💨 El ${fl.nombre} de ${quien} soltó una nube de humo ${donde} (diámetro 3, 2 turnos)`, 'recordatorio'); }
+  if(fl.humo){ await crearNiebla(celda, 1, {nombre: fl.nombre, zonaTurnos: 2, ...(d.atacante && d.atacante.ref ? {fichaId: d.atacante.ref, casteadorTipo: d.atacante.tipo} : {})}); mesaLinea(`💨 El ${fl.nombre} de ${quien} soltó una nube de humo ${donde} (diámetro 3, 2 turnos)`, 'recordatorio'); }
   if(fl.luz){
     await crearElementoZona(celda, {radio: 1, turnos: 3, nombre: fl.nombre, luz: true, color: '#FFE9A0', alfa: 25, enMantenimiento: false});
     mesaLinea(`✨ El ${fl.nombre} de ${quien} prendió una bengala ${donde} (diámetro 3, 3 turnos)`, 'recordatorio');

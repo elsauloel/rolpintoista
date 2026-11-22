@@ -135,34 +135,38 @@ function puedeRevivirToken(t){
   const v = vinculo(t), ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
   return !!((v && v.duenoUid === fbUsuario.uid) || t.duenoUid === fbUsuario.uid || (typeof controloFicha === 'function' && controloFicha(ficha)));
 }
-async function revivirToken(t){
+// o (opcional) = {val, aMano}: la vida ya elegida (P256 (i): la vida subida a mano desde el token, js/10 hudAplicar, después de su cartel) →
+// no pregunta «¿con cuánta vida?», la animación es la corta y la línea de la Mesa lo dice.
+async function revivirToken(t, o){
+  o = o || {};
   if(!puedeRevivirToken(t) || !tokenCaido(t)) return;
   const nom = nombreDe(t), esInv = String(t.fichaId).includes(SEP_INVOCACION);
-  const val = await Revivir.elegirVida(nom, maxVidaDe(t), {titila: !esInv});
+  const forma = o.aMano ? 'corta' : 'revive';
+  const val = o.val > 0 ? Math.round(o.val) : await Revivir.elegirVida(nom, maxVidaDe(t), {titila: !esInv});
   if(!val) return;
   let vuelta = null;   // ☥ al volver se van los estados (Combatiente.volverLimpio); un personaje lo cuenta editarPersonajeMapa (js/11)
   try{
     if(t.tipo === 'creep'){
       await modificarCreep(t.fichaId, sc => {
         sc.hp = val;
-        Combatiente.volverLimpio(sc, 'estados', 'revive'); vuelta = Combatiente.vueltaTomar(sc);
+        Combatiente.volverLimpio(sc, 'estados', forma); vuelta = Combatiente.vueltaTomar(sc);
         const e = typeof estadosPresetCreep === 'function' ? Combatiente.estadoTitilando(estadosPresetCreep()) : null;
         if(e){ sc.estados = sc.estados || []; Combatiente.agregarEstado(sc.estados, e); }
       });
     }else if(esInv){
       const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
-      const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false; inv.hp = val; Combatiente.volverLimpio(inv, 'estados', 'revive'); vuelta = Combatiente.vueltaTomar(inv); Combatiente.vueltaTomar(S); return true; });
+      const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false; inv.hp = val; Combatiente.volverLimpio(inv, 'estados', forma); vuelta = Combatiente.vueltaTomar(inv); Combatiente.vueltaTomar(S); return true; });
       if(!ok) throw new Error('no se pudo escribir la ficha de su dueño');
     }else{
-      const ok = await editarPersonajeMapa(t.fichaId, S => { FichaAcciones.revivir(S, val); return true; });
+      const ok = await editarPersonajeMapa(t.fichaId, S => { if(o.aMano) Combatiente.volverLimpio(S, 'efectos', forma); FichaAcciones.revivir(S, val); return true; });   // (a mano: la forma queda «corta», la anota primero)
       if(!ok) throw new Error('no se pudo escribir su ficha');
     }
   }catch(err){ console.error('Revivir:', err); toast(`No se pudo revivir a ${nom}: ${err.message || err}`); return; }
-  const txt = Revivir.texto(nom, val, {titila: !esInv, quien: soyGM ? 'gm' : 'dueno'});
+  const txt = Revivir.texto(nom, val, {titila: !esInv, quien: soyGM ? 'gm' : 'dueno', aMano: !!o.aMano});
   toast(txt);
   try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
   try{ momentoAbrir({tipo: 'buff', icono: '✚', titulo: `${nom} vuelve a pie`, resultado: txt, estado: 'listo', datos: soyGM && t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid, aviso: true, boton: 'Entendido'} : {}}); }catch(e){}
-  if(vuelta && typeof resurreccionAnunciar === 'function') resurreccionAnunciar({t, forma: 'revive', sacados: vuelta.sacados});   // (creep e invocación; js/123)
+  if(vuelta && typeof resurreccionAnunciar === 'function') resurreccionAnunciar({t, forma, sacados: vuelta.sacados});   // (creep e invocación; js/123)
   pedirDibujo();
 }
 const gmRevivirToken = revivirToken;   // el nombre de antes (js/10)

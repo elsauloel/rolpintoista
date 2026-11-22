@@ -701,7 +701,7 @@ const CombateFin = (() => {
       const ir = () => GrupoBotin.abrir({jugadores, items});
       if(typeof GrupoBotin !== 'undefined') ir();
       else{
-        const s = document.createElement('script'); s.src = '../comun/grupo-botin.js?v=20261122prisa5';
+        const s = document.createElement('script'); s.src = '../comun/grupo-botin.js?v=20261122cola47';
         s.onload = ir; s.onerror = () => console.error('📋 No se pudo cargar grupo-botin.js');
         document.head.appendChild(s);
       }

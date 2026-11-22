@@ -255,7 +255,7 @@ function abrirPasivaNueva(){
     textoCrearDeCero: '+ Crear de cero',
     alCrearDeCero: () => openEditor('pasivas', null),
     alElegir: agregarPasivaDeCatalogo,
-    subtitulo: e => ` · ${fmt(jobCostoPasiva(e.datos.jobCosto))} Job`,
+    subtitulo: e => { const ya = pasivaYaComprada(e.datos, e); return ya ? ` · ya la tenés ×${pasivaCompras(ya)}: la próxima copia cuesta ${fmt(FichaLupa.jobCostoProxima(ya))} Job` : ` · ${fmt(jobCostoPasiva(e.datos.jobCosto))} Job`; },
   });
 }
 
@@ -280,6 +280,12 @@ function pasivasDelCatalogo(){
   });
   return base.concat(subidas.filter(e => !e.reemplaza && e.datos && !e.datos.baja).map(e => ({datos: e.datos, meta: e})));
 }
+// ¿Ya tiene esa pasiva (la misma clave que suma compras)? → la suya o null. (Para mostrar cuánto cuesta la próxima copia en el catálogo.)
+function pasivaYaComprada(datos, meta){
+  if(!datos) return null;
+  const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
+  return S.pasivas.find(p => (p.poolId || claveDePasiva(p)) === clave) || null;
+}
 function agregarPasivaDeCatalogo(datos, meta){
   // La corrección de una de fábrica se acumula con la de fábrica (misma clave), no como otra pasiva distinta.
   const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
@@ -288,8 +294,9 @@ function agregarPasivaDeCatalogo(datos, meta){
   const ya = S.pasivas.find(p => (p.poolId || claveDePasiva(p)) === clave);
   if(ya){
     if(pasivaCompras(ya) >= tope){ toast(`${ya.nombre}: ya tenés el máximo de compras (${tope}, la mitad de tu nivel)`); return; }
+    const esta = FichaLupa.jobCostoProxima(ya);   // 🔁 cada copia cuesta 1 de Job más que la anterior (P260 (7))
     ya.compras = pasivaCompras(ya) + 1;
-    toast(`${ya.nombre} ×${ya.compras} (+${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
+    toast(`${ya.nombre} ×${ya.compras} (+${esta} de Job; la próxima, ${FichaLupa.jobCostoProxima(ya)}) · te quedan ${fmt(jobBudget().resto)}`);
   }else{
     S.pasivas.push(pasivaDeCatalogo(datos, meta));
     toast(`${datos.nombre} agregada (${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);

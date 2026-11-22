@@ -13,8 +13,13 @@ const ZD_ELEM = {fuego: ['fuego', 'al fuego'], hielo: ['hielo', 'al hielo'], ray
   acido: ['ácido', 'al ácido'], luz: ['luz', 'a la luz'], siniestro: ['lo siniestro', 'a lo siniestro'], arcano: ['arcano', 'a lo arcano']};
 
 // Quién la puso, para esta pantalla. → {c (colocador), ct (su token), autor: {nombre, escondido}}
+// ☁ Una nube (`niebla`) guarda quién la puso desde el 2026-11-22 (P259 (3), crearNiebla en js/13); colocadorDe (js/07) no la mira a propósito:
+// su duración se sigue contando por Mantenimientos, no por los turnos de quien la puso.
+function nubeColocador(el){
+  return el && el.niebla && el.zonaCasteadorRef ? {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'} : null;
+}
 function zonaDetalleAutor(el){
-  const c = typeof colocadorDe === 'function' ? colocadorDe(el) : null;
+  const c = nubeColocador(el) || (typeof colocadorDe === 'function' ? colocadorDe(el) : null);
   if(!c){
     // Sin nadie detrás: la puso alguien a mano (o la pantalla que resolvió una habilidad que no guarda quién fue, como una nube).
     const m = miembros.get(el.duenoUid), nom = m ? (m.gm ? 'El GM' : m.nombre) : '';
@@ -67,7 +72,7 @@ function zonaDetalleDescripcion(elId, el, a){
 function zonaTurnosQuedan(el, a){
   if(!el || el.venceMant === null || el.venceMant === undefined || mantenimientoNumero === null) return null;
   a = a || zonaDetalleAutor(el);
-  const porTurnos = Math.round(num(el.turnos)) > 0 && !!a.c && colocadorEnOrden(a.c);
+  const porTurnos = !el.niebla && Math.round(num(el.turnos)) > 0 && !!a.c && colocadorEnOrden(a.c);   // (la nube: por Mantenimientos)
   return {quedan: porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero), porTurnos};
 }
 function zonaDetalleCtx(elId, el){
@@ -96,6 +101,9 @@ function zonaDetalleCtx(elId, el){
     ctx.habilidad = el.trampaNombre || '';
   }
   if(el.fuego || el.portal || el.townPortal || el.acelerador) ctx.habilidad = a.c ? (el.zonaNombre || '') : '';
+  // ☁ La nube: con qué se puso (la Bomba de humo, la Polvareda, la varita, el virote de humo). Si quien la puso no está a la vista, tampoco se dice
+  // con qué (el nombre de la habilidad lo delataría: «si la rata está bajo la niebla… no tiene que decir "la rata usó Polvareda"», js/29).
+  if(el.niebla){ ctx.habilidad = el.zonaNombre || ''; if(a.autor.escondido) ctx.habilidadOculta = true; }
   const d = el.zona || el.niebla ? zonaDetalleDescripcion(elId, el, a) : {};
   ctx.descripcion = d.txt || ''; ctx.descripcionNo = d.no || '';
   return ctx;
@@ -127,6 +135,7 @@ function zonaDetalleAbrir(elId){
   const el = elementos.get(elId);
   if(!el || !puedeVerElemento(el) || !ZonaDetalle.tiene(el)) return;
   zonaDetalleId = elId; zonaDetalleFirma = '';
+  if(typeof inerteDetalleId !== 'undefined') inerteDetalleId = null;   // (la misma caja: un detalle por vez)
   zonaDetalleRefrescar();
 }
 function zonaDetalleCerrar(){
@@ -141,7 +150,7 @@ function zonaDetalleRefrescar(){
   if(!el || !puedeVerElemento(el) || elementoSeleccionado !== zonaDetalleId){ zonaDetalleCerrar(); return; }
   const c = zonaDetalleCaja(), html = zonaDetalleHtml(zonaDetalleId, el);
   if(!html){ zonaDetalleCerrar(); return; }
-  if(html !== zonaDetalleFirma){ c.innerHTML = html; zonaDetalleFirma = html; }
+  if(html !== zonaDetalleFirma || c.dataset.de !== 'zona'){ c.innerHTML = html; zonaDetalleFirma = html; c.dataset.de = 'zona'; }
   const et = $('#elemento-etiqueta');
   c.style.top = ((et && !et.hidden && et.offsetHeight ? et.offsetTop + et.offsetHeight : 64) + 8) + 'px';
   c.hidden = false;
@@ -155,3 +164,58 @@ document.addEventListener('click', e => {
   if(zonaDetalleId && zonaDetalleId === elementoSeleccionado) zonaDetalleCerrar(); else if(elementoSeleccionado) zonaDetalleAbrir(elementoSeleccionado);
 });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && zonaDetalleId) zonaDetalleCerrar(); });
+
+/* ---------- 🚩🤐 «Ver detalle» de un tótem o un estandarte (P259 (4), dueño, 2026-11-22: «Ver detalle para los tótems y los estandartes») ----------
+   Son tokens (un creep quieto, js/73), no zonas: el botón va en el cartel del token seleccionado (js/10, `#token-etiqueta`, `data-inerte-detalle`) y
+   abre la MISMA tarjeta (`#zona-detalle`, con ZonaDetalle.armarInerte): qué hace, a quién, de quién es, con qué se clavó, cuánto dura. Quien lo clavó
+   se nombra salvo que esta pantalla no lo vea (oculto, en sigilo, bajo la niebla): ahí, «Alguien» y sin decir con qué. */
+let inerteDetalleId = null, inerteDetalleFirma = '';
+function inerteDetalleCtx(id, t){
+  const v = vinculo(t) || {}, e = estandarteInfo(t);
+  const ct = v.estandarteDeId ? [...tokens.values()].find(x => x.tipo === 'creep' && String(x.fichaId) === v.estandarteDeId) : null;
+  const mio = ct && typeof puedoMover === 'function' && puedoMover(ct);
+  const escondido = !!ct && !mio && typeof loVeoAhora === 'function' && !loVeoAhora(ct);
+  const deNom = ct ? nombreDe(ct) : v.estandarteDe;
+  const autor = escondido ? {escondido: true} : deNom ? {nombre: `${deNom} (creep)`, corto: deNom} : {};
+  return {e, ctx: {autor, nombre: v.nombre || t.nombre || '', habilidad: escondido ? '' : (v.estandarteCon || ''), habilidadOculta: escondido,
+    vida: typeof inerteVida === 'function' ? inerteVida(id, t) : '', bando: t.tipo === 'creep' ? 'creep' : 'pj'}};
+}
+function inerteDetalleHtml(id, t){
+  const {e, ctx} = inerteDetalleCtx(id, t);
+  const m = e ? ZonaDetalle.armarInerte(e, ctx) : null;
+  if(!m) return '';
+  const filas = m.filas.map(f => `<div class="zd-fila${f.aMano ? ' zd-amano' : ''}"><b>${esc(f.k)}</b><span>${esc(f.v)}</span></div>`).join('');
+  return `<div class="zd-cab"><b>${esc(m.icono)} ${esc(m.titulo)}</b><button type="button" class="zd-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>` +
+    `<div class="zd-esencial"><span class="zd-ico">${esc(m.icono)}</span><span>${esc(m.esencial)}</span></div>` +
+    `<div class="zd-filas">${filas}</div>` +
+    `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${ZonaDetalle.A_MANO}» = ese dato no está guardado ahí.</div>`;
+}
+function inerteDetalleCerrar(){
+  inerteDetalleId = null; inerteDetalleFirma = '';
+  const c = $('#zona-detalle'); if(c && !zonaDetalleId) c.hidden = true;
+}
+function inerteDetalleRefrescar(){
+  if(!inerteDetalleId) return;
+  const t = tokens.get(inerteDetalleId);
+  if(!t || seleccion !== inerteDetalleId || !esInerte(t)){ inerteDetalleCerrar(); return; }
+  const html = inerteDetalleHtml(inerteDetalleId, t);
+  if(!html){ inerteDetalleCerrar(); return; }
+  if(zonaDetalleId) zonaDetalleCerrar();
+  const c = zonaDetalleCaja();
+  if(html !== inerteDetalleFirma || c.dataset.de !== 'inerte'){ c.innerHTML = html; inerteDetalleFirma = html; c.dataset.de = 'inerte'; }
+  const et = $('#token-etiqueta');
+  c.style.top = ((et && !et.hidden && et.offsetHeight ? et.offsetTop + et.offsetHeight : 64) + 8) + 'px';
+  c.hidden = false;
+}
+setInterval(inerteDetalleRefrescar, 700);
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-inerte-detalle]');
+  if(b){
+    e.preventDefault(); e.stopPropagation();
+    if(inerteDetalleId && inerteDetalleId === seleccion) inerteDetalleCerrar();
+    else if(seleccion){ inerteDetalleId = seleccion; inerteDetalleFirma = ''; inerteDetalleRefrescar(); }
+    return;
+  }
+  if(inerteDetalleId && e.target.closest && e.target.closest('#zona-detalle .zd-cerrar')) inerteDetalleCerrar();
+}, true);
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && inerteDetalleId) inerteDetalleCerrar(); });

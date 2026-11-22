@@ -1160,7 +1160,9 @@ function elementoQueEs(e){
   }
   // ☁ La nube y 🔥 el terreno en llamas también dicen qué son (2026-11-20, con el «Ver detalle»; antes salían como «Flor · TRANSITABLE»).
   if(e.niebla){ const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
-    return `<b>☁ NUBE</b> <span>${de}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''} · <span class="es-libre">tapa la vista: quien está adentro no se ve desde afuera</span>`; }
+    // (P259 (3), 2026-11-22: la nube guarda quién la puso; si esta pantalla no lo ve, tampoco se dice desde qué cuenta se puso — js/127)
+    let quien = de; try{ if(typeof zonaDetalleAutor === 'function' && e.zonaCasteadorRef){ const a = zonaDetalleAutor(e).autor || {}; quien = a.escondido ? '(alguien)' : a.nombre ? esc(`(${a.nombre})`) : de; } }catch(err){}
+    return `<b>☁ NUBE${e.zonaNombre && quien !== '(alguien)' ? ' · ' + esc(e.zonaNombre) : ''}</b> <span>${quien}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''} · <span class="es-libre">tapa la vista: quien está adentro no se ve desde afuera</span>`; }
   if(e.fuego && !e.zona && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien sigue adentro al pasar de ronda</span>`;
   if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
   if(e.trampa){
@@ -1180,7 +1182,12 @@ function actualizarEtiquetaToken(){
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !fbMiembro || creando){ el.hidden = true; return; }
   const dueno = t.tipo === 'creep' ? 'GM' : nombreMiembro(t.duenoUid);
-  el.innerHTML = `<b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span>`;
+  // 🔍 «Ver detalle» de un tótem o un estandarte (P259 (4), 2026-11-22; js/127): el mismo botón que el de las zonas.
+  const verDet = typeof esInerte === 'function' && esInerte(t) && typeof ZonaDetalle !== 'undefined' && ZonaDetalle.armarInerte
+    ? '<button type="button" class="ee-detalle" data-inerte-detalle="1" title="Qué hace, a quién, de quién es, con qué se clavó y cuánto dura">🔍 Ver detalle</button>' : '';
+  const html = verDet ? `<div class="ee-txt"><b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span></div>${verDet}` : `<b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span>`;
+  if(el.dataset.html !== html || !el.innerHTML){ el.innerHTML = html; el.dataset.html = html; }
+  el.classList.toggle('con-detalle', !!verDet);
   el.hidden = false;
 }
 
@@ -1553,14 +1560,19 @@ async function hudAplicar(clave, texto){
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !puedoCambiarVida(t) || !String(texto).trim()){ hudEditando = ''; pedirDibujo(); return; }
   const idTok = seleccion, antes = vitalActual(t, clave);
-  // Subirle la vida a un caído (2026-10-06, dueño: una cura no levanta a un inconsciente): avisa y deja seguir — a mano, lo decide la mesa;
-  // si sigue, queda de pie (sin Titilando: eso es de los efectos que reviven).
-  let levantar = false;
-  if(clave === 'hp' && antes !== null && antes !== undefined && num(antes) <= 0){
+  // ☥ Subirle la vida a mano a un caído (P256 (i), dueño, 2026-11-22: «te debe aparecer una notificación que diga: el personaje está caído,
+  // ¿querés resucitarlo con esa cantidad de vida? Sí / No»). Sí: vuelve con esa vida y cuenta como resucitar (el mismo ✚ Revivir del token, js/98:
+  // se van los estados, Titilando, la línea de la Mesa, con la animación corta). No: no se le sube la vida y sigue caído.
+  const levantar = false;
+  if(clave === 'hp' && antes !== null && antes !== undefined && num(antes) <= 0 && (typeof tokenCaido !== 'function' || tokenCaido(t))){
     const nuevo = leerValorVital(texto, num(antes));
     if(nuevo !== null && nuevo > 0){
-      if(!(await AvisoCombate.preguntar(`${nombreDe(t)} ${Combatiente.CAIDO_TXT}: para eso está ✚ Revivir (o un Ankh).\n\n¿Cambiarle la vida igual, a mano? (Lo decide la mesa.)`, {icono: '💔', titulo: 'Está caído', si: 'Sí, cambiarla'}))){ hudEditando = ''; pedirDibujo(); return; }
-      levantar = true;
+      const max = typeof maxVidaDe === 'function' ? maxVidaDe(t) : 0, val = max > 0 ? Math.min(max, Math.round(nuevo)) : Math.round(nuevo);
+      hudEditando = ''; pedirDibujo();
+      if(await AvisoCombate.preguntar(Combatiente.resucitarAManoTxt(nombreDe(t), val), {icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'})){
+        if(typeof revivirToken === 'function') await revivirToken(t, {val, aMano: true});   // (sin Ctrl+Z: es una resurrección, no un cambio de número)
+      }
+      return;
     }
   }
   try{

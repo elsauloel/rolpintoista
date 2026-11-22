@@ -1031,7 +1031,7 @@ const LISTS = {
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}${versionNuevaDePasiva(i) ? ` <button type="button" class="mini" data-versionpasiva="${i.id}" title="Alguien corrigió la pasiva de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div><div class="idesc">${esc(i.detalle)}</div>
+        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}${i.job !== false ? ` <span class="tag" title="Cada copia cuesta 1 de Job más que la anterior (1, 2, 3…)">${fmt(jobCostoDe(i))} Job · la próxima copia: ${fmt(FichaLupa.jobCostoProxima(i))}</span>` : ''}${versionNuevaDePasiva(i) ? ` <button type="button" class="mini" data-versionpasiva="${i.id}" title="Alguien corrigió la pasiva de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div><div class="idesc">${esc(i.detalle)}</div>
         <div class="imeta">${modTags(i.mods)}</div></div>
         <div class="rowbtns"><button class="mini" data-proponerpasiva="${i.id}" title="Subir esta pasiva a la biblioteca compartida: queda disponible para todos al instante">⬆ Subir</button><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
       </div></div>`

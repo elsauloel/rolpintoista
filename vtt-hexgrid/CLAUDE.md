@@ -2569,3 +2569,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sin cartel; `renderZonaBanner` devuelve el resultado); `inicioVentanaVolver` la muestra de nuevo cuando no hay otro aviso ni cuadro del duelo abierto.
   Un reloj (500 ms) la aparta mientras haya un cuadro del duelo abierto en esta pantalla (`inicioDueloAbierto`) y la vuelve a mostrar si otro aviso la
   reemplazó. «▶ Aplicar por él» del GM o aplicado al pasar el turno: la zona sigue con su botón. Un creep, sin cambios. Probado con clics (cola 2026-11-22).
+
+- **📋 Respuestas a P252, P256, P259, P260 y P262** (2026-11-22, cola): (1) el fin del combate vacía también el orden de turnos (comun/tokens-auto.js).
+  (2) `hudAplicar` (js/10): subirle la vida a mano a un caído pregunta «¿Querés resucitarlo con N de vida?» (Sí = `revivirToken(t, {val, aMano: true})`,
+  js/98: sin preguntar cuánta, forma `'corta'` —la animación corta de js/125—, línea «…subiéndole la vida a mano»; No = nada). (3) `crearNiebla` (js/13)
+  guarda `zonaCasteadorRef`/`zonaCasteadorTipo`/`zonaNombre` (desde la habilidad o varita, la Bomba de humo de js/57 y el virote de humo de js/33; campos
+  que las reglas ya aceptaban); `nubeColocador` (js/127) los lee —`colocadorDe` no, a propósito: la nube sigue venciendo por Mantenimientos— y el cartel
+  de arriba (`elementoQueEs`, js/10) dice «(alguien)» si esta pantalla no ve a quien la puso. (4) **«🔍 Ver detalle» de los tótems y estandartes**: el
+  botón va en `#token-etiqueta` (js/10, `data-inerte-detalle`) y abre la misma caja `#zona-detalle` (js/127: `inerteDetalleCtx/Html/Refrescar`; un
+  detalle por vez, `c.dataset.de`). El estandarte guarda con qué se clavó (`estandarte.con`, js/73); lo público, `estandarteDe/DeId/Con` (js/09).

@@ -721,3 +721,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `intercambioHost.adyacentes` / `prepararAdyacentes` (lee los tokens del mapa publicado con `Intercambio.adyacentesPublicado`, al abrir y antes de
   ofrecer en combate): ahora la ficha también marca «· al lado» y avisa «no está al lado» con «Dar igual» / «Cancelar». Los «🤝 Pasar» de la mochila y
   de la ventanita de DDE siguen (P278).
+
+- **🔁 Cada copia de una pasiva cuesta 1 de Job más que la anterior** (2026-11-22, P260 (7); `FichaLupa.jobCostoDe`): 1, 2, 3… (×3 de una de 1 = 6).
+  La pasiva muestra «N Job · la próxima copia: M» (js/04) y el catálogo de «+ Pasiva», si ya la tenés, «ya la tenés ×k: la próxima copia cuesta M Job»
+  (`pasivaYaComprada`, js/10); el toast del «Agregar» lo dice. El tope de la mitad del nivel no cambió.

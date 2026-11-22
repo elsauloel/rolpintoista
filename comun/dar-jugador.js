@@ -24,10 +24,15 @@
    DarJugador.puerta({gm, propios: [{id, nombre}], abrirGM(), abrirPasar(fichaId), toast}) — 🤝 Dar, el botón del menú de la izquierda (mapa, ficha
    y GM Tools; 2026-11-22, opción A del dueño): el GM va a esta ventana; un jugador, a la de pasar algo de su mochila (comun/intercambio.js). Si hay
    más de un camino (el GM con 🎮 el control de un personaje, o un jugador con varios), un cartelito para elegir. `puertaOpciones(o)` es la lista.
+   🎒 Antes de dar (P262 (5), dueño, 2026-11-22: «está bien que la ventana le avise al GM»): por cada personaje marcado se lee su ficha
+   (FichaGuardado.cargar) y se prueba lo que se le da en una COPIA (`mochilaTrasDar`, con el mismo `recibir`); si a alguien le va a quedar la
+   mochila pasada de ranuras, la ventana lo dice abajo y «🎁 Dar» pregunta «¿Dar igual?». No bloquea (ADN: avisar). Si faltan las piezas, las carga
+   solas (`piezasMochila`); si no se puede leer una ficha, dice que no se pudo revisar y deja dar.
    Necesita sesion.js y mesa.js; para recibir, ficha-tienda.js y ficha-equipo.js; la ventana, filtro-catalogo.js (y generador-tiendas.js),
    asistente-item.js y ficha-calculo.js (los bonos del ítem nuevo).
    ========================================================= */
 const DarJugador = (() => {
+  const DIR = (() => { try{ const c = document.currentScript && document.currentScript.src; return c ? c.replace(/dar-jugador\.js.*$/, '') : '../comun/'; }catch(e){ return '../comun/'; } })();
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
   const fmt = n => Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -128,6 +133,37 @@ const DarJugador = (() => {
     especiales.forEach(e => lineas.push({icono: '💎', texto: `+${e.cantidad} × ${e.nombre}`, nota: 'despojo especial'}));
     return {partes: partesDe(que), lineas, items: items.map(x => sinMarca(x.item.nombre) || '?'), pasada, de: String(r.de || 'El GM')};
   }
+  /* 🎒 ¿Cómo le queda la mochila a ese personaje si recibe `que`? Se prueba en una copia (no toca S). → {usada, cap, antes, pasada} o null (sin ítems). */
+  function mochilaTrasDar(S, que){
+    const q = limpiar(que);
+    if(!S || !q.items.length) return null;
+    const antes = FichaEquipo.mochilaUsada(S), cap = FichaEquipo.capMochila(S);
+    const c = structuredClone(S);
+    recibir(c, aviso({id: 'prueba'}, q, 'El GM'));
+    const usada = FichaEquipo.mochilaUsada(c);
+    return {usada, cap, antes, pasada: cap > 0 && usada > cap};
+  }
+  const mochilaAvisoTxt = (nombre, m) => `A ${nombre} le va a quedar la mochila pasada: ${fmt(m.usada)} de ${fmt(m.cap)} ranuras${m.antes > m.cap ? ' (ya estaba pasada)' : ''}.`;
+  // Las piezas para leer una ficha y medir su mochila (GM Tools no las carga con la página).
+  const cargadas = new Map();
+  function cargarScript(src){
+    if(cargadas.has(src)) return cargadas.get(src);
+    const p = new Promise((ok, mal) => { const s = document.createElement('script'); s.src = DIR + src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src)); document.head.appendChild(s); });
+    cargadas.set(src, p);
+    return p;
+  }
+  async function piezasMochila(){
+    if(typeof FichaCalculo === 'undefined' || typeof CATALOGO_BASE === 'undefined') throw new Error('faltan ficha-calculo.js / catalogo.js');
+    if(typeof FichaGuardado === 'undefined') await cargarScript('ficha-guardado.js?v=20261120prisa3');
+    if(typeof FichaEquipo === 'undefined') await cargarScript('ficha-equipo.js?v=20261120basico2');
+    if(typeof FichaTienda === 'undefined') await cargarScript('ficha-tienda.js?v=20261120carcaj2');
+  }
+  // Lee el personaje (una vez por ventana). → S o null.
+  async function leerPersonaje(id){
+    await piezasMochila();
+    const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${id}`), {mezclarCatalogo: false});
+    return l ? l.S : null;
+  }
   const pasadaTexto = p => p ? `Tu mochila quedó pasada: ${fmt(p.usada)} de ${fmt(p.cap)} ranuras. Lo recibiste igual: acomodala cuando puedas.` : '';
 
   /* ---------- El cartel de quien recibe ---------- */
@@ -186,6 +222,7 @@ const DarJugador = (() => {
 .dj .dj-can-fila input{width:64px;padding:3px 6px;text-align:center}
 .dj footer{display:flex;align-items:center;gap:12px;padding:11px 16px;border-top:1px solid #3B2E34}
 .dj footer .dj-resumen{flex:1;color:#B9A796;font-size:13px}
+.dj .dj-mochila{background:rgba(212,87,78,.16);border:1px solid #D4574E;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:13.5px;color:#F5C6C1}
 .dj .view-wrap{display:flex}.dj .view-image-wrap{display:none}.dj .view-info{flex:1;min-width:0}
 .dj .view-title{display:none}.dj .view-lines{display:flex;flex-direction:column;gap:3px}
 .dj .view-line{display:flex;justify-content:space-between;gap:10px;font-size:12.5px}
@@ -337,7 +374,31 @@ const DarJugador = (() => {
       <footer><span class="dj-resumen" data-dj-resumen></span><button type="button" data-dj="cerrar">Cancelar</button><button type="button" class="dj-pri" data-dj="dar">🎁 Dar</button></footer></div>`;
     document.body.appendChild(fondo);
     const $ = s => fondo.querySelector(s);
-    const yo = v = {fondo, pjs: [], marcados: new Set((o.marcados || []).map(String)), que: {items: [], dde: 0, despojos: 0, magico: 0, especiales: []}, tab: 'catalogo', viendo: '', filtro: null, enviando: false};
+    const yo = v = {fondo, pjs: [], marcados: new Set((o.marcados || []).map(String)), que: {items: [], dde: 0, despojos: 0, magico: 0, especiales: []}, tab: 'catalogo', viendo: '', filtro: null, enviando: false,
+      mochilas: new Map()};   // 🎒 fichaId → {S} | 'leyendo' | {error}
+    // 🎒 Lee las fichas marcadas (una vez) para avisar si la mochila se pasa (P262 (5)).
+    const leer = (o.leerPersonaje || leerPersonaje);
+    function mochilasLeer(){
+      if(!yo.que.items.length) return;
+      yo.marcados.forEach(id => {
+        if(yo.mochilas.has(id)) return;
+        yo.mochilas.set(id, 'leyendo');
+        Promise.resolve().then(() => leer(id)).then(S => { yo.mochilas.set(id, S ? {S} : {error: 'sin ficha'}); }, err => { console.error('Dar: no se pudo leer la mochila', err); yo.mochilas.set(id, {error: String(err && err.message || err)}); })
+          .then(() => { if(v === yo) dibujarCanasta(); });
+      });
+    }
+    // → {pasadas: [{nombre, m}], sinRevisar: [nombre], leyendo: bool}
+    function mochilasEstado(){
+      const out = {pasadas: [], sinRevisar: [], leyendo: false};
+      if(!yo.que.items.length) return out;
+      yo.pjs.filter(p => yo.marcados.has(p.id)).forEach(p => {
+        const e = yo.mochilas.get(p.id);
+        if(!e || e === 'leyendo'){ out.leyendo = true; return; }
+        if(e.error){ out.sinRevisar.push(p.nombre); return; }
+        try{ const m = mochilaTrasDar(e.S, yo.que); if(m && m.pasada) out.pasadas.push({nombre: p.nombre, m}); }catch(err){ console.error('Dar: la cuenta de la mochila', err); out.sinRevisar.push(p.nombre); }
+      });
+      return out;
+    }
     const catalogo = () => { try{ return (o.catalogo ? o.catalogo() : (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE : [])) || []; }catch(e){ return []; } };
     const sumarItem = (item, n) => {
       const js = JSON.stringify(copia(item));
@@ -387,7 +448,12 @@ const DarJugador = (() => {
       if(num(q.despojos) > 0) filas.push(`<div class="dj-can-fila"><span>🦴</span><span class="n">${entero(q.despojos)} despojo${entero(q.despojos) === 1 ? '' : 's'}</span><button type="button" data-dj-cero="despojos">✕</button></div>`);
       if(num(q.magico) > 0) filas.push(`<div class="dj-can-fila"><span>✨</span><span class="n">${entero(q.magico)} despojo${entero(q.magico) === 1 ? ' mágico' : 's mágicos'}</span><button type="button" data-dj-cero="magico">✕</button></div>`);
       q.especiales.forEach((e, i) => filas.push(`<div class="dj-can-fila"><span>💎</span><span class="n">${entero(e.cantidad)} × ${esc(e.nombre)} <small style="color:#9A867E">(despojo especial)</small></span><button type="button" data-dj-esp-quitar="${i}">✕</button></div>`));
-      $('[data-dj-canasta]').innerHTML = filas.join('') || '<span class="dj-nota">Todavía nada: agregá un ítem, DDE o despojos de arriba.</span>';
+      mochilasLeer();
+      const me = mochilasEstado();
+      const avisos = me.pasadas.map(x => `<div class="dj-aviso dj-mochila">⚠ 🎒 ${esc(mochilaAvisoTxt(x.nombre, x.m))} Se le da igual y se le avisa; si preferís, sacá algo de la lista.</div>`).join('')
+        + (me.sinRevisar.length ? `<div class="dj-nota">🎒 No se pudo revisar la mochila de ${esc(lista(me.sinRevisar))}.</div>` : '')
+        + (me.leyendo ? '<div class="dj-nota">🎒 Revisando cómo les queda la mochila…</div>' : '');
+      $('[data-dj-canasta]').innerHTML = (filas.join('') || '<span class="dj-nota">Todavía nada: agregá un ítem, DDE o despojos de arriba.</span>') + avisos;
       const quienes = yo.pjs.filter(p => yo.marcados.has(p.id)).map(p => p.nombre);
       $('[data-dj-resumen]').textContent = !quienes.length ? 'Elegí a quién dárselo.' : vacio(q) ? `Para ${lista(quienes)}: elegí qué dar.`
         : `${lista(quienes)} ${quienes.length > 1 ? 'reciben (cada uno)' : 'recibe'}: ${texto(q)}. Le${quienes.length > 1 ? 's' : ''} entra directo y le${quienes.length > 1 ? 's' : ''} salta un cartel.`;
@@ -419,6 +485,18 @@ const DarJugador = (() => {
     async function dar(){
       const fichas = yo.pjs.filter(p => yo.marcados.has(p.id));
       if(!fichas.length || vacio(yo.que) || yo.enviando) return;
+      // 🎒 Antes de dar: si a alguien le va a quedar la mochila pasada, se pregunta (P262 (5)). Espera a que terminen de leerse (hasta 6 s).
+      if(yo.que.items.length){
+        mochilasLeer();
+        for(let i = 0; i < 30 && mochilasEstado().leyendo; i++) await new Promise(r => setTimeout(r, 200));
+        if(v !== yo) return;
+        const me = mochilasEstado();
+        if(me.pasadas.length){
+          const txt = `${me.pasadas.map(x => mochilaAvisoTxt(x.nombre, x.m)).join('\n')}\n\nSe le${me.pasadas.length > 1 ? 's' : ''} da igual (le${me.pasadas.length > 1 ? 's' : ''} sale el aviso para que la acomode${me.pasadas.length > 1 ? 'n' : ''}). ¿Dar igual?`;
+          const si = typeof Confirmar !== 'undefined' ? await Confirmar.preguntar(txt, {titulo: 'Mochila llena', icono: '🎒', si: '🎁 Dar igual', no: 'Volver'}) : confirm(txt);
+          if(!si || v !== yo) return;
+        }
+      }
       yo.enviando = true; dibujarCanasta();
       const que = limpiar(yo.que), r = await enviar(fichas, que);
       yo.enviando = false;
@@ -482,5 +560,5 @@ const DarJugador = (() => {
     dibujarCanasta();
   }
 
-  return {abrir, cerrar, puerta, puertaOpciones, puertaCerrar, enviar, aviso, limpiar, vacio, partesDe, texto, mesaTexto, recibir, itemsDe, pasadaTexto, cartel, copia, MAX_UNIDADES};
+  return {abrir, cerrar, puerta, puertaOpciones, puertaCerrar, enviar, aviso, limpiar, vacio, partesDe, texto, mesaTexto, recibir, itemsDe, pasadaTexto, cartel, copia, mochilaTrasDar, mochilaAvisoTxt, MAX_UNIDADES};
 })();

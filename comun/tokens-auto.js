@@ -289,7 +289,16 @@ const TokensAuto = (() => {
     const p = await publicadoEnCombate();
     if(!p.combate) return false;
     await ponerModo(p.mapaId, 'narrativo');
+    try{ await limpiarIniciativa(p.mapaId); }catch(err){ console.error('No se pudo limpiar el orden de turnos:', err); }
     return true;
+  }
+  /* 🧹 Al terminar el combate se limpia también la lista de iniciativa (P252, dueño, 2026-11-22: «sí, la lista de iniciativa se limpia al terminar
+     el combate»): lo mismo que el botón «Limpiar» del orden de turnos (vtt-hexgrid/js/04). Solo el fin del combate; el interruptor a mano no
+     la toca (no se pidió). */
+  function rutaIniciativa(mapaId){ return mapaId === MAPA_PRINCIPAL_ID || !mapaId ? 'mapa/iniciativa' : `mapas/${mapaId}/estado/iniciativa`; }
+  const INICIATIVA_VACIA = {orden: [], turno: 0, ronda: 1, paso: 0, actuaron: [], empezados: [], demoras: {}, ordenPendientes: [], mufas: {}, movidos: {}, iniciado: false};
+  function limpiarIniciativa(mapaId){
+    return fbDb.doc(fbRutaCampana(rutaIniciativa(mapaId))).set({...INICIATIVA_VACIA, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
   }
   // El mapa publicado (el que ven los jugadores) y si está en modo combate. → {mapaId, combate}
   async function publicadoEnCombate(){
@@ -377,5 +386,5 @@ const TokensAuto = (() => {
     if(!nombre) return {falta: 'Ponele un nombre.'};
     return {nombre, descripcion};
   }
-  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate};
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
 })();

@@ -2036,6 +2036,8 @@ cosas chicas para decidir:
 
 ### P284 — ✋ Consumibles propios, a mano: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-22):** (1) y (3) «están bien resueltas», como están. (2) «no estaría mal agregarle como opción tirar un dado»: el consumible propio puede llevar una tirada opcional que sale al consumirlo (en la cola).
+
 Pedido del dueño (2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización… que los efectos de los consumibles custom se
 resuelvan a mano». Ya está: en el asistente de ítems, la categoría Consumible tiene un camino corto (qué es · unidades · precio/peso · listo) y el ítem
 queda marcado «✋ A mano: el efecto lo resuelve la mesa.». Quedan tres cosas chicas para decidir:

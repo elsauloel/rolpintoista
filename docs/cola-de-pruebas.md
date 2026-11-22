@@ -1617,7 +1617,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   uno de 2 unidades desde su ficha, lo pasó al cinturón, lo consumió fuera de combate (ficha) y en combate (Botonera del mapa) y desapareció; el GM
   armó uno con «✎ Ítem nuevo» de Dar a un jugador y se lo dio al Jugador 2, que lo consumió desde la mochila. También la 🔍, el Ver y la tienda (sin
   guardar). En GM Tools no se le equipa a un creep (avisa; se sube o se da). Dudas: P284. Pruebas automáticas: 1003 en verde.
-- **⬜ en cola — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
+- **🟡 propuesta enviada, espera decisión (2026-11-22) — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
   jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
 - **⬜ en cola — 📖 Glosario con el mouse en «Ver detalle» de trampas y zonas** (dueño, 2026-11-22: «quedó muy bien, por cierto… dice que quedás
@@ -1757,6 +1757,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «→ Cinturón», el aviso dice «el cinturón está lleno (1/5)» aunque no lo está. Revisar y corregir el texto.
 - **⬜ en cola — 🤝 Revisar el botón «Dar un ítem» del «⋯» del token** (visto en la misma tarea): con un clic el ayudante no encontró el botón y
   abrió la ventana por función. Ver si el botón está y se puede tocar (se cruza con el cambio de 🎁 a 🤝).
+
+- **⬜ en cola — 🎲 Consumible propio con una tirada opcional** (dueño, 2026-11-22, P284: «no estaría mal agregarle como opción tirar un dado»):
+  en el asistente, un campo opcional «Tirada al consumirlo» (por ejemplo 1d6, 2d4+1); al consumirlo se tira sola y sale en la Mesa junto al
+  «✋ a mano». Sin tirada, como ahora.
 
 ## En cola
 

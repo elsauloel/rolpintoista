@@ -839,6 +839,7 @@ function arrancarEnVivo(){
     return (f && f.resumen && f.resumen.control) || '';
   }, aplicaSolo: (d, ef) => !(ef && Number(ef.trae) > 0) && !/^(robo|desafiante)$/i.test(String((ef && (ef.nombre || (ef.spec && ef.spec.nombre))) || '').trim())   // 🫳 el robo lo aplica el GM (js/47) · 😤 el Desafiante va al creep que provoca (2026-10-27)
     && !(ef && ef.disipar && !(fbUsuario && d.atacante && d.atacante.uid === fbUsuario.uid)),   // 🧿 Disipar: elige quien lo usa (2026-10-25: el dueño del objetivo lo reclamaba y elegía él)
+    veOculto: d => typeof dueloVeOculto === 'function' ? dueloVeOculto(d) : true, valorOculto: (d, lado, stat) => typeof dueloValorOculto === 'function' ? dueloValorOculto(d, lado, stat) : 0,   // 🙈 el área contra un escondido (js/130, P263)
     aplicar: dueloAplicarDano, previa: d => dueloAplicarDano(d, {simular: true}),   // 🧮 la cuenta antes de aplicar (2026-11-04)
     orbeSalvajeTipo: m => typeof talSalvajeTipo === 'function' ? talSalvajeTipo(m) : null, orbeSalvajeAnunciar: (m, sv, o) => typeof talSalvajeAnunciar === 'function' && talSalvajeAnunciar(m, sv, o),   // 🔮 ¿lo lleva? (el d6 es su paso en el cuadro, 2026-11-19; js/53)
     aplicarEfecto: dueloAplicarEfecto, antesDeAplicar: anulaAntesDeAplicar,

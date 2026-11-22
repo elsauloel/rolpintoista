@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261121foco"></script>
+<script src="duelo.js?v=20261122oculta"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261122cola49"></script>
@@ -9931,6 +9931,84 @@ grupo('✉ Mensajes secretos');
     cierto(/Mensajes\.mesa\(snap\.docs, MESA_MAX\)/.test(mesa) && /t\.desde === 'mensaje'/.test(mesa) && /Mensajes\.iniciar\(\)/.test(mesa) && /"mensaje"\]/.test(mesa));
     cierto(/Mensajes\.borrar\(null\)/.test(hist) && /Mensajes\.borrar\(hasta\)/.test(reg));
     cierto(/window\.mensajesCronica = /.test(m16) && /Mensajes\.cronicaHtml\(k, d\.mensaje/.test(m16) && /data-mensaje-abrir/.test(m16));
+  });
+})();
+
+grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comun/duelo.js, comun/mesa.js, js/29)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  // Un tablero chiquito para js/130: J1 lanza; la rata está en sigilo (no la ve); el orco a la vista; Blanco J2, de otro jugador.
+  async function mundo130(o){
+    const src = await traer('../vtt-hexgrid/js/130-area-oculta.js');
+    const tokens = new Map(o.tokens);
+    return new Function('tokens', 'fbUsuario', 'soyGM', 'ojoRevelando', 'loVeoAhora', 'areaDanoCompartible', 'creepPrivadoDe', 'CreepCalculo', 'fichasPub', 'SEP_INVOCACION', 'num',
+      src + '\nreturn {areaOcultable, areaOcultosDe, dueloVeOculto, areaOcultaLaVeo, dueloValorOculto, areaManejoToken};')(
+      tokens, {uid: o.uid}, !!o.gm, !!o.ojo, t => !t.escondido, h => !!(h && h.dano && !h.dano.porCadaUno), id => o.creeps[id] || null,
+      {statValor: (sc, st) => sc[st] || 0}, new Map(Object.entries(o.fichas || {})), '~', Number);
+  }
+  const TK = [['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'u1'}], ['j2', {tipo: 'pj', fichaId: 'f2', duenoUid: 'u2', escondido: true}],
+    ['rata', {tipo: 'creep', fichaId: 'c1', duenoUid: 'gm', escondido: true}], ['orco', {tipo: 'creep', fichaId: 'c2', duenoUid: 'gm'}]];
+  const SHOCK = {nombre: 'Shockwave', objetivo: 'onda', tira: {stat: 'fue', etq: 'Fuerza'}, contra: [{modo: 'con', stat: 'con', etq: 'Constitución'}], efectos: []};
+  prueba('qué áreas van aparte: con tirada de quien la lanza; no las de aliados, la Tormenta, los misiles ni el daño contra cada uno', async () => {
+    const w = await mundo130({tokens: TK, uid: 'u1', creeps: {}});
+    igual([w.areaOcultable(SHOCK), w.areaOcultable({...SHOCK, aliados: true}), w.areaOcultable({...SHOCK, tormenta: {}}), w.areaOcultable({...SHOCK, reparte: {total: 2}}),
+      w.areaOcultable({...SHOCK, tira: null}), w.areaOcultable({...SHOCK, dano: {formula: '2d6'}}), w.areaOcultable({...SHOCK, dano: {formula: '2d6', porCadaUno: true}}),
+      w.areaOcultable({...SHOCK, dano: {diferencia: true, porCadaUno: true}})],
+      [true, false, false, false, false, true, false, true]);
+  });
+  prueba('el jugador que la lanza: la rata en sigilo va aparte; el orco a la vista y Blanco J2 (lo ve) no', async () => {
+    const w = await mundo130({tokens: TK.map(([k, t]) => [k, k === 'j2' ? {...t, escondido: false} : t]), uid: 'u1', creeps: {}});
+    igual(w.areaOcultosDe(SHOCK, ['rata', 'orco', 'j2']), ['rata']);
+  });
+  prueba('el GM que la lanza con un creep: Blanco J2 en sigilo va aparte; sus creeps nunca', async () => {
+    const w = await mundo130({tokens: TK, uid: 'gm', gm: true, creeps: {}});
+    igual([w.areaOcultosDe(SHOCK, ['j2', 'j1', 'rata']), w.areaOcultosDe({...SHOCK, aliados: true}, ['j2'])], [['j2'], []]);
+  });
+  prueba('quién ve el duelo de un escondido: quien lo maneja, el GM con 👁 y quien lo ve; el atacante no', async () => {
+    const dR = {defensor: {tokenId: 'rata', tipo: 'creep'}}, dJ2 = {defensor: {tokenId: 'j2', tipo: 'pj'}};
+    const j1 = await mundo130({tokens: TK, uid: 'u1', creeps: {}}), j2 = await mundo130({tokens: TK, uid: 'u2', creeps: {}});
+    const gm = await mundo130({tokens: TK, uid: 'gm', gm: true, creeps: {}}), gmOjo = await mundo130({tokens: TK, uid: 'gm', gm: true, ojo: true, creeps: {}});
+    igual([j1.dueloVeOculto(dR), j2.dueloVeOculto(dR), gm.dueloVeOculto(dR), j2.dueloVeOculto(dJ2), j1.dueloVeOculto(dJ2), gm.dueloVeOculto(dJ2), gmOjo.dueloVeOculto(dJ2),
+      j1.areaOcultaLaVeo({objetivos: ['rata']}), gm.areaOcultaLaVeo({objetivos: ['rata']})],
+      [false, false, true, true, false, false, true, false, true]);
+  });
+  prueba('el valor del stat para la tirada sola (el creep, de sus datos; el personaje, de su resumen)', async () => {
+    const w = await mundo130({tokens: TK, uid: 'gm', gm: true, creeps: {c1: {con: 4, eva: 7}}, fichas: {f2: {resumen: {con: 6, eva: 9}}}});
+    const d = {atacante: {tokenId: 'rata'}, defensor: {tokenId: 'j2'}};
+    igual([w.dueloValorOculto(d, 'defensor', 'con'), w.dueloValorOculto(d, 'defensor', 'evasion'), w.dueloValorOculto(d, 'atacante', 'con'), w.dueloValorOculto(d, 'defensor', '')], [6, 9, 4, 0]);
+  });
+  prueba('la Mesa sin mapa (ficha suelta, GM Tools): lo de un escondido, solo su bando (comun/mesa.js)', async () => {
+    const src = await traer('mesa.js');
+    const trozo = src.slice(src.indexOf('function mesaOcultaParte'), src.indexOf('function mesaProcesar'));
+    const hacer = gm => new Function('fbMiembro', trozo + '\nreturn {mesaOcultaParte, mesaOcultaSinMapa};')({gm});
+    const doc = desde => ({id: 'x', data: () => ({desde, origen: 'algo'})});
+    const J = hacer(false), G = hacer(true);
+    const ver = (w, desde) => { const r = w.mesaOcultaSinMapa(doc(desde)); return r ? r.data().desde : null; };
+    igual([J.mesaOcultaParte({desde: 'oculta-pj:reporte'}), J.mesaOcultaParte({desde: 'mapa'}), ver(J, 'oculta-pj:reporte'), ver(J, 'oculta-creep:mapa'), ver(G, 'oculta-pj:reporte'), ver(G, 'oculta-creep:recordatorio'), ver(J, 'mapa')],
+      [{tipo: 'pj', desde: 'reporte'}, null, 'reporte', null, null, 'recordatorio', 'mapa']);
+    cierto(/oculta-\(pj\|creep\):\[a-z-\]\{1,20\}/.test(src));   // mesaPublicar deja pasar la marca
+  });
+  prueba('el duelo: el grupo guarda «oculto», la lista de la pantalla lo deja afuera, la Mesa lo marca y el GM lo resuelve solo a los 40 s (comun/duelo.js)', async () => {
+    const src = await traer('duelo.js');
+    cierto(/\.\.\.\(g\.oculto \? \{oculto: true\} : \{\}\)/.test(src));
+    cierto(/listaDuelos = todosDuelos\.filter\(veoOculto\)/.test(src));
+    cierto(/todosDuelos\.forEach\(publicarResumenSiCorresponde\)/.test(src) && /esOculto\(datos\) \? ocultaMesa\(datos\.id, 'reporte', datos\)/.test(src));
+    cierto(/const OCULTO_MS = 40 \* 1000/.test(src) && /setInterval\(revisarOcultos, 5000\)/.test(src));
+    cierto(/const puedeAtq = esMio\(d\.atacante\) \|\| soyGM\(\) \|\| porOcultoAtq\(d\)/.test(src));
+    cierto(!/anunciarMesa\(anuncio\);/.test(src) && !/mesaPublicar\(publicar\.origen, publicar\.r\)/.test(src));   // todas las líneas pasan por la marca
+  });
+  prueba('el mapa: js/29 filtra lo marcado y js/13 lanza aparte a los que no ve', async () => {
+    const [m29, m13, m14, m05] = await Promise.all([traer('../vtt-hexgrid/js/29-accion-incierta.js'), traer('../vtt-hexgrid/js/13-tokens-portal-duelo.js'), traer('../vtt-hexgrid/js/14-herramientas-y-arranque.js'), traer('../vtt-hexgrid/js/05-vista-y-dibujo.js')]);
+    const trozo = m29.slice(m29.indexOf('function mesaOcultaVer'), m29.indexOf('function mesaFiltrar'));
+    const toks = {f2: {tipo: 'pj', fichaId: 'f2', ve: false}, c1: {tipo: 'creep', fichaId: 'c1', ve: false}, c2: {tipo: 'creep', fichaId: 'c2', ve: true}};
+    const hacer = (gm, ojo) => new Function('soyGM', 'ojoRevelando', 'mesaOcultaParte', 'tokenPorFicha', 'loVeoAhora', 'ocultoPorSigiloParaMi', trozo + '\nreturn mesaOcultaVer;')(
+      gm, ojo, t => { const m = /^oculta-(pj|creep):(.+)$/.exec(t.desde || ''); return m ? {tipo: m[1], desde: m[2]} : null; }, (f) => toks[f] || null, t => t.ve, () => true);
+    const J = hacer(false, false), G = hacer(true, false), GO = hacer(true, true);
+    const r = (w, desde, ficha) => { const o = w({desde, ficha}); return o === null ? 'normal' : o ? o.desde : 'nada'; };
+    igual([r(J, 'mapa', ''), r(J, 'oculta-creep:mapa', 'c1'), r(J, 'oculta-creep:reporte', 'c2'), r(J, 'oculta-pj:reporte', 'f2'), r(G, 'oculta-pj:mapa', 'f2'), r(GO, 'oculta-pj:mapa', 'f2'), r(G, 'oculta-creep:mapa', 'c1')],
+      ['normal', 'nada', 'reporte', 'reporte', 'nada', 'mapa', 'mapa']);
+    cierto(/const ocultosArea = typeof areaOcultosDe === 'function' \? areaOcultosDe\(hab, objetivos\) : \[\]/.test(m13) && /areaLanzarOcultos\(\{hab, casteador, h, radio, ocultos: ocultosArea, deArea: refArea\.id\}\)/.test(m13));
+    cierto(/a\.hab && a\.hab\.oculta \? \{oculto: true\} : \{\}/.test(m13) && /veOculto: d =>/.test(m14) && /areaOcultaLaVeo\(a\)/.test(m05));
   });
 })();
 

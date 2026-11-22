@@ -82,7 +82,7 @@ async function mesaPublicar(origen, r){
     mod: num(r.mod),
     total: num(r.total),
     // r.desde = 'gm': la tirada de un creep que publica el mapa (Acciones nuevas, paso 4 etapa 4c): se pinta como las de GM Tools.
-    desde: r.desde === 'gm' ? 'gm' : MESA_DESDE,
+    desde: r.desde === 'gm' ? 'gm' : /^oculta-(pj|creep):[a-z-]{1,20}$/.test(String(r.desde || '')) ? r.desde : MESA_DESDE,   // 🙈 (P263) una línea de un duelo oculto
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
   // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
@@ -398,10 +398,28 @@ function mesaRender(docs){
 /* Primero los dados, después el resultado (dueño, 2026-09-26, para todo el juego): cuando llega una tirada que se va a animar en 3D, la Mesa lanza los dados
    enseguida pero NO muestra la línea hasta que quedan quietos (máximo 7 segundos; sin espera si las animaciones están apagadas o la pestaña está oculta). */
 let mesaUltimoSnap = null;
+/* 🙈 Las líneas de un duelo oculto (comun/duelo.js, P263, 2026-11-22): `desde = 'oculta-<pj|creep>:<desde de siempre>'` y `ficha` = el escondido.
+   Las ve solo su bando (el mapa lo decide mejor: vtt-hexgrid/js/29 mesaFiltrar, mirando si esta pantalla lo ve); sin mapa, un personaje escondido
+   solo lo ven los jugadores y un creep escondido solo el GM. `mesaOcultaParte(t)` → {tipo, desde} o null; `mesaOcultaDoc(d, desde)` = la línea con su desde. */
+function mesaOcultaParte(t){
+  const m = /^oculta-(pj|creep):(.+)$/.exec(String((t && t.desde) || ''));
+  return m ? {tipo: m[1], desde: m[2]} : null;
+}
+function mesaOcultaDoc(d, desde){
+  const t = d.data({serverTimestamps: 'estimate'}), x = {...t, desde};
+  return {id: d.id, data: () => x};
+}
+function mesaOcultaSinMapa(d){
+  const o = mesaOcultaParte(d.data());
+  if(!o) return d;
+  const gm = typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm === true;
+  return (o.tipo === 'creep') === gm ? mesaOcultaDoc(d, o.desde) : null;
+}
 function mesaProcesar(snap){
   mesaUltimoSnap = snap;
   // 🎭 El mapa filtra lo que cada uno no tiene que ver (vtt-hexgrid/js/29: creeps sin revelar, acciones inciertas).
   if(typeof mesaFiltrar === 'function') snap = {docs: mesaFiltrar(snap.docs)};
+  else snap = {docs: snap.docs.map(mesaOcultaSinMapa).filter(Boolean)};   // 🙈 la ficha suelta y GM Tools: lo de un duelo oculto, solo su bando
   // 🕊️ Los mensajes secretos que me llegaron, mezclados por hora (comun/mensajes.js; no pasan por el filtro ni se animan).
   if(typeof Mensajes !== 'undefined') snap = {docs: Mensajes.mesa(snap.docs, MESA_MAX)};
   const docs = snap.docs;

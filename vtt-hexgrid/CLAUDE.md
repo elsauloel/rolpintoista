@@ -2591,3 +2591,18 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   de arriba (`elementoQueEs`, js/10) dice «(alguien)» si esta pantalla no ve a quien la puso. (4) **«🔍 Ver detalle» de los tótems y estandartes**: el
   botón va en `#token-etiqueta` (js/10, `data-inerte-detalle`) y abre la misma caja `#zona-detalle` (js/127: `inerteDetalleCtx/Html/Refrescar`; un
   detalle por vez, `c.dataset.de`). El estandarte guarda con qué se clavó (`estandarte.con`, js/73); lo público, `estandarteDe/DeId/Con` (js/09).
+- **🙈 Un área contra alguien que no se ve va aparte** (2026-11-22, P263, dueño: «no se debería abrir el duelo para el atacante… si lo logra, todo
+  eso debería pasar desapercibido por el equipo rival»; «si el que está escondido tarda… el juego se frenaría»), `js/130-area-oculta.js`.
+  `dueloElegirAreaMapa` (js/13) separa con `areaOcultosDe(hab, objetivos)` a los que la pantalla que la lanza no ve (`loVeoAhora`, sin contar los
+  propios; solo si `areaOcultable(hab)`: de rivales, con tirada de quien la lanza; afuera aliados, Tormenta/Meteoro, misiles, zonas con duelo, daño
+  contra cada uno). Su cascada sigue con los visibles (las chispas de la Lanza, solo sobre ellos); si no quedó ninguno: el mismo «No hay nadie
+  adentro del área» y sin animación. `areaLanzarOcultos` crea **un área por escondido** con `hab.oculta` (y `hab.ocultaDe` = el área de los
+  visibles), `pdgCompartido` = la tirada de quien la lanza hecha ya (`areaTiroOculto`: la fórmula de `habValor` de sus ganchos —Botonera nueva,
+  invocación o Acciones del creep—, con sus «÷2»; si no, el número de su ficha) y `hab.danoCompartido` (`areaDanoOculto`, si es de una tirada para
+  todos). `areaCrearSiguienteSubDuelo` le pone `grupo.oculto` al sub-duelo. El resto lo hace `comun/duelo.js` con dos ganchos de `Duelo.escuchar`
+  (js/14): `veOculto` = `dueloVeOculto` (quien lo maneja, el GM con 👁, o quien lo ve ahora) y `valorOculto` = `dueloValorOculto` (el valor de un stat
+  para la tirada que hace sola la pantalla del GM a los 40 s). El círculo de esa área solo se dibuja para quien lo ve (`areaOcultaLaVeo`, js/05); el
+  golpe de la onda y de la Lanza (`dueloGrupoResuelto`) y el «débil/resistente» (`dueloAplicarDano`) no salen sobre un escondido; un cartel que
+  flota sobre un token (`ganchoEvaEmpezar`, js/96: inmunidades, «−2 EVA») no sale en una pantalla que no ve ese token. La Mesa: js/29
+  `mesaOcultaVer` (las líneas `oculta-<pj|creep>:<desde>`: su bando, el GM con 👁 o quien lo ve; decidido una vez por línea, `mesaOcultaDecision`).
+  Si el daño le saca más que su Sigilo, se delata como siempre (`sigiloDelatarPorDano`; P288). Dudas: P287.

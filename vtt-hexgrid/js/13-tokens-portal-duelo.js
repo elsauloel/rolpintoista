@@ -1418,7 +1418,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // la primera vez quien la creó (su jugador, o el GM por un creep) tira con su botón (si no está, el GM con «🎲 Tirar a mano») y vale para todos;
     // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
     const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId) : null;
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total)), ...(a.hab && a.hab.oculta ? {oculto: true} : {})}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       // 💍 El Foco también en un área, una línea y los misiles (2026-11-21, visto en el mapa: la Varita de misiles no lo sumaba). Solo cuando el
       // casteador tira acá (con la tirada compartida ya viene sumado desde el primer objetivo). quietoDe solo lo da si la habilidad tira PdG.Esp.
       quieto: pdgZona || a.pdgCompartido ? 0 : (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? quietoDe({...c, id: a.casteador.tokenId}, {hab: a.hab}) : 0; }catch(err){ return 0; } })(),
@@ -1471,10 +1471,10 @@ function dueloGrupoResuelto(d){
     if(!doc.exists) return;
     const a = doc.data();
     // 💫 El Shockwave: sobre quien no la resistió, el golpe y los pajaritos; sobre quien sí, un destello chico (js/94, 2026-11-03).
-    if(a.hab && (a.hab.objetivo === 'onda' || a.hab.objetivo === 'cono') && typeof ondaFxVariante === 'function' && ondaFxVariante(a.hab) && d.defensor && d.defensor.tokenId)
+    if(!(d.grupo && d.grupo.oculto) && a.hab && (a.hab.objetivo === 'onda' || a.hab.objetivo === 'cono') && typeof ondaFxVariante === 'function' && ondaFxVariante(a.hab) && d.defensor && d.defensor.tokenId)   // (🙈 sobre un escondido, nada: P263)
       ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad', ondaFxVariante(a.hab), (a.casteador && a.casteador.tokenId) || (d.atacante && d.atacante.tokenId) || '');
     // ✨ La Lanza arcana: a quien no la esquivó, el destello blanco (Deslumbrado); al que la esquivó, nada: le pasó de largo (js/120, 2026-11-19).
-    if(typeof lanzaFxEs === 'function' && lanzaFxEs(a.hab) && d.defensor && d.defensor.tokenId && (d.resultado === 'pego' || d.resultado === 'mitad'))
+    if(!(d.grupo && d.grupo.oculto) && typeof lanzaFxEs === 'function' && lanzaFxEs(a.hab) && d.defensor && d.defensor.tokenId && (d.resultado === 'pego' || d.resultado === 'mitad'))
       lanzaGolpePublicar(d.defensor.tokenId);
     if(!areaEnCurso(a) || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
@@ -1847,8 +1847,15 @@ function dueloElegirAreaMapa(msg){
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
     if(!objetivos.length && hab.anula) return;   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
-    if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
-    let habArea = hab, objetivosArea = objetivos;
+    // 🙈 Los que esta pantalla no ve (en sigilo, ocultos, en la niebla…) van aparte, sin que el bando que la lanzó se entere (P263, js/130).
+    const ocultosArea = typeof areaOcultosDe === 'function' ? areaOcultosDe(hab, objetivos) : [];
+    const visiblesArea = objetivos.filter(id => !ocultosArea.includes(id));
+    if(!visiblesArea.length){
+      toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área');   // (lo mismo que si no hubiera nadie)
+      if(ocultosArea.length) await areaLanzarOcultos({hab, casteador, h, radio, ocultos: ocultosArea, deArea: ''});
+      return;
+    }
+    let habArea = hab, objetivosArea = visiblesArea;
     // 🌩☄ La Tormenta arcana y el Meteoro, de a uno (2026-11-13, dueño): el d20, la ronda de «¿Esquiva?», la lluvia y el daño (js/118).
     if((hab.tormenta || hab.meteoro) && typeof secuenciaArea === 'function'){ secuenciaArea({yo, casteador, hab, centro: {col: h.col, fila: h.fila}, radio, objetivos}); return; }
     // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03), y el duelo recién cuando se terminó de ver (dueño, el mismo día: «el
@@ -1864,14 +1871,15 @@ function dueloElegirAreaMapa(msg){
     }
     // ✨ La Lanza arcana (js/120, 2026-11-19): la carga, la lanza que recorre la línea y las chispas en cada uno; el duelo, cuando ya se vio.
     if(h.linea && mio && typeof lanzaFxEs === 'function' && lanzaFxEs(hab)){
-      try{ await lanzaFxPublicar(mio.id, {col: mio.col, fila: mio.fila}, h.linea, objetivos); }catch(err){ console.error('No se pudo publicar la Lanza:', err); }
+      try{ await lanzaFxPublicar(mio.id, {col: mio.col, fila: mio.fila}, h.linea, objetivosArea); }catch(err){ console.error('No se pudo publicar la Lanza:', err); }
       await new Promise(r => setTimeout(r, LANZA_DUR + 350));
     }
     try{
-      await coleccionAreas().add({
+      const refArea = await coleccionAreas().add({
         casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {}), mapa: mapaMostrado}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: AREA_EN_CURSO,
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
+      if(ocultosArea.length) await areaLanzarOcultos({hab, casteador, h, radio, ocultos: ocultosArea, deArea: refArea.id});
     }catch(err){
       console.error('No se pudo lanzar el hechizo de área:', err);
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));
@@ -2176,7 +2184,7 @@ async function dueloAplicarDano(d, o){
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resElem ? [Combatiente.resElementalTxt(elDano, resElem)] : []), ...(suelaD ? [`Suela gruesa ${suelaD}`] : [])].join(' − ');
   if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
   if(!simular && elDano && !trueDmg && num(dn.crudo) > 0 && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elDano, resElem, idHab);   // 🛡 «INMUNE AL FUEGO…» flotando sobre el token (js/121, 2026-11-20)
-  if(!simular && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resElem || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resElem, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
+  if(!simular && !(d.grupo && d.grupo.oculto) && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resElem || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resElem, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
@@ -2287,7 +2295,7 @@ async function dueloAplicarDano(d, o){
       const idMag0 = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 (2026-10-26)
       // 🌑 El Arma siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
       const idMag = idMag0 && idMag0.estado && num(dn.magico.identidadTurnos) > 0 ? {...idMag0, estado: {...idMag0.estado, turnos: num(dn.magico.identidadTurnos)}} : idMag0;
-      if(elMag && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resMag || (idMag && idMag.mult === 0))) debilRevelar(t, elMag, {res: resMag, mult: idMag ? idMag.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
+      if(elMag && !(d.grupo && d.grupo.oculto) && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resMag || (idMag && idMag.mult === 0))) debilRevelar(t, elMag, {res: resMag, mult: idMag ? idMag.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
       if(elMag && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elMag, resMag, idMag);   // 🛡 (js/121)
       const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
       const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)

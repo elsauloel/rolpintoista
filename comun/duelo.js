@@ -63,6 +63,8 @@ const Duelo = (() => {
   let autoAbiertos = new Set();
   let chips = new Map();
   let listaDuelos = [];
+  let todosDuelos = [];   // 🙈 (2026-11-22, P263) también los que esta pantalla no tiene que ver: los lleva por detrás (la pantalla del GM)
+  const ocultosInfo = new Map();   // id de un duelo oculto → {desde, ficha} para marcar sus líneas de la Mesa
   let escuchando = null;
   let cfgEscuchar = {};
   let esperaTiro = null;     // {id, campo, re, defensa}
@@ -855,8 +857,10 @@ const Duelo = (() => {
     }
     if(cfg.grupo) inicial.grupo = limpiarGrupo(cfg.grupo);   // hechizo de área (Paso 4/7): ata este sub-duelo a la cascada (docs/reglas-casteo.md §1.3)
     const ref = await col().add(inicial);
-    autoAbiertos.add(ref.id);
-    if(!enIframe()) abrir(ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
+    if(veoOculto({...inicial, id: ref.id})){   // 🙈 (P263) el de un escondido no se le abre a la pantalla del GM que lo crea si no lo ve
+      autoAbiertos.add(ref.id);
+      if(!enIframe()) abrir(ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
+    }
     return ref.id;
   }
 
@@ -959,7 +963,7 @@ const Duelo = (() => {
   // — solo lo que hace falta para dibujar/anunciar acá (el resto vive en el doc de `areas`). `indice`/`total` son 1-based.
   function limpiarGrupo(g){
     if(!g || !g.id) return null;
-    return {id: txtCorto(g.id, 40), indice: Math.max(1, Math.round(_num(g.indice)) || 1), total: Math.max(1, Math.round(_num(g.total)) || 1)};
+    return {id: txtCorto(g.id, 40), indice: Math.max(1, Math.round(_num(g.indice)) || 1), total: Math.max(1, Math.round(_num(g.total)) || 1), ...(g.oculto ? {oculto: true} : {})};
   }
   // Una tirada ya resuelta ({total, formula, rolls, mod}) que llega de afuera (ej. la PdG compartida de un hechizo de
   // área): mismo saneo que guardarTiro le hace a una tirada recién tirada, para no confiar ciego en lo que llega.
@@ -1229,8 +1233,8 @@ const Duelo = (() => {
         ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
         : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
     });
-    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
-    anunciarMesa(anuncio);
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, conOculta(id, publicar.r)); }catch(err){} }
+    anunciarMesa(anuncio, id);
   }
 
   // Si ya están las dos tiradas del par de la fase, lo resuelve (o abre el desempate).
@@ -1266,12 +1270,13 @@ const Duelo = (() => {
     return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}, las dos con «+» fijo o ninguna: ${quien} eligió ${mo.eleccion}, salió ${mo.resultado} (${mo.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${ganador}`;
   }
 
-  async function anunciarMesa(texto){
+  async function anunciarMesa(texto, id){
     if(!texto) return;
+    const oc = id ? ocultaMesa(id, 'recordatorio') : null;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: texto.slice(0, 200), formula: '', rolls: [], mod: 0, total: 0,
-        desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+        desde: oc ? oc.desde : 'recordatorio', ...(oc ? {ficha: oc.ficha} : {}), cuando: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){ console.error('Duelo: no se pudo anunciar en la Mesa', err); }
   }
@@ -1328,8 +1333,8 @@ const Duelo = (() => {
       }
     });
     // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
-    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total, ...quienDeLado(x.lado)}); }catch(err){ return null; } })); }
-    anunciarMesa(anuncio);
+    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, conOculta(id, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total, ...quienDeLado(x.lado)})); }catch(err){ return null; } })); }
+    anunciarMesa(anuncio, id);
   }
 
   // Resuelve el dodge roll de un hechizo de área (Paso 4/7 del casteo): `logroSalir` lo decide quien lo pide
@@ -1363,7 +1368,7 @@ const Duelo = (() => {
       else{ m.resultado = 'pego'; entrarHab(m); anuncio = m.hab && m.hab.esquiva ? `${m.hab.meteoro ? '☄' : '🌩'} ${m.defensor.nombre} sigue adentro del área de ${m.hab.nombre}` : `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
       tx.update(ref, cambiosDe(m));
     });
-    anunciarMesa(anuncio);
+    anunciarMesa(anuncio, id);
   }
 
   /* ---------- efectos del golpe ---------- */
@@ -1497,8 +1502,8 @@ const Duelo = (() => {
       anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}${r.txt ? r.txt : '¡FUNCIONÓ!'}${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
     });
-    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
-    anunciarMesa(anuncio);
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, conOculta(id, publicar.r)); }catch(err){} }
+    anunciarMesa(anuncio, id);
   }
 
   /* Todos los efectos con dado, juntos (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): un solo botón tira un
@@ -1549,8 +1554,8 @@ const Duelo = (() => {
         ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : dados.length === 1 && dados[0].tabla ? {destacar: 'crit:1'} : {}), ...quienDeLado(m.atacante)}};   // 😞 (2026-11-09)
       anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
     });
-    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
-    anunciarMesa(anuncio);
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, conOculta(id, publicar.r)); }catch(err){} }
+    anunciarMesa(anuncio, id);
   }
 
   // Pedir «Aplicar» (lo ejecuta el mapa del GM) o dar por hecho uno que se hace a mano.
@@ -1880,7 +1885,8 @@ const Duelo = (() => {
       if(datos){
         await fbDb.collection(fbRutaCampana('tiradas')).add({
           uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: `⚔ Resumen del duelo · ${datos.atacante.nombre} → ${datos.defensor.nombre}`,
-          formula: lineasResumen(datos).join('\n').slice(0, 900), texto: fraseResumen(datos), rolls: [], mod: 0, total: 0, desde: 'reporte',
+          formula: lineasResumen(datos).join('\n').slice(0, 900), texto: fraseResumen(datos), rolls: [], mod: 0, total: 0,
+          ...(esOculto(datos) ? ocultaMesa(datos.id, 'reporte', datos) : {desde: 'reporte'}),   // 🙈 un duelo oculto: solo lo ve el bando del escondido
           cuando: firebase.firestore.FieldValue.serverTimestamp(),
         });
       }
@@ -1982,7 +1988,7 @@ const Duelo = (() => {
       if(magJunto(dn) && !dn.manual && !dn.invulnerable && !dn.aMano) anuncio += ` · ${magIcono(dn.magico.tipo)} + ${dn.magico.recibido} de ${String(dn.magico.tipo).toLowerCase()} directo = ${_fmt(entroDn(dn) + entroDn(dn.magico))} en total (vida ${vidaCambioDn(dn)})`;   // 🔥 el elemental del arma en la misma cuenta (2026-11-04)
       if(_num(dn.mitiMiti) > 0 && !dn.manual && !tieneCuenta(dn)) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (${dn.mitiMitiTxt || 'Miti-Miti'})`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
     });
-    anunciarMesa(anuncio);
+    anunciarMesa(anuncio, id);
   }
 
   // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un d6 y gana el que acierta.
@@ -2009,8 +2015,8 @@ const Duelo = (() => {
       const quienTiro = quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
       publicar = {origen: `${quienTiro} · Empate: ${eleccion}`, r: {formula: '1d6', rolls: [resultado], mod: 0, total: resultado}};
     });
-    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
-    anunciarMesa(anuncio);
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, conOculta(id, publicar.r)); }catch(err){} }
+    anunciarMesa(anuncio, id);
   }
 
   /* ✊ O con piedra, papel o tijera (dueño, 2026-10-30: «que te ofrezca ese mismo método o piedra, papel o tijera; el primero que haga el clic
@@ -2036,7 +2042,7 @@ const Duelo = (() => {
     });
     if(error){ _toast(error); return; }
     if(pptId){
-      anunciarMesa(`⚖ Empate en el duelo: se desempata con ✊ piedra, papel o tijera`);
+      anunciarMesa(`⚖ Empate en el duelo: se desempata con ✊ piedra, papel o tijera`, id);
       vigilarPpt(id, pptId);
     }
   }
@@ -2062,7 +2068,7 @@ const Duelo = (() => {
       anuncio = textoDesempate(m, par, r);
       tx.update(ref, cambiosDe(m));
     });
-    anunciarMesa(anuncio);
+    anunciarMesa(anuncio, id);
   }
 
   /* ---------- 🎬 El cuadro nace del token y vuelve a él (dueño, 2026-11-03: «al abrirse un duelo… desde el token del personaje o creep con el
@@ -2215,7 +2221,39 @@ const Duelo = (() => {
   const esMio = lado => { if(!lado) return false; const c = controlDe(lado); return c ? c === yo() : lado.uid === yo(); };
   // ¿Puede esta pestaña tirar por ese lado con su propio código (o pidiéndolo al iframe)?
   const puedoTirarYo = lado => esMio(lado) && !!(cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(lado)));
-  const puedoAMano = lado => soyGM() || esMio(lado);
+  const puedoAMano = (lado, d) => soyGM() || esMio(lado) || porOcultoAtq(d);
+  /* 🙈 Un área que alcanza a alguien que el bando atacante NO ve (2026-11-22, P263; dueño: «no se debería abrir el duelo para el atacante. Al
+     personaje en sigilo sí se le debe ofrecer la oportunidad de esquivar… y si lo logra, todo eso debería pasar desapercibido por el equipo rival»):
+     el mapa lo lanza como un área aparte con `grupo.oculto` (vtt-hexgrid/js/13), con la tirada de quien la lanzó ya hecha. Ese duelo solo lo ve quien
+     maneja al escondido (su jugador, el GM si es un creep, el GM con 👁 Revelar) o quien lo esté viendo (`cfg.veOculto`); las demás pantallas no lo
+     abren, no lo nombran ni lo cuentan en la Crónica, y sus líneas de la Mesa van marcadas `oculta-pj` / `oculta-creep` (las ve solo su bando).
+     Quien maneja al escondido hace también lo que le tocaría al atacante (los efectos), y si nadie lo resuelve en OCULTO_MS, la pantalla del GM lo
+     resuelve sola (revisarOcultos). */
+  const esOculto = d => !!(d && d.grupo && d.grupo.oculto);
+  function veoOcultoAhora(d){
+    if(esMio(d.defensor)) return true;
+    if(cfgEscuchar.veOculto){ try{ return !!cfgEscuchar.veOculto(d); }catch(err){ return false; } }
+    return soyGM() && d.defensor && d.defensor.tipo === 'creep';   // (sin mapa: la ficha suelta y GM Tools)
+  }
+  // Lo que esta pantalla no vio mientras pasaba, no lo ve después aunque el escondido quede a la vista (visto probándolo: el creep perdió el sigilo
+  // y aparecían los botones «🛡 Falló…» de los duelos de antes). Mientras sigue en curso, sí (el GM que prende 👁 Revelar lo oculto).
+  const ocultoNoVisto = new Set();
+  function veoOculto(d){
+    if(!esOculto(d)) return true;
+    if(!veoOcultoAhora(d)){ if(d.id) ocultoNoVisto.add(d.id); return false; }
+    return !(d.id && ocultoNoVisto.has(d.id) && d.estado !== 'esperando' && d.estado !== 'empate');
+  }
+  const porOcultoAtq = d => !!(d && esOculto(d) && esMio(d.defensor));   // quien maneja al escondido hace lo del atacante
+  // La marca de la Mesa de un duelo oculto: `oculta-<pj|creep>:<desde de siempre>` y la ficha del escondido (vtt-hexgrid/js/29 la filtra).
+  function ocultaMesa(id, desde, d){
+    const info = ocultosInfo.get(id) || (d && esOculto(d) ? {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || '')} : null);
+    if(!info) return null;
+    return {desde: `oculta-${info.tipo}:${desde || 'mapa'}`.slice(0, 40), ficha: info.ficha.slice(0, 80)};
+  }
+  function conOculta(id, r){
+    const oc = ocultaMesa(id, r && r.desde === 'gm' ? 'gm' : 'mapa');
+    return oc ? {...r, desde: oc.desde, ficha: oc.ficha} : r;
+  }
 
   // Envía un pedido al dueño del lado: en el mapa, al iframe; en una página suelta, se ejecuta acá.
   // Paso 4, etapa 3c-4c (2026-10-01): el mapa puede contestar él mismo por un lado (el personaje de su Botonera nueva) con
@@ -2401,7 +2439,7 @@ const Duelo = (() => {
       ok = true;
       anuncio = con === 'wildcard' ? `🃏 ${quien} usó una wildcard: vuelve a tirar ${etqCampo(m, campo)}` : `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
     });
-    if(ok) anunciarMesa(anuncio);
+    if(ok) anunciarMesa(anuncio, id);
     return ok;
   }
   /* 🦋 Polilla mística dentro del duelo (dueño, 2026-10-08: «yo saco 7, el rival 8, perdí; uso la polilla: 9 contra 8, se tiene que revertir el
@@ -2447,7 +2485,7 @@ const Duelo = (() => {
       res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
         dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(t0.rolls) ? t0.rolls : []).map(_num), mod: _num(t0.mod), nuevaQueda: queda};
     });
-    if(anuncio) anunciarMesa(anuncio);
+    if(anuncio) anunciarMesa(anuncio, id);
     return res;
   }
   // usa (2026-10-12, Empower): el nombre de lo que suma, para el aviso del empate (por defecto, la Polilla).
@@ -2479,7 +2517,7 @@ const Duelo = (() => {
       res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa /.test(anuncio),
         resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
     });
-    if(anuncio) anunciarMesa(anuncio);
+    if(anuncio) anunciarMesa(anuncio, id);
     return res;
   }
   // 💪 Empower (2026-10-12): la tirada de ese lado a la que todavía se le puede sumar (la misma que la Polilla) y cuántos Empower ya lleva.
@@ -2654,7 +2692,7 @@ const Duelo = (() => {
       }catch(err){}
       if(!d.hab) efectos = [...efectos, ...efectosDeHabilidad(d)];
       r = await flashManual(d, campo, r, lado, '');   // ⚡ (2026-11-08) el Flash marcado también vale con la tirada escrita a mano
-      if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, r); }catch(err){} }
+      if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, conOculta(d.id, r)); }catch(err){} }
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
       return;
     }
@@ -2759,7 +2797,7 @@ const Duelo = (() => {
       if(dOp) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" data-desarmar="${campo}" title="${_esc(dOp.titulo || '')}">🤺 Desarmar a ${_esc(d[esAtq ? 'defensor' : 'atacante'].nombre)} · ${_esc(dOp.costo || '')}</button>`;
       else if(dOpApagado) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" disabled style="opacity:.5;cursor:not-allowed" title="Ahora no se puede: ${_esc(dOpApagado.apagado)}">🤺 Desarmar · ${_esc(dOpApagado.apagado)}</button>`;
       cuerpo += flashHtml(d, campo) + manualHtml(d, campo);
-    }else if(puedoAMano(lado)){
+    }else if(puedoAMano(lado, d)){
       const selModo = campo === 'eva' ? `<select data-manual-modo>${selModoHtml(d)}</select>` : '';
       cuerpo = `<div class="espera duelo-nota">esperando que ${quien} tire…</div>
         <div class="duelo-man">${selModo}<input type="number" min="1" data-manual="${campo}" placeholder="valor" value="${_esc(manual[campo] || '')}"><button type="button" class="sec" data-tirarpor="${campo}">🎲 Tirar a mano</button></div>
@@ -2822,7 +2860,7 @@ const Duelo = (() => {
   function empateHtml(d, esNuevo){
     const par = d.empate.par;
     const [na, nb, ta, tb] = nombresPar(d, par);
-    const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => puedoAMano(l));
+    const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => puedoAMano(l, d));
     if(d.empate.ppt){   // ✊ eligieron piedra, papel o tijera (2026-10-30): se espera el juego
       vigilarPpt(d.id, d.empate.ppt);
       return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — se desempata con ✊ piedra, papel o tijera</div>
@@ -2942,7 +2980,7 @@ const Duelo = (() => {
     // «Se resiste con» a mano (2026-09-28): la habilidad tira igual pero no hay stat automático que la resista.
     const contraOtro = (d.hab && d.hab.contraOtro) || '';
     if(!efs.length && !nota && !notaCritico && !contraOtro) return '';
-    const puedeAtq = esMio(d.atacante) || soyGM();
+    const puedeAtq = esMio(d.atacante) || soyGM() || porOcultoAtq(d);
     // El tablero de los dados (2026-10-04): una fila por efecto que se tira — su dado, con qué número funciona y qué salió.
     const conDado = efs.map((ef, i) => [ef, i]).filter(([ef]) => !siempreEf(ef));
     const faltan = efs.filter(ef => !ef.res && !ef.omitido && necesitaTiradaEf(ef));
@@ -3034,7 +3072,7 @@ const Duelo = (() => {
       let cuerpo;
       if(dn) cuerpo = `<div class="duelo-danobox"><div class="duelo-danonum">${_fmt(dn.crudo)}</div><div class="duelo-danosub">${_esc(etq)}${f ? ` (${_esc(f)}${(dn.rolls || []).length ? ': ' + (dn.rolls || []).map(_fmt).join(' + ') : ''})` : ''}</div></div>`;
       else if(esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>${d.hab.dadosEstilo === 'fire' ? '🔥' : '🎲'} Tirar ${_esc(etq.toLowerCase())} · ${_esc(f)}</button></div>${manualHtml(d, 'dano')}`;
-      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>
+      else if(puedoAMano(d.atacante, d)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>
         <div class="duelo-man"><input type="number" min="0" data-manual="dano" placeholder="${_esc(etq.toLowerCase())}" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire ${_esc(etq.toLowerCase())}…</div>`;
       return `<div class="duelo-paso"><h4><span class="n">2</span>${_esc(etq)}</h4>${cuerpo}</div>`;
@@ -3046,7 +3084,7 @@ const Duelo = (() => {
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
       if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}${d.hab.dano.extra && d.hab.dano.extra.formula ? ` + ${_esc(d.hab.dano.extra.formula)} de ${_esc(d.hab.dano.extra.tipo || 'fuego')}` : ''}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
-      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
+      else if(puedoAMano(d.atacante, d)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
     }else{
@@ -3059,7 +3097,7 @@ const Duelo = (() => {
       if(magPend(dn) && !dn.aplicado){
         const mg = dn.magico, ic = magIcono(mg.tipo), tit = magTitulo(mg.tipo);
         const puede = (esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) || puedoAMano(d.atacante);
-        const porOtro = !esMio(d.atacante) && puedoAMano(d.atacante) ? ` por ${_esc(d.atacante.nombre)}` : '';
+        const porOtro = !esMio(d.atacante) && puedoAMano(d.atacante, d) ? ` por ${_esc(d.atacante.nombre)}` : '';
         const boton = puede ? `<div style="text-align:center;margin-top:10px"><button type="button" data-dano-tirar data-magico-tirar>${ic} Tirar el ${_esc(tit.toLowerCase())}${porOtro} · ${_esc(mg.formula)}</button></div>`
           : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el ${_esc(tit.toLowerCase())}…</div>`;
         cuerpo = tiro + `<div class="duelo-danotiro" style="border-color:#e3a85a"><span class="t">${ic} ${_esc(tit)}${mg.mult ? ` ×${_fmt(mg.mult)}` : ''}</span><span class="f">${_esc(mg.formula)} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</span></div>` + boton;
@@ -3069,7 +3107,7 @@ const Duelo = (() => {
       if(salvPend(dn) && !dn.aplicado){
         const sv = dn.salvaje;
         const puede = (esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)))) || puedoAMano(d.atacante);
-        const porOtro = !esMio(d.atacante) && puedoAMano(d.atacante) ? ` por ${_esc(d.atacante.nombre)}` : '';
+        const porOtro = !esMio(d.atacante) && puedoAMano(d.atacante, d) ? ` por ${_esc(d.atacante.nombre)}` : '';
         const mgYa = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))}</div>` : '';
         const k = d.id + ':salvaje', abierto = manualAbierto.has(k);
         const man = puede ? `<div class="duelo-manual"><label class="tg" title="Escribir el número del d6 en vez de tirarlo"><input type="checkbox" data-mtg="salvaje"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>${abierto
@@ -3291,7 +3329,7 @@ const Duelo = (() => {
           : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}${_num(c.resistencia) > 0 ? `, que la Resistencia a crítico del defensor sube ${_fmt(c.resistencia)}` : _num(c.resistencia) < 0 ? `, que el 💢 Punto débil del defensor baja ${_fmt(-_num(c.resistencia))}` : ''}).`, ...lCuenta])
         + viz;
     }else if(!c.d20){
-      const puede = esMio(d.atacante) || soyGM();
+      const puede = esMio(d.atacante) || soyGM() || porOcultoAtq(d);
       cuerpo = titulo('posible', '💥 ' + tituloNivel(_num(c.dados)))
         + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
         + viz
@@ -3860,7 +3898,7 @@ const Duelo = (() => {
     const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
     const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};
-    if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
+    if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, conOculta(d.id, r)); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
     if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón (2026-10-21)
     (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo))).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
@@ -4165,7 +4203,9 @@ const Duelo = (() => {
     escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot({includeMetadataChanges: true}, snap => {
       if(snap.metadata.fromCache && !servidorVisto) return;
       servidorVisto = true;
-      listaDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+      todosDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+      todosDuelos.forEach(d => { if(esOculto(d)) ocultosInfo.set(d.id, {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || '')}); });
+      listaDuelos = todosDuelos.filter(veoOculto);   // 🙈 lo que esta pantalla no tiene que ver, ni se abre ni se cuenta (P263)
       const ahora = Date.now();
       // Un duelo nuevo se abre solo para todos los conectados; si ya hay otro abierto y sin resolver, queda el botón.
       listaDuelos.forEach(d => {
@@ -4180,11 +4220,11 @@ const Duelo = (() => {
       });
       revisarPasos();
       dibujarChips();
-      listaDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa
+      todosDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa (también el de un duelo oculto, marcado)
       // Hechizo de área (Paso 4/7 del casteo): un sub-duelo con `grupo` que se resolvió — el mapa (GM) avanza la cascada
       // al siguiente objetivo o cierra el grupo si era el último.
       if(cfgEscuchar.grupoResuelto && soyGM()){
-        listaDuelos.forEach(d => {
+        todosDuelos.forEach(d => {
           if(!d.grupo || d.estado !== 'resuelto' || grupoAvisado.has(d.id)) return;
           grupoAvisado.add(d.id);
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
@@ -4320,7 +4360,7 @@ const Duelo = (() => {
       }
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
       if(cfgEscuchar.aplicar && soyGM()){
-        listaDuelos.forEach(d => {
+        todosDuelos.forEach(d => {
           if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || tomado(d.dano) || danoPend(d.dano) || aplicando.has(d.id)) return;
           if(pideAceptar(d) && !d.dano.aceptado) return;   // 💔 el personaje que lo recibe todavía no tocó «Aplicar el daño»
           // 👀 (2026-11-05, segunda tanda de pruebas) una pantalla del GM en OTRO mapa tampoco reclama el daño: lo dejaba «el token ya no está en el mapa».
@@ -4342,7 +4382,7 @@ const Duelo = (() => {
       // quedaba en «Aplicando…» para siempre si nadie más estaba mirando. Escribir la propia ficha nunca
       // necesita permiso de nadie más, así que no hace falta esperar al GM para eso puntual.
       if(cfgEscuchar.aplicarEfecto){
-        listaDuelos.forEach(d => {
+        todosDuelos.forEach(d => {
           if(d.fase !== 'efectos' || !(soyGM() || esMio(d.defensor))) return;
           (d.efectos || []).forEach((ef, i) => {
             const clave = d.id + ':' + i;
@@ -4373,7 +4413,65 @@ const Duelo = (() => {
         });
       }
     }, err => console.error('Duelo: error escuchando los duelos', err));
+    if(soyGM()) setInterval(revisarOcultos, 5000);   // 🙈 lo que quedó esperando en un duelo oculto, pasado OCULTO_MS
     limpiarViejos();
+  }
+
+  /* 🙈 Un duelo oculto no frena a nadie (2026-11-22, dueño: «si el que está escondido tarda en hacer su tirada, el juego se frenaría… habría que
+     encontrar alguna forma creativa de resolver eso»): el bando atacante nunca lo espera (corre aparte, ver vtt-hexgrid/js/13), y si quien maneja al
+     escondido no hace lo que le toca en OCULTO_MS (no está, o no contesta), la pantalla del GM lo hace por él con la regla de siempre: tira su
+     resistencia con el valor de su stat (`cfg.valorOculto(d, stat)`, el mismo de una tirada a mano), no se mueve en el dodge roll, acepta el daño,
+     tira y aplica los efectos. Antes de eso, el GM con 👁 Revelar lo oculto lo ve y lo puede resolver a mano. */
+  const OCULTO_MS = 40 * 1000;
+  const ocultoVisto = new Map();   // id → {firma, desde, hecho}
+  function firmaOculto(d){
+    return [d.estado, d.fase, d.pdg ? 1 : 0, d.eva ? 1 : 0, d.empate && d.empate.moneda ? 1 : 0, d.dano ? (d.dano.aceptado ? 2 : 1) : 0,
+      (d.efectos || []).map(e => `${e.res ? 1 : 0}${e.aplicado ? 1 : 0}${e.aplicar || ''}`).join('.')].join('|');
+  }
+  async function revisarOcultos(){
+    const ahora = Date.now();
+    for(const d of todosDuelos){
+      if(!esOculto(d) || d.estado === 'resuelto' || d.estado === 'cancelado'){ ocultoVisto.delete(d.id); continue; }
+      const f = firmaOculto(d);
+      let v = ocultoVisto.get(d.id);
+      if(!v || v.firma !== f){ v = {firma: f, desde: ahora, hecho: false}; ocultoVisto.set(d.id, v); }
+      if(v.hecho || ahora - v.desde < OCULTO_MS) continue;
+      if(cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) continue;   // lo lleva la pantalla del GM que está en ese mapa
+      v.hecho = true;
+      try{ await resolverOcultoSolo(d); }catch(err){ console.error('Duelo: no se pudo resolver solo el duelo oculto', err); }
+    }
+  }
+  // Una tirada con el valor de un stat (como «🎲 Tirar a mano»), sin nada en pantalla.
+  function tiroDeValor(valor){
+    const f = typeof formulaParaValor === 'function' ? formulaParaValor(Math.max(1, Math.round(_num(valor)))) : null;
+    if(!f) return null;
+    const rolls = f.combo.map(x => 1 + Math.floor(Math.random() * x));
+    return {formula: `${f.formula} (solo: no contestó)`.slice(0, 60), rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod};
+  }
+  async function resolverOcultoSolo(d){
+    const valor = (lado, stat) => { try{ return cfgEscuchar.valorOculto ? _num(cfgEscuchar.valorOculto(d, lado, stat)) : 0; }catch(err){ return 0; } };
+    if(d.estado === 'empate'){ await elegirParidad(d.id, 'defensor', Math.random() < 0.5 ? 'par' : 'impar'); return; }
+    if(d.fase === 'contacto'){
+      if(!d.pdg && d.hab && d.hab.tira && d.hab.tira.stat){ const r = tiroDeValor(valor('atacante', d.hab.tira.stat) + _num(d.hab.tira.bono)); if(r) await guardarTiro(d.id, 'pdg', r, null, null); }
+      if(!d.eva){
+        const c = d.hab && (d.hab.contra || [])[0];
+        const r = c && c.formula && typeof tirarDados === 'function' ? tirarDados(c.formula) : tiroDeValor((c ? valor('defensor', c.stat || c.modo) : valor('defensor', 'eva')) + _num(c && c.bono));
+        if(r) await guardarTiro(d.id, 'eva', r, {modo: (c && c.modo) || 'evasion', itemId: '', itemNombre: '', costo: 0}, null);
+      }
+      return;
+    }
+    if(d.fase === 'dodge'){ await resolverDodge(d.id, cfgEscuchar.chequearDodge ? !cfgEscuchar.chequearDodge(d) : false); return; }
+    if(d.fase === 'dano' && d.dano && !d.dano.aceptado && !d.dano.aplicado){ await aceptarDano(d.id); return; }
+    if(d.fase === 'efectos'){
+      const efs = d.efectos || [];
+      if(efs.some(e => e && !e.res && !e.omitido && necesitaTiradaEf(e))){ await tirarEfectos(d.id); return; }
+      for(let i = 0; i < efs.length; i++){
+        const e = efs[i];
+        if(!e || efectoResuelto(e) || e.aplicar) continue;
+        await marcarEfecto(d.id, i, specDeEfecto(e) ? {aplicar: 'pedido-lados'} : {aplicado: true, aplicar: '', nota: 'a mano'});
+      }
+      // (cuando se aplican todos, el duelo se cierra solo: cerrarSiListo)
+    }
   }
 
   async function limpiarViejos(){

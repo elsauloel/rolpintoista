@@ -172,7 +172,23 @@ function noVistoReintentar(){   // lo recién llegado que se escondió se vuelve
   noVistoTimer = setTimeout(f, NO_VISTO_ESPERA_MS + 300);
 }
 // comun/mesa.js lo llama con los documentos de la Mesa antes de dibujarlos.
+/* 🙈 Las líneas de un duelo oculto (P263, 2026-11-22; comun/duelo.js las marca `oculta-<pj|creep>:<desde>` con la ficha del escondido): las ve su
+   bando (los jugadores, si el escondido es un personaje; el GM, si es un creep), el GM con 👁 Revelar lo oculto y quien lo esté viendo ahora.
+   Al resto no le llega nada (ni «Alguien», ni la acción incierta). */
+function mesaOcultaVer(t){
+  const o = typeof mesaOcultaParte === 'function' ? mesaOcultaParte(t) : null;
+  if(!o) return null;
+  if((o.tipo === 'creep') === !!soyGM || (soyGM && ojoRevelando)) return o;
+  const tok = tokenPorFicha(t.ficha, o.tipo);
+  return tok && loVeoAhora(tok) && !(o.tipo === 'pj' && soyGM && ocultoPorSigiloParaMi(tok)) ? o : false;
+}
+const mesaOcultaDecision = new Map();   // id → la decisión, una sola vez (como el resto de la Mesa: no cambia si después se lo ve)
 function mesaFiltrar(docs){
+  docs = docs.map(d => {
+    let o = mesaOcultaDecision.get(d.id);
+    if(o === undefined){ o = mesaOcultaVer(d.data()); if(o !== null && escucharTokens.listo) mesaOcultaDecision.set(d.id, o); }
+    return o === null ? d : o ? mesaOcultaDoc(d, o.desde) : null;
+  }).filter(Boolean);
   if(!escucharTokens.listo){   // sin los tokens todavía: lo dudoso espera (mesaRefiltrar lo vuelve a pasar cuando llegan)
     // (a un jugador, nada: casi cualquier línea puede nombrar a alguien que no ve, y todavía no se sabe a quién ve; 2026-11-20)
     return soyGM ? docs.filter(d => d.data().desde !== 'incierta-pj') : [];

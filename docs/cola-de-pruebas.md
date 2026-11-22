@@ -1663,9 +1663,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (Evasión, Defensa) como GM y jugador. El globo queda por encima de la tarjeta. Dudas: P286. Pruebas automáticas: 1018 en verde.
 - **✅ repasado (2026-11-22; se le mandó el resumen con lo que sigue abierto) — ❓ Repaso de P252 y P256 a P262** (dueño, 2026-11-22: «recordame… y corroborá si siguen pendientes»). Contarle cada una en simple
   y cuál sigue abierta.
-- **⬜ en cola — 🕵 Área contra alguien escondido (P263)** (dueño, 2026-11-22): «me parece que no se debería abrir el duelo para el atacante. Al
+- **✅ hecho (2026-11-22) — 🕵 Área contra alguien escondido (P263)** (dueño, 2026-11-22): «me parece que no se debería abrir el duelo para el atacante. Al
   personaje en sigilo sí se le debe ofrecer la oportunidad de esquivar, si correspondiera, y en el caso de que lo logre, todo eso debería pasar
-  desapercibido por el equipo rival. Habría que contemplarlo».
+  desapercibido por el equipo rival. Habría que contemplarlo». Y después: «si el que está escondido tarda en hacer su tirada, el juego se
+  frenaría… habría que encontrar alguna forma creativa de resolver eso».
+  *Resultado:* cuando un área (área, onda, cono o línea de rivales) alcanza a alguien que la pantalla que la lanza no ve (sigilo, oculto, niebla,
+  nube), ese escondido va a **un área aparte, que corre en paralelo** (`vtt-hexgrid/js/130-area-oculta.js`), con la tirada de quien la lanzó (y el
+  daño de una tirada para todos) hecha sola al lanzarla. Su duelo (`grupo.oculto`, `comun/duelo.js`) **solo lo ve quien lo maneja** (su jugador,
+  el GM si es un creep, el GM con 👁) o quien lo ve; al bando que la lanzó **no se le abre cuadro, ni botón, ni Crónica, ni líneas de la Mesa**
+  (marcadas `oculta-pj` / `oculta-creep`, js/29), ni el golpe de la onda, ni el «débil/resistente», ni carteles sobre su token, **esquive o no**
+  (lo más conservador; P287). Su cascada sigue con los que ve; si no veía a nadie, «No hay nadie adentro del área», como si no hubiera nadie. **No
+  frena a nadie:** si en 40 s nadie hace nada en ese duelo, la pantalla del GM lo resuelve sola (tira su resistencia con el valor de su stat, no se
+  mueve, acepta el daño, tira y aplica los efectos). Quien maneja al escondido hace también lo del atacante (los efectos). Si el daño le saca más
+  que su Sigilo, se delata como siempre (P288). Probado con clics en «Claude · pruebas 2» (GM, Jugador 1, Jugador 2): (a) Blanco J1 con
+  Shockwave (dada por datos) contra un Blanco creep en sigilo pegado y el Protector 3 a la vista: J1 y J2 vieron solo el duelo del Protector; el
+  GM resolvió el del creep con «✍ Elegir manualmente» — resistió (15) y no resistió (0, Pajaritos aplicado) — y J1 no vio nada ni en la Mesa;
+  con el creep solo, J1 no vio ningún cuadro; sin contestar, a los ~45 s la pantalla del GM tiró la Res.CC del creep y cerró el duelo. (b) Arcano 3
+  con la Nova arcana contra Blanco J2 en sigilo (y J1 a la vista): el GM vio solo el duelo de J1; J2 esquivó (30) y el GM no vio nada, ni en la
+  Mesa; J2 no esquivó (1): aplicó el daño y el Empujón él mismo; el daño (7) le sacó más que su Sigilo (6), se delató (regla de siempre) y desde ahí
+  el GM lo vio. De paso: un cartel que flota sobre un token (inmunidad, «−2 EVA») ya no sale en las pantallas que no ven ese token (js/96).
+  Pruebas automáticas: 1026 en verde (8 nuevas). Dudas: P287, P288. Lo que faltó probar, abajo como «Probar».
 - **⬜ en cola — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
   la inventaste y me dejé llevar, pero no estoy seguro de entender exactamente cómo funciona. Vamos a tener que conversar de esto para
   definirlo»). Preparar una explicación de cómo funciona hoy y las preguntas para decidir; no programar hasta conversarlo.
@@ -1836,6 +1853,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   silencio como un estado la pondría para revisar al final, porque técnicamente el silencio es un estado, pero lo revisamos en contexto más
   tarde»). Hoy, en «Ver detalle», las filas de nombres («De quién es», «Con qué se puso») no se marcan, así que «Tótem de silencio» no muestra
   el globo del estado Silencio. Mostrarle el caso y decidir juntos.
+- **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
+  (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
+- **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
+  (Shockwave, Nova arcana). Mirar la Lanza arcana (chispas solo sobre los que se ven), un cono y un área con dodge roll (el escondido se mueve solo
+  en su pantalla).
+- **⬜ en cola — Probar: 🙈 el GM con 👁 Revelar lo oculto ve el duelo de un personaje escondido y lo resuelve a mano** (2026-11-22, P263).
+- **⬜ en cola — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263): solo con pruebas automáticas.
+- **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
+  probó con la pantalla del GM todavía con el código de antes (tiró la Evasión de J2, aceptó el daño y aplicó el Empujón solo); con el código
+  nuevo solo se probó con el creep.
 
 ## En cola
 

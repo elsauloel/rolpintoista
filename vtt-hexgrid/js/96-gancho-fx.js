@@ -96,6 +96,7 @@ function ganchoEvaEmpezar(dt){
   // cada mapa busca su token.
   if(!dt.a && dt.ref){ const par = [...tokens.entries()].find(([, t]) => t && t.tipo !== 'creep' && String(t.fichaId || '') === String(dt.ref)); if(par) dt = {...dt, a: par[0]}; }
   if(!tokens.get(dt.a)) return;
+  if(typeof loVeoAhora === 'function' && !loVeoAhora(tokens.get(dt.a))) return;   // 🙈 sobre un token que esta pantalla no ve, no flota nada (P263, 2026-11-22)
   if(dt.color === 'inmune' || dt.color === 'quieto'){
     // 🛡 El cartel de inmunidad espera a que esta pantalla no tenga el cuadro del duelo ni un aviso al centro tapando el mapa (como la Transfusión,
     // js/92; como mucho 25 s, después sale igual). Si ya flota el mismo sobre ese token, no se repite; si flota otro distinto, va arriba.

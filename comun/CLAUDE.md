@@ -2235,3 +2235,13 @@ versión parecida en más de una, es candidato a juntar.
   `consumoAManoQueHace(it)`, `consumoAManoDetalle(texto)` y `consumoAManoMesa(it)` (lo que se suma a la Mesa en `FichaAcciones.consumir`). La 🔍
   (`ficha-lupa.js`, `cons:`) y el Ver lo dicen. `ficha-editor.js` y `editar-item.js` mandan al asistente los consumibles con la marca; `dar-jugador.js`
   da las unidades elegidas (n en la lista). Dudas: P284.
+- **🙈 El duelo de un escondido** (2026-11-22, P263; `duelo.js`): un sub-duelo con `grupo.oculto` (lo arma el mapa, vtt-hexgrid/js/130) solo
+  existe para las pantallas que lo ven: `veoOculto(d)` (es mío, o `cfg.veOculto(d)`; sin mapa, el GM si es un creep). `listaDuelos` ya viene sin
+  los que no se ven (no se abren, no dan botón ni Crónica, ni `dodgeEmpieza`); `todosDuelos` los tiene a todos para lo que corre por detrás (el
+  resumen, `grupoResuelto`, aplicar el daño y los efectos). Lo que esta pantalla no vio mientras pasaba no lo ve después (`ocultoNoVisto`). `crear`
+  no lo abre en la pantalla del GM que lo crea si no lo ve. Quien maneja al escondido hace también lo del atacante (`porOcultoAtq`: «Tirar a mano»
+  y los efectos). Todas las líneas de la Mesa de ese duelo van marcadas: `conOculta(id, r)` / `anunciarMesa(texto, id)` / el resumen →
+  `desde = 'oculta-<pj|creep>:<desde>'` y `ficha` = el escondido (`mesa.js` lo deja pasar en `mesaPublicar`; sin `mesaFiltrar`, la ficha suelta y
+  GM Tools lo muestran solo a su bando, `mesaOcultaSinMapa`). **No frena a nadie:** `revisarOcultos` (cada 5 s, en la pantalla del GM) resuelve lo
+  que quedó quieto `OCULTO_MS` (40 s): la resistencia con `cfg.valorOculto(d, lado, stat)` (`tiroDeValor`), el empate, el dodge roll (no se mueve),
+  acepta el daño y tira/pide los efectos. Dudas: P287.

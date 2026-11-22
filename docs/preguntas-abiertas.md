@@ -1854,7 +1854,14 @@ La ventana «🎁 Dar a un jugador» (`comun/dar-jugador.js`) deja siempre una l
 6. **Experiencia:** la ventana no da XP (no estaba en el pedido). ¿La sumo?
 
 
-### P263 — 🙈 Cuando un jugador le pega con un área a alguien que no ve, el cuadro del duelo lo nombra (2026-11-21, Claude)
+### P263 — ✅ 🙈 Cuando un jugador le pega con un área a alguien que no ve, el cuadro del duelo lo nombra (2026-11-21, Claude)
+
+> ✅ **Decidida y hecha (dueño, 2026-11-22):** «no se debería abrir el duelo para el atacante. Al personaje en sigilo sí se le debe ofrecer la
+> oportunidad de esquivar, si correspondiera, y en el caso de que lo logre, todo eso debería pasar desapercibido por el equipo rival»; y «si el que
+> está escondido tarda en hacer su tirada, el juego se frenaría… habría que encontrar alguna forma creativa». Quedó así (`vtt-hexgrid/js/130`,
+> `comun/duelo.js`): el escondido va en un área aparte, que corre en paralelo; su duelo solo lo ve quien lo maneja (o quien lo ve); el bando que
+> la lanzó no espera nada, no ve cuadro ni Crónica ni líneas de la Mesa (ni si esquivó, ni si le pegó); si nadie contesta en 40 s, la pantalla
+> del GM lo resuelve sola. Lo que quedó elegido «mientras tanto»: P287. Cuánto daño delata a alguien en sigilo: P288.
 Visto en el clon de El origen: la rata estaba en sigilo, pegada a Rockardo, y él usó el Shockwave (la onda alcanza a los enemigos pegados). A los
 dos jugadores se les abrió el cuadro del duelo con «Rockardo Pedruscko VS **Rata de la grieta. 2**», aunque ninguno la veía. Después todo salió bien:
 la Mesa dijo «le hizo Shockwave a **Alguien**», el «Ver detalle del duelo» también, y la rata siguió en sigilo. La regla escrita hoy dice que
@@ -2084,3 +2091,39 @@ Pedido del dueño (2026-11-22: «en el menú de "Ver detalle" de las trampas y l
    Mesa), no solo en la tarjeta. ¿Está bien?
 4. **Una marca por tarjeta:** un término se marca la primera vez que aparece en toda la tarjeta (lo destacado de arriba primero). Si aparece de nuevo
    más abajo (por ejemplo, «Expuesto» en «Estado que deja»), ahí va sin marcar. ¿O preferís que se marque en cada fila?
+
+### P287 — 🙈 Un área contra alguien escondido: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+Hecho con P263 (el escondido va en un área aparte, en paralelo; solo lo ve quien lo maneja). Probado con clics en «Claude · pruebas 2». Quedaron
+elegidas estas cosas, todas cambiables:
+1. **Dos tiradas de quien la lanza.** Para no hacer esperar a nadie, contra el escondido la tirada de quien lanza el área (y el daño, si es de «una
+   tirada para todos») se hace sola al lanzarla, sin que la vea nadie; contra los que sí ve, la tira él con su botón, como siempre. O sea: puede
+   salir un número contra los visibles y otro contra el escondido (en la prueba: 4 contra el Protector, 1 contra la rata). ¿Está bien, o preferís
+   que el escondido espere la tirada de los visibles (a riesgo de frenarlo un poco)?
+2. **Si le pega, el bando que la lanzó tampoco ve nada** (lo más conservador): ni «Alguien» en la Mesa ni el golpe en el mapa. Lo único que
+   puede enterarlo es la regla de siempre: si el daño le saca más vida que su Sigilo, se delata (P288) y ahí sí aparece con su nombre. ¿Querés que
+   al atacante le llegue algo cuando le pega («sentís que le diste a algo»)?
+3. **Si en el área solo había escondidos**, quien la lanza ve «No hay nadie adentro del área» (lo mismo que si no hubiera nadie) y la animación de
+   la onda no sale (para que no se note la diferencia). Lo malo: el escondido tampoco ve la onda. ¿Te parece?
+4. **El tiempo: 40 segundos** sin que nadie haga nada en el duelo del escondido. Pasado eso, la pantalla del GM lo hace por él: tira su
+   resistencia con el valor de su stat (sin anillos ni Flash: el número de la ficha o del creep, como «🎲 Tirar a mano»), no se mueve en el dodge
+   roll, acepta el daño y tira/aplica los efectos. Necesita la pantalla del GM abierta. ¿40 s está bien? ¿Querés un aviso en su pantalla antes?
+5. **Quién lo ve:** quien lo maneja (su jugador, el GM si es un creep), el GM con 👁 Revelar lo oculto, y quien lo ve en ese momento (un aliado
+   de un personaje escondido lo ve). Lo que una pantalla no vio mientras pasaba no lo ve después aunque el escondido quede a la vista (la Mesa
+   también se decide una vez).
+6. **Qué áreas van aparte:** las de rivales con una tirada de quien la lanza (área, onda, cono, línea). Siguen como antes (a la vista): las de
+   aliados, la Tormenta arcana y el Meteoro, los misiles repartidos, las zonas con duelo y las que tiran el daño contra cada uno.
+7. **El escondido no salta al frente:** si a quien lo maneja ya se le abrió otro duelo, el suyo queda como botón abajo (como cualquier duelo).
+8. **La tirada hecha de antemano** sale de lo que la Botonera de quien la lanza dice que tiraría (con Pajaritos y esas mitades), sin Flash, sin el
+   Foco ni el Ojo de carancho; si no la tiene a mano, del número de su ficha.
+
+### P288 — 🕶 ¿Cuánto daño tiene que recibir alguien en sigilo para que se revele dónde está? (2026-11-22, dueño)
+Dueño: «también tenemos que definir conceptualmente cuánto daño tiene que recibir un personaje en sigilo para que se revele su ubicación». Para
+conversarlo; no se tocó nada. **Cómo funciona hoy** (regla del 2026-11-01, «el golpe le saca más que su Sigilo», sin tirada): si un golpe le saca
+más vida que su valor de Sigilo (personaje: su Sigilo; creep: su stat de Sigilo), pierde el estado Sigilo (sin el Marcado de cuando lo descubren) y
+va a la Mesa «🕶 Fulano se delató y salió del sigilo». **Solo lo miran:** el daño de un área, onda, cono o línea (`dueloAplicarDano`), el de una
+zona al entrar o en el Mantenimiento, y el de una trampa (también a los de alrededor si explota). «Le saca» = vida perdida (lo que se come un
+escudo o la Vida extra no cuenta). **No lo miran:** el veneno, el sangrado y lo demás que pega al empezar el turno; un golpe directo (para pegarle a
+uno hay que verlo); el daño de colisión. En la prueba de P263, Blanco J2 (Sigilo 6) recibió 7 y 8 de la Nova arcana y se delató las dos veces.
+1. ¿Más que su Sigilo está bien como umbral, o preferís otra cosa (cualquier daño, la mitad de su vida, una tirada de Sigilo contra el daño)?
+2. ¿El veneno y el sangrado también tendrían que poder delatarlo?
+3. ¿Delatarse = se sabe dónde está (como ahora: se le saca el sigilo) o solo un «?» en esa casilla, como cuando entra en sigilo a la vista?

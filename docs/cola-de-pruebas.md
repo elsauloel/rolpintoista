@@ -1560,6 +1560,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   izquierda (mapa, ficha y GM Tools) que abre una ventana distinta según quién lo toca: el GM, la de «Dar a un jugador» (catálogo, DDE, despojos,
   ítem nuevo; llega directo); un jugador, la de pasar algo de su mochila a otro (ofrecer / aceptar, con el aviso de combate y no adyacente). El 🎁
   sigue siendo solo el del botín (Despojos). **B:** como pidió al principio: el GM, en el 🎁; los jugadores, en un 🤝 aparte.
+  **Elegido (dueño, 2026-11-22): A** («avanzá con la opción A»). Se hace junto con las dos entradas de abajo.
 - **⬜ en cola — 🎁 «Dar a un jugador» desde el menú de la izquierda** (dueño, 2026-11-22): «que la opción de dar ítems también se pueda acceder,
   como máster, desde el botón de regalo del menú lateral izquierdo del mapa. También agregar ese botón en GM Tools».
 - **⬜ en cola — 🤝 Compartir con un colega desde el menú de la izquierda** (dueño, 2026-11-22): «que los jugadores tengan en ese mismo menú

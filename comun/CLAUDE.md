@@ -2164,6 +2164,16 @@ versión parecida en más de una, es candidato a juntar.
   ranuras se da igual y `pasada = {usada, cap}`. El mapa (js/11, `recibidosAplicar`) y la ficha (js/02) muestran `DarJugador.cartel({nombre, de,
   lineas, pasada})` (al centro, con «✔ Aceptar» que solo lo cierra; si llega otro con el cartel abierto, se suma abajo) y, si quedó pasada, una
   línea en la Mesa. **Se carga con la página en el mapa, la ficha y GM Tools** (el que recibe lo necesita siempre). Lo que no está decidido: P262.
+- **`dar-jugador.js`, 🤝 la puerta del menú de la izquierda** (2026-11-22, dueño, opción A): `DarJugador.puerta({gm, propios: [{id, nombre}],
+  abrirGM(), abrirPasar(id), toast, sinNada})` — un solo camino, lo abre directo; varios, un cartelito (`.dj-puerta`) con «🎁 Dar como GM» y «🤝 Pasar
+  algo de la mochila de X»; ninguno, el toast `sinNada`. `puertaOpciones(o)` da la lista (pruebas). La usan el mapa (js/128), la ficha (js/08) y GM
+  Tools (js/04, solo el GM).
+- **`intercambio.js`, ⚔ no está al lado** (2026-11-22, dueño: «que si está en modo combate y no está adyacente te advierta que la regla no lo permite
+  en modo combate (con opción de dar igual)»): `avisoNoAlLado(nombre)` → `{texto, opciones}` para `Confirmar.preguntar` («Dar igual» / «Cancelar»;
+  reemplaza al «El aliado no está adyacente. ¿Dar igual?»). `host.adyacentes(id)` puede devolver **null** = no se sabe (no se pregunta);
+  `host.prepararAdyacentes?(id)` (promesa) los relee al abrir «Pasar» y antes de ofrecer en combate. Para la ficha: `adyacentesPublicado(fichaId)` (los
+  personajes pegados a su token en el mapa **publicado**, `mapa/activo` + `TokensAuto.rutaTokens`), con `adyacentesDe(tokens, id)` y `distHex(a, b)`
+  (la misma cuenta que `distanciaHex` del mapa; sin las invocaciones ni los creeps).
 - **💀 Caídos** (P257, 2026-11-21): `Combatiente.caerLimpio(quien, campo)` (al caer se van los estados, con el criterio de `quedaAlVolver`, sin anotar
   una vuelta), `caidaTxt(nombre, sacados)` y `estaCaido(hp, hpMax)`. `FichaAcciones.revisarMuerte` devuelve `sacados` al caer. Un caído no recarga ni
   regenera nada: `FichaMantenimiento.inicioTurno` / `finTurno` / `aplicar` (solo `contarMuerte`; sus invocaciones de pie siguen) e `invInicio` (una

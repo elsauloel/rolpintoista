@@ -172,7 +172,11 @@ const intercambioHost = {
   tienda: () => (tiendaCargada && $('#scrim-catalogo').classList.contains('open')) ? tiendaCargada : null,
   toast: t => toast(t),
   propias: () => fichaVivo ? [fichaVivo.id] : [],
+  // ⚔ Quién está al lado, en el mapa publicado (2026-11-22): la ficha no tiene los tokens, los lee al abrir «Pasar» y antes de ofrecer en combate.
+  adyacentes: id => (intercambioAdy && intercambioAdy.id === id) ? intercambioAdy.lista : null,
+  prepararAdyacentes: async id => { try{ intercambioAdy = {id, lista: await Intercambio.adyacentesPublicado(id)}; }catch(e){ console.error('No se pudieron leer los tokens del mapa:', e); intercambioAdy = null; } },
 };
+let intercambioAdy = null;   // {id, lista}
 function intercambioIniciar(){ Intercambio.iniciar(intercambioHost); }
 $('#btn-pasar').onclick = () => { if(fichaVivo) Intercambio.abrirDar(fichaVivo.id); else toast('Abrí tu personaje primero'); };
 // El mismo «Pasar», desde la ventanita «💰 DDE y despojos» del menú de la izquierda (dueño, 2026-11-20): abre la misma ventana y cierra la ventanita.
@@ -182,6 +186,20 @@ $('#btn-pasar-dde').onclick = () => {
   Intercambio.abrirDar(fichaVivo.id);
 };
 $('#tienda-baul').onclick = () => { if(fichaVivo) Intercambio.abrirBaul(fichaVivo.id); };
+/* 🤝 Dar, en el menú de la izquierda (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta según quién lo toca»).
+   Un jugador → «Pasarle algo a otro personaje» desde el personaje abierto (comun/intercambio.js). El GM → «Dar a un jugador» (comun/dar-jugador.js)
+   con el personaje abierto ya marcado; si además lo maneja (🎮 el control, o es suyo), elige entre las dos (DarJugador.puerta). */
+function darDockAbrirGM(){
+  const base = ItemsSubidos.mezclar(structuredClone(DEFAULT.catalogo), itemsSubidos, DEFAULT.catalogo);
+  DarJugador.abrir({marcados: fichaVivo ? [fichaVivo.id] : [], catalogo: () => base, toast: t => toast(t)});
+}
+$('#btn-dar-dock').onclick = () => {
+  const gm = !!(fbMiembro && fbMiembro.gm);
+  const propios = fichaVivo && intercambioHost.maneja(fichaVivo.id) ? [{id: fichaVivo.id, nombre: (S.meta && S.meta.nombre) || 'tu personaje'}] : [];
+  document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; });
+  DarJugador.puerta({gm, propios, abrirGM: darDockAbrirGM, abrirPasar: id => Intercambio.abrirDar(id), toast: t => toast(t),
+    sinNada: fichaVivo ? 'Este personaje lo maneja otro: abrí el tuyo para pasarle algo a un colega' : 'Abrí tu personaje primero'});
+};
 
 let equipoVolverABotin = false;   // la mochila abierta desde el botín: al cerrarla se vuelve al botín (dueño, 2026-10-22)
 function cerrarEquipoFicha(){

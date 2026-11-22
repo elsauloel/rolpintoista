@@ -60,7 +60,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261121dar"></script>
-<script src="dar-jugador.js?v=20261121dar"></script>
+<script src="dar-jugador.js?v=20261122dar"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -6351,6 +6351,35 @@ prueba('🎁 una recompensa del combate (sin la marca de regalo) sigue como siem
   const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 1, exp: 0}}).S;
   const r = Recibidos.recompensa(S, {data: () => ({fichaId: 'F', xp: 20, dde: 1, despojos: 0})});
   igual([r.regalo === undefined, r.partes, S.meta.exp], [true, ['+20 XP', '+1 DDE'], 20]);
+});
+prueba('🤝 Dar (menú de la izquierda): el GM va a «Dar a un jugador», el jugador a pasar desde su personaje, y si hay más de un camino se elige', () => {
+  const tipos = o => DarJugador.puertaOpciones(o).map(x => x.tipo === 'gm' ? 'gm' : 'pasar:' + x.id);
+  igual([tipos({gm: true}), tipos({gm: false, propios: [{id: 'a', nombre: 'Tita'}]}), tipos({gm: true, propios: [{id: 'a', nombre: 'Tita'}]}),
+    tipos({propios: [{id: 'a'}, {id: 'b'}, null]}), tipos({})], [['gm'], ['pasar:a'], ['gm', 'pasar:a'], ['pasar:a', 'pasar:b'], []]);
+});
+prueba('🤝 Dar con un solo camino abre directo (sin cartel para elegir); sin ninguno, avisa', () => {
+  const hechos = [];
+  DarJugador.puerta({gm: true, abrirGM: () => hechos.push('gm'), abrirPasar: id => hechos.push(id)});
+  DarJugador.puerta({propios: [{id: 'F1', nombre: 'Tita'}], abrirGM: () => hechos.push('gm'), abrirPasar: id => hechos.push(id)});
+  DarJugador.puerta({toast: t => hechos.push('toast'), abrirGM: () => hechos.push('gm')});
+  igual([hechos, !!document.querySelector('.dj-puerta-fondo')], [['gm', 'F1', 'toast'], false]);
+});
+prueba('🤝 Dar con dos caminos (el GM con 🎮 el control): cartelito con «Dar como GM» y «Pasar algo de la mochila de …»', () => {
+  const hechos = [];
+  DarJugador.puerta({gm: true, propios: [{id: 'F1', nombre: 'Tita'}], abrirGM: () => hechos.push('gm'), abrirPasar: id => hechos.push(id)});
+  const ops = [...document.querySelectorAll('.dj-puerta-fondo [data-djp-op]')].map(b => b.querySelector('b').textContent);
+  document.querySelectorAll('.dj-puerta-fondo [data-djp-op]')[1].click();
+  igual([ops, hechos, !!document.querySelector('.dj-puerta-fondo')], [['🎁 Dar como GM', '🤝 Pasar algo de la mochila de Tita'], ['F1'], false]);
+});
+prueba('🤝 en combate y no al lado: el aviso dice que la regla no lo permite y ofrece «Dar igual» / «Cancelar»', () => {
+  const a = Intercambio.avisoNoAlLado('Beto');
+  igual([a.texto.includes('Beto no está al lado'), a.texto.includes('La regla no permite'), a.opciones.si, a.opciones.no], [true, true, 'Dar igual', 'Cancelar']);
+});
+prueba('🤝 quién está al lado de un token (la ficha lo mira en el mapa publicado): los 6 vecinos sí, a 2 no, las invocaciones y creeps no cuentan', () => {
+  const t = (fichaId, col, fila, tipo) => ({fichaId, col, fila, tipo: tipo || 'pj'});
+  const toks = [t('yo', 4, 4), t('n1', 4, 3), t('n2', 5, 4), t('n3', 3, 4), t('lejos', 6, 4), t('yo~inv', 4, 5), t('c', 5, 3, 'creep')];
+  igual([Intercambio.adyacentesDe(toks, 'yo').sort(), Intercambio.adyacentesDe(toks, 'nadie'), Intercambio.distHex({col: 4, fila: 4}, {col: 6, fila: 4})],
+    [['n1', 'n2', 'n3'], [], 2]);
 });
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});

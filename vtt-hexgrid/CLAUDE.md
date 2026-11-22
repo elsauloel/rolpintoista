@@ -2513,6 +2513,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (comun/dar-jugador.js) con ese personaje ya marcado; carga antes `bnCargarPiezas` (catálogo, filtro), `acCargarPiezas` (el Ver) y el asistente de
   ítems. Quien recibe: `recibidosAplicar` (js/11) muestra `DarJugador.cartel` en vez de «Botín concluido» cuando la recompensa es un regalo.
 
+- **🤝 Dar, el botón del borde izquierdo** (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta según quién lo toca»;
+  `js/128-dar-jugador.js`, `#toolkit-dar`, entre el 🎁 y el 🗺 del dock, mismo estilo cuadrado en mapa.css): `DarJugador.puerta({gm: soyGM, propios:
+  darDockPropios()})`. El GM → `darDockAbrirGM` («🎁 Dar a un jugador», sin nadie marcado; carga las mismas piezas que el 🎁 del «⋯»). Un jugador →
+  `darDockAbrirPasar(fichaId)`: abre la sesión del personaje sin mostrar la Botonera (`bnAbrirSesion` + `bnSesionLista`; si la Botonera de OTRO
+  personaje estaba abierta, la cierra) y `Intercambio.abrirDar`. `darDockPropios` = los personajes que maneja esta pantalla (`bnManejo`: los suyos o
+  los que el GM tiene con 🎮), así el GM con el control elige «Dar como GM» o «Pasar algo de la mochila de X», y un jugador con varios elige desde cuál.
+  En combate, si el elegido no está pegado: «… La regla no permite pasarle cosas en modo combate… ¿Querés dárselo igual?» (`Intercambio.avisoNoAlLado`,
+  «Dar igual» / «Cancelar»). El 🎁 sigue siendo solo el del botín.
+
 - **⏭ Pasar de ronda** (2026-11-21, dueño: «un botón para el GM que diga PASAR DE RONDA, que se saltee todos los turnos pendientes de la ronda y
   vuelva al primero»; js/04): en el pie del orden de turnos, solo el GM, cuando hay orden y el combate no está «por iniciar» (`#ini-pasar-ronda`).
   `iniciativaPasarRonda()`: si quedan turnos sin jugar (`OrdenTurnos.pendientesRonda(iniciativa, iniciativaFueraDeJuego)`) pregunta con

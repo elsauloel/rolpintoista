@@ -714,3 +714,10 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **🎁 Lo que te da el GM** (2026-11-21, comun/dar-jugador.js): llega como una recompensa marcada `regalo`; `recompensasRevisar` (js/02) la aplica
   como siempre (una vez) y, en vez del toast, muestra `DarJugador.cartel` (al centro, con «Aceptar»); refresca también los despojos mágicos y
   especiales. Si la mochila quedó pasada, lo dice el cartel y una línea en la Mesa.
+- **🤝 Dar, en el menú de la izquierda** (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta según quién lo toca»):
+  `#btn-dar-dock` (debajo de 🎁 Despojos; js/08) → `DarJugador.puerta` (comun/dar-jugador.js). El jugador que maneja al personaje abierto →
+  `Intercambio.abrirDar` (la ventana de pasar cosas de siempre); el GM → `darDockAbrirGM` (`DarJugador.abrir` con el personaje abierto ya marcado y
+  el catálogo con lo subido); el GM que además lo maneja (🎮 el control, o es suyo) → cartelito para elegir. **Adyacencia en la ficha**:
+  `intercambioHost.adyacentes` / `prepararAdyacentes` (lee los tokens del mapa publicado con `Intercambio.adyacentesPublicado`, al abrir y antes de
+  ofrecer en combate): ahora la ficha también marca «· al lado» y avisa «no está al lado» con «Dar igual» / «Cancelar». Los «🤝 Pasar» de la mochila y
+  de la ventanita de DDE siguen (P278).

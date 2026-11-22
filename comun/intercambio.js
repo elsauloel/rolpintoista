@@ -27,7 +27,9 @@
      host = {maneja(fichaId) → ¿esta pantalla lo maneja?, leer(fichaId) → S o null (para dibujar),
              con(fichaId, async S => bool) → cambia al personaje y lo guarda (true = cambió),
              enCombate() → bool, tienda() → la tienda abierta o null, toast(t), propias() → los personajes que maneja,
-             adyacentes?(fichaId) → los ids de los personajes al lado de su token (sin esto, en combate se ofrecen todos con un aviso)}
+             adyacentes?(fichaId) → los ids de los personajes al lado de su token, o null si no se sabe (sin esto, en combate se ofrecen
+               todos con un aviso), prepararAdyacentes?(fichaId) → promesa: los vuelve a leer antes de dibujar y de preguntar (la ficha: los
+               tokens del mapa publicado, con adyacentesPublicado)}
    Ventanas: abrirDar(fichaId, {itemId}) (sin itemId: DDE y despojos, y lo que ya ofreciste), abrirBaul(fichaId).
    Para el resto: reservado(it), botonDar(it) (el botón de la mochila).
    ========================================================= */
@@ -768,14 +770,43 @@ const Intercambio = (() => {
     abierta = {tipo: 'dar', fichaId, itemId: o.itemId || '', el, alforjas: []};
     el.addEventListener('click', ev => clicDar(ev));
     dibujarDar();
-    if(!o.itemId) cargarAlforjas(fichaId);
+    const alforjas = () => { if(!o.itemId) cargarAlforjas(fichaId); };
+    // La ficha no tiene los tokens a mano: los lee del mapa publicado (2026-11-22) y vuelve a dibujar con «· al lado» / «· no está al lado».
+    if(host.prepararAdyacentes && host.enCombate()) Promise.resolve(host.prepararAdyacentes(fichaId)).catch(() => {}).then(() => { if(abierta && abierta.tipo === 'dar' && abierta.fichaId === fichaId){ dibujarDar(); alforjas(); } });
+    else alforjas();
+  }
+  /* ⚔ En combate, a alguien que no está al lado (dueño, 2026-11-22: «que si está en modo combate y no está adyacente te advierta que la regla no
+     lo permite en modo combate (con opción de dar igual)»). Se avisa y se deja seguir: la mesa decide. */
+  function avisoNoAlLado(nombre){
+    return {texto: `Están en combate y ${nombre || 'ese personaje'} no está al lado tuyo. La regla no permite pasarle cosas en modo combate a alguien que no esté adyacente. ¿Querés dárselo igual?`,
+      opciones: {titulo: '⚔ No está al lado', icono: '🤝', si: 'Dar igual', no: 'Cancelar'}};
+  }
+  // La distancia entre dos casillas (col/fila «impar-q», la misma cuenta que distanciaHex del mapa).
+  function distHex(a, b){
+    const cubo = c => { const q = num(c.col), r = num(c.fila) - (q - (q & 1)) / 2; return {q, r, s: -q - r}; };
+    const A = cubo(a), B = cubo(b);
+    return (Math.abs(A.q - B.q) + Math.abs(A.r - B.r) + Math.abs(A.s - B.s)) / 2;
+  }
+  // Los personajes al lado de su token en el mapa PUBLICADO (para la ficha, que no tiene los tokens: 2026-11-22). Sin su token en ese mapa: [].
+  const esPersonaje = t => t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes('~');
+  function adyacentesDe(tokens, fichaId){
+    const pjs = (tokens || []).filter(esPersonaje), mio = pjs.find(t => t.fichaId === fichaId);
+    if(!mio) return [];
+    return [...new Set(pjs.filter(t => t.fichaId !== fichaId && distHex(mio, t) <= 1).map(t => t.fichaId))];
+  }
+  async function adyacentesPublicado(fichaId){
+    const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+    const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : '_principal';
+    const ruta = typeof TokensAuto !== 'undefined' ? TokensAuto.rutaTokens(mapaId) : (mapaId === '_principal' ? 'tokens' : `mapas/${mapaId}/tokens`);
+    const snap = await col(ruta).get();
+    return adyacentesDe(snap.docs.map(d => d.data()), fichaId);
   }
   // A quién: a cualquiera. En combate (dueño, 2026-11-01: la lista muestra a todos; si no está pegado, se pregunta «¿Dar igual?»), los que están
   // al lado van primero y marcados (si la pantalla sabe quiénes son: el mapa). alLado(fichaId, id) → true/false, o null si no se sabe.
-  const alLado = (fichaId, id) => host.adyacentes ? (host.adyacentes(fichaId) || []).includes(id) : null;
+  const alLado = (fichaId, id) => { const a = host.adyacentes ? host.adyacentes(fichaId) : null; return Array.isArray(a) ? a.includes(id) : null; };
   function destinos(fichaId){
     const L = fichas.filter(f => f.id !== fichaId).sort((a, b) => a.nombre.localeCompare(b.nombre));
-    if(!host.enCombate() || !host.adyacentes) return L;
+    if(!host.enCombate() || !host.adyacentes || !Array.isArray(host.adyacentes(fichaId))) return L;
     const ady = new Set(host.adyacentes(fichaId) || []);
     return [...L.filter(f => ady.has(f.id)), ...L.filter(f => !ady.has(f.id))];
   }
@@ -863,7 +894,8 @@ const Intercambio = (() => {
     else if(b.hasAttribute('data-ix-dar-desp')){ const v = valor(el, '#ix-dt'); que = {tipo: 'despojos', despojo: v.startsWith('esp:') ? 'especial' : v, despojoNombre: v.startsWith('esp:') ? v.slice(4) : '', cantidad: valor(el, '#ix-dn')}; }
     if(!que) return;
     if(!para){ host.toast('Elegí a quién'); return; }
-    if(host.enCombate() && alLado(fichaId, para.id) === false && !(await Confirmar.preguntar('El aliado no está adyacente. ¿Dar igual?', {titulo: 'No está al lado', si: 'Sí', no: 'No'}))) return;
+    if(host.enCombate() && host.prepararAdyacentes){ try{ await host.prepararAdyacentes(fichaId); }catch(e){} }
+    if(host.enCombate() && alLado(fichaId, para.id) === false){ const a = avisoNoAlLado(para.nombre); if(!(await Confirmar.preguntar(a.texto, a.opciones))) return; }
     b.disabled = true;
     let error = null;
     const hubo = await hacer(fichaId, async S => { error = await ofrecer(S, fichaId, que, para); return !error; });
@@ -1124,6 +1156,7 @@ const Intercambio = (() => {
   }
 
   return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, textoPasar, botonDespojos, despojosDeItem, clic, abrirDar, abrirManos, abrirBaul, pintarBotonBaul, cerrar,
+    avisoNoAlLado, distHex, adyacentesDe, adyacentesPublicado,
     // para las pruebas
     _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo, _esMano: esMano, _costoEntrega: costoEntrega, _costoRecibe: costoRecibe, _origenDe: origenDe, _entraEnCorrea: entraEnCorrea, _recibir: recibir};
 })();

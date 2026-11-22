@@ -1555,17 +1555,33 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no falte ningún camino y probarlo.
 - **⬜ en cola — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
   comparar y evaluar»).
-- **⬜ en cola — 🤝🎁 Dar y compartir: las dos tareas de abajo se superponen** (dueño, 2026-11-22: «me parece que son un poco redundantes o al
+- **✅ hecho (2026-11-22) — 🤝🎁 Dar y compartir: las dos tareas de abajo se superponen** (dueño, 2026-11-22: «me parece que son un poco redundantes o al
   menos se superponen. Evaluemos esta tarea»). *Propuesta enviada, espera decisión:* **A (recomendada):** un solo botón «🤝 Dar» en el menú de la
   izquierda (mapa, ficha y GM Tools) que abre una ventana distinta según quién lo toca: el GM, la de «Dar a un jugador» (catálogo, DDE, despojos,
   ítem nuevo; llega directo); un jugador, la de pasar algo de su mochila a otro (ofrecer / aceptar, con el aviso de combate y no adyacente). El 🎁
   sigue siendo solo el del botín (Despojos). **B:** como pidió al principio: el GM, en el 🎁; los jugadores, en un 🤝 aparte.
   **Elegido (dueño, 2026-11-22): A** («avanzá con la opción A»). Se hace junto con las dos entradas de abajo.
-- **⬜ en cola — 🎁 «Dar a un jugador» desde el menú de la izquierda** (dueño, 2026-11-22): «que la opción de dar ítems también se pueda acceder,
+  *Resultado:* un botón **🤝 Dar** en el menú de la izquierda del mapa (cuadrado, entre el 🎁 y el 🗺), de la ficha (debajo de 🎁 Despojos) y de GM
+  Tools (debajo de 👥 Personajes). El GM va directo a «🎁 Dar a un jugador» (en la ficha, con ese personaje ya marcado); un jugador, a «🤝 Pasarle algo
+  a otro personaje» desde su personaje. Si hay más de un camino (el GM con 🎮 el control de un personaje, o un jugador con varios) sale un cartelito:
+  «🎁 Dar como GM» / «🤝 Pasar algo de la mochila de X». El 🎁 sigue siendo solo el del botín. Las otras puertas se dejaron (P278). Sin reglas nuevas
+  de Firestore. 5 pruebas automáticas nuevas (989). Probado con clics en «Claude · pruebas 2»: ver las dos entradas de abajo.
+- **✅ hecho (2026-11-22) — 🎁 «Dar a un jugador» desde el menú de la izquierda** (dueño, 2026-11-22): «que la opción de dar ítems también se pueda acceder,
   como máster, desde el botón de regalo del menú lateral izquierdo del mapa. También agregar ese botón en GM Tools».
-- **⬜ en cola — 🤝 Compartir con un colega desde el menú de la izquierda** (dueño, 2026-11-22): «que los jugadores tengan en ese mismo menú
+  *Resultado:* con la opción A va en el **🤝 Dar** (no en el 🎁, que quedó para el botín). Probado con clics: el GM lo toca en el mapa, en GM Tools y
+  en la ficha de Blanco J1 y se abre «Dar a un jugador»; desde el mapa le dio a Blanco J1 un ítem del catálogo, 5 DDE y 2 despojos y al Jugador 1 le
+  llegó con su cartel. Con 🎮 el control de Blanco J1, el GM elige entre las dos (mapa y ficha), y las dos abren. En la ficha, el «Ver» de un ítem
+  muestra solo su texto (la ficha no carga la tarjeta grande del mapa y GM Tools).
+- **✅ hecho (2026-11-22) — 🤝 Compartir con un colega desde el menú de la izquierda** (dueño, 2026-11-22): «que los jugadores tengan en ese mismo menú
   izquierdo un botón con dos manos estrechadas para poder compartir con cualquier colega ítems, DDE o despojos. Que si está en modo combate y no
   está adyacente te advierta que la regla no lo permite en modo combate (con opción de dar igual)».
+  *Resultado:* el **🤝 Dar** del jugador abre la ventana de siempre de pasar cosas (ofrecer / aceptar / rechazar), a cualquier personaje de la
+  partida. En combate siguen las reglas de antes (solo ítems, pagan los dos en No2) y, si el elegido no está pegado, el aviso nuevo: «Están en combate
+  y X no está al lado tuyo. La regla no permite pasarle cosas en modo combate a alguien que no esté adyacente. ¿Querés dárselo igual?» con **«Dar
+  igual» / «Cancelar»**. En la ficha también: lee quién está pegado en el mapa publicado (antes decía «fijate en el mapa»). Probado con clics (Jugador 1
+  y Jugador 2): fuera de combate, desde el mapa, un ítem, DDE y despojos (aceptados) y desde la ficha unos DDE (rechazados: volvieron); en combate,
+  pegados, sin aviso (aceptado, 2 No2 cada uno); separados, desde la ficha: «Cancelar» (no se ofreció nada) y «Dar igual» (rechazado, nadie pagó);
+  desde el mapa: «Dar igual» (aceptado). Sin ver: un jugador con dos personajes, y el 🎁 con un botín publicado (`docs/pruebas-en-el-mapa.md`).
 - **⬜ en cola — 🧪 Consumibles propios, a mano** (dueño, 2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización. Que le
   puedas poner nombre, descripción, configurarlos como consumibles, poder equiparlos en la mochila, consumirlos y que desaparezcan, pero que los
   efectos de los consumibles custom se resuelvan a mano». Vale también para «Ítem nuevo» de «Dar a un jugador».

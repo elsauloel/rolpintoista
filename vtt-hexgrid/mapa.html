@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mapa.css?v=20261122suelto">
+<link rel="stylesheet" href="mapa.css?v=20261122dar">
 </head>
 <body>
 <header>
@@ -129,6 +129,7 @@
         <button type="button" id="toolkit-tokens" aria-expanded="false" title="Personajes y tokens: las fichas de la partida, poner tu personaje en el mapa y un token suelto (NPC u objeto); el GM, además, traer creeps">👥</button>
         <button type="button" id="toolkit-tienda" hidden title="Tienda: abrir la tienda que publicó el GM y comprar o vender (cerrada, se puede mirar, pero no comprar ni vender)">🏪</button>
         <button type="button" id="toolkit-botin" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate">🎁</button>
+        <button type="button" id="toolkit-dar" title="Dar: el GM le da a un personaje un ítem del catálogo, DDE, despojos o un ítem nuevo; un jugador le pasa algo de su mochila a otro personaje (ítems, DDE o despojos; en combate, solo ítems y al lado)">🤝</button>
         <button type="button" id="toolkit-mapas" hidden title="Mapas: ver, publicar, crear o borrar mapas guardados, y el fondo">🗺</button>
       </div>
       <div id="tokens-menu" hidden></div>
@@ -258,8 +259,8 @@
 <script src="../comun/estados-presets.js?v=20261120hasta2"></script>
 <script src="../comun/estados-aplicar.js?v=20261120hasta"></script>
 <script src="../comun/recibidos.js?v=20261121dar"></script>
-<script src="../comun/dar-jugador.js?v=20261121dar"></script>
-<script src="../comun/intercambio.js?v=20261103t4"></script>
+<script src="../comun/dar-jugador.js?v=20261122dar"></script>
+<script src="../comun/intercambio.js?v=20261122dar"></script>
 <script src="../comun/trampas-base.js?v=20261028x"></script>
 <script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/asistente-trampa.js?v=20261110disparo"></script>
@@ -401,7 +402,7 @@
 <script src="js/125-resurreccion-fx.js?v=20261120resu1"></script>   <!-- ✨ Las animaciones de resurrección: Ankh, Fénix, Revive y Pacto, en todas las pantallas (2026-11-20) -->
 <script src="js/126-quieto.js?v=20261121mueve"></script>   <!-- 💍 Quién se movió en cada ronda, anotado en la partida; el cartel «🎯 Puntería certera» / «🔮 Foco» y el aviso antes de moverse y perderlo (2026-11-20) -->
 <script src="js/127-zona-detalle.js?v=20261121muro"></script>   <!-- 🔍 «Ver detalle» de una zona, trampa, fuego o nube puesta en el mapa (2026-11-20) -->
-<script src="js/128-dar-jugador.js?v=20261121dar"></script>   <!-- 🎁 El GM le da un ítem, DDE o despojos a un personaje (2026-11-21; la ventana: comun/dar-jugador.js) -->
+<script src="js/128-dar-jugador.js?v=20261122dar"></script>   <!-- 🎁 El GM le da un ítem, DDE o despojos a un personaje (2026-11-21; la ventana: comun/dar-jugador.js) -->
 <script src="js/93-atajos.js?v=20261103hk"></script>
 <script src="../comun/rodillo.js?v=20261018b"></script>
 </body>

@@ -38,6 +38,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
   <button type="button" class="dock-btn" id="btn-equipo" title="Equipo: lo que llevás puesto y la mochila, para cambiar de un lado a otro"><span class="dock-ico">🛡</span><span class="dock-txt">Equipo</span></button>
   <button type="button" class="dock-btn" id="btn-botin-loot" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate"><span class="dock-ico">🎁</span><span class="dock-txt">Despojos <b id="botin-loot-n"></b></span></button>
+  <button type="button" class="dock-btn" id="btn-dar-dock" title="Dar: pasarle a otro personaje algo de tu mochila (ítems, DDE o despojos; en combate, solo ítems y al lado). El GM, además, puede dar algo del catálogo"><span class="dock-ico">🤝</span><span class="dock-txt">Dar</span></button>
   <button type="button" class="dock-btn" id="btn-personajes" title="Ver y abrir los personajes de la partida"><span class="dock-ico">👥</span><span class="dock-txt">Personajes</span></button>
   <button type="button" class="dock-btn" id="btn-vendedor" title="Abrir la tienda que publicó el GM y comprar"><span class="dock-ico">🏪</span><span class="dock-txt">Vendedor</span></button>
   <div class="dock-item">
@@ -815,8 +816,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-presets.js?v=20261120hasta2"></script>
 <script src="../comun/estados-aplicar.js?v=20261120hasta"></script>
 <script src="../comun/recibidos.js?v=20261121dar"></script>
-<script src="../comun/dar-jugador.js?v=20261121dar"></script>
-<script src="../comun/intercambio.js?v=20261103t4"></script>
+<script src="../comun/dar-jugador.js?v=20261122dar"></script>
+<script src="../comun/intercambio.js?v=20261122dar"></script>
 <script src="../comun/trampas-base.js?v=20261028x"></script>
 <script src="../comun/asistente-trampa.js?v=20261110disparo"></script>
 <script src="../comun/elegir-trampa.js?v=20261028x"></script>
@@ -867,7 +868,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/05-estados-y-botonera.js?v=20261031luz2"></script>
 <script src="js/06-cajas-y-carga.js?v=20261120invocar"></script>
 <script src="js/07-editor-y-catalogo.js?v=20261111r33"></script>
-<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261120min1"></script>
+<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261122dar"></script>
 <script src="js/09-inventario-y-tienda.js?v=20261103nit"></script>
 <script src="js/10-habilidades-pasivas-e-items.js?v=20261104e"></script>
 <script src="js/11-combate.js?v=20261104rv2"></script>

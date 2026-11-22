@@ -1958,3 +1958,12 @@ El de un jugador es un token «de personaje» sin ficha (lo mueve él, borde de 
 que ya hacía un token sin ficha**: se mueve sin costo de No2, no tiene vida ni estados, y entra en «Traer tokens» del orden de turnos igual que
 cualquier token del mapa (como ya pasa con los NPC; está en la cola el pedido de que «Tirar iniciativa» no meta lo que no va). ¿Un token suelto de
 jugador debería quedar fuera del orden de turnos siempre? ¿Y el GM debería poder ocultarlo (hoy sí puede: 👁 en su HUD)?
+
+### P278 — 🤝 Las otras puertas de «Dar» y «Pasar»: ¿se dejan o se sacan? (2026-11-22, Claude)
+Con el botón **🤝 Dar** del menú de la izquierda (mapa, ficha y GM Tools) quedan varias puertas que llevan a las mismas dos ventanas. **Elegí no sacar
+ninguna** y anotarlas: (a) en la ficha, «🤝 Pasar» arriba de la mochila y «🤝 Pasar a un aliado» en la ventanita «💰 DDE y despojos» abren
+exactamente lo mismo que el 🤝 Dar del jugador (las más redundantes; la de la ventanita de DDE es la candidata a irse); (b) el «🤝 Dar» / «🤝 Pasar a
+un aliado» de cada ítem de la mochila sirve para no buscar el ítem en la lista (se queda); (c) el 🎁 del «⋯» del token (mapa) y el 🎁 de cada fila de
+👥 Personajes (GM Tools) abren «Dar a un jugador» con ese personaje ya marcado (atajo; se queda); (d) «🎁 Dar a un jugador» en el Ver de un ítem de GM
+Tools, con el ítem ya puesto (se queda); (e) el 🤝 de mano a mano del token pegado también deja **pedir** (se queda). ¿Saco (a)? ¿Y el 🎁 del «⋯» y de
+👥 Personajes pasan a ser 🤝, para que el 🎁 sea siempre y solo el botín?

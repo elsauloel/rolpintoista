@@ -187,6 +187,14 @@ está en este mapa» con dos personajes propios (no se puede en las partidas de 
 - [ ] El GM crea un **token suelto** (queda como NPC, tipo creep sin ficha) y un jugador lee su descripción.
 - [ ] **«🎭 Ponerlo en el mapa» de una invocación** desde el panel (la Abeja ya estaba en el mapa: se vio «✔ en el mapa», no se la puso).
 
+## 🤝 Dar, el botón del menú de la izquierda (2026-11-22)
+
+- [ ] **Un jugador con dos personajes** toca 🤝 en el mapa: le sale el cartelito para elegir desde cuál (en «Claude · pruebas 2» cada jugador tiene uno
+  solo, a propósito; el mismo cartelito se vio con clics para el GM con 🎮 el control de Blanco J1).
+- [ ] **El 🎁 del botín con un botín publicado** (no se terminó ningún combate: se vio solo que sigue apagado y aparte del 🤝; su código no se tocó).
+- [ ] En la **ficha**, el aviso «no está al lado» mira el mapa **publicado**; con el GM mirando otro mapa (sin publicar) que tenga los dos tokens, la
+  ficha y el mapa del jugador podrían decir distinto. No se armó ese caso.
+
 ## ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22)
 
 - [ ] **Lo que no se vio con clics** (lo demás, en la cola: `docs/cola-de-pruebas.md`, «🪟 Carteles encimados al empezar el turno»): (a) una zona de

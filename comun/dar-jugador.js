@@ -21,6 +21,9 @@
    DarJugador.aviso(ficha, que, de) → el documento · .texto(que) → «Hacha ×2 · 50 DDE · 3 despojos» · .mesaTexto(nombres, que)
    DarJugador.recibir(S, r) → {partes, lineas, items, pasada} (lo llama Recibidos.recompensa cuando el aviso es un regalo)
    DarJugador.cartel({nombre, de, lineas, pasada}) — el cartel de quien recibe (si ya hay uno abierto, se suma abajo).
+   DarJugador.puerta({gm, propios: [{id, nombre}], abrirGM(), abrirPasar(fichaId), toast}) — 🤝 Dar, el botón del menú de la izquierda (mapa, ficha
+   y GM Tools; 2026-11-22, opción A del dueño): el GM va a esta ventana; un jugador, a la de pasar algo de su mochila (comun/intercambio.js). Si hay
+   más de un camino (el GM con 🎮 el control de un personaje, o un jugador con varios), un cartelito para elegir. `puertaOpciones(o)` es la lista.
    Necesita sesion.js y mesa.js; para recibir, ficha-tienda.js y ficha-equipo.js; la ventana, filtro-catalogo.js (y generador-tiendas.js),
    asistente-item.js y ficha-calculo.js (los bonos del ítem nuevo).
    ========================================================= */
@@ -190,6 +193,12 @@ const DarJugador = (() => {
 .dj .view-detalle{padding:7px 0 0;font-size:12.5px;line-height:1.5;color:#DCCFC5;white-space:pre-wrap}
 .dj .view-detalle .view-label{display:block;color:#C98545;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
 .dj .view-narrativa{font-style:italic;color:#B9A796}
+.dj.dj-puerta{width:min(520px,94vw);height:auto;max-height:90vh}
+.dj-puerta .dj-cuerpo{display:flex;flex-direction:column;gap:10px}
+.dj-puerta-op{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border:1px solid #3A2F2B;border-radius:10px;background:#1C1719;color:#F2E8DC;cursor:pointer;font:inherit}
+.dj-puerta-op:hover,.dj-puerta-op:focus{border-color:#C98545;background:#261E1F;outline:none}
+.dj-puerta-op b{font-size:14px}
+.dj-puerta-op small{color:#B9A796;font-size:12px;line-height:1.4}
 `;
   function estilos(){
     if(typeof document === 'undefined' || document.getElementById('dar-jugador-css')) return;
@@ -223,6 +232,49 @@ const DarJugador = (() => {
     document.body.appendChild(fondo);
     cartelAbierto = fondo;
     setTimeout(() => { const b = fondo.querySelector('[data-dj-aceptar]'); if(b) try{ b.focus(); }catch(e){} }, 30);
+  }
+
+  /* ---------- 🤝 Dar: la puerta del menú de la izquierda (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta
+     según quién lo toca») ----------
+     Los caminos: el GM, «🎁 Dar como GM» (esta ventana: catálogo, DDE, despojos, ítem nuevo; llega directo); cada personaje que maneja esta
+     pantalla (el suyo, o el que el GM tiene con 🎮 el control), «🤝 Pasar algo de la mochila de X» (comun/intercambio.js: ofrecer / aceptar).
+     → [{tipo: 'gm'} | {tipo: 'pasar', id, nombre}]. Uno solo: se abre directo; varios: se elige; ninguno: se avisa. */
+  function puertaOpciones(o){
+    o = o || {};
+    const L = [];
+    if(o.gm) L.push({tipo: 'gm'});
+    (o.propios || []).filter(p => p && p.id).forEach(p => L.push({tipo: 'pasar', id: String(p.id), nombre: String(p.nombre || 'tu personaje')}));
+    return L;
+  }
+  let puertaAbierta = null;
+  function puertaCerrar(){ if(puertaAbierta){ puertaAbierta.remove(); puertaAbierta = null; } }
+  function puerta(o){
+    o = o || {};
+    const toast = t => { try{ (o.toast || (typeof window.toast === 'function' ? window.toast : () => {}))(t); }catch(e){} };
+    const ir = x => { puertaCerrar(); if(x.tipo === 'gm') o.abrirGM && o.abrirGM(); else o.abrirPasar && o.abrirPasar(x.id); };
+    const L = puertaOpciones(o);
+    if(!L.length){ toast(o.sinNada || 'Para pasarle algo a un colega, primero abrí o poné tu personaje'); return; }
+    if(L.length === 1){ ir(L[0]); return; }
+    if(typeof document === 'undefined') return;
+    estilos();
+    puertaCerrar();
+    const fondo = document.createElement('div');
+    fondo.className = 'dj-fondo dj-puerta-fondo';
+    fondo.innerHTML = `<div class="dj dj-puerta" role="dialog" aria-modal="true">
+      <header><h3>🤝 Dar</h3><button type="button" data-djp="cerrar">Cerrar</button></header>
+      <div class="dj-cuerpo">${L.map((x, i) => x.tipo === 'gm'
+        ? `<button type="button" class="dj-puerta-op" data-djp-op="${i}"><b>🎁 Dar como GM</b><small>Un ítem del catálogo, DDE, despojos o un ítem nuevo, a uno o varios personajes. Les llega directo, con su cartel.</small></button>`
+        : `<button type="button" class="dj-puerta-op" data-djp-op="${i}"><b>🤝 Pasar algo de la mochila de ${esc(x.nombre)}</b><small>Ítems, DDE o despojos de ${esc(x.nombre)} a otro personaje: le llega un aviso para aceptarlo o rechazarlo.</small></button>`).join('')}</div></div>`;
+    fondo.addEventListener('click', e => {
+      if(e.target === fondo){ puertaCerrar(); return; }
+      const b = e.target.closest('button'); if(!b) return;
+      if(b.dataset.djp === 'cerrar'){ puertaCerrar(); return; }
+      if(b.dataset.djpOp !== undefined){ const x = L[num(b.dataset.djpOp)]; if(x) ir(x); }
+    });
+    fondo.addEventListener('keydown', e => { if(e.key === 'Escape'){ e.stopPropagation(); puertaCerrar(); } });
+    document.body.appendChild(fondo);
+    puertaAbierta = fondo;
+    setTimeout(() => { const b = fondo.querySelector('[data-djp-op]'); if(b) try{ b.focus(); }catch(e){} }, 30);
   }
 
   /* ---------- Dar (el GM) ---------- */
@@ -430,5 +482,5 @@ const DarJugador = (() => {
     dibujarCanasta();
   }
 
-  return {abrir, cerrar, enviar, aviso, limpiar, vacio, partesDe, texto, mesaTexto, recibir, itemsDe, pasadaTexto, cartel, copia, MAX_UNIDADES};
+  return {abrir, cerrar, puerta, puertaOpciones, puertaCerrar, enviar, aviso, limpiar, vacio, partesDe, texto, mesaTexto, recibir, itemsDe, pasadaTexto, cartel, copia, MAX_UNIDADES};
 })();

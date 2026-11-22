@@ -154,6 +154,11 @@ function abrirDarJugadorGM(o){
   const item = o.item ? itemDelCatalogoGM(o.item, catalogo) : null;
   DarJugador.abrir({marcados: o.marcados || [], item, catalogo: () => catalogo, toast: t => toast(t), verItem: it => CreepLupa.verItem(it)});
 }
+// 🤝 Dar, en el menú de la izquierda (2026-11-22, dueño, opción A): GM Tools es solo del GM, así que abre siempre «Dar a un jugador», sin nadie marcado.
+$('#btn-dar-dock').onclick = () => {
+  if(!(fbMiembro && fbMiembro.gm)){ toast('Solo el GM puede dar cosas desde GM Tools'); return; }
+  abrirDarJugadorGM({});
+};
 function editarYSubirItemGM(item){
   if(!item) return;
   EditarItem.abrir({item, catalogo: catalogoGMCompleto(), contexto: 'creep', stats: cfgItemGM().stats,

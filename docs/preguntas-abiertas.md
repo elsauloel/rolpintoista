@@ -2009,11 +2009,15 @@ vida a mano lo levantaba **sin** Titilando. Además, ese cambio no se deshace co
 vida a mano lo levanta sin él?
 
 ### P281 — 🤐 El nombre del tótem o del estandarte delata a quien lo clavó (2026-11-22, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «correcto, sacale el nombre del creep» al token del tótem y del estandarte (en la cola).
 El «Ver detalle» nuevo (P259 (4)) no nombra a quien clavó el tótem si esa pantalla no lo ve («Alguien»), pero **el token** se llama «Tótem de silencio
 de <creep>» / «Estandarte de <creep>» (así se crea desde el 2026-10-24), y ese nombre se ve debajo del token y en el cartel de arriba. ¿Se le saca
 el nombre del creep al token («Tótem de silencio», a secas)?
 
 ### P282 — 👊 El puño cuenta como punzante (2026-11-22, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «por ahora está bien», pero «el puño todavía es toda una gran incógnita de desarrollo»: queda así hasta que se diseñe el puño.
 Desde P260 (4) las armas naturales y el puño cuentan por su Tipo. El puño es Tipo 4, así que **suma la Maestría en armas punzantes** (+1 al daño, +1
 PdG de oportunidad y por la espalda). Lo elegí así porque el pedido decía «y el puño si tiene Tipo». ¿Está bien, o el puño queda afuera? (Los guantes
 de «PdG con punzantes» siguen como antes: al puño de un personaje no le suman; al de un creep sin arma, sí.)

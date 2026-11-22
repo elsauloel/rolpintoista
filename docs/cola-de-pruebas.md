@@ -1699,6 +1699,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      Tools (se canceló: no se dio nada).
   Lo que quedó sin probar, en `docs/pruebas-en-el-mapa.md`. La siguiente de la cola: «🛡 Aguante de trinchera con cualquier daño».
 
+- **⬜ en cola — ☥ Probar: la animación corta al resucitar subiéndole la vida a mano** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): que se vea en las tres pantallas (P256 i).
+- **⬜ en cola — ☥ Probar: resucitar a mano a una invocación caída** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): el cartel «está caído, ¿querés resucitarlo…?» con una invocación (P256 i).
+- **⬜ en cola — ☁ Probar: la Polvareda de un creep escondido** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): «Ver detalle» y el cartel dicen «Alguien» a los jugadores (P259 3).
+- **⬜ en cola — ☁ Probar: la nube de la varita de niebla** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): guarda quién la puso y con qué (P259 3).
+- **⬜ en cola — ☁ Probar: el virote de humo** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): su nube guarda quién la puso y con qué (P259 3).
+- **⬜ en cola — 🚩 Probar: «Ver detalle» del estandarte** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): el del Estandarte de guerra, con y sin quien lo clavó a la vista (P259 4).
+- **⬜ en cola — 👊 Probar: el puño de un personaje con la maestría de punzantes, en un duelo** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): (P260 4; tiene prueba automática).
+- **⬜ en cola — 🐝 Probar: una invocación con colmillos y la maestría de su Tipo** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): (P260 4; tiene prueba automática).
+- **⬜ en cola — 🎁 Probar: «Dar igual» con la mochila llena** (dueño, 2026-11-22: «de la lista de sin probar con clics, ponelas cada una con su propio punto»): darlo de verdad y ver el aviso del jugador; después devolver el inventario (P262 5).
+- **⬜ en cola — 🪧 El nombre del tótem y del estandarte no delata al creep (P281 decidida)** (dueño, 2026-11-22: «correcto, sacale el nombre
+  del creep»): el token se llama solo «Tótem de silencio» / «Estandarte de guerra», sin «de <creep>». Los ya clavados, también.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

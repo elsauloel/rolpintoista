@@ -1989,6 +1989,8 @@ Tools, con el ítem ya puesto (se queda); (e) el 🤝 de mano a mano del token p
 👥 Personajes pasan a ser 🤝, para que el 🎁 sea siempre y solo el botín?
 
 ### P279 — 💨 La Prisa con la tirada partida a la mitad o con Afortunado: ¿el +5 se suma antes o después? (2026-11-22, Claude)
+
+> ✅ **Decidida (dueño, 2026-11-22):** «dejalo así como lo decidiste»: el +5 de la Prisa se suma después y entero.
 La Prisa pasó a ser +5 fijo al RESULTADO de la tirada de Iniciativa (el dado sale de la Iniciativa sin la Prisa: 1d6+5). Si un estado partiera la tirada de
 Iniciativa a la mitad (hoy ninguno lo hace: Pajaritos, Lisiado, Parálisis y Sentado tocan PdG, Evasión o Parry) o con Afortunado, **elegí sumar el +5
 después**, entero: primero el dado (con su mitad o su segunda tirada) y al final el +5. Con Afortunado, las dos tiradas llevan su +5. ¿Va así, o el +5

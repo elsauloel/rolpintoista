@@ -1510,6 +1510,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   entiendo bien en qué contexto suceden, así que para corregirlo debería entender eso»). Pasa cuando al empezar tu turno salen dos cosas a la
   vez: el «▶ Empieza tu turno» (No2, regeneración…) y el cartel de una zona en la que estás parado (Muro de fuego). Explicarle el contexto
   y proponer (por ejemplo, que la zona sea un paso más adentro de «Empieza tu turno», o que salgan uno después del otro); programar lo que elija.
+  **Elegido (dueño, 2026-11-22): A** — la zona pasa a ser un renglón más dentro de «▶ Empieza tu turno» (debajo de los No2), con su botón
+  para tirar el daño: un solo cartel con todo lo que pasa al empezar el turno.
 - **⬜ en cola — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
   opiniones y sugerencias»). Mirar qué hace cada uno y proponer.
 - **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo

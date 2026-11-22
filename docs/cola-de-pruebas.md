@@ -1502,9 +1502,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Lo engañoso era el cartel («No hay nada que tirar: se aplica lo que deja la zona»): ahora dice «No hay tirada para resistirla: le entra 3d4 de
   daño de fuego y Quemadura (3 turnos). El daño lo tira Arcano 3.» (vale para toda zona sin tirada). 1 prueba automática nueva (974).
 
-- **⬜ en cola — 🎨 Color de la columna de la izquierda** (dueño, 2026-11-22: «el fondo blanco no me gusta. Quisiera que fuera un fondo
+- **✅ hecho (2026-11-22) — 🎨 Color de la columna de la izquierda** (dueño, 2026-11-22: «el fondo blanco no me gusta. Quisiera que fuera un fondo
   similar al del resto de la ficha, solo que un poco más claro»). Se le mandaron tres muestras (A suave `#261E23`, B media `#30262C`,
-  C marcada `#3C3037`, en `.dock-izq` de `comun/dock-izq.css`); **espera su elección**.
+  C marcada `#3C3037`, en `.dock-izq` de `comun/dock-izq.css`). *Resultado:* eligió la A («me gusta la intensidad de la opción A»):
+  `#261E23` en la ficha y en GM Tools (`?v=20261122fondoA`). La muestra se sacó con ese mismo color sobre la ficha de Blanco J1.
 - **⬜ en cola — 🪟 Carteles encimados al empezar el turno** (dueño, 2026-11-22, con dos capturas: «esta superposición de menús no me gusta. No
   entiendo bien en qué contexto suceden, así que para corregirlo debería entender eso»). Pasa cuando al empezar tu turno salen dos cosas a la
   vez: el «▶ Empieza tu turno» (No2, regeneración…) y el cartel de una zona en la que estás parado (Muro de fuego). Explicarle el contexto

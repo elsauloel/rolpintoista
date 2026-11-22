@@ -8,7 +8,7 @@
 :root{--dock-ancho:56px}
 body:has(> .dock-izq){padding-left:var(--dock-ancho)}
 html.modo-botonera body,html.modo-acciones body,html.modo-mantenimiento body{padding-left:0}
-.dock-izq{position:fixed;left:0;top:0;bottom:0;width:var(--dock-ancho);box-sizing:border-box;z-index:40;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;padding:58px 0 12px 5px;background:var(--paper);border-right:2px solid var(--copper);box-shadow:2px 0 14px rgba(0,0,0,.5)} /* 🖼 en claro (2026-11-18, dueño: «el botón del mapa se pierde con tanto estímulo») */
+.dock-izq{position:fixed;left:0;top:0;bottom:0;width:var(--dock-ancho);box-sizing:border-box;z-index:40;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;padding:58px 0 12px 5px;background:#261E23;border-right:2px solid var(--copper);box-shadow:2px 0 14px rgba(0,0,0,.5)} /* 🎨 fondo oscuro, un poco más claro que la ficha (2026-11-22, dueño eligió la muestra A); antes en claro (2026-11-18) */
 .dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:40px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
   background:var(--panel);border:1px solid var(--line);border-radius:6px;flex:none;color:var(--paper);text-decoration:none;
   cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;

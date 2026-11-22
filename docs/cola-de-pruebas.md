@@ -1813,6 +1813,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Mesa y de las conversaciones de los jugadores (el 🗑, todos; el Registro nuevo, los de antes del combate anterior).
 - **⬜ en cola — Probar: 🕊️ «Borrar la partida» se lleva los mensajes** (2026-11-22, con las reglas pegadas): en una partida de prueba descartable.
 
+- **⬜ en cola — 🕊️ Ajustes de los mensajes secretos (P285)** (dueño, 2026-11-22):
+  1. **Mensaje público:** «que también exista la posibilidad de mandar un mensaje público» (a toda la mesa; que se vea distinto de una tirada).
+  2. **`/r` responde al último que me escribió**, sin poner el nombre («me gusta la sugerencia»); `/m` sigue con el nombre.
+  3. **La paloma flotante, siempre a la vista y la ruta principal** para abrir los mensajes («más que la Mesa; de última que sean ambas»):
+     que se vea aunque no haya mensajes.
+  (Respondido además: se borran con el 🗑 y con «Registro nuevo», bien; paloma en todos lados, bien; sin «responder a todos».)
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2051,6 +2051,8 @@ queda marcado «✋ A mano: el efecto lo resuelve la mesa.». Quedan tres cosas 
 
 ### P285 — 🕊️ Mensajes secretos: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-22):** (1) «está bien que se borre» así; (2) «me gusta la sugerencia»: `/r` responde al último que me escribió; (3) «la paloma flotante me gusta que quede y que de hecho esa sea la ruta principal para abrir el mensaje, más que la Mesa; de última que sean ambas»; (4) paloma en todos lados, bien; (5) no hace falta «responder a todos». Lo que cambia, en la cola.
+
 Pedido del dueño (2026-11-22, «✉ Mensajes secretos entre usuarios», decisiones (a)–(g) en `docs/cola-de-pruebas.md`). Está hecho
 (`comun/mensajes.js`); quedan cosas chicas para decidir:
 1. **Qué es «limpiar el registro general».** Elegí los dos botones del GM que ya limpian la Mesa: el **🗑 de la Mesa** borra *todos* los mensajes

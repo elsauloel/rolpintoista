@@ -1735,6 +1735,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   estilo: cuerpo a cuerpo, distancia, mágico; función: daño, defensa, movilidad, control, curación, sigilo…) y los filtros del catálogo de
   «+ Pasiva»; conversarlo con el dueño antes de programar.
 
+- **⬜ en cola — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
+  ese caso raro de la perforación y defensa especial»; P283, punto 2): hoy el Aguante se resta después de lo que «pasa siempre» por Perfora, así
+  que puede frenar parte de eso. Explicarle el caso con números y proponer.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

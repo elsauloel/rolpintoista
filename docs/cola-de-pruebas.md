@@ -1775,6 +1775,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en el asistente, un campo opcional «Tirada al consumirlo» (por ejemplo 1d6, 2d4+1); al consumirlo se tira sola y sale en la Mesa junto al
   «✋ a mano». Sin tirada, como ahora.
 
+- **⬜ en cola (al final, a propósito) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (dueño,
+  2026-11-22: «vamos a dejar al final de la cola probar este sistema en el mapa con los clics una vez que estén pegadas las reglas de Firebase…
+  cuando llegue el turno de esa tarea, vamos a chequear que las reglas estén actualizadas y vamos a proceder con las pruebas»). Primer paso:
+  verificar que las reglas pegadas sean las del repo (que mandar un mensaje no dé «faltan pegar las reglas»); si no, avisarle al dueño y esperar.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

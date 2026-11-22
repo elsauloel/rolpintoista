@@ -1563,7 +1563,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
   esas defensas, independientemente si es trampa, ataque u otra cosa»). Ya se sumó en trampas y zonas de número fijo (tanda 5); revisar que
   no falte ningún camino y probarlo.
-- **🟡 explicado, espera decisión (2026-11-22) — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
+- **✅ explicado (2026-11-22; lo que se decidió va al final de la cola) — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
   comparar y evaluar»).
   *Resultado:* no hay otra pasiva de jugador que suba la Iniciativa (la Prisa reemplazó a «Reflejos de gato», +1). La suben ítems: 27 con +1, 10
   con +2 y la Navaja del compadrito con +3 (y 21 con −1); y tres habilidades de creep (a mano). La Iniciativa es el tamaño del dado (6 → 1d6; 11 →
@@ -1653,6 +1653,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   manos para que se entienda que esas manos son para pasar objetos y otras cosas. Que el regalo quede solo para el botín»): el 🎁 del «⋯» del
   token (mapa), el de cada fila de 👥 Personajes (GM Tools), el del Ver de un ítem y donde más aparezca para dar, pasan a 🤝; el cartel «🎁 El GM te
   dio algo» también. El 🎁 queda solo en Despojos / botín.
+
+- **⬜ en cola — 💨 Prisa: +5 fijo al resultado de la tirada de iniciativa** (dueño, 2026-11-22: «la Prisa quiero que sea +5 al resultado de la
+  tirada. Fijo. Porque no es tan relevante. Está bien que sea un bono grande»). Hoy suma 5 al número de Iniciativa (el tamaño del dado: 6 → 1d6,
+  11 → 1d10+1); pasa a sumarse 5 al resultado (1d6 → 1d6+5), en la tirada del mapa («🎲 Tirar iniciativa»), en la de la ficha y en lo que se vea
+  (la 🔍, el texto de la pasiva, `Combatiente.PRISA_DETALLE`). Ojo con las fichas que ya tienen la Prisa (y la copia vieja `prisa`).
 
 ## En cola
 

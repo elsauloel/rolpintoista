@@ -1573,6 +1573,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   entender esto»). Explicarle cómo está y qué preguntaba P271.
 - **⬜ en cola — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
 
+- **⬜ en cola — 🪟 Zona al empezar el turno: lo que quedó sin probar** (dueño, 2026-11-22: «lo que quedó sin probar, probalo. Y si no se puede,
+  y si el problema es que la tirada falló para resistir, forzá la tirada con elegir el resultado manualmente»). Resistir con éxito desde el
+  renglón (con «✍ Elegir manualmente»), una invocación con turno propio sobre el Muro, recargar la página antes de tirar la zona, la frase «Se
+  aplicó solo al pasar el turno…», y confirmar que el botón de tirar el daño lo tira **el dueño de la zona** (dueño: «habitualmente es un
+  rival. ¿Correcto?»), también cuando la zona es de un jugador.
+- **⬜ en cola — 🔥 ¿La Quemadura del Muro pierde un turno en el mismo momento en que entra?** (dueño, 2026-11-22, sobre la captura con
+  «Quemadura: 3 → 2 turnos»: «quiero creer que esa es una quemadura previa… no tendría sentido que en el momento que se le aplica la quemadura
+  por la zona de muro, se baje su cantidad de turnos de 3 a 2, tendría que por lo menos durar una ronda»). Verificar de dónde venía esa
+  Quemadura y qué pasa cuando el Muro le pone otra encima (¿se renueva a 3?); que una recién puesta dure al menos una ronda entera.
+- **⬜ en cola — 🐝 Las invocaciones en el orden de turnos, con su iniciativa** (dueño, 2026-11-22, P275: «una invocación debería ubicarse en la
+  lista en el orden de turnos. Es más, agreguemos una función que al realizar una invocación, esta venga acompañada de una tirada de iniciativa y
+  que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada de iniciativa»). Ver cómo está hoy (hay invocaciones
+  con turno propio y otras fuera del orden, como la abeja); lo dudoso, como pregunta.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

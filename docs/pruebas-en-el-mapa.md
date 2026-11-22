@@ -178,6 +178,16 @@ el Acelerador; la ficha suelta en una pestaña dormida; +N de vida con la vida l
 resurrección** con el duelo abierto o desde lejos; el Foco en una invocación (Dash / Salto / Parpadeo y el creep: hechos, cola 2026-11-21); y el cartel «todavía no
 está en este mapa» con dos personajes propios (no se puede en las partidas de prueba).
 
+## ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22)
+
+- [ ] **Lo que no se vio con clics** (lo demás, en la cola: `docs/cola-de-pruebas.md`, «🪟 Carteles encimados al empezar el turno»): (a) una zona de
+  «al empezar su turno» **resistida con éxito** desde su renglón (las dos tiradas de Res.Esp de la prueba fallaron); (b) una **invocación con turno
+  propio** parada en el Muro de fuego (su ventana es la misma, no se armó el caso); (c) una zona **con duelo por token** (los Pedos Tóxicos) que pegue
+  al empezar el turno (hoy ninguna lo hace: solo el Muro tiene `alEmpezar`); (d) el texto «Se aplicó solo al pasar el turno. Lo de la zona sigue
+  pendiente» (el caso se vio con clics, pero con la frase anterior, «Lo aplicó el GM»); (e) un **creep** parado en el Muro al empezar su turno (no tiene
+  la ventana: sigue con el cartel de siempre en la pantalla del GM; no cambió, no se volvió a mirar); (f) recargar la página con la zona sin tirar: el
+  renglón se pierde (como antes se perdía el cartel).
+
 ## 🎁 Dar a un jugador (2026-11-21)
 
 - [x] (2026-11-21, Claude, «Claude · pruebas 2», GM + Jugador 1 + Jugador 2, todo restaurado después) **🎁 El GM le da un ítem, DDE o despojos a un

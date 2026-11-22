@@ -40,6 +40,21 @@ const AvisoCombate = (() => {
      reemplazan a «Entendido» (la tirada que toca ahora; `detalle`: una línea chica debajo del texto del botón, ej. qué hace el arma, 2026-10-04;
      `fila: true` (2026-10-11, el desplegable de las flechas especiales): el botón ocupa todo el ancho, alineado a la izquierda, como un renglón de una lista); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
      con la misma clave redibuja la ventana abierta sin cerrarla (ni llamar a alCerrar). */
+  /* Un botón adentro de un paso (2026-11-22, «▶ Empieza tu turno» con la zona como un renglón más): `pasos: [{titulo, texto, botones: [{texto, alClic,
+     sec, deshabilitado, titulo}]}]`. `sinPie: true`: sin la fila de botones de abajo (mientras falta algo de un paso). */
+  function botonesPaso(p, i){
+    const bs = Array.isArray(p.botones) ? p.botones : [];
+    if(!bs.length) return '';
+    return `<div class="duelo-pie" style="justify-content:flex-start;margin-top:8px">${bs.map((b, j) => `<button type="button" data-aviso-pb="${i}:${j}"${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}</button>`).join('')}</div>`;
+  }
+  /* Esconder la ventana abierta sin cerrarla (2026-11-22): mientras se tira algo que abre el cuadro del duelo, la ventana no lo tapa. Escondida,
+     `abierto()` da false (no hay nada al centro: otro aviso puede salir, y si sale la reemplaza) y `escondida(clave)` dice si es esa. */
+  function esconder(clave, si){
+    if(!abierto || (clave && abierto.clave !== clave)) return false;
+    abierto.escondido = !!si;
+    abierto.el.style.display = si ? 'none' : '';
+    return true;
+  }
   function mostrar(o){
     o = o || {};
     if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
@@ -54,27 +69,31 @@ const AvisoCombate = (() => {
     f.innerHTML = `<div class="duelo-caja" role="dialog" aria-modal="true">
       <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span>${o.soloBoton ? '' : '<div class="bt"><button type="button" data-aviso-x title="Cerrar">✕</button></div>'}</div>
       <div class="duelo-cuerpo">
-        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${p.html ? p.html : e(p.texto || '')}</p></div>`).join('')
+        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${p.html ? p.html : e(p.texto || '')}</p>${botonesPaso(p, i)}</div>`).join('')
           : o.texto ? `<div class="duelo-paso"><p>${e(o.texto)}</p></div>` : ''}
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
-        <div class="duelo-pie"${o.grilla ? ' style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px"' : ''}>${botones.length
-          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.fila ? ' style="flex:1 1 100%;text-align:left;padding:7px 12px"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')
-          : `<button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button>`}</div>
+        ${o.sinPie ? '' : `<div class="duelo-pie"${o.grilla ? ' style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px"' : ''}>${botones.length
+          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.id ? ` id="${e(b.id)}"` : ''}${b.sec ? ' class="sec"' : ''}${b.fila ? ' style="flex:1 1 100%;text-align:left;padding:7px 12px"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')
+          : `<button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button>`}</div>`}
       </div>
     </div>`;
     f.onclick = ev => {
+      const pb = ev.target.closest('[data-aviso-pb]');
+      if(pb){ const [i, j] = String(pb.dataset.avisoPb).split(':').map(Number); const x = ((pasos[i] || {}).botones || [])[j]; if(x && x.alClic && !pb.disabled) x.alClic(); return; }
       const b = ev.target.closest('[data-aviso-b]');
       if(b){ const x = botones[Number(b.dataset.avisoB)]; if(x && x.alClic && !b.disabled) x.alClic(); return; }
       if(ev.target === f && o.soloBoton) return;   // `soloBoton` (2026-10-22, dueño): se cierra solo con su botón, no con un clic afuera
       if(ev.target === f || ev.target.closest('[data-aviso-x],[data-aviso-ok]')) cerrar();
     };
     if(!mismo) document.body.appendChild(f);
-    abierto = {el: f, alCerrar: o.alCerrar, clave: o.clave || '', soloBoton: !!o.soloBoton};
-    const ok = f.querySelector('[data-aviso-b]:not([disabled]),[data-aviso-ok]');
+    const escondido = mismo && abierto.escondido;
+    abierto = {el: f, alCerrar: o.alCerrar, clave: o.clave || '', soloBoton: !!o.soloBoton, escondido};
+    f.style.display = escondido ? 'none' : '';
+    const ok = f.querySelector('[data-aviso-b]:not([disabled]),[data-aviso-pb]:not([disabled]),[data-aviso-ok]');
     if(ok) ok.focus();
   }
-  document.addEventListener('keydown', ev => { if(abierto && ev.key === 'Escape'){ ev.stopImmediatePropagation(); if(!abierto.soloBoton) cerrar(); } }, true);
+  document.addEventListener('keydown', ev => { if(abierto && !abierto.escondido && ev.key === 'Escape'){ ev.stopImmediatePropagation(); if(!abierto.soloBoton) cerrar(); } }, true);
 
   /* Los carteles que piden algo (tirar, decidir, esperar): el mismo marco, pero SIN oscurecer el mapa (hay que poder mirarlo, y en el dodge
      roll mover el token). cartel(clave, o) dibuja o redibuja el de esa clave; cartel(clave, null) lo saca. Varios a la vez se apilan.
@@ -159,5 +178,6 @@ const AvisoCombate = (() => {
       const b = f.querySelector('[data-p="si"]'); if(b) b.focus();
     });
   }
-  return {mostrar, cerrar, abierto: () => !!abierto, abiertoClave: () => abierto ? abierto.clave : null, cartel, preguntar};
+  return {mostrar, cerrar, abierto: () => !!abierto && !abierto.escondido, abiertoClave: () => abierto ? abierto.clave : null, esconder,
+    escondida: clave => !!(abierto && abierto.escondido && (!clave || abierto.clave === clave)), cartel, preguntar};
 })();

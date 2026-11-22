@@ -1506,12 +1506,27 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   similar al del resto de la ficha, solo que un poco más claro»). Se le mandaron tres muestras (A suave `#261E23`, B media `#30262C`,
   C marcada `#3C3037`, en `.dock-izq` de `comun/dock-izq.css`). *Resultado:* eligió la A («me gusta la intensidad de la opción A»):
   `#261E23` en la ficha y en GM Tools (`?v=20261122fondoA`). La muestra se sacó con ese mismo color sobre la ficha de Blanco J1.
-- **⬜ en cola — 🪟 Carteles encimados al empezar el turno** (dueño, 2026-11-22, con dos capturas: «esta superposición de menús no me gusta. No
+- **✅ hecho (2026-11-22) — 🪟 Carteles encimados al empezar el turno** (dueño, 2026-11-22, con dos capturas: «esta superposición de menús no me gusta. No
   entiendo bien en qué contexto suceden, así que para corregirlo debería entender eso»). Pasa cuando al empezar tu turno salen dos cosas a la
   vez: el «▶ Empieza tu turno» (No2, regeneración…) y el cartel de una zona en la que estás parado (Muro de fuego). Explicarle el contexto
   y proponer (por ejemplo, que la zona sea un paso más adentro de «Empieza tu turno», o que salgan uno después del otro); programar lo que elija.
   **Elegido (dueño, 2026-11-22): A** — la zona pasa a ser un renglón más dentro de «▶ Empieza tu turno» (debajo de los No2), con su botón
   para tirar el daño: un solo cartel con todo lo que pasa al empezar el turno.
+  *Resultado:* un solo cartel. Las zonas de «al empezar su turno» ya no abren el suyo: van como renglones de «▶ Empieza tu turno» (debajo de los
+  estados, la vida y los No2), una por zona, cada una con su botón («🔥 Tirar el daño (3d4)» o «🎲 Tirar Res.Esp para resistir…»). El botón se
+  habilita después de «✔ Aplicar» (primero lo del turno, después la zona: P274); con zonas pendientes, «✔ Aplicar» ya no cierra la ventana. Al tocar
+  el de la zona, la ventana se aparta y queda a la vista el cuadro del duelo de siempre (el daño lo tira el GM o el dueño de la zona; el jugador ve el
+  cuadro «esperando que Arcano 3 tire el daño…» y aplica); cuando el cuadro se cierra, la ventana vuelve con el resultado («9 de daño de fuego (lo
+  tiró Arcano 3; entraron 9) · Quemadura») y «Entendido». **Y nunca tapa un cuadro del duelo**: si se abre otro (la zona de una invocación, un
+  ataque), se aparta sola y vuelve al cerrarse. Si el GM lo aplica por él o se aplica solo al pasar el turno, la zona sigue con su botón (se puede
+  tirar igual); si la zona se fue antes de tirar, dice «ya no está: no pasa nada». Un creep sigue con el cartel de siempre (no tiene esa ventana).
+  Probado con clics en «Claude · pruebas 2» (GM, J1, J2), con capturas de antes (la versión publicada) y después, en la pantalla del jugador y en la
+  del GM (con 🎮 el control de J2): J1 50 → 46 (3d4 = 4) + Quemadura 2; J2 50 → 43 (7) + 2; dos zonas a la vez (el Muro y una Nube con tirada para
+  resistir: dos renglones; Res.Esp 4 contra 8, no resistió, 1d4 + Pajaritos); «▶ Aplicar por él» del GM; pasar el turno sin tirar; un turno sin zona
+  («✔ Aplicar» la cierra, como siempre). **Arreglado en el camino:** el cuadro del daño de la abeja (fuera del orden) se abría debajo de la ventana.
+  Por datos: darle el Muro de fuego a Arcano 3, acercarlo, el orden de turnos, mover a J2 fuera del muro y la Nube de prueba. Sin ver: lo de
+  `docs/pruebas-en-el-mapa.md` (2026-11-22). Dudas: P274 (el orden) y P275 (la abeja fuera del orden sigue con su cartel aparte). 5 pruebas
+  automáticas nuevas (979).
 - **⬜ en cola — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
   opiniones y sugerencias»). Mirar qué hace cada uno y proponer.
 - **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo

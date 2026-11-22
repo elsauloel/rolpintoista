@@ -403,6 +403,7 @@ let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mos
 // `pasos` (el hielo, 2026-10-17): cuántos pasos dio sobre la zona en este movimiento = cuántas tiradas (se suman si ya esperaba).
 // `pisa` (el hielo): las casillas de esos pasos, en orden, con cuántos pasos dio después (`resto`): si se resbala, queda ahí.
 function zonaEncolar(el, t, pasos, pisa){
+  if(zonaJuntar){ zonaJuntar.push(el.id); return; }   // ▶ al empezar el turno: va a la ventana «Empieza tu turno» (zonaInicioOfrecer)
   if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)){ zonaDueloPedir(el, t); return; }   // 💨 con duelo por token (los Pedos Tóxicos, js/112): sin cartel
   const id = zonaIdDe(t), n = Math.max(0, Math.round(num(pasos)));
   const ya = zonaCola.find(x => x.elId === el.id && x.tokenId === id);
@@ -456,7 +457,11 @@ function zonasAlEmpezarTurno(){
   if(zonaTurnoVisto.has(k)) return;
   zonaTurnoVisto.add(k);
   const t = tokens.get(o.id);
-  if(t && zonaResuelvoYo(t)) zonaRevisarToken(t, true, false, false, null, true);
+  if(!t || !zonaResuelvoYo(t)) return;
+  const junta = [];
+  zonaJuntar = junta;
+  try{ zonaRevisarToken(t, true, false, false, null, true); }finally{ zonaJuntar = null; }
+  if(junta.length) zonaInicioOfrecer(o.id, junta);   // ▶ un renglón de «Empieza tu turno» (o el cartel de siempre, si no tiene esa ventana)
 }
 // `soloAlEmpezar`: solo las zonas de «al empezar su turno» (lo llama zonasAlEmpezarTurno).
 function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, soloAlEmpezar){
@@ -765,44 +770,110 @@ function danoDirectoCuentaYAviso(t, monto, res, o){
   danoDirectoAvisar(t, {...o, cz}).catch(err => console.error('El aviso del daño directo:', err));
   return cz;
 }
-function renderZonaBanner(){
-  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
-  if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
-  // Con el resultado ya puesto se muestra aunque la zona se haya borrado (2026-10-05: en su último turno se va apenas la resuelven).
-  const el = elementos.get(zonaBanner.elId) || (zonaBanner.resultado ? zonaBanner.el : null), t = tokens.get(zonaBanner.tokenId) || (zonaBanner.resultado ? zonaBanner.t : null);
-  if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
-  const icono = typeof esHielo === 'function' && esHielo(el) ? '🧊' : el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
-  // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.
-  if(!zonaBanner.resultado && !zonaBanner.momentoP) zonaBanner.momentoP = momentoAbrir({tipo: 'zona', icono, titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
-  const nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
+/* Lo que dice el cartel de una zona ANTES de resolverla (qué se resiste y con qué, o qué le entra y quién tira el daño) → {icono, titulo, texto, boton}.
+   Lo usan el cartel de siempre (renderZonaBanner) y el renglón de la zona dentro de «▶ Empieza tu turno» (zonaInicioRenglon, 2026-11-22). */
+function zonaIconoDe(el){ return typeof esHielo === 'function' && esHielo(el) ? '🧊' : el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫'; }   // 🔥 solo para el fuego (o una zona vieja de puro daño)
+function zonaCartelAntes(el, t, pasos){
+  const icono = zonaIconoDe(el), nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
   const stat = el.zonaResistStat ? (ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat) : '';
-  if(zonaBanner.resultado){
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado, veredicto: zonaBanner.veredicto || null,
-      botones: [{texto: 'Listo', id: 'zona-banner-ok', alClic: () => { zonaBanner = null; zonaMostrarSiguiente(); }}]});
-  }else if(stat){
+  if(stat){
     // Qué se resiste, a la vista antes de tirar (dueño, 2026-10-04, norma general). Resistir una zona evita todo: el daño y lo que deja.
     let spec = null; try{ spec = el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){}
     const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? [`el daño (la diferencia de las tiradas${el.zonaDano ? ' + ' + el.zonaDano : ''})`] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
-    const pasosZ = Math.max(1, num(zonaBanner.pasos) || 1);   // el hielo: una tirada por paso; a la primera que falla, le pasa
-    const porPaso = spec && spec.tiraPaso ? (zonaBanner.pasos ? ` Dio ${pasosZ} paso${pasosZ === 1 ? '' : 's'} sobre ${nombreZ}: ${pasosZ === 1 ? 'una tirada' : `una tirada por paso; a la primera que falla, ${spec.nombre ? 'queda ' + spec.nombre : 'le pasa'}`}.` : ` ${nombreZ} apareció bajo sus pies.`) : '';
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
-      botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
-  }else{
-    // 🔥 Qué le entra y quién tira el daño (2026-11-21: antes decía «No hay nada que tirar» y después se tiraba el 3d4 del Muro de fuego).
-    let quienTira = '';
-    try{ const q = zonaDanoQuien(el), tq = q.deTokenId ? tokens.get(q.deTokenId) : null; quienTira = tq && tq.oculto && !soyGM ? '' : q.yo.nombre; }catch(err){}
-    const textoZ = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira})
-      : 'No hay nada que tirar: se aplica lo que deja la zona.';
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: textoZ,
-      botones: [{texto: 'Aplicar', id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
+    const pasosZ = Math.max(1, num(pasos) || 1);   // el hielo: una tirada por paso; a la primera que falla, le pasa
+    const porPaso = spec && spec.tiraPaso ? (pasos ? ` Dio ${pasosZ} paso${pasosZ === 1 ? '' : 's'} sobre ${nombreZ}: ${pasosZ === 1 ? 'una tirada' : `una tirada por paso; a la primera que falla, ${spec.nombre ? 'queda ' + spec.nombre : 'le pasa'}`}.` : ` ${nombreZ} apareció bajo sus pies.`) : '';
+    return {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
+      boton: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`};
   }
+  // 🔥 Qué le entra y quién tira el daño (2026-11-21: antes decía «No hay nada que tirar» y después se tiraba el 3d4 del Muro de fuego).
+  let quienTira = '';
+  try{ const q = zonaDanoQuien(el), tq = q.deTokenId ? tokens.get(q.deTokenId) : null; quienTira = tq && tq.oculto && !soyGM ? '' : q.yo.nombre; }catch(err){}
+  const texto = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira})
+    : 'No hay nada que tirar: se aplica lo que deja la zona.';
+  const conDados = !!el.zonaDano && /d/i.test(String(el.zonaDano)) && !t.oculto;
+  return {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto, boton: 'Aplicar', botonInicio: conDados ? `${icono} Tirar el daño (${el.zonaDano})` : `${icono} Aplicar`};
+}
+function renderZonaBanner(){
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
+  // ▶ Una zona de «al empezar su turno» resuelta desde su renglón de «Empieza tu turno» (2026-11-22): sin cartel propio; el resultado vuelve a esa ventana.
+  if(zonaBanner.enInicio){
+    if(!zonaBanner.resultado) return;
+    const b = zonaBanner; zonaBanner = null;
+    AvisoCombate.cartel('zona', null);
+    b.enInicio({resultado: b.resultado, veredicto: b.veredicto || null});
+    zonaMostrarSiguiente();
+    return;
+  }
+  // Con el resultado ya puesto se muestra aunque la zona se haya borrado (2026-10-05: en su último turno se va apenas la resuelven).
+  const el = elementos.get(zonaBanner.elId) || (zonaBanner.resultado ? zonaBanner.el : null), t = tokens.get(zonaBanner.tokenId) || (zonaBanner.resultado ? zonaBanner.t : null);
+  if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
+  const icono = zonaIconoDe(el);
+  // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.
+  if(!zonaBanner.resultado && !zonaBanner.momentoP) zonaBanner.momentoP = zonaMomentoAbrir(el, t);
+  const nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
+  if(zonaBanner.resultado){
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado, veredicto: zonaBanner.veredicto || null,
+      botones: [{texto: 'Listo', id: 'zona-banner-ok', alClic: () => { zonaBanner = null; zonaMostrarSiguiente(); }}]});
+  }else{
+    const a = zonaCartelAntes(el, t, zonaBanner.pasos);
+    AvisoCombate.cartel('zona', {icono, titulo: a.titulo, texto: a.texto, botones: [{texto: a.boton, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
+  }
+}
+const zonaMomentoAbrir = (el, t) => momentoAbrir({tipo: 'zona', icono: zonaIconoDe(el), titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
+/* ▶🔥 La zona como un renglón más de «▶ Empieza tu turno» (dueño, 2026-11-22, opción A: «esta superposición de menús no me gusta»). Antes, al empezar
+   el turno de alguien parado en el Muro de fuego, salían dos carteles a la vez y encimados: «Empieza tu turno» y «Muro de fuego: le toca a…». Ahora,
+   si a ese token le sale la ventana «Empieza tu turno» en esta pantalla (un personaje o una invocación, a quien lo maneja), las zonas de «al empezar su
+   turno» (`alEmpezar`) no abren cartel: van como renglones de esa ventana, cada una con su botón (js/16, inicioVentana). El botón se habilita después
+   de «✔ Aplicar» (primero lo del turno, después la zona: P274) y, mientras se tira el daño en el cuadro del duelo, la ventana se esconde (no lo tapa) y
+   vuelve con el resultado. Un creep (no tiene esa ventana) y cualquier caso en que la ventana no llegue (15 s) siguen con el cartel de siempre. */
+let zonaJuntar = null;                    // mientras zonasAlEmpezarTurno revisa: las zonas que encontró, en vez de encolarlas
+const zonaInicioEspera = new Map();       // tokenId → {elIds, timer}: esperando que llegue su «Empieza tu turno»
+function zonaInicioOfrecer(tokenId, elIds){
+  const t = tokens.get(tokenId);
+  const conVentana = t && t.tipo !== 'creep' && typeof inicioTurnoTarjetaSobra === 'function' && inicioTurnoTarjetaSobra(tokenId) && typeof inicioZonasSumar === 'function';
+  const encolar = ids => ids.forEach(id => { const el = elementos.get(id), tk = tokens.get(tokenId); if(el && tk) zonaEncolar(el, tk); });
+  if(!conVentana || (typeof inicioYaCerrado === 'function' && inicioYaCerrado(tokenId))){ encolar(elIds); return; }
+  if(inicioZonasSumar(tokenId, elIds)) return;   // la ventana ya estaba abierta
+  const ya = zonaInicioEspera.get(tokenId);
+  if(ya) clearTimeout(ya.timer);
+  const ids = [...new Set([...(ya ? ya.elIds : []), ...elIds])];
+  zonaInicioEspera.set(tokenId, {elIds: ids, timer: setTimeout(() => { const e = zonaInicioEspera.get(tokenId); zonaInicioEspera.delete(tokenId); if(e) encolar(e.elIds); }, 15000)});
+}
+// Lo que esperaba a la ventana de ese token (js/16 la pide al abrirla).
+function zonaInicioTomar(tokenId){
+  const e = zonaInicioEspera.get(tokenId);
+  if(!e) return [];
+  clearTimeout(e.timer); zonaInicioEspera.delete(tokenId);
+  return e.elIds;
+}
+// El renglón: qué dice y qué botón lleva; abre el momento de la zona (los demás lo ven en la Crónica mientras espera).
+function zonaInicioRenglon(elId, tokenId){
+  const el = elementos.get(elId), t = tokens.get(tokenId);
+  if(!el || !el.zona || !t) return null;
+  const a = zonaCartelAntes(el, t, 0);
+  return {elId, tokenId, icono: a.icono, nombre: el.zonaNombre || 'Zona', texto: a.texto, boton: el.zonaResistStat ? a.boton : (a.botonInicio || a.boton), estado: 'pend', momentoP: zonaMomentoAbrir(el, t)};
+}
+// El botón del renglón: lo mismo que el cartel de siempre (zonaResolverBanner), sin cartel. → Promise {resultado, veredicto} | null (no se pudo empezar).
+function zonaInicioResolver(z){
+  return new Promise(ok => {
+    const el = elementos.get(z.elId), t = tokens.get(z.tokenId);
+    if(!el || !el.zona || !t){ ok({resultado: 'La zona (o el token) ya no está: no pasa nada.'}); return; }
+    if(zonaBanner){ toast('Esperá: se está resolviendo otra zona'); ok(null); return; }
+    if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)){ zonaDueloPedir(el, t); ok({resultado: 'Se resuelve en el cuadro del duelo.'}); return; }
+    zonaBanner = {elId: z.elId, tokenId: z.tokenId, el, t, resultado: null, pasos: 0, pisa: null, momentoP: z.momentoP, enInicio: ok};
+    zonaResolverBanner().catch(err => {
+      console.error('La zona al empezar el turno:', err);
+      if(zonaBanner && zonaBanner.enInicio === ok){ zonaBanner = null; ok({resultado: 'No se pudo resolver: resolvela a mano.'}); zonaMostrarSiguiente(); }
+    });
+  });
 }
 async function zonaResolverBanner(){
   if(!zonaBanner) return;
   const {elId, tokenId} = zonaBanner;
   const el = elementos.get(elId), t = tokens.get(tokenId);
   const bt = document.getElementById('zona-banner-ir'); if(bt) bt.disabled = true;
-  if(!el || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }
+  if(!el || !t){ const fin = zonaBanner.enInicio; zonaBanner = null; if(fin) fin({resultado: 'La zona (o el token) ya no está: no pasa nada.'}); zonaMostrarSiguiente(); return; }
   let resistio = false, diferencia = null;
   const partes = [];
   const quienTxt = t.oculto ? 'Alguien' : nombreDe(t);

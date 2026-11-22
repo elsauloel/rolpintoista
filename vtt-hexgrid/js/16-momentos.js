@@ -225,32 +225,128 @@ function momentoRecibido(id, d){
    el mismo cartel dice «✔ Ya se aplicó» y se cierra con «Entendido». El resto lo ve en la Crónica (el GM, con «▶ Aplicar por él» mientras
    espera). → true si esta pantalla lo mostró al centro. */
 const inicioMostrados = new Set(), inicioAplicadoAca = new Set(), inicioNoAplicadoVisto = new Set();
+/* ▶🔥 Las zonas de «al empezar su turno», adentro de esta ventana (dueño, 2026-11-22, opción A: «un solo cartel con todo lo que pasa al empezar el
+   turno»; js/08 zonaInicioOfrecer). Cada zona es un renglón más (debajo de los No2 y lo demás) con su botón, que se habilita después de «✔ Aplicar»
+   (P274). Mientras se resuelve (el cuadro del duelo para tirar el daño), la ventana se esconde: no tapa el cuadro; vuelve con el resultado. Se cierra
+   con «Entendido» cuando no falta nada (sin zonas, «✔ Aplicar» la cierra, como siempre). */
+const inicioVentanas = new Map();   // id del momento → {d, tokenId, aplicado: '' | 'aca' | 'gm' | 'no', zonas: [renglón de js/08]}
+const inicioCerrados = new Map();   // tokenId → el paso del orden de turnos en que se cerró su ventana (las zonas que lleguen después, en ese mismo turno, van con su cartel de siempre)
+const inicioPasoDe = clave => { const c = String(clave || ''); return Number(c.slice(c.lastIndexOf(':') + 1)); };
+function inicioYaCerrado(tokenId){ return inicioCerrados.has(tokenId) && inicioCerrados.get(tokenId) === Math.round(num(iniciativa.paso)); }
+function inicioZonasDe(v, elIds){
+  (elIds || []).forEach(elId => {
+    if(v.zonas.some(z => z.elId === elId)) return;
+    const r = typeof zonaInicioRenglon === 'function' ? zonaInicioRenglon(elId, v.tokenId) : null;
+    if(r) v.zonas.push(r);
+  });
+}
+// js/08: las zonas de ese token, si su ventana ya está a la vista en esta pantalla → true (si no, esperan a que llegue).
+function inicioZonasSumar(tokenId, elIds){
+  for(const [id, v] of inicioVentanas) if(v.tokenId === tokenId){ inicioZonasDe(v, elIds); inicioVentanaDibujar(id); return true; }
+  return false;
+}
+const inicioFaltan = v => v.zonas.filter(z => z.estado !== 'listo');
+function inicioVentanaDibujar(id){
+  const v = inicioVentanas.get(id);
+  if(!v) return;
+  const dt = v.d.datos || {}, clave = 'inicio-turno:' + id;
+  const pasos = [...(dt.pasos || [])];
+  if(v.aplicado === 'aca' && v.zonas.length) pasos.push({titulo: '✔ Aplicado', texto: 'Los estados, la regeneración, la vida y los No2 quedaron como dice arriba.'});
+  v.zonas.forEach((z, k) => {
+    const listo = z.estado === 'listo', tirando = z.estado === 'tirando';
+    pasos.push({titulo: `${z.icono} ${z.nombre}${listo ? '' : ': estás adentro al empezar tu turno'}`, texto: listo ? z.resultado : z.texto, espera: !listo,
+      botones: listo ? [] : [{texto: tirando ? '⏳ Resolviendo…' : z.boton, deshabilitado: tirando || !v.aplicado,
+        titulo: !v.aplicado ? 'Primero «✔ Aplicar» lo del turno; después, la zona' : '', alClic: () => inicioZonaIr(id, k)}]});
+  });
+  const faltan = inicioFaltan(v);
+  const veredicto = v.aplicado === 'no' ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}
+    : v.aplicado === 'gm' ? {tono: 'bueno', grande: '✔ YA SE APLICÓ', chico: /solo al pasar el turno/.test(v.d.resultado || '') ? 'Se aplicó solo al pasar el turno. Lo de la zona sigue pendiente: tiralo igual.' : 'Lo aplicó el GM.'}
+    : (!faltan.length && v.zonas.length === 1 && v.zonas[0].veredicto) ? v.zonas[0].veredicto : null;
+  let botones = [], sinPie = false;
+  if(!v.aplicado) botones = [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => inicioAplicarClic(id)}];
+  else if(faltan.length) sinPie = true;   // (el botón de cada zona va en su renglón)
+  else botones = [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}];
+  AvisoCombate.mostrar({clave, icono: '▶', titulo: 'Empieza tu turno', pasos, texto: '', soloBoton: true, veredicto, botones, sinPie,
+    alCerrar: () => { inicioMostrados.delete(id); inicioVentanas.delete(id); inicioCerrados.set(v.tokenId, inicioPasoDe(dt.clave)); }});   // cerrado sin aplicar: el GM lo puede aplicar por él, y al pasar el turno se aplica solo
+}
+function inicioAplicarClic(id){
+  const v = inicioVentanas.get(id);
+  if(!v) return;
+  inicioAplicadoAca.add(id);
+  // Sin zonas, se cierra al tocarlo (2026-11-14, dueño: una sola ventana, sin el segundo paso «Ya se aplicó»). Con zonas, queda para tirarlas.
+  if(!v.zonas.length) AvisoCombate.cerrar();
+  else{ v.aplicado = 'aca'; inicioVentanaDibujar(id); }
+  inicioTurnoAplicar(id, v.d, false);   // (si falla, avisa con un toast)
+}
+// El botón de una zona: la ventana se esconde mientras se resuelve (el cuadro del duelo del daño no queda tapado) y vuelve con el resultado.
+async function inicioZonaIr(id, k){
+  const v = inicioVentanas.get(id), z = v && v.zonas[k];
+  if(!z || z.estado !== 'pend' || !v.aplicado) return;
+  z.estado = 'tirando';
+  inicioVentanaDibujar(id);
+  AvisoCombate.esconder('inicio-turno:' + id, true);
+  let r = null;
+  try{ r = await zonaInicioResolver(z); }catch(err){ console.error('La zona al empezar el turno:', err); }
+  if(!inicioVentanas.has(id)) return;
+  if(r){ z.estado = 'listo'; z.resultado = r.resultado || 'sin efecto'; z.veredicto = r.veredicto || null; }
+  else z.estado = 'pend';
+  inicioVentanaVolver(id);
+}
+// Vuelve a mostrar la ventana: si mientras tanto salió otro aviso al centro (la reemplazó), espera a que se cierre; y espera a que se cierre el cuadro
+// del duelo (el resultado del daño se lee ahí; se cierra solo a los pocos segundos), para no taparlo.
+const inicioDueloAbierto = () => typeof Duelo !== 'undefined' && Duelo.abiertoId && !!Duelo.abiertoId();
+function inicioVentanaVolver(id, n){
+  if(!inicioVentanas.has(id)) return;
+  const clave = 'inicio-turno:' + id;
+  if(((AvisoCombate.abierto() && AvisoCombate.abiertoClave() !== clave) || inicioDueloAbierto()) && num(n) < 400){ setTimeout(() => inicioVentanaVolver(id, num(n) + 1), 700); return; }
+  if(AvisoCombate.abiertoClave() === clave) AvisoCombate.esconder(clave, false);
+  inicioVentanaDibujar(id);
+}
+// Si otro aviso la reemplazó con algo pendiente (una zona sin tirar, o «✔ Aplicar»), vuelve sola cuando ese se cierra. Y mientras esté abierto el
+// cuadro de un duelo en esta pantalla (otra zona, la de una invocación, un ataque), se aparta: no lo tapa (visto en el mapa, 2026-11-22: el daño de la
+// Nube sobre la abeja se abrió debajo de la ventana); vuelve cuando el cuadro se cierra o se minimiza.
+setInterval(() => {
+  for(const [id, v] of inicioVentanas){
+    const clave = 'inicio-turno:' + id;
+    if(AvisoCombate.abiertoClave() === clave){
+      const tirando = v.zonas.some(z => z.estado === 'tirando');
+      if(inicioDueloAbierto() && !AvisoCombate.escondida(clave)){ AvisoCombate.esconder(clave, true); v.porDuelo = true; }
+      else if(!inicioDueloAbierto() && v.porDuelo && !tirando){ v.porDuelo = false; AvisoCombate.esconder(clave, false); }
+      continue;
+    }
+    if(v.zonas.some(z => z.estado === 'tirando') || AvisoCombate.escondida(clave)) continue;
+    if(!AvisoCombate.abierto() && !inicioDueloAbierto()) inicioVentanaDibujar(id);
+  }
+}, 500);
 function inicioTurnoMomento(id, d){
   const dt = d.datos || {};
   if(!dt.paraUid || dt.paraUid !== fbUsuario.uid) return false;
   if(d.estado === 'esperando'){
     if(inicioMostrados.has(id)) return true;
+    // (una zona de afuera resolviéndose con el cuadro del duelo abierto: la ventana espera a que termine, así no lo tapa)
+    if(typeof zonaBanner !== 'undefined' && zonaBanner && zonaBanner.tirando && !zonaBanner.enInicio){ setTimeout(() => inicioTurnoMomento(id, d), 800); return true; }
     inicioMostrados.add(id);
-    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], soloBoton: true,   // solo con «✔ Aplicar» (2026-10-22)
-      // Al tocar «Aplicar» se cierra (2026-11-14, dueño: una sola ventana, sin el segundo paso «Ya se aplicó»). Si falla, avisa con un toast.
-      texto: '', botones: [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => {
-        inicioAplicadoAca.add(id);
-        AvisoCombate.cerrar();
-        inicioTurnoAplicar(id, d, false);
-      }}],
-      alCerrar: () => { inicioMostrados.delete(id); }});   // cerrado sin aplicar: el GM lo puede aplicar por él, y al pasar el turno se aplica solo
+    const v = {d, tokenId: dt.tokenId, aplicado: '', zonas: []};
+    inicioVentanas.set(id, v);
+    inicioCerrados.delete(dt.tokenId);
+    inicioZonasDe(v, typeof zonaInicioTomar === 'function' ? zonaInicioTomar(dt.tokenId) : []);   // las zonas que llegaron antes que la ventana
+    inicioVentanaDibujar(id);
     return true;
   }
-  // Ya aplicado desde acá: la ventana ya se cerró (2026-11-14). Solo si el turno cambió en el medio, el aviso de que no se aplicó.
+  const v = inicioVentanas.get(id);
+  // Ya aplicado desde acá: sin zonas la ventana ya se cerró (2026-11-14). Solo si el turno cambió en el medio, el aviso de que no se aplicó.
   if(d.estado === 'listo' && inicioAplicadoAca.has(id)){
-    if(dt.noAplicado && !inicioNoAplicadoVisto.has(id)){ inicioNoAplicadoVisto.add(id); AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', texto: '', soloBoton: true,
-      veredicto: {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]}); }
+    if(dt.noAplicado && !inicioNoAplicadoVisto.has(id)){
+      inicioNoAplicadoVisto.add(id);
+      if(v){ v.aplicado = 'no'; v.d = d; inicioVentanaDibujar(id); }
+      else AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', texto: '', soloBoton: true,
+        veredicto: {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+    }
     return true;
   }
-  // Ya aplicado (por el GM, con la ventana abierta acá): el mismo cartel, con lo que pasó, y «Entendido».
-  if(d.estado === 'listo' && inicioMostrados.has(id) && AvisoCombate.abiertoClave && AvisoCombate.abiertoClave() === 'inicio-turno:' + id){
-    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '', soloBoton: true,
-      veredicto: dt.noAplicado ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'} : {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+  // Ya aplicado (por el GM, o solo al pasar el turno) con la ventana abierta acá: el mismo cartel, con lo que pasó; las zonas siguen con su botón.
+  if(d.estado === 'listo' && v){
+    if(!v.aplicado){ v.aplicado = dt.noAplicado ? 'no' : 'gm'; v.d = {...d, datos: {...dt, pasos: dt.pasos || (v.d.datos || {}).pasos || []}}; inicioVentanaDibujar(id); }
     return true;
   }
   return d.estado === 'listo' && inicioMostrados.has(id);

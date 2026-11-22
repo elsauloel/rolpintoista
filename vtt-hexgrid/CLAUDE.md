@@ -2517,3 +2517,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`ZonaDetalle.cuandoZona`) y el globo de estados (js/103) dicen «al empezar su turno adentro». Las copias guardadas en creeps se ponen al día solas
   (`Combatiente.migrarLuzSanadora`). Probado con clics: lanzado desde las Acciones de un creep; al pasar de ronda le salió el cartel solo al que
   empezaba su turno (J1) y no a J2, también encima; a J2, recién al empezar el suyo. La Varita del muro de fuego quedó como estaba (P272).
+- **▶🔥 La zona como un renglón de «Empieza tu turno»** (dueño, 2026-11-22, opción A: «esta superposición de menús no me gusta»; js/08 + js/16): las
+  zonas de «al empezar su turno» (`alEmpezar`, el Muro de fuego) ya no abren su cartel cuando a ese token le sale la ventana «▶ Empieza tu turno» en
+  esta pantalla (un personaje o una invocación: `inicioTurnoTarjetaSobra`). `zonasAlEmpezarTurno` las junta (`zonaJuntar`, que intercepta
+  `zonaEncolar`) y `zonaInicioOfrecer` las suma a la ventana (`inicioZonasSumar`) o las deja esperando (`zonaInicioEspera`, 15 s; si la ventana no
+  llega, o ya se cerró en ese turno —`inicioYaCerrado`—, el cartel de siempre). En js/16, `inicioVentanas` (por momento) y `inicioVentanaDibujar`: un
+  renglón por zona (`zonaInicioRenglon`: el texto de `zonaCartelAntes`, el mismo del cartel) con su botón adentro del paso (`AvisoCombate`, `pasos[].botones`),
+  habilitado después de «✔ Aplicar» (P274); con zonas pendientes, «✔ Aplicar» no cierra (`sinPie` mientras falta algo; «Entendido» al final). El botón
+  (`inicioZonaIr` → `zonaInicioResolver`) esconde la ventana (`AvisoCombate.esconder`) y resuelve con `zonaResolverBanner` de siempre (`zonaBanner.enInicio`:
+  sin cartel; `renderZonaBanner` devuelve el resultado); `inicioVentanaVolver` la muestra de nuevo cuando no hay otro aviso ni cuadro del duelo abierto.
+  Un reloj (500 ms) la aparta mientras haya un cuadro del duelo abierto en esta pantalla (`inicioDueloAbierto`) y la vuelve a mostrar si otro aviso la
+  reemplazó. «▶ Aplicar por él» del GM o aplicado al pasar el turno: la zona sigue con su botón. Un creep, sin cambios. Probado con clics (cola 2026-11-22).

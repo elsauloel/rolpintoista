@@ -9487,6 +9487,88 @@ grupo('Tu personaje todavía no está en este mapa');
       ['Blanco todavía no está en este mapa.', 'Tus personajes todavía no están en este mapa. ¿A cuál ponés?', '']));
 })();
 
+/* ---------- ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22, dueño, opción A) ---------- */
+grupo('Empieza tu turno con la zona adentro');
+(() => {
+  prueba('AvisoCombate: un botón adentro de un paso, sin la fila de abajo, y esconder la ventana sin cerrarla (no tapa el cuadro del duelo)', () => {
+    let clic = 0, cerro = 0;
+    const abrir = () => AvisoCombate.mostrar({clave: 'x:1', icono: '▶', titulo: 'Empieza tu turno', soloBoton: true, sinPie: true, alCerrar: () => cerro++,
+      pasos: [{titulo: 'No2', texto: 'No2 recargados a 4'}, {titulo: '🔥 Muro de fuego', texto: '3d4', botones: [{texto: '🔥 Tirar el daño', alClic: () => clic++}]}]});
+    abrir();
+    const f = document.querySelector('.aviso-combate-fondo');
+    const pb = f.querySelector('[data-aviso-pb="1:0"]');
+    igual([!!pb, !!f.querySelector('[data-aviso-ok]'), f.querySelectorAll('.duelo-paso')[1].contains(pb)], [true, false, true]);
+    pb.click();
+    igual(clic, 1);
+    AvisoCombate.esconder('x:1', true);
+    igual([AvisoCombate.abierto(), AvisoCombate.abiertoClave(), AvisoCombate.escondida('x:1'), f.style.display], [false, 'x:1', true, 'none']);
+    abrir();   // redibujar con la misma clave la deja escondida
+    igual([f.style.display, cerro], ['none', 0]);
+    AvisoCombate.esconder('x:1', false);
+    igual([AvisoCombate.abierto(), f.style.display], [true, '']);
+    AvisoCombate.cerrar();
+    igual([cerro, AvisoCombate.abierto()], [1, false]);
+  });
+  // La ventana de js/16, con lo de afuera simulado.
+  const armar = async () => {
+    const src = await (await fetch('../vtt-hexgrid/js/16-momentos.js', {cache: 'no-store'})).text();
+    const trozo = src.slice(src.indexOf('const inicioMostrados = new Set()'), src.indexOf('// ¿Esta pantalla maneja ese token y le va a salir su «Empieza tu turno»?'));
+    const mundo = {aplicados: 0, resolver: null, resueltos: 0};
+    const f = new Function('AvisoCombate', 'fbUsuario', 'iniciativa', 'num', 'setInterval', 'setTimeout', 'zonaInicioTomar', 'zonaInicioRenglon', 'zonaInicioResolver', 'inicioTurnoAplicar', 'zonaBanner',
+      trozo + '\nreturn {inicioTurnoMomento, inicioZonasSumar, inicioYaCerrado, inicioVentanas};')(
+      AvisoCombate, {uid: 'yo'}, {paso: 7}, v => Number(v) || 0, () => 0, (fn) => 0,
+      tok => tok === 't1' ? ['muro'] : [],
+      (elId, tokenId) => ({elId, tokenId, icono: '🔥', nombre: 'Muro de fuego', texto: 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura.', boton: '🔥 Tirar el daño (3d4)', estado: 'pend'}),
+      z => new Promise(ok => { mundo.resolver = ok; }),
+      () => { mundo.aplicados++; }, null);
+    return {f, mundo};
+  };
+  const d = (tokenId, extra) => ({tipo: 'inicio-turno', estado: 'esperando', datos: {tokenId, paraUid: 'yo', clave: 'm:7', pasos: [{titulo: 'No2', texto: 'No2 recargados a 6'}], ...(extra || {})}});
+  const ventana = () => document.querySelector('.aviso-combate-fondo');
+  let cadena = Promise.resolve();   // (de a una: comparten la ventana)
+  const enFila = fn => () => (cadena = cadena.then(fn, fn));
+  prueba('con el Muro de fuego: un solo cartel; la zona es un renglón debajo de los No2, con su botón, que se habilita después de «✔ Aplicar»', enFila(async () => {
+    const {f, mundo} = await armar();
+    f.inicioTurnoMomento('m1', d('t1'));
+    const w = ventana(), pasos = [...w.querySelectorAll('.duelo-paso h4')].map(h => h.textContent);
+    const zb = w.querySelector('[data-aviso-pb]');
+    igual([document.querySelectorAll('.aviso-combate-fondo').length, pasos.length, /No2/.test(pasos[0]), /Muro de fuego/.test(pasos[1]), zb.disabled, !!w.querySelector('#inicio-turno-aplicar')], [1, 2, true, true, true, true]);
+    w.querySelector('#inicio-turno-aplicar').click();
+    const w2 = ventana();
+    igual([mundo.aplicados, !!w2, w2.querySelector('[data-aviso-pb]').disabled, !!w2.querySelector('#inicio-turno-aplicar'), !!w2.querySelector('[data-aviso-ok]')], [1, true, false, false, false]);
+    w2.querySelector('[data-aviso-pb]').click();   // tirar el daño: la ventana se esconde (el cuadro del duelo no queda tapado)
+    igual([AvisoCombate.escondida('inicio-turno:m1'), ventana().style.display], [true, 'none']);
+    mundo.resolver({resultado: '9 de daño de fuego (lo tiró Arcano 3; entraron 9) · Quemadura', veredicto: {tono: 'malo', grande: '💔 −9'}});
+    await new Promise(r => setTimeout(r, 0));
+    const w3 = ventana();
+    igual([w3.style.display, /entraron 9/.test(w3.textContent), !!w3.querySelector('[data-aviso-pb]'), !!w3.querySelector('[data-aviso-b]')], ['', true, false, true]);
+    w3.querySelector('[data-aviso-b]').click();   // «Entendido»
+    igual([AvisoCombate.abierto(), f.inicioYaCerrado('t1')], [false, true]);
+  }));
+  prueba('sin zona: «✔ Aplicar» la cierra como siempre; una zona que llega con la ventana abierta se suma como renglón', enFila(async () => {
+    const {f, mundo} = await armar();
+    f.inicioTurnoMomento('m2', d('t2'));
+    ventana().querySelector('#inicio-turno-aplicar').click();
+    igual([mundo.aplicados, AvisoCombate.abierto()], [1, false]);
+    f.inicioTurnoMomento('m3', d('t3'));
+    igual([f.inicioZonasSumar('t3', ['muro']), f.inicioZonasSumar('otro', ['muro']), ventana().querySelectorAll('.duelo-paso').length], [true, false, 2]);
+    AvisoCombate.cerrar();
+  }));
+  prueba('si el GM lo aplica por él con la zona sin tirar: «✔ YA SE APLICÓ» y el botón de la zona queda habilitado', enFila(async () => {
+    const {f} = await armar();
+    f.inicioTurnoMomento('m4', d('t1'));
+    f.inicioTurnoMomento('m4', {...d('t1'), estado: 'listo'});
+    const w = ventana();
+    igual([/YA SE APLICÓ/.test(w.textContent), w.querySelector('[data-aviso-pb]').disabled, !!w.querySelector('[data-aviso-ok]')], [true, false, false]);
+    AvisoCombate.cerrar();
+  }));
+  prueba('js/08: al empezar el turno, las zonas se juntan para la ventana (no abren cartel) y el creep o la ventana que no llega siguen con el cartel', async () => {
+    const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
+    cierto(/if\(zonaJuntar\)\{ zonaJuntar\.push\(el\.id\); return; \}/.test(t08) && /zonaInicioOfrecer\(o\.id, junta\)/.test(t08) && /t\.tipo !== 'creep' && typeof inicioTurnoTarjetaSobra/.test(t08) && /15000/.test(t08));
+    cierto(/if\(zonaBanner\.enInicio\)\{/.test(t08));
+  });
+})();
+
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');

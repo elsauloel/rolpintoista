@@ -1928,3 +1928,17 @@ Se pregunta ahí porque después ya está cobrado. Dos casos en los que el aviso
 1. **La Varita del blink sobre un aliado**: el aviso sale igual (todavía no se eligió a quién); si teletransportás a otro, tu anillo no se apaga.
 2. **El Salto, el Takle o la Carga con el objetivo ya pegado**: no se mueve (ataca sin saltar ni correr) y el anillo sigue, pero el aviso salió.
 ¿Está bien así (el aviso dice «si te movés…»), o preferís que en esos casos no avise?
+
+### P274 — 🔥 Al empezar el turno sobre una zona: ¿primero lo del turno y después la zona? (2026-11-22, Claude)
+Ahora la zona que pega al empezar el turno (el Muro de fuego) es un renglón más de «▶ Empieza tu turno», con su botón. **Elegí, por lo más seguro,
+que el botón de la zona se habilite recién después de «✔ Aplicar»**: primero lo del turno (los estados bajan, la regeneración, los No2) y después
+el fuego. El orden importa en un caso: si el fuego te deja en 0 antes de aplicar el turno, el turno empieza «caído» y no regenera nada; así, primero
+regenerás y después te quemás. Si el GM aplica el turno por el jugador (o se aplica solo al pasar el turno), el botón de la zona queda habilitado
+igual. ¿Está bien ese orden, o preferís que la zona vaya primero (o que se pueda en cualquier orden)?
+
+### P275 — 🐝 Una invocación fuera del orden de turnos parada en una zona: ¿también adentro del cartel? (2026-11-22, Claude)
+Visto en el mapa: la abeja de Blanco J1 (una invocación que **no** está en el orden de turnos) estaba dentro de una zona. Como no tiene turno propio,
+la zona le pega al pasar de ronda, con su cartel de siempre, en la pantalla de su dueño. Ese cartel queda esperando y, cuando después empieza el turno
+del personaje, sale «▶ Empieza tu turno» y se ven los dos a la vez (son de dos fichas distintas). Si el jugador toca el de la abeja y se abre el
+cuadro del daño, la ventana del turno ya se aparta (no lo tapa). ¿Querés que la zona de una invocación sin turno propio también vaya como renglón del
+«Empieza tu turno» de su dueño (pegaría al empezar el turno del dueño en vez de al pasar de ronda), o está bien así?

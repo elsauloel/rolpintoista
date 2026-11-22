@@ -1527,7 +1527,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Por datos: darle el Muro de fuego a Arcano 3, acercarlo, el orden de turnos, mover a J2 fuera del muro y la Nube de prueba. Sin ver: lo de
   `docs/pruebas-en-el-mapa.md` (2026-11-22). Dudas: P274 (el orden) y P275 (la abeja fuera del orden sigue con su cartel aparte). 5 pruebas
   automáticas nuevas (979).
-- **⬜ en cola — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
+- **✅ hecho (2026-11-22) — 👥 y 🎭 del mapa, ¿unificarlos?** (dueño, 2026-11-22: «¿no son medio redundantes? ¿No podrían unificarse? Escucho
   opiniones y sugerencias»). Mirar qué hace cada uno y proponer.
   *Propuesta enviada (2026-11-22), espera decisión:* hoy 👥 (cabecera) lista las fichas (abrir, ✕ del GM) y suma «🎭 Ponerlo en el mapa»
   a los personajes propios sin token; 🎭 (borde izquierdo) al jugador le abre «Nuevo token» (con «⬇ Traer mi token») y al GM un menú
@@ -1537,6 +1537,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pero cada uno con lo suyo: 👥 = solo fichas; 🎭 = solo tokens.
   **Elegido (dueño, 2026-11-22): A, con dos cambios:** «que el botón esté en el menú lateral izquierdo» (no en la cabecera) y «que a los
   jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan cargar una imagen, un nombre y una descripción».
+  *Resultado:* un solo botón **👥** en el menú de la izquierda (donde estaba el 🎭), que abre «Personajes y tokens»: una fila por personaje (📜 su
+  ficha · «✔ en el mapa» o «🎭 Ponerlo en el mapa» · el GM, ✓/💤 y la ✕), sus invocaciones debajo, y abajo «＋ Token suelto» para todos y, para el
+  GM, «👥 Poner a todos los que faltan…» y «👹 Traer creeps…». Salieron el 👥 de la cabecera y la ventana «＋ Token nuevo». El token suelto lleva
+  imagen, nombre y descripción; la descripción se lee al pasar el mouse y en su tarjeta 🪪; lo editan y lo borran quien lo puso y el GM.
+  **Hay reglas de Firestore para pegar** (el campo descripción); sin ellas, crear o guardar con descripción avisa y no se hace. Probado con clics en
+  «Claude · pruebas 2» (GM, J1, J2): el panel de los dos lados, poner un personaje (el jugador el suyo; el GM el de J2 a su nombre), la ✕ cancelada,
+  traer un creep, «Poner a todos los que faltan», un token suelto de J1 con imagen y nombre que J2 y el GM ven, que J2 no puede borrar ni editar, que el
+  GM renombra y que J1 saca. Sin ver de verdad: la descripción con las reglas pegadas (`docs/pruebas-en-el-mapa.md`). Dudas: P276 y P277. 5 pruebas
+  automáticas nuevas (984).
 - **⬜ en cola — 🗡 ¿Los ataques de oportunidad cuentan como por la espalda?** (dueño, 2026-11-22: «si no, evaluar el caso»). Contarle cómo
   está y, si no cuentan, proponer.
 - **⬜ en cola — 🔫 ¿Hay arcabuces?** (dueño, 2026-11-22: «contame cuáles. Ni sé qué es un arcabuz»). Listar los del catálogo, explicar qué

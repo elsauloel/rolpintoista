@@ -1559,12 +1559,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cinco armas de pólvora: Arcabuz de cubierta, Arcabuz de mecha, Pistola de chispa, Pistola de duelo de plata y Trabuco del contrabandista; las
   cinco están **archivadas** (del catálogo viejo: no salen en las tiendas) y ninguna tiene Recarga, por eso la maestría de ballestas no les suma.
   La pólvora quedó pendiente en `docs/rework-armas-rango.md` («no se esquiva, se apunta»). Propuesta: P265 espera a que toque la pólvora en el
-  rework. Espera el ok del dueño.
+  rework. **Ok del dueño (2026-11-22):** «me parece bien».
 - **⬜ en cola — 🛡 Aguante de trinchera con cualquier daño** (dueño, 2026-11-22: «debería contemplarse para cualquier daño que tenga en cuenta
   esas defensas, independientemente si es trampa, ataque u otra cosa»). Ya se sumó en trampas y zonas de número fijo (tanda 5); revisar que
   no falte ningún camino y probarlo.
-- **⬜ en cola — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
+- **🟡 explicado, espera decisión (2026-11-22) — 💨 Prisa contra otras pasivas de iniciativa** (dueño, 2026-11-22: «corroborar si ya hay una pasiva que dé más iniciativa. Si hay,
   comparar y evaluar»).
+  *Resultado:* no hay otra pasiva de jugador que suba la Iniciativa (la Prisa reemplazó a «Reflejos de gato», +1). La suben ítems: 27 con +1, 10
+  con +2 y la Navaja del compadrito con +3 (y 21 con −1); y tres habilidades de creep (a mano). La Iniciativa es el tamaño del dado (6 → 1d6; 11 →
+  1d10+1): la Prisa suma +5 a **ese número**, no al resultado (en promedio +2,5; como mucho +5). El dueño había dicho «+5 a la tirada»: ¿queda
+  así o pasa a +5 fijo al resultado? Comparación: con Agilidad 6, sin nada 1d6 (3,5 de promedio); con un +2 de arma 1d8 (4,5); con Prisa 1d10+1
+  (6,5); con Prisa a +5 fijo, 1d6+5 (8,5).
 - **✅ hecho (2026-11-22) — 🤝🎁 Dar y compartir: las dos tareas de abajo se superponen** (dueño, 2026-11-22: «me parece que son un poco redundantes o al
   menos se superponen. Evaluemos esta tarea»). *Propuesta enviada, espera decisión:* **A (recomendada):** un solo botón «🤝 Dar» en el menú de la
   izquierda (mapa, ficha y GM Tools) que abre una ventana distinta según quién lo toca: el GM, la de «Dar a un jugador» (catálogo, DDE, despojos,

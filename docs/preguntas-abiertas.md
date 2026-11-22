@@ -1852,6 +1852,8 @@ pasó a decir «Goblin Alquimista ⚡ Muro de fuego…» (lo vio enseguida) y al
 2. Si lo delata: ¿la línea de la Mesa tiene que nombrarlo en todas las pantallas por igual (hoy depende de cuántos segundos tardó cada una en verlo)?
 
 ### P265 — 🏹 Los arcabuces del catálogo no tienen Recarga: la Maestría en ballestas no les suma (2026-11-21, Claude)
+
+> ⏸ **Para después (dueño, 2026-11-22: «me parece bien»):** se decide cuando toque la pólvora en el rework de las armas de rango (`docs/rework-armas-rango.md`); hoy las cinco armas de pólvora están archivadas.
 En P260 quedó escrito que «ballesta» es el arma de rango con Recarga y que ahí «entran también los arcabuces». Visto con clics en la pasada de
 pruebas: con la Maestría en ballestas y un **Arcabuz de cubierta**, la 🔍 de Atacar no suma nada. El motivo: los dos arcabuces del catálogo
 (Arcabuz de cubierta y Arcabuz de mecha, los dos archivados) no tienen el dato de Recarga, así que el juego no los cuenta como ballesta (cobran

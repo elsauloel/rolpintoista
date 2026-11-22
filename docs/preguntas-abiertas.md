@@ -2033,3 +2033,16 @@ cosas chicas para decidir:
 2. **Las Armas perforantes contra la Defensa especial.** «Pasan N siempre» se cuenta contra la Defensa especial del equipo; el +N del Aguante se resta
    después, así que puede frenar parte de lo que «pasaba siempre». (Contra la Defensa común sí está bien: la Perfora se cuenta con el Aguante incluido.)
    Mientras tanto queda así (es un caso muy raro). ¿Lo emparejo?
+
+### P284 — ✋ Consumibles propios, a mano: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+
+Pedido del dueño (2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización… que los efectos de los consumibles custom se
+resuelvan a mano». Ya está: en el asistente de ítems, la categoría Consumible tiene un camino corto (qué es · unidades · precio/peso · listo) y el ítem
+queda marcado «✋ A mano: el efecto lo resuelve la mesa.». Quedan tres cosas chicas para decidir:
+1. **GM Tools, «✎ Ítem custom»**: se puede armar un consumible propio, pero **no se le equipa a un creep** (el cinturón de un creep usa los consumibles
+   del catálogo, por nombre): «Crear y equipar» avisa y deja subirlo al catálogo (⬆) o dárselo a un jugador (🎁 Dar a un jugador). ¿Querés que un
+   creep pueda llevar uno propio?
+2. **Una tirada propia**: hoy un consumible propio no tira nada al usarse (la Mesa muestra qué hace y listo). ¿Querés que pueda llevar una tirada
+   opcional (ej. «tira 1d6») que salga sola al consumirlo, como el «✋ A mano» de las varitas?
+3. **Mismo nombre que uno del catálogo**: el cinturón junta las pilas por nombre; un consumible propio que se llame igual que uno de fábrica
+   (ej. «Poción de vida») se apilaría con él. Mientras tanto queda así (es raro); ¿avisamos al crearlo?

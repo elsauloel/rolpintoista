@@ -533,3 +533,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 
 - **🎒 «Dar a un jugador» avisa si la mochila se pasa** (2026-11-22, P262 (5); comun/dar-jugador.js): para medir la mochila, la ventana carga sola
   `ficha-guardado.js`, `ficha-equipo.js` y `ficha-tienda.js` (GM Tools no los carga con la página) y lee la ficha de cada personaje marcado.
+
+- **✋ Consumible propio en «✎ Ítem custom»** (2026-11-22): la categoría Consumible está (camino corto del asistente, `consumoAMano`), pero «Crear y
+  equipar» avisa que no se le equipa a un creep: se sube con ⬆ (`itemComoEntradaCatalogoGM` lo manda como consumible) o se da con 🎁 Dar a un jugador
+  (P284). El generador de tiendas guarda la marca en `agregarItemCreado`.

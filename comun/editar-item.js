@@ -138,7 +138,8 @@ const EditarItem = (() => {
     const opSubir = {catalogo: cfg.catalogo, alSubir: cfg.alSubir};
     // Mismo id que el del catálogo: así "¿corrección o algo nuevo?" lo reconoce aunque se le cambie el nombre.
     const conId = x => cat ? {...x, id: cat.id, _bib: cat._bib} : x;
-    if(d.tipoItem === 'consumibles' || !(typeof AsistenteItem !== 'undefined' && AsistenteItem.esCategoriaDelAsistente(d.tipoItem))){
+    const aManoCons = d.tipoItem === 'consumibles' && d.consumoAMano;   // ✋ un consumible propio se edita en el asistente (su camino corto)
+    if(!aManoCons && (d.tipoItem === 'consumibles' || !(typeof AsistenteItem !== 'undefined' && AsistenteItem.esCategoriaDelAsistente(d.tipoItem)))){
       return formularioSimple(d, datos => subir(conId(datos), opSubir));
     }
     AsistenteItem.abrir({

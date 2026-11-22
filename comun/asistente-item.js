@@ -9,8 +9,12 @@
                ✋ a mano (texto y tirada para lo que no se automatiza) · bonos
      defensa   defensa y resistencias a crítico · bonos  (🔮 un orbe: lo que hace al usar una varita, en vez de la Defensa)
      el resto  bonos
-   y al final estado al equipar, precio/lugar y resumen. Los consumibles no
-   pasan por acá: cfg.onConsumible los manda al formulario de cada herramienta.
+   y al final estado al equipar, precio/lugar y resumen.
+   ✋ Consumible propio, a mano (2026-11-22, dueño): la categoría Consumible tiene un camino corto — nombre y qué hace en palabras ·
+   cuántas unidades · peso/ranuras/precio · resumen — SIN efectos automáticos: el ítem lleva `consumible: true`, `consumoAMano: true` y
+   la nota «✋ A mano: el efecto lo resuelve la mesa.» al final del Detalle (Combatiente.consumoAManoDetalle). Se consume como cualquier
+   consumible; la Mesa muestra qué hace. cfg.onConsumible(d), si está, ofrece en el resumen el formulario completo de esa herramienta
+   (el de los consumibles con efectos automáticos: curar, estado al consumir…).
    Necesita comun/efectos-golpe.js (efectos al golpear).
 
    Lo usan ficha.html (inventario y catálogo), gm-tools.html (arma de un
@@ -39,7 +43,7 @@
      botones     [{texto, accion(d, boton)}] extra en el pie — opcional
      textoGuardar, onGuardar(d, destino) → false para no cerrar
      onFormulario(d) — si está, el resumen ofrece el formulario completo
-     onConsumible(d) — al elegir la categoría Consumibles
+     onConsumible(d) — el formulario completo de consumibles (con efectos automáticos), ofrecido en el resumen de un consumible
      sinEspecial   true = no ofrece «✨ arma especial» (el arma de un creep o de una invocación)
      elegirEstado  () => Promise — el «+ Estado» de la página para la Ejecución ✨ de un arma especial (opcional; ver asistente-duelo-hab.js)
    ========================================================= */
@@ -107,6 +111,10 @@ const AsistenteItem = (() => {
     if(val) d.mods.push({stat, val});
   }
   const EG = () => (typeof EfectosGolpe !== 'undefined' ? EfectosGolpe : null);
+  // ✋ La nota de un consumible propio (comun/combatiente.js; la copia de acá es solo por si una página no carga el motor).
+  const CONSUMO_A_MANO = typeof Combatiente !== 'undefined' && Combatiente.CONSUMO_A_MANO ? Combatiente.CONSUMO_A_MANO : '✋ A mano: el efecto lo resuelve la mesa.';
+  const sinNotaAMano = t => String(t || '').split(CONSUMO_A_MANO).join('').trim();
+  const conNotaAMano = t => typeof Combatiente !== 'undefined' && Combatiente.consumoAManoDetalle ? Combatiente.consumoAManoDetalle(t) : (sinNotaAMano(t) ? `${sinNotaAMano(t)} ${CONSUMO_A_MANO}` : CONSUMO_A_MANO);
 
   /* ✨ Armas especiales y 🔮 orbes (2026-10-05, rework mágico): una varita o un báculo es un hechizo equipable (`especial` = {sp, no2, sube,
      dano, sumaEspecial, duelo (la Ejecución ✨), trampaColocar?, estadoPropio?, aMano?}); un orbe va en la otra mano y actúa al usar una
@@ -160,6 +168,10 @@ const AsistenteItem = (() => {
     const {cfg, d} = st;
     const g = grupoDe(d.tipoItem);
     const L = [{id: 'que', corto: 'Qué es'}];
+    if(g === 'consumible'){   // ✋ el camino corto: sin bonos ni efectos automáticos
+      L.push({id: 'unidades', corto: 'Unidades'}, {id: 'lugar', corto: cfg.conPrecio ? 'Precio' : 'Peso'}, {id: 'listo', corto: 'Listo'});
+      return L;
+    }
     const esp = esEspecial(d), orbe = esOrbe(d);
     if(g === 'arma' && !esp) L.push({id: 'tipo', corto: 'Tipo'}, {id: 'empunadura', corto: 'Empuñadura'}, {id: 'dano', corto: 'Peso y daño'});
     if(esp) L.push({id: 'empunadura', corto: 'Empuñadura'}, {id: 'hechizo', corto: 'Hechizo'}, {id: 'ejecucion', corto: 'Qué hace ✨'}, {id: 'amano', corto: '✋ A mano'});
@@ -224,6 +236,7 @@ const AsistenteItem = (() => {
       equipoEstadoNombre: '', equipoEstadoHpTurno: 0, equipoEstadoDetalle: '', equipoEstadoPreset: '',
     }, structuredClone(cfg.draft || {}));
     if(!DADOS.includes(n(d.tipoDado))) d.tipoDado = 8;
+    if(d.tipoItem === 'consumibles'){ d.detalle = sinNotaAMano(d.detalle); d.unidades = Math.max(1, Math.round(n(d.unidades)) || 1); }   // la nota ✋ se vuelve a poner al guardar
     d.mods = Array.isArray(d.mods) ? d.mods : [];
     d.efectosGolpe = Array.isArray(d.efectosGolpe) ? d.efectosGolpe : [];
     if(st && st.api) st.api.cerrar();
@@ -268,6 +281,7 @@ const AsistenteItem = (() => {
   function faltaAlgo(){
     if(!st.d.tipoItem) return 'Primero elegí qué tipo de ítem es';
     if(!st.d.nombre.trim()) return 'Primero ponele un nombre';
+    if(st.d.tipoItem === 'consumibles' && !sinNotaAMano(st.d.detalle)) return 'Contá en la descripción qué hace: es lo que la mesa va a resolver a mano';
     return '';
   }
 
@@ -353,6 +367,14 @@ const AsistenteItem = (() => {
           ${d.imagen ? '<button type="button" class="aa-op" data-aa-quitarimg="1">Quitar</button>' : ''}
         </div>`);
       }
+    }
+
+    if(paso.id === 'unidades'){
+      titulo('¿Cuántas unidades?', 'Cada vez que se consume se gasta una; cuando no queda ninguna, desaparece.');
+      h += campo('Unidades', num('unidades', d.unidades, 'step="1" min="1" style="max-width:120px"'),
+        cfg.unidadesNota || (q.ctx === 'ficha' ? 'Las que vas a tener en la mochila.' : 'Las que vienen juntas.'));
+      h += efecto(`<b>Se usa como cualquier consumible</b>: va a la mochila, se puede pasar al cinturón («→ Cinturón») y se consume con su botón, en la ficha o en la Botonera del mapa. Cuesta los No2 de siempre (1 del cinturón, 2 de la mochila). Cada uso gasta una unidad; en 0 desaparece.`);
+      h += efecto(`<b>${e(CONSUMO_A_MANO)}</b> No cura, no pone estados ni toca nada solo: al consumirlo, la Mesa muestra su nombre y lo que hace (la descripción del primer paso) para que la mesa lo resuelva.`);
     }
 
     if(paso.id === 'tipo'){
@@ -632,20 +654,21 @@ const AsistenteItem = (() => {
         : 'Equipado, el ítem pesa en la carga; guardado en la mochila, ocupa ranuras en vez de peso.');
       if(g !== 'arma'){
         h += campo('Peso', num('peso', d.peso, 'step="any" min="0" style="max-width:120px"'));
-        if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
+        if(q.ctx !== 'creep' && g !== 'consumible') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
         if(DURABLE(d)) h += durCampo();
       }
       if(cfg.conPrecio){
         h += campo('Precio de compra (DDE)', num('precioCompra', d.precioCompra, 'step="1" min="0" style="max-width:140px"'));
         h += efecto(`<span id="aa-precio">${precioHtml()}</span>`);
       }
-      if(cfg.conLugar){
+      if(g === 'consumible') h += efecto(q.ctx === 'creep' ? 'Un consumible no se equipa a un creep: se sube al catálogo.' : 'Va a la <b>mochila</b> (ocupa ranuras, no peso de equipo). Para llevarlo en el cinturón, «→ Cinturón» desde la mochila.');
+      else if(cfg.conLugar){
         h += campo('¿Dónde lo tenés?', `<div class="aa-opciones">${op('equipado', '1', !!d.equipado, 'Equipado')}${op('equipado', '0', !d.equipado, 'En la mochila')}</div>`);
         h += efecto(d.equipado
           ? `<b>Equipado</b>: sus bonos cuentan${g === 'arma' ? ', aparece en la Botonera para atacar' : ''} y pesa en tu carga.`
           : '<b>En la mochila</b>: no suma nada hasta equiparlo, pero ocupa ranuras de la mochila en vez de peso.');
       }
-      if(cfg.conRanuras || (cfg.conLugar && !d.equipado)){
+      if(cfg.conRanuras || (cfg.conLugar && (!d.equipado || g === 'consumible'))){
         h += campo('Ranuras que ocupa en la mochila', num('ranuras', d.ranuras, 'step="1" min="1" style="max-width:120px"'),
           cfg.conLugar ? '' : 'Lo que ocupa cuando el jugador lo guarda en vez de tenerlo equipado.');
       }
@@ -683,14 +706,15 @@ const AsistenteItem = (() => {
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
         ${g === 'defensa' && !esOrbe(d) ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
-        ${fila('Bonos', e(bonos || 'ninguno'))}
-        ${cfg.conEstadoEquipar ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
+        ${g === 'consumible' ? fila('Unidades', f(Math.max(1, Math.round(n(d.unidades)) || 1))) + fila('Al consumirlo', '✋ a mano: lo resuelve la mesa (cuesta los No2 de siempre)') : fila('Bonos', e(bonos || 'ninguno'))}
+        ${cfg.conEstadoEquipar && g !== 'consumible' ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
         ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))}${Math.round(n(d.durExtra)) > 0 ? ` (Resistente ×${Math.round(n(d.durExtra))})` : Math.round(n(d.durExtra)) < 0 ? ` (Frágil ×${-Math.round(n(d.durExtra))})` : ' (lo normal: 6 por punto de Peso)'}`) : ''}
         ${cfg.conPrecio ? fila('Precio', `${f(n(d.precioCompra))} DDE`) : ''}
-        ${cfg.conLugar ? fila('Dónde', d.equipado ? 'equipado' : `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conRanuras ? fila('Ranuras', f(n(d.ranuras))) : ''}
+        ${cfg.conLugar && g === 'consumible' ? fila('Dónde', `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conLugar ? fila('Dónde', d.equipado ? 'equipado' : `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conRanuras ? fila('Ranuras', f(n(d.ranuras))) : ''}
       </div>`;
-      if(cfg.onFormulario) h += `<button type="button" class="aa-op" data-aa-formulario="1" style="margin-top:10px">Ver en el formulario completo</button>`;
+      if(g === 'consumible'){ if(cfg.onConsumible) h += `<button type="button" class="aa-op" data-aa-consformulario="1" style="margin-top:10px" title="El formulario de los consumibles de fábrica: cura, estado al consumir, cargas…">⚙ Con efectos automáticos: formulario completo</button>`; }
+      else if(cfg.onFormulario) h += `<button type="button" class="aa-op" data-aa-formulario="1" style="margin-top:10px">Ver en el formulario completo</button>`;
     }
     return {h, ayuda};
   }
@@ -746,6 +770,7 @@ const AsistenteItem = (() => {
     if(id === 'cinturon') return '<b>Cinturón</b>: puede dar lugares extra para consumibles, además de bonos.';
     if(id === 'mochila') return '<b>Mochila</b>: da lugares extra en la mochila (solo una puesta a la vez).';
     if(id === 'anillos') return '<b>Anillo</b>: se pueden llevar dos. Da bonos y estados.';
+    if(id === 'consumibles') return '<b>Consumible</b>: se gasta al usarlo (una unidad por vez). Sin efectos automáticos: lo que hace lo resuelve la mesa a mano (✋).';
     return '<b>Otro</b>: cualquier cosa que no entra en las demás. Si se equipa, sus bonos cuentan.';
   }
 
@@ -802,16 +827,14 @@ const AsistenteItem = (() => {
     if(!b) return;
     const d = st.d, ds = b.dataset;
     if(ds.aaFormulario){ const cb = st.cfg.onFormulario, copia = limpio(); cerrar(); cb(copia); return; }
+    if(ds.aaConsformulario){   // el consumible, al formulario completo (con efectos automáticos): sin la marca ✋
+      const cb = st.cfg.onConsumible, copia = limpio();
+      delete copia.consumoAMano; copia.detalle = sinNotaAMano(copia.detalle);
+      cerrar(); cb(copia); return;
+    }
     if(ds.aaCat){
-      if(ds.aaCat === 'consumibles'){
-        const cb = st.cfg.onConsumible, copia = limpio();
-        if(!cb){ avisar('Los consumibles se crean desde el formulario común'); return; }
-        copia.tipoItem = 'consumibles';
-        cerrar();
-        cb(copia);
-        return;
-      }
       d.tipoItem = ds.aaCat;
+      if(d.tipoItem === 'consumibles') d.unidades = Math.max(1, Math.round(n(d.unidades)) || 1);
       if(grupoDe(d.tipoItem) === 'arma' && !n(d.peso)) d.peso = 1;
     }
     else if(ds.aaClase){ if(ds.aaClase === 'especial'){ d.especial = d.especial || ESPECIAL_NUEVA(); d.armaDeRango = false; } else delete d.especial; }
@@ -845,7 +868,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'cargador', 'carcajExtra', 'contraCorre', 'matagente', 'matasobrenatural', 'arcoDuro', 'emboscadaPot', 'emboscadaPdg', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso', 'lectura'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'cargador', 'carcajExtra', 'contraCorre', 'matagente', 'matasobrenatural', 'arcoDuro', 'emboscadaPot', 'emboscadaPdg', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'unidades', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso', 'lectura'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -926,6 +949,16 @@ const AsistenteItem = (() => {
       ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
+    }else if(grupoDe(d.tipoItem) === 'consumible'){
+      // ✋ Consumible propio, a mano: sin bonos, sin estado al equipar ni nada de armas; la nota ✋ al final del Detalle.
+      ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'antebrazo', 'efectosGolpe', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'manoPreferida',
+       ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : [])].forEach(k => delete d[k]);
+      d.mods = [];
+      d.equipoEstadoNombre = ''; d.equipoEstadoHpTurno = 0; d.equipoEstadoDetalle = ''; d.equipoEstadoPreset = '';
+      d.consumible = true; d.consumoAMano = true; d.equipado = false;
+      d.unidades = Math.max(1, Math.round(n(d.unidades)) || 1);
+      d.peso = Math.max(0, n(d.peso)); d.ranuras = Math.max(1, Math.round(n(d.ranuras)) || 1);
+      d.detalle = conNotaAMano(d.detalle);
     }else if(grupoDe(d.tipoItem) === 'arma'){
       delete d.especial;
       d.peso = Math.max(1, n(d.peso) || 1);
@@ -972,6 +1005,7 @@ const AsistenteItem = (() => {
     delete d.durPorPeso;
     if(!DURABLE(d) || !Math.round(n(d.durExtra))) delete d.durExtra;
     else d.durExtra = Math.round(n(d.durExtra));
+    if(grupoDe(d.tipoItem) !== 'consumible' && d.consumoAMano){ delete d.consumoAMano; d.consumible = false; d.detalle = sinNotaAMano(d.detalle); }   // dejó de ser un consumible propio
     return d;
   }
 
@@ -990,7 +1024,7 @@ const AsistenteItem = (() => {
   /* El ítem guardado = lo que había (`base`) con lo que devolvió el asistente (`d`) encima, SIN lo que el asistente sacó a propósito (2026-10-05):
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
-  const CONTROLADOS = ['especial', 'orbe', 'antebrazo', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
+  const CONTROLADOS = ['consumoAMano', 'especial', 'orbe', 'antebrazo', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
     'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos', 'durExtra', 'durPorPeso',
     'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',
     'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido',
@@ -1001,5 +1035,5 @@ const AsistenteItem = (() => {
     return o;
   }
 
-  return {abrir, fusionar, cerrar, abierto: () => !!st, esCategoriaDelAsistente, grupoDe, CATEGORIAS, TIPOS, DADOS};
+  return {abrir, fusionar, cerrar, abierto: () => !!st, esCategoriaDelAsistente, CONSUMO_A_MANO, grupoDe, CATEGORIAS, TIPOS, DADOS};
 })();

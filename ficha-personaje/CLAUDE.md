@@ -725,3 +725,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **🔁 Cada copia de una pasiva cuesta 1 de Job más que la anterior** (2026-11-22, P260 (7); `FichaLupa.jobCostoDe`): 1, 2, 3… (×3 de una de 1 = 6).
   La pasiva muestra «N Job · la próxima copia: M» (js/04) y el catálogo de «+ Pasiva», si ya la tenés, «ya la tenés ×k: la próxima copia cuesta M Job»
   (`pasivaYaComprada`, js/10); el toast del «Agregar» lo dice. El tope de la mitad del nivel no cambió.
+
+- **✋ Consumibles propios, a mano** (2026-11-22, dueño): «+ Ítem» de la mochila → Crear ítem nuevo → Consumible: el asistente común arma uno sin
+  efectos automáticos (`consumoAMano`, ver `comun/CLAUDE.md`); va a la mochila, «→ Cinturón» lo pasa al cinturón y se consume como cualquiera (la Mesa
+  dice qué hace, ✋ a mano). Su «Editar» vuelve al asistente; los consumibles de fábrica siguen con el formulario completo. Una invocación no lleva
+  consumibles (su «Ítem para…» no ofrece la categoría).

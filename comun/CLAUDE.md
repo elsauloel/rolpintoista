@@ -98,7 +98,7 @@ versión parecida en más de una, es candidato a juntar.
   rival sigue siendo manual a propósito — la herramienta solo recuerda y
   tira, no toca el estado del objetivo.
 - **`asistente-item.js`** (`AsistenteItem`) — crear o editar un ítem de
-  equipo (no consumibles) paso a paso: categoría y descripción → lo
+  equipo paso a paso (los consumibles, solo los propios «a mano»: ver abajo, 2026-11-22): categoría y descripción → lo
   práctico según la categoría (armas: Tipo, empuñadura, peso/daño, bonos,
   efectos al golpear; defensa: Defensa y resistencias a crítico; el resto:
   bonos) → estado al equipar, precio/lugar → resumen. Lo usan
@@ -2203,3 +2203,13 @@ versión parecida en más de una, es candidato a juntar.
   `ctx.habilidadOculta`: «No se sabe» en «Con qué se puso»; quien la puso escondido = «Alguien»). `CreepCalculo.tarjetaPublica` suma `estandarteDe`,
   `estandarteDeId` y `estandarteCon`. `DarJugador.mochilaTrasDar(S, que)` (prueba en una copia cómo queda la mochila) y `mochilaAvisoTxt`: la ventana
   lee las fichas marcadas (`FichaGuardado.cargar`; si faltan las piezas, las carga sola) y avisa / pregunta «¿Dar igual?» antes de dar.
+
+- **✋ Consumibles propios, a mano** (2026-11-22, dueño: «que +ítem te deje crear ítems consumibles, pero sin automatización… que los efectos de los
+  consumibles custom se resuelvan a mano»): en `asistente-item.js` la categoría Consumible ya no sale al formulario de cada herramienta: va por un camino
+  corto (Qué es —la descripción es obligatoria— · Unidades · Precio/Peso · Listo) y guarda `consumible: true`, `consumoAMano: true`, `unidades`, sin
+  bonos ni estado al equipar, con «✋ A mano: el efecto lo resuelve la mesa.» al final del Detalle (al editar, la nota no se ve en la caja; se vuelve a
+  poner al guardar; pasarlo a otra categoría saca la marca). `cfg.onConsumible`, si está, es el botón «⚙ Con efectos automáticos: formulario completo»
+  del resumen; `cfg.unidadesNota` cambia la ayuda de Unidades. Las piezas en `combatiente.js`: `CONSUMO_A_MANO`, `consumoAMano(it)`,
+  `consumoAManoQueHace(it)`, `consumoAManoDetalle(texto)` y `consumoAManoMesa(it)` (lo que se suma a la Mesa en `FichaAcciones.consumir`). La 🔍
+  (`ficha-lupa.js`, `cons:`) y el Ver lo dicen. `ficha-editor.js` y `editar-item.js` mandan al asistente los consumibles con la marca; `dar-jugador.js`
+  da las unidades elegidas (n en la lista). Dudas: P284.

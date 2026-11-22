@@ -111,6 +111,7 @@ function abrirItemNuevoInv(invId){
   AsistenteItem.abrir({...cfgItemInv(),
     titulo: `Ítem para ${inv.nombre}`,
     nuevo: true,
+    categorias: AsistenteItem.CATEGORIAS.map(c => c.id).filter(id => id !== 'consumibles'),   // una invocación no lleva consumibles
     draft: {tier: 'A definir', peso: 0},
     portador: () => portadorInv(invId),
     conRanuras: false,

@@ -367,7 +367,7 @@ const DarJugador = (() => {
           <div class="dj-fila"><label>💎 Despojo especial</label><input type="text" data-dj-esp-nombre placeholder="Nombre (ej. Escama de dragón)" style="flex:1;min-width:200px"><input type="number" min="1" step="1" data-dj-esp-n value="1"><button type="button" data-dj="esp-sumar">+ Sumar</button></div>
           <p class="dj-nota">Los despojos especiales llevan nombre; si el personaje ya tiene uno con ese nombre, se le suman. Si elegís a varios, cada uno recibe lo mismo.</p></div>
         <div class="dj-panel" data-dj-panel="nuevo" hidden>
-          <p class="dj-nota" style="margin-top:0">Un ítem que no está en el catálogo: lo armás paso a paso (el mismo asistente de siempre) y queda en la lista de abajo para darlo. No se sube al catálogo. Los consumibles no pasan por el asistente: para esos, usá uno del catálogo.</p>
+          <p class="dj-nota" style="margin-top:0">Un ítem que no está en el catálogo: lo armás paso a paso (el mismo asistente de siempre) y queda en la lista de abajo para darlo. No se sube al catálogo. También un consumible propio: su efecto lo resuelve la mesa a mano (✋).</p>
           <button type="button" class="dj-pri" data-dj="crear">✎ Crear un ítem ahora</button></div>
         <div class="dj-canasta"><div class="dj-tit">Lo que vas a dar</div><div data-dj-canasta></div></div>
       </div>
@@ -466,16 +466,16 @@ const DarJugador = (() => {
         contexto: 'ficha', nuevo: true, titulo: '🎁 Ítem nuevo para dar',
         draft: {nombre: '', tipoItem: '', tier: 'A definir', peso: 0, ranuras: 1, detalle: '', mods: [], imagen: '', unidades: 1, consumible: false, precioCompra: 0,
           tipoDado: 8, danoFijo: 0, danoAmplificado: 0, armaDeRango: false, efectosGolpe: []},
-        categorias: AsistenteItem.CATEGORIAS.map(c => c.id).filter(id => id !== 'consumibles'),
-        stats, tiers: Object.keys(TIER_COLOR),
+        stats, tiers: Object.keys(TIER_COLOR), unidadesNota: 'Cuántas le das (a cada uno, si elegís a varios). Después se puede cambiar en la lista de abajo.',
         ejemplos: (tipoItem, t) => catalogo().filter(it => String(it.tipoItem || '').startsWith('arma_') && num(it.tipoDado) === t).map(it => it.nombre),
         conPrecio: true, conRanuras: true, conNarrativa: true, conEstadoEquipar: true,
         textoGuardar: '✔ Crear y sumarlo a la lista',
         onGuardar: d => {
           if(v !== yo) return true;
           const item = copia(d);
-          delete item.id; item.equipado = false; item.consumible = false; item.unidades = 1;
-          sumarItem(item, 1);
+          const esCons = d.tipoItem === 'consumibles', n = esCons ? Math.max(1, Math.min(MAX_UNIDADES, entero(d.unidades) || 1)) : 1;   // ✋ un consumible propio: las unidades son las que se dan
+          delete item.id; item.equipado = false; item.consumible = esCons; item.unidades = 1;
+          sumarItem(item, n);
           dibujarCanasta();
           toast(`«${item.nombre}» creado: quedó en la lista para dar`);
           return true;

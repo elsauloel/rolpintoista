@@ -216,3 +216,6 @@ queda como archivo histórico, ya no lo lee nada.
 
 - **`auditado`** (2026-10-20, dueño): la fecha en que el ítem pasó por una auditoría con el dueño (la primera: las pociones, P212). Lo que no lo
   tiene queda para revisar después. Solo informativo: no cambia nada en el juego.
+
+- **`consumoAMano: true`** (2026-11-22): un consumible propio, armado con el asistente de ítems, cuyo efecto lo resuelve la mesa a mano. Sin
+  `curahp`/`efectoNombre`; su Detalle termina en «✋ A mano: el efecto lo resuelve la mesa.». Ver `comun/CLAUDE.md`.

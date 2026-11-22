@@ -257,7 +257,8 @@ function itemComoEntradaCatalogoGM(d){
     id: 'new-' + slugItemCatalogo(d.nombre), nombre: d.nombre, tier: d.tier || 'A definir', imagen: '',
     tipoItem: d.tipoItem, peso: num(d.peso), ranuras: num(d.ranuras), precioCompra: num(d.precioCompra),
     ...(esArma ? {tipoDado: d.tipoDado, danoFijo: num(d.danoFijo), danoAmplificado: num(d.danoAmplificado), armaDeRango: !!d.armaDeRango, efectosGolpe: d.efectosGolpe || []} : {}),
-    unidades: 1, cargaMax: 0, consumible: false, curahp: 0, escalaTipos: ESCALA_TIPOS,
+    unidades: d.tipoItem === 'consumibles' ? Math.max(1, Math.round(num(d.unidades)) || 1) : 1, cargaMax: 0, consumible: d.tipoItem === 'consumibles', curahp: 0, escalaTipos: ESCALA_TIPOS,
+    ...(d.consumoAMano ? {consumoAMano: true} : {}),   // ✋ un consumible propio: el efecto lo resuelve la mesa (comun/asistente-item.js)
     mods: d.mods || [], detalle: d.detalle || '', descripcionNarrativa: d.descripcionNarrativa || '', ...CreepCalculo.magiaDeItem(d),
   };
 }
@@ -293,7 +294,6 @@ function abrirItemCustomGM(){
     titulo: 'Ítem custom',
     nuevo: true,
     draft: {tier: 'A definir', peso: 0},
-    categorias: AsistenteItem.CATEGORIAS.map(c => c.id).filter(id => id !== 'consumibles'),
     destinos: {label: 'Equipar a', opciones, valor, nota: 'Un arma reemplaza la del creep; lo demás se suma a su equipo. Si no lo equipás a nadie, igual lo podés publicar en el catálogo desde el último paso.'},
     portador: portadorCreep,
     tiers: Object.keys(TIER_COLOR),
@@ -305,6 +305,8 @@ function abrirItemCustomGM(){
       accion: d => publicarEnCatalogoGM(itemComoEntradaCatalogoGM(d)),
     }],
     onGuardar: (d, scId) => {
+      // ✋ Un consumible propio no va al equipo de un creep (su cinturón usa los del catálogo): se sube al catálogo o se da a un jugador.
+      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: subilo con «⬆ Subir al catálogo» o dáselo a un jugador con 🎁 Dar a un jugador'); return false; }
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
       if(CreepCalculo.vaAlEquipo(d)){ ponerEquipoEnCreep(sc, d); const nuevo = sc.equipo[sc.equipo.length - 1]; hacerLugarEnManosCreep(sc, nuevo, true).then(() => renderAll()); }   // (una varita va al equipo; ✋ hace lugar)

@@ -810,8 +810,8 @@ const FichaEditor = (() => {
       const sc = SCHEMA[key];
       const op = opciones || {};
       const item = borrador(op.draft || (id ? S()[key].find(x=>x.id===id) : null), equipadoPreset);
-      // Ítems de inventario y catálogo (menos consumibles): asistente paso a paso.
-      if(!op.formulario && (key === 'inventario' || key === 'catalogo') && item.tipoItem !== 'consumibles'){
+      // Ítems de inventario y catálogo: asistente paso a paso (los consumibles, solo los propios a mano: ✋ `consumoAMano`; los demás, el formulario).
+      if(!op.formulario && (key === 'inventario' || key === 'catalogo') && (item.tipoItem !== 'consumibles' || item.consumoAMano)){
         abrirAsistenteItem(key, id, {equipadoPreset, draft: op.draft});
         return;
       }
@@ -1118,7 +1118,8 @@ Catálogo: ${c.detalle || '—'}`, {titulo: 'Actualizar desde el catálogo', si:
         onConsumible: d => abrir(key, id, undefined, {formulario: true, draft: {...base, ...d, tipoItem: 'consumibles', consumible: true}}),
         onGuardar: d => {
           const Q = S();
-          const item = {...AsistenteItem.fusionar(base, d), consumible: false};
+          const item = {...AsistenteItem.fusionar(base, d), consumible: d.tipoItem === 'consumibles'};   // ✋ un consumible propio (comun/asistente-item.js)
+          if(item.consumible){ item.equipado = false; item.activo = true; if(!original) item.cargaActual = 1; }
           if(!ES_ARMA(item.tipoItem)) ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'efectosGolpe'].forEach(k => delete item[k]);
           const i = Q[key].findIndex(x => x.id === item.id);
           if(i >= 0) Q[key][i] = item; else Q[key].push(item);

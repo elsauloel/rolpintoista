@@ -1606,9 +1606,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   y Jugador 2): fuera de combate, desde el mapa, un ítem, DDE y despojos (aceptados) y desde la ficha unos DDE (rechazados: volvieron); en combate,
   pegados, sin aviso (aceptado, 2 No2 cada uno); separados, desde la ficha: «Cancelar» (no se ofreció nada) y «Dar igual» (rechazado, nadie pagó);
   desde el mapa: «Dar igual» (aceptado). Sin ver: un jugador con dos personajes, y el 🎁 con un botín publicado (`docs/pruebas-en-el-mapa.md`).
-- **⬜ en cola — 🧪 Consumibles propios, a mano** (dueño, 2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización. Que le
+- **✅ hecho (2026-11-22) — 🧪 Consumibles propios, a mano** (dueño, 2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización. Que le
   puedas poner nombre, descripción, configurarlos como consumibles, poder equiparlos en la mochila, consumirlos y que desaparezcan, pero que los
   efectos de los consumibles custom se resuelvan a mano». Vale también para «Ítem nuevo» de «Dar a un jugador».
+  *Resultado:* en el asistente de ítems (`comun/asistente-item.js`: «+ Ítem» de la ficha, «✎ Ítem nuevo» de Dar a un jugador, el ✎ Ítem custom de GM
+  Tools, la tienda y el editor del catálogo) la categoría Consumible va por un camino corto: Qué es (nombre y qué hace, obligatorio) · Unidades ·
+  Precio/peso/ranuras · Listo; el ítem queda `consumoAMano` con «✋ A mano: el efecto lo resuelve la mesa.» en el Detalle. Se consume como cualquiera
+  (No2 de siempre, una unidad menos, en 0 desaparece) y la Mesa dice «X usó Y: «lo que hace» · ✋ a mano: lo resuelve la mesa»; no toca vida ni
+  estados. El formulario completo (con efectos automáticos) sigue a un botón del resumen. Probado con clics en «Claude · pruebas 2»: el Jugador 1 armó
+  uno de 2 unidades desde su ficha, lo pasó al cinturón, lo consumió fuera de combate (ficha) y en combate (Botonera del mapa) y desapareció; el GM
+  armó uno con «✎ Ítem nuevo» de Dar a un jugador y se lo dio al Jugador 2, que lo consumió desde la mochila. También la 🔍, el Ver y la tienda (sin
+  guardar). En GM Tools no se le equipa a un creep (avisa; se sube o se da). Dudas: P284. Pruebas automáticas: 1003 en verde.
 - **⬜ en cola — ✉ Mensajes secretos entre usuarios** (dueño, 2026-11-22): «ofrecer la opción de mandar mensajes secretos entre usuarios, ya sea
   jugadores o GM. Podría ser desde el menú del log de Mesa, con algún comando, pero que el mensaje le aparezca al receptor con una especie de botón
   flotante tipo notificación de WhatsApp, tanto en el mapa como en la ficha». Proponer antes de programar.
@@ -1738,6 +1746,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
   ese caso raro de la perforación y defensa especial»; P283, punto 2): hoy el Aguante se resta después de lo que «pasa siempre» por Perfora, así
   que puede frenar parte de eso. Explicarle el caso con números y proponer.
+
+- **⬜ en cola — Probar: ⬆ Subir al catálogo un consumible propio** (2026-11-22, de los consumibles a mano): no se probó con clics para no
+  sumar un ítem de prueba a la biblioteca compartida. Ver que suba con su «✋ A mano» y que, tomado del catálogo, se consuma igual.
+
+- **⬜ en cola — Probar: un consumible propio en el editor del catálogo (`datos/catalogo-editor.html`)** (2026-11-22): no se abrió; ver que se
+  guarde como consumible con su marca ✋.
 
 ## En cola
 

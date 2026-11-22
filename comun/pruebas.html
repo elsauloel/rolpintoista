@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261122cola47"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261122cola48"></script>
+<script src="combatiente.js?v=20261122cola49"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -60,7 +60,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261121dar"></script>
-<script src="dar-jugador.js?v=20261122cola47"></script>
+<script src="dar-jugador.js?v=20261122cola49"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -82,7 +82,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261122prisa5"></script>
+<script src="ficha-acciones.js?v=20261122cola49"></script>
 <script src="orden-turnos.js?v=20261121caido"></script>
 <script src="ficha-mantenimiento.js?v=20261121caido"></script>
 <script src="estado-preguntas.js"></script>
@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261121foco"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261122cola47"></script>
+<script src="ficha-lupa.js?v=20261122cola49"></script>
 <script src="ficha-editor.js"></script>
 <script src="creep-lupa.js?v=20261122prisa5"></script>
 <script src="combate-fin.js"></script>
@@ -3256,6 +3256,23 @@ prueba('una trampa consumible que no se pudo colocar no se gasta ni cobra', asyn
   await FichaAcciones.consumir(S, 't', false, uiConsumo(S, reg, false));
   igual([S.nitros, S.inventario.length], [5, 1]);
 });
+prueba('✋ un consumible propio a mano (2026-11-22): cobra No2, gasta una unidad, no toca vida ni estados y la Mesa dice qué hace; en 0 desaparece', async () => {
+  const it = {id: 'm', nombre: 'Caramelo raro', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, curahp: 0, detalle: Combatiente.consumoAManoDetalle('Te deja cantar un tango.')};
+  const S = fichaBotonera({hp: 10, nitros: 5, efectos: [], cinturon: [structuredClone(it)]}), reg = [], anuncios = [];
+  const ui = {...uiConsumo(S, reg), anunciar: a => anuncios.push(a)};
+  await FichaAcciones.consumir(S, 'm', false, ui);
+  const uno = [S.cinturon.length && S.cinturon[0].unidades, S.nitros, S.hp, S.efectos.length];
+  await FichaAcciones.consumir(S, 'm', false, ui);
+  igual([uno, S.cinturon.length, S.nitros, S.hp, anuncios[0].resultado, reg.some(t => /✋ el efecto, a mano/.test(t)), it.detalle],
+    [[1, 5 - FichaBotonera.costoConsumirNitros('cinturon'), 10, 0], 0, 5 - 2 * FichaBotonera.costoConsumirNitros('cinturon'), 10,
+     '«Te deja cantar un tango.» · ✋ a mano: lo resuelve la mesa', true, 'Te deja cantar un tango. ✋ A mano: el efecto lo resuelve la mesa.']);
+});
+prueba('✋ Combatiente.consumoAMano*: la nota va una sola vez y la descripción sale sin ella; un consumible de fábrica no es «a mano»', () => {
+  const d = Combatiente.consumoAManoDetalle(Combatiente.consumoAManoDetalle('Hace X.'));
+  igual([d, Combatiente.consumoAManoQueHace({detalle: d}), Combatiente.consumoAMano({consumible: true, consumoAMano: true}), Combatiente.consumoAMano(CATALOGO_BASE.find(i => i.consumible)),
+    Combatiente.consumoAMano({consumoAMano: true, tipoItem: 'arma_1m'}), Combatiente.consumoAManoDetalle('')],
+    ['Hace X. ✋ A mano: el efecto lo resuelve la mesa.', 'Hace X.', true, false, false, '✋ A mano: el efecto lo resuelve la mesa.']);
+});
 prueba('🛡 Cuero duro (2026-11-05, dueño: «Cuero duro queda»): +1 Res. crítico Tipo 6 y Tipo 8; Ojo para las grietas no existe', () => {
   const P = id => PASIVAS_BASE.find(p => p.poolId === id);
   const f0 = FichaCalculo.calcular(fichaBotonera({})).final, f = FichaCalculo.calcular(fichaBotonera({pasivas: [{...P('cuero-duro')}]})).final;
@@ -4470,6 +4487,35 @@ prueba('asistente de ítems: un orbe nuevo (escudo de una mano) pregunta lo del 
   const o = q('[data-aa-orbe1="orbeResguardo"]'); o.value = '2'; o.dispatchEvent(new Event('input', {bubbles: true}));
   q(`[data-pap-paso="${tabs.length - 1}"]`).click(); q('[data-pap="crear"]').click(); await new Promise(res => setTimeout(res, 0));
   igual([tabs.includes('Defensa'), tabs[1], guardado.orbe, guardado.orbeResguardo, guardado.orbeSalvaje], [false, 'Orbe', true, 2, undefined]);
+});
+prueba('✋ asistente de ítems: un Consumible nuevo va por el camino corto (Qué es · Unidades · Precio · Listo), pide la descripción y sale a mano', async () => {
+  let guardado = null, alForm = null;
+  AsistenteItem.abrir({contexto: 'ficha', nuevo: true, stats: [{id: 'pdg', label: 'PdG'}], conPrecio: true, conLugar: true, draft: {mods: [{stat: 'pdg', val: 2}], equipado: true}, onGuardar: d => { guardado = d; }, onConsumible: d => { alForm = d; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  q('[data-aa-cat="consumibles"]').click();
+  const n = q('[data-aa-c="nombre"]'); n.value = 'Mate milagroso'; n.dispatchEvent(new Event('input', {bubbles: true}));
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q('[data-pap="sig"]').click();
+  const aviso = (q('.pap-aviso') || {}).textContent;
+  const det = q('[data-aa-c="detalle"]'); det.value = 'Te da ánimo para seguir.'; det.dispatchEvent(new Event('input', {bubbles: true}));
+  q('[data-pap="sig"]').click();
+  const u = q('[data-aa-c="unidades"]'); u.value = '3'; u.dispatchEvent(new Event('input', {bubbles: true}));
+  q(`[data-pap-paso="${tabs.length - 1}"]`).click();
+  const hayForm = !!q('[data-aa-consformulario]');
+  q('[data-pap="crear"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([tabs, aviso, guardado.tipoItem, guardado.consumible, guardado.consumoAMano, guardado.unidades, guardado.mods, guardado.equipado, guardado.detalle, hayForm, alForm],
+    [['Qué es', 'Unidades', 'Precio', 'Listo'], 'Contá en la descripción qué hace: es lo que la mesa va a resolver a mano', 'consumibles', true, true, 3, [], false,
+     'Te da ánimo para seguir. ✋ A mano: el efecto lo resuelve la mesa.', true, null]);
+});
+prueba('✋ asistente de ítems: al editar un consumible propio la nota no aparece en la descripción; pasarlo a otra categoría le saca la marca', async () => {
+  let guardado = null;
+  const base = {nombre: 'Mate milagroso', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, detalle: Combatiente.consumoAManoDetalle('Te da ánimo.')};
+  AsistenteItem.abrir({contexto: 'ficha', nuevo: false, draft: base, stats: [{id: 'pdg', label: 'PdG'}], onGuardar: d => { guardado = AsistenteItem.fusionar(base, d); }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const enCaja = q('[data-aa-c="detalle"]').value;
+  q('[data-aa-cat="otros"]').click();
+  mia.querySelector('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([enCaja, guardado.tipoItem, guardado.consumoAMano, guardado.consumible, guardado.detalle], ['Te da ánimo.', 'otros', undefined, false, 'Te da ánimo.']);
 });
 prueba('AsistenteItem.fusionar: lo que el asistente sacó no vuelve de lo que había; una varita equipada a un creep va a su equipo con su hechizo', () => {
   const f = AsistenteItem.fusionar({nombre: 'x', tipoDado: 8, especial: {sp: 1}, mods: [{stat: 'pdg', val: 1}]}, {nombre: 'y', mods: []});

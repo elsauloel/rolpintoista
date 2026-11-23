@@ -2141,3 +2141,16 @@ teletransporte, la Varita del portal, Invocar portal, la Trampa de teleport), co
 2. **El Town portal solo se apaga**: el token se va del mapa, así que la tele se apaga sobre el portal y no se prende en ningún lado.
 3. **«Reducir movimiento»**: la tele no sale (el token salta, como el Parpadeo), pero los pulsos se siguen viendo como siempre (eso ya era así).
    ¿Los achicamos también?
+
+### P290 — 🙈 El inicio de turno de alguien escondido: lo que quedó elegido (2026-11-23, Claude)
+Ahora lo que le pasa a alguien escondido al empezar (y terminar) su turno —la tarjeta «Empieza el turno de…», el «▶ Empieza tu turno» en la Crónica,
+el reporte del veneno en la Mesa, el anillo dorado— lo ven sus aliados con su nombre (los jugadores si es un personaje; el GM si es un creep) y sus
+rivales no ven nada (ni «Alguien»). Quedaron elegidas estas cosas, todas cambiables:
+1. **El GM pierde «▶ Aplicar por él»** del inicio de turno de un personaje escondido (no le llega esa tarjeta). Si el jugador no lo aplica, se aplica
+   solo al pasar el turno, como siempre; con 👁 Revelar lo oculto prendido, el GM sí lo ve y tiene el botón. ¿Está bien?
+2. **El orden de turnos sigue marcando el turno de un creep conocido** aunque esté escondido (decisión del 2026-10-09, P255 c): los jugadores ven
+   en la lista «le toca a Blanco creep», aunque no les llegue nada más. ¿Lo dejamos así o la lista tampoco debería marcarlo mientras esté escondido?
+3. **Si el escondido es el primero de una ronda nueva**, a sus rivales les llega igual una tarjeta «Ronda N · Pasa el turno», sin nombre (para que
+   sepan que cambió la ronda). ¿O preferís que no les llegue nada?
+4. **El 📜 Historial del GM** sigue anotando la vida y los estados de un personaje escondido (lo escribe mirando los datos, sin saber quién lo
+   ve). ¿También habría que esconderlo ahí, o es el registro del GM y está bien que lo tenga?

@@ -68,6 +68,41 @@ const NoVisto = (() => {
     });
     return x;
   }
-  return {ALGUIEN, INCIERTA, hallar, nombrados, anonimo, decidir, anonimoEn};
+  /* 🙈 Quién ve a quién (2026-11-23, dueño, sobre el inicio de turno de una rata escondida y envenenada: «a los rivales no les debería salir
+     nada, a sus aliados sí»). UNA regla para todo lo que le pasa a alguien escondido (su inicio y su fin de turno, sus líneas de la Mesa, un
+     duelo o un área oculta): lo ve su bando (un personaje o una invocación → los jugadores; un creep → el GM, que ve sus creeps siempre), el GM
+     con 👁 Revelar lo oculto y quien lo esté viendo ahora (`loVe`: lo decide el mapa, que sabe qué ve cada pantalla). Al resto, nada.
+     o = {tipo: 'pj' | 'creep', soyGM, ojo, loVe} → true / false */
+  function loVeElEscondido(o){
+    if(!o) return true;
+    if((o.tipo === 'creep') === !!o.soyGM) return true;
+    if(o.soyGM && o.ojo) return true;
+    return !!o.loVe;
+  }
+  /* ¿Está escondido para el bando rival? o = {tipo, oculto (el GM lo ocultó), filaOculta (su fila del orden, 🙈), sigilo, tapado (adentro de una
+     nube o una niebla), invisible (un personaje), aLaVista (un creep: ¿lo ve algún jugador? undefined = no se sabe)} → true / false */
+  function escondido(o){
+    if(!o) return false;
+    if(o.oculto || o.filaOculta || o.sigilo || o.tapado) return true;
+    return o.tipo === 'creep' ? o.aLaVista === false : !!o.invisible;
+  }
+  /* El cambio de turno, en tarjetas de la Crónica según quién ve a quién. sig = {tokenId, escondido} (al que le empieza el turno);
+     grupos = [{tokenId, escondido, lineas}] en orden (lo que terminó el anterior, los salteados, lo de sig).
+     → {sig: las líneas de su tarjeta (si sig está escondido, va marcada: la ven solo los que lo ven), rivales: lo que les llega aparte a los que no
+        ven a sig (sin lo suyo; null si sig se ve), otras: [{tokenId, lineas}] (otro escondido: su propia tarjeta, marcada con él)} */
+  function tarjetasTurno(sig, grupos){
+    const gs = (grupos || []).filter(g => g && Array.isArray(g.lineas) && g.lineas.length);
+    const deSig = g => !!sig && g.tokenId === sig.tokenId;
+    const sigEsc = !!(sig && sig.escondido);
+    const lin = l => l.flatMap(g => g.lineas);
+    const otras = new Map();
+    gs.filter(g => g.escondido && !deSig(g)).forEach(g => otras.set(g.tokenId, [...(otras.get(g.tokenId) || []), ...g.lineas]));
+    return {
+      sig: lin(gs.filter(g => !g.escondido || deSig(g))),
+      rivales: sigEsc ? lin(gs.filter(g => !g.escondido)) : null,
+      otras: [...otras].map(([tokenId, lineas]) => ({tokenId, lineas})),
+    };
+  }
+  return {ALGUIEN, INCIERTA, hallar, nombrados, anonimo, decidir, anonimoEn, loVeElEscondido, escondido, tarjetasTurno};
 })();
 if(typeof window !== 'undefined') window.NoVisto = NoVisto;

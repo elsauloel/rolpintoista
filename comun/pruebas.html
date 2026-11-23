@@ -84,7 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261122cola49"></script>
 <script src="orden-turnos.js?v=20261121caido"></script>
-<script src="ficha-mantenimiento.js?v=20261121caido"></script>
+<script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -131,7 +131,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
-<script src="no-visto.js?v=20261120a"></script>
+<script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261121mueve"></script>
 <script src="mensajes.js?v=20261122msj"></script>
@@ -9275,6 +9275,54 @@ grupo('No visto: la Mesa y la Crónica no delatan a quien no se ve');
     const d = {titulo: `${RATA} → Bizzante`, lineas: [`${RATA} tira PdG: 12`, 'Bizzante esquiva: 9'], datos: {x: 1}};
     const x = NoVisto.anonimoEn(d, ['titulo', 'resultado', 'lineas'], {todos: [RATA, 'Bizzante'], esconder: [RATA]});
     igual([x.titulo, x.lineas, d.titulo, x.datos === d.datos], ['Alguien → Bizzante', ['Alguien tira PdG: 12', 'Bizzante esquiva: 9'], `${RATA} → Bizzante`, true]);
+  });
+})();
+
+/* ---------- 🙈 Quién ve a quién: el inicio de turno de alguien escondido (comun/no-visto.js, 2026-11-23) ---------- */
+grupo('Quién ve a quién: lo de un escondido, a sus aliados sí y a sus rivales no');
+(() => {
+  const ve = (tipo, soyGM, ojo, loVe) => NoVisto.loVeElEscondido({tipo, soyGM, ojo, loVe});
+  prueba('un personaje escondido: lo ven los jugadores (su bando); el GM no, salvo con el 👁 o si lo está viendo', () =>
+    igual([ve('pj', false, false, false), ve('pj', true, false, false), ve('pj', true, true, false), ve('pj', true, false, true)], [true, false, true, true]));
+  prueba('un creep escondido: lo ve el GM siempre; un jugador, solo si lo está viendo (el 👁 es del GM)', () =>
+    igual([ve('creep', true, false, false), ve('creep', false, false, false), ve('creep', false, true, false), ve('creep', false, false, true)], [true, false, false, true]));
+  prueba('escondido: en sigilo, oculto por el GM, su fila oculta, adentro de una nube; un creep que ningún jugador ve; un personaje invisible', () => {
+    const e = o => NoVisto.escondido(o);
+    igual([e({tipo: 'pj', sigilo: true}), e({tipo: 'pj', oculto: true}), e({tipo: 'creep', filaOculta: true}), e({tipo: 'pj', tapado: true}),
+      e({tipo: 'creep', aLaVista: false}), e({tipo: 'creep', aLaVista: true}), e({tipo: 'creep'}), e({tipo: 'pj', invisible: true}), e({tipo: 'pj'}), e(null)],
+      [true, true, true, true, true, false, false, true, false, false]);
+  });
+  prueba('el turno de un escondido: su tarjeta lleva lo suyo y lo de los que se ven; a los rivales, aparte, solo lo de los que se ven', () => {
+    const t = NoVisto.tarjetasTurno({tokenId: 'j2', escondido: true}, [
+      {tokenId: 'j1', escondido: false, lineas: ['Terminó el turno de Blanco J1:', 'Regeneración +1']},
+      {tokenId: 'j2', escondido: true, lineas: ['Empieza el turno de Blanco J2:', 'Veneno: −3 HP']}]);
+    igual([t.sig, t.rivales, t.otras], [['Terminó el turno de Blanco J1:', 'Regeneración +1', 'Empieza el turno de Blanco J2:', 'Veneno: −3 HP'],
+      ['Terminó el turno de Blanco J1:', 'Regeneración +1'], []]);
+  });
+  prueba('al que le toca se ve, pero terminó uno escondido: lo del escondido va en su propia tarjeta; nada de él en la de todos', () => {
+    const t = NoVisto.tarjetasTurno({tokenId: 'j1', escondido: false}, [
+      {tokenId: 'rata', escondido: true, lineas: ['Terminó el turno de Rata:', 'Veneno: 2 → 1 turnos']},
+      {tokenId: '', escondido: false, lineas: ['⏭ El GM pasó de ronda.']},
+      {tokenId: 'j1', escondido: false, lineas: ['Empieza el turno de Blanco J1:', 'SP +1']}]);
+    igual([t.sig, t.rivales, t.otras], [['⏭ El GM pasó de ronda.', 'Empieza el turno de Blanco J1:', 'SP +1'], null, [{tokenId: 'rata', lineas: ['Terminó el turno de Rata:', 'Veneno: 2 → 1 turnos']}]]);
+  });
+  prueba('sin líneas: tarjetas vacías, sin nada para los rivales', () =>
+    igual(NoVisto.tarjetasTurno({tokenId: 'j2', escondido: true}, [{tokenId: 'j2', escondido: true, lineas: []}]), {sig: [], rivales: [], otras: []}));
+  prueba('el reporte del turno de un personaje escondido va marcado para la Mesa (oculta-pj:reporte, con su ficha); sin marca, como siempre', () =>
+    igual([FichaMantenimiento.marcaOculta('reporte', {desde: 'oculta-pj', ficha: 'abc~inv1'}), FichaMantenimiento.marcaOculta('recordatorio', null)],
+      [{desde: 'oculta-pj:reporte', ficha: 'abc~inv1'}, {desde: 'recordatorio'}]));
+  prueba('la marca vuelve a ser la línea de siempre para quien la ve (comun/mesa.js, mesaOcultaParte)', async () => {
+    const src = await (await fetch('mesa.js', {cache: 'no-store'})).text();
+    const m = /function mesaOcultaParte\(t\)\{[\s\S]*?\n\}/.exec(src);
+    cierto(!!m);
+    const f = new Function(m[0] + '; return mesaOcultaParte;')();
+    igual([f({desde: 'oculta-pj:reporte'}), f({desde: 'oculta-pj:recordatorio'}), f({desde: 'reporte'})], [{tipo: 'pj', desde: 'reporte'}, {tipo: 'pj', desde: 'recordatorio'}, null]);
+  });
+  prueba('el mapa usa la regla común (js/29, js/04 y js/16)', async () => {
+    const [t29, t04, t16] = await Promise.all(['29-accion-incierta', '04-mantenimiento-e-iniciativa', '16-momentos'].map(async n => (await fetch(`../vtt-hexgrid/js/${n}.js`, {cache: 'no-store'})).text()));
+    cierto(/function mesaOcultaVer[\s\S]{0,200}escondidoLoVeo\(/.test(t29) && /NoVisto\.loVeElEscondido\(/.test(t29) && /NoVisto\.escondido\(/.test(t29));
+    cierto(/NoVisto\.tarjetasTurno\(/.test(t04) && /tipo: 'inicio-turno'[\s\S]{0,300}escondido: escI/.test(t04) && /publicarReporte\([^)]*mesaOculta\)/.test(t04));
+    cierto(/momentoEscondidoVer\(d\)/.test(t16));
   });
 })();
 

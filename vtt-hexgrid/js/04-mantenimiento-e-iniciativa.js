@@ -345,13 +345,16 @@ async function iniciativaDemorarTurno(orden, demoradoId, sigId){
   const publico = id => { const t = tokens.get(id), o = orden.find(x => x.id === id); return !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t)); };
   const nomDem = publico(demoradoId) ? nombreDe(tokens.get(demoradoId)) : '', nomSig = publico(sigId) ? nombreDe(tokens.get(sigId)) : '';
   mesaLinea(`⏬ ${nomDem || 'Alguien'} demora su turno: ${nomSig ? `le toca a ${nomSig}` : 'le toca al siguiente'} y ${nomDem ? nomDem + ' juega' : 'juega'} justo después`, 'recordatorio');
-  const tarjeta = momentoAbrir({tipo: 'turno', icono: '⏬', titulo: nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno', estado: 'listo',
-    datos: {lineas: [`${nomDem || 'Alguien'} demora su turno: juega justo después${nomSig ? ` de ${nomSig}` : ''}.`]}});
-  const lineasZonas = await zonasDelQueLaTiro(sigId, null);   // P172: sus zonas, un turno menos (js/07)
+  // 🙈 (2026-11-23) Si al que le toca está escondido: su tarjeta, con su nombre, solo para los que lo ven (js/29); a los demás, la de siempre sin él.
+  const escSig = escondidoDe(sigId), nomSigV = escSig ? nombreDe(tokens.get(sigId)) : nomSig;
+  const linDem = n => `${nomDem || 'Alguien'} demora su turno: juega justo después${n ? ` de ${n}` : ''}.`;
+  const tarjeta = momentoAbrir({tipo: 'turno', icono: '⏬', titulo: nomSigV ? `Empieza el turno de ${nomSigV}` : 'Pasa el turno', estado: 'listo',
+    datos: {lineas: [linDem(nomSigV)], ...(escSig ? {escondido: escSig} : {})}});
+  const lineasZonas = turnoMarcar(await zonasDelQueLaTiro(sigId, null), sigId, escSig);   // P172: sus zonas, un turno menos (js/07)
   const pendiente = await inicioTurnoPendiente(sigId, `${mapaFin}:${pasoFin + 1}`);
-  const lineasInicio = !pendiente ? await inicioDeTurno(sigId, `${mapaFin}:${pasoFin + 1}`) : [];
-  const todas = [...lineasZonas, ...lineasInicio];
-  if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
+  const lineasInicio = !pendiente ? await inicioDeTurno(sigId, `${mapaFin}:${pasoFin + 1}`) : turnoMarcar([], sigId, escSig);
+  await turnoTarjetasAbrir(tarjeta, {tokenId: sigId, escondido: escSig}, [lineasZonas, turnoMarcar(lineasInicio, sigId, escSig)],
+    {icono: '⏬', titRivales: escSig ? 'Pasa el turno' : '', preRivales: [linDem('')]});
 }
 
 // Suma de los modificadores de un stat de un creep (equipo puesto, arma y estados activos): mismo criterio que gm-tools.
@@ -532,49 +535,53 @@ async function iniciativaSiguiente(o){
   const tSig = tokens.get(sig.id);
   // A quién se nombra (2026-10-09): un creep, si los jugadores ya lo conocen (js/29); un personaje, si no está en sigilo.
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
-  const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
-  const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
-    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {})}});
-  const lineas = [];
-  if(termina && !terminaRepetido) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
+  // 🙈 (2026-11-23) Si al que le toca está escondido, su tarjeta lo nombra igual y va marcada: la ven solo los que lo ven (su bando, el GM con 👁).
+  const escSig = sig.id ? escondidoDe(sig.id, sig) : null;
+  const nomSig = tSig && (escSig || publico(sig, tSig)) ? nombreDe(tSig) : '';
+  const tituloRonda = nuevaRonda ? `Ronda ${ronda} · ` : '';
+  const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${tituloRonda}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
+    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {}), ...(escSig ? {escondido: escSig} : {})}});
+  const grupos = [];   // cada uno, las líneas de un token (turnoMarcar) o sueltas (de todos)
+  const suelta = l => turnoMarcar(l, '', null);
+  if(termina && !terminaRepetido) grupos.push(await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
   // 🫨 Al terminar el turno de quien arrastró, los que arrastró recuperan el equilibrio (js/78; dueño, 2026-11-05).
-  if(termina && typeof desequilibradosFinTurno === 'function') try{ lineas.push(...await desequilibradosFinTurno(termina.id)); }catch(err){ console.error('Desequilibrado:', err); }
+  if(termina && typeof desequilibradosFinTurno === 'function') try{ grupos.push(suelta(await desequilibradosFinTurno(termina.id))); }catch(err){ console.error('Desequilibrado:', err); }
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
   for(const id of salteados.filter(x => x !== (orden[i] || {}).id)){
-    const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);
-    lineas.push(...ini2, ...fin2);
+    grupos.push(await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`));
   }
   // ⏭ Los que se saltearon al pasar de ronda: su turno pasa igual, sin jugar (lo más parecido a apretar ▶ Siguiente con cada uno: P269). Quien demoró
   // su turno con ▼ ya lo había empezado (no se repite el inicio).
   for(const id of saltaRonda){
     const k = `${mapaFin}:${pasoFin}:ronda:${id}`;
-    const ini2 = (iniciativa.empezados || []).includes(id) ? [] : await inicioDeTurno(id, k);
-    const fin2 = await finDeTurno(id, k);
-    const z2 = iniciativaFueraDeJuego(id) ? [] : await zonasDelQueLaTiro(id, null);
-    lineas.push(...ini2, ...fin2, ...z2);
+    if(!(iniciativa.empezados || []).includes(id)) grupos.push(await inicioDeTurno(id, k));
+    grupos.push(await finDeTurno(id, k));
+    if(!iniciativaFueraDeJuego(id)) grupos.push(turnoMarcar(await zonasDelQueLaTiro(id, null), id));
   }
   if(o.pasarRonda){
     const nomP = id => { const tk = tokens.get(id), fila = orden.find(x => x.id === id); return tk && publico(fila, tk) ? nombreDe(tk) : ''; };
     const vivos = saltaRonda.filter(id => !iniciativaFueraDeJuego(id)), nombres = vivos.map(nomP).filter(Boolean), otros = vivos.length - nombres.length;
     const quien = [...nombres, ...(otros ? [otros === 1 ? 'alguien más' : `${otros} más`] : [])].join(', ');
     const txt = `⏭ El GM pasó de ronda${quien ? `: se saltearon los turnos de ${quien}` : ''}`;
-    lineas.unshift(txt + '.');
+    grupos.unshift(suelta([txt + '.']));
     try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
   }
   const mantNuevo = nuevaRonda ? await pasarMantenimiento(`Ronda ${ronda}`) : null;   // lo que es de la ronda (P161)
+  const deSig = l => turnoMarcar(l, sig.id, escSig);
   const lineasZonas = sig.id && !sinInicio ? await zonasDelQueLaTiro(sig.id, mantNuevo) : [];   // P172: sus zonas, un turno menos (js/07)
   // ▶ Un personaje o una invocación (2026-10-17, dueño): lo de empezar su turno espera su «✔ Aplicar» (inicioTurnoPendiente); un creep, como siempre.
   const pendiente = sig.id && !sinInicio ? await inicioTurnoPendiente(sig.id, `${mapaFin}:${pasoFin + 1}`) : false;
   const lineasInicio = sig.id && !pendiente && !sinInicio ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
-  if(sigEmpezado) lineas.push(`${nomSig || 'Sigue'}: retoma el turno que había demorado (no vuelve a recargar).`);
-  else if(repite) lineas.push(`${nomSig || 'Alguien'} vuelve a actuar: ya había jugado esta ronda, así que no recarga ni cuenta turnos.`);
-  const todas = [...lineas, ...lineasZonas, ...lineasInicio];
+  if(sigEmpezado) grupos.push(deSig([`${nomSig || 'Sigue'}: retoma el turno que había demorado (no vuelve a recargar).`]));
+  else if(repite) grupos.push(deSig([`${nomSig || 'Alguien'} vuelve a actuar: ya había jugado esta ronda, así que no recarga ni cuenta turnos.`]));
+  grupos.push(deSig(lineasZonas), deSig(lineasInicio));
   if(ordenRonda && ordenRonda.lineas.length){
     ordenRonda.lineas.forEach(l => mesaLinea(l, 'recordatorio'));
     (ordenRonda.cambios || []).filter(c => c.desde !== c.hasta).forEach(c => { if(typeof ordenAvisar === 'function') ordenAvisar(c, c.por || '', ''); });
+    grupos.unshift(suelta([...ordenRonda.lineas]));
   }
-  const todasR = ordenRonda ? [...ordenRonda.lineas, ...todas] : todas;
-  if(todasR.length) momentoActualizar(await tarjeta, {'datos.lineas': todasR.slice(0, 14)});
+  await turnoTarjetasAbrir(tarjeta, escSig ? {tokenId: sig.id, escondido: escSig} : {tokenId: sig.id}, grupos,
+    {titRivales: escSig && nuevaRonda ? `Ronda ${ronda} · Pasa el turno` : ''});
 }
 /* ▶ INICIAR COMBATE (dueño, 2026-11-20: «al empezar un combate todos empiezan con los nitros llenos y el primero en la lista de iniciativa es como si
    fuera su turno… se tira iniciativa y al apretar Ordenar al GM le aparezca un botón ahí en el menú de iniciativa que diga Iniciar combate, y ahí se
@@ -666,15 +673,17 @@ async function iniciativaIniciarCombate(){
     const nomSig = publico ? nombreDe(tSig) : '';
     const titulo = `▶ Empieza el combate${nomSig ? `: turno de ${nomSig}` : ''}`;
     try{ mesaLinea(`${titulo} · todos arrancan con los No2 llenos`, 'recordatorio'); }catch(e){}
-    const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `Ronda 1 · ${titulo.replace(/^▶ /, '')}`, estado: 'listo',
-      datos: {lineas: ['Todos los del orden de turnos arrancan con los No2 llenos.', nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {})}});
+    // 🙈 (2026-11-23) El primero escondido: su tarjeta, con su nombre, solo para los que lo ven (js/29); a los demás, «Empieza el combate» sin él.
+    const escSig = escondidoDe(sig.id, sig), nomSigV = escSig ? nombreDe(tSig) : nomSig, LLENOS = 'Todos los del orden de turnos arrancan con los No2 llenos.';
+    const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `Ronda 1 · Empieza el combate${nomSigV ? `: turno de ${nomSigV}` : ''}`, estado: 'listo',
+      datos: {lineas: [LLENOS, nomSigV ? `Le toca a ${nomSigV}.` : 'Sigue el orden de turnos.'], ...(sig.id ? {tokenId: sig.id} : {}), ...(escSig ? {escondido: escSig} : {})}});
     // El turno del primero, como con ▶ Siguiente (sin lógica nueva).
     const clave = `${mapa}:${paso}`;
-    const lineasZonas = await zonasDelQueLaTiro(sig.id, null);
+    const lineasZonas = turnoMarcar(await zonasDelQueLaTiro(sig.id, null), sig.id, escSig);
     const pendiente = await inicioTurnoPendiente(sig.id, clave);
-    const lineasInicio = pendiente ? [] : await inicioDeTurno(sig.id, clave);
-    const todas = [...lineasZonas, ...lineasInicio];
-    if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': ['Todos los del orden de turnos arrancan con los No2 llenos.', ...todas].slice(0, 14)});
+    const lineasInicio = turnoMarcar(pendiente ? [] : await inicioDeTurno(sig.id, clave), sig.id, escSig);
+    await turnoTarjetasAbrir(tarjeta, {tokenId: sig.id, escondido: escSig}, [lineasZonas, lineasInicio],
+      {pre: [LLENOS], titRivales: escSig ? 'Ronda 1 · Empieza el combate' : '', preRivales: [LLENOS, 'Sigue el orden de turnos.']});
   }catch(err){ console.error('Iniciar combate:', err); toast(listo ? 'El combate se inició, pero falló el inicio del turno del primero — mirá la consola' : 'No se pudo iniciar el combate — probá de nuevo (el botón sigue ahí)'); }
   finally{ iniciandoCombate = false; iniciandoTxt = ''; renderIniciativa(); }
 }
@@ -746,8 +755,12 @@ async function iniciativaVolverDeLibre(){
   if(!await guardarIniciativa({turno: k, libre: null})) return;
   const t = tokens.get(iniciativa.orden[k].id);
   const publico = !!t && !t.oculto && !iniciativa.orden[k].oculto && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
-  momentoAbrir({tipo: 'turno', icono: '↩', titulo: publico ? `Vuelve el turno de ${nombreDe(t)}` : 'Termina el turno libre', estado: 'listo',
-    datos: {lineas: [publico ? `Terminó el turno libre: sigue el turno de ${nombreDe(t)}.` : 'Terminó el turno libre: sigue el orden de turnos.']}});
+  // 🙈 (2026-11-23) Escondido: a los que lo ven, con su nombre; a los demás, sin él (js/29).
+  const esc = escondidoDe(iniciativa.orden[k].id, iniciativa.orden[k]);
+  const libreTarjeta = (nombre, marca) => momentoAbrir({tipo: 'turno', icono: '↩', titulo: nombre ? `Vuelve el turno de ${nombre}` : 'Termina el turno libre', estado: 'listo',
+    datos: {lineas: [nombre ? `Terminó el turno libre: sigue el turno de ${nombre}.` : 'Terminó el turno libre: sigue el orden de turnos.'], ...(marca || {})}});
+  if(esc){ libreTarjeta(nombreDe(t), {escondido: esc}); libreTarjeta('', {sinEscondido: esc}); }
+  else libreTarjeta(publico ? nombreDe(t) : '');
 }
 /* Termina el turno y pasa al final del orden (Degollar, dueño 2026-10-10): lo llama el duelo en el mapa del GM cuando se resuelve un ataque
    con `terminaTurno`. Si era su turno, el turno pasa al que quedó en su lugar y él ya cuenta como que jugó la ronda (no le vuelve a tocar al
@@ -818,12 +831,14 @@ async function turnoDeToken(tokenId, clave, inicio){
   if(inicio && soyGM && typeof tunelBorrar === 'function') tunelBorrar(tokenId);   // 🕳 la estela del túnel dura hasta que empieza su próximo turno (js/46)
   if(inicio && soyGM && typeof ceboInicioTurno === 'function') ceboInicioTurno(tokenId).catch(err => console.error('El cebo:', err));   // 💎 el brillo vuelve a tentar (js/80)   // Levitar: al terminar el turno toca el piso
   const o = iniciativa.orden.find(x => x.id === tokenId);
-  const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);
+  // 🙈 (2026-11-23) Si está escondido, sus líneas vuelven igual, marcadas (`.escondido`): la Crónica las muestra solo a quienes lo ven (js/29).
+  const esc = typeof escondidoDe === 'function' ? escondidoDe(tokenId, o) : null;
   const titulo = inicio ? `Empieza el turno de ${nombreDe(t)}:` : `Terminó el turno de ${nombreDe(t)}:`;
   const publicas = rep => {
     const l = rep.filter(x => !/^No2 recargados/.test(x) && (t.tipo !== 'creep' || !/^HP total/.test(x)));
-    return !visible || !l.length ? [] : [titulo, ...l];
+    return turnoMarcar(!l.length ? [] : [titulo, ...l], tokenId, esc);
   };
+  const mesaOculta = esc && esc.tipo === 'pj' ? {desde: 'oculta-pj', ficha: String(t.fichaId).slice(0, 80)} : null;   // 🙈 su reporte en la Mesa: solo los que lo ven
   const numero = Math.round(num(mantenimientoNumero));
   try{
     if(t.tipo === 'creep'){
@@ -857,8 +872,8 @@ async function turnoDeToken(tokenId, clave, inicio){
       return !!r;
     });
     expl.forEach(ex => explotarAlTerminar(t, ex));   // 💥 un estado que explota al terminar (Armadura arcana)
-    if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre);
-    if(r && r.avisos && r.avisos.length) FichaMantenimiento.publicarRecordatorios(r.avisos, r.nombre);
+    if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre, mesaOculta);
+    if(r && r.avisos && r.avisos.length) FichaMantenimiento.publicarRecordatorios(r.avisos, r.nombre, mesaOculta);
     if(r && r.robos && typeof roboAvisoNotado === 'function') roboAvisoNotado(fichaId, r.robos);   // 🫳 lo que le robaron en sigilo (js/47)
     return r ? publicas(r.rep) : [];
   }catch(err){
@@ -885,13 +900,40 @@ function provocadoAvisar(t, estados){
   const contra = String(e.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/);
   const quien = e.provocaDeNombre ? String(e.provocaDeNombre) : contra ? contra[1].trim() : 'quien te provocó';
   const texto = provocadoTexto(quien);
+  const escP = typeof escondidoDe === 'function' ? escondidoDe(idDeToken(t)) : null;   // 🙈 escondido: solo los que lo ven (js/29)
   setTimeout(() => momentoAbrir({tipo: 'provocado', icono: '😤', titulo: `${nombreDe(t)} está Provocado${e.provocaDeNombre ? ` por ${quien}` : ''}`, estado: 'listo',
     resultado: `${texto}${e.turnos ? ` Le queda${num(e.turnos) === 1 ? '' : 'n'} ${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}.` : ''}`,
-    datos: {paraUid: t.tipo === 'creep' ? fbUsuario.uid : (t.duenoUid || ''), aviso: true, boton: 'Aceptar',
+    datos: {paraUid: t.tipo === 'creep' ? fbUsuario.uid : (t.duenoUid || ''), aviso: true, boton: 'Aceptar', ...(escP ? {escondido: escP} : {}),
       ...(e.provocaDe ? {provocaDe: String(e.provocaDe), provocaDeNombre: quien, provocadoNombre: nombreDe(t)} : {}),
       pasos: [{titulo: e.provocaDeNombre ? `Estás provocado por ${quien}` : 'Estás Provocado', texto: `${texto} ✋ Lo respeta quien juega (no lo frena el mapa).`}]}}), 600);
 }
 const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
+/* 🙈 Las líneas del cambio de turno, según quién ve a quién (2026-11-23, dueño: «a los rivales no les debería salir nada, a sus aliados sí»).
+   `turnoMarcar(lineas, tokenId, esc)` deja dicho de quién son (y si está escondido); `turnoTarjetasAbrir(tarjeta, sigId, lineas)` reparte: la tarjeta de
+   siempre lleva lo de los que se ven (y lo de sig, si sig es el escondido: va marcada `datos.escondido`, la ven solo los que lo ven); a los que no ven a
+   sig les llega aparte lo de los demás (`sinEscondido`); otro escondido (el que terminó) tiene su propia tarjeta marcada. Las cuentas: NoVisto.tarjetasTurno. */
+function turnoMarcar(lineas, tokenId, esc){
+  const l = Array.isArray(lineas) ? lineas : [];
+  l.tokenId = tokenId;
+  l.escondido = esc === undefined ? (typeof escondidoDe === 'function' ? escondidoDe(tokenId) : null) : esc;
+  return l;
+}
+async function turnoTarjetasAbrir(tarjeta, sig, grupos, o){
+  o = o || {};
+  const t = NoVisto.tarjetasTurno(sig, grupos.map(g => ({tokenId: g.tokenId, escondido: !!g.escondido, lineas: [...g]})));
+  const pre = o.pre || [];
+  const sigL = [...pre, ...t.sig];
+  if(sigL.length > pre.length) momentoActualizar(await tarjeta, {'datos.lineas': sigL.slice(0, 14)});
+  if(t.rivales && (t.rivales.length || o.titRivales)){
+    momentoAbrir({tipo: 'turno', icono: o.icono || '▶', titulo: o.titRivales || 'Pasa el turno', estado: 'listo',
+      datos: {lineas: [...(o.preRivales || []), ...t.rivales].slice(0, 14), sinEscondido: sig.escondido}});
+  }
+  t.otras.forEach(x => {
+    const g = grupos.find(y => y.tokenId === x.tokenId);
+    momentoAbrir({tipo: 'turno', icono: '▶', titulo: `Turno de ${nombreDe(tokens.get(x.tokenId) || {}) || 'alguien'}`, estado: 'listo',
+      datos: {lineas: x.lineas.slice(0, 14), escondido: g && g.escondido}});
+  });
+}
 
 /* ▶ Empieza tu turno (2026-10-17, dueño: «un pequeño anuncio al principio del turno… los estados bajaron de X a X turnos, la regeneración de SP
    fue tal, la de HP fue tal, que la persona ponga aplicar»; los jugadores preguntaban si la regeneración se había aplicado). Para un personaje o
@@ -943,8 +985,9 @@ async function inicioTurnoPendiente(tokenId, clave){
   if(prev.prov){ const q = prev.prov.quien || 'quien te provocó'; pasos.unshift({titulo: `😤 Estás provocado por ${q}`, texto: `${provocadoTexto(q)} ✋ Lo respeta quien juega (no lo frena el mapa).`}); }
   // 🔮 La Bola de cristal (2026-10-18): si hay algo oculto en su campo de visión, se anuncia acá (js/53).
   try{ if(!invId && typeof bolaCristalAviso === 'function'){ const b = bolaCristalAviso(t); if(b) pasos.push(b); } }catch(err){ console.error('La Bola de cristal:', err); }
+  const escI = escondidoDe(tokenId);   // 🙈 (2026-11-23) escondido: su dueño lo ve siempre; los demás, solo si lo ven (el GM sin 👁, no: js/29)
   await momentoAbrir({tipo: 'inicio-turno', icono: '▶', titulo: `Empieza el turno de ${nombreDe(t)}`, estado: 'esperando',
-    resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos, ...(prev.malviaje ? {malviaje: prev.malviaje} : {}),
+    resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos, ...(escI ? {escondido: escI} : {}), ...(prev.malviaje ? {malviaje: prev.malviaje} : {}),
       ...(prev.prov ? {provocado: true, ...(prev.prov.de ? {provocaDe: prev.prov.de, provocaDeNombre: prev.prov.quien} : {})} : {})}});
   return true;
 }

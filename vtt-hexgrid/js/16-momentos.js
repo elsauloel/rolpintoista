@@ -120,6 +120,10 @@ function momentoRecibido(id, d){
   if(d.tipo === 'provocado-brillo' && typeof provocadoBrilloRecibido === 'function') provocadoBrilloRecibido(d);   // 😤 (js/77)   // 😤 la bronca que estalla (js/51)
   if(d.tipo === 'fin-combate' && typeof finCombateMomento === 'function') finCombateMomento(id);   // 🏁 lo de fin de combate de cada uno (js/25)
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
+  // 🙈 Lo que le pasa a alguien escondido (su turno, «▶ Empieza tu turno», Provocado; js/04): solo a los que lo ven (su bando, el GM con 👁, quien lo
+  // vea ahora); a sus rivales, nada (2026-11-23, dueño). A quien va dirigido le llega siempre.
+  if(d.datos && (d.datos.escondido || d.datos.sinEscondido) && typeof momentoEscondidoVer === 'function' && !momentoEscondidoVer(d)
+    && !(d.datos.paraUid && fbUsuario && d.datos.paraUid === fbUsuario.uid)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   if(d.tipo === 'pergamino-grupal' && typeof pergaminoGrupalMomento === 'function') pergaminoGrupalMomento(id, d);   // 📜 Aplicar o a mano (js/25, 2026-11-03)
   if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM

@@ -312,7 +312,8 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   **Sigilo y orden de turnos** (2026-09-19): quien está en sigilo desaparece
   solo de la lista para el bando rival mientras dure — los jugadores no ven
   a los creeps en sigilo; el GM no ve a los personajes en sigilo salvo con su 👁
-  (`ocultoPorSigiloParaMi` en `renderIniciativa`). El turno pasa igual cuando le toca.
+  (`ocultoPorSigiloParaMi` en `renderIniciativa`). El turno pasa igual cuando le toca. (2026-11-23: lo que le pasa al empezar su turno, a sus
+  aliados sí y a sus rivales no — ver «🙈 El inicio de turno de un escondido», al final.)
 - **Controles flotantes sobre el token seleccionado** (`hudUbicar`,
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
@@ -2615,3 +2616,17 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   flota sobre un token (`ganchoEvaEmpezar`, js/96: inmunidades, «−2 EVA») no sale en una pantalla que no ve ese token. La Mesa: js/29
   `mesaOcultaVer` (las líneas `oculta-<pj|creep>:<desde>`: su bando, el GM con 👁 o quien lo ve; decidido una vez por línea, `mesaOcultaDecision`).
   Si el daño le saca más que su Sigilo, se delata como siempre (`sigiloDelatarPorDano`; P288). Dudas: P287.
+- **🙈 El inicio de turno de un escondido: a sus aliados sí, a sus rivales no** (2026-11-23, dueño: «en realidad a los rivales no les debería salir
+  nada, a sus aliados sí»). **Una sola regla de «quién ve a quién»**: `NoVisto.loVeElEscondido({tipo, soyGM, ojo, loVe})` (comun/no-visto.js) — lo de
+  un escondido lo ve su bando (personaje o invocación → los jugadores; creep → el GM), el GM con 👁 y quien lo ve ahora (`loVeoAhora`). En js/29:
+  `escondidoLoVeo(tipo, tok)` (la usan `mesaOcultaVer` —las líneas `oculta-…` de la Mesa, también las del duelo oculto— y los momentos),
+  `escondidoDe(id, fila)` → `{tipo, tokenId}` o null (sigilo sin delatar, oculto por el GM, su fila 🙈, adentro de una nube, invisible; un creep que
+  ningún jugador ve: `NoVisto.escondido`) y `momentoEscondidoVer(d)`. **Cómo se marca**: un momento con `datos.escondido` lo ven solo los que lo ven;
+  con `datos.sinEscondido`, solo los que NO lo ven (js/16 `momentoRecibido`, después de `inicioTurnoMomento`; a quien va dirigido, `paraUid`, le llega
+  siempre). En js/04: `turnoDeToken` ya no tira las líneas de un escondido, las devuelve marcadas (`turnoMarcar`) y su reporte de la Mesa sale
+  `oculta-pj:reporte` / `oculta-pj:recordatorio` con la ficha (`FichaMantenimiento.publicarReporte(…, oculta)`, `marcaOculta`); `turnoTarjetasAbrir`
+  reparte con `NoVisto.tarjetasTurno`: la tarjeta de quien empieza lo nombra y va marcada si está escondido; a sus rivales, aparte, lo de los demás
+  (o «Ronda N · Pasa el turno»); otro escondido (el que terminó), su propia tarjeta. Lo usan ▶ Siguiente, ▶ Iniciar combate, ⏬ Demorar y ↩ el fin
+  del turno libre; «▶ Empieza tu turno» (`inicioTurnoPendiente`) y el Provocado van marcados. El anillo dorado ya respetaba lo que ve cada pantalla.
+  Para el GM, un personaje escondido ya no deja «▶ Aplicar por él» (salvo con 👁): se aplica solo al pasar el turno. Probado con clics en «Claude ·
+  pruebas 2» (GM, J1, J2): Blanco J2 en sigilo y envenenado, y un creep en sigilo y envenenado. Dudas: P290.

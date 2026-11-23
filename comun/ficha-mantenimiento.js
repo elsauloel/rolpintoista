@@ -333,22 +333,25 @@ const FichaMantenimiento = (() => {
   }
 
   const hayMesa = () => typeof fbDb !== 'undefined' && fbDb && typeof fbUsuario !== 'undefined' && fbUsuario && typeof fbMiembro !== 'undefined' && fbMiembro;
-  function publicarReporte(titulo, lineas, quien){
+  /* 🙈 `oculta` (2026-11-23, el mapa: el inicio o el fin del turno de alguien escondido) = {desde: 'oculta-pj', ficha}: la línea va marcada
+     `oculta-pj:reporte` con la ficha del escondido y la Mesa la muestra solo a los que lo ven (vtt-hexgrid/js/29 mesaOcultaVer; sin mapa, a los jugadores). */
+  const marcaOculta = (desde, oculta) => oculta && oculta.desde ? {desde: `${oculta.desde}:${desde}`, ficha: String(oculta.ficha || '').slice(0, 80)} : {desde};
+  function publicarReporte(titulo, lineas, quien, oculta){
     if(!lineas || !lineas.length || !hayMesa()) return;
     fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: quien || '',
       origen: String(titulo || '').slice(0, 60), formula: lineas.join('\n').slice(0, 900),
-      rolls: [], mod: 0, total: 0, desde: 'reporte',
+      rolls: [], mod: 0, total: 0, ...marcaOculta('reporte', oculta),
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar el reporte del Mantenimiento:', err));
   }
-  function publicarRecordatorios(avisos, quien){
+  function publicarRecordatorios(avisos, quien, oculta){
     if(!avisos || !avisos.length || !hayMesa()) return;
     avisos.slice(0, 5).forEach(e => {
       fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: quien || '',
         origen: String(e.nombre || 'Estado').slice(0, 80), formula: String(e.detalle || '').slice(0, 240),
-        rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+        rolls: [], mod: 0, total: 0, ...marcaOculta('recordatorio', oculta),
         cuando: firebase.firestore.FieldValue.serverTimestamp(),
       }).catch(err => console.error('No se pudo publicar el recordatorio:', err));
     });
@@ -441,5 +444,5 @@ const FichaMantenimiento = (() => {
     if(caido) lineas.push('sigue caído (descansar no lo levanta)');
     return lineas;
   }
-  return {sahumerio, terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto, invInicio};
+  return {sahumerio, terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, marcaOculta, robosTexto, invInicio};
 })();

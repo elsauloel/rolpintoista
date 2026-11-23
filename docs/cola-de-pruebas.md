@@ -1702,8 +1702,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   llamando a la función del consumible (con los dos clics de verdad), los portales con la función de la habilidad (con los dos clics de verdad) y el
   Town portal creando el elemento. Videos `tele-trampa-glifo.mp4` y `tele-invocar-portal.mp4` (fuera del repo). Pruebas automáticas: 1027 en verde
   (1 nueva). Lo que faltó probar, abajo como «Probar».
-- **⬜ en cola — 🐀 Inicio de turno de alguien escondido** (dueño, 2026-11-22: «en realidad a los rivales no les debería salir nada, a sus aliados
+- **✅ hecho (2026-11-23) — 🐀 Inicio de turno de alguien escondido** (dueño, 2026-11-22: «en realidad a los rivales no les debería salir nada, a sus aliados
   sí»). Revisar que sus aliados sí vean su inicio de turno (veneno, etc.).
+  *Resultado:* antes, a un personaje escondido nadie le veía la tarjeta de su turno con el nombre (todos leían «Pasa el turno») y el GM, su rival,
+  leía en la Crónica «▶ Empieza el turno de Blanco J2» con «Aplicar por él» y en la Mesa el reporte del veneno; de un creep escondido, el GM (su
+  aliado) veía la tarjeta sin las líneas del veneno. Ahora hay una sola regla de «quién ve a quién» (`NoVisto.loVeElEscondido`, la usan la Mesa y
+  la Crónica): lo de un escondido lo ve su bando, el GM con 👁 y quien lo esté viendo; a sus rivales, nada. Probado con clics en «Claude · pruebas 2»:
+  Blanco J2 en sigilo y envenenado → el Jugador 1 ve la tarjeta con su nombre, el anillo dorado y el veneno en la Mesa; el GM, nada. Un creep en
+  sigilo y envenenado → el GM ve la tarjeta con el veneno y el anillo; los jugadores, nada. Dudas: P290.
 - **⬜ en cola — 🎲 «Tirar iniciativa» mete tokens que no van** (dueño, 2026-11-22: «acabo de probar "tirar iniciativa" y metió al tótem y al
   estandarte. No deberían ir»).
 - **⬜ en cola — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
@@ -1905,6 +1911,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   última partida: «un creep usó un town portal, se fue del mapa y a la hora de calcular el botín no lo tomó como escapado… repasar ese caso y
   discutir cómo resolverlo. En principio se me ocurre que cuando un creep hace blink out, le aparezca al GM qué hacer con la experiencia o algo
   así»). Revisar cómo «Batalla terminada» decide quién escapó, contarle el caso y conversar la solución antes de programar.
+
+- **⬜ en cola — Probar: 🙈 inicio de turno de un escondido con 👁 Revelar lo oculto** (2026-11-23): por código, con el 👁 prendido el GM ve la
+  tarjeta, «▶ Aplicar por él» y el reporte de la Mesa de un personaje escondido; no se probó en el mapa (prender el 👁 avisa a todos).
+- **⬜ en cola — Probar: 🙈 escondido y ▶ Iniciar combate / ⏬ Demorar / ⟳ Pasar de ronda / ↩ fin del turno libre** (2026-11-23): las cuatro
+  tarjetas usan la misma regla (a los que lo ven, con su nombre; a los rivales, la de siempre sin él); solo se probó con ▶ Siguiente.
+- **⬜ en cola — Probar: 🙈 el fin de turno de un escondido con algo que contar** (2026-11-23): si al terminar su turno le pasa algo (un estado
+  que vence), va en su propia tarjeta, solo para los que lo ven; en la prueba no hubo líneas de fin de turno.
+- **⬜ en cola — Probar: 🙈 una zona de «al empezar su turno» (Muro de fuego) bajo un escondido, y el cartel flotante de inmunidad** (2026-11-23):
+  no se tocaron (la zona la resuelve quien lo maneja; el cartel flotante ya no sale en una pantalla que no ve el token, P263); no se probaron
+  con un escondido al empezar su turno.
 
 ## En cola
 

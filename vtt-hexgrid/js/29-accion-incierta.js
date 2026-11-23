@@ -178,9 +178,35 @@ function noVistoReintentar(){   // lo recién llegado que se escondió se vuelve
 function mesaOcultaVer(t){
   const o = typeof mesaOcultaParte === 'function' ? mesaOcultaParte(t) : null;
   if(!o) return null;
-  if((o.tipo === 'creep') === !!soyGM || (soyGM && ojoRevelando)) return o;
-  const tok = tokenPorFicha(t.ficha, o.tipo);
-  return tok && loVeoAhora(tok) && !(o.tipo === 'pj' && soyGM && ocultoPorSigiloParaMi(tok)) ? o : false;
+  return escondidoLoVeo(o.tipo, tokenPorFicha(t.ficha, o.tipo)) ? o : false;
+}
+/* 🙈 Quién ve a quién (2026-11-23, dueño, sobre el inicio de turno de una rata escondida y envenenada: «a los rivales no les debería salir nada, a
+   sus aliados sí»). UNA regla (NoVisto.loVeElEscondido) para todo lo que le pasa a alguien escondido: las líneas `oculta-…` de la Mesa (de arriba)
+   y los momentos marcados `datos.escondido` / `datos.sinEscondido` (la tarjeta «Empieza el turno de…», «▶ Empieza tu turno», Provocado; js/04).
+   Lo ve su bando, el GM con 👁 y quien lo vea ahora (`loVeoAhora`, lo mismo que dibuja el mapa). */
+function escondidoLoVeo(tipo, tok){
+  const loVe = !!tok && loVeoAhora(tok) && !(tipo === 'pj' && soyGM && ocultoPorSigiloParaMi(tok));
+  return NoVisto.loVeElEscondido({tipo, soyGM: !!soyGM, ojo: typeof ojoRevelando !== 'undefined' && ojoRevelando, loVe});
+}
+// ¿Este token está escondido para el bando rival ahora? → {tipo, tokenId} (lo que se guarda en el momento) o null. Lo decide la pantalla que publica
+// (casi siempre la del GM, que es la que pasa el turno; un creep a la vista de los jugadores lo sabe solo el GM: visibleParaJugadores).
+function escondidoDe(id, fila){
+  const t = tokens.get(id);
+  if(!t) return null;
+  const f = fila || ((typeof iniciativa !== 'undefined' && iniciativa.orden) || []).find(x => x.id === id);
+  const tipo = t.tipo === 'creep' ? 'creep' : 'pj';
+  const delatado = typeof delatadoToken === 'function' && delatadoToken(t);
+  const esc = NoVisto.escondido({tipo, oculto: !!t.oculto, filaOculta: !!(f && f.oculto), sigilo: enSigilo(t) && !delatado,
+    tapado: typeof tapadoPorNiebla === 'function' && tapadoPorNiebla(t), invisible: invisibleParaRivales(t) && !delatado,
+    aLaVista: tipo === 'creep' && soyGM ? visibleParaJugadores(t) : undefined});
+  return esc ? {tipo, tokenId: id} : null;
+}
+// Un momento marcado: ¿lo ve esta pantalla? (`escondido`: solo los que lo ven; `sinEscondido`: lo que les llega aparte a los que NO lo ven).
+function momentoEscondidoVer(d){
+  const dt = (d && d.datos) || {}, e = dt.escondido || dt.sinEscondido;
+  if(!e || !e.tokenId) return true;
+  const ve = escondidoLoVeo(e.tipo === 'creep' ? 'creep' : 'pj', tokens.get(e.tokenId));
+  return dt.escondido ? ve : !ve;
 }
 const mesaOcultaDecision = new Map();   // id → la decisión, una sola vez (como el resto de la Mesa: no cambia si después se lo ve)
 function mesaFiltrar(docs){

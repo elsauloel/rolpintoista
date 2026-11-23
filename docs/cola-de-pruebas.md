@@ -1901,6 +1901,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   2026-11-23): `trampaDestino` está validado pero falta en la lista de campos que se pueden crear de `elementoValido` (firebase/firestore.rules),
   así que crearla da error de permisos. Sumarlo, avisarle al dueño que pegue las reglas, y probar crearla y pisarla con la tele.
 
+- **⬜ en cola (al final, conversación) — 🏃 Un creep que se va por un Town portal no cuenta como escapado** (dueño, 2026-11-23, visto en la
+  última partida: «un creep usó un town portal, se fue del mapa y a la hora de calcular el botín no lo tomó como escapado… repasar ese caso y
+  discutir cómo resolverlo. En principio se me ocurre que cuando un creep hace blink out, le aparezca al GM qué hacer con la experiencia o algo
+  así»). Revisar cómo «Batalla terminada» decide quién escapó, contarle el caso y conversar la solución antes de programar.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

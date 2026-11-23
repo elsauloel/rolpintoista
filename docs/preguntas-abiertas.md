@@ -2143,6 +2143,8 @@ teletransporte, la Varita del portal, Invocar portal, la Trampa de teleport), co
    ¿Los achicamos también?
 
 ### P290 — 🙈 El inicio de turno de alguien escondido: lo que quedó elegido (2026-11-23, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** «las dudas nuevas están bien como están».
 Ahora lo que le pasa a alguien escondido al empezar (y terminar) su turno —la tarjeta «Empieza el turno de…», el «▶ Empieza tu turno» en la Crónica,
 el reporte del veneno en la Mesa, el anillo dorado— lo ven sus aliados con su nombre (los jugadores si es un personaje; el GM si es un creep) y sus
 rivales no ven nada (ni «Alguien»). Quedaron elegidas estas cosas, todas cambiables:

@@ -2037,6 +2037,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🔥 el Muro de la habilidad al cruzarlo (sin terminar adentro) y la Varita al empezar el turno, con resistencia** (2026-11-23):
   van por el mismo cartel y la misma cuenta que los otros caminos probados; con clics no se hizo esa combinación.
 
+- **⬜ en cola — 🔥 El cartel verde del daño de una zona dice «no hay nada que resistir»** (visto en las capturas del 23/11): en el cuadro del duelo del
+  daño del Muro de fuego, el cartel grande de abajo sigue diciendo «no hay nada que resistir: se aplica», aunque la cuenta resta la resistencia al
+  fuego. Que diga algo coherente con lo nuevo (por ejemplo «no se puede esquivar: se aplica»).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

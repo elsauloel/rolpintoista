@@ -1955,6 +1955,7 @@ Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas
 ### P272 — 🔥 La Varita del muro de fuego: ¿también al empezar el turno? (2026-11-21, Claude)
 
 > ✅ **Decidida (dueño, 2026-11-22):** «sí»: la Varita del muro de fuego también pega al empezar el turno (en la cola).
+> ✅ **Hecho (2026-11-23):** el mapa, el texto de la varita, «Ver detalle» y el cartel de arriba dicen «al entrar o cruzarlo y al empezar su turno adentro»; las copias viejas se ponen al día solas. Dudas: P294 y P295.
 El Muro de fuego (la habilidad de los magos creep) ya quema al empezar el turno de quien está parado encima (P259). La **Varita del muro de fuego**
 (Buena Calidad, 1d4 de fuego, 3 casillas) dice otra cosa en su texto: «a cada rival que entra y, en cada Mantenimiento, al que sigue adentro», y así
 sigue (no se tocó: el pedido era el Muro). ¿La paso al mismo comportamiento (y cambio su texto), o queda distinta a propósito?
@@ -2207,3 +2208,19 @@ ronda 1 (P271). Quedaron elegidas estas cosas, todas cambiables:
    «ronda 1», sin cartel ni aviso (igual que el anillo, P258 g).
 3. **La 🔍 y el cuadro del duelo** dicen el porqué en tercera persona («no suma: se movió en esta ronda», «es la ronda 1 del combate: vale recién desde
    la ronda 2»), para que sirva igual a quien lo ve desde otra pantalla. ¿Te gusta así o preferís «te moviste»?
+
+### P294 — 🔥 La Varita del muro de fuego ahora también quema al CRUZARLO (2026-11-23, Claude)
+Para que la varita haga lo mismo que el Muro de fuego (y diga «al entrar o cruzarlo»), su muro ahora pega también a quien lo atraviesa de paso
+sin terminar adentro (antes, solo a quien terminaba el movimiento encima). Es lo mismo que hace la habilidad. ¿Está bien, o la varita (más barata,
+1d4) solo al terminar adentro?
+
+### P295 — 🔥 Otras zonas que pegan «en cada Mantenimiento» a quien sigue adentro: ¿también al empezar su turno? (2026-11-23, Claude)
+Con orden de turnos, el Muro de fuego y la Varita del muro de fuego ya pegan al empezar el turno de quien está encima. Estas siguen pegando a todos a
+la vez al pasar de ronda (no se tocaron):
+1. **Con daño**: Varita de la fogata (fuego), Varita del chorro de lava (fuego), Varita de miasma (tóxico + Veneno), Pedos Tóxicos (un duelo por
+   token), la Nube tóxica (clase y creep: con el Veneno puesto, +1 stack), la Mina napalm (el piso queda ardiendo: 1d6 de fuego), el 🔥 terreno
+   incendiado viejo (ya no se crea) y las zonas que se arman a mano con el asistente de zonas.
+2. **Solo un estado**: las nubes y pisos de trampas (Gas adormecedor, Gas somnífero, Nube de veneno, Aceite resbaladizo, Brea pegajosa, Cola de
+   carpintero, Resina de árbol negro, Arena movediza, las trampas de arena de varita) y las varitas del aceite, del farol, de arena movediza (y la
+   mayor) y de la luz flotante.
+¿Pasamos alguna (o todas las de daño) a «al empezar su turno», o quedan así?

@@ -3165,6 +3165,9 @@ const Combatiente = (() => {
       vieja: it => typeof it.detalle === 'string' && /despeja la niebla de las casillas/.test(it.detalle)},
     {id: 'esp-varita-del-destello', nombre: 'Varita del destello', claves: ['especial', 'detalle'],
       vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.tipoDano === 'arcano' && (d.efectos || []).some(e => e && e.nombre === 'Pajaritos')); }},
+    // 🔥 (P272, dueño, 2026-11-22: «sí»): la Varita del muro de fuego, como el Muro de fuego: quema al cruzarlo y al empezar el turno adentro (no al pasar de ronda).
+    {id: 'esp-buena-varita-del-muro-de-fuego', nombre: 'Varita del muro de fuego', claves: ['especial', 'detalle'],
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar)); }},
   ];
   function ponerAlDiaItemsFabrica(lista){
     if(!Array.isArray(lista) || typeof CATALOGO_BASE === 'undefined') return false;

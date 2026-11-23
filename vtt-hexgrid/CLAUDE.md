@@ -2595,7 +2595,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   token que no está en la lista), como antes: en cada Mantenimiento. Al entrar o cruzarlo, igual que siempre. «Ver detalle», el cartel de arriba
   (`ZonaDetalle.cuandoZona`) y el globo de estados (js/103) dicen «al empezar su turno adentro». Las copias guardadas en creeps se ponen al día solas
   (`Combatiente.migrarLuzSanadora`). Probado con clics: lanzado desde las Acciones de un creep; al pasar de ronda le salió el cartel solo al que
-  empezaba su turno (J1) y no a J2, también encima; a J2, recién al empezar el suyo. La Varita del muro de fuego quedó como estaba (P272).
+  empezaba su turno (J1) y no a J2, también encima; a J2, recién al empezar el suyo. **La Varita del muro de fuego, igual desde el 2026-11-23**
+  (P272): su `especial.duelo` trae `zonaEstado: {alEmpezar: true}` (sin estado: `crearElementoZona`, js/13, guarda el JSON también cuando solo trae
+  `alEmpezar`) y `zonaCadaPaso` (quema al cruzarlo, P294); las copias viejas, `ITEMS_AL_DIA` de `Combatiente.ponerAlDiaItemsFabrica`. «Ver detalle»
+  (js/127, `zonaDetalleDescripcion`) muestra el texto de un ítem si la zona no sale de una habilidad (la mochila de quien la puso, puesta al día con el
+  catálogo; carga el catálogo con `bnCargarPiezas` si hace falta). Otras zonas «en cada Mantenimiento» sin tocar: P295.
 - **▶🔥 La zona como un renglón de «Empieza tu turno»** (dueño, 2026-11-22, opción A: «esta superposición de menús no me gusta»; js/08 + js/16): las
   zonas de «al empezar su turno» (`alEmpezar`, el Muro de fuego) ya no abren su cartel cuando a ese token le sale la ventana «▶ Empieza tu turno» en
   esta pantalla (un personaje o una invocación: `inicioTurnoTarjetaSobra`). `zonasAlEmpezarTurno` las junta (`zonaJuntar`, que intercepta

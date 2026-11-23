@@ -1969,7 +1969,8 @@ versión parecida en más de una, es candidato a juntar.
   fábrica cambia de mecánica, la copia vieja se pone al día con `Combatiente.ponerAlDiaItemsFabrica(lista)` (la ficha en `renderAll` y
   `FichaGuardado.completar`; el creep en `CreepCalculo.normalizar`). Cada ítem va en `ITEMS_AL_DIA` con `vieja(it)` (cómo reconocer la copia de antes:
   si no coincide —la editaron a mano—, no se toca) y las `claves` que se copian del catálogo. Primero: la Varita del destello (luz en vez de arcano,
-  Ceguera 20 % en vez de Pajaritos, Luz sanadora 25 %).
+  Ceguera 20 % en vez de Pajaritos, Luz sanadora 25 %). También la Varita del muro de fuego (2026-11-23, P272: `zonaEstado.alEmpezar` y `zonaCadaPaso`);
+  el toast de la ficha ya no nombra un ítem puntual («se pusieron al día ítems del catálogo que cambiaron»).
 
 - **💉 Adrenalina y 🔋 Pila pila** (2026-11-01, dueño). Adrenalina: la del Support de jugador (`support-adrenalina`, auditada: a vos o a un aliado
   en tu Rango, el estado Adrenalina —`apila`: +1 Des, Fue y Agi por stack, 2 turnos que se renuevan—; 5 SP, 0 No2; «Lento» = solo en tu turno, no es

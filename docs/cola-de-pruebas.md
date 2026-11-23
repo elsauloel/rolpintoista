@@ -1741,7 +1741,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Duda: P292. 2 pruebas automáticas nuevas (1040).
 - **✅ explicado (2026-11-23) — 🎯 Repasar la Apuntada de las ballestas (P271)** (dueño, 2026-11-22: «necesitaría repasar cómo está anotada la Apuntada para
   entender esto»). Explicarle cómo está y qué preguntaba P271.
-- **⬜ en cola — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
+- **✅ hecho (2026-11-23) — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
+  *Resultado:* el muro de la varita hace lo mismo que el de la habilidad: con orden de turnos ya no pega al pasar de ronda, sino al empezar el turno
+  de cada rival que esté encima (un personaje lo ve como un renglón más de «▶ Empieza tu turno», con su botón; un creep, con el cartel de siempre
+  en la pantalla del GM); al entrar o **cruzarlo** pega como siempre (antes solo al entrar terminando adentro: P294); sin orden de turnos, como
+  hoy (al pasar de ronda). El texto de la varita, «Ver detalle», el cartel de arriba y la descripción de la tarjeta dicen «al entrar o cruzarlo y
+  al empezar su turno adentro»; la tarjeta ahora muestra el texto del ítem (antes decía «no encontré una habilidad con ese nombre»). Las copias
+  de la varita que ya estaban en mochilas o en el equipo de un creep se ponen al día solas al cargarse (en el mapa, la ficha y GM Tools; en
+  Firebase la copia vieja queda hasta la próxima vez que se guarde esa parte: no hace falta tocar nada). **Probado con clics en «Claude · pruebas 2»** (GM, J1, J2): Blanco J2 la usó desde la Botonera (con la copia
+  vieja: ya salió con el texto nuevo y el muro nuevo) sobre Blanco creep; Peleador 5 entró caminando → cartel, el daño lo tiró J2 (70 → 68);
+  Blanco J1 (aliado) se paró encima → nada, ni al entrar ni al empezar su turno; con orden (J1, Blanco creep, J2) al empezar el turno del creep el
+  GM vio «le toca a Blanco creep» y el daño lo tiró J2 (dos veces, ronda 1 y 2; 1 de daño, la Defensa especial 2 lo frenó); al pasar de ronda
+  no pegó. Además, con la varita en un creep (para ver el renglón): J2 entró caminando a su muro (50 → 47, el daño lo tiró el GM) y al empezar
+  su turno le salió el renglón «🔥 Varita del muro de fuego: estás adentro al empezar tu turno» con «🔥 Tirar el daño (1d4)» (47 → 44); al pasar
+  de ronda, nada. Sin orden de turnos, al pasar de ronda les tocó a los dos, como hoy (44 → 43). Por datos: la varita vieja a Blanco J2 y una a
+  Blanco creep, el orden de turnos, y al final se sacaron, se borró el muro que quedaba y se devolvieron vidas, No2, SP y estados (narrativo, sin
+  orden). Otras zonas «en cada Mantenimiento» sin tocar: P295. 1 prueba automática nueva (1044).
 
 - **⬜ en cola — 🪟 Zona al empezar el turno: lo que quedó sin probar** (dueño, 2026-11-22: «lo que quedó sin probar, probalo. Y si no se puede,
   y si el problema es que la tirada falló para resistir, forzá la tirada con elegir el resultado manualmente»). Resistir con éxito desde el
@@ -1984,6 +1999,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   sale por la misma función que el del anillo (prueba automática); con clics solo se probó caminar.
 - **⬜ en cola — Probar: 🎯 la Apuntada en un creep y en una invocación con ballesta** (2026-11-23, P271): el creep la toma de su arma en la mano
   (solo la pantalla del GM), la invocación del resumen de la ficha; con clics solo se probó un personaje.
+- **⬜ en cola — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo
+  camino que el Muro de fuego (renglón de «Empieza tu turno» de quien la maneja); con clics, solo un personaje y un creep.
 
 ## En cola
 

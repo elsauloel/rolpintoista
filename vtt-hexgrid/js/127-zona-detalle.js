@@ -60,8 +60,16 @@ function zonaDetalleDescripcion(elId, el, a){
   fbDb.doc(fbRutaCampana(`fichas/${fid}/partes/${invId ? 'invocaciones' : 'habilidades'}`)).get().then(p => {
     const d = p.exists ? JSON.parse(p.data().json || '{}') : {};
     let txt = invId ? buscar((((d.invocaciones || []).find(i => i && i.id === invId)) || {}).habilidades) : buscar(d.habilidades);
-    // (una varita o un consumible: el nombre de la zona es el del ítem)
-    fin(txt ? {txt} : {no: `No encontré una habilidad con ese nombre en la ficha de quien la puso: puede venir de un ítem (${ZonaDetalle.A_MANO}).`});
+    if(txt || invId) return fin(txt ? {txt} : {no: `No encontré una habilidad con ese nombre en la ficha de quien la puso: puede venir de un ítem (${ZonaDetalle.A_MANO}).`});
+    // 🔥 Una varita o un consumible (2026-11-23, P272: la Varita del muro de fuego): el nombre de la zona es el del ítem — su texto sale de la mochila,
+    // puesto al día con el catálogo si la copia es vieja (Combatiente.ponerAlDiaItemsFabrica, sin guardar nada).
+    const conCatalogo = typeof CATALOGO_BASE === 'undefined' && typeof bnCargarPiezas === 'function' ? bnCargarPiezas().catch(() => {}) : Promise.resolve();   // (el catálogo, como el 📚 de js/02)
+    return Promise.all([fbDb.doc(fbRutaCampana(`fichas/${fid}/partes/inventario`)).get(), conCatalogo]).then(([pi]) => {
+      const inv = pi.exists ? structuredClone(JSON.parse(pi.data().json || '{}').inventario || []) : [];
+      try{ if(typeof Combatiente !== 'undefined' && Combatiente.ponerAlDiaItemsFabrica) Combatiente.ponerAlDiaItemsFabrica(inv); }catch(err){}
+      const t2 = buscar(inv);
+      fin(t2 ? {txt: t2} : {no: `No encontré una habilidad ni un ítem con ese nombre en la ficha de quien la puso (${ZonaDetalle.A_MANO}).`});
+    });
   }).catch(err => { console.error('Ver detalle: la descripción de la habilidad', err); fin({no: `No se pudo leer la descripción (${ZonaDetalle.A_MANO}).`}); });
   return {};
 }

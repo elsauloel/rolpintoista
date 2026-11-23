@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261122cola51c"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123cola56"></script>
+<script src="combatiente.js?v=20261123cola58"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -9719,6 +9719,21 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     igual([vieja[0].duelo.zonaEstado, vieja[0].ataqueTxt], [{nombre: 'Quemadura', alEmpezar: true}, '… a quien lo cruza o empieza su turno adentro']);
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t04 = await (await fetch('../vtt-hexgrid/js/04-mantenimiento-e-iniciativa.js', {cache: 'no-store'})).text();
     ok(/function zonasAlEmpezarTurno\(\)/.test(t08) && /desdeMantenimiento && porTurno && zonaAlEmpezar\(el\)/.test(t08) && /zonasAlEmpezarTurno\(\); \}/.test(t04));
+  });
+  prueba('🔥 la Varita del muro de fuego, como el Muro (P272, 2026-11-23): al entrar o cruzarlo y al empezar su turno adentro; la copia vieja de una mochila se pone al día', async () => {
+    const v = CATALOGO_BASE.find(i => i.id === 'esp-buena-varita-del-muro-de-fuego'), d = v.especial.duelo;
+    const z = Combatiente.zonaDeHab({nombre: v.nombre, tiradaExtra: v.especial.dano}, d, {fichaId: 'f1', tipo: 'pj'});
+    const el = {zona: true, zonaNombre: v.nombre, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaCadaPaso: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify(z.zonaEstado), turnos: 3};
+    const m = ZonaDetalle.armar(el, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, autor: {nombre: 'Blanco'}, habilidad: v.nombre, altura: 'ambos', rivalesTxt: 'los creeps'});
+    igual([z.zonaEstado, !!z.zonaCadaPaso, z.zonaForma, z.zonaLargo, /al entrar o cruzarlo y al empezar su turno adentro/.test(v.detalle), /Mantenimiento/.test(v.detalle)], [{alEmpezar: true}, true, 'linea', 3, true, false]);
+    ok(/al entrar o cruzarla y al empezar su turno adentro\.$/.test(m.esencial), m.esencial);
+    igual(ZonaDetalle.cuandoEtiqueta(el, {}), 'se dispara al entrar o cruzarla y al empezar su turno adentro');
+    const vieja = {id: v.id, nombre: v.nombre, equipado: true, especial: {sp: 1, dano: '1d4', duelo: {objetivo: 'zona', tira: '', contra: [], dano: true, tipoDano: 'fuego', zonaTurnos: 3, zonaForma: 'linea', zonaLargo: 3, zonaAltura: 'ambos'}}, detalle: '… en cada Mantenimiento, al que sigue adentro.'};
+    const lista = [vieja, {id: 'otro', nombre: 'Espada'}];
+    const c1 = Combatiente.ponerAlDiaItemsFabrica(lista), c2 = Combatiente.ponerAlDiaItemsFabrica(lista);
+    igual([c1, c2, vieja.especial.duelo.zonaEstado, vieja.especial.duelo.zonaCadaPaso, vieja.detalle === v.detalle, vieja.equipado], [true, false, {alEmpezar: true}, true, true, true]);
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
+    ok(/cfg\.estado\.duelo \|\| cfg\.estado\.alEmpezar\)\) datos\.zonaEstado/.test(t13));   // (una zona sin estado guarda igual la marca)
   });
   prueba('🔥 el cartel de una zona sin tirada dice qué le entra y quién tira el daño (2026-11-21: decía «No hay nada que tirar» y se tiraba el 3d4 del Muro)', async () => {
     const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};

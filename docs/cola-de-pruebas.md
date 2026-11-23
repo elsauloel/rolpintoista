@@ -2181,6 +2181,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   como GM» y «🤝 Pasar algo de la mochila de …» (los dos con 🤝, con textos distintos). El Ver de un ítem de GM Tools se abrió por función (el botón
   «🤝 Dar a un jugador» sí se tocó con un clic).
 
+- **⬜ en cola — 🕊 Cambiar el ícono de «Quitar el Pacto» del anillo del token** (dueño, 2026-11-23, con captura: «el ícono de "quitar pacto" no
+  me gusta, además la paloma quedó para mensajes. Quizás el mismo emoji del pacto, pero con el círculo rojo de "prohibido" encima»). Hoy es 🕊
+  (`vtt-hexgrid/js/10-hud-y-vida.js`, `pacto-quitar`). Pasarlo al emoji del Pacto con un 🚫 / círculo rojo tachado encima; revisar si la 🕊 aparece
+  en otros lugares del Pacto (js/83, Mesa, carteles) y cambiarla también ahí, para que la paloma quede solo para los mensajes secretos.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

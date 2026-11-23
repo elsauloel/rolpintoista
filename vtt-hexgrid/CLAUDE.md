@@ -33,6 +33,15 @@ historia.
 - **Reglas de Firestore** (hay que pegarlas): `descripcion` (texto ≤ 600) en `tokenValido`, y el GM puede cambiar `nombre`, `descripcion`, `imagen`
   y `color` de un token `pj` **sin ficha** de un jugador. Sin pegarlas: crear o guardar un suelto **con descripción** avisa «faltan pegar las reglas
   nuevas de Firestore (descripción de los tokens sueltos). Avisale al GM» y no se crea; sin descripción anda igual.
+- **📦 Token suelto paso a paso: iniciativa y vida** (2026-11-23, dueño: «esto es para objetos inanimados»): `abrirTokenSuelto` tiene tres pasos
+  (`ve` Cómo es · `ini` «¿Ocupa lugar en la iniciativa?» · `vida` «¿Tiene vida?», con cuánta). Campos nuevos del token: `iniciativa` (bool; lo lee
+  `OrdenTurnos.ocupaLugar`), `hp` y `hpMax` (`escucharTokens` los copia; lo puro en `TokensAuto.sueltoNorm/sueltoCampos/sueltoVida/sueltoGolpe/
+  sueltoVidaAMano/sueltoRasgos`). Uno nuevo arranca en No / No (P305); uno viejo sin el campo sigue ocupando lugar. Con vida: `hudDatos` la muestra
+  (la del GM, secreta para los jugadores, P308), `puedoCambiarVida` deja a quien lo puso y al GM, `cambiarVidaSuelto` (js/10, también Ctrl+Z);
+  tarjeta 🪪 y hover con `sueltoRasgos`. **Atacarlo**: `sueltoHooksDuelo` (js/13, en `hooksLocal` antes de `zonaGmHooksDuelo`, solo en la pantalla de
+  quien lo puso) ofrece «🪨 Evasión 1 (es un objeto)» sin tirar, resistencia a crítico 0, sin Parry; `dueloAplicarDano` → `dueloDanoSuelto`: el golpe
+  entra entero (sin Defensa ni nada), `hp` no baja de 0, «✍ Otro valor» tal cual (P306, P307). Reglas nuevas (`tokenValido` y la rama del GM):
+  sin pegarlas, `crearToken` y el Guardar ponen el token sin esos campos y avisan.
 
 **Desde el 2026-10-02 está partido en archivos** (paso 5 nivel A, como la ficha y GM Tools): `mapa.html` es solo la pantalla
 (~260 líneas) y carga `mapa.css` (los estilos) y los 14 tramos de su código en `js/`, en este orden:

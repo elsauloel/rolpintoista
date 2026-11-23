@@ -642,7 +642,11 @@ service cloud.firestore {
       // campo) y sacar cualquier token. fichaId (opcional): la ficha (pj) o
       // el creep al que está vinculado.
       function tokenValido(d) {
-        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto', 'revelado', 'bajoTierra', 'tunel', 'pf', 'descripcion'])
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto', 'revelado', 'bajoTierra', 'tunel', 'pf', 'descripcion', 'iniciativa', 'hp', 'hpMax'])
+          // 📦 Token suelto paso a paso (2026-11-23): ¿ocupa lugar en la iniciativa? y su vida (un objeto que se puede atacar), de 0 a hpMax.
+          && (!('iniciativa' in d) || d.iniciativa is bool)
+          && (!('hpMax' in d) || (d.hpMax is int && d.hpMax >= 1 && d.hpMax <= 9999))
+          && (!('hp' in d) || (d.hp is int && d.hp >= 0 && d.hp <= 9999 && 'hpMax' in d && d.hp <= d.hpMax))
           // 👻 El Paso fantasma del anillo (2026-11-09): {v: ventana, c: pasos seguidos, l: listo, d: ya se activó}; lo escribe el mapa.
           && (!('pf' in d) || (d.pf is map && d.pf.keys().hasOnly(['v', 'c', 'l', 'd'])))
           // 🎭 Los jugadores ya vieron a este creep (2026-10-09, lo pone el mapa del GM): desde ahí su lugar en el orden de turnos no desaparece.
@@ -699,10 +703,10 @@ service cloud.firestore {
             // 🏷 El GM le pone al día el nombre (solo el nombre) a un token de personaje (2026-11-20).
             || (resource.data.tipo == 'pj' && esGM(c)
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']))
-            // ＋ El GM edita un token suelto de un jugador (sin ficha: nombre, descripción, imagen y color; 2026-11-22).
+            // ＋ El GM edita un token suelto de un jugador (sin ficha: nombre, descripción, imagen y color; 2026-11-22; y desde el 2026-11-23, la iniciativa y la vida: el daño de un ataque lo escribe la pantalla del GM).
             || (resource.data.tipo == 'pj' && esGM(c) && resource.data.get('fichaId', '') == ''
               && request.resource.data.get('fichaId', '') == ''
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'descripcion', 'imagen', 'color']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'descripcion', 'imagen', 'color', 'iniciativa', 'hp', 'hpMax']))
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
@@ -782,7 +786,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'verEntero', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'verEntero', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal', 'trampaDestino'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -1007,10 +1011,10 @@ service cloud.firestore {
               // 🏷 El GM le pone al día el nombre (solo el nombre) a un token de personaje (2026-11-20).
               || (resource.data.tipo == 'pj' && esGM(c)
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre']))
-              // ＋ El GM edita un token suelto de un jugador (sin ficha: nombre, descripción, imagen y color; 2026-11-22).
+              // ＋ El GM edita un token suelto de un jugador (sin ficha: nombre, descripción, imagen y color; 2026-11-22; y desde el 2026-11-23, la iniciativa y la vida: el daño de un ataque lo escribe la pantalla del GM).
               || (resource.data.tipo == 'pj' && esGM(c) && resource.data.get('fichaId', '') == ''
                 && request.resource.data.get('fichaId', '') == ''
-                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'descripcion', 'imagen', 'color']))
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'descripcion', 'imagen', 'color', 'iniciativa', 'hp', 'hpMax']))
             );
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);

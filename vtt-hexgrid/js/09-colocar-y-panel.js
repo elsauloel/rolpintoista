@@ -79,7 +79,16 @@ async function crearToken(datos){
     if(datos.imagen) doc.imagen = datos.imagen;
     if(datos.descripcion && !datos.fichaId) doc.descripcion = String(datos.descripcion).slice(0, TokensAuto.DESCRIPCION_MAX);   // ＋ Token suelto (2026-11-22)
     if(Number.isFinite(datos.rotacion) && datos.rotacion !== 0) doc.rotacion = datos.rotacion;
-    const ref = await coleccionTokens().add(doc);
+    // 📦 Token suelto paso a paso (2026-11-23): ¿ocupa lugar en la iniciativa? y su vida. Si las reglas publicadas son viejas (no conocen esos
+    // campos), se pone igual sin ellos y se avisa (avisar antes que bloquear).
+    const campos = !datos.fichaId && datos.campos ? datos.campos : null;
+    let ref;
+    try{ ref = await coleccionTokens().add(campos ? {...doc, ...campos} : doc); }
+    catch(err){
+      if(!campos || err.code !== 'permission-denied') throw err;
+      ref = await coleccionTokens().add(doc);
+      toast('El token se puso, pero sin lo de la iniciativa ni la vida: faltan pegar las reglas nuevas de Firestore (token suelto paso a paso). Avisale al GM');
+    }
     creando = false;
     seleccionar(ref.id);
     if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
@@ -177,6 +186,9 @@ function escucharTokens(){
         barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
         descripcion: typeof d.descripcion === 'string' ? d.descripcion : '',   // ＋ Token suelto (2026-11-22)
+        // 📦 Token suelto paso a paso (2026-11-23): ¿ocupa lugar en la iniciativa? (sin el campo: la regla de siempre, OrdenTurnos.ocupaLugar) y su vida.
+        ...(typeof d.iniciativa === 'boolean' ? {iniciativa: d.iniciativa} : {}),
+        ...(Number.isFinite(d.hpMax) && d.hpMax > 0 ? {hpMax: Math.round(d.hpMax), hp: Math.round(num(d.hp))} : {}),
         rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
         oculto: d.oculto === true,
         revelado: d.revelado === true,   // 🎭 los jugadores ya vieron a este creep (js/29)
@@ -616,6 +628,7 @@ function opcionesDueno(elegido){
 // cambiados la ficha, gm-tools, el tablero y los demás. Los PJ los cambia
 // su dueño; los creeps, el GM (lo imponen las reglas).
 function puedoCambiarVida(t){
+  if(t && TokensAuto.sueltoVida(t)) return !!fbUsuario && !pausaSoloMirar() && (soyGM || t.duenoUid === fbUsuario.uid);   // 📦 un token suelto con vida: quien lo puso y el GM (2026-11-23)
   if(!t || !t.fichaId || !fbUsuario || pausaSoloMirar()) return false;   // ⏸ en pausa, solo mirar (js/04)
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
@@ -1108,8 +1121,9 @@ function cancelarNuevoToken(){
 }
 /* ---------- ＋ Token suelto (2026-11-22, dueño: «que a los jugadores también se les ofrezca la opción de agregar un token suelto. Que le puedan
    cargar una imagen, un nombre y una descripción») ----------
-   Un token sin ficha ni creep: un NPC, un cofre, un objeto. Para todos (jugadores y GM), desde el panel 👥 Personajes y tokens (js/13). Un paso:
-   nombre, descripción, imagen y color; al crear, se elige la casilla y hacia dónde mira (iniciarColocacion). El de un jugador es tipo 'pj' sin
+   Un token sin ficha ni creep: un NPC, un cofre, un objeto. Para todos (jugadores y GM), desde el panel 👥 Personajes y tokens (js/13). Tres pasos
+   (2026-11-23): 1) nombre, descripción, imagen y color; 2) ¿ocupa lugar en la iniciativa? (`iniciativa`); 3) ¿tiene vida? (`hp`/`hpMax`: se lo puede
+   atacar, js/13 `sueltoHooksDuelo` y `dueloAplicarDano`; su círculo de vida, js/10). Al crear, se elige la casilla y hacia dónde mira (iniciarColocacion). El de un jugador es tipo 'pj' sin
    ficha (lo mueve él, borde de los suyos); el del GM, tipo 'creep' sin ficha (un NPC, borde gris), como siempre. La descripción la lee cualquiera:
    al pasar el mouse por el token (js/30) y en su tarjeta 🪪 (js/10). `editId`: editar uno que ya está (lo edita y lo borra quien lo puso y el GM:
    TokensAuto.sueltoPuedeEditar; las reglas de Firestore dejan al GM tocar nombre, descripción, imagen y color de uno de un jugador). */
@@ -1119,7 +1133,10 @@ function abrirTokenSuelto(editId){
   if(editId && !(t0 && TokensAuto.sueltoPuedeEditar(t0, fbUsuario.uid, soyGM))){ toast('Ese token no lo podés editar: lo editan quien lo puso y el GM'); return; }
   if(tokenNuevoPap) tokenNuevoPap.cerrar();
   if(!t0){ creando = true; seleccion = null; moverFondo = false; renderPanel(true); pedirDibujo(); }
-  const st = {nombre: t0 ? t0.nombre : '', descripcion: t0 ? (t0.descripcion || '') : '', imagen: t0 ? (t0.imagen || '') : '', color: t0 ? t0.color : COLORES[Math.floor(Math.random() * COLORES.length)]};
+  const vida0 = t0 ? TokensAuto.sueltoVida(t0) : null;
+  // 📦 (2026-11-23) Uno nuevo arranca en «No» y «No» (dueño: «esto es para objetos inanimados»; P305). Uno de antes, sin el campo, ocupaba lugar: «Sí».
+  const st = {nombre: t0 ? t0.nombre : '', descripcion: t0 ? (t0.descripcion || '') : '', imagen: t0 ? (t0.imagen || '') : '', color: t0 ? t0.color : COLORES[Math.floor(Math.random() * COLORES.length)],
+    iniciativa: t0 ? t0.iniciativa !== false : false, conVida: !!vida0, hpMax: vida0 ? vida0.max : 10};
   const MAX = TokensAuto.DESCRIPCION_MAX;
   const pasos = [{id: 've', nombre: 'Cómo es', ayuda: '<b>Un token sin ficha:</b> un NPC, un cofre, un objeto, una marca. La descripción la puede leer cualquiera de la mesa: al pasar el mouse por el token y en su tarjeta 🪪.',
     html: () => `<div class="pap-campo"><label>Nombre</label><input type="text" id="ts-nombre" maxlength="40" placeholder="Ej: Cofre de la bodega" value="${esc(st.nombre)}"></div>` +
@@ -1129,17 +1146,32 @@ function abrirTokenSuelto(editId){
         `<button type="button" class="pap-boton" data-ts-img="elegir">${st.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
         (st.imagen ? '<button type="button" class="pap-boton" data-ts-img="quitar">Quitar</button>' : '') + '</div></div>' +
       `<div class="pap-campo"><label>Color (se ve si no tiene imagen)</label>${htmlColores(st.color, true)}</div>`,
-    alMontar: (c, a) => { conectarColores(a.raiz, col => { st.color = col; }); const n = a.raiz.querySelector('#ts-nombre'); if(n && !t0) setTimeout(() => n.focus(), 30); }}];
+    alMontar: (c, a) => { conectarColores(a.raiz, col => { st.color = col; }); const n = a.raiz.querySelector('#ts-nombre'); if(n && !t0) setTimeout(() => n.focus(), 30); }},
+    // 📦 Paso a paso (2026-11-23, dueño: «¿Ocupa lugar en la iniciativa? Sí / No»; «¿El token tiene HP? Sí / No»).
+    {id: 'ini', nombre: 'Iniciativa', ayuda: '<b>¿Ocupa lugar en la iniciativa?</b> Si decís que sí, cuando el GM arma el orden de turnos entra como uno más (con su turno). Un objeto que no hace nada (un cofre, una puerta, un barril) va mejor afuera.',
+      html: () => sueltoSiNo('ini', st.iniciativa, '🎲 Sí: tiene su turno en el orden', '🪨 No: queda afuera del orden de turnos')},
+    {id: 'vida', nombre: 'Vida', ayuda: '<b>¿El token tiene vida (HP)?</b> Si tiene, se lo puede elegir como objetivo de un ataque y el golpe le baja la vida. Y hasta ahí: no tiene Defensa, ni estados, ni se defiende: su Evasión es 1 (el mínimo), sin tirar.',
+      html: () => sueltoSiNo('vida', st.conVida, '❤ Sí: tiene vida y se lo puede atacar', '— No: no tiene vida') +
+        (st.conVida ? `<div class="pap-campo" style="margin-top:12px"><label>¿Cuánta vida tiene?</label><input type="number" id="ts-hp" min="1" max="${TokensAuto.VIDA_MAX}" step="1" value="${esc(String(st.hpMax))}" style="max-width:140px">` +
+          `<p class="pap-nota">${vida0 ? `Ahora le quedan ${vida0.hp} de ${vida0.max}. Si bajás el máximo, la vida no pasa del nuevo.` : 'Arranca con la vida llena. Al llegar a 0 queda roto (sigue en el mapa: lo saca quien lo puso o el GM).'}</p></div>` : '')}];
+  function sueltoSiNo(clave, valor, si, no){
+    const b = (v, txt) => `<button type="button" class="pap-boton" data-ts-sino="${clave}:${v ? 'si' : 'no'}" style="${valor === v ? 'border-style:solid;background:rgba(201,133,69,.35);color:#fff' : 'opacity:.75'}">${valor === v ? '✔ ' : ''}${txt}</button>`;
+    return `<div class="pap-fila">${b(true, si)}${b(false, no)}</div>`;
+  }
   const cerrado = () => { tokenNuevoPap = null; if(!t0){ creando = false; renderPanel(true); } pedirDibujo(); };
   async function guardar(){
     const n = TokensAuto.sueltoNorm(st);
     if(n.falta){ api.aviso(n.falta); return false; }
     const cambios = {nombre: n.nombre, color: st.color, descripcion: n.descripcion || firebase.firestore.FieldValue.delete(), imagen: st.imagen || firebase.firestore.FieldValue.delete()};
-    try{ await coleccionTokens().doc(editId).update(cambios); toast('Token guardado'); }
+    const {poner, quitar} = TokensAuto.sueltoCampos(n, t0);
+    const extra = {...poner}; quitar.forEach(k => { extra[k] = firebase.firestore.FieldValue.delete(); });
+    try{ await coleccionTokens().doc(editId).update({...cambios, ...extra}); toast('Token guardado'); }
     catch(err){
       console.error('No se pudo guardar el token suelto:', err);
-      toast(err.code === 'permission-denied' ? 'No se pudo guardar: faltan pegar las reglas nuevas de Firestore (descripción de los tokens sueltos). Avisale al GM' : 'No se pudo guardar');
-      return false;
+      if(err.code !== 'permission-denied'){ toast('No se pudo guardar'); return false; }
+      // 📦 Reglas viejas (no conocen la iniciativa ni la vida): se guarda igual lo de antes y se avisa.
+      try{ await coleccionTokens().doc(editId).update(cambios); toast('Se guardó el nombre, la descripción y la imagen, pero no lo de la iniciativa ni la vida: faltan pegar las reglas nuevas de Firestore (token suelto paso a paso). Avisale al GM'); }
+      catch(err2){ console.error('No se pudo guardar el token suelto (sin lo nuevo):', err2); toast('No se pudo guardar: faltan pegar las reglas nuevas de Firestore (tokens sueltos). Avisale al GM'); return false; }
     }
     cerrado();
   }
@@ -1148,6 +1180,7 @@ function abrirTokenSuelto(editId){
     pasos,
     alClic: e => {
       const b = e.target.closest('button'); if(!b) return;
+      if(b.dataset.tsSino){ const [k, v] = b.dataset.tsSino.split(':'); if(k === 'ini') st.iniciativa = v === 'si'; else st.conVida = v === 'si'; api.redibujar(); return; }
       if(b.dataset.tsImg === 'quitar'){ st.imagen = ''; api.redibujar(); return; }
       if(b.dataset.tsImg === 'elegir'){
         const entrada = $('#token-imagen-archivo');
@@ -1167,13 +1200,15 @@ function abrirTokenSuelto(editId){
     },
     alInput: e => {
       if(e.target.id === 'ts-nombre') st.nombre = e.target.value;
+      if(e.target.id === 'ts-hp') st.hpMax = e.target.value;
       if(e.target.id === 'ts-desc'){ st.descripcion = e.target.value; const c = api.raiz.querySelector('#ts-cuenta'); if(c) c.textContent = `${st.descripcion.length} / ${MAX}`; }
     },
     alTecla: e => {
       if(e.key !== 'Enter' || e.target.id !== 'ts-nombre') return;
       e.preventDefault();
       if(t0){ guardar(); return; }
-      const n = TokensAuto.sueltoNorm(st); if(n.falta) api.aviso(n.falta); else{ api.cerrar(); poner(n); }
+      if(!String(st.nombre || '').trim()){ api.aviso('Ponele un nombre.'); return; }
+      api.irA('ini');   // 📦 al crear, Enter pasa al paso siguiente (2026-11-23)
     },
     confirmarCancelar: '',
     alCrear: () => { const n = TokensAuto.sueltoNorm(st); if(n.falta){ api.aviso(n.falta); return false; } poner(n); },
@@ -1183,7 +1218,7 @@ function abrirTokenSuelto(editId){
   });
   function poner(n){
     tokenNuevoPap = null;
-    iniciarColocacion({nombre: n.nombre, color: st.color, tipo: soyGM ? 'creep' : 'pj', fichaId: '', imagen: st.imagen, descripcion: n.descripcion});
+    iniciarColocacion({nombre: n.nombre, color: st.color, tipo: soyGM ? 'creep' : 'pj', fichaId: '', imagen: st.imagen, descripcion: n.descripcion, campos: TokensAuto.sueltoCampos(n, null).poner});
   }
 }
 

@@ -26,7 +26,9 @@ function hoverEstadosHtml(t){
   const lista = est ? est.estados.filter(e => e && e.nombre) : [];
   // ＋ Token suelto (2026-11-22, dueño: un NPC u objeto con «una imagen, un nombre y una descripción»): la descripción se lee al pasar el mouse.
   const desc = TokensAuto.esSuelto(t) ? String(t.descripcion || '').trim() : '';
-  const descHtml = desc ? `<div style="margin-top:4px;white-space:pre-wrap;color:#EDE6DF">${esc(desc.length > 400 ? desc.slice(0, 397) + '…' : desc)}</div>` : '';
+  const vidaS = TokensAuto.sueltoVida(t) ? TokensAuto.sueltoRasgos(t, {veVida: soyGM || t.tipo !== 'creep'})[0] : '';   // 📦 con vida: cuánta le queda (2026-11-23)
+  const descHtml = (desc ? `<div style="margin-top:4px;white-space:pre-wrap;color:#EDE6DF">${esc(desc.length > 400 ? desc.slice(0, 397) + '…' : desc)}</div>` : '')
+    + (vidaS ? `<div style="margin-top:4px;color:#F28B82">${esc(vidaS)}</div>` : '');
   if(!lista.length) return descHtml ? `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}` : '';
   const veEscudo = soyGM || t.tipo !== 'creep';
   const filas = lista.map(e => {

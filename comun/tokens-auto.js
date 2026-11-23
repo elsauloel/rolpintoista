@@ -380,11 +380,61 @@ const TokensAuto = (() => {
   const esSuelto = t => !!t && !t.fichaId && !t.trampa;
   const sueltoPuedeEditar = (t, uid, gm) => esSuelto(t) && !!uid && (gm || t.duenoUid === uid);
   // Lo que se guarda: nombre (1–40), descripción (hasta 600, sin espacios de más) e imagen. Devuelve {nombre, descripcion} o {falta: '…'}.
+  // 📦 Paso a paso (2026-11-23, dueño: «esto es para objetos inanimados»): además, ¿ocupa lugar en la iniciativa? (`iniciativa`, sí / no) y
+  // ¿tiene vida? (`conVida` + `hpMax`, de 1 a VIDA_MAX). Devuelve también {iniciativa, conVida, hpMax}.
+  const VIDA_MAX = 9999;
   function sueltoNorm(d){
     const nombre = String((d && d.nombre) || '').replace(/\s+/g, ' ').trim().slice(0, 40);
     const descripcion = String((d && d.descripcion) || '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, DESCRIPCION_MAX);
     if(!nombre) return {falta: 'Ponele un nombre.'};
-    return {nombre, descripcion};
+    const iniciativa = !!(d && d.iniciativa), conVida = !!(d && d.conVida);
+    const hpMax = Math.round(Number(d && d.hpMax));
+    if(conVida && !(Number.isFinite(hpMax) && hpMax >= 1 && hpMax <= VIDA_MAX)) return {falta: `Poné cuánta vida tiene (un número de 1 a ${VIDA_MAX}).`};
+    return {nombre, descripcion, iniciativa, conVida, hpMax: conVida ? hpMax : 0};
   }
-  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
+  // La vida de un token suelto que la tiene: {hp, max} (el hp, entre 0 y el máximo); null si no tiene (o no es suelto).
+  function sueltoVida(t){
+    if(!esSuelto(t)) return null;
+    const max = Math.round(Number(t.hpMax));
+    if(!(Number.isFinite(max) && max > 0)) return null;
+    const hp = Math.round(Number(t.hp));
+    return {hp: Number.isFinite(hp) ? Math.max(0, Math.min(max, hp)) : max, max};
+  }
+  // Los campos que se escriben al crear (t0 = null) o al editar uno que ya está (t0): `poner` y `quitar` (lo que se borra del documento).
+  // La vida: al crear, llena; al editar, se conserva la que tenía (sin pasarse del máximo nuevo); si deja de tener vida, se borra.
+  function sueltoCampos(n, t0){
+    const poner = {iniciativa: !!n.iniciativa}, quitar = [];
+    if(n.conVida){
+      const antes = t0 ? sueltoVida(t0) : null;
+      poner.hpMax = n.hpMax;
+      poner.hp = antes ? Math.min(antes.hp, n.hpMax) : n.hpMax;
+    }else if(t0 && (t0.hpMax !== undefined || t0.hp !== undefined)) quitar.push('hp', 'hpMax');
+    return {poner, quitar};
+  }
+  // Un golpe a un token suelto con vida (2026-11-23, «que se lo pueda elegir como objetivo de ataques… y hasta ahí nomás»): sin Defensa, sin estados;
+  // entra entero y la vida no baja de 0. → {antes, despues, max, entro} o null si no tiene vida.
+  function sueltoGolpe(t, monto){
+    const v = sueltoVida(t); if(!v) return null;
+    const m = Math.max(0, Math.round(Number(monto) || 0));
+    const despues = Math.max(0, v.hp - m);
+    return {antes: v.hp, despues, max: v.max, entro: v.hp - despues};
+  }
+  // Cambiar la vida a mano (el círculo del HUD): «12», «+5», «-3» → el valor nuevo entre 0 y el máximo, o null si no se entiende.
+  function sueltoVidaAMano(t, texto){
+    const v = sueltoVida(t); if(!v) return null;
+    const s = String(texto || '').replace(/\s+/g, '');
+    const m = s.match(/^([+-]?)(\d{1,5})$/); if(!m) return null;
+    const n = Number(m[2]), nuevo = m[1] === '+' ? v.hp + n : m[1] === '-' ? v.hp - n : n;
+    return Math.max(0, Math.min(v.max, nuevo));
+  }
+  // Lo que se cuenta de un token suelto en su tarjeta 🪪 y al pasar el mouse: la vida (o «roto» en 0; `veVida` = false: sin los números, como la de
+  // un creep para los jugadores) y si ocupa lugar en la iniciativa (sin el campo: sí, como antes del paso a paso).
+  function sueltoRasgos(t, o){
+    if(!esSuelto(t)) return [];
+    const v = sueltoVida(t), ve = !o || o.veVida !== false, out = [];
+    if(v) out.push(v.hp <= 0 ? (ve ? `💥 Roto (0 de ${v.max} de vida)` : '💥 Roto') : ve ? `❤ Vida ${v.hp} de ${v.max} · se lo puede atacar` : '❤ Tiene vida · se lo puede atacar');
+    out.push(t.iniciativa === false ? '🪨 No ocupa lugar en la iniciativa' : '🎲 Ocupa lugar en la iniciativa');
+    return out;
+  }
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
 })();

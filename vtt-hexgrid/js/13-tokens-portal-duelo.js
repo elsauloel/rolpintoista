@@ -2088,6 +2088,51 @@ function magFrenos(r){
 /* 🧮 `o.simular` (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al aplicar uno ya debe saber cuánto
    va a ser»): la misma cuenta, sin escribir nada ni disparar efectos (Espinas, drenar, el rayo que salta…): la vista previa del duelo (cfgEscuchar.previa). Lo
    que todavía no se sabe (el 1d6 del Orbe salvaje) no entra; el elemental del arma se cuenta como si los escudos no lo frenaran después del golpe. */
+/* 📦 Un token suelto con vida (2026-11-23, dueño: «que se lo pueda elegir como objetivo de ataques… y hasta ahí nomás»): un objeto. Se defiende solo con
+   «Evasión 1» (no se mueve: `sueltoHooksDuelo`, lo contesta la pantalla de quien lo puso), no tiene Defensa, ni escudos, ni resistencias, ni estados:
+   el golpe (con el crítico, si salió) entra entero a su vida, que vive en el token (`hp`, de 0 a `hpMax`) y no baja de 0. Lo escribe la pantalla del
+   GM (como todo daño del duelo). El «✍ Otro valor» se aplica tal cual. P305–P307. */
+async function dueloDanoSuelto(d, t, base, simular){
+  const dn = d.dano || {};
+  const aMano = dn.aMano && !simular ? {valor: Math.max(0, Math.round(num(dn.aMano.valor))), sugerido: Math.max(0, Math.round(num(dn.aMano.sugerido)))} : null;
+  const g = TokensAuto.sueltoGolpe(t, aMano ? aMano.valor : base.golpe);
+  if(!g) return {...base, manual: true, motivoManual: 'el token ya no tiene vida'};
+  if(!simular && g.entro > 0){
+    try{ await coleccionTokens().doc(d.defensor.tokenId).update({hp: g.despues}); }
+    catch(err){
+      console.error('No se pudo bajar la vida del token suelto:', err);
+      return {...base, manual: true, motivoManual: err && err.code === 'permission-denied' ? 'faltan pegar las reglas nuevas de Firestore (la vida de los tokens sueltos)' : 'no se pudo bajar su vida'};
+    }
+  }
+  const cuenta = aMano ? [{s: '', txt: 'El duelo sugería', v: aMano.sugerido}, {s: '=', txt: '✍ se aplicó a mano: entra a la vida', v: g.entro, f: 1}]
+    : [{s: '', txt: 'Golpe', v: base.golpe}, {s: '=', txt: 'es un objeto, sin Defensa: entra entero', v: g.entro, f: 1}];
+  return {...base, ignoraDef: true, cuenta, ...(aMano ? {aMano} : {}), defensa: 0, recibido: g.entro, absorbido: 0, invulnerable: false,
+    hpAntes: g.antes, hpDespues: g.despues, hpMax: g.max, ...(g.despues <= 0 && g.antes > 0 ? {roto: true} : {})};
+}
+// Lo que el duelo le pide a un token suelto con vida cuando lo atacan (2026-11-23): defenderse con «Evasión 1» (no se mueve), sin resistencia a crítico.
+// Contesta la pantalla de quien lo puso (el GM, uno suyo); si no está, el GM lo escribe a mano en el cuadro («✍ Elegir manualmente»). Va en `hooksLocal`
+// del mapa (js/14), antes que las zonas del GM.
+function sueltoHooksDuelo(lado){
+  const t = lado && lado.tokenId ? tokens.get(lado.tokenId) : null;
+  if(!t || !TokensAuto.sueltoVida(t) || !fbUsuario || t.duenoUid !== fbUsuario.uid) return null;
+  const mio = l => !!(l && l.tokenId === lado.tokenId);
+  const r1 = (modo) => ({formula: modo === 'eva' ? '1 (es un objeto: no se mueve)' : '0 (es un objeto)', rolls: [], mod: modo === 'eva' ? 1 : 0, total: modo === 'eva' ? 1 : 0, estados: []});
+  const publicar = (origen, r) => { mesaPublicar(origen, t.tipo === 'creep' ? {...r, quien: 'GM', desde: 'gm'} : r); window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}})); };
+  return {
+    soy: mio,
+    registrarTirada: publicar,
+    opcionesDefensa: () => [{modo: 'evasion', etiqueta: '🪨 Evasión 1 (es un objeto)', info: ['No se mueve: su Evasión es 1, sin tirar', 'No tiene Defensa: el golpe entra entero a su vida']}],
+    defender: () => publicar(`${nombreDe(t)} · Evasión`, r1('eva')),
+    resistenciaCritico: () => 0,
+    puedeParry: () => false,
+    habValor: (d, quien) => quien === 'atacante' ? '' : '1',
+    habTirar: (d, quien, modo) => {
+      if(quien === 'atacante') return;
+      const c = d.hab && (d.hab.contra || []).find(x => x.modo === modo);
+      publicar(`${nombreDe(t)} · ${c ? c.etq : 'Evasión'}`, r1(modo === 'eva' || /evasi/i.test(c ? c.etq : '') ? 'eva' : 'otro'));
+    },
+  };
+}
 async function dueloAplicarDano(d, o){
   const simular = !!(o && o.simular);
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
@@ -2126,6 +2171,7 @@ async function dueloAplicarDano(d, o){
   const multTxt = [multHab > 1 ? `${multEtq}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} → ${fmt(sinId)}` : '', idHab && idHab.txt && multId !== 1 ? `${idHab.txt}: ${fmt(sinId)} → ${fmt(crudo)}` : ''].filter(Boolean).join(' · ');
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multTxt ? {cargaMult: multTxt} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
+  if(TokensAuto.sueltoVida(t)) return dueloDanoSuelto(d, t, base, simular);   // 📦 un token suelto con vida: un objeto, sin Defensa (2026-11-23)
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   // ✍ «Otro valor» (2026-11-06, dueño): quien recibe (o el GM por él) escribió lo que ENTRA A LA VIDA. Se aplica tal cual (sin Defensa, escudos ni
   // resistencias; Invulnerable sigue mandando) y lo que depende del daño (Espinas, Espejo, Drena, Luz sanadora, el estado por daño, el salto del

@@ -10106,7 +10106,7 @@ grupo('Personajes y tokens: una fila por personaje, y el token suelto');
   });
   prueba('nombre obligatorio (1–40) y la descripción limpia, hasta 600', () => {
     igual(TokensAuto.sueltoNorm({nombre: '  ', descripcion: 'x'}), {falta: 'Ponele un nombre.'});
-    igual(TokensAuto.sueltoNorm({nombre: ' Cofre   viejo ', descripcion: '  Huele  a\r\n\n\n\nhumedad  '}), {nombre: 'Cofre viejo', descripcion: 'Huele a\n\nhumedad'});
+    igual(TokensAuto.sueltoNorm({nombre: ' Cofre   viejo ', descripcion: '  Huele  a\r\n\n\n\nhumedad  '}), {nombre: 'Cofre viejo', descripcion: 'Huele a\n\nhumedad', iniciativa: false, conVida: false, hpMax: 0});
     igual([TokensAuto.sueltoNorm({nombre: 'x'.repeat(50)}).nombre.length, TokensAuto.sueltoNorm({nombre: 'a', descripcion: 'y'.repeat(900)}).descripcion.length], [40, 600]);
   });
   prueba('el mapa: sin el 👥 de la cabecera ni el «+ Token»; el 👥 del borde abre el panel y el token suelto tiene su descripción en el hover y en la tarjeta', async () => {
@@ -10116,6 +10116,50 @@ grupo('Personajes y tokens: una fila por personaje, y el token suelto');
     cierto(/TokensAuto\.filasPersonajes/.test(t13) && /data-tm="suelto"/.test(t13) && /data-tm="creeps"/.test(t13) && /data-tm="jugadores"/.test(t13));
     cierto(/function abrirTokenSuelto/.test(t09) && /descripcion: typeof d\.descripcion === 'string'/.test(t09) && !/function abrirTokenNuevo/.test(t09));
     cierto(/TokensAuto\.esSuelto\(t\)/.test(t30) && /function hudSueltoTarjetaHtml/.test(t10));
+  });
+})();
+
+/* ---------- 📦 Token suelto paso a paso: iniciativa y vida (comun/tokens-auto.js, 2026-11-23, dueño: «esto es para objetos inanimados») ---------- */
+grupo('Token suelto paso a paso: iniciativa y vida');
+(() => {
+  prueba('el paso a paso: ¿ocupa lugar en la iniciativa? y ¿tiene vida? (de 1 a 9999; sin número válido, avisa)', () => {
+    igual(TokensAuto.sueltoNorm({nombre: 'Barril', iniciativa: true, conVida: true, hpMax: '12'}), {nombre: 'Barril', descripcion: '', iniciativa: true, conVida: true, hpMax: 12});
+    igual(TokensAuto.sueltoNorm({nombre: 'Barril', conVida: false, hpMax: 'nada'}).hpMax, 0);
+    cierto(/Poné cuánta vida/.test(TokensAuto.sueltoNorm({nombre: 'Barril', conVida: true, hpMax: 0}).falta));
+    cierto(/Poné cuánta vida/.test(TokensAuto.sueltoNorm({nombre: 'Barril', conVida: true, hpMax: 10000}).falta));
+  });
+  prueba('lo que se escribe: al crear, la vida llena; al editar, se conserva sin pasarse del máximo nuevo; sin vida, se borra', () => {
+    igual(TokensAuto.sueltoCampos({iniciativa: false, conVida: true, hpMax: 10}, null), {poner: {iniciativa: false, hpMax: 10, hp: 10}, quitar: []});
+    igual(TokensAuto.sueltoCampos({iniciativa: true, conVida: false}, null), {poner: {iniciativa: true}, quitar: []});
+    const t0 = {nombre: 'Barril', fichaId: '', hp: 7, hpMax: 10};
+    igual(TokensAuto.sueltoCampos({iniciativa: false, conVida: true, hpMax: 5}, t0).poner, {iniciativa: false, hpMax: 5, hp: 5});
+    igual(TokensAuto.sueltoCampos({iniciativa: false, conVida: true, hpMax: 20}, t0).poner, {iniciativa: false, hpMax: 20, hp: 7});
+    igual(TokensAuto.sueltoCampos({iniciativa: false, conVida: false}, t0), {poner: {iniciativa: false}, quitar: ['hp', 'hpMax']});
+  });
+  prueba('la vida del token suelto: solo si es suelto y tiene máximo; el golpe entra entero y no baja de 0; a mano «12», «+5», «-3»', () => {
+    const t = {nombre: 'Barril', fichaId: '', hp: 7, hpMax: 10};
+    igual([TokensAuto.sueltoVida(t), TokensAuto.sueltoVida({...t, fichaId: 'f1'}), TokensAuto.sueltoVida({nombre: 'x', fichaId: ''}), TokensAuto.sueltoVida({...t, hp: undefined})], [{hp: 7, max: 10}, null, null, {hp: 10, max: 10}]);
+    igual(TokensAuto.sueltoGolpe(t, 4), {antes: 7, despues: 3, max: 10, entro: 4});
+    igual(TokensAuto.sueltoGolpe(t, 99), {antes: 7, despues: 0, max: 10, entro: 7});
+    igual(TokensAuto.sueltoGolpe({nombre: 'x', fichaId: ''}, 3), null);
+    igual(['12', '+5', '-3', '-30', 'abc', ''].map(x => TokensAuto.sueltoVidaAMano(t, x)), [10, 10, 4, 0, null, null]);
+  });
+  prueba('la tarjeta y el mouse: la vida (o «Roto»), sin números para quien no los ve, y si ocupa lugar en la iniciativa', () => {
+    igual(TokensAuto.sueltoRasgos({nombre: 'B', fichaId: '', hp: 3, hpMax: 10, iniciativa: false}), ['❤ Vida 3 de 10 · se lo puede atacar', '🪨 No ocupa lugar en la iniciativa']);
+    igual(TokensAuto.sueltoRasgos({nombre: 'B', fichaId: '', hp: 0, hpMax: 10}, {veVida: false}), ['💥 Roto', '🎲 Ocupa lugar en la iniciativa']);
+    igual(TokensAuto.sueltoRasgos({nombre: 'B', fichaId: 'f'}), []);
+  });
+  prueba('el orden de turnos respeta el «no» del paso a paso (y uno de antes, sin el campo, sigue entrando)', () => {
+    igual([OrdenTurnos.ocupaLugar({nombre: 'B', fichaId: '', iniciativa: false}), OrdenTurnos.ocupaLugar({nombre: 'B', fichaId: '', iniciativa: true}), OrdenTurnos.ocupaLugar({nombre: 'B', fichaId: ''})], [false, true, true]);
+  });
+  prueba('el mapa: los tres pasos, los campos que se leen del token, el duelo (Evasión 1, sin Defensa) y las reglas de Firestore', async () => {
+    const [t09, t10, t13, t14, reglas] = await Promise.all(['../vtt-hexgrid/js/09-colocar-y-panel.js', '../vtt-hexgrid/js/10-hud-y-vida.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js', '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../firebase/firestore.rules']
+      .map(async u => (await fetch(u, {cache: 'no-store'})).text()));
+    cierto(/id: 'ini', nombre: 'Iniciativa'/.test(t09) && /id: 'vida', nombre: 'Vida'/.test(t09) && /typeof d\.iniciativa === 'boolean'/.test(t09) && /hpMax: Math\.round\(d\.hpMax\)/.test(t09));
+    cierto(/TokensAuto\.sueltoVida\(t\)\) return dueloDanoSuelto/.test(t13) && /function sueltoHooksDuelo/.test(t13) && /sueltoHooksDuelo\(lado\) \|\| zonaGmHooksDuelo/.test(t14));
+    cierto(/async function cambiarVidaSuelto/.test(t10) && /TokensAuto\.sueltoRasgos/.test(t10));
+    cierto(/'descripcion', 'iniciativa', 'hp', 'hpMax'\]\)/.test(reglas) && /d\.hp <= d\.hpMax/.test(reglas) && /'townPortal', 'trampaDestino'\]\)/.test(reglas));
+    igual((reglas.match(/hasOnly\(\['nombre', 'descripcion', 'imagen', 'color', 'iniciativa', 'hp', 'hpMax'\]\)/g) || []).length, 2);
   });
 })();
 

@@ -119,7 +119,8 @@ async function deshacerVital(u){
   const txt = String(u.antes);
   const nombre = u.clave === 'hp' ? 'HP' : u.clave === 'sp' ? 'SP' : 'No2';
   try{
-    if(u.clave === 'no2') await cambiarNitros(t, txt);
+    if(u.clave === 'hp' && TokensAuto.sueltoVida(t)) await cambiarVidaSuelto(t, txt);   // 📦 un token suelto con vida (js/10)
+    else if(u.clave === 'no2') await cambiarNitros(t, txt);
     else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, txt, u.clave);
     else await cambiarVidaPj(t, u.clave, txt);
     pedirDibujo();

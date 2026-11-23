@@ -968,6 +968,9 @@ versión parecida en más de una, es candidato a juntar.
   «Se tira 1d6 +5 Prisa»; el botón de la Botonera dice «🎲+5» y lo explica en su globo. Dudas: P279.
 - **`orden-turnos.js`, ▶ Iniciar combate** (2026-11-20): `OrdenTurnos.enCurso(ini, modo)`, `marcasAlOrdenar(ini, modo)` (lo que guarda Ordenar),
   `porIniciar(ini)` (¿se muestra el botón?), `primero(orden, fuera)` (el primero que puede jugar) y `SIN_INICIAR`. Lo usa el mapa (js/04, js/86).
+- **`tokens-auto.js`, token suelto paso a paso** (2026-11-23): `sueltoNorm` devuelve además `{iniciativa, conVida, hpMax}`; `sueltoCampos(n, t0)` →
+  `{poner, quitar}` (la vida llena al crear, conservada al editar), `sueltoVida(t)` → `{hp, max}` o null, `sueltoGolpe(t, monto)` (entra entero, no baja
+  de 0), `sueltoVidaAMano(t, texto)` y `sueltoRasgos(t, {veVida})` (los renglones de la tarjeta). `VIDA_MAX` = 9999. Lo usa el mapa (vtt-hexgrid/CLAUDE.md).
 - **`orden-turnos.js`, ¿ocupa lugar en la iniciativa?** (2026-11-23): `OrdenTurnos.ocupaLugar(t, pub)` — el tótem y el estandarte no (`pub.estandarteRadio`),
   una trampa no, el campo `t.iniciativa` (true/false) manda; lo demás sí. La regla de todos los caminos que arman el orden de turnos (vtt-hexgrid/js/04, 86, 31).
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,

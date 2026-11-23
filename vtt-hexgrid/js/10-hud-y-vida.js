@@ -28,12 +28,13 @@ function hudDatos(t){
   const n = valoresNo2(t);
   const invocacion = !!(v && v.invocacion);
   const secreto = t.tipo === 'creep' && !soyGM;  // los jugadores no ven números de creeps
-  const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : v ? num(r.hp) : null);   // (un token suelto no tiene vida: sin el «0» gris, 2026-11-22)
+  const vidaSuelta = TokensAuto.sueltoVida(t);   // 📦 un token suelto con vida (2026-11-23): la suya, en el token (la del GM, secreta como la de un creep)
+  const hp = secreto ? null : vidaSuelta ? vidaSuelta.hp : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : v ? num(r.hp) : null);   // (un token suelto sin vida: sin el «0» gris, 2026-11-22)
   const {sp, spMax} = spDeResumen(r);
   const conSp = t.tipo === 'pj' && !invocacion && spMax > 0;
   const spCreep = !secreto && sc && CreepCalculo.modoSP(sc);   // 💧 un creep en modo SP: su círculo de SP, editable por el GM (2026-10-29)
   return {
-    hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : v ? num(r.hpMax) : null,
+    hp, hpMax: vidaSuelta ? (secreto ? null : vidaSuelta.max) : t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : v ? num(r.hpMax) : null,
     sp: conSp ? sp : spCreep ? CreepCalculo.spActual(sc) : null, spMax: conSp ? spMax : spCreep ? CreepCalculo.spMax(sc) : null,
     no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
@@ -1023,7 +1024,8 @@ function hudSueltoTarjetaHtml(t){
     `<h3>${esc(t.nombre || '?')}</h3>` +
     (t.imagen ? `<img src="${esc(t.imagen)}" alt="" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin:0 auto 10px">` : '') +
     `<div class="hud-seccion" style="padding-top:0;border-top:none"><h3>Descripción</h3>${desc ? '<p class="hud-tarjeta-nota">' + esc(desc) + '</p>' : '<span style="color:var(--muted)">Sin descripción.</span>'}</div>` +
-    `<div class="hud-seccion"><span style="color:var(--muted);font-size:12px">Token suelto · lo puso ${esc(quien)}</span>` +
+    `<div class="hud-seccion">${TokensAuto.sueltoRasgos(t, {veVida: soyGM || t.tipo !== 'creep'}).map(x => `<div style="font-size:12.5px">${esc(x)}</div>`).join('')}` +   // 📦 (2026-11-23)
+    `<span style="color:var(--muted);font-size:12px">Token suelto · lo puso ${esc(quien)}</span>` +
     (puede ? '<div class="hud-pie" style="margin-top:6px"><button type="button" class="hud-mini" data-hud-editar="1">✎ Editar</button></div>' : '') + '</div>' +
   '</div>';
 }
@@ -1578,7 +1580,8 @@ async function hudAplicar(clave, texto){
     }
   }
   try{
-    if(clave === 'no2') await cambiarNitros(t, texto);
+    if(clave === 'hp' && TokensAuto.sueltoVida(t)) await cambiarVidaSuelto(t, texto);   // 📦 (2026-11-23)
+    else if(clave === 'no2') await cambiarNitros(t, texto);
     else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto, clave);
     else await cambiarVidaPj(t, clave, texto, levantar);
     vitalRegistrar(idTok, clave, antes);
@@ -1591,6 +1594,16 @@ async function hudAplicar(clave, texto){
     hudEditando = '';
     pedirDibujo();
   }
+}
+
+// 📦 La vida de un token suelto, a mano (el círculo del HUD o Ctrl+Z; 2026-11-23): «12», «+5», «-3», entre 0 y su máximo. La escribe quien lo puso
+// o el GM (reglas de Firestore: `hp` del token).
+async function cambiarVidaSuelto(t, texto){
+  const id = [...tokens.entries()].find(([, x]) => x === t);
+  const nuevo = TokensAuto.sueltoVidaAMano(t, texto);
+  if(nuevo === null) throw new Error(ERROR_TIPEO);
+  if(!id) return;
+  await coleccionTokens().doc(id[0]).update({hp: nuevo});
 }
 
 // SP máximo a mano desde el HUD (2026-09-24, pedido de los jugadores): se guarda como un ajuste `meta.spMaxExtra` sobre el máximo que

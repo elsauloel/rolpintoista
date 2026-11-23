@@ -2215,6 +2215,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   con la tienda abierta, sacar del 📦 baúl con la mochila llena (tiene que preguntar «Sacar igual» con la cuenta) y comprar algo que te deje con
   sobrepeso (cartel «⚖ Tenés sobrepeso» en el mapa y en la ficha). No se probó con clics: hacía falta abrir una tienda.
 
+- **⬜ en cola — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
+  más estados que los slots disponibles alrededor de un token para poner los iconitos»). Ver cuántos entran hoy, qué pasa con los que sobran
+  (¿se pisan, se cortan, hay un «+N»?) y proponerle al dueño cómo mostrarlos, con capturas.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -85,6 +85,10 @@ const FichaResumen = (() => {
   /* ---------- El resumen (js/12, fichaResumen) ----------
      o: {control: {uid} | null (🎮 si el GM tiene el control), miniaturaInv(imagen) (la miniatura de una invocación; la
      ficha la calcula aparte y devuelve '' mientras tanto)}. */
+  // 🎯 Las Apuntadas de las armas en la mano ({apuntada?, apuntadaFirme?}, solo las que hay; comun/quieto.js — P271, 2026-11-23).
+  function apuntadasDe(armas){
+    try{ return typeof Quieto === 'undefined' ? {} : Object.fromEntries(Object.entries(Quieto.deArmas(armas)).filter(([, v]) => v > 0)); }catch(e){ return {}; }
+  }
   // La tirada para desarmar una trampa ('' si no tiene el talento «Desarmar trampas», que sigue siendo lo que deja intentarlo). Desde el
   // 2026-10-19 (dueño): una trampa **mecánica** se desarma con la **Destreza** (+ las Ganzúas: `bonoDesarmar` del mejor ítem en la mochila o el
   // cinturón); una **mágica** se disipa con el **Efecto especial** (`magica`). Antes: el dado del talento + la Inteligencia sin invertir.
@@ -160,6 +164,7 @@ const FichaResumen = (() => {
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,
       ...Object.fromEntries(['cascara', 'primerasangre', 'foco', 'pulso', 'pasofantasma', 'cambiante', 'absorbearmadura', 'impulsofue', 'impulsodes', 'impulsoesp', 'impulsocon', 'vaquita']
         .map(k => [k, n(c.final[k])]).filter(([, v]) => v)),   // anillos Comunes (2026-10-06): el mapa los mira (js/13, js/25)
+      ...apuntadasDe(FichaCombate.armasEquipadasConDano(S).map(a => a.item).filter(i => i && !FichaCalculo.itemRoto(i))),   // 🎯 las Apuntadas de la ballesta en la mano: el cartel y el aviso del mapa (P271, js/126)
       anillosDados: !!S.anillosDados, absorbeUsada: !!S.absorbeUsada, campanaUsada: !!(S.meta && S.meta.campanaUsada), trebolUsado: !!(S.meta && S.meta.trebolUsado), curanderoDia: num((S.meta || {}).curanderoDia), curanderoUsos: num((S.meta || {}).curanderoUsos), ultimoAlientoUsado: !!(S.meta && S.meta.ultimoAlientoUsado), cargasUsadas: !!(S.cargasEsp && Object.keys(S.cargasEsp).length),   // (las cargas de una varita, 2026-10-08: el mapa las vuelve a llenar al terminar el combate)   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
       defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
@@ -268,6 +273,7 @@ const FichaResumen = (() => {
           costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), tormenta: Combatiente.tormenta(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),
+          ...apuntadasDe([Combatiente.armaEnMano(inv)]),   // 🎯 las Apuntadas de su arma (P271, el mapa: js/126)
           enjambre: num(invModTotal(inv, 'enjambre')), trinchera: num(invModTotal(inv, 'trinchera')),   // 🛡 Aguante de trinchera (2026-11-20)
             // 🐝 Táctica de enjambre (2026-11-20): el mapa la suma al atacar (js/65)
           percepcionAumentada: (inv.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada')),   // 👁 sin punto ciego para el sigilo (2026-11-09)   // Guantes del envenenador (2026-10-05)

@@ -797,6 +797,7 @@ const Duelo = (() => {
     }
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
     if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
+    if(cfg.quietoNo) inicial.ataque.quietoNo = txtCorto(cfg.quietoNo, 200);   // 🎯 lo de «no te moviste» que NO suma y por qué (P271: «es la ronda 1 del combate…»)
     if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
     // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
@@ -902,6 +903,7 @@ const Duelo = (() => {
     if(d.ataque && d.ataque.maestria) t.push(_esc(String(d.ataque.maestria)));   // ⚔ las maestrías (2026-11-20)
     if(d.ataque && d.ataque.enjambre && _num(d.ataque.enjambre.pdg) > 0) t.push(typeof Combatiente !== 'undefined' && Combatiente.enjambreTxt ? Combatiente.enjambreTxt(d.ataque.enjambre) : `🐝 Táctica de enjambre +${_fmt(d.ataque.enjambre.pdg)}`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
+    if(d.ataque && d.ataque.quietoNo) t.push(_esc(String(d.ataque.quietoNo)));   // 🎯 lo que no suma y por qué (lo arma el mapa, vtt-hexgrid/js/126)
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
     if(d.ataque && _num(d.ataque.rafaga) > 1) t.push(`🗡 ${_fmt(d.ataque.rafaga)} cortes: los efectos del arma se tiran ${_fmt(d.ataque.rafaga)} veces`);

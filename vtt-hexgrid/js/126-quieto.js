@@ -14,7 +14,11 @@
      token «🎯 Puntería certera» (o «🔮 Foco»). Lo ven quien maneja al token y el GM; no se publica: cada pantalla lo deduce de lo anotado.
    - **El aviso antes de moverse** (`quietoAvisoAntes`, desde confirmarRuta, js/08): en combate, con el bono activo, a quien lo va a mover:
      «Tenés Puntería certera activa (+2 a PdG). Si te movés, la perdés.» [Moverme igual] [Cancelar]. Cancelar deja el token donde estaba.
-     Vuelve a preguntar mientras el bono siga activo (después de «Moverme igual» ya no lo está). El dodge roll no pregunta (es una defensa). */
+     Vuelve a preguntar mientras el bono siga activo (después de «Moverme igual» ya no lo está). El dodge roll no pregunta (es una defensa).
+   - **🎯 Las Apuntadas de las ballestas, con la misma pieza** (P271, 2026-11-23, dueño: «sí, sumale el aviso»): `apuntada` (no se movió en esta
+     ronda) y `apuntadaFirme` (ni en esta ni en la anterior) del arma en la mano tienen el mismo cartel («🎯 Apuntada» / «🎯 Apuntada firme») y el
+     mismo aviso; con el anillo y una Apuntada a la vez, un solo aviso que nombra a los dos. **Ninguna vale en la ronda 1** (tampoco el anillo).
+     La 🔍 de Atacar (`quietoLupaHtml`, desde js/11) y el cuadro del duelo (`quietoNoSumaTxt`, desde js/13) dicen si suma y por qué. */
 
 const quietoLocal = new Map();        // `${id}@${ronda}` → cuándo lo anotó esta pantalla (vale hasta que llega lo guardado, o siempre si no se pudo guardar)
 const quietoNoPrimero = new Set();    // `${id}@${ronda}`: al anotarlo ya estaba anotado (deshacer ese movimiento no lo borra)
@@ -50,7 +54,7 @@ window.mapaQuietoActivo = quietoActivo;
 /* 🎯 Las Apuntadas de las ballestas (2026-11-21, dueño: «arreglalo también»), con lo anotado en la partida como el anillo: lo que se movió (caminar, Salto,
    Carga, Dash, Parpadeo…) cuenta en todas las pantallas; que te muevan (empujón, arrastre, trampa, Mover libre) no. Sin orden de turnos, como antes
    (la memoria de esta pantalla, por Mantenimiento). Apuntada: no se movió en esta ronda. Apuntada firme: ni en esta ni en la anterior (desde la ronda 2). */
-function apuntadaActiva(id){
+function apuntadaActiva(id){   // (desde el 2026-11-23, P271: con orden de turnos, recién desde la ronda 2, como el anillo)
   if(!id) return false;
   if(!quietoHayOrden()) return !seMovioEsteTurno(id);
   return Quieto.apuntada(quietoMovidos(), id, quietoRonda());
@@ -84,10 +88,61 @@ function quietoMarcar(id, si){
 }
 window.mapaQuietoMarcar = quietoMarcar;
 
-// Los bonos de un token: [{stat, icono, nombre, a, val}] (un creep solo lo sabe el GM; una invocación, por lo que publica la ficha).
+/* 🎯 Las Apuntadas del arma en la mano (P271, 2026-11-23): un personaje y una invocación, por lo que publica su resumen (`apuntada`,
+   `apuntadaFirme`); un creep, de su arma en la mano (solo el GM, que tiene su parte privada). */
+function apuntadaValores(t){
+  if(!t || !t.fichaId) return {apuntada: 0, apuntadaFirme: 0};
+  if(t.tipo === 'creep' && typeof creepPrivadoDe === 'function' && typeof Combatiente !== 'undefined'){
+    const sc = soyGM ? creepPrivadoDe(t.fichaId) : null;
+    return sc ? Quieto.deArmas([Combatiente.armaEnMano(sc)]) : {apuntada: 0, apuntadaFirme: 0};
+  }
+  return {apuntada: statPiesDe(t, 'apuntada'), apuntadaFirme: statPiesDe(t, 'apuntadaFirme')};
+}
+// Los bonos de un token: [{stat, icono, nombre, a, val, regla}] — los anillos y las Apuntadas (un creep solo lo sabe el GM; una invocación, por
+// lo que publica la ficha).
 function quietoBonos(t){
   if(!t || typeof statPiesDe !== 'function') return [];
-  return Quieto.bonos({pulso: statPiesDe(t, 'pulso'), foco: statPiesDe(t, 'foco')});
+  return Quieto.bonos({pulso: statPiesDe(t, 'pulso'), foco: statPiesDe(t, 'foco'), ...apuntadaValores(t)});
+}
+// ¿Está activo ese bono ahora? (el anillo y la firme: ni esta ronda ni la anterior; la Apuntada: esta ronda; todos desde la ronda 2)
+function quietoBonoActivo(id, b){
+  if(!id || !b) return false;
+  if(b.regla === 'apuntada') return apuntadaActiva(id);
+  if(b.regla === 'firme') return apuntadaFirmeActiva(id);
+  return quietoActivo(id);
+}
+// Los bonos de un token que están activos ahora (para el aviso antes de moverse).
+const quietoBonosActivos = (id, t) => quietoBonos(t).filter(b => quietoBonoActivo(id, b));
+window.mapaQuietoBonosActivos = id => quietoBonosActivos(id, tokens.get(id));
+/* 🔍 Por qué suma o no cada bono de «no te moviste» de un token (P271): [{b, suma, por}] — para la 🔍 de Atacar y el cuadro del duelo. Sin orden
+   de turnos, con lo que recuerda esta pantalla. `filtro(b)`: cuáles cuentan para ese ataque (`quietoFiltroAtaque`). */
+// Qué bonos cuentan para un ataque: con arma, Puntería certera y las Apuntadas que tenga ESA arma (de rango); una habilidad que tira PdG.Esp, el Foco.
+function quietoFiltroAtaque(ataque, arma){
+  const hab = ataque && ataque.hab, tira = hab && hab.tira && (hab.tira.stat || hab.tira);
+  const de = arma || ataque || {};
+  return b => hab ? (b.stat === 'foco' && tira === 'pdgmg')
+    : b.stat === 'pulso' || ((b.stat === 'apuntada' || b.stat === 'apuntadaFirme') && !!(de.armaDeRango || de.rango) && num(de[b.stat]) > 0);
+}
+function quietoExplicar(id, t, filtro){
+  if(!id || !t) return [];
+  const hay = quietoHayOrden(), movidos = hay ? quietoMovidos() : null, ronda = quietoRonda();
+  return quietoBonos(t).filter(b => typeof filtro !== 'function' || filtro(b)).map(b => ({b,
+    ...Quieto.porque(b.regla === 'apuntada' ? 'apuntada' : 'anillo', {hayOrden: hay, movidos, id, ronda,
+      movioAhora: !hay && seMovioEsteTurno(id), movioAntes: !hay && seMovioTurnoAnterior(id)})}));
+}
+// La línea del cuadro del duelo con lo que NO suma y por qué («🎯 Apuntada +2: no suma — es la ronda 1 del combate…»); '' si no hay nada.
+function quietoNoSumaTxt(id, t, filtro){
+  try{ return quietoExplicar(id, t, filtro).filter(x => !x.suma).map(x => `${x.b.icono} ${x.b.nombre} +${x.b.val}: no suma — ${x.por}`).join(' · ').slice(0, 200); }
+  catch(err){ console.error('💍 Quieto: por qué no suma', err); return ''; }
+}
+// La sección de la 🔍 de Atacar: «En el mapa, ahora» con cada bono, si suma y por qué. '' si el token no tiene ninguno.
+function quietoLupaHtml(id, t, filtro){
+  if(typeof lupaSeccion !== 'function' || typeof lupaFila !== 'function') return '';
+  const l = quietoExplicar(id, t, filtro);
+  if(!l.length) return '';
+  const filas = l.map(x => lupaFila(`${x.b.icono} ${esc(x.b.nombre)} +${x.b.val} <span class="lupa-gris">— ${x.suma ? 'suma' : 'no suma'}: ${esc(x.por)}</span>`,
+    x.suma ? `+${x.b.val}` : 'no suma')).join('');
+  return lupaSeccion('En el mapa, ahora', filas + lupaNota(quietoHayOrden() ? 'Se cuenta con el orden de turnos: ninguno vale en la ronda 1 del combate.' : 'Sin orden de turnos: lo que recuerda esta pantalla.'));
 }
 
 /* El cartel flotante: cada pantalla mira, de los tokens que maneja (el GM, todos), si el bono pasó de apagado a activo. La primera mirada de
@@ -104,8 +159,8 @@ function quietoRevisar(){
     const bonos = quietoBonos(t);
     if(!bonos.length) return;
     const fuera = typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id);
-    const act = !fuera && quietoActivo(id);
     bonos.forEach((b, i) => {
+      const act = !fuera && quietoBonoActivo(id, b);   // cada uno con su regla (el anillo y la Apuntada firme: dos rondas; la Apuntada: esta)
       const k = `${id}:${b.stat}`, antes = quietoVisto.get(k);
       quietoVisto.set(k, act);
       if(antes === false && act && typeof ganchoEvaEmpezar === 'function')
@@ -122,8 +177,8 @@ async function quietoAvisoHab(id, h, nombre){
   try{
     if(!id || !Quieto.habMueve(h) || typeof modoMapa === 'undefined' || modoMapa !== 'combate' || !quietoHayOrden()) return true;
     const t = tokens.get(id);
-    if(!t || !quietoActivo(id)) return true;
-    const bonos = quietoBonos(t);
+    if(!t) return true;
+    const bonos = quietoBonosActivos(id, t);   // el anillo y las Apuntadas que están activos ahora (un solo aviso que los nombra a todos)
     if(!bonos.length || typeof AvisoCombate === 'undefined') return true;
     const propio = t.tipo !== 'creep' && !!fbUsuario && t.duenoUid === fbUsuario.uid && !String(t.fichaId || '').includes(SEP_INVOCACION);
     return !!(await AvisoCombate.preguntar(Quieto.aviso(bonos, nombreDe(t), propio, nombre || h.nombre || 'la habilidad'),
@@ -138,8 +193,8 @@ async function quietoAvisoAntes(id, o){
   try{
     if((o && o.dodge) || (typeof enDodge === 'function' && enDodge(id)) || typeof modoMapa === 'undefined' || modoMapa !== 'combate' || !quietoHayOrden()) return true;
     const t = tokens.get(id);
-    if(!t || !quietoActivo(id)) return true;
-    const bonos = quietoBonos(t);
+    if(!t) return true;
+    const bonos = quietoBonosActivos(id, t);
     if(!bonos.length || typeof AvisoCombate === 'undefined') return true;
     const propio = t.tipo !== 'creep' && !!fbUsuario && t.duenoUid === fbUsuario.uid && !String(t.fichaId || '').includes(SEP_INVOCACION);
     return !!(await AvisoCombate.preguntar(Quieto.aviso(bonos, nombreDe(t), propio),

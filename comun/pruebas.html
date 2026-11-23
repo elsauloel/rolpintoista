@@ -74,7 +74,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261122prisa5"></script>
+<script src="ficha-resumen.js?v=20261123cola57"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261122prisa5"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261122oculta"></script>
+<script src="duelo.js?v=20261123cola57"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261122cola49"></script>
@@ -133,7 +133,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
-<script src="quieto.js?v=20261121mueve"></script>
+<script src="quieto.js?v=20261123cola57"></script>
 <script src="mensajes.js?v=20261122msj"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
@@ -9472,11 +9472,29 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     igual(Quieto.bonos({pulso: 0, foco: 3}).map(x => [x.nombre, x.a]), [['Foco', 'PdG.Esp']]);
     igual(Quieto.bonos({}), []);
   });
-  prueba('🎯 las Apuntadas de las ballestas (2026-11-21): Apuntada = no se movió en esta ronda (desde la ronda 1); Apuntada firme = como el anillo', () => {
-    igual([Quieto.apuntada({}, 'a', 1), Quieto.apuntada({a: [1]}, 'a', 1), Quieto.apuntada({a: [2]}, 'a', 3), Quieto.apuntada({a: [3]}, 'a', 3), Quieto.apuntada(null, 'a', 2)],
-      [true, false, true, false, true]);
+  prueba('🎯 las Apuntadas de las ballestas: Apuntada = no se movió en esta ronda; Apuntada firme = como el anillo; ninguna en la ronda 1 (P271, 2026-11-23)', () => {
+    igual([Quieto.apuntada({}, 'a', 1), Quieto.apuntada({a: [1]}, 'a', 1), Quieto.apuntada({a: [2]}, 'a', 3), Quieto.apuntada({a: [3]}, 'a', 3), Quieto.apuntada(null, 'a', 2), Quieto.apuntada({a: [1]}, 'a', 2)],
+      [false, false, true, false, true, true]);
     igual([Quieto.apuntadaFirme({}, 'a', 1), Quieto.apuntadaFirme({}, 'a', 2), Quieto.apuntadaFirme({a: [1]}, 'a', 2), Quieto.apuntadaFirme({a: [1]}, 'a', 3), Quieto.apuntadaFirme({b: [2, 3]}, 'a', 3)],
       [false, true, false, true, true]);
+  });
+  prueba('🎯 las Apuntadas con la pieza del anillo (P271): bonos, cartel, un solo aviso con los dos, por qué no suma y lo que publica el resumen', () => {
+    const b = Quieto.bonos({pulso: 2, apuntada: 2, apuntadaFirme: 0});
+    igual(b.map(x => [x.nombre, x.regla]), [['Puntería certera', 'anillo'], ['Apuntada', 'apuntada']]);
+    igual([Quieto.cartel(b[1]), Quieto.cartel(Quieto.bonos({apuntadaFirme: 3})[0])], ['🎯 Apuntada', '🎯 Apuntada firme']);
+    igual(Quieto.aviso(b.slice(1), 'J1', true), 'Tenés Apuntada activa (+2 a PdG). Si te movés, la perdés.');
+    igual(Quieto.aviso(b, 'J1', true), 'Tenés Puntería certera activa (+2 a PdG) y Apuntada activa (+2 a PdG). Si te movés, las perdés.');
+    igual([Quieto.activoSegun('apuntada', {a: [1]}, 'a', 2), Quieto.activoSegun('firme', {a: [1]}, 'a', 2), Quieto.activoSegun('anillo', {}, 'a', 1)], [true, false, false]);
+    igual(Quieto.porque('apuntada', {movidos: {}, id: 'a', ronda: 1}).suma, false);
+    cierto(/ronda 1 del combate/.test(Quieto.porque('anillo', {movidos: {}, id: 'a', ronda: 1}).por));
+    igual([Quieto.porque('apuntada', {movidos: {a: [2]}, id: 'a', ronda: 2}).por, Quieto.porque('anillo', {movidos: {a: [1]}, id: 'a', ronda: 2}).por, Quieto.porque('apuntada', {movidos: {a: [1]}, id: 'a', ronda: 2}).suma],
+      ['se movió en esta ronda', 'se movió en la ronda anterior', true]);
+    igual(Quieto.porque('apuntada', {hayOrden: false, movioAhora: false}).suma, true);   // sin orden de turnos: lo que recuerda esa pantalla, sin ronda 1
+    igual(Quieto.deArmas([{armaDeRango: true, apuntada: 2}, {armaDeRango: true, apuntadaFirme: 3}, {apuntada: 4}, null]), {apuntada: 2, apuntadaFirme: 3});
+    const S = fichaBotonera({inventario: [{id: 'bal', nombre: 'Ballesta de guerra', tipoItem: 'arma_2m', equipado: true, armaDeRango: true, tipoDado: 10, peso: 2, apuntada: 2}]});
+    const r = FichaResumen.resumen(S);
+    igual([r.apuntada, r.apuntadaFirme], [2, undefined]);
+    igual(FichaResumen.resumen(fichaBotonera({})).apuntada, undefined);
   });
   prueba('🎯 el mapa ya no usa la memoria de una sola pantalla para las Apuntadas (js/13 y js/35 pasan por js/126)', async () => {
     const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t35 = await (await fetch('../vtt-hexgrid/js/35-arcos.js', {cache: 'no-store'})).text();
@@ -9599,6 +9617,47 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const movido = await mundo({ini: {...ini, movidos: {biz: [2]}}, tokens}), r1 = await mundo({ini: {...ini, ronda: 1}, tokens}), narr = await mundo({ini, tokens, modo: 'narrativo'}), dodge = await mundo({ini, tokens, dodge: true});
     igual([await movido.quietoAvisoAntes('biz'), await r1.quietoAvisoAntes('biz'), await narr.quietoAvisoAntes('biz'), await dodge.quietoAvisoAntes('biz')], [true, true, true, true]);
     igual([movido.preguntas.length, r1.preguntas.length, narr.preguntas.length, dodge.preguntas.length], [0, 0, 0, 0]);
+  });
+  prueba('🎯 en el mapa (js/126): la Apuntada tiene su cartel dorado al pasar a la ronda 2 y su aviso antes de moverse; con el anillo, un solo aviso (P271)', async () => {
+    const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Blanco J1', apuntada: 2}], ['j2', {tipo: 'pj', fichaId: 'f2', duenoUid: 'yo', nombre: 'Blanco J2', apuntada: 2, pulso: 2}]]);
+    const ini = {orden: [{id: 'j1'}, {id: 'j2'}], ronda: 1, movidos: {j2: [1]}};
+    const yo = await mundo({ini, tokens});
+    yo.quietoRevisar(); igual(yo.carteles, []);   // ronda 1: nada
+    igual([await yo.quietoAvisoAntes('j1'), yo.preguntas.length], [true, 0]);   // ronda 1: no hay nada que perder, no pregunta
+    ini.ronda = 2; yo.quietoRevisar();
+    igual(yo.carteles, ['🎯 Apuntada', '🎯 Apuntada']);   // j2 se movió en la 1 → solo la Apuntada (el anillo pide dos rondas)
+    igual(await yo.quietoAvisoAntes('j1'), false);
+    igual(yo.preguntas[0], ['Tenés Apuntada activa (+2 a PdG). Si te movés, la perdés.', 'Moverme igual', 'Cancelar']);
+    ini.ronda = 3; yo.quietoRevisar();
+    igual(yo.carteles.slice(2), ['🎯 Puntería certera']);   // ahora el anillo de J2 también
+    await yo.quietoAvisoAntes('j2');
+    igual(yo.preguntas[1][0], 'Tenés Puntería certera activa (+2 a PdG) y Apuntada activa (+2 a PdG). Si te movés, las perdés.');
+    igual(await yo.quietoAvisoHab('j1', {nombre: 'Dash', dashMapa: {casillas: 3}}), false);   // también antes de un movimiento especial
+    igual(yo.preguntas[2][0], 'Tenés Apuntada activa (+2 a PdG). Si te movés con Dash, la perdés.');
+    ini.movidos.j1 = [3]; yo.quietoRevisar();
+    igual([await yo.quietoAvisoAntes('j1'), yo.preguntas.length], [true, 3]);   // ya se movió: no pregunta
+  });
+  prueba('🎯 en el mapa (js/126): por qué no suma, para la 🔍 de Atacar y el cuadro del duelo (ronda 1, se movió, sin la ballesta)', async () => {
+    const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Blanco J1', apuntada: 2, pulso: 2}]]);
+    const ini = {orden: [{id: 'j1'}], ronda: 1, movidos: {}};
+    const src = await (await fetch('../vtt-hexgrid/js/126-quieto.js', {cache: 'no-store'})).text();
+    const f = new Function('iniciativa', 'tokens', 'modoMapa', 'soyGM', 'statPiesDe', 'num', 'seMovioEsteTurno', 'seMovioTurnoAnterior', 'Quieto', 'setInterval', 'window', 'lupaSeccion', 'lupaFila', 'lupaNota', 'esc',
+      src + '\nreturn {quietoNoSumaTxt, quietoLupaHtml, quietoFiltroAtaque, quietoExplicar};');
+    const m = f(ini, tokens, 'combate', false, (t, st) => Number(t[st]) || 0, v => Number(v) || 0, () => false, () => false, Quieto, () => 0, {},
+      (t, h) => `[${t}]${h}`, (a, b, c) => `<${a}|${b}|${c || ''}>`, x => `(${x})`, x => x);
+    const ballesta = {armaDeRango: true, apuntada: 2}, espada = {tipoDado: 8};
+    const t1 = m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta));
+    cierto(t1.includes('🎯 Apuntada +2: no suma — es la ronda 1 del combate') && t1.includes('Puntería certera +2: no suma'));
+    igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(espada)).includes('Apuntada'), false);   // con la espada, la Apuntada no cuenta
+    cierto(/\[En el mapa, ahora\].*Apuntada.*no suma: es la ronda 1/.test(m.quietoLupaHtml('j1', tokens.get('j1'), m.quietoFiltroAtaque(null, ballesta))));
+    ini.ronda = 2;
+    igual(m.quietoExplicar('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)).map(x => [x.b.nombre, x.suma]), [['Puntería certera', true], ['Apuntada', true]]);
+    igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '');
+    ini.movidos.j1 = [2];
+    igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
+    // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js', {cache: 'no-store'})).text();
+    cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();
 

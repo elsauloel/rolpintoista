@@ -1173,7 +1173,7 @@ function dueloElegirObjetivoMapa(msg){
         try{ const rt = await tiroRevisar(mio, t, ataque, yo); if(!rt.seguir){ pedir(); return; } tiro = rt.tiro; }
         catch(err){ console.error('No se pudo revisar la línea de tiro:', err); }   // nunca traba el ataque
         // 🎯 Apuntada (2026-10-10, ballestas): +N PdG si no se movió en este turno (el francotirador quieto). Desde el 2026-11-21, con lo anotado en la
-        // partida (js/126 apuntadaActiva): lo que se movió en otra pantalla también cuenta.
+        // partida (js/126 apuntadaActiva): lo que se movió en otra pantalla también cuenta. Desde el 2026-11-23 (P271), recién desde la ronda 2.
         if(num(ataque.apuntada) > 0 && mio && (typeof apuntadaActiva === 'function' ? apuntadaActiva(mio.id) : !seMovioEsteTurno(mio.id))){
           tiro = tiro || {motivo: ''};
           tiro.pdg = num(tiro.pdg) + num(ataque.apuntada);
@@ -1188,8 +1188,10 @@ function dueloElegirObjetivoMapa(msg){
       let carancho = 0;
       try{ carancho = caranchoBono(mio, t); }catch(err){ console.error('No se pudo ver el Ojo de carancho:', err); }
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
-      let quieto = 0, primeraSangre = 0;
+      let quieto = 0, primeraSangre = 0, quietoNo = '';
       try{ quieto = quietoDe(mio, ataque); primeraSangre = primeraSangreDe(mio, ataque); }catch(err){ console.error('No se pudieron ver los anillos del ataque:', err); }
+      // 🎯 Lo que NO suma de «no te moviste» y por qué (P271, 2026-11-23: «es la ronda 1 del combate…»), para que el cuadro lo diga (js/126).
+      try{ if(mio && typeof quietoNoSumaTxt === 'function') quietoNo = quietoNoSumaTxt(mio.id, mio, quietoFiltroAtaque(ataque)); }catch(err){ console.error('No se pudo ver por qué no suma:', err); }
       if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
       if(embestida) embestidaUsadas.add(`${mio.id}@${Math.round(num(mantenimientoNumero))}`);
       if(primeraSangre) primeraSangreUsadas.add(mio.id);
@@ -1221,7 +1223,7 @@ function dueloElegirObjetivoMapa(msg){
       try{ presa = presaContra(mio, t); }catch(err){ console.error('No se pudo ver la presa:', err); }   // 🎯 el defensor está señalado: +2 al daño
       let estandarte = null;
       try{ estandarte = typeof estandarteBonus === 'function' ? estandarteBonus(mio, yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 bajo el estandarte de un aliado (js/73)
-      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, ...(carancho ? {carancho} : {}), embestida, quieto, primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, ...(carancho ? {carancho} : {}), embestida, quieto, ...(quietoNo ? {quietoNo} : {}), primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .then(id => { if(msg.alDuelo) msg.alDuelo(id); })   // 🌀 el Barrido espera que se resuelva para pasar al siguiente (js/108)
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); if(msg.alSaltear) msg.alSaltear(); });
     };

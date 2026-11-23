@@ -118,7 +118,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120basico2', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261123esc', '../comun/ficha-calculo.js?v=20261122prisa5', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
-  '../comun/catalogo.js?v=20261120basico', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261120prisa3', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261122prisa5', '../comun/ficha-resumen.js?v=20261122prisa5', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261122prisa5', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261122cola49', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261122prisa5',
+  '../comun/catalogo.js?v=20261120basico', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261120prisa3', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261122prisa5', '../comun/ficha-resumen.js?v=20261123cola57', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261122prisa5', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261122cola49', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261122prisa5',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261120mae7', '../comun/lupa.js?v=20261122prisa5', '../comun/ficha-lupa.js?v=20261122cola49'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -1002,6 +1002,19 @@ function lupaContenido(clave){
       if(l) r.html += lupaSeccion('En el mapa, ahora', lupaFila(`🛡 ${esc(l.txt)} <span class="lupa-gris">(pasiva: +1 por cada enemigo pegado; se suma al recibir el golpe)</span>`, l.val ? lupaSigno(l.val) : '–'));
     }
   }catch(err){ console.error('No se pudo sumar el Aguante de trinchera a la 🔍:', err); }
+  // 🎯 En la 🔍 de Atacar: Puntería certera y las Apuntadas del arma, si suman AHORA y por qué (P271, 2026-11-23: «no suma — es la ronda 1…»; js/126).
+  try{
+    const k = String(clave), esCreep = k.includes('|'), esInv = k.startsWith('inv:');
+    const tipo = esCreep ? k.split('|')[1] : esInv ? k.split(':')[2] : k.split(':')[0];
+    if(tipo === 'atacar' && r && r.html && typeof quietoLupaHtml === 'function'){
+      let id = '', arma = null;
+      if(esCreep){ const e = [...tokens.entries()].find(([, x]) => x && x.tipo === 'creep' && x.fichaId === k.split('|')[0]); id = e ? e[0] : ''; const sc = creepPrivadoDe(k.split('|')[0]); arma = sc ? Combatiente.armaEnMano(sc) : null; }
+      else if(esInv){ const fid = bn.fichaId + SEP_INVOCACION + k.split(':')[1]; const e = [...tokens.entries()].find(([, x]) => x && x.fichaId === fid); id = e ? e[0] : ''; const inv = (bn.S.invocaciones || []).find(x => x && x.id === k.split(':')[1]); arma = inv ? Combatiente.armaEnMano(inv) : null; }
+      else if(bn){ const e = [...tokens.entries()].find(([, x]) => x && x.tipo !== 'creep' && x.fichaId === bn.fichaId); id = e ? e[0] : ''; arma = (bn.S.inventario || []).find(i => i && i.id === k.split(':').slice(1).join(':')) || null; }
+      const t = id ? tokens.get(id) : null;
+      if(t) r.html += quietoLupaHtml(id, {...t, id}, quietoFiltroAtaque(null, arma || {}));
+    }
+  }catch(err){ console.error('No se pudo sumar «no te moviste» a la 🔍:', err); }
   return r;
 }
 function lupaContenido0(clave){

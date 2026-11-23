@@ -1964,9 +1964,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🩸 GM Tools: la vida de un creep no baja de 0 (P292)** (dueño, 2026-11-23: «corregilo para que la vida no baje de cero»): hoy «Daño»
   la deja en negativo (999 → −989). Que quede en 0, como en el mapa, en todos los caminos de GM Tools.
 
-- **⬜ en cola — 🎯 Apuntadas de las ballestas como el anillo (P271)** (dueño, 2026-11-23): (1) sumarles el cartel dorado al activarse y el aviso
+- **✅ hecho (2026-11-23) — 🎯 Apuntadas de las ballestas como el anillo (P271)** (dueño, 2026-11-23): (1) sumarles el cartel dorado al activarse y el aviso
   «si te movés, la perdés» antes de moverse (la misma pieza que Puntería certera); (2) **ninguna Apuntada vale en la ronda 1**: la firme ya no
   valía; la simple tampoco tiene que valer («tampoco en el anillo»: verificar que el anillo siga sin bono en la ronda 1).
+  *Resultado:* la Apuntada y la Apuntada firme usan la pieza del anillo (comun/quieto.js, js/126): el cartel dorado «🎯 Apuntada» / «🎯 Apuntada
+  firme» al activarse (a quien maneja al token y al GM), el aviso antes de caminar y antes de Dash / Salto / Carga / Takle / Parpadeo, y con el anillo
+  y una Apuntada a la vez, un solo aviso que nombra a los dos. La simple vale recién desde la ronda 2 (el anillo y la firme ya). La 🔍 de Atacar suma
+  «En el mapa, ahora» (si suma o no y por qué) y el cuadro del duelo dice «🎯 Apuntada +2: no suma — es la ronda 1 del combate…». La ficha publica
+  `apuntada` / `apuntadaFirme` del arma en la mano. **Probado con clics** en «Claude · pruebas 2» (GM, J1, J2), con la Ballesta de guerra (Apuntada +2,
+  archivada) dada a Blanco J1 por datos y el orden de turnos (J1, J2, Blanco creep) armado por datos, «▶ Iniciar combate» con clics: ronda 1, la 🔍 y
+  el cuadro (en las tres pantallas) dicen que no suma por la ronda 1; ⏭ Pasar de ronda → cartel «🎯 Apuntada» en J1 y en el GM (no en J2), y el
+  duelo con «apuntada (no se movió): +2 PdG» (tirada 1d6 +2); arrastrar → aviso; Cancelar no lo movió (las tres pantallas, sigue activa); «Moverme
+  igual» lo movió y la apagó en las tres; el segundo arrastre ya no preguntó; la 🔍, «no suma: se movió en esta ronda»; ronda siguiente, el cartel
+  otra vez. Con el Anillo de Puntería certera (por datos) en la ronda 4: un solo aviso «Puntería certera y Apuntada… las perdés». Al final se
+  devolvió el inventario de J1, sin orden de turnos y en narrativo. 5 pruebas automáticas nuevas o cambiadas (1043). Duda: P293.
+- **⬜ en cola — Probar: 🎯 la Apuntada firme con clics** (2026-11-23, P271): las dos ballestas con firme (de mira, de vigía) están archivadas; misma
+  pieza que la simple (pruebas automáticas), sin clics.
+- **⬜ en cola — Probar: 🎯 el aviso de la Apuntada antes de una habilidad que mueve (Dash, Salto, Carga, Takle, Parpadeo)** (2026-11-23, P271):
+  sale por la misma función que el del anillo (prueba automática); con clics solo se probó caminar.
+- **⬜ en cola — Probar: 🎯 la Apuntada en un creep y en una invocación con ballesta** (2026-11-23, P271): el creep la toma de su arma en la mano
+  (solo la pantalla del GM), la invocación del resumen de la ficha; con clics solo se probó un personaje.
 
 ## En cola
 

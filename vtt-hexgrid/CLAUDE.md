@@ -2576,10 +2576,17 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `Combatiente.caerLimpio` y `creepCaidaContar`). Las invocaciones no se reviven: al caer se desinvocan (dueño). Dudas: P270.
 - **🎯 Las Apuntadas de las ballestas, compartidas entre pantallas** (2026-11-21, dueño: «arreglalo también»; js/126 + `Quieto.apuntada` /
   `Quieto.apuntadaFirme` en comun/quieto.js): con orden de turnos, «se movió» sale de lo anotado en la partida (`iniciativa.movidos`), como Puntería
-  certera: `apuntadaActiva(id)` (Apuntada: no se movió en esta ronda; desde la ronda 1) y `apuntadaFirmeActiva(id)` (ni en esta ni en la anterior,
+  certera: `apuntadaActiva(id)` (Apuntada: no se movió en esta ronda; desde el 2026-11-23, desde la ronda 2) y `apuntadaFirmeActiva(id)` (ni en esta ni en la anterior,
   desde la ronda 2). Las usan js/13 (la Apuntada, al apuntar) y js/35 (`arcoBonos`, la firme). Cuenta lo que el token hace (caminar, Salto, Dash…);
-  que lo muevan (empujón, Mover libre) no. Sin orden de turnos, como antes. Sin cartel ni aviso antes de moverse (P271). Probado con clics: J1 camina
+  que lo muevan (empujón, Mover libre) no. Sin orden de turnos, como antes. (El cartel y el aviso, desde el 2026-11-23: abajo.) Probado con clics: J1 camina
   en su pantalla y el GM con 🎮 el control dispara desde la suya → sin Apuntada; ronda nueva, quieto (y con un Mover libre del GM) → «+2 PdG».
+  **Como el anillo (P271, 2026-11-23)**: ya no vale en la ronda 1 (la simple tampoco; `apuntadaActiva` exige ronda ≥ 2). En js/126: `apuntadaValores(t)`
+  (personaje e invocación por su resumen; un creep, del arma en la mano, solo el GM), `quietoBonos` suma las Apuntadas y cada bono se mira con su regla
+  (`quietoBonoActivo`): el cartel dorado «🎯 Apuntada» / «🎯 Apuntada firme» y el aviso antes de caminar (`quietoAvisoAntes`) y antes de una habilidad
+  que mueve (`quietoAvisoHab`) nombran solo los activos (con el anillo, un solo aviso). **Por qué no suma**: `quietoFiltroAtaque(ataque, arma)` (con
+  arma: Puntería certera y las Apuntadas de ESA arma; una habilidad de PdG.Esp: el Foco), `quietoExplicar`, `quietoNoSumaTxt` (js/13 lo manda al duelo
+  como `quietoNo`: «🎯 Apuntada +2: no suma — es la ronda 1 del combate…») y `quietoLupaHtml` (js/11 lo agrega a la 🔍 de Atacar de un personaje, un
+  creep o una invocación: «En el mapa, ahora»). Probado con clics en «Claude · pruebas 2». Dudas: P293.
 - **🔥 El Muro de fuego quema al empezar el turno** (P259, dueño, 2026-11-21: «debería hacer daño a un personaje/token al iniciar el turno del mismo, si
   este está parado sobre el muro»; js/08): una zona con `alEmpezar` adentro del JSON de `zonaEstado` (sin regla nueva de Firestore) no pega en el
   Mantenimiento a quien está en el orden de turnos (`zonaPorTurno`) sino al EMPEZAR SU TURNO: `zonasAlEmpezarTurno()` (llamada desde

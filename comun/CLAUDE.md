@@ -2217,6 +2217,12 @@ versión parecida en más de una, es candidato a juntar.
   fuera)` (⏭ Pasar de ronda: quiénes faltan en la ronda).
 - **🎯 `Quieto.apuntada(movidos, id, ronda)` y `Quieto.apuntadaFirme`** (2026-11-21, `comun/quieto.js`): las Apuntadas de las ballestas con lo anotado
   en la partida (la primera, no se movió en esta ronda; la firme, la misma regla que el anillo). Las usa el mapa (js/126).
+  **Con la pieza del anillo** (2026-11-23, P271): `Quieto.APUNTADAS` (🎯 Apuntada / Apuntada firme, `regla` 'apuntada' | 'firme'; los anillos llevan
+  'anillo') entran en `Quieto.bonos({pulso, foco, apuntada, apuntadaFirme})`, así el cartel y el aviso son los mismos; `activoSegun(regla, …)`;
+  `porque(regla, {movidos, id, ronda, hayOrden, movioAhora, movioAntes})` → `{suma, por}` (la 🔍 y el cuadro del duelo); `deArmas(armas)` → las
+  Apuntadas de las armas de rango en la mano (lo publica `FichaResumen`: `apuntada` / `apuntadaFirme` del personaje y de cada invocación; por eso
+  `ficha.html` y el simulador cargan ahora `quieto.js`). **Ninguna vale en la ronda 1**: `apuntada` exige ronda ≥ 2, como el anillo. `comun/duelo.js`
+  muestra `ataque.quietoNo` (lo que no suma y por qué, lo arma el mapa).
 
 - **📋 Respuestas a P252, P256, P259, P260 y P262** (2026-11-22, cola): `TokensAuto.volverANarrativo` (el fin del combate) también vacía el orden de turnos
   del mapa publicado (`limpiarIniciativa`, `rutaIniciativa`; el interruptor a mano, `ponerModo`, no). `Combatiente.resucitarAManoTxt` y `Revivir.texto(…,

@@ -1945,6 +1945,7 @@ la decisión venía con «un caído queda como estaba al caer». Así quedó:
 ### P271 — 🎯 Las Apuntadas de las ballestas: ¿cartel y aviso como el anillo? (2026-11-21, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-23):** (1) «sí, sumale el aviso» (y el cartel), como el anillo; (2) la Apuntada firme no vale en la ronda 1, «y de hecho la Apuntada simple tampoco debería valer desde la ronda 1. Tampoco en el anillo» (el anillo ya no daba bono en la ronda 1). En la cola.
+> ✅ **Hecho (2026-11-23):** el cartel «🎯 Apuntada» / «🎯 Apuntada firme» y el aviso antes de moverse (también antes de Dash, Salto, Carga, Takle y Parpadeo; con el anillo, un solo aviso), ninguna Apuntada en la ronda 1 (el anillo tampoco, verificado), y la 🔍 de Atacar y el cuadro del duelo dicen si suma y por qué. Probado con clics en «Claude · pruebas 2». Dudas: P293.
 Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas las pantallas; que te muevan, no), como pediste. Lo que NO se les sumó
 (no estaba en el pedido): el cartel dorado cuando se activa y el aviso «si te movés, la perdés» que tienen Puntería certera y Foco. Además, la
 **Apuntada firme** quedó como el anillo: recién desde la ronda 2 (en la 1 no hay «turno anterior» quieto); la Apuntada simple vale desde la ronda 1.
@@ -2193,3 +2194,14 @@ estados (…)». Quedaron elegidas estas cosas, todas cambiables:
 2. **La vida en negativo**: en GM Tools, «Daño» puede dejar la vida por debajo de 0 (un golpe de 999 a un creep con 5 de vida la dejó en −989), y el
    recuadro de HP también acepta un número negativo; en el mapa la vida nunca baja de 0. Para caer da lo mismo, pero se ve raro y «revivir» desde ahí
    cuenta desde el negativo. ¿Hacemos que en GM Tools tampoco baje de 0?
+
+### P293 — 🎯 Las Apuntadas como el anillo: lo que quedó elegido (2026-11-23, Claude)
+
+Desde hoy la Apuntada y la Apuntada firme de las ballestas tienen el cartel dorado y el aviso «si te movés, la perdés» del anillo, y ninguna vale en la
+ronda 1 (P271). Quedaron elegidas estas cosas, todas cambiables:
+1. **Con dos armas en la mano**: el cartel y el aviso salen si cualquiera de las armas en la mano tiene Apuntada, aunque después ataques con la otra
+   (el bono sí se suma solo con la ballesta). ¿Está bien, o el aviso debería salir solo si la ballesta es el arma elegida?
+2. **Sin orden de turnos** (narrativo o combate sin lista) la Apuntada sigue como antes: vale si no te moviste desde el último Mantenimiento, sin
+   «ronda 1», sin cartel ni aviso (igual que el anillo, P258 g).
+3. **La 🔍 y el cuadro del duelo** dicen el porqué en tercera persona («no suma: se movió en esta ronda», «es la ronda 1 del combate: vale recién desde
+   la ronda 2»), para que sirva igual a quien lo ve desde otra pantalla. ¿Te gusta así o preferís «te moviste»?

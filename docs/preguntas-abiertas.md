@@ -2197,6 +2197,8 @@ estados (…)». Quedaron elegidas estas cosas, todas cambiables:
 
 ### P293 — 🎯 Las Apuntadas como el anillo: lo que quedó elegido (2026-11-23, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-23):** (1) está bien que el aviso salga igual («el juego no sabe con qué arma vas a atacar»; además la ballesta es de dos manos); (2) sin orden de turnos, bien; (3) el texto queda como está.
+
 Desde hoy la Apuntada y la Apuntada firme de las ballestas tienen el cartel dorado y el aviso «si te movés, la perdés» del anillo, y ninguna vale en la
 ronda 1 (P271). Quedaron elegidas estas cosas, todas cambiables:
 1. **Con dos armas en la mano**: el cartel y el aviso salen si cualquiera de las armas en la mano tiene Apuntada, aunque después ataques con la otra

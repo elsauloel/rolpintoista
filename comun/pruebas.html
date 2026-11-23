@@ -59,8 +59,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
-<script src="recibidos.js?v=20261121dar"></script>
-<script src="dar-jugador.js?v=20261122cola49"></script>
+<script src="recibidos.js?v=20261123cola65"></script>
+<script src="dar-jugador.js?v=20261123cola65"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -6476,20 +6476,20 @@ prueba('lo reclamado del botín llega a la mochila al cerrarlo (2026-10-08): los
   igual([r.partes, !!hacha && hacha.equipado === false && hacha.unidades === 1 && !!hacha.id, S.inventario.find(i => i.id === 't').unidades, S.inventario.length],
     [['🎁 Hacha, Colmillo → mochila'], true, 2, 2]);
 });
-// 🎁 Dar a un jugador (comun/dar-jugador.js, 2026-11-21): el GM deja un aviso en `recompensas` marcado `regalo`; lo aplica quien maneja al personaje.
-prueba('🎁 dar a un jugador: el aviso lleva cada unidad escrita (como el botín), DDE y los tres tipos de despojos, y va marcado como regalo', () => {
+// 🤝 Dar a un jugador (comun/dar-jugador.js, 2026-11-21): el GM deja un aviso en `recompensas` marcado `regalo`; lo aplica quien maneja al personaje.
+prueba('🤝 dar a un jugador: el aviso lleva cada unidad escrita (como el botín), DDE y los tres tipos de despojos, y va marcado como regalo', () => {
   const hacha = {id: 'cat-hacha', nombre: '⚠️ Hacha', tipoItem: 'arma_1m', _bib: {id: 'x'}, equipado: true};
   const a = DarJugador.aviso({id: 'F', duenoUid: 'u1', nombre: 'Tita'}, {items: [{item: hacha, n: 3}], dde: 50, despojos: 2, magico: 1, especiales: [{nombre: 'Escama', cantidad: 2}, {nombre: '', cantidad: 5}]}, 'El GM');
   const it = JSON.parse(a.items[0]);
   igual([a.fichaId, a.duenoUid, a.regalo, a.aplicada, a.xp, a.dde, a.despojos, a.despojosMagicos, a.despojosEsp, a.items.length, it.nombre, it.id, '_bib' in it, 'equipado' in it],
     ['F', 'u1', true, false, 0, 50, 2, 1, [{nombre: 'Escama', cantidad: 2}], 3, 'Hacha', 'cat-hacha', false, false]);
 });
-prueba('🎁 dar a un jugador: el texto de la Mesa (a uno y a varios) y «nada para dar»', () => {
+prueba('🤝 dar a un jugador: el texto de la Mesa (a uno y a varios) y «nada para dar»', () => {
   const que = {items: [{item: {nombre: 'Hacha'}, n: 3}, {item: {nombre: 'Yelmo'}, n: 1}], dde: 50, despojos: 1, magico: 2};
   igual([DarJugador.mesaTexto(['Tita'], que), DarJugador.mesaTexto(['Tita', 'Beto'], {dde: 10}), DarJugador.vacio({items: [{item: {nombre: 'x'}, n: 0}], dde: 0}), DarJugador.vacio({dde: 1})],
-    ['🎁 El GM le dio a Tita: Hacha ×3, Yelmo, 50 DDE, 1 despojo, 2 despojos mágicos', '🎁 El GM les dio a Tita y Beto (a cada uno): 10 DDE', true, false]);
+    ['🤝 El GM le dio a Tita: Hacha ×3, Yelmo, 50 DDE, 1 despojo, 2 despojos mágicos', '🤝 El GM les dio a Tita y Beto (a cada uno): 10 DDE', true, false]);
 });
-prueba('🎁 lo que da el GM entra directo: ítems a la mochila (los consumibles se apilan), DDE, despojos normales, mágicos y especiales (se suman al del mismo nombre)', () => {
+prueba('🤝 lo que da el GM entra directo: ítems a la mochila (los consumibles se apilan), DDE, despojos normales, mágicos y especiales (se suman al del mismo nombre)', () => {
   const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 2, exp: 10, dde: 5}, loot: {normal: 2, magico: 1, especial: [{id: 'e', nombre: 'Escama', cantidad: 1}]},
     inventario: [{id: 'p', nombre: 'Poción', consumible: true, tipoItem: 'consumibles', unidades: 1}]}).S;
   const pocion = {id: 'cat-pocion', nombre: 'Poción', consumible: true, tipoItem: 'consumibles', unidades: 1, ranuras: 1};
@@ -6503,7 +6503,7 @@ prueba('🎁 lo que da el GM entra directo: ítems a la mochila (los consumibles
       ['Hacha ×3', 'Poción ×2', '50 DDE', '4 despojos', '2 despojos mágicos', '2 × escama (despojo especial)', '1 × Diente (despojo especial)'],
       ['Hacha ×3', 'Poción ×2', '+50 DDE', '+4 despojos', '+2 despojos mágicos', '+2 × escama', '+1 × Diente'], null]);
 });
-prueba('🎁 con la mochila llena se da igual y avisa (no se bloquea): `pasada` dice cuánto quedó', () => {
+prueba('🤝 con la mochila llena se da igual y avisa (no se bloquea): `pasada` dice cuánto quedó', () => {
   const S = FichaGuardado.normalizar({meta: {nombre: 'Tita'}, caps: {mochila: 2}, inventario: [{id: 'a', nombre: 'Soga', tipoItem: 'otros'}, {id: 'b', nombre: 'Pala', tipoItem: 'otros'}]}).S;
   const cap = FichaEquipo.capMochila(S);
   const r = Recibidos.recompensa(S, {data: () => DarJugador.aviso({id: 'F'}, {items: [{item: {nombre: 'Yelmo', tipoItem: 'cabeza'}, n: 1}]}, 'El GM')});
@@ -6542,7 +6542,15 @@ prueba('🤝 Dar con dos caminos (el GM con 🎮 el control): cartelito con «Da
   DarJugador.puerta({gm: true, propios: [{id: 'F1', nombre: 'Tita'}], abrirGM: () => hechos.push('gm'), abrirPasar: id => hechos.push(id)});
   const ops = [...document.querySelectorAll('.dj-puerta-fondo [data-djp-op]')].map(b => b.querySelector('b').textContent);
   document.querySelectorAll('.dj-puerta-fondo [data-djp-op]')[1].click();
-  igual([ops, hechos, !!document.querySelector('.dj-puerta-fondo')], [['🎁 Dar como GM', '🤝 Pasar algo de la mochila de Tita'], ['F1'], false]);
+  igual([ops, hechos, !!document.querySelector('.dj-puerta-fondo')], [['🤝 Dar como GM', '🤝 Pasar algo de la mochila de Tita'], ['F1'], false]);
+});
+// P278 (dueño, 2026-11-23): el 🎁 queda solo para el botín; dar y pasar llevan 🤝 (el cartel de quien recibe, también).
+prueba('🤝 el cartel «El GM te dio algo» lleva 🤝 (no 🎁: el 🎁 es solo el botín)', () => {
+  DarJugador.cartel({nombre: 'Tita', de: 'El GM', lineas: [{texto: 'Algo'}]});
+  const c = document.querySelector('.dj-cartel-fondo');
+  const r = [c.querySelector('.dj-regalo').textContent, c.querySelector('.dj-linea span').textContent, c.textContent.includes('🎁')];
+  c.querySelector('[data-dj-aceptar]').click();
+  igual([r, !!document.querySelector('.dj-cartel-fondo')], [['🤝', '🤝', false], false]);
 });
 prueba('🤝 en combate y no al lado: el aviso dice que la regla no lo permite y ofrece «Dar igual» / «Cancelar»', () => {
   const a = Intercambio.avisoNoAlLado('Beto');

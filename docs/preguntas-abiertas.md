@@ -2003,6 +2003,7 @@ jugador debería quedar fuera del orden de turnos siempre? ¿Y el GM debería po
 ### P278 — 🤝 Las otras puertas de «Dar» y «Pasar»: ¿se dejan o se sacan? (2026-11-22, Claude)
 
 > ✅ **Decidida (dueño, 2026-11-22):** «reemplazá el emoji del regalito por el emoji de las manos… que el regalo quede solo para el botín» (en la cola). Las puertas se quedan; cambia el ícono.
+> **Aplicada (2026-11-23):** el 🤝 en el «⋯» del token, en cada fila de 👥 Personajes, en el Ver de un ítem, en la ventana «Dar a un jugador», en su cartel «El GM te dio algo», en «Dar como GM» y en «Darle un ítem» de mano a mano. El 🎁 quedó en Despojos / botín (y en dos lugares que no son ni dar ni botín: P309). Ojo con el 🤝 repetido en el token: P310.
 Con el botón **🤝 Dar** del menú de la izquierda (mapa, ficha y GM Tools) quedan varias puertas que llevan a las mismas dos ventanas. **Elegí no sacar
 ninguna** y anotarlas: (a) en la ficha, «🤝 Pasar» arriba de la mochila y «🤝 Pasar a un aliado» en la ventanita «💰 DDE y despojos» abren
 exactamente lo mismo que el 🤝 Dar del jugador (las más redundantes; la de la ventanita de DDE es la candidata a irse); (b) el «🤝 Dar» / «🤝 Pasar a
@@ -2353,3 +2354,20 @@ solo del mapa al llegar a 0; (c) que quede roto y ya no se lo pueda elegir como 
 La vida del token suelto **de un jugador** la ve todo el mundo (en el círculo rojo del token y en su tarjeta). La de uno **del GM** se maneja como la de
 un creep: los jugadores no ven los números, solo «❤ Tiene vida · se lo puede atacar» y, al llegar a 0, «💥 Roto». Opciones: (a) como quedó; (b) que la
 de todos los objetos se vea (una puerta no tiene secretos); (c) que lo elija el GM al crearlo.
+
+### P309 — 🎁 Dos 🎁 que no son ni «dar» ni botín: ¿se quedan? (2026-11-23, Claude, cola de programación, de P278)
+
+Al pasar el «dar» a 🤝 (P278: «que el regalo quede solo para el botín»), quedaron dos 🎁 que no son del botín ni sirven para dar algo, y no los toqué:
+(a) en el **Generador de tiendas**, la casilla «🎁 Permitir agregar gratis» (deja que los jugadores sumen ítems de la tienda sin pagar);
+(b) en la **📐 Guía de diseño**, la tarjeta «Ver todos los efectos» y el título «🎁 Efectos para un arma» (la lista de efectos al golpear).
+Opciones: (1) dejarlos así; (2) cambiarles el ícono para que el 🎁 sea de verdad solo el botín (por ejemplo, (a) 🆓 o 💸 y (b) 💥 o 🗡).
+
+### P310 — 🤝 Dos 🤝 en el menú de un token, con funciones distintas (2026-11-23, Claude, cola de programación, de P278)
+
+Con el cambio de P278, en el menú de un token de personaje hay dos 🤝, en anillos distintos (nunca los dos a la vista a la vez):
+(1) en el **primer anillo**, el de **mano a mano** (ya estaba): sale cuando el token está pegado al tuyo; abre «Con X: 🤝 Darle un ítem / 🙋 Pedirle un
+ítem» (el otro acepta o rechaza; en combate cuesta No2). Lo ve un jugador, y también el GM cuando tiene 🎮 el control de un personaje pegado;
+(2) en el **«⋯»**, solo para el GM: «Dar un ítem (o DDE, o despojos)», que entra **directo**, con su cartel, sin costo.
+Hacen cosas parecidas pero con reglas distintas. Opciones: (a) dejarlo así (los dos son «pasar cosas», que es lo que pidió el dueño); (b) diferenciar
+uno (por ejemplo, el del GM con 🤝 y el de mano a mano con 🫴, o al revés). Mientras, quedó (a).
+

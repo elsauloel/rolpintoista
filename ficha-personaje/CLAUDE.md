@@ -711,7 +711,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   vez en cada combate. `botinLootAbrir` es la única forma de abrirla (saca la pastilla). El botón 🎁 Despojos del menú de la izquierda late
   (`.pendiente`, ficha.css) mientras el botín esté publicado. Al recargar minimizado, la pastilla vuelve; cuando el GM cierra el botín, se va.
 
-- **🎁 Lo que te da el GM** (2026-11-21, comun/dar-jugador.js): llega como una recompensa marcada `regalo`; `recompensasRevisar` (js/02) la aplica
+- **🤝 Lo que te da el GM** (2026-11-21; el cartel lleva 🤝 desde el 2026-11-23, P278, comun/dar-jugador.js): llega como una recompensa marcada `regalo`; `recompensasRevisar` (js/02) la aplica
   como siempre (una vez) y, en vez del toast, muestra `DarJugador.cartel` (al centro, con «Aceptar»); refresca también los despojos mágicos y
   especiales. Si la mochila quedó pasada, lo dice el cartel y una línea en la Mesa.
 - **🤝 Dar, en el menú de la izquierda** (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta según quién lo toca»):

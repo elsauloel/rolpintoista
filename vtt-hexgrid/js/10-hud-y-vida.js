@@ -111,8 +111,8 @@ function hudHtml(t){
     (!pausaSoloMirar() && typeof pactoPuedeRenovar === 'function' && pactoPuedeRenovar(t) ? icono('pacto', '😇', 'Renovar el Pacto (se gastó): lo da la historia') : '') +
     // 🕊 Quitar el Pacto (2026-11-19, dueño): los mismos, con el Pacto activo (js/83).
     (!pausaSoloMirar() && typeof pactoPuedeQuitar === 'function' && pactoPuedeQuitar(t) ? icono('pacto-quitar', '🕊', 'Quitar el Pacto (está activo)') : '') +
-    // 🎁 Dar un ítem, DDE o despojos (2026-11-21, dueño): el GM, sobre el token de un personaje (js/128, comun/dar-jugador.js).
-    (!pausaSoloMirar() && typeof darJugadorPuede === 'function' && darJugadorPuede(t) ? icono('dar', '🎁', 'Dar un ítem (o DDE, o despojos): le entra directo a la mochila y le salta un cartel') : '') +
+    // 🤝 Dar un ítem, DDE o despojos (2026-11-21, dueño; 🎁 → 🤝 el 2026-11-23, P278: el 🎁 queda solo para el botín): el GM, sobre el token de un personaje (js/128, comun/dar-jugador.js).
+    (!pausaSoloMirar() && typeof darJugadorPuede === 'function' && darJugadorPuede(t) ? icono('dar', '🤝', 'Dar un ítem (o DDE, o despojos): le entra directo a la mochila y le salta un cartel') : '') +
     '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
@@ -1373,7 +1373,7 @@ function hudConectar(t){
     if(clave === 'riesgo'){ if(typeof alternarVisionSigilo === 'function') alternarVisionSigilo(); return; }   // 🕵 (js/124)
     if(clave === 'pacto'){ if(typeof pactoRenovar === 'function') pactoRenovar(t); return; }   // 😇 (js/83)
     if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
-    if(clave === 'dar'){ if(typeof darJugadorAbrir === 'function') darJugadorAbrir(t); return; }   // 🎁 (js/128)
+    if(clave === 'dar'){ if(typeof darJugadorAbrir === 'function') darJugadorAbrir(t); return; }   // 🤝 (js/128)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';

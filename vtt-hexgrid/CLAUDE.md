@@ -2561,13 +2561,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `iniciativaTirar` suma el +5 a un personaje cuyo resumen todavía trae `prisa` (publicado antes del cambio, con la Iniciativa sin el +5).
 
 - **🎁 Dar un ítem (o DDE, o despojos) desde el token** (2026-11-21, dueño; `js/128-dar-jugador.js`): en el menú «⋯» del token de un personaje (no una
-  invocación), solo para el GM, «🎁» (`darJugadorPuede`, `darJugadorAbrir`; `icono('dar')` en js/10) abre la ventana común `DarJugador.abrir`
+  invocación), solo para el GM, «🤝» (desde el 2026-11-23, P278; antes 🎁) (`darJugadorPuede`, `darJugadorAbrir`; `icono('dar')` en js/10) abre la ventana común `DarJugador.abrir`
   (comun/dar-jugador.js) con ese personaje ya marcado; carga antes `bnCargarPiezas` (catálogo, filtro), `acCargarPiezas` (el Ver) y el asistente de
   ítems. Quien recibe: `recibidosAplicar` (js/11) muestra `DarJugador.cartel` en vez de «Botín concluido» cuando la recompensa es un regalo.
 
 - **🤝 Dar, el botón del borde izquierdo** (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta según quién lo toca»;
   `js/128-dar-jugador.js`, `#toolkit-dar`, entre el 🎁 y el 🗺 del dock, mismo estilo cuadrado en mapa.css): `DarJugador.puerta({gm: soyGM, propios:
-  darDockPropios()})`. El GM → `darDockAbrirGM` («🎁 Dar a un jugador», sin nadie marcado; carga las mismas piezas que el 🎁 del «⋯»). Un jugador →
+  darDockPropios()})`. El GM → `darDockAbrirGM` («🤝 Dar a un jugador», sin nadie marcado; carga las mismas piezas que el 🤝 del «⋯»). Un jugador →
   `darDockAbrirPasar(fichaId)`: abre la sesión del personaje sin mostrar la Botonera (`bnAbrirSesion` + `bnSesionLista`; si la Botonera de OTRO
   personaje estaba abierta, la cierra) y `Intercambio.abrirDar`. `darDockPropios` = los personajes que maneja esta pantalla (`bnManejo`: los suyos o
   los que el GM tiene con 🎮), así el GM con el control elige «Dar como GM» o «Pasar algo de la mochila de X», y un jugador con varios elige desde cuál.

@@ -525,11 +525,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   solo se redibuja si cambia quién tiene token). «🎯 Poner en el tablero los que faltan (N)» crea solo los que no tienen token (sin ninguno:
   «✔ Todos en el tablero»). «Ver en el tablero ↗» abre el mapa en otra pestaña mirando ese mapa (`verMapaEnTablero`, sin publicar). Título:
   «Creeps de la partida»; «Todos los creeps».
-- **🎁 Dar a un jugador** (2026-11-21, dueño): `abrirDarJugadorGM({marcados, item})` (js/04) abre la ventana común (comun/dar-jugador.js, la misma del
-  mapa). Puertas: el 🎁 de cada fila de 👥 Personajes (js/10, `data-dar-personaje`) y «🎁 Dar a un jugador» en el Ver de un ítem (`#veritem-dar`; se
+- **🤝 Dar a un jugador** (2026-11-21, dueño; 🎁 → 🤝 el 2026-11-23, P278: el 🎁 queda solo para el botín): `abrirDarJugadorGM({marcados, item})` (js/04) abre la ventana común (comun/dar-jugador.js, la misma del
+  mapa). Puertas: el 🤝 de cada fila de 👥 Personajes (js/10, `data-dar-personaje`) y «🤝 Dar a un jugador» en el Ver de un ítem (`#veritem-dar`; se
   ve si el ítem es del catálogo: `itemDelCatalogoGM` lo busca por id o por nombre y tipo, porque los del ⚔ Catálogo vienen sin id).
 - **🤝 Dar, en el menú de la izquierda** (2026-11-22, dueño, opción A): `#btn-dar-dock` (debajo de 👥 Personajes; el handler en js/04) abre
-  `abrirDarJugadorGM({})` — «🎁 Dar a un jugador» sin nadie marcado. GM Tools es solo del GM: no tiene la ventana de pasar cosas de un jugador.
+  `abrirDarJugadorGM({})` — «🤝 Dar a un jugador» sin nadie marcado. GM Tools es solo del GM: no tiene la ventana de pasar cosas de un jugador.
 
 - **🎒 «Dar a un jugador» avisa si la mochila se pasa** (2026-11-22, P262 (5); comun/dar-jugador.js): para medir la mochila, la ventana carga sola
   `ficha-guardado.js`, `ficha-equipo.js` y `ficha-tienda.js` (GM Tools no los carga con la página) y lee la ficha de cada personaje marcado.
@@ -537,7 +537,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **🕊️ Mensajes secretos** (2026-11-22): GM Tools carga `comun/mensajes.js` (después de `mesa.js`): el 🕊️ al pie de la Mesa, el `/m` y el 🕊️
   flotante a la izquierda de la Mesa. El GM no lee lo que se mandan dos jugadores (las reglas). Ver `comun/CLAUDE.md`.
 - **✋ Consumible propio en «✎ Ítem custom»** (2026-11-22): la categoría Consumible está (camino corto del asistente, `consumoAMano`), pero «Crear y
-  equipar» avisa que no se le equipa a un creep: se sube con ⬆ (`itemComoEntradaCatalogoGM` lo manda como consumible) o se da con 🎁 Dar a un jugador
+  equipar» avisa que no se le equipa a un creep: se sube con ⬆ (`itemComoEntradaCatalogoGM` lo manda como consumible) o se da con 🤝 Dar a un jugador
   (P284). El generador de tiendas guarda la marca en `agregarItemCreado`.
 
 - **💀 Un creep que cae desde GM Tools pierde sus estados** (2026-11-23, P270: «si un creep cae desde GM Tools… no debería ser así»): `gmCaidasRevisar`

@@ -1837,10 +1837,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   mapa y editarlo con las reglas viejas (se pone / se guarda sin lo nuevo, con el aviso). **Sin probar, hasta que se peguen las reglas**: todo lo que
   guarda la iniciativa o la vida (abajo, «Probar»). 6 pruebas automáticas nuevas (1059).
 
-- **⬜ en cola — 🤝 El 🎁 queda solo para el botín (P278 decidida)** (dueño, 2026-11-22: «reemplazá el emoji del regalito por el emoji de las
+- **✅ hecho (2026-11-23) — 🤝 El 🎁 queda solo para el botín (P278 decidida)** (dueño, 2026-11-22: «reemplazá el emoji del regalito por el emoji de las
   manos para que se entienda que esas manos son para pasar objetos y otras cosas. Que el regalo quede solo para el botín»): el 🎁 del «⋯» del
   token (mapa), el de cada fila de 👥 Personajes (GM Tools), el del Ver de un ítem y donde más aparezca para dar, pasan a 🤝; el cartel «🎁 El GM te
   dio algo» también. El 🎁 queda solo en Despojos / botín.
+  *Resultado:* pasan a 🤝 el botón del «⋯» del token, el de cada fila de 👥 Personajes, «Dar a un jugador» del Ver de un ítem, la ventana «Dar a un
+  jugador» (título, «🤝 Dar», «Dar igual», «Ítem nuevo para dar», el aviso de «Listo»), la línea de la Mesa «🤝 El GM le dio a…», el cartel «El GM te
+  dio algo», «Dar como GM» del 🤝 Dar de la izquierda y «Darle un ítem» de mano a mano. El 🎁 quedó en Despojos (mapa, ficha, GM Tools), «Botín» de la
+  ficha lite y de la ficha, «Botín concluido», la pastilla «Botín abierto», el aviso de lo que llega del botín, el piedra, papel o tijera por el botín y
+  los arquetipos del botín. Dos 🎁 que no son ni dar ni botín (la casilla «Permitir agregar gratis» del generador de tiendas y los efectos de arma de
+  la Guía de diseño) se dejaron: P309. En el menú de un token quedan dos 🤝 (mano a mano en el primer anillo, el del GM en el «⋯»): P310. **Probado
+  con clics** («Claude · pruebas 2», GM y Jugador 1): el 🤝 del «⋯» sobre Blanco J1 (abre la ventana con él marcado); en GM Tools el 🤝 de la fila de
+  Blanco J1 y «🤝 Dar a un jugador» del Ver de un ítem (con el ítem ya puesto); el GM le dio 1 DDE a Blanco J1 y en su ficha salió el cartel «🤝 El GM
+  te dio algo» (después se le volvió a poner 0 DDE); el 🤝 de mano a mano del Jugador 1 sobre Blanco J2. Pruebas automáticas 1060/1060.
 
 - **✅ hecho (2026-11-22) — 💨 Prisa: +5 fijo al resultado de la tirada de iniciativa** (dueño, 2026-11-22: «la Prisa quiero que sea +5 al resultado de la
   tirada. Fijo. Porque no es tan relevante. Está bien que sea un bono grande»). Hoy suma 5 al número de Iniciativa (el tamaño del dado: 6 → 1d6,
@@ -1926,8 +1935,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola — 🎒 Aviso equivocado al pasar al cinturón** (visto en la tarea de consumibles propios, 2026-11-22): al mover 1 unidad con
   «→ Cinturón», el aviso dice «el cinturón está lleno (1/5)» aunque no lo está. Revisar y corregir el texto.
-- **⬜ en cola — 🤝 Revisar el botón «Dar un ítem» del «⋯» del token** (visto en la misma tarea): con un clic el ayudante no encontró el botón y
+- **✅ hecho (2026-11-23) — 🤝 Revisar el botón «Dar un ítem» del «⋯» del token** (visto en la misma tarea): con un clic el ayudante no encontró el botón y
   abrió la ventana por función. Ver si el botón está y se puede tocar (se cruza con el cambio de 🎁 a 🤝).
+  *Resultado:* el botón está y anda: el GM toca el token de Blanco J1, el «⋯», y ahí aparece (ahora 🤝, entre 😇 y ↩); con un clic de verdad abre «Dar
+  a un jugador» con Blanco J1 ya marcado. Lo que falló antes fue la prueba: buscaba un botón con el texto «Dar un ítem», y el botón muestra solo el
+  ícono (el texto está en el globo al pasar el mouse). No hizo falta cambiar nada.
 
 - **⬜ en cola — 🎲 Consumible propio con una tirada opcional** (dueño, 2026-11-22, P284: «no estaría mal agregarle como opción tirar un dado»):
   en el asistente, un campo opcional «Tirada al consumirlo» (por ejemplo 1d6, 2d4+1); al consumirlo se tira sola y sale en la Mesa junto al
@@ -2164,6 +2176,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar (con las reglas pegadas): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
   uno del Jugador 2 (cada uno contesta «🪨 Evasión 1» desde su pantalla; si no está, el GM a mano), el crítico, el daño que entra entero, «✍ Otro valor»,
   la línea de la Mesa, llegar a 0 («💥 Roto») y una habilidad dirigida contra el objeto.
+- **⬜ en cola — Probar: 🤝 el cartel «El GM te dio algo» en el mapa y con el GM con 🎮 el control** (2026-11-23, de P278): con clics se vio el cartel en la
+  ficha del Jugador 1; falta verlo con el jugador mirando el mapa, y que el GM con 🎮 el control de un personaje vea en el 🤝 Dar de la izquierda «🤝 Dar
+  como GM» y «🤝 Pasar algo de la mochila de …» (los dos con 🤝, con textos distintos). El Ver de un ítem de GM Tools se abrió por función (el botón
+  «🤝 Dar a un jugador» sí se tocó con un clic).
 
 ## En cola
 

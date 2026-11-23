@@ -1,5 +1,5 @@
 /* =========================================================
-   DAR A UN JUGADOR — 🎁 el GM le da un ítem, DDE o despojos a uno o varios personajes (2026-11-21, dueño: «me gustaría que el GM pueda darle un
+   DAR A UN JUGADOR — 🤝 el GM le da un ítem, DDE o despojos a uno o varios personajes (2026-11-21, dueño: «me gustaría que el GM pueda darle un
    ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa como desde GM Tools»; «que sea directo a la mochila, pero que sí le aparezca
    una notificación, que uno ponga aceptar, que no aparezca simplemente en la Mesa, porque eso pasa un poco desapercibido. También doblones del
    espacio, despojos y ítems custom, ítems que uno puede crear en el momento»).
@@ -10,7 +10,7 @@
      (normales, mágicos, especiales con nombre) o un ítem nuevo creado en el momento (comun/asistente-item.js).
    - Cómo llega: SIN colección ni reglas nuevas. Es un aviso más en `campanas/<id>/recompensas` (el mismo camino que el fin del combate: lo crea el
      GM, lo aplica una sola vez la pantalla de quien maneja al personaje —el mapa o la ficha—, también si estaba desconectado), marcado
-     `regalo: true`. Entra directo a la mochila / DDE / despojos y a quien lo recibe le sale un cartel al centro «🎁 El GM te dio: …» con
+     `regalo: true`. Entra directo a la mochila / DDE / despojos y a quien lo recibe le sale un cartel al centro «🤝 El GM te dio: …» con
      «Aceptar» (solo lo cierra). El GM deja además la línea en la Mesa. Si la mochila queda pasada de ranuras se da igual y se avisa (en el
      cartel y en la Mesa).
 
@@ -26,7 +26,7 @@
    más de un camino (el GM con 🎮 el control de un personaje, o un jugador con varios), un cartelito para elegir. `puertaOpciones(o)` es la lista.
    🎒 Antes de dar (P262 (5), dueño, 2026-11-22: «está bien que la ventana le avise al GM»): por cada personaje marcado se lee su ficha
    (FichaGuardado.cargar) y se prueba lo que se le da en una COPIA (`mochilaTrasDar`, con el mismo `recibir`); si a alguien le va a quedar la
-   mochila pasada de ranuras, la ventana lo dice abajo y «🎁 Dar» pregunta «¿Dar igual?». No bloquea (ADN: avisar). Si faltan las piezas, las carga
+   mochila pasada de ranuras, la ventana lo dice abajo y «🤝 Dar» pregunta «¿Dar igual?». No bloquea (ADN: avisar). Si faltan las piezas, las carga
    solas (`piezasMochila`); si no se puede leer una ficha, dice que no se pudo revisar y deja dar.
    Necesita sesion.js y mesa.js; para recibir, ficha-tienda.js y ficha-equipo.js; la ventana, filtro-catalogo.js (y generador-tiendas.js),
    asistente-item.js y ficha-calculo.js (los bonos del ítem nuevo).
@@ -75,7 +75,7 @@ const DarJugador = (() => {
   // La línea de la Mesa (la escribe el GM al dar).
   function mesaTexto(nombres, que){
     const varios = nombres.length > 1;
-    return `🎁 El GM le${varios ? 's' : ''} dio a ${lista(nombres)}${varios ? ' (a cada uno)' : ''}: ${partesDe(que).join(', ')}`;
+    return `🤝 El GM le${varios ? 's' : ''} dio a ${lista(nombres)}${varios ? ' (a cada uno)' : ''}: ${partesDe(que).join(', ')}`;
   }
   // El aviso que se deja en `recompensas` para un personaje (sin la hora, que la pone quien escribe).
   function aviso(ficha, que, de){
@@ -248,7 +248,7 @@ const DarJugador = (() => {
   function tandaHtml(o){
     const lineas = (o.lineas || []).map(l => {
       const det = l.item && l.item.detalle ? `<span class="dj-detalle">${esc(String(l.item.detalle).split('\n')[0].slice(0, 160))}</span>` : '';
-      return `<div class="dj-linea"><span>${l.icono || '🎁'}</span><span><b>${esc(l.texto)}</b>${det}</span>${l.nota ? `<small>${esc(l.nota)}</small>` : ''}</div>`;
+      return `<div class="dj-linea"><span>${l.icono || '🤝'}</span><span><b>${esc(l.texto)}</b>${det}</span>${l.nota ? `<small>${esc(l.nota)}</small>` : ''}</div>`;
     }).join('');
     return `<div class="dj-tanda"><div class="dj-para">${esc(o.de || 'El GM')} le dio a <b>${esc(o.nombre || 'tu personaje')}</b>:</div>${lineas}
       ${o.pasada ? `<div class="dj-aviso">⚠ ${esc(pasadaTexto(o.pasada))}</div>` : ''}</div>`;
@@ -263,7 +263,7 @@ const DarJugador = (() => {
     }
     const fondo = document.createElement('div');
     fondo.className = 'dj-cartel-fondo';
-    fondo.innerHTML = `<div class="dj-cartel" role="dialog" aria-modal="true"><div class="dj-regalo">🎁</div><h3>${esc(o.de || 'El GM')} te dio algo</h3>
+    fondo.innerHTML = `<div class="dj-cartel" role="dialog" aria-modal="true"><div class="dj-regalo">🤝</div><h3>${esc(o.de || 'El GM')} te dio algo</h3>
       <div class="dj-tandas">${tandaHtml(o)}</div><button type="button" data-dj-aceptar>✔ Aceptar</button></div>`;
     fondo.querySelector('[data-dj-aceptar]').onclick = () => { fondo.remove(); if(cartelAbierto === fondo) cartelAbierto = null; };
     document.body.appendChild(fondo);
@@ -273,7 +273,7 @@ const DarJugador = (() => {
 
   /* ---------- 🤝 Dar: la puerta del menú de la izquierda (2026-11-22, dueño, opción A: «un solo botón 🤝 Dar… que abre una ventana distinta
      según quién lo toca») ----------
-     Los caminos: el GM, «🎁 Dar como GM» (esta ventana: catálogo, DDE, despojos, ítem nuevo; llega directo); cada personaje que maneja esta
+     Los caminos: el GM, «🤝 Dar como GM» (esta ventana: catálogo, DDE, despojos, ítem nuevo; llega directo); cada personaje que maneja esta
      pantalla (el suyo, o el que el GM tiene con 🎮 el control), «🤝 Pasar algo de la mochila de X» (comun/intercambio.js: ofrecer / aceptar).
      → [{tipo: 'gm'} | {tipo: 'pasar', id, nombre}]. Uno solo: se abre directo; varios: se elige; ninguno: se avisa. */
   function puertaOpciones(o){
@@ -300,7 +300,7 @@ const DarJugador = (() => {
     fondo.innerHTML = `<div class="dj dj-puerta" role="dialog" aria-modal="true">
       <header><h3>🤝 Dar</h3><button type="button" data-djp="cerrar">Cerrar</button></header>
       <div class="dj-cuerpo">${L.map((x, i) => x.tipo === 'gm'
-        ? `<button type="button" class="dj-puerta-op" data-djp-op="${i}"><b>🎁 Dar como GM</b><small>Un ítem del catálogo, DDE, despojos o un ítem nuevo, a uno o varios personajes. Les llega directo, con su cartel.</small></button>`
+        ? `<button type="button" class="dj-puerta-op" data-djp-op="${i}"><b>🤝 Dar como GM</b><small>Un ítem del catálogo, DDE, despojos o un ítem nuevo, a uno o varios personajes. Les llega directo, con su cartel.</small></button>`
         : `<button type="button" class="dj-puerta-op" data-djp-op="${i}"><b>🤝 Pasar algo de la mochila de ${esc(x.nombre)}</b><small>Ítems, DDE o despojos de ${esc(x.nombre)} a otro personaje: le llega un aviso para aceptarlo o rechazarlo.</small></button>`).join('')}</div></div>`;
     fondo.addEventListener('click', e => {
       if(e.target === fondo){ puertaCerrar(); return; }
@@ -351,7 +351,7 @@ const DarJugador = (() => {
     const fondo = document.createElement('div');
     fondo.className = 'dj-fondo';
     fondo.innerHTML = `<div class="dj" role="dialog" aria-modal="true">
-      <header><h3>🎁 Dar a un jugador</h3><button type="button" data-dj="cerrar">Cerrar</button></header>
+      <header><h3>🤝 Dar a un jugador</h3><button type="button" data-dj="cerrar">Cerrar</button></header>
       <div class="dj-cuerpo">
         <div><div class="dj-tit">¿A quién?</div><div class="dj-quien" data-dj-quien><span class="dj-nota">Leyendo los personajes…</span></div></div>
         <div><div class="dj-tit">¿Qué le das?</div><div class="dj-tabs">
@@ -371,7 +371,7 @@ const DarJugador = (() => {
           <button type="button" class="dj-pri" data-dj="crear">✎ Crear un ítem ahora</button></div>
         <div class="dj-canasta"><div class="dj-tit">Lo que vas a dar</div><div data-dj-canasta></div></div>
       </div>
-      <footer><span class="dj-resumen" data-dj-resumen></span><button type="button" data-dj="cerrar">Cancelar</button><button type="button" class="dj-pri" data-dj="dar">🎁 Dar</button></footer></div>`;
+      <footer><span class="dj-resumen" data-dj-resumen></span><button type="button" data-dj="cerrar">Cancelar</button><button type="button" class="dj-pri" data-dj="dar">🤝 Dar</button></footer></div>`;
     document.body.appendChild(fondo);
     const $ = s => fondo.querySelector(s);
     const yo = v = {fondo, pjs: [], marcados: new Set((o.marcados || []).map(String)), que: {items: [], dde: 0, despojos: 0, magico: 0, especiales: []}, tab: 'catalogo', viendo: '', filtro: null, enviando: false,
@@ -463,7 +463,7 @@ const DarJugador = (() => {
       if(typeof AsistenteItem === 'undefined'){ toast('No se pudo abrir el asistente de ítems'); return; }
       const stats = typeof FichaCalculo !== 'undefined' && FichaCalculo.MOD_TARGETS ? FichaCalculo.MOD_TARGETS.map(x => ({id: x.id, label: x.label})) : [];
       AsistenteItem.abrir({
-        contexto: 'ficha', nuevo: true, titulo: '🎁 Ítem nuevo para dar',
+        contexto: 'ficha', nuevo: true, titulo: '🤝 Ítem nuevo para dar',
         draft: {nombre: '', tipoItem: '', tier: 'A definir', peso: 0, ranuras: 1, detalle: '', mods: [], imagen: '', unidades: 1, consumible: false, precioCompra: 0,
           tipoDado: 8, danoFijo: 0, danoAmplificado: 0, armaDeRango: false, efectosGolpe: []},
         stats, tiers: Object.keys(TIER_COLOR), unidadesNota: 'Cuántas le das (a cada uno, si elegís a varios). Después se puede cambiar en la lista de abajo.',
@@ -493,7 +493,7 @@ const DarJugador = (() => {
         const me = mochilasEstado();
         if(me.pasadas.length){
           const txt = `${me.pasadas.map(x => mochilaAvisoTxt(x.nombre, x.m)).join('\n')}\n\nSe le${me.pasadas.length > 1 ? 's' : ''} da igual (le${me.pasadas.length > 1 ? 's' : ''} sale el aviso para que la acomode${me.pasadas.length > 1 ? 'n' : ''}). ¿Dar igual?`;
-          const si = typeof Confirmar !== 'undefined' ? await Confirmar.preguntar(txt, {titulo: 'Mochila llena', icono: '🎒', si: '🎁 Dar igual', no: 'Volver'}) : confirm(txt);
+          const si = typeof Confirmar !== 'undefined' ? await Confirmar.preguntar(txt, {titulo: 'Mochila llena', icono: '🎒', si: '🤝 Dar igual', no: 'Volver'}) : confirm(txt);
           if(!si || v !== yo) return;
         }
       }
@@ -501,7 +501,7 @@ const DarJugador = (() => {
       const que = limpiar(yo.que), r = await enviar(fichas, que);
       yo.enviando = false;
       if(r.error){ toast(r.error); if(v === yo) dibujarCanasta(); return; }
-      toast(`🎁 Listo: ${lista(r.nombres)} ${r.nombres.length > 1 ? 'reciben' : 'recibe'} ${texto(que)}`);
+      toast(`🤝 Listo: ${lista(r.nombres)} ${r.nombres.length > 1 ? 'reciben' : 'recibe'} ${texto(que)}`);
       if(typeof o.alDar === 'function') try{ o.alDar(fichas, que); }catch(e){}
       if(v === yo) cerrar();
     }

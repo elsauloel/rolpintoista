@@ -23,7 +23,7 @@ async function renderListaPersonajes(){
           return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">
             <a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(f.id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
               `${mini}<span class="pj-nombre">${esc(f.nombre || 'Sin nombre')}</span>${dueno ? `<span class="pj-dueno">${esc(dueno)}</span>` : ''}</a>` +
-            `<button type="button" class="pj-inactivar" data-dar-personaje="${esc(f.id)}" title="Darle un ítem, DDE o despojos a ${esc(f.nombre || 'este personaje')}: le entra directo y le salta un cartel">🎁</button>` +
+            `<button type="button" class="pj-inactivar" data-dar-personaje="${esc(f.id)}" title="Darle un ítem, DDE o despojos a ${esc(f.nombre || 'este personaje')}: le entra directo y le salta un cartel">🤝</button>` +
             `<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(f.id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button>` +
             `<button type="button" class="pj-borrar" data-borrar-personaje="${esc(f.id)}" data-nombre="${esc(f.nombre || 'Sin nombre')}" title="Borrar a ${esc(f.nombre || 'este personaje')} de la partida">✕</button>
           </div>`;
@@ -32,7 +32,7 @@ async function renderListaPersonajes(){
     caja.querySelectorAll('[data-borrar-personaje]').forEach(b => {
       b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
     });
-    caja.querySelectorAll('[data-dar-personaje]').forEach(b => { b.onclick = () => abrirDarJugadorGM({marcados: [b.dataset.darPersonaje]}); });   // 🎁 (js/04)
+    caja.querySelectorAll('[data-dar-personaje]').forEach(b => { b.onclick = () => abrirDarJugadorGM({marcados: [b.dataset.darPersonaje]}); });   // 🤝 (js/04)
     caja.querySelectorAll('[data-inactivo-personaje]').forEach(b => {
       b.onclick = async () => { const id = b.dataset.inactivoPersonaje; b.disabled = true; const s = await CombateFin.fueraCambiar(id, !afuera.has(id)); if(typeof jugadoresFueraGM !== 'undefined'){ jugadoresFueraGM = new Set(s); renderMapasBarra(); } renderListaPersonajes(); };
     });
@@ -219,7 +219,7 @@ $('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id ===
 $('#editar-creep-guardar').onclick = () => guardarEditarCreep();
 $('#editar-creep-cancelar').onclick = () => cancelarEditarCreep();
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
-$('#veritem-dar').onclick = () => { const it = verItemActual; $('#scrim-ver-item').classList.remove('open'); if(it) abrirDarJugadorGM({item: it}); };   // 🎁
+$('#veritem-dar').onclick = () => { const it = verItemActual; $('#scrim-ver-item').classList.remove('open'); if(it) abrirDarJugadorGM({item: it}); };   // 🤝
 $('#veritem-editar').onclick = () => { $('#scrim-ver-item').classList.remove('open'); editarYSubirItemGM(verItemActual); };
 $('#veritem-baja').onclick = async () => {
   if(!verItemActual) return;

@@ -140,8 +140,8 @@ function verItemGM(idx){ verItemDatos(CATALOGO_EQUIPO[idx]); }
 // "✎ Editar y subir" arma una copia y la sube al catálogo compartido (comun/editar-item.js); no toca lo que se está viendo.
 let verItemActual = null;
 function catalogoGMCompleto(){ return ItemsSubidos.mezclar(structuredClone(CATALOGO_BASE), itemsSubidosGM); }
-/* 🎁 Dar a un jugador (2026-11-21, dueño): la ventana común (comun/dar-jugador.js, la misma del mapa). `o.marcados` = los personajes ya tildados
-   (el 🎁 de una fila de 👥 Personajes); `o.item` = el ítem del catálogo que se estaba viendo, ya en la lista (el «🎁 Dar a un jugador» del Ver de un ítem). */
+/* 🤝 Dar a un jugador (2026-11-21, dueño): la ventana común (comun/dar-jugador.js, la misma del mapa). `o.marcados` = los personajes ya tildados
+   (el 🤝 de una fila de 👥 Personajes); `o.item` = el ítem del catálogo que se estaba viendo, ya en la lista (el «🤝 Dar a un jugador» del Ver de un ítem). */
 // El ítem del catálogo que se está viendo (los del ⚔ Catálogo vienen en la forma de creep, sin su id: se lo busca por nombre y tipo). null si no es del catálogo.
 function itemDelCatalogoGM(item, catalogo){
   if(!item || !item.nombre) return null;
@@ -177,7 +177,7 @@ function verItemDatos(item){
   // o una plantilla de botín, que no tienen id ahí).
   const delCatalogo = !!(item.id && catalogoGMCompleto().some(c => c.id === item.id));
   $('#veritem-baja').style.display = delCatalogo ? '' : 'none';
-  $('#veritem-dar').style.display = itemDelCatalogoGM(item) && fbMiembro && fbMiembro.gm ? '' : 'none';   // 🎁 (comun/dar-jugador.js, 2026-11-21)
+  $('#veritem-dar').style.display = itemDelCatalogoGM(item) && fbMiembro && fbMiembro.gm ? '' : 'none';   // 🤝 (comun/dar-jugador.js, 2026-11-21)
   $('#scrim-ver-item').classList.add('open');
 }
 

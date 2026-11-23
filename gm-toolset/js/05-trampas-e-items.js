@@ -306,7 +306,7 @@ function abrirItemCustomGM(){
     }],
     onGuardar: (d, scId) => {
       // ✋ Un consumible propio no va al equipo de un creep (su cinturón usa los del catálogo): se sube al catálogo o se da a un jugador.
-      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: subilo con «⬆ Subir al catálogo» o dáselo a un jugador con 🎁 Dar a un jugador'); return false; }
+      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: subilo con «⬆ Subir al catálogo» o dáselo a un jugador con 🤝 Dar a un jugador'); return false; }
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
       if(CreepCalculo.vaAlEquipo(d)){ ponerEquipoEnCreep(sc, d); const nuevo = sc.equipo[sc.equipo.length - 1]; hacerLugarEnManosCreep(sc, nuevo, true).then(() => renderAll()); }   // (una varita va al equipo; ✋ hace lugar)

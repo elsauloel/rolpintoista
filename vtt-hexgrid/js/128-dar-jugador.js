@@ -1,6 +1,6 @@
-// js/128-dar-jugador.js — 🎁 El GM le da un ítem, DDE o despojos a un personaje desde el mapa (2026-11-21, dueño: «que el GM pueda darle un ítem
+// js/128-dar-jugador.js — 🤝 El GM le da un ítem, DDE o despojos a un personaje desde el mapa (2026-11-21, dueño: «que el GM pueda darle un ítem
 // del catálogo muy fácilmente a un jugador… tanto desde el mapa como desde GM Tools»).
-// La puerta: «🎁 Dar un ítem» en el menú «⋯» del token de un personaje (junto a Renovar / Quitar el Pacto), solo para el GM. La ventana, cómo
+// La puerta: «🤝 Dar un ítem» en el menú «⋯» del token de un personaje (junto a Renovar / Quitar el Pacto), solo para el GM. La ventana, cómo
 // viaja y cómo lo recibe el jugador (directo a la mochila + cartel con «Aceptar») es la pieza común comun/dar-jugador.js: la misma de GM Tools.
 // Quien recibe lo aplica con lo de siempre (recibidosAplicar, js/11): por eso comun/dar-jugador.js se carga con la página, para todos.
 const DAR_PIEZAS = ['../comun/asistente-item.js?v=20261122cola49'];

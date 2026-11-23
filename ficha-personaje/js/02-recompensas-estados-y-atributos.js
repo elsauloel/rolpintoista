@@ -26,7 +26,7 @@ async function recompensasRevisar(){
       if(r.regalo){ $('#f-loot-magico').value = S.loot.magico; renderLootEspecial(); }
       if(r.vueltas || (r.items && r.items.length)){ renderInventario(); renderList('cinturon'); }
       refresh();
-      // 🎁 Lo que el GM dio a mano (comun/dar-jugador.js, 2026-11-21): ya entró; el cartel al centro con «Aceptar» es el «enterado».
+      // 🤝 Lo que el GM dio a mano (comun/dar-jugador.js, 2026-11-21): ya entró; el cartel al centro con «Aceptar» es el «enterado».
       if(r.regalo){
         const nombre = ((S.meta && S.meta.nombre) || '').trim();
         DarJugador.cartel({nombre, de: r.regalo.de, lineas: r.regalo.lineas, pasada: r.regalo.pasada});

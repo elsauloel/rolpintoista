@@ -430,7 +430,7 @@ y la última posición vista se calculan en cada navegador y no se guardan.
   jugador **reclama** lo libre (su uid en `tomadoPor`, el personaje en `tomadoFicha`) o **suelta** lo suyo; **disputa** lo de otro creando un
   juego en `ppt` y anotándolo en `disputa` (en la misma transacción); quien juega lo cierra y el ítem queda a nombre del ganador. Al cerrar el
   botín, el GM manda lo reclamado en la recompensa de cada personaje (`recompensas/{auto}.items` = las plantillas) y su ficha lo suma a la
-  mochila. **🎁 Dar a un jugador** (2026-11-21, comun/dar-jugador.js) usa esa misma colección, sin reglas nuevas: una recompensa con
+  mochila. **🤝 Dar a un jugador** (2026-11-21, comun/dar-jugador.js) usa esa misma colección, sin reglas nuevas: una recompensa con
   `regalo: true`, `de`, `xp: 0`, `dde`, `despojos`, `despojosMagicos`, `despojosEsp: [{nombre, cantidad}]` e `items` (una plantilla por unidad). `campanas/{id}/ppt/{auto}` = un juego: `{a, b: {uid, nombre, ficha}, uids, motivo: {tipo: 'libre', texto} | {tipo: 'botin', botinId,
   item}, jugadas: {a, b}, ronda, estado: 'jugando' | 'terminado' | 'cancelado', ganador, rendido, ultima: {ronda, a, b, res}, creado,
   actualizado}`; lo ven todos, lo empieza uno de los dos, lo juegan los dos, el GM lo puede cortar y borra los de más de un día.

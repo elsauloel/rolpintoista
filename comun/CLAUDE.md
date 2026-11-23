@@ -1382,7 +1382,7 @@ versión parecida en más de una, es candidato a juntar.
   arriba de la mochila (`FichaEquipo.html(S, {fichaId})`): fuera de combate «🤝 Pasar · ♻», en combate «🤝 Pasar a un aliado · ♻» (desde la regla
   nueva del mismo día aparece siempre: ver «de mano a mano» abajo). Un caído (0 de vida) da y recibe igual (su token sigue en el mapa).
 - **`intercambio.js`, 🤝 de mano a mano y 💸 ambos pagan** (2026-11-01, dueño). **Ruta nueva:** el token de OTRO personaje pegado al mío (caído o no)
-  muestra 🤝 entre sus botones flotantes (`manosMiPersonaje(t)` en vtt-hexgrid/js/11) → `Intercambio.abrirManos(miFicha, aliadoId)`: «🎁 Darle un
+  muestra 🤝 entre sus botones flotantes (`manosMiPersonaje(t)` en vtt-hexgrid/js/11) → `Intercambio.abrirManos(miFicha, aliadoId)`: «🤝 Darle un
   ítem» (= `ofrecer` con el aliado ya elegido) o «🙋 Pedirle un ítem» (lee su ficha; `pedirMano`: paquete `tipo: 'pedido'` con `despojo: 'mano'` y
   `despojoNombre: '<origen>><destino>'` — sin campos nuevos, así no cambian las reglas de Firestore). El dueño del ítem ve el cartel «🤝 Te piden
   algo» (el mismo de las ofertas, `mostrarPendientes`) y acepta (`aceptarPedido`: lo saca, lo manda en `json`) o rechaza; quien pidió lo recibe en
@@ -2212,7 +2212,7 @@ versión parecida en más de una, es candidato a juntar.
   público ya no lo lleva. **Una pasiva que cambie de efecto se convierte en `pasivasAlDia`**, por su `poolId`.
 
 - **`dar-jugador.js`** (`DarJugador`, 2026-11-21, dueño: «que el GM pueda darle un ítem del catálogo muy fácilmente a un jugador… tanto desde el mapa
-  como desde GM Tools… directo a la mochila, pero que sí le aparezca una notificación, que uno ponga aceptar») — **🎁 Dar a un jugador**, UNA ventana para
+  como desde GM Tools… directo a la mochila, pero que sí le aparezca una notificación, que uno ponga aceptar») — **🤝 Dar a un jugador** (🎁 hasta el 2026-11-23, P278), UNA ventana para
   el mapa y GM Tools: `abrir({catalogo(), marcados: [fichaId], item, toast, verItem})` (a quién: los personajes de la partida con casillas; qué:
   ítems del catálogo con `FiltroCatalogo`, «Ver» y cuántos —hasta `MAX_UNIDADES`—, DDE, despojos normales / mágicos / especiales con nombre, o un
   ítem nuevo con `AsistenteItem`, sin consumibles). **Sin colección ni reglas nuevas:** `enviar(fichas, que)` deja un aviso por personaje en
@@ -2224,7 +2224,7 @@ versión parecida en más de una, es candidato a juntar.
   lineas, pasada})` (al centro, con «✔ Aceptar» que solo lo cierra; si llega otro con el cartel abierto, se suma abajo) y, si quedó pasada, una
   línea en la Mesa. **Se carga con la página en el mapa, la ficha y GM Tools** (el que recibe lo necesita siempre). Lo que no está decidido: P262.
 - **`dar-jugador.js`, 🤝 la puerta del menú de la izquierda** (2026-11-22, dueño, opción A): `DarJugador.puerta({gm, propios: [{id, nombre}],
-  abrirGM(), abrirPasar(id), toast, sinNada})` — un solo camino, lo abre directo; varios, un cartelito (`.dj-puerta`) con «🎁 Dar como GM» y «🤝 Pasar
+  abrirGM(), abrirPasar(id), toast, sinNada})` — un solo camino, lo abre directo; varios, un cartelito (`.dj-puerta`) con «🤝 Dar como GM» y «🤝 Pasar
   algo de la mochila de X»; ninguno, el toast `sinNada`. `puertaOpciones(o)` da la lista (pruebas). La usan el mapa (js/128), la ficha (js/08) y GM
   Tools (js/04, solo el GM).
 - **`intercambio.js`, ⚔ no está al lado** (2026-11-22, dueño: «que si está en modo combate y no está adyacente te advierta que la regla no lo permite

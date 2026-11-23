@@ -934,7 +934,7 @@ const Intercambio = (() => {
     let lista = '';
     if(modo === 'dar'){
       lista = !mio ? '<p class="ix-hint">Cargando tu mochila…</p>' : (() => { const L = sueltos(mio); return L.length ? L.map(({it, key}) => fila(it, key, `<button type="button" data-ix-mano-dar="${esc(it.id)}">Dárselo${costoTxt(costoEntrega(mio, origenDe(key, it)))}</button>`)).join('') : '<p class="ix-hint">No tenés nada suelto para darle (lo equipado o lo ya ofrecido no cuenta).</p>'; })();
-      lista = `<div class="ix-paso"><h4>🎁 Darle un ítem — de tu mochila y tu cinturón</h4>${lista}<p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo; hasta que responda, queda reservado.${combate ? ' Pagan los dos recién cuando lo acepta (él elige: equipado en la mano si tiene una libre, al cinturón o a una vaina / correa, 1 No2; a la mochila, 2); si lo rechaza, nadie paga. Un consumible de una pila va de a 1.' : ''}</p></div>`;
+      lista = `<div class="ix-paso"><h4>🤝 Darle un ítem — de tu mochila y tu cinturón</h4>${lista}<p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo; hasta que responda, queda reservado.${combate ? ' Pagan los dos recién cuando lo acepta (él elige: equipado en la mano si tiene una libre, al cinturón o a una vaina / correa, 1 No2; a la mochila, 2); si lo rechaza, nadie paga. Un consumible de una pila va de a 1.' : ''}</p></div>`;
     } else if(modo === 'pedir'){
       const pc = d => mio ? costoRecibe(mio, d) : COSTO_DESTINO[d];
       // ✋ Equipármelo (2026-11-01): lo de la mano, si te queda una libre (lo mismo que al cinturón; fuera de combate, gratis)
@@ -948,7 +948,7 @@ const Intercambio = (() => {
     cuerpo.innerHTML = `
       ${combate ? `<div class="ix-aviso">⚔ En combate pagan los dos, cuando se concreta: quien da, 1 No2 si sale del cinturón o de una vaina / correa (0 con Pasamanos) o 2 si sale de la mochila; quien recibe, 1 si se lo equipa en una mano libre o lo pone en el cinturón (un consumible) o en una vaina / correa libre (lo de la mano), o 2 si lo guarda en la mochila. La regla dice que con No2 en negativo no se puede (te pregunta si querés hacerlo igual). Un caído no paga (se le avisa que está inconsciente). Si se rechaza, nadie paga.</div>` : ''}
       <div class="ix-paso"><h4>¿Qué querés hacer con ${esc(aliado.nombre)}?</h4>
-        <div class="ix-fila"><button type="button" data-ix-mano-modo="dar"${modo === 'dar' ? ' class="on"' : ' class="sec"'}>🎁 Darle un ítem</button><button type="button" data-ix-mano-modo="pedir"${modo === 'pedir' ? ' class="on"' : ' class="sec"'}>🙋 Pedirle un ítem</button></div></div>
+        <div class="ix-fila"><button type="button" data-ix-mano-modo="dar"${modo === 'dar' ? ' class="on"' : ' class="sec"'}>🤝 Darle un ítem</button><button type="button" data-ix-mano-modo="pedir"${modo === 'pedir' ? ' class="on"' : ' class="sec"'}>🙋 Pedirle un ítem</button></div></div>
       ${lista}
       ${pend.length ? `<div class="ix-paso"><h4>Esperando respuesta</h4>${pend.map(p => `<div class="ix-fila"><span class="ix-q">${p.tipo === 'item' ? `Le ofreciste ${esc(paqueteTxt(p))}` : `Le pediste ${esc(p.nombre)}`}</span><button type="button" class="sec" data-ix-mano-cancelar="${esc(p.id)}">Cancelar</button></div>`).join('')}</div>` : ''}`;
   }

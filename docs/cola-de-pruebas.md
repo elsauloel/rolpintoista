@@ -1772,7 +1772,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada de iniciativa»). Ver cómo está hoy (hay invocaciones
   con turno propio y otras fuera del orden, como la abeja); lo dudoso, como pregunta.
 
-- **⬜ en cola — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
+- **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
   reglas pegadas: que otro jugador y el GM lean una descripción guardada de verdad (mouse y 🪪), un token suelto creado por el GM, y el
   «🎭 Ponerlo en el mapa» de una invocación que no está en el mapa.
 - **⬜ en cola — 📦 Token suelto paso a paso: iniciativa y vida** (dueño, 2026-11-22, dictado; «esto es para objetos inanimados»): que crear un
@@ -1876,7 +1876,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en el asistente, un campo opcional «Tirada al consumirlo» (por ejemplo 1d6, 2d4+1); al consumirlo se tira sola y sale en la Mesa junto al
   «✋ a mano». Sin tirada, como ahora.
 
-- **⬜ en cola (al final, a propósito) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (dueño,
+- **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) (al final, a propósito) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (dueño,
   2026-11-22: «vamos a dejar al final de la cola probar este sistema en el mapa con los clics una vez que estén pegadas las reglas de Firebase…
   cuando llegue el turno de esa tarea, vamos a chequear que las reglas estén actualizadas y vamos a proceder con las pruebas»). Primer paso:
   verificar que las reglas pegadas sean las del repo (que mandar un mensaje no dé «faltan pegar las reglas»); si no, avisarle al dueño y esperar.

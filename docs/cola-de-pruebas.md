@@ -2101,6 +2101,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
   23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
 
+- **⬜ en cola — 🐝 «Empieza tu turno» de una invocación dice su nombre** (P299, dueño 2026-11-23: «sí»): «▶ Empieza el turno de Abeja de prueba»
+  (y que se entienda que no es el turno del personaje).
+- **⬜ en cola — 🔥 «Lo frena (en parte) su resistencia al fuego» solo si hay resistencia** (P300, dueño 2026-11-23, opción a): con resistencia 0, el
+  cartel y el renglón de la zona no la nombran («le entra 1d4 de daño de fuego»). En una invocación sin el número a mano, como hoy.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

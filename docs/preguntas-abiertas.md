@@ -2265,7 +2265,9 @@ para todos (el número, solo en la cuenta)?
 4. **La Suela gruesa del rival**: en el cartel, al rival no se le nombra la Suela gruesa de quien lo recibe (es parte de lo que lo frena, con número).
    ¿Se nombra sin número, o queda así?
 
-### P299 — 🐝 «Empieza tu turno» de una invocación no dice de quién es el turno (2026-11-23, Claude, cola de pruebas)
+### ✅ P299 — 🐝 «Empieza tu turno» de una invocación no dice de quién es el turno (2026-11-23, Claude, cola de pruebas)
+
+**Decidido (dueño, 2026-11-23): sí, que diga su nombre** («▶ Empieza el turno de Abeja de prueba»). En la cola de programación.
 
 Probando la Abeja de prueba (una invocación del Jugador 1 con turno propio en el orden) parada sobre el Muro de fuego: al empezar su turno, al Jugador 1
 le sale la ventana de siempre, «▶ Empieza tu turno», con «Lo que pasa al empezar: nada que cambie» y el renglón del Muro («le entra 3d4 de daño de
@@ -2273,7 +2275,9 @@ fuego…»). En ningún lado dice que es el turno de **la abeja** y no el de su 
 Con un personaje y una invocación en el orden, el jugador puede confundirse. ¿Le sumamos el nombre («▶ Empieza el turno de Abeja de prueba», o «Abeja de
 prueba: le entra 3d4…»), o se deja así?
 
-### P300 — 🔥 «Lo frena su resistencia al fuego» cuando la resistencia es 0 (2026-11-23, Claude, cola de pruebas)
+### ✅ P300 — 🔥 «Lo frena su resistencia al fuego» cuando la resistencia es 0 (2026-11-23, Claude, cola de pruebas)
+
+**Decidido (dueño, 2026-11-23): opción (a)**: la frase sale solo cuando de verdad tiene algo de resistencia; con 0, no se nombra. En la cola de programación.
 
 El cartel y el renglón de una zona de fuego dicen «No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego)»
 también cuando quien lo recibe tiene resistencia 0 (lo vi en la pantalla del GM con Blanco creep, resistencia al fuego 0: el GM ve el número de los

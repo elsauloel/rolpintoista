@@ -1943,6 +1943,8 @@ la decisión venía con «un caído queda como estaba al caer». Así quedó:
    empezar su turno).
 
 ### P271 — 🎯 Las Apuntadas de las ballestas: ¿cartel y aviso como el anillo? (2026-11-21, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** (1) «sí, sumale el aviso» (y el cartel), como el anillo; (2) la Apuntada firme no vale en la ronda 1, «y de hecho la Apuntada simple tampoco debería valer desde la ronda 1. Tampoco en el anillo» (el anillo ya no daba bono en la ronda 1). En la cola.
 Las Apuntadas ya usan lo anotado en la partida (lo que se movió cuenta en todas las pantallas; que te muevan, no), como pediste. Lo que NO se les sumó
 (no estaba en el pedido): el cartel dorado cuando se activa y el aviso «si te movés, la perdés» que tienen Puntería certera y Foco. Además, la
 **Apuntada firme** quedó como el anillo: recién desde la ronda 2 (en la 1 no hay «turno anterior» quieto); la Apuntada simple vale desde la ronda 1.

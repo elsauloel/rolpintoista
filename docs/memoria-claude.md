@@ -165,7 +165,8 @@
   (o «podés avanzar»)**. Al terminarla se le pasan los resultados y **se espera**: él los lee y comenta; lo que corresponda de sus comentarios
   se agrega **al final de la cola** (`docs/cola-de-pruebas.md`); cuando vuelve a decir «avanzá», se toma la siguiente. Nunca encadenar dos
   tareas sin su ok. **«Avanzá con el resto» NO es permiso para encadenar** (2026-11-23: se encadenaron cuatro y el dueño lo frenó: «cuando termines me
-  contás y no seguías automáticamente… te tengo que decir yo avanzá después de ver los resultados de cada trabajo»): un «avanzá» = una tarea.
+  contás y no seguías automáticamente… te tengo que decir yo avanzá después de ver los resultados de cada trabajo»): un «avanzá» = una tarea. El dueño (2026-11-23): «por default vamos a ir avanzando de a una tarea. Puede que en algún contexto yo te
+  pida que sigas con la siguiente, si veo que tengo más tiempo y atención… pero si no, vamos de a una» (solo si lo pide con claridad).
 - **Videos de las animaciones, no capturas** (2026-11-10, dueño: «si pudieras mandarme videítos de las animaciones en lugar de capturas, sería
   genial»). Para todo lo que se mueve (pulsos, duelos que se despliegan, vaquita, lava, rayos…), grabar con Playwright
   (`newContext({recordVideo: {dir, size: {width: 1280, height: 720}}, viewport: {width: 1280, height: 720}})`, cerrar el contexto para que se

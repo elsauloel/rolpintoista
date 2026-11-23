@@ -1992,7 +1992,9 @@ ya no la de antes, que dejaba elegir «Vinculado a…». **Elegí lo más simple
 creeps…» (y saca el suelto); para un personaje, «🎭 Ponerlo en el mapa». Los tokens **vinculados** siguen con su «✎ Editar token» de siempre
 (cambiar el vínculo y el dueño). ¿Hace falta poder convertir un suelto en el token de un creep (por ejemplo, un NPC que se vuelve enemigo), o así está bien?
 
-### P277 — 🪨 El token suelto de un jugador: ¿cómo se comporta en combate? (2026-11-22, Claude)
+### ✅ P277 — 🪨 El token suelto de un jugador: ¿cómo se comporta en combate? (2026-11-22, Claude)
+
+> ✅ **Resuelta (dueño, 2026-11-22, «token suelto paso a paso»; aplicado el 2026-11-23):** al crearlo se pregunta «¿Ocupa lugar en la iniciativa? Sí / No» y «¿Tiene vida? Sí / No»; con vida, se lo puede atacar y hasta ahí. Lo que quedó abierto de eso: P305–P308. Ocultarlo (👁 del GM) sigue como estaba.
 El de un jugador es un token «de personaje» sin ficha (lo mueve él, borde de los suyos); el del GM, un NPC (borde gris). **Elegí no cambiar nada de lo
 que ya hacía un token sin ficha**: se mueve sin costo de No2, no tiene vida ni estados, y entra en «Traer tokens» del orden de turnos igual que
 cualquier token del mapa (como ya pasa con los NPC; está en la cola el pedido de que «Tirar iniciativa» no meta lo que no va). ¿Un token suelto de
@@ -2321,3 +2323,33 @@ Lo nuevo vale para la invocación que **aparece** en el mapa con el orden ya arm
 2. Las que quedaron **fuera** del orden (como la Abeja de prueba hasta hoy: el GM la sacó con ✕, o estaba antes de armar el orden): siguen fuera, sin
    turno propio (les toca con su dueño o al pasar de ronda). ¿Pasan todas a tener turno, o se deja como decisión del GM?
 3. Una invocación con el token puesto de antemano (sin invocar) que después se invoca: el token no aparece de nuevo (ya estaba), así que no tira.
+
+### P305 — 📦 El token suelto paso a paso: ¿con qué respuesta arranca cada pregunta? (2026-11-23, Claude, cola de programación)
+
+Crear un token suelto ahora son tres pasos: «Cómo es» (nombre, descripción, imagen, color), «¿Ocupa lugar en la iniciativa? Sí / No» y «¿El token tiene
+vida? Sí / No» (con cuánta). Como dijiste «esto es para objetos inanimados», **uno nuevo arranca con las dos en «No»** (queda afuera del orden de turnos
+y sin vida); se cambia con un clic. Los que ya estaban puestos antes (sin la respuesta guardada) siguen como hasta ahora: ocupan lugar. Opciones:
+(a) como quedó: «No» y «No»; (b) la iniciativa en «Sí» (un NPC que actúa) y la vida en «No»; (c) sin nada marcado: hay que elegir las dos para poder
+ponerlo. Esto resuelve la primera parte de P277 (el token suelto de un jugador fuera del orden: lo decide quien lo crea).
+
+### P306 — 📦 Atacar a un objeto: ¿Evasión 1 y crítico como siempre? (2026-11-23, Claude, cola de programación)
+
+Pediste que al token suelto con vida «se lo pueda elegir como objetivo de ataques… y hasta ahí nomás». Quedó así: **se defiende solo con «🪨 Evasión 1
+(es un objeto)»** (la Evasión nunca baja de 1, como con el Stun), sin tirar; **no tiene Defensa, escudos, resistencias ni estados**, así que el golpe
+entra entero a su vida. Contesta la defensa la pantalla de quien lo puso (si no está, el GM lo escribe a mano en el cuadro). Como la Evasión es 1,
+**casi siempre sale crítico** y el daño se multiplica (las reglas de siempre). Opciones: (a) como quedó; (b) a un objeto no se le hace crítico (el
+golpe entra con su daño normal); (c) que quien lo crea le ponga una Defensa (un número que se resta, como la armadura). Con una habilidad dirigida pasa
+lo mismo: su resistencia vale 1 (la Evasión) o 0 (las demás).
+
+### P307 — 📦 Un objeto que llega a 0 de vida: ¿qué pasa? (2026-11-23, Claude, cola de programación)
+
+**Elegí lo más conservador: queda en el mapa, «💥 Roto»** (lo dicen su tarjeta 🪪 y el globo al pasar el mouse), y lo saca quien lo puso o el GM. No
+cuenta como caído (no tiene ✚ Revivir ni turnos de muerte) y se lo puede seguir atacando (no le baja de 0). Opciones: (a) como quedó; (b) que se borre
+solo del mapa al llegar a 0; (c) que quede roto y ya no se lo pueda elegir como objetivo (como un caído); (d) un aviso al que lo puso: «X se rompió:
+¿lo sacás del mapa?».
+
+### P308 — 📦 La vida de un objeto del GM, ¿la ven los jugadores? (2026-11-23, Claude, cola de programación)
+
+La vida del token suelto **de un jugador** la ve todo el mundo (en el círculo rojo del token y en su tarjeta). La de uno **del GM** se maneja como la de
+un creep: los jugadores no ven los números, solo «❤ Tiene vida · se lo puede atacar» y, al llegar a 0, «💥 Roto». Opciones: (a) como quedó; (b) que la
+de todos los objetos se vea (una puerta no tiene secretos); (c) que lo elija el GM al crearlo.

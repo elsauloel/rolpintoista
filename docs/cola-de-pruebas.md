@@ -1814,13 +1814,28 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   🗑 Borrar token» se fue del mapa y del orden. Al final, todo como estaba (narrativo, sin orden, la abeja en su casilla, sus datos iguales). 2 pruebas
   automáticas nuevas (1053).
 
-- **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
+- **✅ hecho (2026-11-23) — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
   reglas pegadas: que otro jugador y el GM lean una descripción guardada de verdad (mouse y 🪪), un token suelto creado por el GM, y el
   «🎭 Ponerlo en el mapa» de una invocación que no está en el mapa.
-- **⬜ en cola — 📦 Token suelto paso a paso: iniciativa y vida** (dueño, 2026-11-22, dictado; «esto es para objetos inanimados»): que crear un
+  *Resultado:* todo anduvo, no hubo que arreglar nada. Probado con clics en «Claude · pruebas 2» («Prueba · R4 M4»): el Jugador 1 puso un cofre con
+  descripción; el Jugador 2 y el GM, después de recargar la página (o sea, leyéndola guardada de verdad), la leyeron al pasar el mouse y en la tarjeta 🪪
+  («Token suelto · lo puso Jugador 1»); el GM le cambió la descripción y el Jugador 2 vio la nueva. El GM puso un NPC con descripción y el Jugador 1 y el
+  Jugador 2 la leyeron igual («lo puso el GM»). El Jugador 1 sacó a su Abeja de prueba del mapa, el panel 👥 mostró «🎭 Ponerlo en el mapa» en la fila de la
+  invocación, y con eso la volvió a poner en su casilla (el GM la vio llegar). Al final: los tokens sueltos borrados y la abeja en su lugar, con su color.
+- **🟡 a medias (2026-11-23: programado; faltan pegar las reglas y probar lo que depende de ellas) — 📦 Token suelto paso a paso: iniciativa y vida** (dueño, 2026-11-22, dictado; «esto es para objetos inanimados»): que crear un
   token suelto sea una serie de pasos: nombre y descripción; «¿Ocupa lugar en la iniciativa? Sí / No»; «¿El token tiene HP? Sí / No», y si
   tiene HP, que se lo pueda elegir como objetivo de ataques («y hasta ahí nomás»). Resuelve también P277. (El «agregar tener» del dictado
   era «agregarlo a la lista de pendientes», dueño 2026-11-22.)
+  *Resultado:* «＋ Token suelto» ahora son tres pasos: **1. Cómo es** (nombre, descripción, imagen, color), **2. Iniciativa** («🎲 Sí: tiene su turno» /
+  «🪨 No: queda afuera del orden de turnos») y **3. Vida** («❤ Sí: tiene vida y se lo puede atacar», con cuánta, de 1 a 9999 / «— No»). Uno nuevo
+  arranca en «No» y «No» (P305); editar uno que ya estaba abre los mismos pasos. Con vida: su círculo rojo en el token (lo cambian quien lo puso y el
+  GM), «❤ Vida 7 de 10» en la tarjeta 🪪 y al pasar el mouse, y **se lo puede atacar**: se defiende con «🪨 Evasión 1 (es un objeto)», sin tirar, y el
+  golpe entra entero a su vida, sin Defensa, escudos ni estados (P306); en 0 queda «💥 Roto» en el mapa (P307). La de un objeto del GM, los jugadores
+  no la ven en números (P308). P277 queda resuelta. **Hay reglas de Firestore para pegar** (los campos nuevos del token, y de paso `trampaDestino`, que
+  faltaba al crear una trampa de teleport): sin pegarlas, el token se pone igual sin la iniciativa ni la vida y avisa «faltan pegar las reglas».
+  **Probado con clics** (Jugador 1 y GM): los tres pasos, el aviso si la vida no es un número, Enter en el nombre pasa al paso siguiente, ponerlo en el
+  mapa y editarlo con las reglas viejas (se pone / se guarda sin lo nuevo, con el aviso). **Sin probar, hasta que se peguen las reglas**: todo lo que
+  guarda la iniciativa o la vida (abajo, «Probar»). 6 pruebas automáticas nuevas (1059).
 
 - **⬜ en cola — 🤝 El 🎁 queda solo para el botín (P278 decidida)** (dueño, 2026-11-22: «reemplazá el emoji del regalito por el emoji de las
   manos para que se entienda que esas manos son para pasar objetos y otras cosas. Que el regalo quede solo para el botín»): el 🎁 del «⋯» del
@@ -2142,6 +2157,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
   la abeja con «🎭 Ponerlo en el mapa» (el mismo camino: aparece el token) y se fue con «Turnos agotados → Borrar»; falta invocarla con una habilidad que
   invoca y que salga del orden al caer con la vida en 0.
+- **⬜ en cola — Probar (con las reglas pegadas): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
+  iniciativa y ver que «Traer tokens» / «Tirar iniciativa» no lo meten; otro con «Sí», que entra. Uno con vida: el círculo rojo en el token, cambiarla a
+  mano («12», «-3», Ctrl+Z) desde quien lo puso y desde el GM; en la tarjeta 🪪 y al pasar el mouse, la de un jugador con números y la del GM sin números
+  para los jugadores. Editarlo: bajar el máximo (la vida no pasa del nuevo) y sacarle la vida.
+- **⬜ en cola — Probar (con las reglas pegadas): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
+  uno del Jugador 2 (cada uno contesta «🪨 Evasión 1» desde su pantalla; si no está, el GM a mano), el crítico, el daño que entra entero, «✍ Otro valor»,
+  la línea de la Mesa, llegar a 0 («💥 Roto») y una habilidad dirigida contra el objeto.
 
 ## En cola
 

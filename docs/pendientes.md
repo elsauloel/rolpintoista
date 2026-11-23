@@ -818,6 +818,12 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+- [ ] **📋 Pegar las reglas de Firestore (2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
+  suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
+  jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos
+  (la Trampa de teleport de Terreno y Formas no se podía crear). Mientras no estén pegadas no se rompe nada: el token suelto se pone (o se guarda) sin
+  la iniciativa ni la vida y avisa «faltan pegar las reglas». Después: las dos entradas «Probar … 📦» de `docs/cola-de-pruebas.md`.
+
 - [ ] **✨ Mirar las cuatro animaciones de resurrección (2026-11-20)** — Ankh, Fénix, Revive y Pacto ya están en el mapa (`vtt-hexgrid/CLAUDE.md`,
   «Las animaciones de resurrección»). Claude mandó un video corto de cada una (y uno con las cuatro seguidas): mirarlos en la compu y decir qué
   cambiar. Para verlas en vivo, en una partida de pruebas: matar a un personaje con el Pacto activo, con un Ankh de Reencarnación en el cinturón o

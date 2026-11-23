@@ -2259,6 +2259,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   que se hacen durante los testeos en el mapa»). Revisar por qué se animan tiradas viejas al entrar (¿la Mesa trae las últimas y las anima como
   nuevas?) y que al cargar solo se animen las que llegan después de abrir el mapa.
 
+- **⬜ en cola — ❤ «Vida extra»: descripción corta y con el origen** (dueño, 2026-11-23, con captura de la ventana ◎ Estados alterados): «la
+  explicación de vida extra está innecesariamente larga. Se entiende bastante solo con el nombre, aunque está bueno que diga algo como "vida por
+  encima de tu máximo", y que diga el origen (normalmente solo se va a permitir en casos particulares, lo dará algún ítem o algún skill, así que
+  debería mencionar eso, o si se carga a mano, que diga "cargado a mano")». Acortar la descripción a algo como «Vida por encima de tu máximo» y
+  mostrar de dónde viene (el ítem / la habilidad, o «cargado a mano»).
+- **⬜ en cola — 📜 Ventana ◎ Estados alterados: poder leer la descripción entera cuando no entra** (dueño, 2026-11-23: «en el caso de que una
+  descripción de un estado no entre en el recuadro, debería haber alguna forma de poder leer el texto completo. En este caso no tengo cómo saber
+  cómo termina ese texto»). Hoy se corta con «…» (p. ej. la de Vida extra). Que se pueda desplegar o ver completa.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2228,3 +2228,18 @@ la vez al pasar de ronda (no se tocaron):
    carpintero, Resina de árbol negro, Arena movediza, las trampas de arena de varita) y las varitas del aceite, del farol, de arena movediza (y la
    mayor) y de la luz flotante.
 ¿Pasamos alguna (o todas las de daño) a «al empezar su turno», o quedan así?
+
+### P296 — 🔥 La Varita del muro de fuego: ¿la frena también la Defensa especial? (2026-11-23, Claude)
+
+Probado con clics: el muro de la **habilidad** Muro de fuego es daño **directo** (no lo frena la Defensa especial; sí la resistencia al fuego), pero
+el de la **Varita del muro de fuego** no está marcado como directo, así que hoy le resta **la Defensa especial y la resistencia al fuego** de quien lo
+recibe (como cualquier daño de fuego de una habilidad). El texto de la varita no dice nada de eso. ¿Queda así (la varita, más barata, la frena también
+la Defensa especial) o la paso a daño directo, como el Muro de la habilidad?
+
+### P297 — 🔥 ¿Lo que frena el daño de una zona, con el número de quien la recibe? (2026-11-23, Claude)
+
+El cartel de la zona y el renglón de «Empieza tu turno» ahora dicen qué frena el daño, y con un personaje muestran su número: «(lo frena su
+resistencia al fuego 2)», «(es inmune al fuego: su resistencia al fuego es 99)», y la Suela gruesa si la tiene. De un **creep** el número solo lo ve
+el GM (a un jugador no se le cuenta la resistencia de un rival); de una **invocación** no se muestra el número (se lee aparte y el cartel sale antes):
+dice «lo frena su resistencia al fuego» a secas, y la cuenta del cuadro del duelo sí trae el número. ¿Está bien así, o preferís el texto sin números
+para todos (el número, solo en la cuenta)?

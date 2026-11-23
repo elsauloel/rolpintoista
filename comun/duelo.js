@@ -1840,7 +1840,9 @@ const Duelo = (() => {
         if(dn.manual) partes.push(`Le hizo ${_fmt(_num(dn.golpe))} de daño (a mano).`);
         else if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0 && entro > _num(dn.hpAntes)) partes.push(`Le hizo ${_fmt(entro)} de daño y ${D} cayó.`);   // más que la vida que tenía (dueño, 2026-11-03: decía «le bajó 18» con 6 de vida)
         else{
-          partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
+          // 🔥 (2026-11-23) lo que lo frenó, de la cuenta del daño («Resistencia al fuego»…): antes decía siempre «la armadura o el escudo».
+          const frenos = [...new Set((Array.isArray(dn.cuenta) ? dn.cuenta : []).filter(x => x && x.s === '−' && x.txt).map(x => String(x.txt)))];
+          partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : frenos.length ? `No le hizo daño (lo frenó: ${frenos.join(', ')}).` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
           if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
         }
       }

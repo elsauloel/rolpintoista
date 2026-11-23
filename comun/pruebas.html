@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261122cola51c"></script>
+<script src="zona-detalle.js?v=20261123cola59"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123cola58"></script>
+<script src="combatiente.js?v=20261123cola59"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261123cola57"></script>
+<script src="duelo.js?v=20261123cola59"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261122cola49"></script>
@@ -9702,7 +9702,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     igual(m.filas.map(f => f.k), ['Fuego amigo', 'De quién es', 'Con qué se puso', 'Cuánto le queda', 'Cuándo se dispara', 'Tirada para evitarla', 'Estado que deja', 'Qué frena el daño', 'Altura']);
     ok(/^NO\./.test(fila(m, 'Fuego amigo')) && /él mismo/.test(fila(m, 'Fuego amigo')));
     ok(/3 turnos \(son turnos de Mago/.test(fila(m, 'Cuánto le queda')));
-    igual(fila(m, 'Tirada para evitarla'), 'No tiene: entra directo.');
+    igual(fila(m, 'Tirada para evitarla'), 'No tiene: no se puede esquivar (lo que frena el daño, más abajo).');
     ok(/va directo/.test(fila(m, 'Qué frena el daño')) && /resistencia al fuego/.test(fila(m, 'Qué frena el daño')));
     igual(m.descripcion, 'Levanta un muro.');
   });
@@ -9737,13 +9737,43 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
   });
   prueba('🔥 el cartel de una zona sin tirada dice qué le entra y quién tira el daño (2026-11-21: decía «No hay nada que tirar» y se tiraba el 3d4 del Muro)', async () => {
     const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
-    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: 'Arcano 3'}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura. El daño lo tira Arcano 3.');
-    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: ''}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura. El daño se tira en el cuadro del duelo.');
-    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: null}), 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura.');   // (un token oculto: el daño sale solo)
-    igual(ZonaDetalle.sinTiradaTexto({zona: true, zonaDano: '4', zonaDanoTipo: 'tóxico'}, {quienTira: 'GM'}), 'No hay tirada para resistirla: le entra 4 de daño tóxico.');
-    igual(ZonaDetalle.sinTiradaTexto({zona: true}, {}), 'No hay nada que tirar para resistirla: se aplica lo que deja la zona.');
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: 'Arcano 3'}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego y Quemadura. El daño lo tira Arcano 3.');
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: ''}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego y Quemadura. El daño se tira en el cuadro del duelo.');
+    igual(ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: null}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego y Quemadura.');   // (un token oculto: el daño sale solo)
+    igual(ZonaDetalle.sinTiradaTexto({zona: true, zonaDano: '4', zonaDanoTipo: 'tóxico'}, {quienTira: 'GM'}), 'No hay tirada para esquivarla: le entra 4 de daño tóxico (lo frena su Defensa).');
+    igual(ZonaDetalle.sinTiradaTexto({zona: true}, {}), 'No hay nada que tirar para esquivarla: se aplica lo que deja la zona.');
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
     ok(/ZonaDetalle\.sinTiradaTexto\(el, /.test(t08));
+  });
+  prueba('🔥 el Muro de fuego no se esquiva, pero lo frena la resistencia al fuego (dueño, 2026-11-23): el cartel, el renglón de «Empieza tu turno» y «Ver detalle» lo dicen', async () => {
+    const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
+    const T = o => ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: 'Arcano 3', elemento: 'fuego', ...o});
+    igual(T({}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego) y Quemadura. El daño lo tira Arcano 3.');
+    igual(T({res: 0}), T({}));
+    igual(T({res: 2}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego 2) y Quemadura. El daño lo tira Arcano 3.');
+    igual(T({res: 99}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (es inmune al fuego: su resistencia al fuego es 99) y Quemadura. El daño lo tira Arcano 3.');
+    igual(T({res: 2, suela: 1}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frenan su resistencia al fuego 2 y su Suela gruesa 1) y Quemadura. El daño lo tira Arcano 3.');
+    ok(/su resistencia al fuego −2, vulnerable/.test(T({res: -2})));
+    // La Varita (de habilidad, sin «directo»): la Defensa especial también, como lo resta el mapa (js/08: `directo` = sin elemento ni casteador, o zonaDirecto).
+    const varita = {zona: true, zonaNombre: 'Varita del muro de fuego', zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({alEmpezar: true})};
+    igual(ZonaDetalle.sinTiradaTexto(varita, {quienTira: 'Blanco', elemento: 'fuego', res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frenan su Defensa especial y su resistencia al fuego 2). El daño lo tira Blanco.');
+    igual(ZonaDetalle.frenoDe(varita, {elemento: 'fuego', altura: 'ambos'}), {defensa: 'Defensa especial', directo: false, elemento: 'fuego', res: 'resistencia al fuego', suela: true});
+    igual(ZonaDetalle.frenoDe(muro, {elemento: 'fuego', altura: 'aire'}), {defensa: '', directo: true, elemento: 'fuego', res: 'resistencia al fuego', suela: false});
+    igual(ZonaDetalle.frenoCorto({zona: true, zonaDano: '2d6', zonaDanoTipo: 'eléctrico', zonaIgnoraDef: true, zonaCasteadorRef: 'c'}, {elemento: 'rayo', res: 99}), 'es inmune a lo eléctrico: su resistencia eléctrica es 99');
+    igual(ZonaDetalle.frenoCorto({zona: true, zonaDano: '4', zonaIgnoraDef: true}, {}), '');   // (una zona del GM sin elemento: va directo)
+    // «Ver detalle»: la fila «Qué frena el daño» con lo que de verdad lo frena (la Suela gruesa también en «piso y aire»).
+    const m = ZonaDetalle.armar(varita, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, autor: {nombre: 'Blanco'}, habilidad: 'Varita del muro de fuego', altura: 'ambos', rivalesTxt: 'los creeps'});
+    igual(fila(m, 'Qué frena el daño'), 'La Defensa común no; la Defensa especial sí. Sí le resta la resistencia al fuego de quien lo recibe (con 99 o más, es inmune; si es negativa, entra de más). También la Suela gruesa (es del piso). El daño lo tira quien la puso (o el GM por él).');
+    igual(fila(m, 'Tirada para evitarla'), 'No tiene: no se puede esquivar (lo que frena el daño, más abajo).');
+    // La cuenta: «resistencia al fuego 2» (antes «Res. fuego 2» en la zona y «Resistencia a fuego» en el cuadro del duelo).
+    igual([Combatiente.resElementalNombre('fuego'), Combatiente.resElementalNombre('rayo'), Combatiente.resElementalNombre('toxico'), Combatiente.resElementalCuenta('fuego', 2), Combatiente.resElementalCuenta('hielo', -1)],
+      ['Resistencia al fuego', 'Resistencia eléctrica', 'Resistencia a lo tóxico', 'resistencia al fuego 2', 'resistencia al hielo −1 (vulnerable)']);
+    // La frase del final del duelo (la Mesa): lo que lo frenó, de la cuenta (antes, siempre «la armadura o el escudo»).
+    igual(Duelo.fraseResumen({atacante: {nombre: 'Mago'}, defensor: {nombre: 'Blanco'}, hab: {nombre: 'Muro de fuego: el daño'}, ataque: {tipo: 'habilidad', habNombre: 'Muro de fuego: el daño'}, resultado: 'pego',
+      dano: {aplicado: true, recibido: 0, hpAntes: 43, hpDespues: 43, cuenta: [{s: '', txt: 'Tirada de daño', v: 8}, {s: '−', txt: 'Resistencia al fuego', v: 99}, {s: '=', txt: 'entra a la vida', v: 0}]}}),
+      'Mago le hizo Muro de fuego: el daño a Blanco. No le hizo daño (lo frenó: Resistencia al fuego).');
+    const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
+    ok(/elemento: elZ, res: t\.oculto \? null : resZ, suela: t\.oculto \? 0 : suelaZ/.test(t08) && /Combatiente\.resElementalCuenta\(o\.elZ/.test(t08) && /Combatiente\.resElementalNombre\(elDano\)/.test(t13));
   });
   prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
     const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,
@@ -9996,7 +10026,7 @@ grupo('Empieza tu turno con la zona adentro');
       trozo + '\nreturn {inicioTurnoMomento, inicioZonasSumar, inicioYaCerrado, inicioVentanas};')(
       AvisoCombate, {uid: 'yo'}, {paso: 7}, v => Number(v) || 0, () => 0, (fn) => 0,
       tok => tok === 't1' ? ['muro'] : [],
-      (elId, tokenId) => ({elId, tokenId, icono: '🔥', nombre: 'Muro de fuego', texto: 'No hay tirada para resistirla: le entra 3d4 de daño de fuego y Quemadura.', boton: '🔥 Tirar el daño (3d4)', estado: 'pend'}),
+      (elId, tokenId) => ({elId, tokenId, icono: '🔥', nombre: 'Muro de fuego', texto: 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego) y Quemadura.', boton: '🔥 Tirar el daño (3d4)', estado: 'pend'}),
       z => new Promise(ok => { mundo.resolver = ok; }),
       () => { mundo.aplicados++; }, null);
     return {f, mundo};

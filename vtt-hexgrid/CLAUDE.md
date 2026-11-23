@@ -2611,6 +2611,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sin cartel; `renderZonaBanner` devuelve el resultado); `inicioVentanaVolver` la muestra de nuevo cuando no hay otro aviso ni cuadro del duelo abierto.
   Un reloj (500 ms) la aparta mientras haya un cuadro del duelo abierto en esta pantalla (`inicioDueloAbierto`) y la vuelve a mostrar si otro aviso la
   reemplazó. «▶ Aplicar por él» del GM o aplicado al pasar el turno: la zona sigue con su botón. Un creep, sin cambios. Probado con clics (cola 2026-11-22).
+- **🔥 El daño de una zona sin tirada: lo que lo frena, a la vista** (2026-11-23, dueño: «en el Muro de fuego, si bien no se resiste, el daño sí lo
+  frena la resistencia al fuego»): el daño ya restaba la resistencia a su elemento en los tres caminos (al entrar, al cruzar, al empezar el turno: el
+  cartel de la zona → `danoDuelo` → `dueloAplicarDano`); ahora el texto lo dice. `zonaCartelAntes` (js/08) le pasa a `ZonaDetalle.sinTiradaTexto` el
+  elemento, la resistencia de quien lo recibe (un personaje: su resumen; un creep: solo en la pantalla del GM; una invocación: sin número) y su Suela
+  gruesa si la zona es del piso → «No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego 2)»; con 99, «es
+  inmune al fuego». `zonaDanoCuenta` y la fila de la cuenta del duelo (js/13) dicen «resistencia al fuego» (`Combatiente.resElementalCuenta` /
+  `resElementalNombre`). Probado con clics en «Claude · pruebas 2» (cola 2026-11-23). Dudas: P296 (la varita, sin «directo», la frena también la
+  Defensa especial), P297.
 
 - **📋 Respuestas a P252, P256, P259, P260 y P262** (2026-11-22, cola): (1) el fin del combate vacía también el orden de turnos (comun/tokens-auto.js).
   (2) `hudAplicar` (js/10): subirle la vida a mano a un caído pregunta «¿Querés resucitarlo con N de vida?» (Sí = `revivirToken(t, {val, aMano: true})`,

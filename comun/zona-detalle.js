@@ -19,6 +19,34 @@ const ZonaDetalle = (() => {
   const pctDe = sp => { const p = Math.round(Number(sp && sp.pct)); return p > 0 && p < 100 ? p : 0; };
   const ICONOS = {fuego: '🔥', hielo: '❄', rayo: '⚡', toxico: '☠', acido: '🧪', luz: '☀', siniestro: '🌑'};
 
+  /* 🔥 Qué frena el daño de una zona (2026-11-23, dueño: «en el Muro de fuego, si bien no se resiste, el daño sí lo frena la resistencia al fuego»).
+     La MISMA cuenta que hace el mapa al aplicarlo (vtt-hexgrid/js/08 `zonaResolverBanner` → el cuadro del duelo, js/13 `dueloAplicarDano`): sin
+     «ignora la Defensa», la Defensa; si la ignora, la Defensa especial (salvo el daño directo, y las zonas del GM sin elemento, que van directo);
+     siempre la resistencia a su elemento; y la Suela gruesa si es del piso (`altura` 'piso' o 'ambos'). → {defensa: 'Defensa' | 'Defensa especial' | '',
+     directo, elemento, res (el nombre: «resistencia al fuego»), suela}. */
+  const RES_NOMBRE = {fuego: 'al fuego', hielo: 'al hielo', rayo: 'eléctrica', toxico: 'a lo tóxico', acido: 'al ácido', luz: 'a la luz', siniestro: 'a lo siniestro'};
+  const resNombre = elem => elem ? `resistencia ${RES_NOMBRE[elem] || 'a ' + elem}` : '';
+  function frenoDe(el, o){
+    o = o || {};
+    const elem = o.elemento || '';
+    const defensa = !el.zonaIgnoraDef ? 'Defensa' : (!el.zonaDirecto && (el.zonaCasteadorRef || elem)) ? 'Defensa especial' : '';
+    return {defensa, directo: !!el.zonaIgnoraDef && !defensa, elemento: elem, res: resNombre(elem), suela: o.altura === 'piso' || o.altura === 'ambos'};
+  }
+  /* Lo corto, para el cartel y el renglón de «Empieza tu turno»: «lo frena su resistencia al fuego» / «lo frenan su Defensa especial y su resistencia
+     al hielo». o = {elemento, res (la de quien lo recibe, si se puede mostrar: un personaje), suela (la Suela gruesa de quien lo recibe, si la tiene)}.
+     Con resistencia 99 o más, «es inmune al fuego». '' si no lo frena nada (sin contar escudos ni Invulnerable). */
+  const INMUNE_A = {fuego: 'al fuego', hielo: 'al hielo', rayo: 'a lo eléctrico', toxico: 'a lo tóxico', acido: 'al ácido', luz: 'a la luz', siniestro: 'a lo siniestro'};
+  function frenoCorto(el, o){
+    o = o || {};
+    const f = frenoDe(el, {elemento: o.elemento});
+    const hayRes = o.res !== undefined && o.res !== null && o.res !== '' && Number.isFinite(Number(o.res)), res = Number(o.res);
+    if(f.res && hayRes && res >= 99) return `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}: su ${f.res} es ${res}`;
+    const cosas = [f.defensa ? `su ${f.defensa}` : '', f.res ? `su ${f.res}${hayRes && res !== 0 ? (res < 0 ? ` −${-res}, vulnerable: le entra de más` : ` ${res}`) : ''}` : '',
+      Number(o.suela) > 0 ? `su Suela gruesa ${Math.round(Number(o.suela))}` : ''].filter(Boolean);
+    if(!cosas.length) return '';
+    return `${cosas.length === 1 ? 'lo frena' : 'lo frenan'} ${cosas.length === 1 ? cosas[0] : cosas.slice(0, -1).join(', ') + ' y ' + cosas[cosas.length - 1]}`;
+  }
+
   function tiene(el){
     return !!(el && (el.zona || el.trampa || el.fuego || el.niebla || el.portal || el.townPortal || el.acelerador));
   }
@@ -96,11 +124,12 @@ const ZonaDetalle = (() => {
     const sp = json(el.zonaEstado), est = estadoTxt(sp, o), pct = pctDe(sp);
     const tipoD = String(el.zonaDanoTipo || '').toLowerCase().replace(/^de\s+/, '');
     const danoTipo = !tipoD ? '' : /^(t[oó]xico|arcano|f[ií]sico|[aá]cido|siniestro|sagrado|m[aá]gico|directo|el[eé]ctrico)/.test(tipoD) ? ` ${tipoD}` : ` de ${tipoD}`;
-    const dano = el.zonaDano && !el.zonaDanoDif ? `${el.zonaDano} de daño${danoTipo}` : '';
+    const freno = el.zonaDano && !el.zonaDanoDif ? frenoCorto(el, o) : '';   // 🔥 (2026-11-23) lo que lo frena: no se esquiva, pero no entra entero
+    const dano = el.zonaDano && !el.zonaDanoDif ? `${el.zonaDano} de daño${danoTipo}${freno ? ` (${freno})` : ''}` : '';
     const que = [dano, est ? `${pct ? `${pct} % de chance de ` : ''}${est}` : ''].filter(Boolean).join(' y ');
-    if(!que) return 'No hay nada que tirar para resistirla: se aplica lo que deja la zona.';
+    if(!que) return 'No hay nada que tirar para esquivarla: se aplica lo que deja la zona.';
     const tira = dano && /d/i.test(String(el.zonaDano)) && o.quienTira !== null ? (o.quienTira ? ` El daño lo tira ${o.quienTira}.` : ' El daño se tira en el cuadro del duelo.') : '';
-    return `No hay tirada para resistirla: le entra ${que}.${tira}`;
+    return `No hay tirada para esquivarla: le entra ${que}.${tira}`;
   }
 
   function armarZona(el, ctx){
@@ -152,7 +181,7 @@ const ZonaDetalle = (() => {
         v: `Quien entra tira ${lbl(el.zonaResistStat)}; la zona tira ${lbl(el.zonaTiraStat)} (${el.zonaTiraValor}, el de quien la puso al ponerla), una tirada nueva cada vez. Hay que superarla: el empate lo gana la zona. Quien resiste no recibe nada.`});
       else if(el.zonaResistStat && Number.isFinite(el.zonaResistValor)) filas.push({k: 'Tirada para evitarla',
         v: `Quien entra tira ${lbl(el.zonaResistStat)} y tiene que llegar a ${el.zonaResistValor}. Quien resiste no recibe nada.`});
-      else if(esencial && !/a mano/.test(esencial) && !(el.zonaLuz && !sp.nombre && !dano) && !(sup === 'agua' && !sp.nombre)) filas.push({k: 'Tirada para evitarla', v: 'No tiene: entra directo.'});
+      else if(esencial && !/a mano/.test(esencial) && !(el.zonaLuz && !sp.nombre && !dano) && !(sup === 'agua' && !sp.nombre)) filas.push({k: 'Tirada para evitarla', v: dano ? 'No tiene: no se puede esquivar (lo que frena el daño, más abajo).' : 'No tiene: entra directo.'});
     }
     // El estado que deja.
     if(est){
@@ -164,13 +193,14 @@ const ZonaDetalle = (() => {
     if(sp.porTirada && el.zonaTiraExtra) filas.push({k: 'Tirada extra', v: `Si el daño entra, quien la puso tira ${el.zonaTiraExtra} y lo que sale decide un efecto más${ctx.porTiradaTxt ? `: ${ctx.porTiradaTxt}` : ''}.`});
     // Qué frena el daño.
     if(dano){
-      const fr = [];
-      if(!el.zonaIgnoraDef) fr.push('Le resta la Defensa.');
+      // 🔥 (2026-11-23) la misma cuenta que el mapa al aplicarlo (frenoDe): la resistencia a su elemento siempre, la Suela gruesa también en «piso y aire».
+      const fr = [], f = frenoDe(el, {elemento: elem, altura: ctx.altura});
+      if(f.defensa === 'Defensa') fr.push('Le resta la Defensa.');
+      else if(f.defensa) fr.push('La Defensa común no; la Defensa especial sí.');
       else if(el.zonaDirecto) fr.push('No lo frenan la Defensa ni la Defensa especial (va directo).');
-      else if(el.zonaCasteadorRef || elem) fr.push('La Defensa común no; la Defensa especial sí.');
-      else fr.push('Nada: va directo a la vida.');
-      if(elem) fr.push(`Sí le resta la resistencia ${ctx.elementoRes || 'a ' + elem}.`);
-      if(ctx.altura === 'piso') fr.push('También la Suela gruesa.');
+      else fr.push(elem ? 'No lo frenan la Defensa ni la Defensa especial (va directo).' : 'Nada: va directo a la vida.');
+      if(elem) fr.push(`Sí le resta la ${f.res} de quien lo recibe (con 99 o más, es inmune; si es negativa, entra de más).`);
+      if(f.suela) fr.push('También la Suela gruesa (es del piso).');
       if(el.zonaDano && /d/i.test(el.zonaDano)) fr.push('El daño lo tira quien la puso (o el GM por él).');
       filas.push({k: 'Qué frena el daño', v: fr.join(' ')});
     }
@@ -302,6 +332,6 @@ const ZonaDetalle = (() => {
       `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${A_MANO}» = ese dato no está guardado ahí.</div>`;
   }
 
-  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, html, A_MANO};
+  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

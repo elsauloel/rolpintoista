@@ -2012,6 +2012,30 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Resina de árbol negro y Arena movediza (con las trampas de arena de varita)** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita del aceite y Varita del farol** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de arena movediza (y la mayor) y Varita de la luz flotante** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-23) — 🔥 El Muro de fuego lo frena la resistencia al fuego.** Dueño: «En el Muro de fuego, si bien no se resiste, el daño sí
+  lo frena la resistencia al fuego. Ajustá esta tarea con lo de la resistencia al fuego, que ya esté resuelto eso.» (El renglón de «Empieza tu turno»
+  y el cartel decían «No hay tirada para resistirla: le entra 1d4 de daño de fuego…», como si nada lo frenara.)
+  *Resultado:* el daño ya restaba la resistencia al fuego en los tres caminos (al entrar, al cruzar, al empezar el turno: los tres van por el cartel de
+  la zona → el cuadro del duelo, `dueloAplicarDano`, la misma función que el resto del daño elemental); no hubo que tocar la cuenta. Lo que se cambió
+  son los textos: el cartel y el renglón dicen «No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego 2)»
+  (con el número de un personaje; «lo frenan su Defensa especial y su resistencia al fuego» en la varita; «es inmune al fuego: su resistencia al
+  fuego es 99»; la Suela gruesa si la tiene); «Ver detalle»: «Tirada para evitarla: no se puede esquivar» y «Qué frena el daño» con la resistencia
+  (99 = inmune, negativa = entra de más) y la Suela gruesa también en «piso y aire» (la resta el mapa); la cuenta dice «Resistencia al fuego» (antes
+  «Resistencia a fuego») y la frase de la Mesa «No le hizo daño (lo frenó: Resistencia al fuego)» (antes, siempre «la armadura o el escudo»). Sirve a
+  toda zona con daño sin tirada (`ZonaDetalle.frenoDe` / `frenoCorto`, comun/zona-detalle.js), sin cambiar cuándo pegan. Probado con clics en
+  «Claude · pruebas 2» (GM, J1, J2), con la resistencia al fuego de Blanco J1 y el Muro de fuego en Blanco creep **armados por datos**: Muro de la
+  habilidad, al entrar con resistencia 2 (6 − 2 = 4) y al empezar el turno con 2 (5 − 2 = 3) y con 99 (8 − 99 = 0, el texto de inmune); Varita del
+  muro de fuego, al cruzar con 99 (cartel «INMUNE AL FUEGO» en la pantalla del GM) y con 2 (4 − 2 = 2, «Daño especial»); las tiradas con «✍ Elegir
+  manualmente». Al final, todo como estaba (sin muros, sin la resistencia ni la habilidad/varita de prueba, vida y No2 de antes, narrativo, sin orden).
+  Las pruebas del cartel puestas al día y una nueva (1045). Dudas: P296 (¿la varita también la frena la Defensa especial?) y P297 (el número en el cartel).
+- **⬜ en cola — Probar: 🔥 la Suela gruesa en el texto y la cuenta del Muro de fuego** (2026-11-23): nadie de la partida tiene Suela gruesa; el
+  texto la nombra y el mapa la resta (prueba automática), sin clics.
+- **⬜ en cola — Probar: 🔥 el Muro de fuego sobre un creep y sobre una invocación con resistencia al fuego** (2026-11-23): con clics, solo un
+  personaje; el creep (el número solo en la pantalla del GM) y la invocación (sin número en el cartel) van por la misma función.
+- **⬜ en cola — Probar: 🔥 resistencia al fuego negativa (vulnerable) en el Muro de fuego** (2026-11-23): el texto «−2, vulnerable» solo con la
+  prueba automática.
+- **⬜ en cola — Probar: 🔥 el Muro de la habilidad al cruzarlo (sin terminar adentro) y la Varita al empezar el turno, con resistencia** (2026-11-23):
+  van por el mismo cartel y la misma cuenta que los otros caminos probados; con clics no se hizo esa combinación.
 
 ## En cola
 

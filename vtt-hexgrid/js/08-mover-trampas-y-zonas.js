@@ -730,7 +730,7 @@ function zonaDanoCuenta(monto, r, o){
   if(!o.ignoraDef && defBase > 0) resta.push(`Defensa ${fmt(defBase)}`);
   if(o.ignoraDef && num(o.armadmg) > 0) resta.push(`Defensa especial ${fmt(o.armadmg)}`);
   if(trinV > 0) resta.push(`🛡 Aguante de trinchera${trinZ.esp ? ' (a la Defensa especial)' : ''} ${fmt(trinV)}`);
-  if(num(o.resElem) && o.elZ) resta.push(Combatiente.resElementalTxt(o.elZ, num(o.resElem)));
+  if(num(o.resElem) && o.elZ) resta.push(Combatiente.resElementalCuenta(o.elZ, num(o.resElem)));   // «resistencia al fuego 2» (2026-11-23)
   if(num(o.suela) > 0) resta.push(`Suela gruesa ${fmt(o.suela)}`);
   if(num(r.arcano) > 0) resta.push(`Armadura arcana ${fmt(r.arcano)}`);
   if(num(r.mitiMiti) > 0) resta.push(`${r.mitiMitiNombre || 'otro'} se llevó ${fmt(r.mitiMiti)}`);
@@ -789,7 +789,18 @@ function zonaCartelAntes(el, t, pasos){
   // 🔥 Qué le entra y quién tira el daño (2026-11-21: antes decía «No hay nada que tirar» y después se tiraba el 3d4 del Muro de fuego).
   let quienTira = '';
   try{ const q = zonaDanoQuien(el), tq = q.deTokenId ? tokens.get(q.deTokenId) : null; quienTira = tq && tq.oculto && !soyGM ? '' : q.yo.nombre; }catch(err){}
-  const texto = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira})
+  // 🔥 Lo que frena el daño (2026-11-23, dueño: «si bien no se resiste, el daño sí lo frena la resistencia al fuego»): la resistencia a su elemento
+  // de quien lo recibe (un personaje: su resumen; un creep, solo en la pantalla del GM), la Defensa o la Defensa especial y la Suela gruesa.
+  let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+  if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // (como zonaResolverBanner)
+  let resZ = null;
+  try{
+    if(elZ && t.tipo === 'creep'){ const sc = soyGM ? creepPrivadoDe(t.fichaId) : null; if(sc) resZ = num(CreepCalculo.resElemental(sc, elZ)); }
+    else if(elZ && !String(t.fichaId || '').includes(SEP_INVOCACION)){ const f = fichasPub.get(t.fichaId); if(f && f.resumen) resZ = num(f.resumen['res' + elZ]); }
+  }catch(err){}
+  const suelaZ = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+  const texto = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira,
+      elemento: elZ, res: t.oculto ? null : resZ, suela: t.oculto ? 0 : suelaZ})
     : 'No hay nada que tirar: se aplica lo que deja la zona.';
   const conDados = !!el.zonaDano && /d/i.test(String(el.zonaDano)) && !t.oculto;
   return {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto, boton: 'Aplicar', botonInicio: conDados ? `${icono} Tirar el daño (${el.zonaDano})` : `${icono} Aplicar`};

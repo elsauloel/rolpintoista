@@ -2258,7 +2258,7 @@ async function dueloAplicarDano(d, o){
     return cuenta;
   };
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(frenaAm ? {frenaEsp: true} : {}), ...(resEl ? {resTxt: [...(resElem ? [`${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(frenaAm ? {frenaEsp: true} : {}), ...(resEl ? {resTxt: [...(resElem ? [`${Combatiente.resElementalNombre(elDano)}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     if(simular) oD.simular = true;
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);

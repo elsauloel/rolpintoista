@@ -2138,6 +2138,15 @@ versión parecida en más de una, es candidato a juntar.
   (la usa js/127 para zonas, trampas y tótems/estandartes) con `Glosario.marcar(t, {usados, basicos: true})`: un término se marca **una vez en toda la
   tarjeta** (primero lo destacado, después las filas —también su título, como «Fuego amigo»— y la descripción); las filas «De quién es» y «Con qué se
   puso» no se marcan (son nombres: «Tótem de silencio» no es el estado Silencio). Sin `glosario`, texto escapado. Dudas: P286.
+  **🔥 Qué frena el daño** (2026-11-23, dueño: «si bien no se resiste, el daño sí lo frena la resistencia al fuego»): `frenoDe(el, {elemento, altura})`
+  → `{defensa: 'Defensa' | 'Defensa especial' | '', directo, elemento, res: 'resistencia al fuego', suela}` (la MISMA cuenta que hace el mapa al
+  aplicarlo: vtt-hexgrid/js/08 `zonaResolverBanner` → js/13 `dueloAplicarDano`) y `frenoCorto(el, {elemento, res, suela})` → «lo frena su
+  resistencia al fuego 2» / «lo frenan su Defensa especial y su resistencia al fuego» / «es inmune al fuego: su resistencia al fuego es 99». Lo usan
+  `sinTiradaTexto` (el cartel de una zona sin tirada y su renglón de «Empieza tu turno»: «No hay tirada para esquivarla: le entra … (lo frena …)»;
+  `o.elemento`, `o.res`, `o.suela` los pone js/08 `zonaCartelAntes`) y la fila «Qué frena el daño» (con la Suela gruesa también en «piso y aire»).
+  `Combatiente.resElementalNombre(el)` («Resistencia al fuego», «Resistencia eléctrica») y `resElementalCuenta(el, n)` («resistencia al fuego 2»):
+  la fila de la cuenta del cuadro del duelo y la de `zonaDanoCuenta`. `Duelo.fraseResumen`: «No le hizo daño (lo frenó: Resistencia al fuego)», de las
+  filas «−» de `dano.cuenta` (antes, siempre «la armadura o el escudo»). Dudas: P296, P297.
 - **`glosario.js`: `marcar(texto, {usados, basicos})`** (2026-11-22): `usados` = un `Set` compartido entre varios textos (un término marcado en uno no se
   vuelve a marcar en otro); `basicos: true` suma PdG (y «Probabilidad de Golpe»), Defensa y Evasión (`BASICOS_TXT`; en el resto del juego siguen sin
   marcarse). `def()` también los encuentra. Entradas nuevas en `MECANICAS`: Res.Esp, Res.CC, Res.Mt, Fuego amigo, Mantenimiento, y Ef.Esp, PdG.Esp,

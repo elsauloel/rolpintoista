@@ -1683,7 +1683,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Mesa; J2 no esquivó (1): aplicó el daño y el Empujón él mismo; el daño (7) le sacó más que su Sigilo (6), se delató (regla de siempre) y desde ahí
   el GM lo vio. De paso: un cartel que flota sobre un token (inmunidad, «−2 EVA») ya no sale en las pantallas que no ven ese token (js/96).
   Pruebas automáticas: 1026 en verde (8 nuevas). Dudas: P287, P288. Lo que faltó probar, abajo como «Probar».
-- **⬜ en cola — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
+- **🟡 en conversación (2026-11-23: se le mandó cómo funciona hoy y seis preguntas) — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
   la inventaste y me dejé llevar, pero no estoy seguro de entender exactamente cómo funciona. Vamos a tener que conversar de esto para
   definirlo»). Preparar una explicación de cómo funciona hoy y las preguntas para decidir; no programar hasta conversarlo.
 - **⬜ en cola — 📺 ¿El Portal trampa tiene la animación de la tele?** (dueño, 2026-11-22: «imagino que la teletransportación tiene la animación de

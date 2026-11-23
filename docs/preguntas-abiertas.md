@@ -2474,7 +2474,9 @@ ronda siguiente). Con eso el punto 1 ya no hace falta. **2:** el cartel sale sol
    que el número nuevo ya lo tiene restado (si después el sobrepeso cambia, se ajusta desde ahí). Una fila sin tirar no se toca hasta que se tira.
 
 
-### P314 — 🔘 Guardar quién puso cada estado y con qué (2026-11-23, Claude, cola de programación: el globo de los iconitos y el detalle en ◎)
+### ✅ P314 — 🔘 Guardar quién puso cada estado y con qué (2026-11-23, Claude, cola de programación: el globo de los iconitos y el detalle en ◎)
+
+**Decidido (dueño, 2026-11-23): «en principio no hace falta».** Los estados no guardan quién los puso; queda como está.
 
 **Contexto.** El dueño pidió (2026-11-23) que el globo de los iconitos de alrededor del token diga solo el efecto y que el detalle —«cuál es el
 origen, por qué, quién es el caster»— vaya en la ventana ◎ Estados alterados del token. Hecho con lo que hoy se guarda: la cuenta del sobrepeso, de

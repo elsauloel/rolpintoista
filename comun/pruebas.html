@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261122cola51c"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261122cola49"></script>
+<script src="combatiente.js?v=20261123cola56"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -2810,6 +2810,27 @@ prueba('💀 Al caer se van los estados (P257, 2026-11-21): un personaje que que
   igual([r.cayo, r.sacados.map(x => x.nombre), S.efectos.map(e => e.nombre).sort(), otra.cayo, Combatiente.vueltaTomar(S), sac.map(x => x.nombre), sc.estados.map(e => e.nombre),
     Combatiente.caidaTxt('Rata', sac), Combatiente.caidaTxt('Rata', []), Combatiente.caerLimpio(null, 'estados')],
     [true, ['Veneno', 'Bendecido'], ['Anillo puesto', 'Llama de Fénix'], false, null, ['Sangrado'], ['Vuela'], '💀 Rata cayó: se le fue 1 estado (Sangrado)', '', []]);
+});
+prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatiente.caerSiCayo solo corta si tenía vida y ahora está caído', () => {
+  const mk = hp => ({nombre: 'Rata', hp, hpMax: 10, estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 3}, {nombre: 'Bendecido', polaridad: 'buff', turnos: 2}, {nombre: 'Vuela', volador: true, permanente: true},
+    {nombre: 'Llama de Fénix', fenix: true, turnos: 3}]});
+  const a = mk(0), sa = Combatiente.caerSiCayo(a, 'estados', 4);
+  const b = mk(0), sb = Combatiente.caerSiCayo(b, 'estados', 0);        // ya estaba caído: no toca
+  const c = mk(3), sc = Combatiente.caerSiCayo(c, 'estados', 7);        // sigue en pie
+  const d = {...mk(0), hpMax: 0}, sd = Combatiente.caerSiCayo(d, 'estados', 5);   // sin vida máxima (un token suelto): no
+  const otra = Combatiente.caerSiCayo(a, 'estados', 4);                 // dos veces: la segunda no encuentra nada
+  igual([sa.map(x => x.nombre), a.estados.map(e => e.nombre), sb, b.estados.length, sc, c.estados.length, sd, otra, Combatiente.caerSiCayo(null, 'estados', 5), Combatiente.caidaTxt('Rata', sa)],
+    [['Veneno', 'Bendecido'], ['Vuela', 'Llama de Fénix'], [], 4, [], 4, [], [], [], '💀 Rata cayó: se le fueron 2 estados (Veneno, Bendecido)']);
+});
+prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
+  const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
+  const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js');
+  cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
+  cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
+  cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
+  cierto(/r\.cayo && \(r\.sacados \|\| \[\]\)\.length/.test(f02) && /Combatiente\.caidaTxt\(/.test(f02), 'la ficha suelta cuenta la caída');
+  cierto((m11.match(/caidaContarPj\(/g) || []).length >= 3, 'la Botonera nueva y el pase de turno cuentan la caída');
 });
 prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estandarte no; personajes, invocaciones, creeps y tokens sueltos sí; el campo del token manda', () => {
   const O = OrdenTurnos;

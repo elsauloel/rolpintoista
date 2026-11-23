@@ -539,3 +539,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **✋ Consumible propio en «✎ Ítem custom»** (2026-11-22): la categoría Consumible está (camino corto del asistente, `consumoAMano`), pero «Crear y
   equipar» avisa que no se le equipa a un creep: se sube con ⬆ (`itemComoEntradaCatalogoGM` lo manda como consumible) o se da con 🎁 Dar a un jugador
   (P284). El generador de tiendas guarda la marca en `agregarItemCreado`.
+
+- **💀 Un creep que cae desde GM Tools pierde sus estados** (2026-11-23, P270: «si un creep cae desde GM Tools… no debería ser así»): `gmCaidasRevisar`
+  (js/11) corre al principio de `renderAll` y de cada `gmGuardarTick`, mira cada creep contra la última vida que le vio (`gmCaidaHp`) y, si pasó de
+  tener vida a 0, le saca los estados con `Combatiente.caerSiCayo` (el mismo corte que `modificarCreep` del mapa), toast y la línea «💀 X cayó: se le
+  fueron N estados (…)» en la Mesa si los jugadores lo conocen (`gmCaidaPublica`: un token no oculto, `revelado`, y sin Sigilo al caer; los datos de los
+  tokens los guarda `tokensGMEscuchar` en `tokensGMInfo`, js/09). Así cubre todos los caminos (el recuadro de HP, «Daño», el Mantenimiento, las
+  habilidades, los estados…) sin tocar cada uno; **un camino nuevo que cambie la vida no tiene que hacer nada**, salvo redibujar. Lo que llega del mapa ya
+  viene limpio: no se repite la línea. Un creep que se ve por primera vez (al cargar) solo se anota. Dudas: P292.

@@ -1931,6 +1931,7 @@ El botón nuevo «⏭ Pasar de ronda» (orden de turnos, solo el GM) hace lo mis
 ### P270 — 💀 «Al morir se van los estados»: ¿al caer o al morir del todo? (2026-11-21, Claude)
 
 > ✅ **Decidida (dueño, 2026-11-22):** «sí»: al caer en 0 se borran los estados. «Si un creep cae desde GM Tools… no debería ser así»: tiene que perderlos también (en la cola).
+> ✅ **Hecho (2026-11-23):** un creep que cae desde GM Tools (por cualquier camino) pierde los estados igual que en el mapa, con la misma línea en la Mesa; la ficha suelta y, en el mapa, la Botonera nueva y el pase de turno de un personaje ahora también cuentan la caída. Lo que quedó elegido: P292.
 P257 dice «al momento de morir se le eliminan todos los estados alterados». Se tomó **morir = caer** (la vida a 0, inconsciente o derrotado), porque
 la decisión venía con «un caído queda como estaba al caer». Así quedó:
 1. **Al caer** se le van todos los estados, menos lo del equipo, lo derivado y la Llama de Fénix sin usar (el mismo criterio que al volver de la
@@ -2178,3 +2179,13 @@ ronda); los **personajes, las invocaciones, los creeps y los tokens sueltos sí*
 3. **Un orden armado antes del arreglo** con el tótem o el estandarte adentro: siguen viéndose en la lista hasta que el GM toca Traer tokens u
    Ordenar (ahí salen); mientras tanto Tirar no les tira y ▶ Siguiente los saltea sin darles turno (ni inicio ni fin de turno). ¿Está bien?
 4. **El Ojo de Kicillof** (la invocación que solo observa) sí entra: se mueve en su turno. ¿Lo dejamos adentro?
+
+### P292 — 💀 Un creep que cae desde GM Tools: lo que quedó elegido (2026-11-23, Claude)
+
+Desde hoy un creep que llega a 0 por cualquier camino de GM Tools pierde sus estados como en el mapa (P270), con la línea «💀 X cayó: se le fueron N
+estados (…)». Quedaron elegidas estas cosas, todas cambiables:
+1. **Quién ve la línea**: va a la Mesa solo si los jugadores conocen al creep (su token no está oculto, ya lo vieron y no estaba en Sigilo al caer); si
+   no, el GM ve solo el aviso en su pantalla. Es el mismo criterio del mapa. ¿Está bien?
+2. **La vida en negativo**: en GM Tools, «Daño» puede dejar la vida por debajo de 0 (un golpe de 999 a un creep con 5 de vida la dejó en −989), y el
+   recuadro de HP también acepta un número negativo; en el mapa la vida nunca baja de 0. Para caer da lo mismo, pero se ve raro y «revivir» desde ahí
+   cuenta desde el negativo. ¿Hacemos que en GM Tools tampoco baje de 0?

@@ -186,6 +186,7 @@ async function gmTarjetasFaltantes(docs, creeps){
 async function gmGuardarTick(forzar){
   const g = gmVivo;
   if(!g.activo || !g.listo || g.escribiendo) return;
+  gmCaidasRevisar();   // 💀 por si algún camino cambió la vida sin redibujar
   const ahora = Date.now();
   if(g.reintentarDesde && ahora < g.reintentarDesde && !forzar) return;
 
@@ -311,6 +312,42 @@ function gmMarcarGuardado(sc, orden, firma){
   gmVivo.ultimo[sc.id] = {json: creepFichaJson(sc), imagen: sc.imagen || '', enc: JSON.stringify(sc.imagenEncuadre || null), publico: JSON.stringify(creepPublico(sc, orden))};
   gmVivo.firmas[sc.id] = firma;
   delete gmVivo.sucios[sc.id];
+}
+
+/* ---------- 💀 Un creep que cae desde GM Tools (2026-11-23, P270: «si un creep cae desde GM Tools… no debería ser así») ----------
+   La vida de un creep cambia acá por muchos caminos (el recuadro de HP, «Recibe daño», el Mantenimiento con su veneno, una habilidad, un estado…).
+   En vez de tocar cada uno, se mira cada creep contra la última vida que se le vio: si pasó de tener vida a 0, se le van los estados con el mismo
+   corte que el mapa (Combatiente.caerSiCayo: queda lo del equipo, lo derivado y la Llama sin usar) y se cuenta «💀 X cayó: se le fueron N estados (…)».
+   Corre al principio de renderAll y de cada vuelta del guardado. Lo que llega de otra pantalla (el mapa ya lo limpió en modificarCreep) no tiene
+   nada que sacar, así que no se repite la línea. Un creep que se ve por primera vez (al cargar) solo se anota. */
+const gmCaidaHp = new Map();   // id → la vida que se le vio la última vez
+function gmCaidasRevisar(){
+  if(typeof Combatiente === 'undefined' || typeof creepsReales !== 'function') return;
+  const vistos = new Set();
+  creepsReales().forEach(sc => {
+    if(!sc || !sc.id) return;
+    vistos.add(sc.id);
+    const antes = gmCaidaHp.get(sc.id);
+    gmCaidaHp.set(sc.id, num(sc.hp));
+    if(antes === undefined || !gmVivo.activo) return;
+    const sigilo = (sc.estados || []).some(e => e && e.activo !== false && String(e.nombre || '').trim().toLowerCase() === 'sigilo');
+    const sac = Combatiente.caerSiCayo(sc, 'estados', antes);
+    if(!sac.length) return;
+    CreepCalculo.vidaAlDia(sc);   // ❤ un estado con Vida +N que se fue
+    gmCaidaHp.set(sc.id, num(sc.hp));
+    const txt = Combatiente.caidaTxt(sc.nombre, sac);
+    setTimeout(() => {
+      toast(txt);   // (el toast ya queda en el historial de la sesión)
+      if(gmCaidaPublica(sc, sigilo)){ try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }
+    }, 0);
+  });
+  for(const id of [...gmCaidaHp.keys()]) if(!vistos.has(id)) gmCaidaHp.delete(id);
+}
+// ¿Los jugadores lo conocen? Como creepCaidaContar del mapa: con token no oculto que ya se vio (revelado) y sin estar en sigilo al caer. Si no, solo el GM.
+function gmCaidaPublica(sc, sigilo){
+  if(sigilo || typeof tokensGMInfo === 'undefined') return false;
+  for(const info of tokensGMInfo.values()){ const t = info.get(sc.id); if(t && !t.oculto && t.revelado) return true; }
+  return false;
 }
 
 async function gmProcesarSnapshot(snap){

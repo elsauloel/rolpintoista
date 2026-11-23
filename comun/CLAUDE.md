@@ -2247,3 +2247,7 @@ versión parecida en más de una, es candidato a juntar.
   GM Tools lo muestran solo a su bando, `mesaOcultaSinMapa`). **No frena a nadie:** `revisarOcultos` (cada 5 s, en la pantalla del GM) resuelve lo
   que quedó quieto `OCULTO_MS` (40 s): la resistencia con `cfg.valorOculto(d, lado, stat)` (`tiroDeValor`), el empate, el dodge roll (no se mueve),
   acepta el daño y tira/pide los efectos. Dudas: P287.
+- **💀 `Combatiente.caerSiCayo(quien, campo, hpAntes)`** (2026-11-23, P270): el corte común de «un creep cayó»: si tenía vida (`hpAntes > 0`) y ahora
+  está caído (`estaCaido`, con vida máxima), `caerLimpio` → los sacados; si no, []. Lo usan `modificarCreep` del mapa (js/09) y GM Tools
+  (`gmCaidasRevisar`, js/11). La ficha suelta ahora cuenta la caída de un personaje (toast y Mesa con `caidaTxt`, solo la pantalla que puede guardarlo;
+  ficha js/02) y el mapa también en la Botonera nueva y en el pase de turno (`caidaContarPj`, vtt-hexgrid/js/11).

@@ -575,6 +575,7 @@ function normalizarCreep(sc){ return CreepCalculo.normalizar(sc); }
 function creepsReales(){ return S.creeps.filter(sc => !sc._borrador && !sc._creando); }   // _creando: el asistente de creeps, hasta «✔ Crear»
 
 function renderAll(){
+  if(typeof gmCaidasRevisar === 'function') gmCaidasRevisar();   // 💀 un creep que cayó: se le van los estados (js/11, P270)
   $('#turno-badge').textContent = 'Turno ' + S.turno;
   if(typeof mesaPonerTurno === 'function') mesaPonerTurno(S.turno);
   const grid = $('#grid');

@@ -248,6 +248,14 @@ function revisarMuerte(){
     if(r.revivio) $('#overlay-muerte').classList.remove('open');
     return;
   }
+  // 💀 (2026-11-23, P270) Al caer se le fueron los estados (FichaAcciones.revisarMuerte): la ficha suelta también lo cuenta, como el mapa
+  // («💀 X cayó: se le fueron N estados (…)»). Solo la pantalla que puede guardar al personaje (su dueño, o el GM editándolo): así un mirón no la repite.
+  if(r.cayo && (r.sacados || []).length){
+    try{ renderList('efectos'); }catch(e){}
+    const puede = !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura && !fichaVivo.editaGM);
+    const txtC = Combatiente.caidaTxt(((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje', r.sacados);
+    if(puede && txtC){ toast(txtC); try{ mesaLinea(txtC, 'recordatorio'); }catch(e){} }
+  }
   // ☥ (2026-11-20) Con más de una forma de volver no revive solo: en vez del cartel de «caíste», la pregunta de con qué vuelve.
   if(r.cayo){ if(FichaAcciones.volverPendiente(S).length > 1) preguntarVolver(); else $('#scrim-muerte').classList.add('open'); }
   renderOverlayMuerte();

@@ -665,10 +665,8 @@ async function modificarCreep(creepId, cambiar){
     const resultado = cambiar(sc);
     // 💀 Si con este cambio cayó (la vida pasó a 0), se le van los estados (P257, 2026-11-21: «al momento de morir se le eliminan todos los estados
     // alterados»; queda lo del equipo y la Llama de Fénix sin usar, el criterio de Combatiente.quedaAlVolver).
-    if(hpAntes > 0 && num(sc.hp) <= 0 && num(sc.hpMax) > 0){
-      const sac = Combatiente.caerLimpio(sc, 'estados');
-      if(sac.length) setTimeout(() => creepCaidaContar(creepId, sc.nombre, sac), 0);
-    }
+    { const sac = Combatiente.caerSiCayo(sc, 'estados', hpAntes);   // (el mismo corte que GM Tools, P270)
+      if(sac.length) setTimeout(() => creepCaidaContar(creepId, sc.nombre, sac), 0); }
     CreepCalculo.vidaAlDia(sc);   // ❤ si el cambio tocó el equipo o un estado con Vida +N (2026-11-06)
     const hpMax = num(sc.hpMax);
     const json = JSON.stringify(sc);

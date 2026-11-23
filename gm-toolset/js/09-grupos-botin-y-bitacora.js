@@ -115,17 +115,18 @@ function mapasGMEscuchar(){
 /* 🟢 / ⏸ ¿Está en el tablero? (2026-11-05, dueño: los tokens y los creeps de GM Tools van juntos): los tokens de creeps de cada mapa, en vivo.
    Solo se redibuja si cambia QUÉ creeps tienen token en un mapa (mover un token no redibuja nada). */
 let mapaActivoGM = CreepsMapas.PRINCIPAL;
-const tokensGM = new Map(), tokensGMEsc = new Map();
+const tokensGM = new Map(), tokensGMEsc = new Map(), tokensGMInfo = new Map();   // tokensGMInfo: mapa → (creep → {oculto, revelado})
 function tokensGMEscuchar(){
   if(!fbDb || !fbMiembro || !fbMiembro.gm) return;
   const ids = new Set(mapasOrdenadosGM().map(m => m.id));
-  for(const [id, corte] of tokensGMEsc) if(!ids.has(id)){ try{ corte(); }catch(e){} tokensGMEsc.delete(id); tokensGM.delete(id); }
+  for(const [id, corte] of tokensGMEsc) if(!ids.has(id)){ try{ corte(); }catch(e){} tokensGMEsc.delete(id); tokensGM.delete(id); tokensGMInfo.delete(id); }
   ids.forEach(id => {
     if(tokensGMEsc.has(id)) return;
     const ruta = id === CreepsMapas.PRINCIPAL ? 'tokens' : `mapas/${id}/tokens`;
     tokensGMEsc.set(id, fbDb.collection(fbRutaCampana(ruta)).onSnapshot(sn => {
-      const set = new Set();
-      sn.docs.forEach(d => { const t = d.data(); if(t && t.tipo === 'creep' && t.fichaId) set.add(t.fichaId); });
+      const set = new Set(), info = new Map();
+      sn.docs.forEach(d => { const t = d.data(); if(t && t.tipo === 'creep' && t.fichaId){ set.add(t.fichaId); const ya = info.get(t.fichaId); info.set(t.fichaId, {oculto: !!t.oculto && (!ya || ya.oculto), revelado: !!t.revelado || !!(ya && ya.revelado)}); } });
+      tokensGMInfo.set(id, info);   // 💀 ¿lo ven los jugadores? (gmCaidaPublica, js/11)
       const antes = tokensGM.get(id), firma = x => [...x].sort().join('|');
       tokensGM.set(id, set);
       if(!antes || firma(antes) !== firma(set)) renderAll();

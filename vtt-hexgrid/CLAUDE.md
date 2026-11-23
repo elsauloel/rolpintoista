@@ -2638,3 +2638,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   del turno libre; «▶ Empieza tu turno» (`inicioTurnoPendiente`) y el Provocado van marcados. El anillo dorado ya respetaba lo que ve cada pantalla.
   Para el GM, un personaje escondido ya no deja «▶ Aplicar por él» (salvo con 👁): se aplica solo al pasar el turno. Probado con clics en «Claude ·
   pruebas 2» (GM, J1, J2): Blanco J2 en sigilo y envenenado, y un creep en sigilo y envenenado. Dudas: P290.
+
+- **💀 Caer, el mismo corte en todos lados** (2026-11-23, P270): `modificarCreep` (js/09) usa `Combatiente.caerSiCayo` (el mismo que GM Tools, que desde hoy
+  también limpia al creep que cae ahí: gm-toolset/CLAUDE.md). Un personaje que cae desde la Botonera nueva (`bnRevisarVida`) o en su pase de turno
+  (`mantFijarHp`) ya perdía los estados en `FichaAcciones.revisarMuerte`; ahora además deja la línea «💀 X cayó: se le fueron N estados (…)»
+  (`caidaContarPj`, js/11), como `vidaCeroRevisar` (js/98).

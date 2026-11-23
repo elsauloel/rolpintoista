@@ -514,7 +514,8 @@ function bnUi(antes, comoGM){
 function bnRevisarVida(){
   const ankh = FichaAcciones.revisarAnkh(bn.S);
   if(ankh) toast(ankh === 'El Pacto' ? `😇 Zafaste de morir: te salvó el pacto (volvés con ${fmt(bn.S.hp)} HP, Titilando).` : `¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
-  FichaAcciones.revisarMuerte(bn.S);
+  const caida = FichaAcciones.revisarMuerte(bn.S);
+  caidaContarPj(bn.S, caida);   // 💀 se le fueron los estados: la línea de la Mesa, como js/98 (P270)
   if(typeof resurreccionRevisarPj === 'function') resurreccionRevisarPj(bn.fichaId, bn.S);   // ☥ si volvió, lo cuenta (js/123)
 }
 // Una tirada del personaje armada acá, a la Mesa a su nombre y con su `ficha` (P138). Como registrarTirada de la ficha, avisa
@@ -1491,7 +1492,13 @@ function mantFijarHp(S, v){
   FichaAcciones.fijarHp(S, v);
   const ankh = FichaAcciones.revisarAnkh(S);
   if(ankh) toast(ankh === 'El Pacto' ? `😇 ${(S.meta && S.meta.nombre) || 'Tu personaje'} zafó de morir: lo salvó el pacto (vuelve con ${fmt(S.hp)} HP, Titilando).` : `¡${ankh} se activó solo! ${(S.meta && S.meta.nombre) || 'Tu personaje'} revive con ${fmt(S.hp)} HP.`);
-  FichaAcciones.revisarMuerte(S);
+  caidaContarPj(S, FichaAcciones.revisarMuerte(S));   // 💀 (P270)
+}
+// 💀 Un personaje que cayó por un camino de esta pantalla (la Botonera nueva, el pase de turno) y perdió estados: la misma línea que js/98.
+function caidaContarPj(S, r){
+  if(!r || !r.cayo || !(r.sacados || []).length) return;
+  const txt = Combatiente.caidaTxt(((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje', r.sacados);
+  if(txt) setTimeout(() => { try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }, 0);
 }
 async function mantenimientoPersonaje(fichaId, numero){
   await editarPersonajeMapa(fichaId, async (S, o) => {

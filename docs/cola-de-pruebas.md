@@ -1723,8 +1723,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   los saca, ▶ Siguiente pasa de Blanco creep a Control mental 4 salteándolos y ▶ Iniciar combate arranca con Control mental 4. Dudas: P291.
 - **✅ explicado (2026-11-23) — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
   lo entienda»). Explicarlas con un ejemplo.
-- **⬜ en cola — 💀 Un creep que cae desde GM Tools también pierde sus estados (P270)** (dueño, 2026-11-22: «no debería ser así»; P270 decidida:
+- **✅ hecho (2026-11-23) — 💀 Un creep que cae desde GM Tools también pierde sus estados (P270)** (dueño, 2026-11-22: «no debería ser así»; P270 decidida:
   caer en 0 = se borran los estados).
+  *Resultado:* en GM Tools ningún camino los sacaba (el recuadro de HP, «Daño», el Mantenimiento con veneno, las habilidades…): solo el mapa
+  (`modificarCreep`). En vez de tocar cada camino, GM Tools mira cada creep contra la última vida que le vio (al redibujar y en cada vuelta del
+  guardado, `gmCaidasRevisar`, js/11): si pasó de tener vida a 0, se le van los estados con **el mismo corte que el mapa**
+  (`Combatiente.caerSiCayo`, nuevo, que ahora usa también `modificarCreep`; quedan lo del equipo, lo derivado y la Llama sin usar), toast al GM y la
+  línea «💀 X cayó: se le fueron N estados (…)» en la Mesa si los jugadores lo conocen (token no oculto, ya visto y sin Sigilo; si no, solo el toast).
+  Lo que llega del mapa ya viene limpio: no se repite la línea. **Otros caminos fuera del mapa**: la ficha suelta ya sacaba los estados al caer pero no
+  lo contaba (ahora sí, toast y Mesa, solo la pantalla que puede guardar al personaje); en el mapa, la Botonera nueva (`bnRevisarVida`) y el pase de
+  turno de un personaje (`mantFijarHp`) también los sacaban sin la línea: ahora la dejan (`caidaContarPj`, js/11). Las invocaciones se desinvocan al
+  caer. **Probado con clics** en «Claude · pruebas 2» (GM con GM Tools y el mapa abiertos, J1 y J2 con el mapa): Blanco creep con Veneno y Bendecido
+  (por datos) → «0» en su recuadro de HP de GM Tools: sin estados, una sola línea en la Mesa de GM Tools y de los mapas del GM y de J1; con Veneno 3
+  por turno y 2 de vida → «⟳ Pasar de ronda» de GM Tools (lo aplicó GM Tools): cayó, sin estados, una línea; con Sangrado y Afortunado → «999» en
+  «Daño»: igual. Con GM Tools abierto, la vida a 0 desde el mapa (la función del «HP directo», por datos) dio una sola línea (la del mapa). La ficha
+  suelta de Blanco J1 (Veneno y Bendecido por datos) → «0» en su vida: sin estados, una línea. Se devolvieron vidas, estados y el turno de GM Tools.
+  Duda: P292. 2 pruebas automáticas nuevas (1040).
 - **⬜ en cola — 🎯 Repasar la Apuntada de las ballestas (P271)** (dueño, 2026-11-22: «necesitaría repasar cómo está anotada la Apuntada para
   entender esto»). Explicarle cómo está y qué preguntaba P271.
 - **⬜ en cola — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
@@ -1939,6 +1953,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
   activo, primero sale «Si te movés, lo perdés. [Moverme igual] [Cancelar]» y recién si confirma se le ofrece al rival el ataque de oportunidad.
+
+- **⬜ en cola — Probar: 💀 un personaje que cae desde la Botonera del mapa o en su pase de turno** (2026-11-23, P270): ahora deja la línea «💀 X cayó:
+  se le fueron N estados (…)» (`caidaContarPj`, vtt-hexgrid/js/11); antes los sacaba sin contarlo. Probarlo con J1 envenenado y poca vida (⏭ Pasar
+  de ronda) y con un golpe que lo deja en 0 desde su Botonera: una sola línea, sin la repetida de js/98.
+- **⬜ en cola — Probar: 💀 un creep que cae desde GM Tools por una habilidad o un estado** (2026-11-23, P270): el corte es el mismo para cualquier
+  camino (`gmCaidasRevisar`), pero con clics solo se probaron el recuadro de HP, «Daño» y ⟳ Pasar de ronda. Falta: una habilidad que le cuesta vida,
+  un estado con daño al aplicarse, y un creep oculto o en Sigilo (tiene que salir solo el toast al GM, sin línea en la Mesa).
 
 ## En cola
 

@@ -1798,10 +1798,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Quemadura: ya la tenía, vuelve a 3 turnos», en la ficha 3; la abeja con el Muro tirado después de pasar su turno (30 → 25 → 23): en su inicio
   siguiente salió el renglón nuevo. Al final, todo como estaba (sin el Muro ni la habilidad, vidas, No2, SP, estados, la abeja y las posiciones;
   narrativo, sin orden de turnos). Capturas en la carpeta de la tanda. 2 pruebas automáticas nuevas (1051).
-- **⬜ en cola — 🐝 Las invocaciones en el orden de turnos, con su iniciativa** (dueño, 2026-11-22, P275: «una invocación debería ubicarse en la
+- **✅ hecho (2026-11-23) — 🐝 Las invocaciones en el orden de turnos, con su iniciativa** (dueño, 2026-11-22, P275: «una invocación debería ubicarse en la
   lista en el orden de turnos. Es más, agreguemos una función que al realizar una invocación, esta venga acompañada de una tirada de iniciativa y
   que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada de iniciativa»). Ver cómo está hoy (hay invocaciones
   con turno propio y otras fuera del orden, como la abeja); lo dudoso, como pregunta.
+  *Cómo estaba:* una invocación que aparecía en el mapa con el orden armado entraba al final con 0 y con Mareo de invocación, sin tirar nada; las que ya
+  estaban al «Traer tokens» entraban con 0 y nadie les tiraba. Al irse (muerta o sin turnos) salía del orden solo si lo veía la pantalla del GM; si no,
+  quedaba «(token borrado)».
+  *Resultado:* al aparecer su token con el orden armado, la pantalla del GM tira la Iniciativa de la invocación (sus datos, con lo fijo como la Prisa), la
+  tirada va a la Mesa («Iniciativa · Abeja de prueba», con dados 3D) y entra en su lugar: antes del primero que sacó menos (`OrdenTurnos.entrarConTirada`).
+  La Crónica dice con cuánto y dónde quedó, y el mareo. Si su lugar ya pasó en esta ronda, juega desde la próxima (P301). Al irse su token sale del orden
+  aunque lo haya borrado la pantalla del jugador (una sola vez, aunque lo pidan dos caminos). Dudas: P301–P304. **Probado con clics** en «Claude · pruebas 2»
+  (GM y Jugador 1; la abeja puesta con «🎭 Ponerlo en el mapa»): con el turno del Jugador 1 (6) sacó 4 y quedó después del Jugador 2 (5); con el Jugador 1
+  en 0 sacó 3, quedó antes que él, anotada como que ya jugó, y en la ronda siguiente le tocó su turno (mareada) después del creep; con «⏳ Turnos agotados →
+  🗑 Borrar token» se fue del mapa y del orden. Al final, todo como estaba (narrativo, sin orden, la abeja en su casilla, sus datos iguales). 2 pruebas
+  automáticas nuevas (1053).
 
 - **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) — 👥 Token suelto: probar lo que faltó** (dueño, 2026-11-22: «probar lo que no se probó»; va a pegar las reglas pronto). Con las
   reglas pegadas: que otro jugador y el GM lean una descripción guardada de verdad (mouse y 🪪), un token suelto creado por el GM, y el
@@ -2128,6 +2139,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   visto por el GM, tampoco la nombra; solo con la prueba automática (con clics se vio un personaje).
 - **⬜ en cola — Probar: 🔥 el renglón «le llegó fuera de su turno» con el texto final** (2026-11-23): con clics se vio con la primera redacción («se lo
   pusieron fuera de su turno… ya pegó al ponérselo»); la final («le llegó… ya pegó al llegar») solo con la prueba automática.
+- **⬜ en cola — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
+  la abeja con «🎭 Ponerlo en el mapa» (el mismo camino: aparece el token) y se fue con «Turnos agotados → Borrar»; falta invocarla con una habilidad que
+  invoca y que salga del orden al caer con la vida en 0.
 
 ## En cola
 

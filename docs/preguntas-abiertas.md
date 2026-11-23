@@ -1979,7 +1979,7 @@ igual. ¿Está bien ese orden, o preferís que la zona vaya primero (o que se pu
 
 ### P275 — 🐝 Una invocación fuera del orden de turnos parada en una zona: ¿también adentro del cartel? (2026-11-22, Claude)
 
-> ✅ **Decidida (dueño, 2026-11-22):** «una invocación debería ubicarse en la lista en el orden de turnos», con su propia tirada de iniciativa al invocarse (en la cola).
+> ✅ **Decidida (dueño, 2026-11-22):** «una invocación debería ubicarse en la lista en el orden de turnos», con su propia tirada de iniciativa al invocarse (en la cola). **Aplicado (2026-11-23):** al aparecer con el orden armado tira su iniciativa (va a la Mesa) y entra en su lugar; al irse, sale del orden. Dudas: P301–P304.
 Visto en el mapa: la abeja de Blanco J1 (una invocación que **no** está en el orden de turnos) estaba dentro de una zona. Como no tiene turno propio,
 la zona le pega al pasar de ronda, con su cartel de siempre, en la pantalla de su dueño. Ese cartel queda esperando y, cuando después empieza el turno
 del personaje, sale «▶ Empieza tu turno» y se ven los dos a la vez (son de dos fichas distintas). Si el jugador toca el de la abeja y se abre el
@@ -2284,3 +2284,40 @@ también cuando quien lo recibe tiene resistencia 0 (lo vi en la pantalla del GM
 creeps, y ahí no hay nada que frene). Con un número se lee «(lo frena su resistencia al fuego 2)»; con 0 queda como si algo frenara. Opciones:
 (a) con 0, no nombrar la resistencia («le entra 1d4 de daño de fuego»); (b) dejarla como recordatorio de que existe; (c) «(sin resistencia al fuego)».
 En una invocación (que no tiene el número a mano) se seguiría diciendo como hoy.
+
+### P301 — 🐝 Una invocación que entra al orden en un lugar que ya pasó en esta ronda: ¿juega recién en la próxima? (2026-11-23, Claude, cola de programación)
+
+Desde hoy, al invocar con el orden de turnos armado, la invocación tira su iniciativa y entra en su lugar según la tirada (P275). Si ese lugar queda
+**antes** de quien tiene el turno (por ejemplo, el Jugador 1 tiene 0, invoca en su turno y la abeja saca 3), su lugar ya pasó en esta ronda.
+**Elegí lo más conservador: en esta ronda no juega y juega desde la próxima** (nadie juega fuera de su lugar). La Crónica lo dice: «Su lugar ya pasó
+en esta ronda: juega desde la próxima». Ojo con el Mareo de invocación: su primer turno (el mareado) es el de la próxima ronda, así que recién actúa
+de verdad en la siguiente. Antes entraba siempre al final, jugaba mareada en esta misma ronda y actuaba en la próxima. Opciones:
+(a) como quedó: juega desde la próxima ronda;
+(b) en esta ronda juega igual, al final (o justo después de quien tiene el turno), y desde la próxima en su lugar;
+(c) como (a), pero si su lugar ya pasó, entra sin Mareo (para que no pierda una ronda más que antes).
+Salida a mano: el GM la mueve con ▲▼ o le da el turno con clic derecho en su nombre.
+
+### P302 — 🐝 ¿Quién tira la iniciativa de la invocación? (2026-11-23, Claude, cola de programación)
+
+Pediste que la invocación «venga acompañada de una tirada de iniciativa» y que se ubique sola. **Quedó automática: la tira la pantalla del GM** al ver
+aparecer el token (como hasta ahora la metía al final del orden), con la Iniciativa de la invocación (la de sus datos: Agilidad y lo que la suba, más
+lo fijo como la Prisa). La tirada va a la Mesa como cualquier tirada de iniciativa («Iniciativa · Abeja de prueba», con los dados 3D), firmada por el GM.
+Choca un poco con la regla «las tiradas las hace el involucrado»: si preferís, al invocar le puede salir al jugador un botón «🎲 Tirar la iniciativa de
+<invocación>» y recién al tocarlo entra al orden. Opciones: (a) automática, como quedó; (b) la tira el jugador con su botón (si no la tira en un rato,
+el GM puede tirarla por él). Además: si el GM no tiene el mapa abierto, la invocación no entra al orden (igual que antes); si no se pueden leer sus datos,
+entra al final con 0 y se le avisa al GM para que escriba el número.
+
+### P303 — 🐝 Empate de iniciativa entre la invocación y alguien que ya estaba (2026-11-23, Claude, cola de programación)
+
+Si la invocación saca lo mismo que alguien del orden (por ejemplo, su invocador), **queda después de los que ya estaban** (como Ordenar, que deja los
+empates en el orden previo). Opciones: (a) como quedó, después; (b) antes; (c) siempre justo después de su invocador, saque lo que saque si empata con él;
+(d) desempate al azar o por Agilidad.
+
+### P304 — 🐝 Las invocaciones que ya estaban en el mapa: ¿también tiran iniciativa? (2026-11-23, Claude, cola de programación)
+
+Lo nuevo vale para la invocación que **aparece** en el mapa con el orden ya armado. Quedan afuera, sin cambios:
+1. Las que ya están en el mapa cuando el GM arma el orden con «Traer tokens»: entran con 0 y ni «🎲 Tirar iniciativa» del jugador ni la del GM («de los
+   creeps») les tira, así que con Ordenar quedan últimas. ¿Querés que el «🎲 Tirar iniciativa» del jugador tire también la de sus invocaciones del orden?
+2. Las que quedaron **fuera** del orden (como la Abeja de prueba hasta hoy: el GM la sacó con ✕, o estaba antes de armar el orden): siguen fuera, sin
+   turno propio (les toca con su dueño o al pasar de ronda). ¿Pasan todas a tener turno, o se deja como decisión del GM?
+3. Una invocación con el token puesto de antemano (sin invocar) que después se invoca: el token no aparece de nuevo (ya estaba), así que no tira.

@@ -1138,15 +1138,39 @@ const sobrepesoDeToken = t => {
   return e ? 1 : 0;
 };
 
-/* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra al final y con «Mareo de invocación» (su primer turno no hace nada).
-   Lo hace la pantalla del GM al ver aparecer el token. */
+/* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra con «Mareo de invocación» (su primer turno no hace nada).
+   Lo hace la pantalla del GM al ver aparecer el token.
+   🐝 Con su tirada de iniciativa (2026-11-23, dueño, P275: «al realizar una invocación, esta venga acompañada de una tirada de iniciativa y que
+   automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada»): antes entraba al final con 0. Ahora tira la Iniciativa
+   de la invocación (la de sus datos, `InvCalculo.statValor(inv, 'ini')`, con lo fijo como la Prisa sumado al resultado), la tirada va a la Mesa
+   como cualquier tirada de iniciativa («Iniciativa · <invocación>») y entra en su lugar (`OrdenTurnos.entrarConTirada`): antes del primero que
+   sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima (P301). Si no se pueden leer sus datos, entra al final con 0, como
+   antes, y se avisa al GM para que escriba el número a mano. La tira la pantalla del GM (P302). */
+async function invocacionIniciativa(t){
+  try{
+    if(typeof bnCargarPiezas === 'function') await bnCargarPiezas();   // (InvCalculo no se carga de entrada: js/11)
+    const inv = await invDeToken(t);
+    if(!inv || typeof InvCalculo === 'undefined') return null;
+    const x = InvCalculo.migrar(structuredClone(inv));
+    const base = num(InvCalculo.statValor(x, 'ini')), fijo = InvCalculo.iniFijo(x);
+    const fo = formulaParaValor(base);
+    return Combatiente.conIniFijo((fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0}, fijo && fijo.val ? fijo : null);
+  }catch(err){ console.error('No se pudo tirar la iniciativa de la invocación:', err); return null; }
+}
 async function invocacionAlOrden(tokenId){
   const t = tokens.get(tokenId);
   if(!soyGM || !t || !iniciativa.orden.length || iniciativa.orden.some(o => o.id === tokenId)) return;
   if(!String(t.fichaId || '').includes(SEP_INVOCACION) || !iniciativaOcupaLugar(tokenId)) return;
-  const ok = await guardarIniciativa({orden: [...iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}), {id: tokenId, valor: 0}]});
-  if(!ok) return;
+  const r = await invocacionIniciativa(t);
+  if(!tokens.has(tokenId) || iniciativa.orden.some(o => o.id === tokenId)) return;   // (mientras se tiraba se fue, o ya entró)
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const nombre = nombreDe(t);
+  const e = OrdenTurnos.entrarConTirada(iniciativa, {id: tokenId, valor: r ? num(r.total) : 0}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa), alFinal: !r});
+  if(!e) return;
+  const ok = await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron});
+  if(!ok) return;
+  if(r && !ocultoParaMesa(tokenId)) mesaPublicar(`Iniciativa · ${nombre}`, {...r, ficha: fichaId});
+  if(!r) toast(`🐝 ${nombre} entró al final del orden con 0: no se pudo leer su Iniciativa. Escribí el número a mano.`);
   const sinMareo = !!((vinculo(t) || {}).resumen || {}).sinMareo;   // 👁 el Ojo de Kicillof entra sin mareo (2026-10-20)
   try{
     if(!sinMareo) await editarPersonajeMapa(fichaId, S => {
@@ -1159,8 +1183,19 @@ async function invocacionAlOrden(tokenId){
       return true;
     });
   }catch(err){ console.error('No se pudo marear a la invocación nueva:', err); }
-  momentoAbrir({tipo: 'turno', icono: '✨', titulo: `${nombreDe(t)} entra al orden de turnos`, estado: 'listo',
-    datos: {lineas: [sinMareo ? 'Al final del orden, sin mareo: actúa en su primer turno.' : 'Al final del orden, con Mareo de invocación: en su primer turno no actúa (reacciona igual).']}});
+  momentoAbrir({tipo: 'turno', icono: '✨', titulo: `${nombre} entra al orden de turnos`, estado: 'listo',
+    datos: {lineas: invocacionAlOrdenLineas(e, r, sinMareo)}});
+}
+// Lo que cuenta la Crónica al entrar (la usan las pruebas): dónde quedó, con qué sacó, si juega en esta ronda y el mareo.
+function invocacionAlOrdenLineas(e, r, sinMareo){
+  const antes = e.orden[e.lugar - 1], despues = e.orden[e.lugar + 1];
+  const nom = f => { const tt = f && tokens.get(f.id); return tt && !ocultoParaMesa(f.id) ? nombreDe(tt) : ''; };
+  const donde = e.lugar === 0 ? 'primera del orden' : nom(antes) ? `después de ${nom(antes)}` : nom(despues) ? `antes de ${nom(despues)}` : `${e.lugar + 1}.ª del orden`;
+  return [
+    r ? `🎲 Sacó ${fmt(num(r.total))} de iniciativa: queda ${donde}.` : 'Sin su Iniciativa a mano: entra al final del orden (el GM escribe el número).',
+    ...(e.yaPaso ? ['Su lugar ya pasó en esta ronda: juega desde la próxima.'] : []),
+    sinMareo ? 'Sin mareo: actúa en su primer turno.' : 'Con Mareo de invocación: en su primer turno no actúa (reacciona igual).',
+  ];
 }
 
 function renderIniciativa(){

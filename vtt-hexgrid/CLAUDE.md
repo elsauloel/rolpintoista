@@ -1018,6 +1018,12 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   ⏭ Pasar de ronda no les hace pasar el turno), `iniciativaIniciarCombate` (`OrdenTurnos.primero` y los No2 llenos), `iniciativaPendientesRonda`,
   `invocacionAlOrden` y `refuerzoAlOrden` (js/31). **Un camino nuevo que sume tokens al orden tiene que pasar por esta regla.** No hay botón para sumar una
   fila suelta a mano (P291). Probado con clics en «Claude · pruebas 2».
+- **🐝 Una invocación entra al orden con su tirada** (2026-11-23, dueño, P275): `invocacionAlOrden` (js/04, la pantalla del GM al aparecer el token de una
+  invocación con el orden armado) tira su Iniciativa (`invocacionIniciativa`: `bnCargarPiezas` + `invDeToken` + `InvCalculo.statValor(x, 'ini')` +
+  `Combatiente.conIniFijo`), la publica en la Mesa («Iniciativa · <invocación>», salvo oculta) y la ubica con `OrdenTurnos.entrarConTirada` (si su lugar ya
+  pasó en la ronda, a `actuaron`: juega desde la próxima); sin datos, al final con 0 y un aviso al GM. Mareo y Crónica como antes
+  (`invocacionAlOrdenLineas`). Al borrarse el token de una invocación que está en el orden, la pantalla del GM la saca (`escucharTokens` js/09 →
+  `temporalFueraDelOrden` js/54, que ahora va una sola vez por token: `fueraDelOrdenSacando`). Dudas: P301–P304. Probado con clics en «Claude · pruebas 2».
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

@@ -133,6 +133,11 @@ function escucharTokens(){
         if(t && t.tipo === 'creep' && t.fichaId) creepMapaRevisar(t.fichaId, mapaDeEsteListener);
       }
       if(ch.type === 'removed'){
+        // 🐝 Una invocación que se va del mapa (murió, se terminaron sus turnos, la sacaron) sale del orden de turnos (2026-11-23, P275): lo hace la
+        // pantalla del GM, aunque el token lo haya borrado la del jugador (antes quedaba la fila «(token borrado)»). (js/54 temporalFueraDelOrden)
+        const ido = tokens.get(ch.doc.id);
+        if(escucharTokens.listo && soyGM && mapaDeEsteListener === mapaMostrado && ido && String(ido.fichaId || '').includes(SEP_INVOCACION) && typeof temporalFueraDelOrden === 'function'
+          && typeof iniciativa !== 'undefined' && iniciativa.orden.some(o => o.id === ch.doc.id)) setTimeout(() => temporalFueraDelOrden(ch.doc.id), 0);
         tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
         if(seleccion === ch.doc.id) seleccion = null;
         return;

@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261122cola49"></script>
-<script src="orden-turnos.js?v=20261123ocupa"></script>
+<script src="orden-turnos.js?v=20261123cola63"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2851,6 +2851,29 @@ prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, �
   cierto(/SEP_INVOCACION\) \|\| !iniciativaOcupaLugar\(tokenId\)\) return;/.test(t04), 'invocaciones');
   cierto(/iniciativa\.orden\.filter\(o => iniciativaOcupaLugar\(o\.id\)\)/.test(t86), 'Ordenar');
   cierto(/!iniciativaOcupaLugar\(idNuevo\)\) return;/.test(t31), 'refuerzos');
+});
+prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en su lugar, el turno sigue con quien lo tenía, si su lugar ya pasó juega desde la próxima', () => {
+  const E = OrdenTurnos.entrarConTirada, ids = r => r.orden.map(o => o.id).join('');
+  const orden = [{id: 'a', valor: 15}, {id: 'b', valor: 10}, {id: 'c', valor: 5}];
+  const r1 = E({orden, turno: 1, actuaron: ['a']}, {id: 'x', valor: 7}, {enCurso: true});     // después de b (que juega): esta ronda
+  const r2 = E({orden, turno: 1, actuaron: ['a']}, {id: 'x', valor: 12}, {enCurso: true});    // antes de b (que juega): ya pasó
+  const r3 = E({orden, turno: 1}, {id: 'x', valor: 10}, {enCurso: true});                       // empate con b: después de b
+  const r4 = E({orden, turno: 0}, {id: 'x', valor: 20}, {enCurso: false});                       // combate sin empezar: primera, no «ya pasó»
+  const r5 = E({orden, turno: 2}, {id: 'x', valor: 99}, {enCurso: true, alFinal: true});        // sin tirada: al final con 0
+  const r6 = E({orden, turno: 2, libre: {id: 'c', vuelve: 'a'}}, {id: 'x', valor: 12}, {enCurso: true});   // turno libre: cuenta desde quien lo tenía (a)
+  igual([ids(r1), r1.turno, r1.yaPaso, r1.actuaron, ids(r2), r2.turno, r2.yaPaso, r2.actuaron, ids(r3), r3.lugar, ids(r4), r4.turno, r4.yaPaso,
+    ids(r5), r5.orden[3].valor, r5.yaPaso, ids(r6), r6.turno, r6.yaPaso, E({orden}, {id: 'a', valor: 3}), E({orden}, null)],
+    ['abxc', 1, false, ['a'], 'axbc', 2, true, ['a', 'x'], 'abxc', 2, 'xabc', 1, false,
+     'abcx', 0, false, 'axbc', 3, false, null, null]);
+});
+prueba('🐝 El mapa tira la iniciativa de la invocación al entrar y la saca del orden al irse (2026-11-23, P275)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t09 = await leer('09-colocar-y-panel.js'), t54 = await leer('54-soltarse-al-empezar.js');
+  cierto(/InvCalculo\.statValor\(x, 'ini'\)/.test(t04) && /Combatiente\.conIniFijo\(/.test(t04), 'tira la Iniciativa de sus datos, con lo fijo');
+  cierto(/OrdenTurnos\.entrarConTirada\(iniciativa,/.test(t04), 'entra en su lugar');
+  cierto(/mesaPublicar\(`Iniciativa · \$\{nombre\}`/.test(t04), 'la tirada va a la Mesa');
+  cierto(/includes\(SEP_INVOCACION\) && typeof temporalFueraDelOrden === 'function'/.test(t09), 'al irse el token, sale del orden (pantalla del GM)');
+  cierto(/fueraDelOrdenSacando\.has\(id\)/.test(t54), 'una sola vez aunque lo pidan dos caminos');
 });
 prueba('⏭ Pasar de ronda (2026-11-21): quiénes faltan en la ronda (sin los que ya jugaron ni los caídos; en un turno libre, desde quien lo tenía)', () => {
   const orden = ['a', 'b', 'c', 'd', 'e'].map(id => ({id}));

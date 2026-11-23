@@ -456,8 +456,14 @@ async function turnosAgotadosPreguntar(t, ficha, invId){   // → true si decidi
   return true;   // (borrar: lo anuncia el vigilante de arriba al sacar el token)
 }
 // Su lugar en el orden de turnos también se va: si justo era su turno, primero pasa al siguiente (con su inicio de turno).
+// (2026-11-23) Una sola vez por token: lo pueden pedir a la vez el vigilante de arriba y la salida del token (js/09), y si era su turno, pasaría dos.
+const fueraDelOrdenSacando = new Set();
 async function temporalFueraDelOrden(id){
-  if(!iniciativa.orden.some(o => o.id === id)) return;
+  if(!iniciativa.orden.some(o => o.id === id) || fueraDelOrdenSacando.has(id)) return;
+  fueraDelOrdenSacando.add(id);
+  try{ await temporalFueraDelOrdenYa(id); }finally{ setTimeout(() => fueraDelOrdenSacando.delete(id), 5000); }
+}
+async function temporalFueraDelOrdenYa(id){
   if(iniciativa.orden[iniciativa.turno] && iniciativa.orden[iniciativa.turno].id === id){ try{ await iniciativaSiguiente(); }catch(e){ console.error(e); } }
   const i = iniciativa.orden.findIndex(o => o.id === id);
   if(i < 0) return;

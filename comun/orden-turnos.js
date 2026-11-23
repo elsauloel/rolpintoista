@@ -118,6 +118,33 @@ const OrdenTurnos = (() => {
     if(t.tipo === 'creep' && pub && Math.round(num(pub.estandarteRadio)) > 0) return false;
     return true;
   }
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar};
+  /* 🐝 Alguien que entra al orden a mitad de combate con su tirada (2026-11-23, dueño, P275: «al realizar una invocación, esta venga acompañada de
+     una tirada de iniciativa y que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada»). Función pura.
+     `ini` = el documento de la iniciativa ({orden: [{id, valor, oculto?}], turno, actuaron, libre?}); `fila` = {id, valor}; `o.enCurso` = el combate
+     ya empezó (OrdenTurnos.enCurso); `o.alFinal` = sin tirada: al final, como antes (valor 0).
+     · Va justo antes del primero que sacó MENOS; con el mismo número, después de los que ya estaban (como Ordenar: los empates quedan en el orden
+       previo; P303).
+     · El turno sigue con quien lo tenía (por id; en un turno libre, también).
+     · Si el combate está en curso y su lugar ya pasó en esta ronda (queda antes de quien tiene el turno —o de quien lo tenía, en un turno libre—),
+       en esta ronda no juega: queda anotado como que ya jugó y juega desde la próxima (lo más conservador: nadie juega fuera de su lugar; P301).
+     → {orden, turno, actuaron, lugar (índice donde quedó), yaPaso} o null si ya estaba. */
+  function entrarConTirada(ini, fila, o){
+    o = o || {};
+    const orden0 = ini && Array.isArray(ini.orden) ? ini.orden : [];
+    if(!fila || !fila.id || orden0.some(x => x && x.id === fila.id)) return null;
+    const turno0 = Math.round(num(ini.turno)), v = num(fila.valor);
+    const activo = orden0[turno0] ? orden0[turno0].id : null;
+    const base = ini.libre && ini.libre.vuelve ? ini.libre.vuelve : activo;
+    const kBase = orden0.findIndex(x => x && x.id === base);
+    let k = o.alFinal ? -1 : orden0.findIndex(x => x && num(x.valor) < v);
+    if(k < 0) k = orden0.length;
+    const orden = orden0.slice();
+    orden.splice(k, 0, {id: fila.id, valor: o.alFinal ? 0 : v});
+    const turno = activo ? Math.max(0, orden.findIndex(x => x && x.id === activo)) : turno0;
+    const yaPaso = !!o.enCurso && kBase >= 0 && k <= kBase;
+    const actuaron = [...new Set([...(Array.isArray(ini.actuaron) ? ini.actuaron : []), ...(yaPaso ? [fila.id] : [])])];
+    return {orden, turno, actuaron, lugar: k, yaPaso};
+  }
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

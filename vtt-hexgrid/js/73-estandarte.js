@@ -129,7 +129,7 @@ async function estandarteCrear(sc, e, celda, tOrig, origId, h){   // h: la habil
   const col = fbDb.collection(fbRutaCampana('creeps'));
   const nuevo = col.doc();
   const color = sil ? TOTEM_VIOLETA : ESTANDARTE_CARMESI;
-  const nombre = `${sil ? 'Tótem de silencio' : 'Estandarte'} de ${String(sc.nombre || 'creep').replace(/\s*\((auditar|copia|refuerzo)\)\s*$/i, '')}`.slice(0, 60);
+  const nombre = ZonaDetalle.nombreInerte(sil, h && h.nombre);   // 🪧 sin «de <creep>» (P281): quien lo clavó, en «Ver detalle», con su regla (P259 4)
   // Todo en 1 y la vida por un estado propio (la vida de un creep sale de la Constitución: con 1, 5 de vida + lo del estado); sin resistencias.
   const est = {id: uidCorto(), nombre: sil ? 'Tótem' : 'Estandarte', polaridad: 'otro', permanente: true, turnos: 0, activo: true, stacks: 1, hpTurno: 0,
     mods: [{stat: 'hpmax', val: vida - 5}, {stat: 'resmg', val: -1}, {stat: 'rescc', val: -1}, {stat: 'resm', val: -1}],
@@ -137,7 +137,7 @@ async function estandarteCrear(sc, e, celda, tOrig, origId, h){   // h: la habil
       : `Un estandarte clavado en el piso: no ataca ni se mueve, no esquiva y no tiene defensas ni resistencias. Mientras siga en pie, los aliados de ${sc.nombre} a ${radio} casillas o menos suman +${pdg} a la Probabilidad de Golpe y +${dano} al daño.`};
   const ficha = {id: nuevo.id, nombre, nivel: n, con: 1, fue: 1, agl: 1, des: 1, esp: 1, hp: vida, hpMax: vida, defensa: 0, armadmg: 0, crit: [0, 0, 0, 0, 0],
     equipo: [], habilidades: [], estados: [est], cinturon: [], pasivas: [], tipoCriatura: 'Otro', tipoCriaturaOtro: 'Estandarte', oroBase: 0, jefe: false,
-    mapa: mapaMostrado, recompensado: true, escalaTipos: 2, notas: sil ? `Tótem de silencio de ${sc.nombre}: sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP mientras siga en pie.` : `Estandarte de guerra de ${sc.nombre}: sus aliados a ${radio} casillas o menos pegan mejor mientras siga en pie.`,
+    mapa: mapaMostrado, recompensado: true, escalaTipos: 2, notas: ZonaDetalle.notasInerte(sil, radio),
     estandarte: {de: sc.id, deNombre: String(sc.nombre || '').slice(0, 60), con: String((h && h.nombre) || '').slice(0, 60), radio, ...(sil ? {pdg: 0, dano: 0, silencio: true} : {pdg, dano})}};
   const imagen = sil ? totemImagen() : estandarteImagen();
   const json = JSON.stringify(ficha);
@@ -176,11 +176,31 @@ async function estandarteQuitar(id, t, motivo){
     try{ momentoAbrir({tipo: 'estandarte', icono: ic, titulo: `Rompieron ${nom}`, resultado: sil ? 'Sus rivales ya pueden volver a usar habilidades que cuestan SP.' : 'Sus aliados ya no suman el bonus.', estado: 'listo', datos: {centro: true}}); }catch(err){}
   }
 }
+// 🪧 Los clavados antes de P281 (2026-11-23) se llamaban «Tótem de silencio de <creep>» / «Estandarte de <creep>»: la pantalla del GM, al verlos, les
+// cambia el nombre (el del token, el de su ficha y su nota) por el de la habilidad, una vez. Quien lo clavó sigue en su ficha (`estandarte.de`).
+const estandartesRenombrados = new Set();
+async function estandarteRenombrar(id, t){
+  const p = creepPrivadoDe(t.fichaId), e = p && p.estandarte;
+  if(!e) return;
+  const sil = !!e.silencio, v = vinculo(t) || {};
+  const nom = x => ZonaDetalle.nombreInerte(sil, e.con, x, e.deNombre);
+  const nuevo = nom(p.nombre);
+  const cambia = x => x !== undefined && x !== null && x !== '' && nom(x) !== String(x);
+  const notas = ZonaDetalle.notasInerte(sil, e.radio, p.notas, e.deNombre);
+  if(!cambia(t.nombre) && !cambia(v.nombre) && !cambia(p.nombre) && notas === String(p.notas || '')) return;
+  estandartesRenombrados.add(t.fichaId);
+  try{
+    if(cambia(t.nombre)) await coleccionTokens().doc(id).update({nombre: nom(t.nombre)});
+    if(cambia(p.nombre) || notas !== String(p.notas || '')) await modificarCreep(t.fichaId, x => { x.nombre = nom(x.nombre); x.notas = ZonaDetalle.notasInerte(sil, e.radio, x.notas, e.deNombre); });
+    if(cambia(v.nombre)) await fbDb.doc(fbRutaCampana(`creeps/${t.fichaId}`)).update({nombre: nom(v.nombre)});
+  }catch(err){ console.error('No se pudo cambiar el nombre del estandarte:', err); }
+}
 // La pantalla del GM saca los que se rompieron (0 de vida).
 const estandartesQuitando = new Set();
 setInterval(() => {
   if(!soyGM || !fbDb) return;
   tokens.forEach((t, id) => {
+    if(estandarteInfo(t) && !estandartesRenombrados.has(t.fichaId)) estandarteRenombrar(id, t);
     if(!estandarteInfo(t) || estandarteEnPie(id, t) || estandartesQuitando.has(id)) return;
     estandartesQuitando.add(id);
     estandarteQuitar(id, t, 'roto').finally(() => setTimeout(() => estandartesQuitando.delete(id), 5000));

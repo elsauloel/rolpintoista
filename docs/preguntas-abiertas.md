@@ -2030,6 +2030,7 @@ vida a mano lo levanta sin él?
 ### P281 — 🤐 El nombre del tótem o del estandarte delata a quien lo clavó (2026-11-22, Claude)
 
 > ✅ **Decidida (dueño, 2026-11-22):** «correcto, sacale el nombre del creep» al token del tótem y del estandarte (en la cola).
+> ✅ **Aplicada (2026-11-23):** el token, su ficha y su nota se llaman como la habilidad («Estandarte de guerra», «Tótem de silencio»). Los ya clavados con el nombre viejo los renombra solo la pantalla del GM al verlos. «Ver detalle» sigue diciendo de quién es con la regla de P259 (4). Duda que salió: P311.
 El «Ver detalle» nuevo (P259 (4)) no nombra a quien clavó el tótem si esa pantalla no lo ve («Alguien»), pero **el token** se llama «Tótem de silencio
 de <creep>» / «Estandarte de <creep>» (así se crea desde el 2026-10-24), y ese nombre se ve debajo del token y en el cartel de arriba. ¿Se le saca
 el nombre del creep al token («Tótem de silencio», a secas)?
@@ -2387,3 +2388,8 @@ Con el cambio de P278, en el menú de un token de personaje hay dos 🤝, en ani
 Hacen cosas parecidas pero con reglas distintas. Opciones: (a) dejarlo así (los dos son «pasar cosas», que es lo que pidió el dueño); (b) diferenciar
 uno (por ejemplo, el del GM con 🤝 y el de mano a mano con 🫴, o al revés). Mientras, quedó (a).
 
+### P311 — 📣 El aviso de la Mesa al clavar un tótem o un estandarte nombra al creep aunque esté escondido (2026-11-23, Claude, de P281)
+
+Con P281 el token ya no nombra al creep, y «Ver detalle» dice «Alguien» si quien lo clavó no está a la vista. Pero al clavarlo, la Mesa y la Crónica
+siempre dicen «Blanco creep clava un tótem de silencio…» (y el ⚡ con el nombre de la habilidad), aunque el creep esté oculto o en sigilo. ¿Se hace como
+con otras acciones de un creep escondido (una frase incierta, «Alguien clava un tótem…», o solo para el GM), o queda así? Mientras, quedó como estaba.

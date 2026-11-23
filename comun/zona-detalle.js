@@ -315,6 +315,27 @@ const ZonaDetalle = (() => {
     return {icono: sil ? '🤐' : '🚩', titulo: (ctx.autor && ctx.autor.escondido ? '' : ctx.nombre) || (sil ? 'Tótem de silencio' : 'Estandarte de guerra'), esencial, filas, descripcion: '', descripcionNo: ''};
   }
 
+  /* 🪧 El nombre del token de un tótem o un estandarte (P281, dueño, 2026-11-22: «correcto, sacale el nombre del creep»): el de la habilidad con que se
+     clavó («Tótem de silencio», «Estandarte de guerra»), sin «de <creep>». `actual`: el nombre que tiene hoy; los clavados antes se llamaban «Tótem de
+     silencio de <creep>» / «Estandarte de <creep>» y, con `deNombre` (quien lo clavó), se reconocen y pasan al nombre nuevo. Otro nombre queda como está
+     (uno que le puso el GM a mano, por ejemplo). Sin `actual`: el nombre para uno nuevo. */
+  function nombreInerte(silencio, habilidad, actual, deNombre){
+    const limpio = String(habilidad || '').trim().slice(0, 60) || (silencio ? 'Tótem de silencio' : 'Estandarte de guerra');
+    if(actual === undefined || actual === null) return limpio;
+    const quien = String(deNombre || '').replace(/\s*\((auditar|copia|refuerzo)\)\s*$/i, '');
+    const viejo = quien ? `${silencio ? 'Tótem de silencio' : 'Estandarte'} de ${quien}`.slice(0, 60) : '';
+    return viejo && String(actual) === viejo ? limpio : String(actual);
+  }
+  // Su nota (la 🪪, que ven todos): tampoco nombra a quien lo clavó. Con `actual` y `deNombre`: la nota vieja («… de <creep>: …») pasa a la nueva; otra, igual.
+  function notasInerte(silencio, radio, actual, deNombre){
+    const r = Math.max(1, Math.round(Number(radio)) || 3);
+    const nueva = silencio ? `Tótem de silencio: los rivales de quien lo clavó a ${r} casillas o menos no pueden usar habilidades que cuestan SP mientras siga en pie.`
+      : `Estandarte de guerra: los aliados de quien lo clavó a ${r} casillas o menos pegan mejor mientras siga en pie.`;
+    if(actual === undefined || actual === null) return nueva;
+    const viejo = `${silencio ? 'Tótem de silencio' : 'Estandarte de guerra'} de ${String(deNombre || '')}:`;
+    return deNombre && String(actual).startsWith(viejo) ? nueva : String(actual);
+  }
+
   /* 📖 La tarjeta en HTML, con el glosario al pasar el mouse (2026-11-22, dueño: «en el menú de "Ver detalle" de las trampas y las zonas… le agregaría
      el glosario con hover. Por ejemplo… dice que quedás expuesto, pero ni yo me acuerdo el detalle de expuesto»). Los términos que tienen entrada en
      comun/glosario.js (estados, resistencias, PdG, Defensa, Evasión, fuego amigo, Mantenimiento…) se marcan UNA vez en toda la tarjeta (la primera en que
@@ -341,6 +362,6 @@ const ZonaDetalle = (() => {
       `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${A_MANO}» = ese dato no está guardado ahí.</div>`;
   }
 
-  return {tiene, armar, armarInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, A_MANO};
+  return {tiene, armar, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

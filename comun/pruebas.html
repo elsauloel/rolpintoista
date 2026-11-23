@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261123c66"></script>
+<script src="zona-detalle.js?v=20261123p281"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261123c66"></script>
@@ -9965,6 +9965,24 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     // Lo público del creep-estandarte lleva de quién es y con qué (CreepCalculo.tarjetaPublica).
     const tp = CreepCalculo.tarjetaPublica(creepPrueba({estandarte: {de: 'c9', deNombre: 'Goblin jefe', con: 'Estandarte de guerra', radio: 3, pdg: 3, dano: 5}}));
     igual([tp.estandarteDe, tp.estandarteDeId, tp.estandarteCon, tp.estandarteRadio], ['Goblin jefe', 'c9', 'Estandarte de guerra', 3]);
+  });
+  prueba('🪧 El nombre del tótem y del estandarte no delata al creep (P281): el de la habilidad; los clavados antes («… de <creep>») pasan al nuevo', async () => {
+    const N = ZonaDetalle.nombreInerte, T = ZonaDetalle.notasInerte;
+    igual([N(false, 'Estandarte de guerra'), N(true, 'Tótem de silencio'), N(false, ''), N(true)], ['Estandarte de guerra', 'Tótem de silencio', 'Estandarte de guerra', 'Tótem de silencio']);
+    // Los viejos: con quien lo clavó (también con «(copia)» o «(refuerzo)», que el nombre viejo no llevaba).
+    igual(N(false, 'Estandarte de guerra', 'Estandarte de Goblin jefe', 'Goblin jefe'), 'Estandarte de guerra');
+    igual(N(true, '', 'Tótem de silencio de Chamán', 'Chamán (copia)'), 'Tótem de silencio');
+    igual(N(true, 'Tótem de silencio', 'Tótem de silencio', 'Chamán'), 'Tótem de silencio');   // ya está bien: igual
+    igual(N(false, 'Estandarte de guerra', 'Bandera del capitán', 'Goblin jefe'), 'Bandera del capitán');   // uno renombrado a mano: no se toca
+    igual(N(false, 'Estandarte de guerra', 'Estandarte de Goblin jefe', ''), 'Estandarte de Goblin jefe');   // sin saber de quién era: no se adivina
+    const nota = T(true, 3);
+    ok(!/Chamán/.test(nota) && /quien lo clavó a 3 casillas/.test(nota));
+    igual(T(false, 3, 'Estandarte de guerra de Goblin jefe: sus aliados a 3 casillas o menos pegan mejor mientras siga en pie.', 'Goblin jefe'), T(false, 3));
+    igual(T(false, 3, 'Una nota del GM', 'Goblin jefe'), 'Una nota del GM');
+    // El mapa: lo nuevo se crea así, y la pantalla del GM renombra los viejos.
+    const t73 = await (await fetch('../vtt-hexgrid/js/73-estandarte.js', {cache: 'no-store'})).text();
+    ok(/const nombre = ZonaDetalle\.nombreInerte\(sil, h && h\.nombre\)/.test(t73) && /notas: ZonaDetalle\.notasInerte\(sil, radio\)/.test(t73));
+    ok(!/'Estandarte'\} de \$\{/.test(t73) && /estandarteRenombrar\(id, t\)/.test(t73));
   });
   prueba('hielo (cada paso), curación (pulsos), terreno en llamas y una zona sin Mantenimiento', () => {
     const hielo = ZonaDetalle.armar({zona: true, zonaNombre: 'Suelo congelado', zonaResistStat: 'agl', zonaResistValor: 8, zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({nombre: 'Sentado', superficie: 'hielo', tiraPaso: true})}, {statLabel: lbl, autor: {}, altura: 'piso'});

@@ -2179,6 +2179,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
   dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
   ficha). El aura, `estandarteDibujar(z)` desde js/05.
+  **El nombre no delata al creep** (P281, 2026-11-23): el token, su ficha y su nota se llaman como la habilidad («Estandarte de guerra», «Tótem de silencio»;
+  `ZonaDetalle.nombreInerte` / `notasInerte`), sin «de <creep>»; de quién es lo dice «Ver detalle» con su regla (P259 4). Los clavados antes («Estandarte de
+  <creep>») los renombra una vez la pantalla del GM (`estandarteRenombrar`, en el mismo intervalo que saca los rotos): token, ficha pública y privada y nota.
 - **🚩 Estandartes: qué hacen y sus áreas como estados** (2026-11-05, dueño; `js/103-estandartes-info.js`). Nombres para el usuario: **«objetos inertes»**
   (lo general, `esInerte` de js/73) y **«estandartes»** (el poste con aura: Estandarte de guerra, Tótem de silencio). (1) `estandarteTexto(id, t)` arma el
   globito `#inerte-globo` (aura con radio y diámetro, efecto, vida: el GM ve hp/hpMax, el resto el % público); sale al pasar el mouse por el token o

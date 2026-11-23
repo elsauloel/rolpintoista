@@ -2253,7 +2253,7 @@ versión parecida en más de una, es candidato a juntar.
   por su Tipo** (garras de Tipo 4 → punzantes; sin arma, el puño, Tipo 4: `ataqueDeArma` y `FichaCombate.statParaArma` lo usan cuando no hay arma).
   `FichaLupa.jobCostoDe`: con k compras de una pasiva de costo c, c + (c+1) + … + (c+k−1); `jobCostoCopia(x, n)`, `jobCostoProxima(x)` (la ficha lo muestra
   en la pasiva y en el subtítulo del catálogo). `ZonaDetalle.armarInerte(e, ctx)`: la tarjeta de «Ver detalle» de un tótem o un estandarte (y
-  `ctx.habilidadOculta`: «No se sabe» en «Con qué se puso»; quien la puso escondido = «Alguien»). `CreepCalculo.tarjetaPublica` suma `estandarteDe`,
+  `ctx.habilidadOculta`: «No se sabe» en «Con qué se puso»; quien la puso escondido = «Alguien»). `ZonaDetalle.nombreInerte(silencio, habilidad, actual?, deNombre?)` y `notasInerte(silencio, radio, actual?, deNombre?)` (P281, 2026-11-23): el nombre y la nota del token sin «de <creep>»; con `actual`, pasan los viejos al nuevo. `CreepCalculo.tarjetaPublica` suma `estandarteDe`,
   `estandarteDeId` y `estandarteCon`. `DarJugador.mochilaTrasDar(S, que)` (prueba en una copia cómo queda la mochila) y `mochilaAvisoTxt`: la ventana
   lee las fichas marcadas (`FichaGuardado.cargar`; si faltan las piezas, las carga sola) y avisa / pregunta «¿Dar igual?» antes de dar.
 

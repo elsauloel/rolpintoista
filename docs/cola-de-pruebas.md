@@ -2254,6 +2254,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   P283: «casi siempre todo esto va a suceder en el mapa. Quizás lo que debería pasar en GM Tools es que te avise que están pasando cosas en el mapa
   que requieren que vayas ahí»). Pensar qué cosas (duelos esperando al GM, momentos pendientes, zonas por tirar…) y cómo avisarlas; conversarlo antes.
 
+- **⬜ en cola — 🎲 Al cargar el mapa (o con F5) a veces se ven muchas tiradas de dados animadas juntas** (dueño, 2026-11-23: «a veces cuando
+  aprieto F5 o cargo el mapa por primera vez aparece la animación de muchas tiradas de dados, juntas. Asumo que será la acumulación de tiradas
+  que se hacen durante los testeos en el mapa»). Revisar por qué se animan tiradas viejas al entrar (¿la Mesa trae las últimas y las anima como
+  nuevas?) y que al cargar solo se animen las que llegan después de abrir el mapa.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

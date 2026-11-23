@@ -74,7 +74,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261123c69"></script>
+<script src="ficha-resumen.js?v=20261123c70"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261122prisa5"></script>
@@ -741,8 +741,8 @@ prueba('⚖ la cuenta, el cartel y la Iniciativa con sobrepeso (2026-11-23, P312
   const S = fichaDePrueba({caps: {mochila: 1}, inventario: [{id: 'e', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 5, mods: []},
     {id: 'a', nombre: 'A', tipoItem: 'otros', peso: 1}, {id: 'b', nombre: 'B', tipoItem: 'otros', peso: 1}, {id: 'c', nombre: 'C', tipoItem: 'otros', peso: 1}]});
   const res = FichaResumen.resumen(S), est = FichaResumen.estadoSobrepeso(S)[0];
-  igual([res.sobre, res.sobreCuenta, est.sobrepeso, /5 \+ 2 ranuras de más/.test(est.detalle), /Iniciativa: −1/.test(est.detalle), FichaResumen.resumen(fichaDePrueba()).sobre],
-    [1, {peso: 5, ranuras: 2, crg: 6}, 1, true, true, 0]);
+  igual([res.sobre, res.sobreCuenta, est.sobrepeso, /5 \+ 2 ranuras de más/.test(est.detalle), /Iniciativa −1/.test(est.detalle) && est.detalle.length <= 160, FichaResumen.resumen(fichaDePrueba()).sobre],
+    [1, {peso: 5, ranuras: 2, crg: 6}, 1, true, true, 0]);   // (el detalle, corto: es el globo del ⚖ alrededor del token)
 });
 prueba('No2 máximo con un tope forzado (regla común) y Job por nivel', () => {
   const c = FichaCalculo.calcular(fichaDePrueba({efectos: [{nombre: 'Stun', activo: true, forzarNitros: 2}]}));
@@ -2921,6 +2921,10 @@ prueba('⚖ Los carteles del sobrepeso: solo en la pantalla que guardó el cambi
     ['Tenés sobrepeso', true, null, 'Tenés sobrepeso', null, 'Tita: tu sobrepeso bajó (5 → 2)', true,
      'Ya no tenés sobrepeso', true, true, true, true, null, null, true]);
   igual([typeof FichaResumen.pantallaYo().id, FichaResumen.pantallaYo().id === FichaResumen.pantallaYo().id, FichaResumen.resumen(fichaDePrueba()).sobreCuenta], ['string', true, {peso: 0, ranuras: 0, crg: 6}]);
+});
+prueba('⚖ El Sobrepeso se ve como un estado alrededor del token (2026-11-23)', async () => {
+  const t88 = await (await fetch('../vtt-hexgrid/js/88-iconos-estados.js', {cache: 'no-store'})).text();
+  cierto(/'sobrepeso': \{ic: '⚖️'\}/.test(t88) && /e\.derivado && !e\.area && e\.nombre !== 'Sobrepeso'/.test(t88), 'el ícono ⚖ y el derivado que sí se muestra');
 });
 prueba('⚖ El mapa: la tirada de Iniciativa resta el sobrepeso, el GM ajusta el número y el orden espera a la ronda; los carteles (2026-11-23, P312 y P313)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();

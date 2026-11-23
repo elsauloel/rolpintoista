@@ -1923,6 +1923,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   se acomoda en la ronda siguiente). Todo quedó como estaba. Pruebas automáticas 1065/1065. Dudas: P313. Sin probar: el baúl y la tienda (abajo).
   *Ajuste P313 (2026-11-23):* en combate el número cambia en el momento y el orden recién al pasar de ronda (sin «¿vuelve a actuar?»); el cartel sale en
   una sola pantalla (la que guardó el cambio); carteles «bajó» y «Ya no tenés sobrepeso». Probado con clics (ficha + mapa abiertos, y en combate). 1066/1066.
+  *El ⚖ alrededor del token (2026-11-23, dueño):* el Sobrepeso se ve como un estado más alrededor del token, con su globo (cuánto, la cuenta y lo que implica);
+  se va solo al sacarse el peso. Visto con clics desde el GM, el Jugador 1 y el Jugador 2. 1067/1067.
 - **⬜ en cola — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
   creep con la pasiva, recibir daño desde el cuadro de daño de GM Tools y ver que el aviso dice que el Aguante se suma a mano (P283).
 - **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo

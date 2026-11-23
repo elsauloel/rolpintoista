@@ -9,7 +9,8 @@
 // - Orden de llegada: cada estado nuevo toma el siguiente lugar libre y lo conserva mientras dure (`iconosOrden`); los que ya estaban al cargar el
 //   mapa, en el orden en que vienen.
 // - Se dibuja en el recorrido de los tokens que se ven (js/05), así que un token oculto, en la niebla o en sigilo para el que mira no se delata.
-//   No se muestran los estados derivados (pasivas, sobrepeso) ni los apagados. El Sigilo, solo si el token está de verdad en sigilo (con Marcado no).
+//   No se muestran los estados derivados (pasivas) ni los apagados, salvo el Sobrepeso (⚖, 2026-11-23, dueño: «que el sobrepeso además aparezca como
+//   un estado alrededor del token»), que lo arma la ficha y se va solo cuando se va el sobrepeso. El Sigilo, solo si el token está de verdad en sigilo (con Marcado no).
 // - Algunos animan (burbujas del Veneno, la gotita del Sangrado, la llamita, el chispazo, las Z del Sueño, las estrellitas del Stun): mientras haya
 //   uno en pantalla, el dibujo sigue animando (como el brillo del Marcado).
 // La tabla vive acá abajo (ICONOS_ESTADO): para cambiar un ícono, se cambia ahí.
@@ -50,6 +51,7 @@ const ICONOS_ESTADO = {
   'punto debil': {ic: '💢'}, 'expuesto': {ic: '💢'},
   'herida sombria': {ic: '🌑'},
   'armadura rota': {ic: '🛡️', tachado: true},
+  'sobrepeso': {ic: '⚖️'},   // (2026-11-23) derivado: lo publica la ficha mientras dure (FichaResumen.estadoSobrepeso)
   'desarmado': {ic: '🫳'},
   // 😮‍💨 Cansancio y cuerpo
   'cansado': {ic: '😮‍💨'}, 'exhausto': {ic: '😮‍💨'}, 'extenuado': {ic: '😮‍💨'}, 'debilitado': {ic: '😮‍💨'},
@@ -141,7 +143,7 @@ function iconoDeEstado(clave){
 function iconosLista(id, t, est){
   const vistos = new Map();
   (est.estados || []).forEach(e => {
-    if(!e || !e.nombre || (e.derivado && !e.area) || e.activo === false) return;   // (los de un área sí: js/103)
+    if(!e || !e.nombre || (e.derivado && !e.area && e.nombre !== 'Sobrepeso') || e.activo === false) return;   // (los de un área sí: js/103; ⚖ el Sobrepeso también)
     const k = iconosNorm(e.nombre);
     if(k === 'sigilo' && !(typeof enSigilo === 'function' && enSigilo(t))) return;
     if(!vistos.has(k)) vistos.set(k, e);

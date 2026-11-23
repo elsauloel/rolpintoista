@@ -1041,7 +1041,9 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   la lista muestra «⚖−N» con la cuenta); la pantalla del GM (`sobrepesoIniRevisar`, al cambiar las fichas o la iniciativa) ajusta el número si cambia
   (tirada − sobrepeso de ese momento) con `OrdenTurnos.cambiarValor` (sin mover a nadie) y deja la línea en la Mesa; a quien le tocaría otro lugar lo
   anota en `iniciativa.reubicar` e `iniciativaSiguiente` lo acomoda al empezar la ronda (`OrdenTurnos.reubicarAlEmpezar`); Ordenar y Limpiar lo vacían.
-  Probado con clics en «Claude · pruebas 2». Dudas: P313.
+  Probado con clics en «Claude · pruebas 2». Dudas: P313. (3) **El ⚖ alrededor del token** (2026-11-23, dueño: «que el sobrepeso además aparezca como
+  un estado alrededor del token»): `iconosLista` (js/88) deja pasar el derivado «Sobrepeso» (ícono ⚖️ en `ICONOS_ESTADO`); el globo (js/30) dice
+  «mientras cargue de más» y el detalle corto que publica la ficha (`FichaResumen.estadoSobrepeso`, en tercera persona, ≤ 160).
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

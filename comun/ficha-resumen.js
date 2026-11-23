@@ -37,7 +37,8 @@ const FichaResumen = (() => {
     const c = FichaCalculo.calcular(S), s = c.sobrecarga;
     if(!(s > 0)) return [];
     return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
-      detalle: `Te pasás por ${fmt(s)}: ${Combatiente.sobrepesoCuentaTxt(cuentaSobrepeso(c))}. Evasión: −${fmt(s)}, o pagás 1 No2 para evitarlo. Además, +1 No2 fijo: Parry y «Poner escudo» 2 No2 (con Parada fácil, 1), y el dodge roll lo de moverse + 1. Iniciativa: −${fmt(s)}.`}];
+      // (2026-11-23) corto y en tercera persona: lo leen todos en el globo del ícono ⚖ alrededor del token (vtt-hexgrid/js/88 y js/30, que corta en 160)
+      detalle: (cu => `Se pasa por ${fmt(s)} (equipo ${fmt(cu.peso)}${cu.ranuras ? ` + ${fmt(cu.ranuras)} ranuras de más` : ''} contra Carga máxima ${fmt(cu.crg)}): Evasión −${fmt(s)} (o 1 No2), Iniciativa −${fmt(s)}, Parry/escudo/dodge +1 No2.`)(cuentaSobrepeso(c))}];
   }
   /* 🛡 Armadura rota (dueño, 2026-10-29: «esta armadura rota no es del jugador, sino del ítem, pero lo tiene que ver el jugador para saberlo… si ningún
      ítem tiene, todos tienen la durabilidad full, no aparece el estado»): derivado de las piezas puestas con puntos de rotura (`armRota`, armadura o

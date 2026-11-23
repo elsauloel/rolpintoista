@@ -107,6 +107,7 @@ function creepPublico(sc, orden){
           ...Combatiente.atrapaPub(es),   // 🕸 la telaraña o la red, encima del token (el mapa, js/68)
           ...(es.marcado ? {marcado: true} : {}),   // ⚡ brilla y se lo ve en la niebla (el Rayo cargado, 2026-10-24)
           ...(es.protege ? {protege: String(es.protege).slice(0, 80)} : {}),   // 🛡 el Escudo humano: a quién protege (el lazo del mapa, js/95)
+          ...(typeof EstadoCorto !== 'undefined' ? EstadoCorto.pub(es, 'hpTurno') : {}),   // 🔘 los números para el globo del token (2026-11-23)
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(es.detalle || '').slice(0, 300),

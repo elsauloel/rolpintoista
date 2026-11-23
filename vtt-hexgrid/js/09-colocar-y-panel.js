@@ -712,6 +712,7 @@ async function modificarCreep(creepId, cambiar){
           ...(e.marcado ? {marcado: true} : {}),   // ⚡ brilla y se lo ve en la niebla (el Rayo cargado, 2026-10-24)
           ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
           ...(e.protege ? {protege: String(e.protege).slice(0, 80)} : {}),   // 🛡 el Escudo humano: a quién protege (el lazo de js/95, para todas las pantallas)
+          ...(typeof EstadoCorto !== 'undefined' ? EstadoCorto.pub(e, 'hpTurno') : {}),   // 🔘 los números para el globo del token (2026-11-23)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,

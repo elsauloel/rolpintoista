@@ -37,7 +37,13 @@ function hoverEstadosHtml(t){
   // y los turnos que le quedan. El detalle (de dónde viene, quién lo puso, la cuenta del sobrepeso) va en ◎ Estados alterados (js/10).
   const o = estadoCortoOpc(t), veEscudo = soyGM || t.tipo !== 'creep';
   const filas = lista.map(e => estadoCortoFilaHtml(veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined}, o, 5)).join('');
-  return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}${filas}`;
+  return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}${filas}${hoverDetallePie()}`;
+}
+// 🔘 Al pie de los dos globos, dónde se ve el detalle (2026-11-23, dueño: «una línea que explique bien dónde ver el detalle»). El ◎ está en el anillo de
+// cualquier token que se ve (el propio, el de otro jugador o un creep) y la E lo abre con el token seleccionado: sirve para todos los que ven el globo.
+const HOVER_DETALLE_PIE = 'Para ver el detalle de cada estado (de dónde viene, quién lo puso, la cuenta), tocá el token y su botón ◎ Estados alterados (o la tecla E).';
+function hoverDetallePie(){
+  return `<div style="margin-top:7px;padding-top:5px;border-top:1px solid #4A3C43;color:#9C8F86;font-size:10.5px;line-height:1.3">${esc(HOVER_DETALLE_PIE)}</div>`;
 }
 // Las opciones de EstadoCorto para un token: su sobrepeso (del resumen) y cómo nombrar a otro token sin delatar a uno que esta pantalla no ve.
 function estadoCortoOpc(t){
@@ -61,8 +67,8 @@ function estadoCortoFilaHtml(e, o, arriba){
 function hoverIconoHtml(t, ic){
   const o = estadoCortoOpc(t), veEscudo = soyGM || t.tipo !== 'creep';
   const limpio = e => veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined};
-  if(ic.resto) return `<div style="font-weight:700;color:#F0D27A">${ic.resto.length} estados más</div>` + ic.resto.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('');
-  return estadoCortoFilaHtml(limpio(ic.e), o, 0);
+  if(ic.resto) return `<div style="font-weight:700;color:#F0D27A">${ic.resto.length} estados más</div>` + ic.resto.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('') + hoverDetallePie();
+  return estadoCortoFilaHtml(limpio(ic.e), o, 0) + (ic.e && ic.e.mano ? '' : hoverDetallePie());
 }
 function hoverEstadosMostrar(){
   const t = tokens.get(hoverEstados.tok);

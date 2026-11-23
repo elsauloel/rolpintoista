@@ -985,7 +985,9 @@ versión parecida en más de una, es candidato a juntar.
   {titulo «Sobrepeso 2», efecto, dura «quedan 3 turnos»}, `texto(e, o)` (en una línea), `efecto`, `numero`, `dura`, `limpiar` (la primera frase sin ⚙/✋/Ej./
   «Viene de») y `CORTO` (lo que hace cada estado de la lista en una línea; al sumar un estado largo a `estados-presets.js`, sumarlo acá), y `detalle(e, o)` →
   {descripcion, origen: [renglones]} (la cuenta del sobrepeso y lo que el estado guarda de quién: protege, marca, miedo, provocado, sanguijuela, escudo
-  elemental, arma). `o = {sobre, sobreCuenta, nombreDe(id), oculto(id)}`. Lo usa el mapa (js/30 y js/10); lo que no se guarda (quién puso cada estado): P314.
+  elemental, arma). `o = {sobre, sobreCuenta, nombreDe(id), oculto(id)}`. `pub(e, campoHp)` (2026-11-23): los números de un estado para el resumen público (`vidaTurno` ya
+  por los stacks, `stacks`, `curaDado`, `mods`, `sobrepeso`); lo usan `ficha-resumen.js`, GM Tools (`creepPublico`) y el mapa (`modificarCreep`), así que
+  se carga también en la ficha, GM Tools y el simulador de encuentros. Lo usa el mapa (js/30 y js/10); lo que no se guarda (quién puso cada estado): P314.
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
   yaPaso}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda, queda en `actuaron` (P301).
   La usa el mapa para las invocaciones (js/04 `invocacionAlOrden`).

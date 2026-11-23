@@ -59,7 +59,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
-<script src="estado-corto.js?v=20261123c71"></script>
+<script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
 <script src="dar-jugador.js?v=20261123c68"></script>
 <script src="tokens-auto.js"></script>
@@ -75,7 +75,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261123c70"></script>
+<script src="ficha-resumen.js?v=20261123c73"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261122prisa5"></script>
@@ -2929,9 +2929,22 @@ prueba('⚖ El Sobrepeso se ve como un estado alrededor del token (2026-11-23)',
 });
 prueba('🔘 El globo de un iconito de estado: solo el nombre (con su número), el efecto en corto y los turnos que quedan (2026-11-23)', () => {
   const g = EstadoCorto.globo({nombre: 'Sobrepeso', derivado: true, permanente: true, polaridad: 'debuff', detalle: 'Se pasa por 2 (equipo 8 contra Carga máxima 6): …'}, {sobre: 2});
-  igual(g, {titulo: 'Sobrepeso 2', efecto: 'Evasión −2 (o 1 No2) · Iniciativa −2 · Parry/escudo/dodge +1 No2', dura: ''});
+  igual(g, {titulo: 'Sobrepeso: 2', efecto: '−2 a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −2 a Iniciativa', dura: ''});
+  // (un resumen viejo sin el número: sale de la descripción, «Se pasa por 3…»)
+  igual(EstadoCorto.globo({nombre: 'Sobrepeso', derivado: true, detalle: 'Se pasa por 3 (equipo 9 contra Carga máxima 6): …'}, {}).titulo, 'Sobrepeso: 3');
+  // 🔘 El número que importa (2026-11-23, dueño: «que diga cuánto cura cada turno»): la vida por turno, ya por los stacks.
+  igual([EstadoCorto.texto({nombre: 'Regeneración (túnica)', permanente: true, vidaTurno: 2}), EstadoCorto.texto({nombre: 'Regeneración', turnos: 2, hpturno: 5}),
+    EstadoCorto.texto({nombre: 'Veneno', stacks: 3, turnos: 3, vidaTurno: -3}), EstadoCorto.texto({nombre: 'Sangrado', stacks: 3, permanente: true, hpTurno: -1}),
+    EstadoCorto.texto({nombre: 'Escarcha', stacks: 2, turnos: 2}), EstadoCorto.texto({nombre: 'Llama propia', turnos: 2, vidaTurno: -4}),
+    EstadoCorto.texto({nombre: 'Rengo', turnos: 1}), EstadoCorto.texto({nombre: 'Vida extra', excedente: true, escudo: 49, permanente: true})],
+    ['Regeneración (túnica) · Cura 2 de vida cada turno', 'Regeneración · Cura 5 de vida cada turno · quedan 2 turnos',
+     'Veneno: 3 · −3 de vida al empezar el turno · quedan 3 turnos', 'Sangrado: 3 · −3 de vida cada turno',
+     'Escarcha: 2 · −2 a sus No2 máximos · quedan 2 turnos', 'Llama propia · −4 de vida cada turno · quedan 2 turnos',
+     'Rengo · Moverse cuesta 2 No2 por casilla · queda 1 turno', 'Vida extra · Vida extra +49']);
+  igual(EstadoCorto.pub({nombre: 'Veneno', stacks: 3, hpturno: -1, mods: [{stat: 'def', val: -2}, {stat: 'x', val: 0}]}, 'hpturno'), {vidaTurno: -3, stacks: 3, mods: [{stat: 'def', val: -2}]});
+  igual(EstadoCorto.pub({nombre: 'Sobrepeso', sobrepeso: 2, stacks: 1}, 'hpturno'), {sobrepeso: 2});
   igual(EstadoCorto.texto({nombre: 'Quemadura', stacks: 2, turnos: 2, detalle: 'Arde: pierde 2 HP por turno, 3 turnos. Si lo vuelven a quemar, vuelven a contar los turnos (no se suma). ⚙ Automatizado: su Res. fuego le resta a cada turno.'}),
-    'Quemadura 2 · −2 vida por turno (le resta su Res. fuego) · quedan 2 turnos');
+    'Quemadura: 2 · −2 de vida cada turno (le resta su Res. fuego) · quedan 2 turnos');
   igual(EstadoCorto.texto({nombre: 'Frenético propio', turnos: 1, detalle: 'Frenético: +3 a la PdG y +5 al daño. Se le pasa solo. ⚙ Automatizado.'}), 'Frenético propio · +3 a la PdG y +5 al daño · queda 1 turno');
   igual([EstadoCorto.texto({nombre: 'Stun', turnos: 1, detalle: ''}) === 'Stun · No puede hacer nada · Evasión 1 · queda 1 turno', EstadoCorto.dura({nombre: 'Stun', turnos: 1}),
     EstadoCorto.texto({nombre: 'Debilitado (Goblin)', turnos: 3, mods: [{stat: 'def', val: -2}, {stat: 'dmg', val: 1}]}),
@@ -2939,8 +2952,8 @@ prueba('🔘 El globo de un iconito de estado: solo el nombre (con su número), 
     EstadoCorto.texto({nombre: 'Armadura rota', armaduraRota: true, stacks: 3, permanente: true}),
     EstadoCorto.texto({nombre: 'Armadura rota', derivado: true, stacks: 3, detalle: 'Viene de tu equipo: Peto ×2 (−2 Defensa), durabilidad 4 de 12; Casco ×1, durabilidad 2 de 6. Se va sola…'}),
     EstadoCorto.texto({nombre: 'Escalofrío', permanente: true, hasta: 'el fin del turno de Rata'})],
-    [true, 'queda 1 turno', 'Debilitado (Goblin) · Defensa −2 · Dmg +1 · quedan 3 turnos', 'Escudo especial · Escudo 5/8', 'Armadura rota 3 · Defensa −3',
-     'Armadura rota 3 · Defensa −2', 'Escalofrío · PdG −2 · hasta el fin del turno de Rata']);
+    [true, 'queda 1 turno', 'Debilitado (Goblin) · Defensa −2 · Dmg +1 · quedan 3 turnos', 'Escudo especial · Escudo 5/8', 'Armadura rota: 3 · Defensa −3',
+     'Armadura rota: 3 · Defensa −2', 'Escalofrío · PdG −2 · hasta el fin del turno de Rata']);
   // Nada de origen ni de la cuenta en el globo: sin «Viene de», sin «⚙», sin «Ej.:».
   const limpio = EstadoCorto.limpiar('Viene de tu pasiva "Sangre fría": recupera 3 HP en cada Mantenimiento.');
   igual([limpio, EstadoCorto.limpiar('Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.')],
@@ -2964,6 +2977,7 @@ prueba('🔘 El mapa: el mouse sobre un iconito muestra solo ese estado; ◎ mue
   const [t88, t30, t10, html] = await Promise.all(['js/88-iconos-estados.js', 'js/30-hover-estados.js', 'js/10-hud-y-vida.js', 'mapa.html'].map(leer));
   cierto(/function iconoEn\(x, y\)/.test(t88) && /hit\.push\(\{px, py, r, e\}\)/.test(t88) && /vistos\.has\(id\)/.test(t88), 'dónde quedó cada iconito, solo de los tokens que se ven');
   cierto(/iconoEn\(m\.x, m\.y\)/.test(t30) && /function hoverIconoHtml/.test(t30) && /EstadoCorto\.globo/.test(t30), 'el globo del iconito');
+  cierto(/botón ◎ Estados alterados \(o la tecla E\)/.test(t30) && (t30.match(/hoverDetallePie\(\)/g) || []).length >= 3, 'al pie de los dos globos, dónde se ve el detalle');
   cierto(/EstadoCorto\.detalle\(eV, o\)/.test(t10) && /hud-estado-det/.test(t10), 'el detalle en ◎');
   cierto(/comun\/estado-corto\.js/.test(html));
 });

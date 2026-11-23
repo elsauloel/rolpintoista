@@ -2240,6 +2240,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `comun/estado-corto.js`. Probado con clics en «Claude · pruebas 2» (GM, Jugador 1 y Jugador 2): Blanco J1 con sobrepeso 2 (el Peto del gigante y 22
   agujas que pasan la mochila), Quemadura de 3 turnos y Miedo a un creep; el mouse sobre cada iconito y sobre el token, y la ventana ◎ desde las tres
   pantallas; con el creep escondido, el Jugador 2 ve «alguien que no se ve». Todo volvió a como estaba. Pruebas automáticas 1070/1070.
+  **Ajuste (2026-11-23, dueño, con captura):** el corto nunca pierde el número — «Regeneración · Cura 2 de vida cada turno», «Veneno: 3 · −3 de vida al
+  empezar el turno» (la ficha, GM Tools y el mapa publican ahora la vida por turno, los stacks y los números de cada estado); el Sobrepeso con su
+  formato, también en el globo del token: «Sobrepeso: 1 · −1 a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −1 a Iniciativa»; y al
+  pie de los dos globos: «Para ver el detalle de cada estado (de dónde viene, quién lo puso, la cuenta), tocá el token y su botón ◎ Estados alterados (o
+  la tecla E)» (el ◎ está en el anillo de cualquier token que se ve, también un creep para un jugador). Probado con clics desde el GM, el Jugador 1 y el
+  Jugador 2 (Regeneración de 2, Veneno ×3, Rengo y sobrepeso 1; la E del Jugador 2 sobre el token del Jugador 1); todo volvió a como estaba. 1070/1070.
 - **⬜ en cola — Probar: 🔘 los estados puestos de verdad por un creep, con su habilidad** (2026-11-23): en la prueba, la Quemadura y el Miedo se le
   mandaron a Blanco J1 por el mismo aviso que usan las habilidades de creep (sin pasar por el duelo). Falta verlo con un creep usando su habilidad en
   un duelo, el «+N» con más de 12 estados, un creep visto por un jugador (sin el escudo) y una invocación.

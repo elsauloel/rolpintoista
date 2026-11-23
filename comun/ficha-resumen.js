@@ -55,6 +55,8 @@ const FichaResumen = (() => {
     return [{id: 'armadura-rota', nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: st, turnos: 0, hpturno: 0, activo: true, derivado: true,
       detalle: `Viene de tu equipo: ${txt.join('; ')}. Se va sola cuando reparás esas piezas (herrero, talento de reparar u Óleo reparador).`}];
   }
+  // 🔘 Los números de un estado para el resumen público (2026-11-23): comun/estado-corto.js (`EstadoCorto.pub`); sin esa pieza, nada.
+  const EstadoPub = (e, campo) => typeof EstadoCorto !== 'undefined' && EstadoCorto.pub ? EstadoCorto.pub(e, campo) : {};
   const estadosTodos = S => [...(S.efectos || []).filter(Combatiente.estadoVisible), ...estadosDePasivas(S), ...estadoSobrepeso(S), ...estadoArmaduraRota(S)];
 
   /* ---------- Moverse (js/11) ---------- */
@@ -264,6 +266,9 @@ const FichaResumen = (() => {
           ...(num(e.sprint) > 0 ? {sprint: num(e.sprint)} : {}),   // Sprint (Asalto, 2026-10-13): los casilleros pagos que le quedan
           ...(e.vigilancia ? {vigilancia: alcanceVigilancia(S)} : {}),   // 👁 Vigilancia (Shooter, 2026-10-21): el alcance de su arma a distancia (el mapa, js/58)
           ...(e.repetir ? {repetir: {quedan: Math.max(0, num(e.stacks)), hechos: num(e.repHechos), arma: String(e.repArma || ''), blanco: String(e.repBlanco || '')}} : {}),   // Repetición (Shooter, 2026-10-13)
+          // 🔘 Lo que el globo del token necesita para decir el número (2026-11-23, dueño: «que diga cuánto cura cada turno»): la vida por turno (ya por
+          // los stacks), los stacks, el dado de cura, los números del estado y el sobrepeso (comun/estado-corto.js).
+          ...EstadoPub(e, 'hpturno'),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(e.detalle || '').slice(0, 300),
@@ -319,6 +324,7 @@ const FichaResumen = (() => {
           ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
           ...(e.chupaDe ? {chupaDe: String(e.chupaDe).slice(0, 120), chupaUid: String(e.chupaUid || '').slice(0, 80), chupaNombre: String(e.chupaNombre || '').slice(0, 40)} : {}),   // 🪱 quién lanzó la Sanguijuela (la cura se la lleva él)
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+              ...EstadoPub(e, e.hpturno !== undefined ? 'hpturno' : 'hpTurno'),   // 🔘 (2026-11-23)
               polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
               ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}), ...Combatiente.atrapaPub(e),   // 🤝 (js/54)
               detalle: String(e.detalle || '').slice(0, 300),

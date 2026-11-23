@@ -5,7 +5,7 @@
    es el caster». Y: «en los estados alterados que tengan duración, sí tienen que aparecer [los turnos que quedan] en el hover del icono».
 
    - `globo(e, o)` → {titulo, efecto, dura}: lo que dice el globo de un iconito alrededor del token (y cada renglón del globo del token).
-     «Sobrepeso 2» · «Evasión −2 (o 1 No2) · Iniciativa −2 · Parry/escudo/dodge +1 No2» · sin duración (dura mientras cargue de más).
+     «Sobrepeso: 2» · «−2 a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −2 a Iniciativa» · sin duración.
    - `texto(e, o)` → la misma cosa en una línea: «Quemadura 2 · Arde: pierde 2 HP por turno · quedan 2 turnos».
    - `detalle(e, o)` → {descripcion, origen: [renglones]}: para la ventana ◎ Estados alterados del token. Solo lo que el estado trae guardado
      (quién lo protege, a quién marcó, de quién tiene miedo, quién lo provocó, quién le pegó la sanguijuela, de qué arma, de qué pasiva o pieza
@@ -17,6 +17,7 @@
 const EstadoCorto = (() => {
   const n = v => Number(v) || 0;
   const f = v => { const x = Math.round(n(v) * 100) / 100; return String(x); };
+  const menos = v => `−${f(Math.abs(n(v)))}`;
   const norm = s => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
   // Las etiquetas de los números (las de la ficha si están; si no, estas).
@@ -30,8 +31,14 @@ const EstadoCorto = (() => {
   /* Lo que hace cada estado de la lista común, en una línea (comun/estados-presets.js tiene la regla entera; esto es solo el «qué te hace»). Un estado
      que no está acá usa la primera frase de su descripción. Al sumar un estado nuevo a la lista, conviene sumarlo también acá si su descripción es larga. */
   const CORTO = {
-    'veneno': '−1 vida por stack al empezar el turno', 'veneno severo': 'Daño al empezar cada turno, +1 cada turno',
-    'sangrado': '−1 vida por stack cada turno', 'quemadura': '−2 vida por turno (le resta su Res. fuego)', 'regeneracion': 'Cura vida cada turno',
+    // (2026-11-23, dueño: «que diga cuánto cura cada turno»): los de vida por turno y los que se apilan, con su número si llegó (`vt` = la vida por
+    // turno ya multiplicada por los stacks, `st` = los stacks); si no llegó, la regla por stack.
+    'veneno': (vt, st) => vt ? `${menos(vt)} de vida al empezar el turno` : st > 1 ? `−${f(st)} de vida al empezar el turno` : '−1 vida por stack al empezar el turno',
+    'veneno severo': vt => vt ? `${menos(vt)} de vida al empezar el turno, +1 cada turno` : 'Daño al empezar cada turno, +1 cada turno',
+    'sangrado': (vt, st) => vt ? `${menos(vt)} de vida cada turno` : st > 1 ? `−${f(st)} de vida cada turno` : '−1 vida por stack cada turno',
+    'quemadura': vt => `${vt ? menos(vt) : '−2'} de vida cada turno (le resta su Res. fuego)`,
+    'regeneracion': (vt, st, e) => vt > 0 ? `Cura ${f(vt)} de vida cada turno` : e && e.curaDado ? `Cura ${e.curaDado} de vida cada turno` : 'Cura vida cada turno',
+    'escarcha': (vt, st) => `−${f(Math.max(1, st))} a sus No2 máximos`, 'debilitado': (vt, st) => `−${f(Math.max(1, st))} a todas sus tiradas`,
     'stun': 'No puede hacer nada · Evasión 1', 'sueno': 'Dormido: no puede hacer nada · Evasión 1 · lo despierta el daño',
     'pajaritos': 'PdG, PdG.Esp y Evasión a la mitad', 'lisiado': 'PdG y Parry a la mitad', 'paralisis': 'PdG, Parry y Evasión a la mitad · recarga 1 No2 menos',
     'cansado': 'No2 máximos a 2/3', 'exhausto': 'No2 máximos a 1/3', 'hypeado': 'No2 máximos +1/3',
@@ -48,7 +55,7 @@ const EstadoCorto = (() => {
     'presa': 'Evasión −1 · le pegan +2 de daño', 'presa senalada': 'Evasión −2 · le pegan +4 de daño', 'coraza maldita': 'Defensa −2 y Defensa especial −2',
     'sanguijuela': 'Las curas que recibe se las lleva quien se la pegó', 'sequia': 'No recupera vida ni SP por sí mismo',
     'espinas': 'Devuelve 1/4 del daño cuerpo a cuerpo', 'espejo': 'Devuelve 1/4 del daño especial', 'etereo': 'No puede ser objetivo ni atacar',
-    'llama de fenix': 'Si cae, revive con toda la vida', 'piel de hierro': '+(3 + nivel) Defensa y Defensa especial · +1 Res. a crítico', 'escarcha': '−1 No2 máximo por stack', 'debilitado': '−1 a todas sus tiradas por stack', 'bendecido': '+1 a todas sus tiradas',
+    'llama de fenix': 'Si cae, revive con toda la vida', 'piel de hierro': '+(3 + nivel) Defensa y Defensa especial · +1 Res. a crítico',
   };
   // La descripción sin lo que no es el efecto: las notas de automatización (⚙ / ✋), los avisos (⚠), los ejemplos y de dónde viene.
   function limpiar(txt){
@@ -83,7 +90,7 @@ const EstadoCorto = (() => {
 
   // El número que va al lado del nombre: el sobrepeso, o los stacks si hay más de uno (Armadura rota, siempre).
   function numero(e, o){
-    if(esSobrepeso(e)){ const s = n(e.sobrepeso) || n(o && o.sobre); return s > 0 ? s : null; }
+    if(esSobrepeso(e)){ const s = sobrepesoDe(e, o); return s > 0 ? s : null; }
     const st = n(e.stacks);
     if(esArmRota(e)) return Math.max(1, st);
     return st > 1 ? st : null;
@@ -97,34 +104,51 @@ const EstadoCorto = (() => {
     return t > 0 ? (t === 1 ? 'queda 1 turno' : `quedan ${f(t)} turnos`) : '';
   }
   // Lo que hace, en corto. Lo concreto primero (escudo, números, vida por turno); si no trae, su descripción limpia (o la del preset).
+  // La vida por turno: la que llega publicada (`vidaTurno`, ya por los stacks) o, del lado del GM, la de su ficha privada (por stack × stacks).
+  function vidaTurno(e){
+    if(e.vidaTurno !== undefined) return n(e.vidaTurno);
+    const hp = n(e.hpturno !== undefined ? e.hpturno : e.hpTurno);
+    return hp * Math.max(1, n(e.stacks) || 1);
+  }
+  // El número del sobrepeso: el del estado, el del resumen o, de un resumen viejo, el de su descripción («Se pasa por 2…» / «Te pasás por 2…»).
+  function sobrepesoDe(e, o){
+    const m = String((e && e.detalle) || '').match(/pas(?:a|ás) por (\d+(?:[.,]\d+)?)/);
+    return n(e && e.sobrepeso) || n(o && o.sobre) || (m ? n(m[1].replace(',', '.')) : 0);
+  }
   function efecto(e, o){
     if(!e) return '';
     if(esSobrepeso(e)){
-      const s = n(e.sobrepeso) || n(o && o.sobre);
-      return s > 0 ? `Evasión −${f(s)} (o 1 No2) · Iniciativa −${f(s)} · Parry/escudo/dodge +1 No2` : 'Evasión e Iniciativa más bajas · Parry/escudo/dodge +1 No2';
+      // (2026-11-23, dueño: «Sobrepeso: X · −X a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2», y la Iniciativa en el mismo estilo)
+      const s = sobrepesoDe(e, o);
+      return s > 0 ? `−${f(s)} a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −${f(s)} a Iniciativa`
+        : 'Menos Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · menos Iniciativa';
     }
     if(esArmRota(e)){
-      const menos = [...String(e.detalle || '').matchAll(/−(\d+(?:[.,]\d+)?) Defensa/g)].reduce((a, m) => a + n(String(m[1]).replace(',', '.')), 0);
-      if(e.derivado) return menos > 0 ? `Defensa −${f(menos)}` : 'Piezas abolladas: menos Defensa';
+      const menosDef = [...String(e.detalle || '').matchAll(/−(\d+(?:[.,]\d+)?) Defensa/g)].reduce((a, m) => a + n(String(m[1]).replace(',', '.')), 0);
+      if(e.derivado) return menosDef > 0 ? `Defensa −${f(menosDef)}` : 'Piezas abolladas: menos Defensa';
       return `Defensa −${f(Math.max(1, n(e.stacks)))}`;
     }
-    const partes = [];
-    if(e.escudo !== undefined && e.escudo !== null) partes.push(e.excedente ? `Vida extra +${f(e.escudo)}${e.tope ? ' (tope ' + f(e.tope) + ')' : ''}` : `Escudo ${f(e.escudo)}${e.escudoMax !== undefined ? '/' + f(e.escudoMax) : ''}`);
+    const vt = vidaTurno(e), st = n(e.stacks);
+    const escudo = e.escudo !== undefined && e.escudo !== null ? (e.excedente ? `Vida extra +${f(e.escudo)}${e.tope ? ' (tope ' + f(e.tope) + ')' : ''}` : `Escudo ${f(e.escudo)}${e.escudoMax !== undefined ? '/' + f(e.escudoMax) : ''}`) : '';
+    const p = presetDe(e.nombre);
+    const c = p && CORTO[norm(p.nombre)];
+    // (un estado con el nombre de la lista pero con números propios —«Debilitado (Goblin)»: Defensa −2—: van sus números, no los de la lista)
+    const modsDe = l => JSON.stringify((Array.isArray(l) ? l : []).filter(m => m && m.stat && n(m.val)).map(m => [m.stat, n(m.val)]));
+    const propios = Array.isArray(e.mods) && e.mods.length && modsDe(e.mods) !== modsDe(p && p.mods);
+    if(c && !propios) return [escudo, typeof c === 'function' ? c(vt, st, e) : c].filter(Boolean).join(' · ');
+    const partes = escudo ? [escudo] : [];
     (Array.isArray(e.mods) ? e.mods : []).filter(m => m && m.stat && n(m.val)).forEach(m => partes.push(`${etiqueta(m.stat)} ${n(m.val) > 0 ? '+' : '−'}${f(Math.abs(n(m.val)))}`));
-    const hp = n(e.hpturno !== undefined ? e.hpturno : e.hpTurno);
-    if(hp) partes.push(`${hp > 0 ? '+' : '−'}${f(Math.abs(hp))} de vida por turno`);
+    if(vt) partes.push(vt > 0 ? `Cura ${f(vt)} de vida cada turno` : `${menos(vt)} de vida cada turno`);
+    else if(e.curaDado) partes.push(`Cura ${e.curaDado} de vida cada turno`);
     if(e.invulnerable && !partes.length) partes.push('No recibe daño');
     if(partes.length) return partes.join(' · ');
-    const p = presetDe(e.nombre);
-    const corto = p && CORTO[norm(p.nombre)];
-    if(corto) return corto;
     const propio = limpiar(e.detalle);
     if(propio) return propio;
     return p ? limpiar(p.detalle) : '';
   }
   function globo(e, o){
     const num = numero(e, o || {});
-    return {titulo: String((e && e.nombre) || '?') + (num !== null ? ' ' + f(num) : ''), efecto: efecto(e, o || {}), dura: dura(e)};
+    return {titulo: String((e && e.nombre) || '?') + (num !== null ? ': ' + f(num) : ''), efecto: efecto(e, o || {}), dura: dura(e)};
   }
   function texto(e, o){
     const g = globo(e, o);
@@ -137,7 +161,7 @@ const EstadoCorto = (() => {
     const origen = [];
     const nom = id => { if(!id) return ''; try{ return (o.nombreDe && o.nombreDe(id)) || ''; }catch(err){ return ''; } };
     if(esSobrepeso(e)){
-      const s = n(e.sobrepeso) || n(o.sobre);
+      const s = sobrepesoDe(e, o);
       if(o.sobreCuenta && typeof Combatiente !== 'undefined' && Combatiente.sobrepesoCuentaTxt){
         const c = Combatiente.sobrepesoCuentaTxt(o.sobreCuenta).replace('tu equipo pesa', 'el equipo pesa').replace('tu Carga máxima es', 'la Carga máxima es');
         origen.push(`Por qué: ${c}${s > 0 ? ` → se pasa por ${f(s)}` : ''}.`);
@@ -170,6 +194,17 @@ const EstadoCorto = (() => {
     return {descripcion: desc, origen};
   }
 
-  return {CORTO, limpiar, numero, dura, efecto, globo, texto, detalle};
+  /* Los números de un estado para el resumen público (2026-11-23, dueño: «que diga cuánto cura cada turno… que el corto nunca pierda el número»): la vida
+     por turno ya multiplicada por los stacks, los stacks, el dado de cura, sus números (mods) y el sobrepeso. `campoHp` = 'hpturno' (personaje) o
+     'hpTurno' (invocación, creep). Lo usan comun/ficha-resumen.js, GM Tools (creepPublico) y el mapa (modificarCreep). */
+  function pub(e, campoHp){
+    if(!e) return {};
+    const st = Math.max(1, n(e.stacks) || 1), vt = n(e[campoHp || 'hpturno']) * st;
+    const mods = (Array.isArray(e.mods) ? e.mods : []).filter(m => m && m.stat && n(m.val)).slice(0, 8).map(m => ({stat: String(m.stat).slice(0, 20), val: n(m.val)}));
+    return {...(vt ? {vidaTurno: vt} : {}), ...(st > 1 ? {stacks: st} : {}), ...(e.curaDado ? {curaDado: String(e.curaDado).slice(0, 12)} : {}),
+      ...(mods.length ? {mods} : {}), ...(n(e.sobrepeso) > 0 ? {sobrepeso: n(e.sobrepeso)} : {})};
+  }
+
+  return {CORTO, pub, vidaTurno, limpiar, numero, dura, efecto, globo, texto, detalle};
 })();
 if(typeof window !== 'undefined') window.EstadoCorto = EstadoCorto;

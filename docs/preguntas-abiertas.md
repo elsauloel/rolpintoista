@@ -2254,6 +2254,8 @@ para todos (el número, solo en la cuenta)?
 
 ### P298 — 🔥 La resistencia sin número para el rival: lo que quedó elegido (2026-11-23, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-23):** (1) «el GM está bien que lo vea» (el número de la resistencia de los jugadores); «el tema son los jugadores a los creeps» (en la cola). (2) bien, «si el jugador deduce la resistencia tampoco es tan grave». (3) Mesa sin números, bien. (4) la Suela gruesa: «no me acuerdo bien qué es», revisarla (en la cola).
+
 1. **El GM ante un personaje**: como pediste («el equipo rival no vea el número»), el GM tampoco ve el número de la resistencia de un personaje en el
    cartel ni en la cuenta del duelo (es del bando de los creeps), aunque igual lo puede ver en la ficha. ¿Está bien, o el GM («ve todo») lo ve siempre?
 2. **Se puede deducir restando**: la cuenta muestra la tirada (4) y lo que entra (2), así que el rival puede sacar la cuenta. Lo dejé así para que la

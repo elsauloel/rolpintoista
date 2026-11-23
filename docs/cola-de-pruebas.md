@@ -2069,6 +2069,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🔥 inmune y vulnerable sin número, a la vista del rival** (2026-11-23): «es inmune al fuego» y «(es vulnerable: le entra de
   más)» y la fila «+ Resistencia… (vulnerable)» del cuadro, solo con la prueba automática.
 
+- **⬜ en cola — 🔥 Ajustes de la Varita del muro de fuego y del texto de la resistencia** (dueño, 2026-11-23):
+  1. **El GM ve el número de la resistencia de los jugadores** (cartel, renglón de «Empieza tu turno», cuenta del daño): «el GM está bien que lo
+     vea; el tema son los jugadores a los creeps». Los jugadores siguen sin ver el número de los creeps.
+  2. **La varita pasa a 2d4** de daño de fuego directo («un d4 sin quemadura ni nada me parece muy poco»): catálogo, textos y las varitas ya en
+     mochilas.
+  3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
+     frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
+- **⬜ en cola — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
+  rival se le nombra en el cartel del daño de una zona.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

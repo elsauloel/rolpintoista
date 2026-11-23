@@ -2267,7 +2267,7 @@ para todos (el número, solo en la cuenta)?
 
 ### ✅ P299 — 🐝 «Empieza tu turno» de una invocación no dice de quién es el turno (2026-11-23, Claude, cola de pruebas)
 
-**Decidido (dueño, 2026-11-23): sí, que diga su nombre** («▶ Empieza el turno de Abeja de prueba»). En la cola de programación.
+**Decidido (dueño, 2026-11-23): sí, que diga su nombre** («▶ Empieza el turno de Abeja de prueba»). **Aplicado (2026-11-23):** el título dice «▶ Empieza el turno de <invocación>», el primer renglón «🐝 Es el turno de <invocación>: empieza el turno de tu invocación, no el de <personaje>», «Sus estados» en vez de «Tus estados», el renglón de la zona «<invocación> está adentro al empezar su turno» y «⏱ YA NO ES SU TURNO» (vtt-hexgrid/js/16 `inicioDeInvocacion`, js/04).
 
 Probando la Abeja de prueba (una invocación del Jugador 1 con turno propio en el orden) parada sobre el Muro de fuego: al empezar su turno, al Jugador 1
 le sale la ventana de siempre, «▶ Empieza tu turno», con «Lo que pasa al empezar: nada que cambie» y el renglón del Muro («le entra 3d4 de daño de
@@ -2277,7 +2277,7 @@ prueba: le entra 3d4…»), o se deja así?
 
 ### ✅ P300 — 🔥 «Lo frena su resistencia al fuego» cuando la resistencia es 0 (2026-11-23, Claude, cola de pruebas)
 
-**Decidido (dueño, 2026-11-23): opción (a)**: la frase sale solo cuando de verdad tiene algo de resistencia; con 0, no se nombra. En la cola de programación.
+**Decidido (dueño, 2026-11-23): opción (a)**: la frase sale solo cuando de verdad tiene algo de resistencia; con 0, no se nombra. **Aplicado (2026-11-23):** `ZonaDetalle.frenoCorto` (comun/zona-detalle.js) no nombra la resistencia cuando se sabe que es 0; sin el número (una invocación, o un creep que los jugadores no descubrieron) sigue como antes.
 
 El cartel y el renglón de una zona de fuego dicen «No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego)»
 también cuando quien lo recibe tiene resistencia 0 (lo vi en la pantalla del GM con Blanco creep, resistencia al fuego 0: el GM ve el número de los

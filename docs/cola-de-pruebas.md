@@ -1782,10 +1782,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   prueba, la Varita a Blanco J2 (la usó con clics), mover la abeja, Blanco J1 y Blanco creep a las zonas, y el orden de turnos; al final se borraron
   las zonas, se vació el orden (narrativo) y se devolvieron vidas, No2, SP, estados, la mochila de J2, la abeja y las posiciones. Dudas: P299, P300.
   2 pruebas automáticas nuevas (1049).
-- **⬜ en cola — 🔥 ¿La Quemadura del Muro pierde un turno en el mismo momento en que entra?** (dueño, 2026-11-22, sobre la captura con
+- **✅ hecho (2026-11-23) — 🔥 ¿La Quemadura del Muro pierde un turno en el mismo momento en que entra?** (dueño, 2026-11-22, sobre la captura con
   «Quemadura: 3 → 2 turnos»: «quiero creer que esa es una quemadura previa… no tendría sentido que en el momento que se le aplica la quemadura
   por la zona de muro, se baje su cantidad de turnos de 3 a 2, tendría que por lo menos durar una ronda»). Verificar de dónde venía esa
   Quemadura y qué pasa cuando el Muro le pone otra encima (¿se renueva a 3?); que una recién puesta dure al menos una ronda entera.
+  *Resultado:* **no pierde un turno al entrar: era la previa**, como sospechaba el dueño. Orden real: «✔ Aplicar» cuenta los estados que ya tenía
+  (P177: bajan al empezar el turno) y recién después se tira el Muro. La Quemadura nueva pega una vez al ponerse (la regla de siempre: pega apenas te la
+  ponen) y queda en 3; baja a 2 recién al empezar el turno siguiente. Si ya tenía una, el Muro la vuelve a 3 sin pegar otra vez. Si llega fuera de su
+  turno (el Muro tirado después de pasar el turno), su próximo inicio no la cuenta ni le pega: ese era el «Nada que cambie» de la abeja. **Lo que se
+  cambió es lo que se lee:** el renglón del Muro dice «Quemadura (3 turnos)» o «Quemadura: ya la tenía, vuelve a 3 turnos», y en vez de «Nada que
+  cambie» sale «Quemadura: le llegó fuera de su turno, así que este turno no le cuenta ni le pega (ya pegó al llegar) — sigue con 3 turnos» (vale
+  para todo estado que llegue fuera del turno). **Probado con clics en «Claude · pruebas 2»** (GM, J1, J2; el Muro de fuego en Blanco creep lanzado
+  desde sus Acciones; Blanco J1 y la Abeja puestos encima por datos; orden J1, abeja, J2): ronda 1, J1: 50 → 46 (Muro) → 44 (la Quemadura al
+  ponerse), «Quemadura (3 turnos)», en la ficha 3 turnos; ronda 2, J1: «Quemadura: 3 → 2 turnos · −2 HP (44 → 42)», el Muro 11 (42 → 31) y
+  «Quemadura: ya la tenía, vuelve a 3 turnos», en la ficha 3; la abeja con el Muro tirado después de pasar su turno (30 → 25 → 23): en su inicio
+  siguiente salió el renglón nuevo. Al final, todo como estaba (sin el Muro ni la habilidad, vidas, No2, SP, estados, la abeja y las posiciones;
+  narrativo, sin orden de turnos). Capturas en la carpeta de la tanda. 2 pruebas automáticas nuevas (1051).
 - **⬜ en cola — 🐝 Las invocaciones en el orden de turnos, con su iniciativa** (dueño, 2026-11-22, P275: «una invocación debería ubicarse en la
   lista en el orden de turnos. Es más, agreguemos una función que al realizar una invocación, esta venga acompañada de una tirada de iniciativa y
   que automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada de iniciativa»). Ver cómo está hoy (hay invocaciones
@@ -2101,10 +2113,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
   23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
 
-- **⬜ en cola — 🐝 «Empieza tu turno» de una invocación dice su nombre** (P299, dueño 2026-11-23: «sí»): «▶ Empieza el turno de Abeja de prueba»
+- **✅ hecho (2026-11-23) — 🐝 «Empieza tu turno» de una invocación dice su nombre** (P299, dueño 2026-11-23: «sí»): «▶ Empieza el turno de Abeja de prueba»
   (y que se entienda que no es el turno del personaje).
-- **⬜ en cola — 🔥 «Lo frena (en parte) su resistencia al fuego» solo si hay resistencia** (P300, dueño 2026-11-23, opción a): con resistencia 0, el
+  *Resultado:* título «▶ Empieza el turno de Abeja de prueba», primer renglón «🐝 Es el turno de Abeja de prueba — Empieza el turno de tu invocación, no
+  el de Blanco J1: lo de abajo le pasa a Abeja de prueba», «Sus estados», el renglón «Muro de fuego: Abeja de prueba está adentro al empezar su turno» y
+  «⏱ YA NO ES SU TURNO». La de un personaje sigue «▶ Empieza tu turno». Probado con clics (pantalla del Jugador 1, dos rondas y el cierre).
+- **✅ hecho (2026-11-23) — 🔥 «Lo frena (en parte) su resistencia al fuego» solo si hay resistencia** (P300, dueño 2026-11-23, opción a): con resistencia 0, el
   cartel y el renglón de la zona no la nombran («le entra 1d4 de daño de fuego»). En una invocación sin el número a mano, como hoy.
+  *Resultado:* con resistencia 0 (y el número a la vista de esa pantalla) no se nombra; lo demás que frena (Defensa especial, Suela gruesa) sigue. Sin el
+  número (una invocación, o un creep que los jugadores no descubrieron) sigue «lo frena su resistencia al fuego»: los jugadores no se enteran de nada
+  nuevo de un creep. Probado con clics: Blanco J1 (resistencia 0) leyó «le entra 3d4 de daño de fuego y Quemadura (3 turnos)»; la abeja, como antes.
+  (El «en parte» de los textos es otra tarea de la cola, todavía sin hacer.)
+- **⬜ en cola — Probar: 🔥 la resistencia 0 de un creep en la pantalla del GM** (2026-11-23, P300): el cartel de una zona sobre un creep sin resistencia,
+  visto por el GM, tampoco la nombra; solo con la prueba automática (con clics se vio un personaje).
+- **⬜ en cola — Probar: 🔥 el renglón «le llegó fuera de su turno» con el texto final** (2026-11-23): con clics se vio con la primera redacción («se lo
+  pusieron fuera de su turno… ya pegó al ponérselo»); la final («le llegó… ya pegó al llegar») solo con la prueba automática.
 
 ## En cola
 

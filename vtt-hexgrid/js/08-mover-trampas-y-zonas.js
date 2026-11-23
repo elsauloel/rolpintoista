@@ -755,7 +755,7 @@ async function danoDirectoAvisar(t, o){
   const para = t.tipo === 'creep' ? gms : [zonaVenenoJugador(t)].filter(Boolean);
   let otros = para;
   if(o.enCartel && para.includes(fbUsuario.uid) && zonaBanner){ zonaBanner.veredicto = veredicto; otros = para.filter(u => u !== fbUsuario.uid); }   // lo resolvió acá: en el cartel de la zona
-  if(o.mesa !== false && !t.oculto) try{ await mesaLinea(`${icono} ${quien} · ${nombreZ}: le ${cuantos} (${cz.cuenta})${o.detalle ? ` · ${o.detalle}` : ''}`, o.estilo || 'recordatorio'); }catch(err){}   // (a uno oculto, la Mesa —la ven todos— no lo nombra)
+  if(o.mesa !== false && !t.oculto) try{ await mesaLinea(`${icono} ${quien} · ${nombreZ}: le ${cuantos} (${Combatiente.resSinNumero(cz.cuenta)})${o.detalle ? ` · ${o.detalle}` : ''}`, o.estilo || 'recordatorio'); }catch(err){}   // (la Mesa la ven todos: sin el número de su resistencia, P297)   // (a uno oculto, la Mesa —la ven todos— no lo nombra)
   if(otros.length)
     momentoAbrir({tipo: 'zona-dano', icono, titulo: `${quien} · ${nombreZ}`, estado: 'listo', resultado: `Le ${cuantos} (${cz.cuenta}).`,
       datos: {paraUids: otros, aviso: true, tituloAviso: o.titulo || nombreZ.replace(/^(el|la|los|las|tu|su) /i, '').replace(/^./, c => c.toUpperCase()), textoAviso: texto, veredicto: {...veredicto, chico: cz.cuenta}, ...(t.oculto && t.tipo === 'creep' ? {soloGM: true} : {})}});
@@ -793,14 +793,22 @@ function zonaCartelAntes(el, t, pasos){
   // de quien lo recibe (un personaje: su resumen; un creep, solo en la pantalla del GM), la Defensa o la Defensa especial y la Suela gruesa.
   let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
   if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // (como zonaResolverBanner)
+  // 🔥 El número, solo para su bando (P297, dueño, 2026-11-23: «que el equipo rival no vea el número, pero que sí diga resistente al fuego»): el GM
+  // ve el de los creeps; un jugador, el de los personajes. El rival lee «(es resistente)» / «es inmune» sin cuánto; de un creep, solo lo que los
+  // jugadores ya descubrieron (`revelado`, js/89).
+  const verNum = Combatiente.verResDe(soyGM, t.tipo);
   let resZ = null;
   try{
-    if(elZ && t.tipo === 'creep'){ const sc = soyGM ? creepPrivadoDe(t.fichaId) : null; if(sc) resZ = num(CreepCalculo.resElemental(sc, elZ)); }
+    if(elZ && t.tipo === 'creep'){
+      const sc = soyGM ? creepPrivadoDe(t.fichaId) : null;
+      if(sc) resZ = num(CreepCalculo.resElemental(sc, elZ));
+      else{ const rv = ((vinculo(t) || {}).revelado || {})[elZ]; resZ = rv === 'inmune' ? 99 : rv === 'resistente' ? 1 : rv === 'debil' ? -1 : null; }
+    }
     else if(elZ && !String(t.fichaId || '').includes(SEP_INVOCACION)){ const f = fichasPub.get(t.fichaId); if(f && f.resumen) resZ = num(f.resumen['res' + elZ]); }
   }catch(err){}
-  const suelaZ = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+  const suelaZ = tocaElPiso(el) && verNum ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
   const texto = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira,
-      elemento: elZ, res: t.oculto ? null : resZ, suela: t.oculto ? 0 : suelaZ})
+      elemento: elZ, res: t.oculto ? null : resZ, suela: t.oculto ? 0 : suelaZ, sinNumero: !verNum})
     : 'No hay nada que tirar: se aplica lo que deja la zona.';
   const conDados = !!el.zonaDano && /d/i.test(String(el.zonaDano)) && !t.oculto;
   return {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto, boton: 'Aplicar', botonInicio: conDados ? `${icono} Tirar el daño (${el.zonaDano})` : `${icono} Aplicar`};
@@ -1058,8 +1066,10 @@ async function zonaResolverBanner(){
     try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(...claves)}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
-  zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};
-  { const resTxt = zonaBanner.resultado; if(zonaBanner.momentoP) zonaBanner.momentoP.then(mid => momentoActualizar(mid, {estado: 'listo', resultado: resTxt})); }
+  // 🔥 (P297) el número de su resistencia, solo para su bando: en el cartel de esta pantalla si es de su bando; en el momento (lo ven todos), nunca.
+  const resultadoZ = partes.join(' · ') || 'sin efecto';
+  zonaBanner = {...zonaBanner, el, t, resultado: Combatiente.verResDe(soyGM, t.tipo) ? resultadoZ : Combatiente.resSinNumero(resultadoZ)};
+  { const resTxt = Combatiente.resSinNumero(resultadoZ); if(zonaBanner.momentoP) zonaBanner.momentoP.then(mid => momentoActualizar(mid, {estado: 'listo', resultado: resTxt})); }
   renderZonaBanner();
 }
 

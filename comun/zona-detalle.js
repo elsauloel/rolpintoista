@@ -33,15 +33,19 @@ const ZonaDetalle = (() => {
     return {defensa, directo: !!el.zonaIgnoraDef && !defensa, elemento: elem, res: resNombre(elem), suela: o.altura === 'piso' || o.altura === 'ambos'};
   }
   /* Lo corto, para el cartel y el renglón de «Empieza tu turno»: «lo frena su resistencia al fuego» / «lo frenan su Defensa especial y su resistencia
-     al hielo». o = {elemento, res (la de quien lo recibe, si se puede mostrar: un personaje), suela (la Suela gruesa de quien lo recibe, si la tiene)}.
+     al hielo». o = {elemento, res (la de quien lo recibe, si se puede mostrar: un personaje), suela (la Suela gruesa de quien lo recibe, si la tiene),
+     sinNumero (P297: la pantalla es del bando rival de quien lo recibe: «lo frena su resistencia al fuego (es resistente)», «es inmune al fuego»)}.
      Con resistencia 99 o más, «es inmune al fuego». '' si no lo frena nada (sin contar escudos ni Invulnerable). */
   const INMUNE_A = {fuego: 'al fuego', hielo: 'al hielo', rayo: 'a lo eléctrico', toxico: 'a lo tóxico', acido: 'al ácido', luz: 'a la luz', siniestro: 'a lo siniestro'};
   function frenoCorto(el, o){
     o = o || {};
     const f = frenoDe(el, {elemento: o.elemento});
     const hayRes = o.res !== undefined && o.res !== null && o.res !== '' && Number.isFinite(Number(o.res)), res = Number(o.res);
-    if(f.res && hayRes && res >= 99) return `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}: su ${f.res} es ${res}`;
-    const cosas = [f.defensa ? `su ${f.defensa}` : '', f.res ? `su ${f.res}${hayRes && res !== 0 ? (res < 0 ? ` −${-res}, vulnerable: le entra de más` : ` ${res}`) : ''}` : '',
+    // 🔥 (P297, 2026-11-23) `o.sinNumero`: lo ve el bando rival de quien lo recibe — «es resistente», «es inmune», «es vulnerable», sin cuánto.
+    const sinN = !!o.sinNumero;
+    if(f.res && hayRes && res >= 99) return sinN ? `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}` : `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}: su ${f.res} es ${res}`;
+    const resTxt = !hayRes || res === 0 ? '' : sinN ? (res < 0 ? ' (es vulnerable: le entra de más)' : ' (es resistente)') : (res < 0 ? ` −${-res}, vulnerable: le entra de más` : ` ${res}`);
+    const cosas = [f.defensa ? `su ${f.defensa}` : '', f.res ? `su ${f.res}${resTxt}` : '',
       Number(o.suela) > 0 ? `su Suela gruesa ${Math.round(Number(o.suela))}` : ''].filter(Boolean);
     if(!cosas.length) return '';
     return `${cosas.length === 1 ? 'lo frena' : 'lo frenan'} ${cosas.length === 1 ? cosas[0] : cosas.slice(0, -1).join(', ') + ' y ' + cosas[cosas.length - 1]}`;

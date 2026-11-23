@@ -2147,6 +2147,13 @@ versión parecida en más de una, es candidato a juntar.
   `Combatiente.resElementalNombre(el)` («Resistencia al fuego», «Resistencia eléctrica») y `resElementalCuenta(el, n)` («resistencia al fuego 2»):
   la fila de la cuenta del cuadro del duelo y la de `zonaDanoCuenta`. `Duelo.fraseResumen`: «No le hizo daño (lo frenó: Resistencia al fuego)», de las
   filas «−» de `dano.cuenta` (antes, siempre «la armadura o el escudo»). Dudas: P296, P297.
+  **🔥 El número de la resistencia, solo para su bando** (P297, dueño, 2026-11-23): `frenoCorto(el, {…, sinNumero})` → «lo frena su resistencia al
+  fuego (es resistente)», «es inmune al fuego», «(es vulnerable: le entra de más)», sin cuánto. `Combatiente.verResDe(gm, tipo)` (¿esta pantalla ve el
+  número de alguien de ese tipo? el GM, el de los creeps; un jugador, el de los personajes) y `Combatiente.resSinNumero(texto)` (saca el número de
+  «Res. fuego 2», «resistencia al fuego −2 (vulnerable)», «… es 99»). `Duelo.danoSinRes(dn)`: la copia del daño sin ese número (el renglón con `res`
+  o que empieza con «Resistencia…» queda sin `v`, con `oculto`, `neg` si era negativa y la nota «cuánto, lo ve su bando»; `freno` y `magico.resEl`
+  sin el número): la usan el cuadro (`danoHtml` y la vista previa, si `resTapar(d)`: la pantalla es del bando rival del defensor) y la Mesa
+  (`lineasResumen` y el anuncio del daño: siempre). `Duelo.cuentaTxt` / `cuentaHtml` se exportan para las pruebas. Dudas: P298.
 - **`glosario.js`: `marcar(texto, {usados, basicos})`** (2026-11-22): `usados` = un `Set` compartido entre varios textos (un término marcado en uno no se
   vuelve a marcar en otro); `basicos: true` suma PdG (y «Probabilidad de Golpe»), Defensa y Evasión (`BASICOS_TXT`; en el resto del juego siguen sin
   marcarse). `def()` también los encuentra. Entradas nuevas en `MECANICAS`: Res.Esp, Res.CC, Res.Mt, Fuego amigo, Mantenimiento, y Ef.Esp, PdG.Esp,

@@ -2227,7 +2227,7 @@ async function dueloAplicarDano(d, o){
   const vidaCampos = r => ({...(r && r.extraAntes !== undefined ? {extraAntes: num(r.extraAntes), extraDespues: num(r.extraDespues)} : {}), ...(r && num(r.max) > 0 ? {hpMax: num(r.max)} : {})});
   const armarCuenta = res => {
     const cuenta = [];
-    const R = (s, txt, v, nota, f) => cuenta.push({s, txt: String(txt || '').slice(0, 90), ...(v !== undefined && v !== null ? {v: num(v)} : {}), ...(nota ? {nota: String(nota).slice(0, 140)} : {}), ...(f ? {f: 1} : {})});
+    const R = (s, txt, v, nota, f, res) => cuenta.push({s, txt: String(txt || '').slice(0, 90), ...(v !== undefined && v !== null ? {v: num(v)} : {}), ...(nota ? {nota: String(nota).slice(0, 140)} : {}), ...(f ? {f: 1} : {}), ...(res ? {res: 1} : {})});   // `res`: la resistencia de quien recibe (P297: el número, solo para su bando)
     const manualNum = dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== '' && dn.defensaManual !== 'no';
     R('', 'Tirada de daño', num(dn.crudo));
     if(menosDist) R('−', d.hab && d.hab.menosPorOrden ? 'por los que tocó antes en la línea' : 'por la distancia', menosDist);
@@ -2247,7 +2247,7 @@ async function dueloAplicarDano(d, o){
     const rr = res.r || {};
     if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
     else{
-      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota));
+      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota, 0, x.res));
       if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? (ignoraDef ? 'pasa' : 'pasa la Defensa') : (ignoraDef ? 'lo frena entero' : 'la Defensa lo frena entero'), rr.llega);
       if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
       // ❤ La Vida extra es vida (dueño, 2026-11-18): no se resta como un escudo; lo que se lleva cuenta en «entra a la vida».

@@ -615,6 +615,29 @@ const Duelo = (() => {
      dice 19 de daño menos X de defensa menos 8 de blindaje»): `dano.cuenta` la arma el mapa al aplicar (js/13), un renglón por cosa —{s: '' | '+' | '−' |
      '×' | '÷' | '=', txt, v, nota, f (el final)}—. En la Mesa, en una línea: «19 − Defensa 11 − Blindaje (escudo) 8 = 0 a la vida». */
   const tieneCuenta = dn => !!(dn && Array.isArray(dn.cuenta) && dn.cuenta.length);
+  /* 🔥 El número de la resistencia de quien recibe el daño, solo para su bando (P297, dueño, 2026-11-23: «me gustaría que el equipo rival no vea el
+     número, pero que sí diga resistente al fuego… pero que no diga cuánto»). `danoSinRes(dn)`: una copia del daño sin ese número (el renglón de la
+     resistencia queda «− Resistencia al fuego» sin valor, con la nota de que lo ve su bando; `freno` y el `resEl` del elemental, sin el número); el
+     resultado final sigue a la vista. La usan el cuadro (si la pantalla es del bando rival: el GM ante un personaje, un jugador ante un creep,
+     `Combatiente.verResDe`) y la Mesa (la ven todos: siempre sin el número). */
+  const resSinN = t => (typeof Combatiente !== 'undefined' && Combatiente.resSinNumero ? Combatiente.resSinNumero(t) : t);
+  const esFilaRes = c => !!(c && c.s === '−' && (c.res || /^(Resistencia (al|a lo|a la|eléctrica)|Res\. )/.test(String(c.txt || ''))));
+  const NOTA_RES = 'cuánto, lo ve su bando';
+  function danoSinRes(dn){
+    if(!dn || typeof dn !== 'object') return dn;
+    const o = {...dn};
+    if(Array.isArray(dn.cuenta)) o.cuenta = dn.cuenta.map(c => {
+      if(!esFilaRes(c)) return c && c.nota ? {...c, nota: resSinN(c.nota)} : c;
+      const f = {...c, txt: resSinN(c.txt), nota: NOTA_RES, oculto: 1};
+      if(_num(c.v) < 0) f.neg = 1;
+      delete f.v;
+      return f;
+    });
+    if(dn.freno) o.freno = resSinN(dn.freno);
+    if(dn.magico && typeof dn.magico === 'object'){ o.magico = {...dn.magico}; if(dn.magico.resEl) o.magico.resEl = resSinN(dn.magico.resEl); if(dn.magico.frenos) o.magico.frenos = resSinN(dn.magico.frenos); }
+    return o;
+  }
+  const resTapar = d => !!(d && d.defensor && typeof Combatiente !== 'undefined' && Combatiente.verResDe && !Combatiente.verResDe(soyGM(), d.defensor.tipo));
   /* 🧮 La vista previa de la cuenta (2026-11-04): una por duelo y tirada de daño (si cambia el daño, el crítico o la Defensa a mano, se vuelve a pedir).
      Solo en la pantalla que puede aplicarlo (el defensor o el GM) y si el mapa da el gancho; si no, el cuadro queda como antes. */
   const previas = new Map();
@@ -635,7 +658,8 @@ const Duelo = (() => {
     dn.cuenta.forEach((c, i) => {
       const v = c.v === undefined ? null : _num(c.v);
       if(i === 0){ t = `${_fmt(v)}`; return; }
-      if(c.s === '−' && v) t += ` ${v < 0 ? '+' : '−'} ${c.txt} ${_fmt(Math.abs(v))}`;
+      if(c.s === '−' && c.oculto) t += ` ${c.neg ? '+' : '−'} ${c.txt}`;   // 🔥 (P297) la resistencia, sin el número
+      else if(c.s === '−' && v) t += ` ${v < 0 ? '+' : '−'} ${c.txt} ${_fmt(Math.abs(v))}`;
       else if(c.s === '+' && v) t += ` + ${c.txt} ${_fmt(v)}`;
       else if(c.s === '×') t += ` ×${_fmt(v)}`;
       else if(c.s === '÷') t += ` ÷${_fmt(v)}`;
@@ -666,7 +690,7 @@ const Duelo = (() => {
     if(!tieneCuenta(dn)) return '';
     const filas = cuentaConMag(dn).map(c => {
       const v = c.v === undefined ? null : _num(c.v);
-      const signo = c.s === '−' && v < 0 ? '+' : c.s;
+      const signo = c.s === '−' && (v < 0 || c.neg) ? '+' : c.s;
       const val = v === null ? '' : c.s === '×' ? '×' + _fmt(v) : c.s === '÷' ? '÷' + _fmt(v) : _fmt(Math.abs(v));
       const cls = c.f ? 'final' : c.s === '=' ? 'sub' : c.s === '−' ? 'resta' : c.s === '+' ? 'suma' : c.s === '' && v === null ? 'nota' : '';
       return `<div class="duelo-cuenta-fila ${cls}"><span class="s">${signo === '×' || signo === '÷' ? '' : _esc(signo)}</span><span class="t">${_esc(c.txt)}${c.nota ? `<small>${_esc(c.nota)}</small>` : ''}</span><span class="v">${val}</span></div>`;
@@ -1783,7 +1807,7 @@ const Duelo = (() => {
     else if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defNom} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
     if(d.crit && d.crit.critico) L.push(`¡Crítico ×${d.crit.mult}!${d.crit.mult > 1 ? '' : ' (el d20 no alcanzó a multiplicar, pero ignora la Defensa)'} (d20: ${(d.crit.d20 || []).join(', ')})`);
-    const dn = d.dano;
+    const dn = danoSinRes(d.dano);   // (la Mesa la ven todos: sin el número de la resistencia de quien lo recibe, P297)
     let juntoMag = false;   // 🔥 el elemental ya fue en la línea del daño
     if(dn && dn.aplicado){
       const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
@@ -1979,7 +2003,7 @@ const Duelo = (() => {
       if((m.efectos || []).length){ m.fase = 'efectos'; m.estado = 'esperando'; cerrarSiListo(m); }
       else{ m.fase = 'fin'; m.estado = 'resuelto'; }
       tx.update(ref, cambiosDe(m));
-      const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.critico;
+      const dn = danoSinRes(m.dano), crit = m.resultado === 'pego' && m.crit && m.crit.critico;   // (la Mesa: sin el número de su resistencia, P297)
       anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
         : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
         : dn.aMano ? `✍ ${m.atacante.nombre} → ${m.defensor.nombre}: se aplicó a mano: ${_fmt(dn.aMano.valor)} de daño (el duelo sugería ${_fmt(dn.aMano.sugerido)}) (vida ${vidaCambioDn(dn)})`
@@ -3069,7 +3093,7 @@ const Duelo = (() => {
 
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
   function danoHtml(d){
-    const dn = d.dano;
+    const dn = resTapar(d) ? danoSinRes(d.dano) : d.dano;   // 🔥 (P297) el bando rival de quien lo recibe, sin el número de su resistencia
     // 🌩 Una tirada que no es daño (los proyectiles de la Tormenta, js/118): el botón de quien la usa y, ya tirada, el número grande.
     if(d.hab && d.hab.soloTirada){
       const etq = d.hab.soloTirada.etq || 'Tirada', f = d.hab.dano ? d.hab.dano.formula : '';
@@ -3142,7 +3166,7 @@ const Duelo = (() => {
         // ya debe saber cuánto va a ser»): la pide al mapa (cfgEscuchar.previa: la misma cuenta, sin escribir) la pantalla que puede aplicarlo.
         const pv = previaDe(d);
         const conPrevia = pv && pv.listo && pv.dato && tieneCuenta(pv.dato) && !pv.dato.manual;
-        const pvd = conPrevia ? pv.dato : null, pvTotal = pvd ? entroDn(pvd) + (magJunto(pvd) ? entroDn(pvd.magico) : 0) : 0;
+        const pvd = conPrevia ? (resTapar(d) ? danoSinRes(pv.dato) : pv.dato) : null, pvTotal = pvd ? entroDn(pvd) + (magJunto(pvd) ? entroDn(pvd.magico) : 0) : 0;
         cuerpo = tiro + svTxt + (conPrevia
           ? `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(pvTotal)}</div><div class="duelo-danosub" style="font-size:14px">de daño ${suyo ? 'te va a entrar a la vida' : `le va a entrar a la vida a ${_esc(d.defensor.nombre)}`}${magJunto(pvd) ? ` (${_fmt(entroDn(pvd))} del golpe + ${magIcono(pvd.magico.tipo)} ${_fmt(entroDn(pvd.magico))} de ${_esc(String(pvd.magico.tipo).toLowerCase())})` : ''}</div></div>${cuentaHtml(pvd)}<div class="duelo-mini">${_esc(d.defensor.nombre)}: vida <b>${vidaAntesDn(pvd)}</b> → <b>${vidaFinDn(pvd)}</b></div>`
           : `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${pv && !pv.listo ? '<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">🧮 Calculando la cuenta…</div>' : frenan}</div>${mgAntes}`)
@@ -4488,5 +4512,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

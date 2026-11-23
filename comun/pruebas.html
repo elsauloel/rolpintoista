@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261123cola59"></script>
+<script src="zona-detalle.js?v=20261123cola60"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123cola59"></script>
+<script src="combatiente.js?v=20261123cola60"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261123cola59"></script>
+<script src="duelo.js?v=20261123cola60"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261122cola49"></script>
@@ -9774,6 +9774,55 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
       'Mago le hizo Muro de fuego: el daño a Blanco. No le hizo daño (lo frenó: Resistencia al fuego).');
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
     ok(/elemento: elZ, res: t\.oculto \? null : resZ, suela: t\.oculto \? 0 : suelaZ/.test(t08) && /Combatiente\.resElementalCuenta\(o\.elZ/.test(t08) && /Combatiente\.resElementalNombre\(elDano\)/.test(t13));
+  });
+  prueba('🔥 la Varita del muro de fuego es daño directo (P296, dueño, 2026-11-23): no la frenan la Defensa ni la Defensa especial; sí la resistencia al fuego', async () => {
+    const it = CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-muro-de-fuego');
+    ok(it && it.especial.duelo.danoDirecto === true && it.especial.dano === '1d4');
+    ok(/1d4 de fuego directo a cada rival \(no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego y la Suela gruesa\)/.test(it.detalle));
+    // El mensaje de la zona (el mismo para personajes y creeps): zonaDirecto.
+    const z = Combatiente.zonaDeHab({nombre: it.nombre, tiradaExtra: '1d4'}, structuredClone(it.especial.duelo), {fichaId: 'f1', tipo: 'pj'});
+    ok(z.zonaDirecto === true && z.zonaIgnoraDef === true && z.zonaDano === '1d4');
+    const el = {zona: true, zonaNombre: it.nombre, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({alEmpezar: true})};
+    igual(ZonaDetalle.frenoDe(el, {elemento: 'fuego', altura: 'ambos'}), {defensa: '', directo: true, elemento: 'fuego', res: 'resistencia al fuego', suela: true});
+    igual(ZonaDetalle.sinTiradaTexto(el, {quienTira: 'Blanco', elemento: 'fuego', res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego 2). El daño lo tira Blanco.');
+    const m = ZonaDetalle.armar(el, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, autor: {nombre: 'Blanco'}, habilidad: it.nombre, altura: 'ambos', rivalesTxt: 'los creeps'});
+    ok(/^No lo frenan la Defensa ni la Defensa especial \(va directo\)\. Sí le resta la resistencia al fuego/.test(fila(m, 'Qué frena el daño')));
+    // Las varitas ya en mochilas se ponen al día solas (la de antes: con «al empezar», sin «directo»; y la de antes de eso).
+    const vieja1 = {id: it.id, nombre: it.nombre, especial: {sp: 1, dano: '1d4', duelo: {objetivo: 'zona', dano: true, tipoDano: 'fuego', zonaEstado: {alEmpezar: true}}}, detalle: 'viejo'};
+    const vieja2 = {id: it.id, nombre: it.nombre, especial: {sp: 1, dano: '1d4', duelo: {objetivo: 'zona', dano: true, tipoDano: 'fuego'}}, detalle: 'viejo'};
+    ok(Combatiente.ponerAlDiaItemsFabrica([vieja1, vieja2]));
+    ok(vieja1.especial.duelo.danoDirecto === true && vieja2.especial.duelo.danoDirecto === true && vieja1.detalle === it.detalle);
+    const nueva = structuredClone(it);
+    ok(!Combatiente.ponerAlDiaItemsFabrica([nueva]));
+  });
+  prueba('🔥 el número de la resistencia, solo para su bando (P297, dueño, 2026-11-23): el rival lee «es resistente» sin cuánto', async () => {
+    igual([Combatiente.verResDe(true, 'pj'), Combatiente.verResDe(true, 'creep'), Combatiente.verResDe(false, 'pj'), Combatiente.verResDe(false, 'creep')], [false, true, true, false]);
+    igual(['Res. fuego 2', 'resistencia al fuego −2 (vulnerable)', 'su resistencia al fuego es 99', '8 − Resistencia al fuego 2 − Suela gruesa 1 = 5', 'Res. eléctrica 3', 'Defensa 4'].map(Combatiente.resSinNumero),
+      ['Res. fuego', 'resistencia al fuego (vulnerable)', 'su resistencia al fuego', '8 − Resistencia al fuego − Suela gruesa 1 = 5', 'Res. eléctrica', 'Defensa 4']);
+    const el = {zona: true, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep'};
+    const T = o => ZonaDetalle.sinTiradaTexto(el, {quienTira: 'Mago', elemento: 'fuego', ...o});
+    igual(T({res: 2, sinNumero: true}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego (es resistente)). El daño lo tira Mago.');
+    igual(T({res: 99, sinNumero: true}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (es inmune al fuego). El daño lo tira Mago.');
+    ok(/su resistencia al fuego \(es vulnerable: le entra de más\)/.test(T({res: -2, sinNumero: true})));
+    igual(T({res: null, sinNumero: true}), T({}));   // (no lo sabe: un creep sin descubrir)
+    igual(T({res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego 2). El daño lo tira Mago.');
+    // El cuadro del duelo: la resistencia sin el número (con la nota), el resultado a la vista; la Mesa (cuentaTxt), igual.
+    const dn = {aplicado: true, recibido: 2, cuenta: [{s: '', txt: 'Tirada de daño', v: 4}, {s: '', txt: 'Daño directo: no lo frena la Defensa ni la Defensa especial'}, {s: '−', txt: 'Resistencia al fuego', v: 2, res: 1}, {s: '=', txt: 'pasa', v: 2}, {s: '=', txt: 'entra a la vida', v: 2, f: 1}], freno: 'Res. fuego 2'};
+    const sin = Duelo.danoSinRes(dn);
+    igual(sin.cuenta[2], {s: '−', txt: 'Resistencia al fuego', res: 1, nota: 'cuánto, lo ve su bando', oculto: 1});
+    igual(sin.freno, 'Res. fuego'); igual(dn.cuenta[2].v, 2);   // (no toca el original)
+    igual(Duelo.cuentaTxt(dn), '4 (Daño directo: no lo frena la Defensa ni la Defensa especial) − Resistencia al fuego 2 = 2 a la vida');
+    igual(Duelo.cuentaTxt(sin), '4 (Daño directo: no lo frena la Defensa ni la Defensa especial) − Resistencia al fuego = 2 a la vida');
+    ok(/Resistencia al fuego<small>cuánto, lo ve su bando<\/small><\/span><span class="v"><\/span>/.test(Duelo.cuentaHtml(sin)) && /<span class="v">2<\/span>/.test(Duelo.cuentaHtml(dn)));
+    const vul = Duelo.danoSinRes({cuenta: [{s: '', txt: 'Tirada', v: 4}, {s: '−', txt: 'Resistencia al hielo (vulnerable)', v: -1, res: 1}]});
+    ok(vul.cuenta[1].neg === 1 && / \+ Resistencia al hielo \(vulnerable\)/.test(Duelo.cuentaTxt(vul)));
+    // Los caminos: el cartel con `sinNumero`, el renglón de la resistencia marcado (`res`), el cuadro y la Mesa sin el número.
+    const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
+    const t10 = await (await fetch('../vtt-hexgrid/js/10-hud-y-vida.js', {cache: 'no-store'})).text(), tdu = await (await fetch('duelo.js', {cache: 'no-store'})).text();
+    ok(/sinNumero: !verNum/.test(t08) && /const verNum = Combatiente\.verResDe\(soyGM, t\.tipo\)/.test(t08) && /revelado \|\| \{\}\)\[elZ\]/.test(t08));
+    ok(/resultado: resTxt\}/.test(t08) && /const resTxt = Combatiente\.resSinNumero\(resultadoZ\)/.test(t08) && /Combatiente\.resSinNumero\(cz\.cuenta\)/.test(t08));
+    ok(/v: num\(c\.restaExtra\), res: 1\}/.test(t10) && /R\('−', x\.txt, x\.v, x\.nota, 0, x\.res\)/.test(t13));
+    ok(/const dn = resTapar\(d\) \? danoSinRes\(d\.dano\) : d\.dano;/.test(tdu) && /const dn = danoSinRes\(d\.dano\);/.test(tdu) && /const dn = danoSinRes\(m\.dano\)/.test(tdu));
   });
   prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
     const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,

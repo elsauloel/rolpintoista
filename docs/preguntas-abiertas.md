@@ -2236,6 +2236,9 @@ el de la **Varita del muro de fuego** no está marcado como directo, así que ho
 recibe (como cualquier daño de fuego de una habilidad). El texto de la varita no dice nada de eso. ¿Queda así (la varita, más barata, la frena también
 la Defensa especial) o la paso a daño directo, como el Muro de la habilidad?
 
+> ✅ **Respondida (dueño, 2026-11-23):** «probablemente sea un daño bajo (1d4) y debería ser daño directo». Hecho: la varita es daño directo (no la
+> frenan la Defensa ni la Defensa especial; sí la resistencia al fuego y la Suela gruesa); las ya guardadas se ponen al día solas.
+
 ### P297 — 🔥 ¿Lo que frena el daño de una zona, con el número de quien la recibe? (2026-11-23, Claude)
 
 El cartel de la zona y el renglón de «Empieza tu turno» ahora dicen qué frena el daño, y con un personaje muestran su número: «(lo frena su
@@ -2243,3 +2246,19 @@ resistencia al fuego 2)», «(es inmune al fuego: su resistencia al fuego es 99)
 el GM (a un jugador no se le cuenta la resistencia de un rival); de una **invocación** no se muestra el número (se lee aparte y el cartel sale antes):
 dice «lo frena su resistencia al fuego» a secas, y la cuenta del cuadro del duelo sí trae el número. ¿Está bien así, o preferís el texto sin números
 para todos (el número, solo en la cuenta)?
+
+> ✅ **Respondida (dueño, 2026-11-23):** «me gustaría que el equipo rival no vea el número, pero que sí diga resistente al fuego, resistente a lo
+> tóxico, pero que no diga cuánto». Hecho: el número lo ve solo el bando de quien recibe el daño (el GM, el de los creeps; los jugadores, el de los
+> personajes); el rival lee «es resistente» / «es inmune» / «es vulnerable» (de un creep, solo lo ya descubierto); en la cuenta del duelo, «−
+> Resistencia al fuego» sin valor; en la Mesa y la Crónica (las ven todos), siempre sin el número. Lo que quedó elegido: P298.
+
+### P298 — 🔥 La resistencia sin número para el rival: lo que quedó elegido (2026-11-23, Claude)
+
+1. **El GM ante un personaje**: como pediste («el equipo rival no vea el número»), el GM tampoco ve el número de la resistencia de un personaje en el
+   cartel ni en la cuenta del duelo (es del bando de los creeps), aunque igual lo puede ver en la ficha. ¿Está bien, o el GM («ve todo») lo ve siempre?
+2. **Se puede deducir restando**: la cuenta muestra la tirada (4) y lo que entra (2), así que el rival puede sacar la cuenta. Lo dejé así para que la
+   cuenta se siga entendiendo. ¿Alcanza, o preferís esconder también el «pasa»?
+3. **La Mesa, sin número para todos**: la línea del daño en la Mesa la ven los dos bandos, así que ahí la resistencia va siempre sin número (también
+   para su propio bando, que lo ve en el cuadro). ¿Está bien?
+4. **La Suela gruesa del rival**: en el cartel, al rival no se le nombra la Suela gruesa de quien lo recibe (es parte de lo que lo frena, con número).
+   ¿Se nombra sin número, o queda así?

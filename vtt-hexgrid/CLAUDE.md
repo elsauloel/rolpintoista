@@ -2619,6 +2619,16 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   inmune al fuego». `zonaDanoCuenta` y la fila de la cuenta del duelo (js/13) dicen «resistencia al fuego» (`Combatiente.resElementalCuenta` /
   `resElementalNombre`). Probado con clics en «Claude · pruebas 2» (cola 2026-11-23). Dudas: P296 (la varita, sin «directo», la frena también la
   Defensa especial), P297.
+- **🔥 La resistencia de quien recibe, con número solo para su bando** (P297, dueño, 2026-11-23: «que el equipo rival no vea el número, pero que sí
+  diga resistente al fuego»): `zonaCartelAntes` (js/08) le pasa `sinNumero` a `sinTiradaTexto` si la pantalla es del bando rival
+  (`Combatiente.verResDe(soyGM, t.tipo)`: el GM, el de los creeps; un jugador, el de los personajes); de un creep, a un jugador le arma la resistencia
+  con lo descubierto (`vinculo(t).revelado`, js/89). El resultado del cartel (`zonaBanner.resultado`) sin el número si es del rival; el del momento
+  (Crónica) y la línea de la Mesa del daño directo (`danoDirectoAvisar`), siempre sin el número (`Combatiente.resSinNumero`). js/10: el renglón de la
+  resistencia de `defensaPartes` lleva `res: 1` y js/13 `armarCuenta` lo pasa a `dano.cuenta`: el cuadro del duelo (comun/duelo.js, `danoSinRes`) lo
+  muestra sin valor al bando rival y la Mesa siempre sin el número. El aviso de los saltos del rayo (js/10), sin el número. Dudas: P298.
+- **🔥 La Varita del muro de fuego, daño directo** (P296, dueño, 2026-11-23): `danoDirecto` en su `especial.duelo` (comun/catalogo.js) → el muro sale con
+  `zonaDirecto` (no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego y la Suela gruesa). Las copias guardadas se ponen al día
+  solas (`Combatiente.ponerAlDiaItemsFabrica`, lista `ITEMS_AL_DIA`). Probado con clics en «Claude · pruebas 2» (cola 2026-11-23).
 
 - **📋 Respuestas a P252, P256, P259, P260 y P262** (2026-11-22, cola): (1) el fin del combate vacía también el orden de turnos (comun/tokens-auto.js).
   (2) `hudAplicar` (js/10): subirle la vida a mano a un caído pregunta «¿Querés resucitarlo con N de vida?» (Sí = `revivirToken(t, {val, aMano: true})`,

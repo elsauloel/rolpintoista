@@ -297,7 +297,7 @@ function defensaPartes(c){
     if(c.trinchera) p.push({txt: Combatiente.trincheraTxt(c.trinchera).replace(/ \+\d+/, ''), v: num(c.trinchera.def)});   // 🛡 Aguante de trinchera (2026-11-20)
     if(c.estoico) p.push({txt: `Estoicismo: ${c.estoico.n} enemigo${c.estoico.n === 1 ? '' : 's'} pegado${c.estoico.n === 1 ? '' : 's'}`, v: num(c.estoico.val)});
   }
-  if(num(c.restaExtra)) p.push({txt: (c.o && c.o.resTxt) || 'Resistencia al elemento', v: num(c.restaExtra)});
+  if(num(c.restaExtra)) p.push({txt: (c.o && c.o.resTxt) || 'Resistencia al elemento', v: num(c.restaExtra), res: 1});   // `res` (P297, 2026-11-23): la resistencia de quien recibe: el número, solo para su bando (comun/duelo.js)
   return p;
 }
 const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
@@ -846,7 +846,7 @@ async function rayoCadenaAplicar(cadena, o){
     // 📣 (P246) a quien recibe el salto, el mismo aviso (js/08); la línea de la Mesa ya la deja el reporte del rayo (js/110) o el aviso de abajo.
     if(ok && r0) danoDirectoCuentaYAviso(s.t, dano, r0, {nombre: 'el salto del rayo', titulo: 'El salto del rayo', icono: '⚡', resElem: res0, elZ: 'rayo', mesa: false});
     hubo.push({id: s.id, t: s.t, dano, entro, antes, despues, ...(vidaTxt ? {vidaTxt} : {}), ...(nota ? {nota} : {})});
-    (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}${nota ? ` (${nota})` : ''}`);
+    (ok ? hechos : manual).push(`${nombre}: ${dano}${Combatiente.resSinNumero(resTxt)}${ok && entro !== dano ? ` → ${entro}` : ''}${nota ? ` (${nota})` : ''}`);
     prev = dano;   // ⚡ (2026-11-18, dueño: «debería haber saltado a Bizzante y a Larry»): el salto que sigue es la mitad de lo que LLEGABA, no de lo que entró (un invulnerable o una resistencia no cortan la cadena)
   }
   if(hubo.length && !o.callado) alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${hubo.length} más (la mitad de lo que le entró al anterior, para abajo; cada uno resta su Res. eléctrica). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);

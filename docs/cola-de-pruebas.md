@@ -2040,6 +2040,34 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🔥 El cartel verde del daño de una zona dice «no hay nada que resistir»** (visto en las capturas del 23/11): en el cuadro del duelo del
   daño del Muro de fuego, el cartel grande de abajo sigue diciendo «no hay nada que resistir: se aplica», aunque la cuenta resta la resistencia al
   fuego. Que diga algo coherente con lo nuevo (por ejemplo «no se puede esquivar: se aplica»).
+- **✅ hecho (2026-11-23) — 🔥 Varita del muro de fuego directa y la resistencia sin número para el rival (P296, P297).** Dueño: (P296) «probablemente
+  sea un daño bajo (1d4) y debería ser daño directo»; (P297) «me gustaría que el equipo rival no vea el número, pero que sí diga resistente al fuego,
+  resistente a lo tóxico, pero que no diga cuánto».
+  *Resultado:* **P296** — la varita (catálogo) lleva `danoDirecto`: su muro sale con `zonaDirecto` y no lo frenan la Defensa ni la Defensa especial; sí
+  la resistencia al fuego y la Suela gruesa (es de piso y aire). El texto de la varita lo dice («1d4 de fuego directo a cada rival (no lo frenan la
+  Defensa ni la Defensa especial; sí la resistencia al fuego y la Suela gruesa)»), y «Ver detalle», el cartel, el renglón de «Empieza tu turno» y la
+  cuenta del duelo lo toman de la zona. Las varitas ya guardadas se ponen al día solas (`ITEMS_AL_DIA`, también la de un creep). **P297** — el número
+  de la resistencia de quien recibe el daño lo ve solo su bando (`Combatiente.verResDe`: el GM, el de los creeps; los jugadores, el de los personajes):
+  el bando rival lee «lo frena su resistencia al fuego (es resistente)», «es inmune al fuego» o «(es vulnerable: le entra de más)», sin cuánto; de un
+  creep, solo lo que los jugadores ya descubrieron (`revelado`, js/89). En la cuenta del cuadro del duelo, el rival ve «− Resistencia al fuego» sin
+  valor («cuánto, lo ve su bando») y el resultado final igual (elegido así: el pedido es no decir cuánto; la cuenta queda clara; restando se puede
+  deducir — P298). La Mesa y la Crónica las ven todos: ahí la resistencia va siempre sin el número (`Combatiente.resSinNumero`; también la línea del
+  daño directo de una zona y el aviso de los saltos del rayo). Probado con clics en «Claude · pruebas 2» (GM, J1, J2), **armado por datos**: Blanco J1
+  con resistencia al fuego 2 y Defensa especial 3 (un estado de prueba); Blanco creep con una copia VIEJA de la varita (sin «directo»: se puso al
+  día sola) y después con resistencia al fuego 2; J1 con la varita en la mochila. (a) Varita del creep, J1 la cruza: cartel en la pantalla de J1 «(lo
+  frena su resistencia al fuego 2)», sin Defensa especial; cuenta 4 − 2 = 2 (la Defensa especial 3 ya no frena): J1 y J2 ven «Resistencia al fuego 2»,
+  el GM «Resistencia al fuego · cuánto, lo ve su bando»; la Mesa sin número; «Ver detalle»: «No lo frenan la Defensa ni la Defensa especial (va
+  directo)». (b) Varita de J1, el creep la cruza: cartel en la pantalla del GM «(lo frena su resistencia al fuego 2)»; cuenta 4 − 2 = 2: el GM con
+  el número, J1 y J2 sin él; se reveló «Blanco creep es resistente al fuego» (sin número). Tiradas con «✍ Elegir manualmente». Al final, todo como
+  estaba (sin muros; el creep sin la varita, sin la resistencia ni lo descubierto, vida 60 y No2 5, en su casilla; J1 y J2 con su mochila, vida,
+  No2 y estados de antes, en su casilla; narrativo, sin orden de turnos). Dos pruebas nuevas (1047).
+- **⬜ en cola — Probar: 🔥 el cartel de la zona visto por el bando rival** (2026-11-23): el cartel lo ve solo la pantalla que lo resuelve (la del
+  dueño del personaje, o la del GM para un creep), o sea siempre su bando; el texto sin número («es resistente») sale cuando el GM resuelve por un
+  personaje (🎮 el control). Solo con la prueba automática.
+- **⬜ en cola — Probar: 🔥 la Varita del muro de fuego al empezar el turno adentro, con resistencia** (2026-11-23): el renglón de «Empieza tu turno»
+  usa el mismo texto que el cartel (probado al cruzarla); esa combinación no se hizo con clics.
+- **⬜ en cola — Probar: 🔥 inmune y vulnerable sin número, a la vista del rival** (2026-11-23): «es inmune al fuego» y «(es vulnerable: le entra de
+  más)» y la fila «+ Resistencia… (vulnerable)» del cuadro, solo con la prueba automática.
 
 ## En cola
 

@@ -2010,7 +2010,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 📺 la tele de un teletransporte con un token oculto, en sigilo o en la niebla, y con «reducir movimiento»** (2026-11-23): por
   código, una pantalla que no ve el token no dibuja la tele (como el Parpadeo) y con «reducir movimiento» salta sin animación; no se probó en el mapa.
 
-- **🟡 a medias (2026-11-23: ya está en `firebase/firestore.rules`, junto con lo del token suelto; falta que el dueño pegue las reglas y probar crearla y pisarla) — 🔒 Arreglar las reglas: la Trampa de teleport de Terreno y Formas no se puede crear** (visto en la tarea de la tele,
+- **🟡 a medias (2026-11-23: ya está en `firebase/firestore.rules`, junto con lo del token suelto; **el dueño ya pegó las reglas (2026-11-23)**: falta probar crearla y pisarla) — 🔒 Arreglar las reglas: la Trampa de teleport de Terreno y Formas no se puede crear** (visto en la tarea de la tele,
   2026-11-23): `trampaDestino` está validado pero falta en la lista de campos que se pueden crear de `elementoValido` (firebase/firestore.rules),
   así que crearla da error de permisos. Sumarlo, avisarle al dueño que pegue las reglas, y probar crearla y pisarla con la tele.
 
@@ -2169,11 +2169,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
   la abeja con «🎭 Ponerlo en el mapa» (el mismo camino: aparece el token) y se fue con «Turnos agotados → Borrar»; falta invocarla con una habilidad que
   invoca y que salga del orden al caer con la vida en 0.
-- **⬜ en cola — Probar (con las reglas pegadas): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
+- **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
   iniciativa y ver que «Traer tokens» / «Tirar iniciativa» no lo meten; otro con «Sí», que entra. Uno con vida: el círculo rojo en el token, cambiarla a
   mano («12», «-3», Ctrl+Z) desde quien lo puso y desde el GM; en la tarjeta 🪪 y al pasar el mouse, la de un jugador con números y la del GM sin números
   para los jugadores. Editarlo: bajar el máximo (la vida no pasa del nuevo) y sacarle la vida.
-- **⬜ en cola — Probar (con las reglas pegadas): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
+- **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
   uno del Jugador 2 (cada uno contesta «🪨 Evasión 1» desde su pantalla; si no está, el GM a mano), el crítico, el daño que entra entero, «✍ Otro valor»,
   la línea de la Mesa, llegar a 0 («💥 Roto») y una habilidad dirigida contra el objeto.
 - **⬜ en cola — Probar: 🤝 el cartel «El GM te dio algo» en el mapa y con el GM con 🎮 el control** (2026-11-23, de P278): con clics se vio el cartel en la
@@ -2185,6 +2185,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   me gusta, además la paloma quedó para mensajes. Quizás el mismo emoji del pacto, pero con el círculo rojo de "prohibido" encima»). Hoy es 🕊
   (`vtt-hexgrid/js/10-hud-y-vida.js`, `pacto-quitar`). Pasarlo al emoji del Pacto con un 🚫 / círculo rojo tachado encima; revisar si la 🕊 aparece
   en otros lugares del Pacto (js/83, Mesa, carteles) y cambiarla también ahí, para que la paloma quede solo para los mensajes secretos.
+
+- **⬜ en cola — 🐝 Invocación cuyo lugar ya pasó: juega igual al final de esta ronda (P301 decidida, b)** (dueño, 2026-11-23): si al
+  invocarse su tirada la ubica en un lugar que ya pasó en esta ronda, en esta ronda juega igual al final, y desde la próxima en su lugar.
+- **⬜ en cola — 📦 Atacar a un objeto: sin crítico (P306 decidida, b)** (dueño, 2026-11-23): contra un token suelto con vida no hay crítico.
+- **⬜ en cola — 📦 Objeto en 0 de vida: aviso a quien lo puso para que lo saque (P307 decidida, d)** (dueño, 2026-11-23).
+- **⬜ en cola — 📦 Un token suelto sin vida no se puede atacar** (dueño, 2026-11-23: «no se debería poder atacar un token suelto»; sobre el
+  hallazgo de que atacar uno sin vida abre un duelo donde el defensor no tiene opciones). Que no se lo pueda elegir como objetivo de un ataque
+  (solo los que tienen vida, P305–P308).
+- **⬜ en cola — 🎁 Ver en detalle los dos 🎁 que no son ni «dar» ni botín (P309)** (dueño, 2026-11-23: «ponelo al final de la cola para ver en
+  detalle»): la casilla «🎁 Permitir agregar gratis» del generador de tiendas y los efectos de arma de la Guía de diseño. Mostrárselos al dueño
+  con captura y proponer.
 
 ## En cola
 

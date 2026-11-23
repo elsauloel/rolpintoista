@@ -2288,7 +2288,9 @@ creeps, y ahí no hay nada que frene). Con un número se lee «(lo frena su resi
 (a) con 0, no nombrar la resistencia («le entra 1d4 de daño de fuego»); (b) dejarla como recordatorio de que existe; (c) «(sin resistencia al fuego)».
 En una invocación (que no tiene el número a mano) se seguiría diciendo como hoy.
 
-### P301 — 🐝 Una invocación que entra al orden en un lugar que ya pasó en esta ronda: ¿juega recién en la próxima? (2026-11-23, Claude, cola de programación)
+### ✅ P301 — 🐝 Una invocación que entra al orden en un lugar que ya pasó en esta ronda: ¿juega recién en la próxima? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (b)** — si su lugar ya pasó, en esta ronda juega igual al final, y desde la próxima en su lugar. En la cola de programación.
 
 Desde hoy, al invocar con el orden de turnos armado, la invocación tira su iniciativa y entra en su lugar según la tirada (P275). Si ese lugar queda
 **antes** de quien tiene el turno (por ejemplo, el Jugador 1 tiene 0, invoca en su turno y la abeja saca 3), su lugar ya pasó en esta ronda.
@@ -2300,7 +2302,9 @@ de verdad en la siguiente. Antes entraba siempre al final, jugaba mareada en est
 (c) como (a), pero si su lugar ya pasó, entra sin Mareo (para que no pierda una ronda más que antes).
 Salida a mano: el GM la mueve con ▲▼ o le da el turno con clic derecho en su nombre.
 
-### P302 — 🐝 ¿Quién tira la iniciativa de la invocación? (2026-11-23, Claude, cola de programación)
+### ✅ P302 — 🐝 ¿Quién tira la iniciativa de la invocación? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (a)** — la tira sola la pantalla del GM, como quedó.
 
 Pediste que la invocación «venga acompañada de una tirada de iniciativa» y que se ubique sola. **Quedó automática: la tira la pantalla del GM** al ver
 aparecer el token (como hasta ahora la metía al final del orden), con la Iniciativa de la invocación (la de sus datos: Agilidad y lo que la suba, más
@@ -2310,7 +2314,9 @@ Choca un poco con la regla «las tiradas las hace el involucrado»: si preferís
 el GM puede tirarla por él). Además: si el GM no tiene el mapa abierto, la invocación no entra al orden (igual que antes); si no se pueden leer sus datos,
 entra al final con 0 y se le avisa al GM para que escriba el número.
 
-### P303 — 🐝 Empate de iniciativa entre la invocación y alguien que ya estaba (2026-11-23, Claude, cola de programación)
+### ✅ P303 — 🐝 Empate de iniciativa entre la invocación y alguien que ya estaba (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (a)** — en un empate queda después de los que ya estaban, su invocador incluido, como quedó.
 
 Si la invocación saca lo mismo que alguien del orden (por ejemplo, su invocador), **queda después de los que ya estaban** (como Ordenar, que deja los
 empates en el orden previo). Opciones: (a) como quedó, después; (b) antes; (c) siempre justo después de su invocador, saque lo que saque si empata con él;
@@ -2325,7 +2331,9 @@ Lo nuevo vale para la invocación que **aparece** en el mapa con el orden ya arm
    turno propio (les toca con su dueño o al pasar de ronda). ¿Pasan todas a tener turno, o se deja como decisión del GM?
 3. Una invocación con el token puesto de antemano (sin invocar) que después se invoca: el token no aparece de nuevo (ya estaba), así que no tira.
 
-### P305 — 📦 El token suelto paso a paso: ¿con qué respuesta arranca cada pregunta? (2026-11-23, Claude, cola de programación)
+### ✅ P305 — 📦 El token suelto paso a paso: ¿con qué respuesta arranca cada pregunta? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (a)** — arranca en «No» para la iniciativa y «No» para la vida, como quedó.
 
 Crear un token suelto ahora son tres pasos: «Cómo es» (nombre, descripción, imagen, color), «¿Ocupa lugar en la iniciativa? Sí / No» y «¿El token tiene
 vida? Sí / No» (con cuánta). Como dijiste «esto es para objetos inanimados», **uno nuevo arranca con las dos en «No»** (queda afuera del orden de turnos
@@ -2333,7 +2341,9 @@ y sin vida); se cambia con un clic. Los que ya estaban puestos antes (sin la res
 (a) como quedó: «No» y «No»; (b) la iniciativa en «Sí» (un NPC que actúa) y la vida en «No»; (c) sin nada marcado: hay que elegir las dos para poder
 ponerlo. Esto resuelve la primera parte de P277 (el token suelto de un jugador fuera del orden: lo decide quien lo crea).
 
-### P306 — 📦 Atacar a un objeto: ¿Evasión 1 y crítico como siempre? (2026-11-23, Claude, cola de programación)
+### ✅ P306 — 📦 Atacar a un objeto: ¿Evasión 1 y crítico como siempre? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (b)** — sin crítico contra objetos. En la cola de programación.
 
 Pediste que al token suelto con vida «se lo pueda elegir como objetivo de ataques… y hasta ahí nomás». Quedó así: **se defiende solo con «🪨 Evasión 1
 (es un objeto)»** (la Evasión nunca baja de 1, como con el Stun), sin tirar; **no tiene Defensa, escudos, resistencias ni estados**, así que el golpe
@@ -2342,20 +2352,26 @@ entra entero a su vida. Contesta la defensa la pantalla de quien lo puso (si no 
 golpe entra con su daño normal); (c) que quien lo crea le ponga una Defensa (un número que se resta, como la armadura). Con una habilidad dirigida pasa
 lo mismo: su resistencia vale 1 (la Evasión) o 0 (las demás).
 
-### P307 — 📦 Un objeto que llega a 0 de vida: ¿qué pasa? (2026-11-23, Claude, cola de programación)
+### ✅ P307 — 📦 Un objeto que llega a 0 de vida: ¿qué pasa? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (d)** — al llegar a 0, le llega un aviso a quien lo puso para que lo saque. En la cola de programación.
 
 **Elegí lo más conservador: queda en el mapa, «💥 Roto»** (lo dicen su tarjeta 🪪 y el globo al pasar el mouse), y lo saca quien lo puso o el GM. No
 cuenta como caído (no tiene ✚ Revivir ni turnos de muerte) y se lo puede seguir atacando (no le baja de 0). Opciones: (a) como quedó; (b) que se borre
 solo del mapa al llegar a 0; (c) que quede roto y ya no se lo pueda elegir como objetivo (como un caído); (d) un aviso al que lo puso: «X se rompió:
 ¿lo sacás del mapa?».
 
-### P308 — 📦 La vida de un objeto del GM, ¿la ven los jugadores? (2026-11-23, Claude, cola de programación)
+### ✅ P308 — 📦 La vida de un objeto del GM, ¿la ven los jugadores? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (a)** — los jugadores no ven los números de la vida de un objeto del GM, como con los creeps.
 
 La vida del token suelto **de un jugador** la ve todo el mundo (en el círculo rojo del token y en su tarjeta). La de uno **del GM** se maneja como la de
 un creep: los jugadores no ven los números, solo «❤ Tiene vida · se lo puede atacar» y, al llegar a 0, «💥 Roto». Opciones: (a) como quedó; (b) que la
 de todos los objetos se vea (una puerta no tiene secretos); (c) que lo elija el GM al crearlo.
 
 ### P309 — 🎁 Dos 🎁 que no son ni «dar» ni botín: ¿se quedan? (2026-11-23, Claude, cola de programación, de P278)
+
+**Dueño (2026-11-23): «ponelo al final de la cola para ver en detalle».** En la cola de programación.
 
 Al pasar el «dar» a 🤝 (P278: «que el regalo quede solo para el botín»), quedaron dos 🎁 que no son del botín ni sirven para dar algo, y no los toqué:
 (a) en el **Generador de tiendas**, la casilla «🎁 Permitir agregar gratis» (deja que los jugadores sumen ítems de la tienda sin pagar);

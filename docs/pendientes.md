@@ -818,7 +818,7 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
-- [ ] **📋 Pegar las reglas de Firestore (2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
+- [x] **📋 Pegar las reglas de Firestore (2026-11-23; ✅ pegadas por el dueño el 2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
   suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
   jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos
   (la Trampa de teleport de Terreno y Formas no se podía crear). Mientras no estén pegadas no se rompe nada: el token suelto se pone (o se guarda) sin

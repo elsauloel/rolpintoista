@@ -2388,7 +2388,9 @@ Con el cambio de P278, en el menú de un token de personaje hay dos 🤝, en ani
 Hacen cosas parecidas pero con reglas distintas. Opciones: (a) dejarlo así (los dos son «pasar cosas», que es lo que pidió el dueño); (b) diferenciar
 uno (por ejemplo, el del GM con 🤝 y el de mano a mano con 🫴, o al revés). Mientras, quedó (a).
 
-### P311 — 📣 El aviso de la Mesa al clavar un tótem o un estandarte nombra al creep aunque esté escondido (2026-11-23, Claude, de P281)
+### ✅ P311 — 📣 El aviso de la Mesa al clavar un tótem o un estandarte nombra al creep aunque esté escondido (2026-11-23, Claude, de P281)
+
+**Decidido (dueño, 2026-11-23): (b)** — si el creep está escondido, la Mesa y la Crónica dicen «Alguien clava…». En la cola de programación.
 
 Con P281 el token ya no nombra al creep, y «Ver detalle» dice «Alguien» si quien lo clavó no está a la vista. Pero al clavarlo, la Mesa y la Crónica
 siempre dicen «Blanco creep clava un tótem de silencio…» (y el ⚡ con el nombre de la habilidad), aunque el creep esté oculto o en sigilo. ¿Se hace como

@@ -2202,6 +2202,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   detalle»): la casilla «🎁 Permitir agregar gratis» del generador de tiendas y los efectos de arma de la Guía de diseño. Mostrárselos al dueño
   con captura y proponer.
 
+- **⬜ en cola — 🪧 «Alguien clava un tótem…» si el creep está escondido (P311 decidida, b)** (dueño, 2026-11-23): la línea de la Mesa y la
+  tarjeta de la Crónica al clavar un tótem o un estandarte no nombran al creep si está oculto o en sigilo; el GM lo sigue viendo.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

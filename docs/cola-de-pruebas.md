@@ -2221,6 +2221,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   más estados que los slots disponibles alrededor de un token para poner los iconitos»). Ver cuántos entran hoy, qué pasa con los que sobran
   (¿se pisan, se cortan, hay un «+N»?) y proponerle al dueño cómo mostrarlos, con capturas.
 
+- **✅ hecho (2026-11-23) — 🔘 El globo de los iconitos de estado dice solo el efecto; el detalle, en la ventana de estados alterados** (dueño,
+  2026-11-23: «al poner el hover en el icono, que solamente diga sobrepeso: número, y en qué consiste… solamente el efecto. Si después querés ver el
+  detalle… apretando el icono de estados alterados… ahí puedas ver el detalle de cada estado: cuál es el origen, por qué, quién es el caster»; «en los
+  estados alterados que tengan duración, sí tienen que aparecer [los turnos que quedan] en el hover del icono»).
+  *Resultado:* pasar el mouse por UN iconito de alrededor del token ahora muestra solo ese estado: «Sobrepeso 2 — Evasión −2 (o 1 No2) · Iniciativa −2 ·
+  Parry/escudo/dodge +1 No2»; «Quemadura · quedan 3 turnos — −2 vida por turno (le resta su Res. fuego)»; «Miedo · quedan 2 turnos — Acercarse a quien
+  lo asustó cuesta el doble de No2 · −2 PdG y −2 daño contra él». El «+N» lista los que no entraron. **El globo del token entero** (pasar el mouse por el
+  token, no por un iconito) cambió igual: un renglón por estado con lo mismo, sin las descripciones largas. **La ventana ◎ Estados alterados** suma, debajo
+  de cada estado, lo que hace en corto con los turnos, la descripción entera y de dónde viene: la cuenta del sobrepeso («el equipo pesa 5 + 3 ranuras de
+  más en la mochila = 8; la Carga máxima es 6 → se pasa por 2»), de qué pasiva o pieza viene, a quién protege o marcó, de quién tiene miedo, quién lo
+  provocó, quién le pegó la Sanguijuela o le puso un Escudo elemental. Un creep escondido sale como «alguien que no se ve» para los jugadores (el GM lo
+  ve). **Lo que no existe hoy:** quién puso cada estado y con qué (un Veneno, una Quemadura de un creep): pregunta nueva P314. La pieza común:
+  `comun/estado-corto.js`. Probado con clics en «Claude · pruebas 2» (GM, Jugador 1 y Jugador 2): Blanco J1 con sobrepeso 2 (el Peto del gigante y 22
+  agujas que pasan la mochila), Quemadura de 3 turnos y Miedo a un creep; el mouse sobre cada iconito y sobre el token, y la ventana ◎ desde las tres
+  pantallas; con el creep escondido, el Jugador 2 ve «alguien que no se ve». Todo volvió a como estaba. Pruebas automáticas 1070/1070.
+- **⬜ en cola — Probar: 🔘 los estados puestos de verdad por un creep, con su habilidad** (2026-11-23): en la prueba, la Quemadura y el Miedo se le
+  mandaron a Blanco J1 por el mismo aviso que usan las habilidades de creep (sin pasar por el duelo). Falta verlo con un creep usando su habilidad en
+  un duelo, el «+N» con más de 12 estados, un creep visto por un jugador (sin el escudo) y una invocación.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

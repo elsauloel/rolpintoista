@@ -615,6 +615,14 @@ aside{
 #hud .hud-estado .nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #hud .hud-estado .turnos{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);min-width:26px;text-align:right}
 #hud .hud-estado-hasta{font-size:11.5px;color:var(--muted);padding:0 0 5px 15px;line-height:1.3}   /* ⏳ «Dura hasta el fin del turno de…» (2026-11-20) */
+/* 🔘 El detalle de cada estado en ◎ (2026-11-23): lo que hace, la descripción entera y de dónde viene (js/10, comun/estado-corto.js). */
+#hud .hud-estados-globo{width:330px}
+#hud .hud-estado-det{padding:0 0 6px 15px;font-size:11.5px;line-height:1.35;user-select:text}
+#hud .hud-estado-det .efecto{color:var(--paper)}
+#hud .hud-estado-det .dura{color:var(--brass)}
+#hud .hud-estado-det .desc{color:var(--muted);margin-top:2px}
+#hud .hud-estado-det .origen{color:#C9B9A6;margin-top:2px}
+#hud .hud-estado-det .origen::before{content:"↳ ";color:var(--muted)}
 #hud .hud-mini{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);font-size:11px;padding:1px 6px;cursor:pointer}
 /* Tarjeta del creep (🪪): equipo en chips de solo lectura y nota con saltos de línea. */
 #hud .hud-tarjeta-equipo{display:flex;flex-wrap:wrap;gap:5px}

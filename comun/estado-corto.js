@@ -1,0 +1,175 @@
+/* =========================================================
+   🔘 EL ESTADO EN CORTO Y EN DETALLE (compartido; hoy lo usa el mapa)
+   Pedido del dueño (2026-11-23): «al poner el hover en el icono, que solamente diga sobrepeso: número, y en qué consiste… solamente el efecto. Si
+   después querés ver el detalle… apretando el icono de estados alterados… ahí puedas ver el detalle de cada estado: cuál es el origen, por qué, quién
+   es el caster». Y: «en los estados alterados que tengan duración, sí tienen que aparecer [los turnos que quedan] en el hover del icono».
+
+   - `globo(e, o)` → {titulo, efecto, dura}: lo que dice el globo de un iconito alrededor del token (y cada renglón del globo del token).
+     «Sobrepeso 2» · «Evasión −2 (o 1 No2) · Iniciativa −2 · Parry/escudo/dodge +1 No2» · sin duración (dura mientras cargue de más).
+   - `texto(e, o)` → la misma cosa en una línea: «Quemadura 2 · Arde: pierde 2 HP por turno · quedan 2 turnos».
+   - `detalle(e, o)` → {descripcion, origen: [renglones]}: para la ventana ◎ Estados alterados del token. Solo lo que el estado trae guardado
+     (quién lo protege, a quién marcó, de quién tiene miedo, quién lo provocó, quién le pegó la sanguijuela, de qué arma, de qué pasiva o pieza
+     viene, la cuenta del sobrepeso). Lo que hoy no se guarda (quién puso un Veneno, con qué habilidad) no se inventa: ver P314.
+   `e` = un estado como lo publica el resumen (de un personaje, una invocación o un creep). `o` = {sobre, sobreCuenta, nombreDe(id)}: el sobrepeso y
+   su cuenta del resumen del personaje, y cómo nombrar un token o una ficha por su id (el Escudo elemental guarda el id de quien lo tiró).
+   Funciones puras: sin pantalla ni Firebase (pruebas en comun/pruebas.html).
+   ========================================================= */
+const EstadoCorto = (() => {
+  const n = v => Number(v) || 0;
+  const f = v => { const x = Math.round(n(v) * 100) / 100; return String(x); };
+  const norm = s => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  // Las etiquetas de los números (las de la ficha si están; si no, estas).
+  const ETQ = {def: 'Defensa', armadmg: 'Def. especial', dmg: 'Daño', dmgesp: 'Ef.Esp', pdg: 'PdG', pdgmg: 'PdG.Esp', eva: 'Evasión', parry: 'Parry',
+    bloqueo: 'Bloqueo', percepcion: 'Percepción', sigilo: 'Sigilo', sp: 'SP máx.', hp: 'Vida máx.', nitros: 'No2 máx.', ini: 'Iniciativa', resmg: 'Res.Esp'};
+  function etiqueta(stat){
+    const t = (typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_LABEL) || (typeof CreepCalculo !== 'undefined' && CreepCalculo.STAT_LABEL) || {};
+    return t[stat] || ETQ[stat] || stat;
+  }
+
+  /* Lo que hace cada estado de la lista común, en una línea (comun/estados-presets.js tiene la regla entera; esto es solo el «qué te hace»). Un estado
+     que no está acá usa la primera frase de su descripción. Al sumar un estado nuevo a la lista, conviene sumarlo también acá si su descripción es larga. */
+  const CORTO = {
+    'veneno': '−1 vida por stack al empezar el turno', 'veneno severo': 'Daño al empezar cada turno, +1 cada turno',
+    'sangrado': '−1 vida por stack cada turno', 'quemadura': '−2 vida por turno (le resta su Res. fuego)', 'regeneracion': 'Cura vida cada turno',
+    'stun': 'No puede hacer nada · Evasión 1', 'sueno': 'Dormido: no puede hacer nada · Evasión 1 · lo despierta el daño',
+    'pajaritos': 'PdG, PdG.Esp y Evasión a la mitad', 'lisiado': 'PdG y Parry a la mitad', 'paralisis': 'PdG, Parry y Evasión a la mitad · recarga 1 No2 menos',
+    'cansado': 'No2 máximos a 2/3', 'exhausto': 'No2 máximos a 1/3', 'hypeado': 'No2 máximos +1/3',
+    'inmovilizado': 'No se puede mover', 'rengo': 'Moverse cuesta 2 No2 por casilla', 'lento': 'La 1.ª casilla de cada turno cuesta el doble de No2',
+    'miedo': 'Acercarse a quien lo asustó cuesta el doble de No2 · −2 PdG y −2 daño contra él',
+    'panico': 'Acercarse a un rival cuesta el doble de No2 · −2 PdG y −2 daño contra todos',
+    'provocado': 'Su turno es para ir contra quien lo provocó', 'confusion': 'Antes de actuar tira 1d4: puede perder el turno o atacar a cualquiera',
+    'silencio': 'No puede usar habilidades con SP', 'silenciado': 'No puede usar habilidades con SP',
+    'sentado': 'Evasión a la mitad · no puede atacar · levantarse cuesta 1 No2', 'ceguera': 'Ve a 2 casillas · PdG y PdG.Esp a la mitad',
+    'marcado': 'No puede entrar en sigilo · se lo ve aunque haya niebla', 'invulnerable': 'No recibe daño ni estados malos',
+    'afortunado': 'PdG, Parry y Evasión: tira dos veces y se queda con la mejor', 'sigilo': 'Oculto: sus rivales no lo ven',
+    'expuesto': 'Evasión a la mitad · sin Parry, oportunidad ni dodge roll', 'desarmado': 'Se le cayó el arma: levantarla cuesta 1 No2',
+    'desequilibrado': 'Evasión −2', 'escalofrio': 'PdG −2', 'mente abierta': 'Res.Mt −2', 'deslumbrado': 'Res.Esp −2', 'herida sombria': 'No se cura con nada',
+    'presa': 'Evasión −1 · le pegan +2 de daño', 'presa senalada': 'Evasión −2 · le pegan +4 de daño', 'coraza maldita': 'Defensa −2 y Defensa especial −2',
+    'sanguijuela': 'Las curas que recibe se las lleva quien se la pegó', 'sequia': 'No recupera vida ni SP por sí mismo',
+    'espinas': 'Devuelve 1/4 del daño cuerpo a cuerpo', 'espejo': 'Devuelve 1/4 del daño especial', 'etereo': 'No puede ser objetivo ni atacar',
+    'llama de fenix': 'Si cae, revive con toda la vida', 'piel de hierro': '+(3 + nivel) Defensa y Defensa especial · +1 Res. a crítico', 'escarcha': '−1 No2 máximo por stack', 'debilitado': '−1 a todas sus tiradas por stack', 'bendecido': '+1 a todas sus tiradas',
+  };
+  // La descripción sin lo que no es el efecto: las notas de automatización (⚙ / ✋), los avisos (⚠), los ejemplos y de dónde viene.
+  function limpiar(txt){
+    let s = String(txt || '').replace(/\(Sin auditar\)\s*/gi, '').replace(/PLACEHOLDER[^.]*\.?/g, '');
+    const partes = s.split(/\s*[⚙✋⚠]/);
+    s = (partes[0].trim() || String(partes[1] || '').replace(/^\s*(Automatizado|A mano)[^:]*:\s*/i, '')).trim().replace(/^Viene de [^:.]*:\s*/i, '');   // «Viene de tu pasiva X: recupera 3…» → «Recupera 3…»
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+    const frases = s.split(/(?<=[.!?])\s+/).map(x => x.trim()).filter(Boolean)
+      .filter(x => !/^(Ej\.|Ejemplo|Viene de|Se va sol|Se saca|Regla provisoria)/i.test(x));
+    // Solo la primera frase (lo que hace); la segunda, únicamente si la primera es muy corta («Arde.»). Las reglas finas, en la ventana ◎.
+    let out = frases[0] || '';
+    if(out && out.length < 18 && frases[1] && (out + ' ' + frases[1]).length <= 160) out += ' ' + frases[1];
+    // «Frenético: +3 a la PdG…» → «+3 a la PdG…» (el nombre o la imagen antes de los dos puntos sobra cuando después vienen los números).
+    const c = out.indexOf(':');
+    if(c > 0 && c < 35 && /[\d+−]/.test(out.slice(c + 1))) out = out.slice(c + 1).trim();
+    // Largo: sin los paréntesis y, si sigue largo, cortado en la última coma antes de ~110 letras.
+    if(out.length > 110) out = out.replace(/(?<![+−-])\s*\([^)]*\)/g, '');
+    if(out.length > 110){
+      const cut = Math.max(out.lastIndexOf(', ', 110), out.lastIndexOf('; ', 110));
+      out = (cut > 50 ? out.slice(0, cut) : out.slice(0, 107).replace(/\s+\S*$/, '')) + '…';
+    }
+    out = out.charAt(0).toUpperCase() + out.slice(1);
+    return out.replace(/[.\s]+$/, '');
+  }
+  function presetDe(nombre){
+    const lista = typeof ESTADOS_PRESET !== 'undefined' && Array.isArray(ESTADOS_PRESET) ? ESTADOS_PRESET : [];
+    const k = norm(nombre), base = k.replace(/\s*\(.*\)\s*$/, '');
+    return lista.find(p => p && (norm(p.nombre) === k || norm(p.nombre) === base)) || null;
+  }
+  const esSobrepeso = e => !!e && norm(e.nombre) === 'sobrepeso';
+  const esArmRota = e => !!e && (!!e.armaduraRota || norm(e.nombre) === 'armadura rota');
+
+  // El número que va al lado del nombre: el sobrepeso, o los stacks si hay más de uno (Armadura rota, siempre).
+  function numero(e, o){
+    if(esSobrepeso(e)){ const s = n(e.sobrepeso) || n(o && o.sobre); return s > 0 ? s : null; }
+    const st = n(e.stacks);
+    if(esArmRota(e)) return Math.max(1, st);
+    return st > 1 ? st : null;
+  }
+  function dura(e){
+    if(!e || e.derivado) return '';
+    const h = typeof Combatiente !== 'undefined' && Combatiente.hastaTxt ? Combatiente.hastaTxt(e) : (e.hasta ? 'hasta ' + e.hasta : '');
+    if(h) return h;
+    if(e.permanente) return '';
+    const t = n(e.turnos);
+    return t > 0 ? (t === 1 ? 'queda 1 turno' : `quedan ${f(t)} turnos`) : '';
+  }
+  // Lo que hace, en corto. Lo concreto primero (escudo, números, vida por turno); si no trae, su descripción limpia (o la del preset).
+  function efecto(e, o){
+    if(!e) return '';
+    if(esSobrepeso(e)){
+      const s = n(e.sobrepeso) || n(o && o.sobre);
+      return s > 0 ? `Evasión −${f(s)} (o 1 No2) · Iniciativa −${f(s)} · Parry/escudo/dodge +1 No2` : 'Evasión e Iniciativa más bajas · Parry/escudo/dodge +1 No2';
+    }
+    if(esArmRota(e)){
+      const menos = [...String(e.detalle || '').matchAll(/−(\d+(?:[.,]\d+)?) Defensa/g)].reduce((a, m) => a + n(String(m[1]).replace(',', '.')), 0);
+      if(e.derivado) return menos > 0 ? `Defensa −${f(menos)}` : 'Piezas abolladas: menos Defensa';
+      return `Defensa −${f(Math.max(1, n(e.stacks)))}`;
+    }
+    const partes = [];
+    if(e.escudo !== undefined && e.escudo !== null) partes.push(e.excedente ? `Vida extra +${f(e.escudo)}${e.tope ? ' (tope ' + f(e.tope) + ')' : ''}` : `Escudo ${f(e.escudo)}${e.escudoMax !== undefined ? '/' + f(e.escudoMax) : ''}`);
+    (Array.isArray(e.mods) ? e.mods : []).filter(m => m && m.stat && n(m.val)).forEach(m => partes.push(`${etiqueta(m.stat)} ${n(m.val) > 0 ? '+' : '−'}${f(Math.abs(n(m.val)))}`));
+    const hp = n(e.hpturno !== undefined ? e.hpturno : e.hpTurno);
+    if(hp) partes.push(`${hp > 0 ? '+' : '−'}${f(Math.abs(hp))} de vida por turno`);
+    if(e.invulnerable && !partes.length) partes.push('No recibe daño');
+    if(partes.length) return partes.join(' · ');
+    const p = presetDe(e.nombre);
+    const corto = p && CORTO[norm(p.nombre)];
+    if(corto) return corto;
+    const propio = limpiar(e.detalle);
+    if(propio) return propio;
+    return p ? limpiar(p.detalle) : '';
+  }
+  function globo(e, o){
+    const num = numero(e, o || {});
+    return {titulo: String((e && e.nombre) || '?') + (num !== null ? ' ' + f(num) : ''), efecto: efecto(e, o || {}), dura: dura(e)};
+  }
+  function texto(e, o){
+    const g = globo(e, o);
+    return [g.titulo, g.efecto, g.dura].filter(Boolean).join(' · ');
+  }
+
+  // El detalle para la ventana ◎: la descripción entera (sin las notas internas de ⚙/✋ que ya están en «Detalles técnicos») y de dónde viene.
+  function detalle(e, o){
+    o = o || {};
+    const origen = [];
+    const nom = id => { if(!id) return ''; try{ return (o.nombreDe && o.nombreDe(id)) || ''; }catch(err){ return ''; } };
+    if(esSobrepeso(e)){
+      const s = n(e.sobrepeso) || n(o.sobre);
+      if(o.sobreCuenta && typeof Combatiente !== 'undefined' && Combatiente.sobrepesoCuentaTxt){
+        const c = Combatiente.sobrepesoCuentaTxt(o.sobreCuenta).replace('tu equipo pesa', 'el equipo pesa').replace('tu Carga máxima es', 'la Carga máxima es');
+        origen.push(`Por qué: ${c}${s > 0 ? ` → se pasa por ${f(s)}` : ''}.`);
+      }else origen.push('Por qué: lleva más peso que su Carga máxima.');
+      origen.push('Se va solo cuando deja de cargar de más.');
+      return {descripcion: '', origen};
+    }
+    const det0 = String((e && e.detalle) || '').trim();
+    const viene = det0.match(/^Viene de ([^:.]*)[:.]\s*/);   // «Viene de tu pasiva "X": …» / «Viene de tu equipo: …»
+    const det = viene ? det0.slice(viene[0].length) : det0;
+    if(e && e.derivado){
+      if(e.area) origen.push('Viene de un área: se va solo al salir de ella.');
+      else if(viene) origen.push(`Viene de ${viene[1].trim()}.`);
+      else origen.push('Viene de una pasiva o del equipo: no se saca a mano.');
+    }
+    // Un nombre guardado se muestra salvo que sea de alguien que esta pantalla no ve (`o.oculto(id)`: un creep escondido para un jugador).
+    const quien = (nombre, id) => (id && o.oculto && o.oculto(id)) ? 'alguien que no se ve' : nombre;
+    if(e && (e.protegeNombre || (e.protege && nom(e.protege)))) origen.push(`Protege a ${quien(e.protegeNombre || nom(e.protege), e.protege)}.`);
+    if(e && e.marcaNombre) origen.push(`Marcó a ${quien(e.marcaNombre, e.marca)}.`);
+    if(e && e.miedoDeNombre) origen.push(`Le tiene miedo a ${quien(e.miedoDeNombre, e.miedoDe)}.`);
+    if(e && e.provocaDeNombre) origen.push(`Lo provocó ${quien(e.provocaDeNombre, e.provocaDe)}.`);
+    if(e && e.chupaNombre) origen.push(`Se la pegó ${quien(e.chupaNombre, e.chupaDe)} (la vida que chupa va para quien la pegó).`);
+    if(e && e.escudoDe && nom(e.escudoDe)) origen.push(`Lo puso ${quien(nom(e.escudoDe), e.escudoDe)}.`);
+    if(e && e.armaDe && e.armaDe.nombre) origen.push(`En el arma: ${e.armaDe.nombre}.`);
+    const h = typeof Combatiente !== 'undefined' && Combatiente.hastaTxt ? Combatiente.hastaTxt(e || {}) : '';
+    if(h) origen.push(`Dura ${h}.`);
+    let desc = (det.split(/\s*[⚙✋]/)[0] || '').trim();
+    if(desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1) + (det0.length >= 190 && !/[.!?…)]$/.test(desc) ? "…" : "");   // (lo que llega se corta en 200 o 300 letras)
+    if(!desc){ const p = presetDe(e && e.nombre); desc = p ? String(p.detalle || '').split(/\s*[⚙✋]/)[0].trim() : ''; }
+    return {descripcion: desc, origen};
+  }
+
+  return {CORTO, limpiar, numero, dura, efecto, globo, texto, detalle};
+})();
+if(typeof window !== 'undefined') window.EstadoCorto = EstadoCorto;

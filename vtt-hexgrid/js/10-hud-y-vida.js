@@ -947,14 +947,23 @@ function hudEstadosHtml(t, estados, puede){
   const agregar = puede && puedeAgregarEstado(t)
     ? '<div class="hud-globo-acciones"><button type="button" class="hud-mini" data-hud-estado-nuevo="1">+ Estado</button></div>' : '';
   if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
-  return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
+  // 🔘 El detalle de cada estado (2026-11-23, dueño: «si querés ver el detalle de los estados, tenés que ir al botón de estados alterados y ahí puedas
+  // ver el detalle de cada estado: cuál es el origen, por qué, quién es el caster»): debajo de cada renglón, lo que hace en corto (lo mismo que el globo
+  // de su iconito), la descripción entera y de dónde viene (comun/estado-corto.js). Lo que hoy no se guarda (quién puso un Veneno) no aparece: P314.
+  const o = typeof estadoCortoOpc === 'function' ? estadoCortoOpc(t) : {};
+  const veEscudo = puede || t.tipo !== 'creep';
+  return '<div class="hud-globo hud-estados-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
     const hasta = Combatiente.hastaTxt(e);   // ⏳ «hasta el fin del turno de…» (2026-11-20): se guarda «no vence» pero se va solo; va en un renglón propio, abajo
-    const turnos = hasta ? `<span title="Se va solo: ${esc(hasta)}">⏳</span>` : (e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—"));
-    const det = hudDetalleEstado(e);
+    const turnos = hasta ? `<span title="Se va solo: ${esc(hasta)}">⏳</span>` : e.derivado && e.nombre === 'Sobrepeso' ? '' : (e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—"));
+    const eV = veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined};
+    const g = EstadoCorto.globo(eV, o), dt = EstadoCorto.detalle(eV, o);
+    const desc = dt.descripcion && dt.descripcion.replace(/[.\s]+$/, '') !== g.efecto ? dt.descripcion : '';
+    const detHtml = '<div class="hud-estado-det">' + (g.efecto ? `<div class="efecto">${esc(g.efecto)}${g.dura ? ` · <span class="dura">${esc(g.dura)}</span>` : ''}</div>` : (g.dura ? `<div class="dura">${esc(g.dura)}</div>` : ''))
+      + (desc ? `<div class="desc">${esc(desc)}</div>` : '')
+      + dt.origen.filter(x => !(hasta && /^Dura hasta/.test(x))).map(x => `<div class="origen">${esc(x)}</div>`).join('') + '</div>';
     return `<div class="hud-estado">
       <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
-      <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>
-      ${det ? `<span class="estado-tip"><b>${esc(e.nombre)}</b>${esc(det)}</span>` : ""}
+      <span class="nom" title="${esc(g.titulo)}">${esc(g.titulo)}</span>
       <span class="turnos">${turnos}</span>` +
       (e.armaduraRota && (puede || t.tipo !== 'creep')
         ? (puede && !e.derivado
@@ -968,8 +977,11 @@ function hudEstadosHtml(t, estados, puede){
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
       (puede && !e.derivado && puedeAgregarEstado(t) ? `<button type="button" class="hud-mini" data-hud-estado-editar="${i}" title="Editar este estado">⚙</button>` : '') +
-      (e.derivado ? (e.area ? '<span title="Viene de un área: se va solo al salir de ella" style="color:var(--muted)">⬡</span>' : '<span title="Viene de una pasiva: se saca quitando la pasiva" style="color:var(--muted)">✦</span>') : '') +
-    '</div>' + (hasta ? `<div class="hud-estado-hasta">⏳ Dura ${esc(hasta)}</div>` : '');
+      (e.derivado ? (e.area ? '<span title="Viene de un área: se va solo al salir de ella" style="color:var(--muted)">⬡</span>'
+        : e.nombre === 'Sobrepeso' ? '<span title="Viene del peso que carga: se va solo cuando deja de cargar de más" style="color:var(--muted)">⚖</span>'
+        : e.armaduraRota || e.nombre === 'Armadura rota' ? '<span title="Viene de las piezas abolladas: se va reparándolas" style="color:var(--muted)">🛠</span>'
+        : '<span title="Viene de una pasiva: se saca quitando la pasiva" style="color:var(--muted)">✦</span>') : '') +
+    '</div>' + (hasta ? `<div class="hud-estado-hasta">⏳ Dura ${esc(hasta)}</div>` : '') + detHtml;
   }).join('') + agregar + '</div>';
 }
 

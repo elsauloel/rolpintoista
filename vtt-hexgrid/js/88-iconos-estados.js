@@ -104,6 +104,9 @@ const ICONOS_ESTADO = {
 const ICONOS_BORDE = {buff: '#4CB86A', debuff: '#E0434F', '': '#8A7D77'};
 const ICONOS_ANGULOS = [240, 300, 180, 0, 120, 60, 270, 210, 330, 150, 30, 90];   // 6 vértices (los de arriba primero) y después los 6 medios de los lados
 const iconosOrden = new Map();   // id del token → [nombres normalizados, en orden de llegada]
+// 🔘 Dónde quedó dibujado cada iconito (2026-11-23, dueño: «al poner el hover en el icono, que solamente diga… el efecto»): id del token →
+// [{px, py, r, e}] (en coordenadas del mapa), y el «+N» con los que no entraron (`resto`). Lo lee el globo al pasar el mouse (js/30, `iconoEn`).
+const iconosHit = new Map();
 
 const iconosNorm = s => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -166,10 +169,13 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   const mano = modoMapa === 'combate' && typeof tokenSinArma === 'function' && tokenSinArma(t);
   const deArea = typeof estadosDeArea === 'function' ? estadosDeArea(t) : [];
   if(deArea.length) est = {...(est || {}), estados: [...((est && est.estados) || []), ...deArea]};
+  iconosHit.delete(id);
   if((!est || !est.estados || !est.estados.length) && !mano) return res;
   const lista = iconosLista(id, t, est || {estados: []});
-  if(mano) lista.push({clave: '__mano', e: {nombre: 'Nada en la mano'}});
+  if(mano) lista.push({clave: '__mano', e: {nombre: 'Nada en la mano', mano: true}});
   if(!lista.length) return res;
+  const hit = [];
+  iconosHit.set(id, hit);
   const r = Math.max(6 / z, rad * 0.235);
   const max = ICONOS_ANGULOS.length;
   const ver = lista.length > max ? lista.slice(0, max - 1) : lista;
@@ -191,6 +197,7 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   ver.forEach(({clave, e}, i) => {
     const {px, py} = lugar(i);
     if(py + r > y + rad * 0.8) res.abajo = Math.max(res.abajo, py + r - (y + rad * Math.sqrt(3) / 2));
+    hit.push({px, py, r, e});
     const def = iconoDeEstado(clave);
     const pol = e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : (def && def.pol) || '';
     circulo(px, py, ICONOS_BORDE[pol], def && def.fondo);
@@ -219,6 +226,7 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   });
   if(lista.length > max){
     const {px, py} = lugar(max - 1);
+    hit.push({px, py, r, resto: lista.slice(max - 1).map(x => x.e)});
     circulo(px, py, '#C9B9A6');
     ctx.font = `700 ${r * 0.95}px "Space Grotesk", system-ui, sans-serif`;
     ctx.fillStyle = '#fff';
@@ -281,4 +289,19 @@ function iconosAnimar(def, px, py, r, z, ms){
 }
 
 // Los tokens que ya no están: fuera de la memoria del orden.
-function iconosLimpiar(){ iconosOrden.forEach((_, id) => { if(!tokens.has(id)) iconosOrden.delete(id); }); }
+function iconosLimpiar(){ iconosOrden.forEach((_, id) => { if(!tokens.has(id)) iconosOrden.delete(id); }); iconosHit.forEach((_, id) => { if(!tokens.has(id)) iconosHit.delete(id); }); }
+
+// 🔘 El iconito bajo el mouse (x, y del mapa) → {id, e} o {id, resto}, o null. Solo de los tokens que esta pantalla ve ahora (`disposicion`, js/05):
+// un token oculto, en la niebla o en sigilo para el que mira no tiene iconitos a los que pasarles el mouse.
+function iconoEn(x, y){
+  const vistos = new Set((typeof disposicion !== 'undefined' ? disposicion : []).map(d => d.id));
+  let mejor = null;
+  iconosHit.forEach((lista, id) => {
+    if(!vistos.has(id)) return;
+    lista.forEach(h => {
+      const dist = Math.hypot(h.px - x, h.py - y);
+      if(dist <= h.r * 1.1 && (!mejor || dist < mejor.dist)) mejor = {dist, id, e: h.e, resto: h.resto};
+    });
+  });
+  return mejor;
+}

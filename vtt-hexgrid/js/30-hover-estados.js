@@ -2,8 +2,10 @@
    Con el mouse quieto un momento sobre un token que se ve (no arrastrando), un cartelito al lado del puntero lista sus estados alterados: el
    nombre en su color (verde beneficio, violeta perjuicio), los turnos que le quedan, el escudo y los stacks, y la descripción corta. Los datos
    son los mismos que ya ve cada uno (el resumen público; el escudo de un creep, solo el GM). Sin estados, no aparece nada (salvo la descripción de un
-   token suelto, 2026-11-22). */
-let hoverEstados = {id: null, timer: 0, x: 0, y: 0};
+   token suelto, 2026-11-22).
+   🔘 Desde el 2026-11-23 (dueño): cada estado dice solo su efecto en corto y los turnos que quedan (comun/estado-corto.js); el mouse sobre UN iconito
+   de alrededor del token muestra solo ese. El detalle (origen, quién lo puso, la cuenta) está en ◎ Estados alterados del anillo (js/10). */
+let hoverEstados = {id: null, tok: null, ic: null, timer: 0, x: 0, y: 0};
 function hoverEstadosCaja(){
   let c = document.getElementById('hover-estados');
   if(c) return c;
@@ -17,7 +19,7 @@ function hoverEstadosCaja(){
 }
 function hoverEstadosOcultar(){
   clearTimeout(hoverEstados.timer);
-  hoverEstados.id = null;
+  hoverEstados.id = null; hoverEstados.tok = null; hoverEstados.ic = null;
   const c = document.getElementById('hover-estados');
   if(c) c.hidden = true;
 }
@@ -30,25 +32,41 @@ function hoverEstadosHtml(t){
   const descHtml = (desc ? `<div style="margin-top:4px;white-space:pre-wrap;color:#EDE6DF">${esc(desc.length > 400 ? desc.slice(0, 397) + '…' : desc)}</div>` : '')
     + (vidaS ? `<div style="margin-top:4px;color:#F28B82">${esc(vidaS)}</div>` : '');
   if(!lista.length) return descHtml ? `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}` : '';
-  const veEscudo = soyGM || t.tipo !== 'creep';
-  const filas = lista.map(e => {
-    const color = ESTADO_COLOR[e.polaridad] || ESTADO_COLOR[''];
-    const dura = e.derivado ? (e.nombre === 'Sobrepeso' ? 'mientras cargue de más' : 'siempre') : Combatiente.hastaTxt(e) ? Combatiente.hastaTxt(e) : e.permanente ? 'no vence' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
-    const extras = [
-      e.stacks > 1 ? `×${fmt(num(e.stacks))}` : '',
-      veEscudo && e.escudo !== undefined ? (e.excedente ? `❤+${fmt(num(e.escudo))}` : `🛡${fmt(num(e.escudo))}${e.escudoMax !== undefined ? '/' + fmt(num(e.escudoMax)) : ''}`) : '',
-      dura,
-    ].filter(Boolean).join(' · ');
-    const det = String(e.detalle || '').trim();
-    return `<div style="margin-top:5px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;vertical-align:1px"></span>`
-      + `<b>${esc(e.nombre)}</b>${extras ? ` <span style="color:#B7A99F">· ${esc(extras)}</span>` : ''}`
-      + (det ? `<div style="color:#B7A99F;font-size:11px;margin-left:14px">${esc(det.length > 160 ? det.slice(0, 157) + '…' : det)}</div>` : '') + '</div>';
-  }).join('');
+  // 🔘 (2026-11-23, dueño: «los iconos que están visibles alrededor del token, que te den puramente el efecto… si querés ver el detalle de los
+  // estados, tenés que ir al botón de estados alterados»): cada renglón, como el globo de su iconito — el nombre (con su número), lo que hace en corto
+  // y los turnos que le quedan. El detalle (de dónde viene, quién lo puso, la cuenta del sobrepeso) va en ◎ Estados alterados (js/10).
+  const o = estadoCortoOpc(t), veEscudo = soyGM || t.tipo !== 'creep';
+  const filas = lista.map(e => estadoCortoFilaHtml(veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined}, o, 5)).join('');
   return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>${descHtml}${filas}`;
 }
+// Las opciones de EstadoCorto para un token: su sobrepeso (del resumen) y cómo nombrar a otro token sin delatar a uno que esta pantalla no ve.
+function estadoCortoOpc(t){
+  const v = vinculo(t), r = (v && v.resumen) || {};
+  // (el id guardado puede ser el del token o el de su ficha / creep) → [id del token, token]
+  const tokDe = id => !id ? null : tokens.has(id) ? [id, tokens.get(id)] : ([...tokens.entries()].find(([, x]) => x && x.fichaId === id) || null);
+  const vistos = new Set((typeof disposicion !== 'undefined' ? disposicion : []).map(d => d.id));
+  return {sobre: num(r.sobre), sobreCuenta: r.sobreCuenta || null,
+    nombreDe: id => { const x = tokDe(id); return x ? nombreDe(x[1]) : ''; },
+    oculto: id => { if(soyGM) return false; const x = tokDe(id); return !!(x && !vistos.has(x[0])); }};
+}
+// Un renglón del globo: «Sobrepeso 2» en su color, lo que hace y los turnos que quedan.
+function estadoCortoFilaHtml(e, o, arriba){
+  const g = e && e.mano ? {titulo: 'Nada en la mano', efecto: 'Pega sin arma (con los puños)', dura: ''} : EstadoCorto.globo(e, o);
+  const color = ESTADO_COLOR[e && e.polaridad] || ESTADO_COLOR[''];
+  return `<div style="margin-top:${arriba}px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;vertical-align:1px"></span>`
+    + `<b>${esc(g.titulo)}</b>${g.dura ? ` <span style="color:#B7A99F">· ${esc(g.dura)}</span>` : ''}`
+    + (g.efecto ? `<div style="color:#D9CFC6;font-size:11.5px;margin-left:14px">${esc(g.efecto)}</div>` : '') + '</div>';
+}
+// 🔘 El globo de UN iconito alrededor del token: solo ese estado (o los que no entraron, si es el «+N»).
+function hoverIconoHtml(t, ic){
+  const o = estadoCortoOpc(t), veEscudo = soyGM || t.tipo !== 'creep';
+  const limpio = e => veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined};
+  if(ic.resto) return `<div style="font-weight:700;color:#F0D27A">${ic.resto.length} estados más</div>` + ic.resto.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('');
+  return estadoCortoFilaHtml(limpio(ic.e), o, 0);
+}
 function hoverEstadosMostrar(){
-  const t = tokens.get(hoverEstados.id);
-  const html = t ? hoverEstadosHtml(t) : '';
+  const t = tokens.get(hoverEstados.tok);
+  const html = !t ? '' : hoverEstados.ic ? hoverIconoHtml(t, hoverEstados.ic) : hoverEstadosHtml(t);
   const c = hoverEstadosCaja();
   if(!html){ c.hidden = true; return; }
   c.innerHTML = html;
@@ -65,13 +83,16 @@ lienzo.addEventListener('pointermove', e => {
   if(e.buttons){ hoverEstadosOcultar(); return; }   // arrastrando: nada
   const {px, py} = posEvento(e);
   const m = pantallaAMundo(px, py);
-  const id = tokenEn(m.x, m.y);
+  // 🔘 Primero un iconito de estado (2026-11-23): su globo dice solo ese estado; si no, el token entero.
+  const ic = typeof iconoEn === 'function' ? iconoEn(m.x, m.y) : null;
+  const tok = ic ? ic.id : tokenEn(m.x, m.y);
+  const id = ic ? `ic:${ic.id}:${ic.resto ? '+' : (ic.e && ic.e.nombre)}` : tok;
   hoverEstados.x = e.clientX; hoverEstados.y = e.clientY;
   if(id !== hoverEstados.id){
     hoverEstadosOcultar();
     if(!id) return;
-    hoverEstados.id = id;
-    hoverEstados.timer = setTimeout(hoverEstadosMostrar, 350);
+    hoverEstados.id = id; hoverEstados.tok = tok; hoverEstados.ic = ic;
+    hoverEstados.timer = setTimeout(hoverEstadosMostrar, ic ? 200 : 350);
   }else if(id && !hoverEstadosCaja().hidden) hoverEstadosMostrar();   // sigue al puntero
 });
 ['pointerleave', 'pointerdown', 'wheel'].forEach(ev => lienzo.addEventListener(ev, hoverEstadosOcultar, {passive: true}));

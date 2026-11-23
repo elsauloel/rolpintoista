@@ -1044,6 +1044,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Probado con clics en «Claude · pruebas 2». Dudas: P313. (3) **El ⚖ alrededor del token** (2026-11-23, dueño: «que el sobrepeso además aparezca como
   un estado alrededor del token»): `iconosLista` (js/88) deja pasar el derivado «Sobrepeso» (ícono ⚖️ en `ICONOS_ESTADO`); el globo (js/30) dice
   «mientras cargue de más» y el detalle corto que publica la ficha (`FichaResumen.estadoSobrepeso`, en tercera persona, ≤ 160).
+- **🔘 El globo de cada iconito dice solo el efecto; el detalle, en ◎** (2026-11-23, dueño: «al poner el hover en el icono, que solamente diga
+  sobrepeso: número, y en qué consiste… si querés ver el detalle… apretando el icono de estados alterados»): js/88 anota dónde quedó cada iconito
+  (`iconosHit`, coordenadas del mapa; el «+N» con `resto`) e `iconoEn(x, y)` lo busca, solo en los tokens que esta pantalla ve (`disposicion`). js/30:
+  con el mouse sobre un iconito, `hoverIconoHtml` (ese estado: «Nombre N», el efecto en corto y los turnos que quedan); sobre el token, un renglón así por
+  estado (`estadoCortoFilaHtml`); `estadoCortoOpc(t)` da el sobrepeso y su cuenta del resumen y cómo nombrar a otro token sin delatar a uno que no se
+  ve. js/10 `hudEstadosHtml` (◎): debajo de cada estado, `.hud-estado-det` con lo corto, la descripción entera y de dónde viene
+  (`EstadoCorto.detalle`); el ⚖ del Sobrepeso y el 🛠 de la Armadura rota de las piezas en lugar del ✦ de las pasivas. La pieza: `comun/estado-corto.js`.
+  Lo que no se guarda (quién puso un Veneno): P314.
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

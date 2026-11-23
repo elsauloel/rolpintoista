@@ -2473,3 +2473,19 @@ ronda siguiente). Con eso el punto 1 ya no hace falta. **2:** el cartel sale sol
 4. **Un número de iniciativa escrito a mano**: si el GM (o el jugador) escribe el número de una fila que ya tenía el sobrepeso restado, se toma como
    que el número nuevo ya lo tiene restado (si después el sobrepeso cambia, se ajusta desde ahí). Una fila sin tirar no se toca hasta que se tira.
 
+
+### P314 — 🔘 Guardar quién puso cada estado y con qué (2026-11-23, Claude, cola de programación: el globo de los iconitos y el detalle en ◎)
+
+**Contexto.** El dueño pidió (2026-11-23) que el globo de los iconitos de alrededor del token diga solo el efecto y que el detalle —«cuál es el
+origen, por qué, quién es el caster»— vaya en la ventana ◎ Estados alterados del token. Hecho con lo que hoy se guarda: la cuenta del sobrepeso, de
+qué pasiva o pieza viene un estado derivado, a quién protege, a quién marcó, de quién tiene miedo, quién lo provocó, quién le pegó la Sanguijuela,
+quién le puso un Escudo elemental y en qué arma va un Arma elemental. **Lo que hoy NO se guarda en el estado**: quién se lo puso y con qué (un
+Veneno, una Quemadura, un Stun de un creep o de un jugador). El aviso que le llega al personaje sí trae ese texto (`origen`, p. ej. «Arcano 3:
+Lengua de fuego»), pero al aplicarlo se pierde; en un creep, no se anota nada.
+
+**Propuesta.** Que todo estado que se pone sobre otro guarde `puestoPor` ({nombre, id del token}) y `con` (el nombre de la habilidad, el arma o la
+zona), lo publique el resumen y la ventana ◎ lo muestre («Lo puso Arcano 3 · con Lengua de fuego»), respetando lo oculto: un creep escondido o en
+sigilo sale como «alguien que no se ve» para los jugadores (ya lo hace así con el Miedo y los demás nombres). Toca varios caminos (el duelo, las
+zonas, las trampas, las habilidades sobre sí, GM Tools, los avisos a la ficha), por eso no se hizo de una.
+
+**Mientras tanto (lo conservador):** la ventana ◎ muestra solo lo que ya existe; no se inventa el origen de los que no lo traen.

@@ -2093,6 +2093,8 @@ Pedido del dueño (2026-11-22: «en el menú de "Ver detalle" de las trampas y l
    más abajo (por ejemplo, «Expuesto» en «Estado que deja»), ahí va sin marcar. ¿O preferís que se marque en cada fila?
 
 ### P287 — 🙈 Un área contra alguien escondido: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** «lo que elegiste mientras tanto está bien».
 Hecho con P263 (el escondido va en un área aparte, en paralelo; solo lo ve quien lo maneja). Probado con clics en «Claude · pruebas 2». Quedaron
 elegidas estas cosas, todas cambiables:
 1. **Dos tiradas de quien la lanza.** Para no hacer esperar a nadie, contra el escondido la tirada de quien lanza el área (y el daño, si es de «una

@@ -1925,8 +1925,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   una sola pantalla (la que guardó el cambio); carteles «bajó» y «Ya no tenés sobrepeso». Probado con clics (ficha + mapa abiertos, y en combate). 1066/1066.
   *El ⚖ alrededor del token (2026-11-23, dueño):* el Sobrepeso se ve como un estado más alrededor del token, con su globo (cuánto, la cuenta y lo que implica);
   se va solo al sacarse el peso. Visto con clics desde el GM, el Jugador 1 y el Jugador 2. 1067/1067.
-- **⬜ en cola — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
+- **✅ hecho (2026-11-23) — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
   creep con la pasiva, recibir daño desde el cuadro de daño de GM Tools y ver que el aviso dice que el Aguante se suma a mano (P283).
+  *Resultado:* anda, sin cambios. Probado con clics en «Claude · pruebas 2» con «Blanco creep» (GM de pruebas): sin la pasiva, el «Daño» dice solo
+  «10 − Defensa 5 = 5 de daño (60 → 55 HP)»; con la pasiva (dada con «+ Pasiva»), en el «Daño» de la ficha completa y en el de la tarjeta, golpe que
+  entra y golpe frenado entero, suma «🛡 el Aguante de trinchera no se cuenta acá (lo cuenta el mapa): si tiene enemigos pegados, sumalo a mano». Quedó
+  como estaba (60 de vida, sin la pasiva).
 - **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
   (son directos); se revisó el código y se probó solo con el Terreno incendiado.
 

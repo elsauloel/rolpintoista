@@ -1739,7 +1739,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Daño»: igual. Con GM Tools abierto, la vida a 0 desde el mapa (la función del «HP directo», por datos) dio una sola línea (la del mapa). La ficha
   suelta de Blanco J1 (Veneno y Bendecido por datos) → «0» en su vida: sin estados, una línea. Se devolvieron vidas, estados y el turno de GM Tools.
   Duda: P292. 2 pruebas automáticas nuevas (1040).
-- **⬜ en cola — 🎯 Repasar la Apuntada de las ballestas (P271)** (dueño, 2026-11-22: «necesitaría repasar cómo está anotada la Apuntada para
+- **✅ explicado (2026-11-23) — 🎯 Repasar la Apuntada de las ballestas (P271)** (dueño, 2026-11-22: «necesitaría repasar cómo está anotada la Apuntada para
   entender esto»). Explicarle cómo está y qué preguntaba P271.
 - **⬜ en cola — 🔥 La Varita del muro de fuego también al empezar el turno (P272 decidida)** (dueño, 2026-11-22: «sí»).
 
@@ -1960,6 +1960,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 💀 un creep que cae desde GM Tools por una habilidad o un estado** (2026-11-23, P270): el corte es el mismo para cualquier
   camino (`gmCaidasRevisar`), pero con clics solo se probaron el recuadro de HP, «Daño» y ⟳ Pasar de ronda. Falta: una habilidad que le cuesta vida,
   un estado con daño al aplicarse, y un creep oculto o en Sigilo (tiene que salir solo el toast al GM, sin línea en la Mesa).
+
+- **⬜ en cola — 🩸 GM Tools: la vida de un creep no baja de 0 (P292)** (dueño, 2026-11-23: «corregilo para que la vida no baje de cero»): hoy «Daño»
+  la deja en negativo (999 → −989). Que quede en 0, como en el mapa, en todos los caminos de GM Tools.
 
 ## En cola
 

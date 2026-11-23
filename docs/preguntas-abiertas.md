@@ -2182,6 +2182,8 @@ ronda); los **personajes, las invocaciones, los creeps y los tokens sueltos sí*
 
 ### P292 — 💀 Un creep que cae desde GM Tools: lo que quedó elegido (2026-11-23, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-23):** (1) «prácticamente irrelevante… los jugadores matan a los creeps»: queda como está; (2) «sí, corregilo para que la vida no baje de cero» en GM Tools (en la cola).
+
 Desde hoy un creep que llega a 0 por cualquier camino de GM Tools pierde sus estados como en el mapa (P270), con la línea «💀 X cayó: se le fueron N
 estados (…)». Quedaron elegidas estas cosas, todas cambiables:
 1. **Quién ve la línea**: va a la Mesa solo si los jugadores conocen al creep (su token no está oculto, ya lo vieron y no estaba en Sigilo al caer); si

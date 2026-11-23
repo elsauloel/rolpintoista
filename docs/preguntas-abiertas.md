@@ -2396,7 +2396,17 @@ Con P281 el token ya no nombra al creep, y «Ver detalle» dice «Alguien» si q
 siempre dicen «Blanco creep clava un tótem de silencio…» (y el ⚡ con el nombre de la habilidad), aunque el creep esté oculto o en sigilo. ¿Se hace como
 con otras acciones de un creep escondido (una frase incierta, «Alguien clava un tótem…», o solo para el GM), o queda así? Mientras, quedó como estaba.
 
-### P312 — 🎒 La mochila pasada de ranuras, ¿suma al sobrepeso? (2026-11-23, Claude, cola de programación)
+### ✅ P312 — 🎒 La mochila pasada de ranuras, ¿suma al sobrepeso? (2026-11-23, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-23): (a)** — cada ranura de más de la mochila pesa 1 y se suma al peso del equipo contra la Carga máxima. Además:
+- **Emparejar los avisos**: el baúl y lo que te pasa otro jugador avisan y dejan seguir (como el 🤝 Dar); el cartel muestra la cuenta.
+- **Cartel «⚖ Tenés sobrepeso»** con todo el detalle de lo que implica y «Aceptar», donde sea que pase (ficha, mapa…): al equiparse algo, y también
+  al recibir cosas en la mochila (GM, botín, otro jugador, baúl, tienda) que lo hagan pasar a tener sobrepeso o se lo suban.
+- **Regla nueva: cada punto de sobrepeso resta 1 a la iniciativa.** Al iniciar el combate: tirada − sobrepeso es el número de la tabla. Si en medio
+  del combate cambia el sobrepeso (sube o baja), sale el cartel, se ajusta el número y se reordena la tabla; si le corresponde otro lugar se lo
+  mueve, pero **nadie repite ni pierde turno**: si ya jugó esta ronda no vuelve a jugar; si no jugó, juega igual esta ronda; desde la próxima, en su
+  lugar nuevo. Si baja o se va el sobrepeso, **recupera** (siempre es tirada − sobrepeso de ese momento).
+- Creeps e invocaciones siguen sin sobrepeso.
 
 Pedido del dueño (2026-11-22): «revisar el sobrepeso y evaluar que la mochila sobrecargada también se sume al de sobrepeso». Viene de P262 (5).
 

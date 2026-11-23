@@ -1913,9 +1913,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Ver detalle», con el creep a la vista los jugadores ven «De quién es: Blanco creep (creep)» y, escondido, «Alguien». Uno puesto a mano con el nombre
   viejo («Tótem de silencio de Blanco creep») el Jugador 1 lo vio así un segundo y enseguida cambió solo. Duda que salió: P311 (el aviso de la Mesa).
 
-- **⬜ en cola — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22: «revisar el sobrepeso y evaluar que
-  la mochila sobrecargada también se sume al de sobrepeso»). Hoy la mochila llena se mide por ranuras y el peso solo cuenta lo equipado (P262).
-  Contarle cómo está el sobrepeso hoy (qué lo dispara, qué hace) y proponer cómo sumar la mochila pasada de ranuras; programar lo que elija.
+- **🟡 diagnóstico hecho (2026-11-23), esperando P312 — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22:
+  «revisar el sobrepeso y evaluar que la mochila sobrecargada también se sume al de sobrepeso»). Hoy la mochila llena se mide por ranuras y el peso solo cuenta lo equipado (P262).
+  *Diagnóstico:* el sobrepeso es el peso de lo equipado contra la Carga máxima (= Fuerza): Evasión −1 por punto (o 1 No2) y +1 No2 a Parry y dodge roll;
+  pasarse de ranuras hoy solo avisa. Cuatro opciones en P312 (Claude recomienda: cada ranura de más pesa 1); programar lo que elija.
 - **⬜ en cola — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
   creep con la pasiva, recibir daño desde el cuadro de daño de GM Tools y ver que el aviso dice que el Aguante se suma a mano (P283).
 - **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo

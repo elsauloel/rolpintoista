@@ -2395,3 +2395,43 @@ uno (por ejemplo, el del GM con 🤝 y el de mano a mano con 🫴, o al revés).
 Con P281 el token ya no nombra al creep, y «Ver detalle» dice «Alguien» si quien lo clavó no está a la vista. Pero al clavarlo, la Mesa y la Crónica
 siempre dicen «Blanco creep clava un tótem de silencio…» (y el ⚡ con el nombre de la habilidad), aunque el creep esté oculto o en sigilo. ¿Se hace como
 con otras acciones de un creep escondido (una frase incierta, «Alguien clava un tótem…», o solo para el GM), o queda así? Mientras, quedó como estaba.
+
+### P312 — 🎒 La mochila pasada de ranuras, ¿suma al sobrepeso? (2026-11-23, Claude, cola de programación)
+
+Pedido del dueño (2026-11-22): «revisar el sobrepeso y evaluar que la mochila sobrecargada también se sume al de sobrepeso». Viene de P262 (5).
+
+**Cómo funciona hoy (diagnóstico):**
+- **El sobrepeso** sale de sumar el peso de **lo equipado** (armas incluidas) contra la **Carga máxima**, que por defecto es igual a la
+  **Fuerza** (fórmula `crgmax: 'fue'`, `comun/ficha-guardado.js`; se puede cambiar en la ficha y sumar bonos, ej. la pasiva «+1 Crg.Max»). La
+  cuenta es `FichaCalculo.calcular` (`comun/ficha-calculo.js`: `pesoEquipado`, `sobrecarga = peso equipado − Carga máxima`). Lo de la mochila
+  y el cinturón no pesa nada.
+- **Qué hace** (P108, recargos del 2026-11-11): aparece el estado derivado **⚖ Sobrepeso** (`FichaResumen.estadoSobrepeso`, no se guarda; el
+  mapa lo lee del resumen con `sobrepesoDeToken`, `vtt-hexgrid/js/04`). (1) **Evasión con −1 por cada punto de más**, o pagar **1 No2** para tirar
+  sin penalidad (se elige en el cuadro del duelo, `comun/ficha-duelo.js`, o en el cartel «Tenés sobrepeso» de la ficha y la Botonera). (2) **+1 No2
+  fijo** al Parry y «Poner escudo» (2 No2; con Parada fácil, 1) y al dodge roll (`Combatiente.recargoSobrepeso` / `costoParrySobrepeso`,
+  `comun/combatiente.js`; dodge en `vtt-hexgrid/js/06-mouse.js`). Solo personajes: ni creeps ni invocaciones.
+- **Dónde se ve:** la barra «Peso equipado N / Crg.Max» y el renglón rojo «Te pasás por N…» de la ficha; el panel 🛡 Equipo (`comun/ficha-equipo.js`);
+  el estado entre los estados alterados; la cuenta en cada botón de defensa del duelo.
+- **Las ranuras de la mochila:** cada ítem no equipado ocupa al menos 1 (una pila de apilables, 1; con Morral de cazador los trofeos no ocupan).
+  Capacidad = **20** por defecto (número editable en la ficha) + lo que dé la mochila equipada (`FichaEquipo.mochilaUsada` / `capMochila`). Pasarse
+  **no tiene ningún efecto de juego**; solo avisos, y no parejos entre caminos: «🎁 Dar a un jugador» avisa al GM y da igual, y al que recibe le sale
+  «Tu mochila quedó pasada: 32 de 20 ranuras…» y una línea en la Mesa (`comun/dar-jugador.js`); el botín avisa «ojo: tu mochila no da» y llega igual
+  (`comun/ficha-botin.js`); la tienda no mira; en cambio **aceptar lo que te pasa otro jugador y sacar del baúl sí se frenan** («Mochila llena: no
+  entra», `comun/intercambio.js`).
+- **El cinturón:** 5 ranuras (1 por unidad) + lo que dé el cinturón equipado. Ese sí es un tope: lo que no entra queda en la mochila.
+
+**Opciones** (ejemplo: Fuerza 8 → Carga máxima 8; equipo que pesa 7; mochila con 24 de 20 ranuras = 4 de más):
+- **(a) Cada ranura de más pesa 1** y se suma al peso del equipo. 7 + 4 = 11 contra 8 → sobrepeso 3: Evasión −3 (o 1 No2), Parry 2 No2. Con 32/20
+  serían 12 de más → sobrepeso 11. Simple, una sola cuenta; el que tiene Fuerza de sobra «carga» la mochila pasada sin castigo. Contra: se dispara
+  rápido si la mochila está muy pasada (aunque pagando 1 No2 la Evasión sale sin penalidad igual).
+- **(b) Un punto de sobrepeso cada 5 ranuras de más** (o fracción), aparte del peso del equipo. 24/20 → +1; 32/20 → +3. Con el equipo de 7 (sin
+  sobrepeso propio) queda sobrepeso 1. Más suave y no depende de la Fuerza. Contra: dos cuentas para explicar.
+- **(c) Pasarse de ranuras da Sobrepeso directo, fijo**: 21/20 o 32/20, igual: el +1 No2 a Parry/dodge y Evasión −1 (o pagar). Clarísimo, pero da lo
+  mismo una ranura que doce.
+- **(d) Solo avisar**: un estado recordatorio «🎒 Mochila pasada», sin penalidad (lo de hoy, más visible).
+
+En todas: el cinturón no cambia, los creeps e invocaciones siguen sin sobrepeso, y la salida a mano es la de siempre (la capacidad de la mochila
+y la fórmula de la Carga máxima se editan en la ficha). Aprovechando el cambio, se pueden emparejar los avisos (que aceptar de otro jugador y el
+baúl avisen y dejen seguir, como el 🎁 Dar) y poner la cuenta en el cartel: «tu equipo pesa 7 + 4 ranuras de más en la mochila = 11; tu Carga
+máxima es 8».
+**Recomendación de Claude: (a)**, por simple y porque usa la Fuerza («lo que no entra lo llevás colgado»). Mientras, queda como está.

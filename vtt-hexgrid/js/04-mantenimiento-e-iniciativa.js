@@ -981,7 +981,7 @@ async function inicioTurnoPendiente(tokenId, clave){
   const humo = new Set(prev.rep.map(l => (/^Sahumerio.*se llevó (.+)$/.exec(l) || [])[1]).filter(Boolean));
   const estados = (est.length ? est : prev.turnos).map(l => { const n = [...humo].find(x => l.startsWith(`${x}:`)); return n ? `${n}: se lo llevó el humo` : l; });
   const pasos = [
-    ...(estados.length ? [{titulo: 'Tus estados', texto: estados.join(' · ')}] : []),
+    ...(estados.length ? [{titulo: invId ? 'Sus estados' : 'Tus estados', texto: estados.join(' · ')}] : []),   // 🐝 (P299) la de una invocación habla de ella
     ...(vida.length ? [{titulo: 'Vida y SP', texto: vida.join(' · ')}] : []),
     ...(no2.length ? [{titulo: 'No2', texto: no2.join(' · ')}] : []),
     ...(otros.length ? [{titulo: 'Además', texto: otros.join(' · ')}] : []),

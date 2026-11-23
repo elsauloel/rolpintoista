@@ -491,6 +491,18 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
     zonaEncolar(el, t);
   });
 }
+/* 🔥 ¿La Quemadura que deja la zona es nueva o renueva la que ya tenía? (cola 2026-11-23, dueño: «no tendría sentido que en el momento que se le
+   aplica la quemadura por la zona de muro, se baje su cantidad de turnos de 3 a 2»). No se baja: el «3 → 2 turnos» de «▶ Empieza tu turno» es la
+   Quemadura de la vuelta anterior, que cuenta al empezar el turno (P177); después el Muro la vuelve a poner en sus turnos. El renglón lo dice:
+   «Quemadura: ya la tenía, vuelve a 3 turnos» / «Quemadura (3 turnos)». Solo para los estados que se renuevan contando de nuevo (la Quemadura). */
+function zonaRenuevaTxt(t, spec){
+  const pre = spec && spec.nombre && EstadosAplicar.presetPorNombre ? EstadosAplicar.presetPorNombre(spec.nombre) : null;
+  if(!pre || !pre.esQuemadura) return '';
+  const tt = Math.round(num(spec.turnos) || num(pre.turnos));
+  if(!(tt > 0)) return '';
+  const s = tt === 1 ? '' : 's';
+  return zonaTieneEstado(t, spec.nombre) ? `${spec.nombre}: ya la tenía, vuelve a ${tt} turno${s}` : `${spec.nombre} (${tt} turno${s})`;
+}
 const zonaSpecDe = el => { try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };
 const zonaTieneEstado = (t, nombre) => (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(x => x && x.activo !== false && x.nombre === nombre);
 // Al soltar un movimiento: para la mayoría de las zonas alcanza con mirar dónde terminó. Las de zonaCadaPaso
@@ -1051,10 +1063,11 @@ async function zonaResolverBanner(){
     const rv = spec && spec.nombre && zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, true) : null;
     if(rv && !rv.aplicar){ partes.push(`${spec.nombre}: se resuelve a mano`); zonaVenenoContar(t, el, spec, rv); spec = null; }
     if(spec && spec.nombre){
+      const renueva = !rv ? zonaRenuevaTxt(t, spec) : '';   // 🔥 la Quemadura que ya tenía: vuelve a contar (cola 2026-11-23)
       try{
         if(t.tipo === 'creep'){ await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec)); }
         else{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: el.zonaNombre || 'Zona'}); }
-        partes.push(rv ? (rv.antes ? `${spec.nombre} ${rv.antes} → ${rv.despues}` : `${spec.nombre} ${rv.despues}`) : spec.nombre);
+        partes.push(rv ? (rv.antes ? `${spec.nombre} ${rv.antes} → ${rv.despues}` : `${spec.nombre} ${rv.despues}`) : renueva || spec.nombre);
         // Al jugador del personaje (si no lo resolvió él), su Aviso; la línea de la Crónica ya la pone el momento de la zona.
         if(rv && t.tipo !== 'creep' && !t.oculto){ const uid = zonaVenenoJugador(t); if(uid && uid !== fbUsuario.uid) zonaVenenoContar(t, el, spec, rv); }
       }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }

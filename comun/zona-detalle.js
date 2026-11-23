@@ -45,7 +45,10 @@ const ZonaDetalle = (() => {
     const sinN = !!o.sinNumero;
     if(f.res && hayRes && res >= 99) return sinN ? `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}` : `es inmune ${INMUNE_A[f.elemento] || 'a ese daño'}: su ${f.res} es ${res}`;
     const resTxt = !hayRes || res === 0 ? '' : sinN ? (res < 0 ? ' (es vulnerable: le entra de más)' : ' (es resistente)') : (res < 0 ? ` −${-res}, vulnerable: le entra de más` : ` ${res}`);
-    const cosas = [f.defensa ? `su ${f.defensa}` : '', f.res ? `su ${f.res}${resTxt}` : '',
+    // 🔥 (P300, dueño, 2026-11-23, opción a) Con resistencia 0 a ese elemento (y se sabe), no la nombra: «le entra 1d4 de daño de fuego». Sin el número
+    // (una invocación, o un creep que los jugadores no descubrieron), como antes: se nombra sin cuánto.
+    const sinRes = hayRes && res === 0;
+    const cosas = [f.defensa ? `su ${f.defensa}` : '', f.res && !sinRes ? `su ${f.res}${resTxt}` : '',
       Number(o.suela) > 0 ? `su Suela gruesa ${Math.round(Number(o.suela))}` : ''].filter(Boolean);
     if(!cosas.length) return '';
     return `${cosas.length === 1 ? 'lo frena' : 'lo frenan'} ${cosas.length === 1 ? cosas[0] : cosas.slice(0, -1).join(', ') + ' y ' + cosas[cosas.length - 1]}`;

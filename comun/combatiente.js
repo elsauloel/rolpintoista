@@ -352,7 +352,8 @@ const Combatiente = (() => {
       if(e && e.agotada){ fin.add(e); return; }   // un estado con cargas ya gastado se va sin aviso
       if(e && e.seGasta && e.activo !== false && n(e.escudoMagicoActual ?? e.escudoMagico) <= 0){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); return; }   // Shield gastado (2026-10-11)
       if(!e || e.activo === false) return;
-      if(e.recien){ delete e.recien; if(o && o.alEmpezar) return; }
+      // 🔥 (2026-11-23, cola: «nada que cambie» con una Quemadura puesta) lo que se lo saltea, dicho: así no parece que el estado no anda.
+      if(e.recien){ delete e.recien; if(o && o.alEmpezar){ if(!e.permanente && n(e.turnos) > 0) eventos.push({tipo: 'recien', nombre: e.nombre, turnos: n(e.turnos), pego: n(e[c.hp]) < 0}); return; } }
       e.disparado = false;   // en la vuelta que viene se vuelve a disparar
       const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
       const stacks = Math.max(1, n(e.stacks) || 1);
@@ -633,6 +634,7 @@ const Combatiente = (() => {
       if(ev.tipo === 'stacks') return `${ev.nombre}: stacks ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
       if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;
+      if(ev.tipo === 'recien') return `${ev.nombre}: le llegó fuera de su turno, así que este turno no le cuenta${ev.pego ? ' ni le pega (ya pegó al llegar)' : ''} — sigue con ${fmtN(ev.turnos)} turno${ev.turnos === 1 ? '' : 's'}`;
       if(ev.tipo === 'fin') return `${ev.nombre}: se terminó`;
       if(ev.tipo === 'caido') return `${ev.nombre}: no cura a un caído`;
       if(ev.tipo === 'sincura') return `${ev.nombre}: ${SIN_CURA_TXT}`;

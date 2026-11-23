@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261123cola60"></script>
+<script src="zona-detalle.js?v=20261123cola62"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123cola60"></script>
+<script src="combatiente.js?v=20261123cola62"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -4809,7 +4809,7 @@ prueba('el veneno pega al ponerlo y después al empezar cada turno; el contador 
   const r2 = Combatiente.agregarEstado(S.efectos, {id: 'p', nombre: 'Pajaritos', turnos: 1, activo: true});
   FichaMantenimiento.finTurno(S, ui, 'k3', '', [], 7);
   FichaMantenimiento.inicioTurno(S, ui, 'k4', '', [], 8);
-  igual([d.hp, hp1, hp2, no2 > 0, otra, hp3, quedan2, S.efectos.length, S.hp, S.finTurnoEn, i1.rep.some(l => /Veneno/.test(l)), r2.ok], [-2, 8, 8, true, null, 7, 1, 0, 7, 8, false, true]);
+  igual([d.hp, hp1, hp2, no2 > 0, otra, hp3, quedan2, S.efectos.length, S.hp, S.finTurnoEn, i1.rep.some(l => /Veneno: −/.test(l)) || !i1.rep.some(l => /^Veneno: le llegó fuera de su turno, así que este turno no le cuenta ni le pega/.test(l)), r2.ok], [-2, 8, 8, true, null, 7, 1, 0, 7, 8, false, true]);   // (ese primer inicio lo dice: cola 2026-11-23)
 });
 prueba('con turno propio, el ⟳ Mantenimiento de la ronda no toca nada; sin turnos en el Mantenimiento anterior, vuelve', () => {
   const base = () => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, nitros: 0, turno: 4,
@@ -6063,6 +6063,45 @@ prueba('Quemadura: 2 por turno; al reaplicar solo vuelven los turnos (no sube); 
   igual([t1.hp, Combatiente.reporteTurno(t1.eventos)[0], est[0].stacks, t2.hp, est[0].turnos, geiser.estado, geiser.estadoHp || 0,
     JSON.parse(TokensAuto.estadoJson({nombre: 'Quemadura', turnos: 3})).nombre],
     [-1, 'Quemadura: Res. fuego 1 le saca 1 (de 2 a 1)', 2, -2, 2, 'Quemadura', 0, 'Quemadura']);
+});
+prueba('🔥 la Quemadura recién puesta dura al menos una ronda (cola 2026-11-23): no baja ni pega en el inicio del turno en que la pone la zona; si ya la tenía, vuelve a 3', async () => {
+  const q = () => estadosPresetFicha().find(p => p.nombre === 'Quemadura');
+  const C = {hp: 'hpturno', stacks: 'stacksturno'};
+  // En su propio turno (la zona al empezar su turno, después de «✔ Aplicar»): pega una vez al ponérsela; al terminar el turno deja de ser «recién»;
+  // en el próximo inicio baja 3 → 2 y pega.
+  const a = [];
+  const r = Combatiente.agregarEstado(a, q());
+  const ya = Combatiente.dispararAlAplicar(r, a, C);
+  Combatiente.terminarTurnoEstados(a);
+  const s1 = Combatiente.empezarTurnoEstados(a, C);
+  igual([r.que, ya.hp, a[0].turnos, s1.hp, Combatiente.reporteTurno(s1.eventos)], ['nuevo', -2, 2, -2, ['Quemadura: 3 → 2 turnos', 'Quemadura: −2 HP (2 stacks)']]);
+  // Ya la tenía (le quedaban 2): el Muro la renueva a 3 y no pega de nuevo (ya pegó la del inicio).
+  const r2 = Combatiente.agregarEstado(a, q());
+  const ya2 = Combatiente.dispararAlAplicar(r2, a, C);
+  igual([a.length, r2.que, a[0].turnos, ya2.hp], [1, 'acumulado', 3, 0]);
+  // Fuera de su turno (la zona se tiró después de pasar el turno): el próximo inicio no baja ni pega, y lo dice (antes: «Nada que cambie»).
+  const b = [];
+  Combatiente.dispararAlAplicar(Combatiente.agregarEstado(b, q()), b, C);
+  const s2 = Combatiente.empezarTurnoEstados(b, C);
+  igual([s2.hp, b[0].turnos, Combatiente.reporteTurno(s2.eventos)], [0, 3, ['Quemadura: le llegó fuera de su turno, así que este turno no le cuenta ni le pega (ya pegó al llegar) — sigue con 3 turnos']]);
+  const s3 = Combatiente.empezarTurnoEstados(b, C);
+  igual([s3.hp, b[0].turnos], [-2, 2]);
+  // Uno sin daño (Pajaritos) no dice «ni le pega».
+  const c = [];
+  Combatiente.agregarEstado(c, estadosPresetFicha().find(p => p.nombre === 'Pajaritos'));
+  cierto(/^Pajaritos: le llegó fuera de su turno, así que este turno no le cuenta — sigue con \d+ turnos?$/.test(Combatiente.reporteTurno(Combatiente.empezarTurnoEstados(c, C).eventos)[0] || ''));
+  // El renglón de la zona dice si la renovó (js/08 zonaRenuevaTxt), y la ventana del inicio de una invocación dice su nombre (P299, js/16).
+  const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text(), t16 = await (await fetch('../vtt-hexgrid/js/16-momentos.js', {cache: 'no-store'})).text();
+  const trozo = t08.slice(t08.indexOf('function zonaRenuevaTxt'), t08.indexOf('const zonaSpecDe'));
+  const f = tiene => new Function('EstadosAplicar', 'num', 'zonaTieneEstado', trozo + '\nreturn zonaRenuevaTxt;')(EstadosAplicar, x => Number(x) || 0, () => tiene);
+  igual([f(true)({}, {nombre: 'Quemadura'}), f(false)({}, {nombre: 'Quemadura'}), f(true)({}, {nombre: 'Veneno'})], ['Quemadura: ya la tenía, vuelve a 3 turnos', 'Quemadura (3 turnos)', '']);
+  cierto(/: renueva \|\| spec\.nombre\);/.test(t08));
+  const t16i = t16.slice(t16.indexOf('function inicioDeInvocacion'), t16.indexOf('const inicioTitulo'));
+  const g = new Function('tokens', 'fichasPub', 'SEP_INVOCACION', 'nombreDe', t16i + '\nreturn inicioDeInvocacion;')(
+    new Map([['a', {fichaId: 'f1~i1', nombre: 'Abeja de prueba'}], ['b', {fichaId: 'f1', nombre: 'Blanco J1'}]]), new Map([['f1', {nombre: 'Blanco J1'}]]), '~', t => t.nombre);
+  const iv = g('a');
+  igual([iv.titulo, iv.paso.titulo, iv.paso.texto, g('b')], ['Empieza el turno de Abeja de prueba', '🐝 Es el turno de Abeja de prueba', 'Empieza el turno de tu invocación, no el de Blanco J1: lo de abajo le pasa a Abeja de prueba.', null]);
+  cierto(/titulo: iv \? iv\.titulo : 'Empieza tu turno'/.test(t16) && /: \$\{iv\.nombre\} está adentro al empezar su turno/.test(t16));
 });
 prueba('Confusión: estado estándar con su marca (la tira el mapa), y la Niebla de confusión ya no la deja a mano', () => {
   const p = estadosPresetCreep().find(x => x.nombre === 'Confusión'), niebla = CATALOGO_BASE.find(i => i.nombre === 'Niebla de confusión').trampaDatos;
@@ -9749,7 +9788,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
     const T = o => ZonaDetalle.sinTiradaTexto(nuevo, {quienTira: 'Arcano 3', elemento: 'fuego', ...o});
     igual(T({}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego) y Quemadura. El daño lo tira Arcano 3.');
-    igual(T({res: 0}), T({}));
+    igual(T({res: 0}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego y Quemadura. El daño lo tira Arcano 3.');   // (P300: con 0, no la nombra)
     igual(T({res: 2}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego 2) y Quemadura. El daño lo tira Arcano 3.');
     igual(T({res: 99}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (es inmune al fuego: su resistencia al fuego es 99) y Quemadura. El daño lo tira Arcano 3.');
     igual(T({res: 2, suela: 1}), 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frenan su resistencia al fuego 2 y su Suela gruesa 1) y Quemadura. El daño lo tira Arcano 3.');
@@ -9823,6 +9862,19 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     ok(/resultado: resTxt\}/.test(t08) && /const resTxt = Combatiente\.resSinNumero\(resultadoZ\)/.test(t08) && /Combatiente\.resSinNumero\(cz\.cuenta\)/.test(t08));
     ok(/v: num\(c\.restaExtra\), res: 1\}/.test(t10) && /R\('−', x\.txt, x\.v, x\.nota, 0, x\.res\)/.test(t13));
     ok(/const dn = resTapar\(d\) \? danoSinRes\(d\.dano\) : d\.dano;/.test(tdu) && /const dn = danoSinRes\(d\.dano\);/.test(tdu) && /const dn = danoSinRes\(m\.dano\)/.test(tdu));
+  });
+  prueba('🔥 con resistencia 0 al elemento, el cartel y el renglón no la nombran (P300, dueño, 2026-11-23, opción a); sin el número, como antes', async () => {
+    const varita = {zona: true, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep'};
+    const T = (el, o) => ZonaDetalle.sinTiradaTexto(el, {quienTira: 'Mago', elemento: 'fuego', ...o});
+    igual(T(varita, {res: 0}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego. El daño lo tira Mago.');
+    igual(T(varita, {res: 0, sinNumero: true}), T(varita, {res: 0}));
+    igual(T(varita, {res: null}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego). El daño lo tira Mago.');   // (una invocación, o un creep sin descubrir)
+    igual(T(varita, {}), T(varita, {res: null}));
+    igual(T(varita, {res: 0, suela: 1}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su Suela gruesa 1). El daño lo tira Mago.');
+    igual(T(varita, {res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego 2). El daño lo tira Mago.');
+    const deHab = {...varita, zonaDirecto: false};   // (la Defensa especial sigue: lo que no es la resistencia no cambia)
+    igual(T(deHab, {res: 0}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su Defensa especial). El daño lo tira Mago.');
+    igual(ZonaDetalle.frenoCorto(varita, {elemento: 'fuego', res: 0}), '');
   });
   prueba('zona de estado con resistencia, chance y fuego amigo: lo dice todo desde los datos', () => {
     const el = {zona: true, zonaNombre: 'Nube tóxica', zonaAmiga: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaResistStat: 'resmg', zonaTiraStat: 'dmgesp', zonaTiraValor: 9,
@@ -10071,13 +10123,13 @@ grupo('Empieza tu turno con la zona adentro');
     const src = await (await fetch('../vtt-hexgrid/js/16-momentos.js', {cache: 'no-store'})).text();
     const trozo = src.slice(src.indexOf('const inicioMostrados = new Set()'), src.indexOf('// ¿Esta pantalla maneja ese token y le va a salir su «Empieza tu turno»?'));
     const mundo = {aplicados: 0, resolver: null, resueltos: 0};
-    const f = new Function('AvisoCombate', 'fbUsuario', 'iniciativa', 'num', 'setInterval', 'setTimeout', 'zonaInicioTomar', 'zonaInicioRenglon', 'zonaInicioResolver', 'inicioTurnoAplicar', 'zonaBanner',
+    const f = new Function('AvisoCombate', 'fbUsuario', 'iniciativa', 'num', 'setInterval', 'setTimeout', 'zonaInicioTomar', 'zonaInicioRenglon', 'zonaInicioResolver', 'inicioTurnoAplicar', 'zonaBanner', 'tokens', 'fichasPub', 'SEP_INVOCACION', 'nombreDe',
       trozo + '\nreturn {inicioTurnoMomento, inicioZonasSumar, inicioYaCerrado, inicioVentanas};')(
       AvisoCombate, {uid: 'yo'}, {paso: 7}, v => Number(v) || 0, () => 0, (fn) => 0,
       tok => tok === 't1' ? ['muro'] : [],
       (elId, tokenId) => ({elId, tokenId, icono: '🔥', nombre: 'Muro de fuego', texto: 'No hay tirada para esquivarla: le entra 3d4 de daño de fuego (lo frena su resistencia al fuego) y Quemadura.', boton: '🔥 Tirar el daño (3d4)', estado: 'pend'}),
       z => new Promise(ok => { mundo.resolver = ok; }),
-      () => { mundo.aplicados++; }, null);
+      () => { mundo.aplicados++; }, null, new Map(), new Map(), '~', t => t.nombre);   // (un personaje: «Empieza tu turno»; P299 la de una invocación dice su nombre)
     return {f, mundo};
   };
   const d = (tokenId, extra) => ({tipo: 'inicio-turno', estado: 'esperando', datos: {tokenId, paraUid: 'yo', clave: 'm:7', pasos: [{titulo: 'No2', texto: 'No2 recargados a 6'}], ...(extra || {})}});

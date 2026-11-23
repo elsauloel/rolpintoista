@@ -253,20 +253,32 @@ function inicioZonasSumar(tokenId, elIds){
   return false;
 }
 const inicioFaltan = v => v.zonas.filter(z => z.estado !== 'listo');
+/* 🐝 (P299, dueño, 2026-11-23: «sí») La ventana de una invocación dice de quién es el turno: «▶ Empieza el turno de Abeja de prueba», con un primer
+   renglón que aclara que no es el turno del personaje. → null si es un personaje (sigue «Empieza tu turno»). */
+function inicioDeInvocacion(tokenId){
+  const t = tokens.get(tokenId);
+  if(!t || !String(t.fichaId || '').includes(SEP_INVOCACION)) return null;
+  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
+  const nombre = nombreDe(t), pj = (f && (f.nombre || (f.resumen && f.resumen.nombre))) || '';
+  return {nombre, titulo: `Empieza el turno de ${nombre}`,
+    paso: {titulo: `🐝 Es el turno de ${nombre}`, texto: `Empieza el turno de tu invocación${pj ? `, no el de ${pj}` : ''}: lo de abajo le pasa a ${nombre}.`}};
+}
+const inicioTitulo = tokenId => { const iv = inicioDeInvocacion(tokenId); return iv ? iv.titulo : 'Empieza tu turno'; };
 function inicioVentanaDibujar(id){
   const v = inicioVentanas.get(id);
   if(!v) return;
   const dt = v.d.datos || {}, clave = 'inicio-turno:' + id;
-  const pasos = [...(dt.pasos || [])];
+  const iv = inicioDeInvocacion(v.tokenId);
+  const pasos = [...(iv ? [iv.paso] : []), ...(dt.pasos || [])];
   if(v.aplicado === 'aca' && v.zonas.length) pasos.push({titulo: '✔ Aplicado', texto: 'Los estados, la regeneración, la vida y los No2 quedaron como dice arriba.'});
   v.zonas.forEach((z, k) => {
     const listo = z.estado === 'listo', tirando = z.estado === 'tirando';
-    pasos.push({titulo: `${z.icono} ${z.nombre}${listo ? '' : ': estás adentro al empezar tu turno'}`, texto: listo ? z.resultado : z.texto, espera: !listo,
+    pasos.push({titulo: `${z.icono} ${z.nombre}${listo ? '' : iv ? `: ${iv.nombre} está adentro al empezar su turno` : ': estás adentro al empezar tu turno'}`, texto: listo ? z.resultado : z.texto, espera: !listo,
       botones: listo ? [] : [{texto: tirando ? '⏳ Resolviendo…' : z.boton, deshabilitado: tirando || !v.aplicado,
         titulo: !v.aplicado ? 'Primero «✔ Aplicar» lo del turno; después, la zona' : '', alClic: () => inicioZonaIr(id, k)}]});
   });
   const faltan = inicioFaltan(v);
-  const veredicto = v.aplicado === 'no' ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}
+  const veredicto = v.aplicado === 'no' ? {tono: 'malo', grande: iv ? '⏱ YA NO ES SU TURNO' : '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}
     : v.aplicado === 'gm' ? {tono: 'bueno', grande: '✔ YA SE APLICÓ', chico: (/solo al pasar el turno/.test(v.d.resultado || '') ? 'Se aplicó solo al pasar el turno.' : 'Lo aplicó el GM.')
         + (faltan.length ? ` Lo de la zona sigue pendiente: tiralo igual.` : '')}   // (con la zona ya tirada, sin «sigue pendiente»: cola 2026-11-23)
     : (!faltan.length && v.zonas.length === 1 && v.zonas[0].veredicto) ? v.zonas[0].veredicto : null;
@@ -274,7 +286,7 @@ function inicioVentanaDibujar(id){
   if(!v.aplicado) botones = [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => inicioAplicarClic(id)}];
   else if(faltan.length) sinPie = true;   // (el botón de cada zona va en su renglón)
   else botones = [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}];
-  AvisoCombate.mostrar({clave, icono: '▶', titulo: 'Empieza tu turno', pasos, texto: '', soloBoton: true, veredicto, botones, sinPie,
+  AvisoCombate.mostrar({clave, icono: '▶', titulo: iv ? iv.titulo : 'Empieza tu turno', pasos, texto: '', soloBoton: true, veredicto, botones, sinPie,
     alCerrar: () => { inicioMostrados.delete(id); inicioVentanas.delete(id); inicioCerrados.set(v.tokenId, inicioPasoDe(dt.clave)); }});   // cerrado sin aplicar: el GM lo puede aplicar por él, y al pasar el turno se aplica solo
 }
 function inicioAplicarClic(id){
@@ -347,8 +359,8 @@ function inicioTurnoMomento(id, d){
     if(dt.noAplicado && !inicioNoAplicadoVisto.has(id)){
       inicioNoAplicadoVisto.add(id);
       if(v){ v.aplicado = 'no'; v.d = d; inicioVentanaDibujar(id); }
-      else AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', texto: '', soloBoton: true,
-        veredicto: {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+      else AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: inicioTitulo(dt.tokenId), texto: '', soloBoton: true,
+        veredicto: {tono: 'malo', grande: inicioDeInvocacion(dt.tokenId) ? '⏱ YA NO ES SU TURNO' : '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
     }
     return true;
   }

@@ -256,7 +256,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <button class="iconbtn iconbtn-add" data-add-inv="1">+ Ítem</button>
         </header>
         <div class="body">
-          <div class="cap"><span>Peso equipado</span><span><b id="cap-equipo-n">0</b> / <span id="cap-equipo-t">0</span></span></div>
+          <div class="cap" title="Lo que pesa tu equipo puesto, más 1 por cada ranura de más de la mochila (2026-11-23), contra tu Carga máxima"><span>Peso cargado</span><span><b id="cap-equipo-n">0</b> / <span id="cap-equipo-t">0</span></span></div>
           <div class="capbar" id="cap-equipo-bar"><span></span></div>
           <div class="overload" id="equipo-over"></div>
           <div id="list-equipo"></div>
@@ -696,7 +696,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <header><h3>Tenés sobrepeso</h3><button class="iconbtn" id="sobrepeso-x">Cancelar</button></header>
     <div class="body">
       <p id="sobrepeso-texto" style="margin:0 0 8px"></p>
-      <p class="hint" style="margin:0">Regla en prueba: por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada.</p>
+      <p class="hint" style="margin:0">Por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada. Cada ranura de más de la mochila pesa 1.</p>
     </div>
     <footer style="flex-wrap:wrap;gap:8px">
       <button class="btn" id="sobrepeso-penal"></button>
@@ -811,14 +811,14 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js?v=20261018f"></script>
 <script src="../comun/modificadores-tirada.js?v=20261111sob"></script>
 <script src="../comun/tokens-auto.js?v=20261123cola64"></script>
-<script src="../comun/combatiente.js?v=20261123c66"></script>
-<script src="../comun/ficha-calculo.js?v=20261122prisa5"></script>
+<script src="../comun/combatiente.js?v=20261123c68"></script>
+<script src="../comun/ficha-calculo.js?v=20261123c68"></script>
 <script src="../comun/ficha-combate.js?v=20261122cola47"></script>
 <script src="../comun/estados-presets.js?v=20261120hasta2"></script>
 <script src="../comun/estados-aplicar.js?v=20261120hasta"></script>
 <script src="../comun/recibidos.js?v=20261123cola65"></script>
-<script src="../comun/dar-jugador.js?v=20261123cola65"></script>
-<script src="../comun/intercambio.js?v=20261123cola65"></script>
+<script src="../comun/dar-jugador.js?v=20261123c68"></script>
+<script src="../comun/intercambio.js?v=20261123c68"></script>
 <script src="../comun/trampas-base.js?v=20261028x"></script>
 <script src="../comun/asistente-trampa.js?v=20261110disparo"></script>
 <script src="../comun/elegir-trampa.js?v=20261028x"></script>
@@ -832,12 +832,12 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/ficha-habilidades.js?v=20261110vaq"></script>
 <script src="../comun/ficha-guardado.js?v=20261120prisa3"></script>
 <script src="../comun/ficha-sesion.js?v=20261120nom"></script>
-<script src="../comun/ficha-botonera.js?v=20261122prisa5"></script>
+<script src="../comun/ficha-botonera.js?v=20261123c68"></script>
 <script src="../comun/quieto.js?v=20261123cola57"></script>   <!-- 🎯 las Apuntadas que publica el resumen (P271) -->
-<script src="../comun/ficha-resumen.js?v=20261123cola57"></script>
+<script src="../comun/ficha-resumen.js?v=20261123c68"></script>
 <script src="../comun/inv-calculo.js?v=20261122prisa5"></script>
 <script src="../comun/ficha-mantenimiento.js?v=20261123esc"></script>
-<script src="../comun/ficha-equipo.js?v=20261120basico2"></script>
+<script src="../comun/ficha-equipo.js?v=20261123c68"></script>
 <script src="../comun/ficha-botin.js?v=20261120min1"></script>
 <script src="../comun/glosario.js?v=20261123cola57"></script>
 <script src="../comun/tip-ejecutar.js?v=20261109tip3"></script>
@@ -851,8 +851,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/inv-duelo.js?v=20261120mae7"></script>
 <script src="../comun/inv-habilidades.js?v=20261120mae7"></script>
 <script src="../comun/inv-lupa.js?v=20261122prisa5"></script>
-<script src="../comun/ficha-acciones.js?v=20261123c66"></script>
-<script src="../comun/ficha-duelo.js?v=20261123c66"></script>
+<script src="../comun/ficha-acciones.js?v=20261123c68"></script>
+<script src="../comun/ficha-duelo.js?v=20261123c68"></script>
 <script src="../comun/ficha-lupa.js?v=20261122cola49"></script>
 <script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/asistente-personaje.js?v=20261028x2"></script>
@@ -864,7 +864,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/biblioteca.js?v=20261103ref"></script>
 <script src="../comun/recorte-imagen.js?v=20261030im1"></script>
 <script src="js/01-modelo-y-reglas.js?v=20261111dur6"></script>
-<script src="js/02-recompensas-estados-y-atributos.js?v=20261123cola65"></script>
+<script src="js/02-recompensas-estados-y-atributos.js?v=20261123c68"></script>
 <script src="js/03-tiradas.js?v=20261103t2b"></script>
 <script src="js/04-invocaciones.js?v=20261122cola49"></script>
 <script src="js/05-estados-y-botonera.js?v=20261123cola58"></script>
@@ -873,7 +873,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/08-equipo-botin-y-mesa-comun.js?v=20261122dar"></script>
 <script src="js/09-inventario-y-tienda.js?v=20261103nit"></script>
 <script src="js/10-habilidades-pasivas-e-items.js?v=20261122cola47"></script>
-<script src="js/11-combate.js?v=20261104rv2"></script>
+<script src="js/11-combate.js?v=20261123c68"></script>
 <script src="js/12-en-vivo.js?v=20261120nom"></script>
 <script src="js/13-bitacora.js?v=20261025n"></script>
 <script src="js/14-modo-botonera.js?v=20261120carcaj3"></script>

@@ -89,6 +89,19 @@ const Intercambio = (() => {
     const cap = E().capMochila(S);
     return !(cap > 0 && E().mochilaUsada(S) + E().ranuras(item) > cap);
   }
+  /* 🎒 La mochila no da (2026-11-23, dueño, P312: «el baúl y lo que te pasa otro jugador avisan y dejan seguir, como el 🤝 Dar, y el cartel muestra la
+     cuenta»): cuántas ranuras quedarían y el sobrepeso que eso da (cada ranura de más pesa 1). → true = seguir. */
+  async function siguePasada(S, it, que, si){
+    let txt = `${que}: tu mochila no da.`;
+    try{
+      const m = E().siRecibe(S, [it]);
+      txt = `${que}: tu mochila queda pasada (${fmt(m.usada)} de ${fmt(m.cap)} ranuras). Cada ranura de más pesa 1.`
+        + (m.despues > 0 ? `\n\n⚖ ${m.despues > m.antes ? (m.antes > 0 ? `Tu sobrepeso sube de ${fmt(m.antes)} a ${fmt(m.despues)}` : `Quedás con sobrepeso ${fmt(m.despues)}`) : `Seguís con sobrepeso ${fmt(m.despues)}`}: ${Combatiente.sobrepesoCuentaTxt(m.cuenta)}.`
+          : `\n\nTodavía sin sobrepeso: ${Combatiente.sobrepesoCuentaTxt(m.cuenta)}.`);
+    }catch(e){}
+    txt += '\n\nSe puede igual: después acomodala (sacá algo o guardalo en el baúl).';
+    return typeof Confirmar !== 'undefined' ? Confirmar.preguntar(txt, {titulo: 'Mochila llena', icono: '🎒', si, no: 'Volver'}) : confirm(txt);
+  }
   // Una copia del ítem para mandar: sin lo que es de quien lo tiene.
   function copia(it, unidades){
     const c = structuredClone(it);
@@ -277,7 +290,8 @@ const Intercambio = (() => {
         if(destino === 'mano' && !entraEnMano(S, it)){ host.toast(`${p.nombre} no entra en el cinturón (está lleno o no es un consumible): aceptalo a la mochila o hacé lugar.`); return false; }
         if(destino === 'correa' && !entraEnCorrea(S, it)){ host.toast(`${p.nombre}: ${esDeMano(it) ? sinCorreaTxt(it) : 'solo lo que va en la mano va en una vaina o correa'}. Aceptalo a la mochila o hacé lugar.`); return false; }
         if(destino === 'equipar' && !entraEnManos(S, it)){ host.toast(`${p.nombre}: ${esDeMano(it) ? SIN_MANO_TXT : 'solo lo que va en la mano se equipa al recibirlo'}. Aceptalo a la mochila o hacé lugar.`); return false; }
-        if(!['mano', 'equipar'].includes(destino) && !entraEnMochila(S, it)){ host.toast(`Mochila llena: ${p.nombre} no entra. Hacé lugar y aceptalo de nuevo.`); return false; }
+        // 🎒 Mochila llena: avisa y deja seguir, como el 🎁 Dar (2026-11-23, dueño, P312); cada ranura de más pesa 1 (sobrepeso).
+        if(!['mano', 'equipar'].includes(destino) && !entraEnMochila(S, it) && !(await siguePasada(S, it, `Aceptar ${p.nombre}`, '🤝 Aceptar igual'))) return false;
       }
       const costo = combate ? costoRecibe(S, destino) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
       if(!(await reglaNeg(S, costo, 'recibir un ítem'))) return false;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
@@ -1074,7 +1088,7 @@ const Intercambio = (() => {
         let it = null; try{ it = JSON.parse((x && x.json) || 'null'); }catch(e){}
         if(!x || !it) return;
         await hacer(fichaId, async S => {
-          if(!entraEnMochila(S, it)){ host.toast(`Mochila llena: ${x.nombre} no entra`); return false; }
+          if(!entraEnMochila(S, it) && !(await siguePasada(S, it, `Sacar ${x.nombre} del baúl`, '📦 Sacar igual'))) return false;   // 🎒 avisa y deja seguir (P312)
           const ref = col('baul').doc(x.id);
           const ok = await fbDb.runTransaction(async tx => { const d = await tx.get(ref); if(!d.exists) return false; tx.delete(ref); return true; });
           if(!ok){ host.toast(`${x.nombre}: ya lo sacó otro`); return false; }

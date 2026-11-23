@@ -326,7 +326,7 @@ function renderVitals(){
 
   // capacidad
   const crg = Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax;
-  setCap('equipo', c.pesoEquipado, crg);
+  setCap('equipo', c.pesoTotal, crg);   // ⚖ lo equipado + las ranuras de más de la mochila (2026-11-23, P312)
   const capMochilaTotal = capMochilaEfectivo();
   setCap('mochila', FichaEquipo.mochilaUsada(S), capMochilaTotal);   // con el Morral de cazador, los trofeos no ocupan (2026-10-05)
   const bonusMochila = capMochilaTotal - num(S.caps.mochila);
@@ -347,8 +347,11 @@ function renderVitals(){
   if(document.activeElement !== $('#f-sp-vital')) $('#f-sp-vital').value = fmt(Math.max(0, sp));
   $('#v-spmax-vital').textContent = fmt(spMax);
   $('#bar-sp').style.width = pct(Math.max(0, sp), spMax);
+  // ⚖ (2026-11-23, P312) La cuenta suma las ranuras de más de la mochila (pesan 1 cada una); el sobrepeso también resta a la Iniciativa.
   $('#equipo-over').innerHTML = c.sobrecarga > 0
-    ? `Te pasás por ${fmt(c.sobrecarga)}: −${fmt(c.sobrecarga)} a la Evasión al tirarla, o pagás 1 No2 para evitarlo. ${IT2_PENDIENTE('regla de sobrepeso en prueba')}` : '';
+    ? `⚖ Sobrepeso: te pasás por ${fmt(c.sobrecarga)} (${esc(Combatiente.sobrepesoCuentaTxt({peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg}))}). Evasión −${fmt(c.sobrecarga)} al tirarla (o pagás 1 No2 para evitarlo), Parry, «Poner escudo» y dodge roll +1 No2, e Iniciativa −${fmt(c.sobrecarga)}.`
+    : c.ranurasDeMas > 0 ? `Tu mochila está pasada por ${fmt(c.ranurasDeMas)} ranura${c.ranurasDeMas === 1 ? '' : 's'}: pesa${c.ranurasDeMas === 1 ? '' : 'n'} ${fmt(c.ranurasDeMas)} (todavía sin sobrepeso).` : '';
+  sobrepesoVigilar(c);
 }
 
 // SP máximo = el calculado (Especial × 3 + bonos) + un ajuste a mano (`S.meta.spMaxExtra`, puede ser negativo) que se fija desde el
@@ -356,6 +359,26 @@ function renderVitals(){
 function spMaximo(c){ return FichaBotonera.spMaximo(S, c); }   // comun/ficha-botonera.js
 
 function nitrosMaximo(c){ return FichaBotonera.nitrosMaximo(S, c); }
+
+/* ⚖ El cartel «Tenés sobrepeso» (2026-11-23, dueño, P312: «con todo el detalle de lo que implica y Aceptar, donde sea que pase… al equiparse algo y
+   al recibir cosas en la mochila… que lo hagan pasar a tener sobrepeso o se lo suban. Lo ve el jugador dueño del personaje»). La ficha suelta lo
+   muestra cuando el sobrepeso de SU personaje sube (por lo que sea: equipar, comprar, recibir del GM, del botín, de otro jugador, del baúl). Adentro
+   del mapa (la Botonera es esta ficha en un marco) lo muestra el mapa (js/132), no el marco. La primera vez que se ve un personaje solo se anota. */
+let sobrepesoVisto = {id: null, s: 0};
+function sobrepesoVigilar(c){
+  try{
+    const f = typeof fichaVivo !== 'undefined' ? fichaVivo : null;
+    if(!f || !f.cargada) return;
+    const s = num(c.sobrecarga);
+    if(sobrepesoVisto.id !== f.id){ sobrepesoVisto = {id: f.id, s}; return; }
+    const antes = sobrepesoVisto.s;
+    sobrepesoVisto.s = s;
+    if(!(s > antes)) return;
+    if(window.parent !== window || f.soloLectura || !fbUsuario || f.duenoUid !== fbUsuario.uid) return;
+    const txt = Combatiente.sobrepesoCartel(s, {peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg: Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax});
+    if(typeof Confirmar !== 'undefined') Confirmar.avisar(txt, {titulo: antes > 0 ? `Tu sobrepeso subió: ${fmt(antes)} → ${fmt(s)}` : 'Tenés sobrepeso', icono: '⚖', si: 'Aceptar'});
+  }catch(err){ console.error('El cartel del sobrepeso:', err); }
+}
 
 function setCap(key, used, total){
   $('#cap-'+key+'-n').textContent = fmt(used);

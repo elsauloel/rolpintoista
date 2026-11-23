@@ -102,7 +102,7 @@ const combateUi = {
   avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
   preguntarSobrepeso: ({nombre, valor, extra, sobre: s}) => {
     sobrepesoPendiente = {nombre, valor, extra, sobre: s};
-    $('#sobrepeso-texto').innerHTML = `Tu equipo pesa <b>${fmt(s)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(s)}</b>? (tenés ${fmt(Math.max(0, num(S.nitros)))} No2)`;
+    $('#sobrepeso-texto').innerHTML = `Te pasás por <b>${fmt(s)}</b> de tu Carga máxima. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(s)}</b>? (tenés ${fmt(Math.max(0, num(S.nitros)))} No2)`;
     $('#sobrepeso-penal').textContent = `Tirar con −${fmt(s)}`;
     $('#sobrepeso-pagar').disabled = num(S.nitros) < 1;
     $('#scrim-sobrepeso').classList.add('open');

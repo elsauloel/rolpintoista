@@ -973,6 +973,12 @@ versión parecida en más de una, es candidato a juntar.
   de 0), `sueltoVidaAMano(t, texto)` y `sueltoRasgos(t, {veVida})` (los renglones de la tarjeta). `VIDA_MAX` = 9999. Lo usa el mapa (vtt-hexgrid/CLAUDE.md).
 - **`orden-turnos.js`, ¿ocupa lugar en la iniciativa?** (2026-11-23): `OrdenTurnos.ocupaLugar(t, pub)` — el tótem y el estandarte no (`pub.estandarteRadio`),
   una trampa no, el campo `t.iniciativa` (true/false) manda; lo demás sí. La regla de todos los caminos que arman el orden de turnos (vtt-hexgrid/js/04, 86, 31).
+- **⚖ El sobrepeso con la mochila** (2026-11-23, dueño, P312 (a)): `FichaCalculo.calcular` suma a lo equipado **1 por cada ranura de más de la mochila**
+  (`ranurasDeMas`, `pesoTotal`; las cuentas de ranuras viven ahí: `ranurasItem`, `mochilaUsadaDe`, `capMochilaDe`, `ranurasDeMasDe`, y `FichaEquipo`
+  las usa). `FichaEquipo.siRecibe(S, items)` → cómo quedaría (lo usa `intercambio.js`: aceptar de otro jugador y sacar del baúl ya no se frenan,
+  preguntan «… igual» con la cuenta). `Combatiente.sobrepesoCuentaTxt/sobrepesoCartel/conSobrepesoIni` (la cuenta, el cartel «⚖ Tenés sobrepeso» y la
+  tirada de Iniciativa con −N: regla nueva, cada punto resta 1). El resumen publica `sobre` (siempre) y `sobreCuenta`. `OrdenTurnos.reubicarPorValor`
+  (un número nuevo en medio del combate: nadie repite ni pierde turno; si su lugar nuevo ya pasó y no jugó, `pendiente`) y `reubicarAlEmpezar`. Dudas: P313.
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
   yaPaso}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda, queda en `actuaron` (P301).
   La usa el mapa para las invocaciones (js/04 `invocacionAlOrden`).

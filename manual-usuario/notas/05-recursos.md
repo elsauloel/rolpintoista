@@ -47,17 +47,21 @@ estado: confirmado
 > Hasta la Iteración 2 este recurso se llamaba **Bonos**. Si lo ves en material viejo, es lo mismo que SP. → [[Historial de versiones]]
 
 ## El sobrepeso lo baja
-Si el peso de tu equipo supera tu [[Carga máxima]], tenés el estado alterado **Sobrepeso**: **por cada punto que te pasás restás 1 a la Evasión** cuando la tirás. Antes de tirar, el juego te pregunta si querés **pagar 1 No2** para evitar esa penalidad en esa tirada. *(Regla en prueba, 2026-09-24; antes se perdía SP máximo.)*
+Si lo que cargás supera tu [[Carga máxima]], tenés el estado alterado **Sobrepeso**. Cuenta **lo que pesa tu equipo puesto** más **1 por cada ranura de más de la mochila** (desde el 2026-11-23: una mochila pasada de ranuras también pesa).
+
+> [!example] La cuenta
+> Carga máxima 8, tu equipo pesa 7 y la mochila tiene 24 de 20 ranuras (4 de más) → 7 + 4 = 11 → te pasás por **3**.
+
+Lo que hace, por cada punto que te pasás:
+- **[[Evasión]]: −1** al tirarla. Antes de tirar, el juego te pregunta si querés **pagar 1 No2** para evitar esa penalidad en esa tirada.
+- **Iniciativa: −1** a tu tirada (desde el 2026-11-23). El número del orden de turnos es *tu tirada − tu sobrepeso*, y la tabla lo muestra con un ⚖. Si en medio del combate te ponés o te sacás algo y el sobrepeso cambia, el número se ajusta solo (si baja, lo recuperás) y te acomoda en el orden, **sin repetir ni perder turno**: si ya jugaste esta ronda no volvés a jugar; si no jugaste, jugás igual esta ronda (si tu lugar nuevo ya pasó, en el de siempre) y desde la próxima, en tu lugar nuevo.
 
 Además, con sobrepeso tus reacciones cuestan **+1 No2** (fijo, te pases lo que te pases; regla del 2026-11-11, «por ahora»):
 - el **[[Parry]]** cuesta **2 No2** en lugar de 1 (también **«Poner escudo»** contra un disparo, que es un Parry);
 - el primer Parry con **Parada fácil** cuesta **1 No2** (el escudo te ahorra el Parry, pero el peso lo seguís cargando);
 - el **dodge roll** cuesta lo de moverse **+ 1 No2**.
 
-Los botones de defensa lo dicen («2 No2 (1 + 1 por sobrepeso)») junto con la cuenta: cuánto pesa tu equipo y cuál es tu Carga máxima.
-
-> [!question] Piso del sobrepeso
-> ¿Se puede llegar a 0 de SP por sobrepeso? ¿La penalidad afecta solo al SP, o también al movimiento?
+Cuando te queda sobrepeso o te sube (al equiparte algo, al recibir cosas del GM, del botín, de otro jugador, del baúl o de la tienda), te sale el cartel **«⚖ Tenés sobrepeso»** con todo esto y la cuenta. Los botones de defensa también lo dicen («2 No2 (1 + 1 por sobrepeso)») con la cuenta. *(Antes del 2026-09-24 se perdía SP máximo.)*
 
 +++
 titulo: Nitros (No2)

@@ -65,12 +65,19 @@ const FichaEquipo = (() => {
   const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
   // Lo que ocupa un ítem en la mochila (dueño, 2026-10-05, P158): al menos 1 ranura, salvo que el ítem diga lo contrario (`sinRanura: true`);
   // una pila de algo apilable (consumibles, trofeos iguales) ocupa 1 por pila. Antes había armas y piezas con 0 (no ocupaban lugar).
-  const ranuras = i => (i && i.sinRanura) ? 0 : Math.max(1, Math.round(num(i && i.ranuras)) || 1);
+  // (2026-11-23, P312) Las cuentas viven en FichaCalculo, que las usa para el sobrepeso: cada ranura de más de la mochila pesa 1.
+  const ranuras = i => FichaCalculo.ranurasItem(i);
   // Lo que ocupa la mochila (con el Morral de cazador, los trofeos no ocupan: 2026-10-05).
-  const mochilaUsada = S => { const morral = num(FichaCalculo.calcular(S).final.morral) > 0; return (S.inventario || []).filter(i => !i.equipado && !(morral && i.trofeo)).reduce((a, i) => a + ranuras(i), 0); };
-  function capMochila(S){
-    const bonus = FichaCalculo.calcular(S).final.capmochila;
-    return num(S.caps && S.caps.mochila) + (Number.isNaN(bonus) ? 0 : bonus);
+  const mochilaUsada = S => FichaCalculo.mochilaUsadaDe(S, FichaCalculo.calcular(S).final.morral);
+  const capMochila = S => FichaCalculo.capMochilaDe(S, FichaCalculo.calcular(S).final.capmochila);
+  /* ⚖ ¿Cómo queda el sobrepeso si a este personaje le llegan `items` a la mochila? Se prueba en una copia (no toca S).
+     → {usada, cap, pasada, antes, despues, cuenta} (antes/despues: el sobrepeso; cuenta: {peso, ranuras, crg} con lo recibido). */
+  function siRecibe(S, items){
+    const c0 = FichaCalculo.calcular(S);
+    const S2 = {...S, inventario: [...(S.inventario || []), ...(items || []).filter(Boolean).map(i => ({...i, equipado: false}))]};
+    const c = FichaCalculo.calcular(S2), cap = FichaCalculo.capMochilaDe(S2, c.final.capmochila), usada = FichaCalculo.mochilaUsadaDe(S2, c.final.morral);
+    return {usada, cap, pasada: cap > 0 && usada > cap, antes: c0.sobrecarga, despues: c.sobrecarga,
+      cuenta: {peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg: Number.isNaN(c.final.crgmax) ? 0 : num(c.final.crgmax)}};
   }
   /* ---------- Las ranuras del cinturón (dueño, 2026-10-04) ----------
      1 ranura = 1 unidad (5 pociones = 5 ranuras). La base es 5 para todos (S.caps.cinturon; el número a mano queda para casos especiales) y
@@ -559,7 +566,8 @@ const FichaEquipo = (() => {
     }).join('');
     const cEq = FichaCalculo.calcular(S);
     const crgEq = Number.isNaN(cEq.final.crgmax) ? 0 : cEq.final.crgmax;
-    const pesoEq = `<div class="equipo-peso">Peso equipado <b>${fmt(cEq.pesoEquipado)}</b> / ${fmt(crgEq)}${cEq.sobrecarga > 0 ? ` · <span style="color:var(--danger)">te pasás por ${fmt(cEq.sobrecarga)}</span>` : ''}</div>`;
+    // ⚖ (2026-11-23, P312) con las ranuras de más de la mochila, que pesan 1 cada una
+    const pesoEq = `<div class="equipo-peso">Peso equipado <b>${fmt(cEq.pesoEquipado)}</b>${cEq.ranurasDeMas > 0 ? ` + <b>${fmt(cEq.ranurasDeMas)}</b> ranura${cEq.ranurasDeMas === 1 ? '' : 's'} de más en la mochila = <b>${fmt(cEq.pesoTotal)}</b>` : ''} / ${fmt(crgEq)}${cEq.sobrecarga > 0 ? ` · <span style="color:var(--danger)">te pasás por ${fmt(cEq.sobrecarga)} (sobrepeso)</span>` : ''}</div>`;
     // Resumen arriba de todo (2026-09-27): qué hay en cada mano (nombre + efecto) y Defensa/Resistencia a crítico con su 🔍.
     const manos = equipados.filter(i => ['arma_1m', 'arma_2m', 'escudo_1m', 'escudo_2m'].includes(i.tipoItem));
     const manoEfecto = it => esc((it.detalle || '').trim() || statTxt(it) || 'Sin efecto');
@@ -765,6 +773,6 @@ const FichaEquipo = (() => {
     <div style="display:flex;gap:8px;align-items:stretch">${col(equipado, 'Equipado')}${col(item, 'Nuevo')}</div>`;
   }
 
-  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, carcajReal, carcajHuerfano, acomodarCarcaj, costoCarcaj, CAP_CARCAJ_INCLUIDO, tieneArcoOBallesta, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, aManoApto, esEscudo, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, siRecibe, BASE_CINTURON, esFlecha, carcajDe, carcajReal, carcajHuerfano, acomodarCarcaj, costoCarcaj, CAP_CARCAJ_INCLUIDO, tieneArcoOBallesta, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, aManoApto, esEscudo, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

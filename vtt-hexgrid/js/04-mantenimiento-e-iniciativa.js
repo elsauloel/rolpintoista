@@ -193,7 +193,8 @@ let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaro
    turno: su turno ya había empezado (recarga, cooldowns), así que cuando les vuelve a tocar en la ronda no se les aplica de nuevo el inicio (se
    vacía al empezar una ronda nueva). `demoras` = {tokenId: lugares}: la Demora que le llegó a alguien en su propio turno; baja esos lugares
    cuando termina el turno (iniciativaSiguiente). */
-const ordenSerial = lista => lista.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)});
+// ⚖ `sobre` (2026-11-23, P312): el sobrepeso que ya tiene restado esa fila (valor = tirada − sobre); el GM lo ajusta si cambia en combate (js/132).
+const ordenSerial = lista => lista.map(o => ({id: o.id, valor: num(o.valor), ...(o.oculto ? {oculto: true} : {}), ...(typeof o.sobre === 'number' && o.sobre > 0 ? {sobre: o.sobre} : typeof o.sobre === 'number' ? {sobre: 0} : {})}));
 // Turno propio (2026-10-06): cada ▶ Siguiente sube `paso` y deja en `termino` de quién fue el turno que terminó; los estados nuevos llevan la
 // marca «mapa:paso» del turno en curso (Combatiente.agregarEstado), así uno que te ponen en tu propio turno no se descuenta al terminarlo.
 Combatiente.fijarMarcaTurno(() => iniciativa.orden.length ? `${mapaMostrado}:${iniciativa.paso}` : null);
@@ -219,7 +220,8 @@ function escucharIniciativa(){
     const d = doc.exists ? doc.data() : {};
     const antesTurno = iniciativa.turno, antesRonda = iniciativa.ronda, antesIniciado = iniciativa.iniciado === true;
     iniciativa = {
-      orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true})).filter(o => o.id),
+      orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true, ...(o.sobre !== undefined ? {sobre: Math.max(0, num(o.sobre))} : {})})).filter(o => o.id),
+      reubicar: Array.isArray(d.reubicar) ? d.reubicar.map(String) : [],   // ⚖ los que se acomodan al empezar la ronda (js/132, P312)
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
       paso: Math.max(0, Math.round(num(d.paso))),
@@ -243,6 +245,7 @@ function escucharIniciativa(){
     renderIniciativa();
     if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); if(typeof zonasAlEmpezarTurno === 'function') zonasAlEmpezarTurno(); }   // 🔓 js/54 · 🔥 el Muro de fuego (js/08)
     iniciativaCargada = true;
+    if(typeof sobrepesoIniRevisar === 'function') sobrepesoIniRevisar();   // ⚖ js/132: ¿alguien cambió de sobrepeso? (el GM acomoda su número)
   }, err => console.error('Error escuchando la iniciativa:', err));
 }
 
@@ -268,6 +271,7 @@ async function guardarIniciativa(cambios){
     ...(iniciativa.repite ? {repite: iniciativa.repite} : {}),
     ordenPendientes: iniciativa.ordenPendientes || [], mufas: iniciativa.mufas || {}, ...(iniciativa.ordenUsados ? {ordenUsados: iniciativa.ordenUsados} : {}),   // (js/102)
     ...(iniciativa.porIniciar ? {porIniciar: true} : {}), ...(typeof iniciativa.iniciado === 'boolean' ? {iniciado: iniciativa.iniciado} : {}),   // ▶ Iniciar combate
+    ...((iniciativa.reubicar || []).length ? {reubicar: iniciativa.reubicar} : {}),   // ⚖ js/132
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -278,7 +282,9 @@ async function guardarIniciativa(cambios){
   if(!datos.porIniciar) delete datos.porIniciar;
   if(typeof datos.iniciado !== 'boolean') delete datos.iniciado;
   if(!datos.termino) delete datos.termino;
-  if(!datos.ordenUsados) delete datos.ordenUsados;   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
+  if(!datos.ordenUsados) delete datos.ordenUsados;
+  if(!(Array.isArray(datos.reubicar) && datos.reubicar.length)) delete datos.reubicar;
+  if(Array.isArray(datos.orden)) datos.orden = ordenSerial(datos.orden);   // (las filas en memoria traen `oculto: false`; ⚖ conserva `sobre`)   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
     return true;
@@ -302,8 +308,8 @@ function iniciativaOcupaLugar(id){ const t = tokens.get(id); return !t || OrdenT
 // Traer tokens: todos los del mapa que ocupan lugar (los que no, como el tótem o el estandarte, se quedan afuera y, si estaban, salen).
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
-  const lista = [...tokens.keys()].filter(iniciativaOcupaLugar).map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
-  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});   // (`iniciado` se conserva: sumar un token a mitad de combate no vuelve a ofrecer «Iniciar combate»)
+  const lista = [...tokens.keys()].filter(iniciativaOcupaLugar).map(id => ({...(previos.get(id) || {}), id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
+  guardarIniciativa({orden: ordenSerial(ordenarIniciativa(lista)), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});   // (`iniciado` se conserva: sumar un token a mitad de combate no vuelve a ofrecer «Iniciar combate»)
 }
 
 // Mover a mano una fila del orden de turnos (▲ ▼, solo GM): los dos cambian de lugar y nadie gana ni pierde su turno de la ronda (dueño,
@@ -370,17 +376,18 @@ function creepIniMapa(sc){ return sc ? CreepCalculo.statValor(sc, 'ini') : null;
 // resultado)} o null. Creep: tal como está guardado (CreepCalculo ya lee la Prisa vieja como fija). Personaje: lo publicado en su resumen; un resumen
 // del 2026-11-20 al 2026-11-22 no dice si su Iniciativa trae el +5 adentro, así que ahí se lee la ficha (FichaGuardado.cargar la pone al día).
 function iniciativaDeCreep(sc){ return sc ? {base: CreepCalculo.statValor(sc, 'ini'), fijo: CreepCalculo.iniFijo(sc)} : null; }
+// ⚖ `sobre` (2026-11-23, P312): el sobrepeso, que se resta al resultado (del resumen; uno viejo sin `sobre` se lee de la ficha).
 async function iniciativaDePj(fichaId){
   const f = fichasPub.get(fichaId), r = f && f.resumen;
   if(!r || r.ini === undefined) return null;
   const fijo = Combatiente.iniFijoDeResumen(r);
-  if(fijo) return {base: num(r.ini), fijo};
+  if(fijo && r.sobre !== undefined) return {base: num(r.ini), fijo, sobre: Math.max(0, num(r.sobre))};
   try{
     await cargarPiezas(BN_PIEZAS);   // (FichaGuardado y FichaCalculo no se cargan de entrada: js/11)
     const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${fichaId}`), {mezclarCatalogo: typeof bnMezclarCatalogo === 'function' ? bnMezclarCatalogo : undefined});
-    if(l && l.S){ const c = FichaCalculo.calcular(l.S); return {base: num(c.final.ini), fijo: FichaCalculo.iniFijo(l.S, c)}; }
+    if(l && l.S){ const c = FichaCalculo.calcular(l.S); return {base: num(c.final.ini), fijo: FichaCalculo.iniFijo(l.S, c), sobre: Math.max(0, num(c.sobrecarga))}; }
   }catch(err){ console.error('No se pudo leer la ficha para la Iniciativa:', err); }
-  return {base: num(r.ini), fijo: null};
+  return {base: num(r.ini), fijo: fijo || null, sobre: 0};
 }
 // 🎲 Tirar iniciativa (2026-09-24, pedido del dueño): un jugador tira la de sus personajes; el GM, la de todos los creeps de la
 // lista. El resultado se carga solo junto al nombre (no agrega ni saca filas: los tokens los trae el GM con "Traer tokens").
@@ -401,13 +408,16 @@ async function iniciativaTirar(){
     const dato = t.tipo === 'creep' ? iniciativaDeCreep(creepPrivadoDe(t.fichaId)) : await iniciativaDePj(t.fichaId);
     if(!dato){ sinDato.push(nombreDe(t)); continue; }
     const fo = formulaParaValor(dato.base);
-    const r = Combatiente.conIniFijo((fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0}, dato.fijo);
-    nuevos.set(id, r.total);
+    let r = Combatiente.conIniFijo((fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0}, dato.fijo);
+    // ⚖ El sobrepeso resta a la Iniciativa (2026-11-23, P312): el número de la tabla es la tirada − el sobrepeso, y la fila recuerda cuánto se restó.
+    const sobre = t.tipo === 'pj' ? Math.max(0, num(dato.sobre)) : 0;
+    if(sobre) r = Combatiente.conSobrepesoIni(r, sobre);
+    nuevos.set(id, {valor: r.total, ...(t.tipo === 'pj' ? {sobre} : {})});
     if(!soyGM) mesaPublicar(`Iniciativa · ${nombreDe(t)}`, r);
   }
   if(sinDato.length) toast(soyGM ? `Sin datos de: ${sinDato.join(', ')}` : 'Abrí tu ficha una vez para que se publique tu Iniciativa y volvé a tirar');
   if(!nuevos.size) return;
-  await guardarIniciativa({orden: iniciativa.orden.map(o => nuevos.has(o.id) ? {...o, valor: nuevos.get(o.id)} : o)});
+  await guardarIniciativa({orden: iniciativa.orden.map(o => nuevos.has(o.id) ? {...o, ...nuevos.get(o.id)} : o)});
   if(soyGM){
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -512,6 +522,15 @@ async function iniciativaSiguiente(o){
       avisoDemora = {id: termina.id, lugares: j - k, desde: k + 1, hasta: j + 1};
     }
   }
+  // ⚖ Al empezar la ronda (2026-11-23, P312): los que cambiaron de número por el sobrepeso y esta ronda jugaron en su lugar de siempre van al lugar
+  // que les toca (js/132). Nadie jugó todavía: el primero que puede jugar es el que empieza.
+  const reubicarIds = nuevaRonda ? (iniciativa.reubicar || []).filter(id => ordenFin.some(x => x.id === id)) : [];
+  if(reubicarIds.length){
+    ordenFin = OrdenTurnos.reubicarAlEmpezar(ordenFin, reubicarIds);
+    let k = 0;
+    while(k < ordenFin.length - 1 && (iniciativaFueraDeJuego(ordenFin[k].id) || !iniciativaOcupaLugar(ordenFin[k].id))) k++;
+    turnoFin = k;
+  }
   // 🎺🔄🥁🐈‍⬛ Al empezar la ronda (2026-11-05, js/102): los Cambios de guardia, lo que quedó de la ronda pasada, Marcar el ritmo y la Mufa. Se
   // acomoda antes de darle el turno al primero (nadie jugó todavía: el que quede arriba de los que pueden jugar es el que empieza).
   let ordenRonda = null;
@@ -529,14 +548,14 @@ async function iniciativaSiguiente(o){
   const sigEmpezado = !nuevaRonda && !!orden[i] && empezados.includes(orden[i].id);
   const sinInicio = sigEmpezado || repite;   // su turno ya había empezado (o ya lo jugó): no se vuelve a contar el inicio
   const ok = await guardarIniciativa({...(o.orden || ordenFin !== orden ? {orden: ordenSerial(ordenFin)} : {}), turno: turnoFin, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {}), libre: null,
-    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null,
+    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null, ...(nuevaRonda ? {reubicar: []} : {}),
     ...(ordenRonda ? {ordenPendientes: [], ordenUsados: {ronda, ids: ordenRonda.usados}, mufas: ordenRonda.mufas} : nuevaRonda ? {ordenPendientes: [], ordenUsados: null} : {})});
   if(!ok) return;
   if(notaDemora) mesaLinea(notaDemora, 'recordatorio');
   if(avisoDemora && typeof demoraAviso === 'function') demoraAviso(avisoDemora.id, 'aplicada', avisoDemora);   // ⏬ el Aviso (js/13)
   // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
-  const sig = (ordenRonda ? ordenFin[turnoFin] : orden[i]) || {id: ''};   // (la ronda nueva pudo reacomodar el orden: js/102)
+  const sig = (ordenRonda || reubicarIds.length ? ordenFin[turnoFin] : orden[i]) || {id: ''};   // (la ronda nueva pudo reacomodar el orden: js/102, ⚖ js/132)
   const tSig = tokens.get(sig.id);
   // A quién se nombra (2026-10-09): un creep, si los jugadores ya lo conocen (js/29); un personaje, si no está en sigilo.
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
@@ -1137,6 +1156,12 @@ const sobrepesoDeToken = t => {
   const f = fichasPub.get(String(t.fichaId)), e = f && f.resumen && (f.resumen.estados || []).find(x => x && x.nombre === 'Sobrepeso' && x.derivado);
   return e ? 1 : 0;
 };
+// ⚖ Cuánto sobrepeso tiene (2026-11-23, P312: resta a la Iniciativa; lo publica el resumen como `sobre`). null = un resumen viejo, que no lo dice.
+const sobrepesoValorDeToken = t => {
+  if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION) || typeof fichasPub === 'undefined') return null;
+  const f = fichasPub.get(String(t.fichaId)), r = f && f.resumen;
+  return r && r.sobre !== undefined ? Math.max(0, num(r.sobre)) : null;
+};
 
 /* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra con «Mareo de invocación» (su primer turno no hace nada).
    Lo hace la pantalla del GM al ver aparecer el token.
@@ -1261,8 +1286,10 @@ function renderIniciativa(){
       return `<div class="ini-fila${(lib ? libre : i === iniciativa.turno) ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${ya && i > base ? ' — ya jugó esta ronda: si le vuelve a tocar, el GM decide si actúa de nuevo' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
+        // ⚖ El sobrepeso restado (2026-11-23, P312): «⚖−3» al lado del número, con la cuenta (tirada − sobrepeso) al pasar el mouse.
+        (num(o.sobre) > 0 ? `<span class="ini-sobre" title="Tiró ${fmt(num(o.valor) + num(o.sobre))} − ${fmt(num(o.sobre))} de sobrepeso = ${fmt(num(o.valor))}${(iniciativa.reubicar || []).includes(o.id) ? ' · esta ronda juega en su lugar de siempre; desde la próxima, en el que le toca por este número' : ''}" style="font-size:11px;color:#e0a040;white-space:nowrap;margin-right:2px">⚖−${fmt(num(o.sobre))}</span>` : '') +
         (puede
-          ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
+          ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa${num(o.sobre) > 0 ? ` (ya tiene restado ${fmt(num(o.sobre))} de sobrepeso)` : ''}">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
         (soyGM ? (() => { const p = iniDisplay.ids.indexOf(o.id), c = iniDisplay.corte, n = iniDisplay.ids.length;   // ▲ ▼ con el vecino que se ve, sin cruzar la línea
           return `<button type="button" class="ini-quitar" data-ini-subir="${esc(o.id)}" title="Cambiar de lugar con el de arriba"${p <= 0 || p === c ? ' disabled' : ''}>▲</button><button type="button" class="ini-quitar" data-ini-bajar="${esc(o.id)}" title="Cambiar de lugar con el de abajo"${p < 0 || p === n - 1 || p === c - 1 ? ' disabled' : ''}>▼</button>`; })() : '') +
@@ -1391,7 +1418,7 @@ function conectarIniciativa(){
   const iniciar = $('#ini-iniciar');
   if(iniciar) iniciar.onclick = () => iniciativaIniciarCombate();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, ...OrdenTurnos.SIN_INICIAR}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, reubicar: [], ...OrdenTurnos.SIN_INICIAR}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

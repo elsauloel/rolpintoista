@@ -1913,10 +1913,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Ver detalle», con el creep a la vista los jugadores ven «De quién es: Blanco creep (creep)» y, escondido, «Alguien». Uno puesto a mano con el nombre
   viejo («Tótem de silencio de Blanco creep») el Jugador 1 lo vio así un segundo y enseguida cambió solo. Duda que salió: P311 (el aviso de la Mesa).
 
-- **🟡 diagnóstico hecho (2026-11-23), esperando P312 — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22:
-  «revisar el sobrepeso y evaluar que la mochila sobrecargada también se sume al de sobrepeso»). Hoy la mochila llena se mide por ranuras y el peso solo cuenta lo equipado (P262).
-  *Diagnóstico:* el sobrepeso es el peso de lo equipado contra la Carga máxima (= Fuerza): Evasión −1 por punto (o 1 No2) y +1 No2 a Parry y dodge roll;
-  pasarse de ranuras hoy solo avisa. Cuatro opciones en P312 (Claude recomienda: cada ranura de más pesa 1); programar lo que elija.
+- **✅ hecho (2026-11-23) — 🎒 Revisar el sobrepeso, y que la mochila sobrecargada también cuente** (dueño, 2026-11-22; decidido en P312: opción (a)).
+  *Resultado:* cada ranura de más de la mochila pesa 1 y se suma a lo equipado contra la Carga máxima (solo personajes). Cartel «⚖ Tenés sobrepeso»
+  (o «tu sobrepeso subió») con todo lo que implica y la cuenta, al dueño, cuando le queda o le sube, venga de donde venga. Regla nueva: −1 a la
+  Iniciativa por punto (la tirada lo resta y la tabla muestra ⚖−N); en combate, si cambia, el GM ajusta el número y lo acomoda sin repetir ni perder
+  turno. Aceptar de otro jugador y sacar del baúl ya no se frenan: preguntan y dejan seguir. Textos «regla en prueba» y el manual (05, 08), al día.
+  Probado con clics en «Claude · pruebas 2» (GM, J1, J2): equiparse en la ficha suelta y en el mapa, recibir del GM y de otro jugador, tirar
+  iniciativa, y en combate sacarse/ponerse el peto (sube y juega ahí · ya jugó y no vuelve · no jugó y su lugar ya pasó: juega en el de siempre y
+  se acomoda en la ronda siguiente). Todo quedó como estaba. Pruebas automáticas 1065/1065. Dudas: P313. Sin probar: el baúl y la tienda (abajo).
 - **⬜ en cola — 🛡 Probar: el aviso del Aguante de trinchera en GM Tools** (2026-11-22, de la tarea «Aguante de trinchera con cualquier daño»): un
   creep con la pasiva, recibir daño desde el cuadro de daño de GM Tools y ver que el aviso dice que el Aguante se suma a mano (P283).
 - **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
@@ -2205,6 +2209,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola — 🪧 «Alguien clava un tótem…» si el creep está escondido (P311 decidida, b)** (dueño, 2026-11-23): la línea de la Mesa y la
   tarjeta de la Crónica al clavar un tótem o un estandarte no nombran al creep si está oculto o en sigilo; el GM lo sigue viendo.
+- **⬜ en cola — ⚖ Probar: el sobrepeso al sacar del baúl y al comprar en la tienda** (2026-11-23, de la tarea del sobrepeso con la mochila, P312):
+  con la tienda abierta, sacar del 📦 baúl con la mochila llena (tiene que preguntar «Sacar igual» con la cuenta) y comprar algo que te deje con
+  sobrepeso (cartel «⚖ Tenés sobrepeso» en el mapa y en la ficha). No se probó con clics: hacía falta abrir una tienda.
 
 ## En cola
 

@@ -318,7 +318,7 @@ const FichaDuelo = (() => {
         // 🔎 Cada penalidad dice de dónde sale (2026-11-11, dueño: «si la penalidad de −5 es por sobrepeso, debe ser claro; si es por otra razón,
         // también»): el sobrepeso con su cuenta (lo que pesa tu equipo y tu Carga máxima) y los estados que tocan la tirada (ModTirada.porQue).
         const porQue = (est, st) => typeof ModTirada !== 'undefined' && ModTirada.porQue ? ModTirada.porQue(est, st) : '';
-        const sobreCuenta = sobre > 0 ? `sobrepeso: tu equipo pesa ${fmt(c.pesoEquipado)} y tu Carga máxima es ${fmt(num(c.final.crgmax))} (te pasás ${fmt(sobre)})` : '';
+        const sobreCuenta = sobre > 0 ? `sobrepeso: ${Combatiente.sobrepesoCuentaTxt({peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg: num(c.final.crgmax)})} (te pasás ${fmt(sobre)})` : '';   // ⚖ con las ranuras de más (P312)
         const modEva = porQue(estEva, 'eva');
         // Con sobrepeso la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
         const ops = sobre > 0

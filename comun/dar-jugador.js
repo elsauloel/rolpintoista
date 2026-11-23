@@ -141,9 +141,13 @@ const DarJugador = (() => {
     const c = structuredClone(S);
     recibir(c, aviso({id: 'prueba'}, q, 'El GM'));
     const usada = FichaEquipo.mochilaUsada(c);
-    return {usada, cap, antes, pasada: cap > 0 && usada > cap};
+    // ⚖ (2026-11-23, P312) cada ranura de más pesa 1: el sobrepeso de antes y de después
+    let sobre = null;
+    try{ const c0 = FichaCalculo.calcular(S), c1 = FichaCalculo.calcular(c); sobre = {antes: c0.sobrecarga, despues: c1.sobrecarga}; }catch(e){}
+    return {usada, cap, antes, pasada: cap > 0 && usada > cap, sobre};
   }
-  const mochilaAvisoTxt = (nombre, m) => `A ${nombre} le va a quedar la mochila pasada: ${fmt(m.usada)} de ${fmt(m.cap)} ranuras${m.antes > m.cap ? ' (ya estaba pasada)' : ''}.`;
+  const mochilaAvisoTxt = (nombre, m) => `A ${nombre} le va a quedar la mochila pasada: ${fmt(m.usada)} de ${fmt(m.cap)} ranuras${m.antes > m.cap ? ' (ya estaba pasada)' : ''}.`
+    + (m.sobre && m.sobre.despues > m.sobre.antes ? ` Cada ranura de más pesa 1: ${m.sobre.antes > 0 ? `su sobrepeso sube de ${fmt(m.sobre.antes)} a ${fmt(m.sobre.despues)}` : `queda con sobrepeso ${fmt(m.sobre.despues)}`}.` : '');
   // Las piezas para leer una ficha y medir su mochila (GM Tools no las carga con la página).
   const cargadas = new Map();
   function cargarScript(src){
@@ -155,7 +159,7 @@ const DarJugador = (() => {
   async function piezasMochila(){
     if(typeof FichaCalculo === 'undefined' || typeof CATALOGO_BASE === 'undefined') throw new Error('faltan ficha-calculo.js / catalogo.js');
     if(typeof FichaGuardado === 'undefined') await cargarScript('ficha-guardado.js?v=20261120prisa3');
-    if(typeof FichaEquipo === 'undefined') await cargarScript('ficha-equipo.js?v=20261120basico2');
+    if(typeof FichaEquipo === 'undefined') await cargarScript('ficha-equipo.js?v=20261123c68');
     if(typeof FichaTienda === 'undefined') await cargarScript('ficha-tienda.js?v=20261120carcaj2');
   }
   // Lee el personaje (una vez por ventana). → S o null.
@@ -164,7 +168,7 @@ const DarJugador = (() => {
     const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${id}`), {mezclarCatalogo: false});
     return l ? l.S : null;
   }
-  const pasadaTexto = p => p ? `Tu mochila quedó pasada: ${fmt(p.usada)} de ${fmt(p.cap)} ranuras. Lo recibiste igual: acomodala cuando puedas.` : '';
+  const pasadaTexto = p => p ? `Tu mochila quedó pasada: ${fmt(p.usada)} de ${fmt(p.cap)} ranuras. Lo recibiste igual: acomodala cuando puedas (cada ranura de más pesa 1 y puede darte sobrepeso).` : '';
 
   /* ---------- El cartel de quien recibe ---------- */
   const CSS = `

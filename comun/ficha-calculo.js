@@ -286,10 +286,14 @@ const FichaCalculo = (() => {
     STAT_LIST.forEach(s => ctx[s.id] = 0);
 
     const pesoEquipado = (S.inventario || []).filter(i=>i.equipado).reduce((a,i)=>a+num(i.peso),0);
+    // 🎒 La mochila pasada de ranuras también pesa (2026-11-23, dueño, P312 (a)): cada ranura de más cuenta como 1 de peso y se suma a lo equipado
+    // contra la Carga máxima. Las ranuras que da la mochila equipada y el Morral de cazador salen de las mismas cuentas (por eso, en cada pasada).
+    let ranurasDeMas = 0;
 
     const base = {};
     for(let pass=0; pass<4; pass++){
-      ctx.sobrecarga = Math.max(0, pesoEquipado - (ctx.crgmax||0));
+      ranurasDeMas = ranurasDeMasDe(S, ctx.capmochila, ctx.morral);
+      ctx.sobrecarga = Math.max(0, pesoEquipado + ranurasDeMas - (ctx.crgmax||0));
       STAT_LIST.forEach(s => {
         const v = evalFormula(S.formulas[s.id], ctx);
         base[s.id] = Number.isNaN(v) ? NaN : v;
@@ -314,7 +318,18 @@ const FichaCalculo = (() => {
     // Nitros, así que actúan al moverse (ver costoMoverCasillero).
     // Armadura arruinada se sacó (2026-09-21, repaso de debuffs): lo que la aplicaba pasó a sumar stacks de Armadura rota.
 
-    return {base, mods, modTotal, final, pesoEquipado, sobrecarga:ctx.sobrecarga};
+    ranurasDeMas = ranurasDeMasDe(S, final.capmochila, final.morral);
+    return {base, mods, modTotal, final, pesoEquipado, ranurasDeMas, pesoTotal: pesoEquipado + ranurasDeMas, sobrecarga: Math.max(0, pesoEquipado + ranurasDeMas - (Number.isNaN(final.crgmax) ? 0 : num(final.crgmax)))};
+  }
+  /* 🎒 Las ranuras de la mochila (las mismas cuentas que FichaEquipo, que las usa): lo que ocupa un ítem (al menos 1, salvo `sinRanura`; P158), lo
+     que ocupa la mochila (lo no equipado; con el Morral de cazador, los trofeos no) y su capacidad (S.caps.mochila + lo que da la mochila equipada).
+     Una capacidad de 0 o menos es «sin límite» (nunca queda pasada). */
+  const ranurasItem = i => (i && i.sinRanura) ? 0 : Math.max(1, Math.round(num(i && i.ranuras)) || 1);
+  const mochilaUsadaDe = (S, morral) => (S.inventario || []).filter(i => i && !i.equipado && !(num(morral) > 0 && i.trofeo)).reduce((a, i) => a + ranurasItem(i), 0);
+  const capMochilaDe = (S, capmochila) => num(S.caps && S.caps.mochila) + (Number.isNaN(Number(capmochila)) ? 0 : num(capmochila));
+  function ranurasDeMasDe(S, capmochila, morral){
+    const cap = capMochilaDe(S, capmochila);
+    return cap > 0 ? Math.max(0, mochilaUsadaDe(S, morral) - cap) : 0;
   }
 
   /* ---------- Iteración 2 — Nitros (No2) y SP: los costos (movido tal cual de ficha-personaje/js/01, 2026-10-01) ----------
@@ -353,5 +368,5 @@ const FichaCalculo = (() => {
   }
   return {iniFijo, IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
     SLOT_MAP, SLOT_LABEL, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, esEscudoItem, pierdeDefPorRotura, durMax, durActual, itemRoto, armRotaDe,
-    pasivaCompras, jobTotal, modsDe, evalFormula, calcular};
+    pasivaCompras, jobTotal, modsDe, evalFormula, calcular, ranurasItem, mochilaUsadaDe, capMochilaDe, ranurasDeMasDe};
 })();

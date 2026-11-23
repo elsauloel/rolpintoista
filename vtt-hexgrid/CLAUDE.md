@@ -1033,6 +1033,13 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   pasó en la ronda, a `actuaron`: juega desde la próxima); sin datos, al final con 0 y un aviso al GM. Mareo y Crónica como antes
   (`invocacionAlOrdenLineas`). Al borrarse el token de una invocación que está en el orden, la pantalla del GM la saca (`escucharTokens` js/09 →
   `temporalFueraDelOrden` js/54, que ahora va una sola vez por token: `fueraDelOrdenSacando`). Dudas: P301–P304. Probado con clics en «Claude · pruebas 2».
+- **⚖ El sobrepeso** (2026-11-23, dueño, P312; `js/132-sobrepeso.js`): (1) el cartel «⚖ Tenés sobrepeso / tu sobrepeso subió» al jugador dueño cuando
+  el `sobre` publicado de un personaje suyo sube (`sobrepesoFichaCambio`, desde `escucharVinculables` js/09; junta 0,9 s los cambios seguidos);
+  (2) la Iniciativa: `iniciativaTirar` (js/04) resta el sobrepeso (`Combatiente.conSobrepesoIni`) y la fila guarda `sobre` (`ordenSerial` lo conserva;
+  la lista muestra «⚖−N» con la cuenta); la pantalla del GM (`sobrepesoIniRevisar`, al cambiar las fichas o la iniciativa) ajusta el número si cambia
+  (tirada − sobrepeso de ese momento) con `OrdenTurnos.reubicarPorValor` y deja la línea en la Mesa; los que quedan `pendiente` van en
+  `iniciativa.reubicar` y `iniciativaSiguiente` los acomoda al empezar la ronda (`OrdenTurnos.reubicarAlEmpezar`); Ordenar y Limpiar lo vacían.
+  Probado con clics en «Claude · pruebas 2». Dudas: P313.
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

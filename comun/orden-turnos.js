@@ -145,6 +145,61 @@ const OrdenTurnos = (() => {
     const actuaron = [...new Set([...(Array.isArray(ini.actuaron) ? ini.actuaron : []), ...(yaPaso ? [fila.id] : [])])];
     return {orden, turno, actuaron, lugar: k, yaPaso};
   }
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada};
+  /* ⚖ Le cambió el número a alguien que ya está en el orden (2026-11-23, dueño, P312: el sobrepeso resta a la Iniciativa; «si en medio del combate cambia
+     el sobrepeso… se ajusta el número y se reordena la tabla; si le corresponde otro lugar se lo mueve, pero nadie repite ni pierde turno: si ya jugó
+     esta ronda no vuelve a jugar; si no jugó, juega igual esta ronda; desde la próxima, en su lugar nuevo»). Función pura.
+     `ini` = el documento de la iniciativa; `id`; `valor` = su número nuevo; `o.enCurso` (OrdenTurnos.enCurso); `o.fila` = campos de más para su fila
+     (el sobrepeso con que quedó, `sobre`).
+     · Sin el combate en curso: cambia solo el número (Ordenar lo acomoda).
+     · Su lugar nuevo es como entrarConTirada: antes del primero que sacó MENOS (empates: después de los que ya estaban).
+     · Es su turno (o el turno libre es suyo o vuelve a él): cambia el número y se acomoda al empezar la ronda que viene (`pendiente`).
+     · Ya jugó esta ronda: se mueve ya; si queda después de quien tiene el turno, va a `actuaron` (no vuelve a jugar).
+     · No jugó: si su lugar nuevo todavía no pasó, se mueve ya (juega ahí); si ya pasó, esta ronda juega en su lugar de siempre y se acomoda al
+       empezar la próxima (`pendiente`).
+     → {orden, turno, actuaron, movido, pendiente, desde, lugar (índice donde queda ahora), lugarNuevo (el que le toca por su número), yaJugo} o null. */
+  function reubicarPorValor(ini, id, valor, o){
+    o = o || {};
+    const orden0 = ini && Array.isArray(ini.orden) ? ini.orden : [];
+    const i = orden0.findIndex(x => x && x.id === id);
+    if(i < 0) return null;
+    const v = num(valor), fila = {...orden0[i], ...(o.fila || {}), valor: v};
+    const turno0 = Math.round(num(ini.turno));
+    const activo = orden0[turno0] ? orden0[turno0].id : null;
+    const lib = ini.libre && ini.libre.id ? ini.libre : null;
+    const base = lib && lib.vuelve ? lib.vuelve : activo;
+    const actuaron0 = Array.isArray(ini.actuaron) ? ini.actuaron.slice() : [];
+    const quieto = orden0.map((x, k) => k === i ? fila : x);
+    const resto = orden0.filter((x, k) => k !== i);
+    let k = resto.findIndex(x => x && num(x.valor) < v);
+    if(k < 0) k = resto.length;
+    const nueva = resto.slice(); nueva.splice(k, 0, fila);
+    const kBase0 = orden0.findIndex(x => x && x.id === base);
+    const jugo = actuaron0.includes(id) || (kBase0 >= 0 && i < kBase0);
+    const sale = (orden, extra) => ({orden, turno: activo ? Math.max(0, orden.findIndex(x => x && x.id === activo)) : turno0, actuaron: actuaron0,
+      movido: false, pendiente: false, desde: i, lugar: orden.findIndex(x => x && x.id === id), lugarNuevo: k, yaJugo: jugo, ...extra});
+    if(!o.enCurso || k === i) return sale(quieto);
+    if(id === activo || (lib && (id === lib.id || id === lib.vuelve))) return sale(quieto, {pendiente: true});
+    const kBaseN = nueva.findIndex(x => x && x.id === base);
+    if(jugo){
+      const actuaron = kBaseN >= 0 && k > kBaseN && !actuaron0.includes(id) ? [...actuaron0, id] : actuaron0;
+      return {...sale(nueva, {movido: true}), actuaron};
+    }
+    if(kBaseN < 0 || k > kBaseN) return sale(nueva, {movido: true});
+    return sale(quieto, {pendiente: true});
+  }
+  // Al empezar una ronda: los que quedaron `pendiente` van al lugar que les toca por su número (como reubicarPorValor, de a uno). → la lista nueva.
+  function reubicarAlEmpezar(orden, ids){
+    let l = Array.isArray(orden) ? orden.slice() : [];
+    for(const id of ids || []){
+      const i = l.findIndex(x => x && x.id === id);
+      if(i < 0) continue;
+      const [fila] = l.splice(i, 1), v = num(fila.valor);
+      let k = l.findIndex(x => x && num(x.valor) < v);
+      if(k < 0) k = l.length;
+      l.splice(k, 0, fila);
+    }
+    return l;
+  }
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, reubicarPorValor, reubicarAlEmpezar};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

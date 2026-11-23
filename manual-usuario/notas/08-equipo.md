@@ -138,7 +138,7 @@ alias: [Inventario, Mochila (inventario)]
 tags: [equipo]
 estado: borrador
 +++
-La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa **al menos una ranura**; una pila de algo apilable (pociones, trofeos iguales) ocupa una sola.
+La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos**, y mientras entre en sus ranuras **no pesa**: cada ranura **de más** pesa 1 para tu [[Carga máxima]] (se puede pasar igual: el juego avisa y deja seguir). Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa **al menos una ranura**; una pila de algo apilable (pociones, trofeos iguales) ocupa una sola.
 
 +++
 titulo: Pasarle cosas a otro personaje
@@ -182,19 +182,18 @@ alias: [Crg.Max, Peso, Peso equipado, Sobrepeso, Sobrecarga]
 tags: [equipo, stats]
 estado: borrador
 +++
-Tu **[[Fuerza]]** define tu **Carga máxima** (Crg.Max): cuánto peso podés llevar **equipado** sin castigo.
+Tu **[[Fuerza]]** define tu **Carga máxima** (Crg.Max): cuánto podés cargar sin castigo (por defecto, igual a tu Fuerza).
 
-- **Solo cuenta lo equipado.** Lo que está en la mochila no suma.
-- Cada ítem equipado tiene un **peso**. Se suman todos.
-- Si te pasás, tenés **Sobrepeso**: **por cada punto de peso que sobra restás 1 a la [[Evasión]]** (o pagás 1 No2 para evitarlo en esa tirada), y el **[[Parry]]**, «Poner escudo» y el **dodge roll** cuestan **+1 No2**. Detalle en [[SP]] → «El sobrepeso lo baja». *(Antes: perdías 1 de SP máximo por punto.)*
+- Cuenta **lo equipado** (cada ítem puesto tiene un **peso**; se suman todos) **más 1 por cada ranura de más de la [[Mochila]]**. Lo que entra en la mochila no pesa.
+- Si te pasás, tenés **Sobrepeso**: por cada punto de más, **−1 a la [[Evasión]]** (o pagás 1 No2 para evitarlo en esa tirada) y **−1 a la Iniciativa**; además el **[[Parry]]**, «Poner escudo» y el **dodge roll** cuestan **+1 No2**. Detalle en [[SP]] → «El sobrepeso lo baja». *(Antes: perdías 1 de SP máximo por punto.)*
+- Cuando te queda sobrepeso o te sube, sale el cartel **«⚖ Tenés sobrepeso»** con lo que implica y la cuenta.
 
 > [!example] Sobrecargado
-> Crg.Max 8, llevás 10 de peso → te pasás por 2 → tu Evasión tira con −2 (o pagás 1 No2), y cada Parry te cuesta 2 No2.
+> Crg.Max 8, llevás 7 de peso puesto y la mochila tiene 24 de 20 ranuras → 7 + 4 = 11 → te pasás por 3: Evasión −3 (o pagás 1 No2), Iniciativa −3 y cada Parry te cuesta 2 No2.
 
 > [!question] Fórmula y efectos
-> - ¿Cuál es la fórmula exacta FUE → Crg.Max?
-> - ¿Hay piso (se puede llegar a 0 SP)? ¿El sobrepeso afecta el movimiento?
-> - ¿La penalidad baja el máximo del combate o se recalcula cada vez que cambia el equipo?
+> - ¿La fórmula FUE → Crg.Max queda así (igual a la Fuerza)?
+> - ¿El sobrepeso afecta el movimiento?
 
 +++
 titulo: Rareza

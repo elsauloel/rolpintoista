@@ -303,6 +303,7 @@ function escucharVinculables(){
         if(previo && fbUsuario && d.duenoUid === fbUsuario.uid && previo.resumen && d.resumen && num(d.resumen.nivel) > num(previo.resumen.nivel) && num(previo.resumen.nivel) > 0){
           mostrarSubidaNivelMapa(num(d.resumen.nivel), o.nombre);
         }
+        if(typeof sobrepesoFichaCambio === 'function') sobrepesoFichaCambio(ch.doc.id, previo, d);   // ⚖ el cartel «Tenés sobrepeso» del dueño (js/132)
         if((!o.miniatura || miniaturasInvalidas.has(ch.doc.id)) && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
         if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
         else if(!miniaturasLocales.has(ch.doc.id) && !miniaturasInvalidas.has(ch.doc.id)) verificarMiniatura(ch.doc.id, o.miniatura);
@@ -330,6 +331,7 @@ function escucharVinculables(){
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
     if(coleccion === 'fichas') actualizarCabecera();   // el nombre del personaje principal
     if(coleccion === 'fichas'){ escucharVinculables.fichasListas = true; avisoSinTokenRevisar(); renderTokensMenu(true); }   // 🎭 ¿falta tu token? (2026-11-20)
+    if(coleccion === 'fichas' && typeof sobrepesoIniRevisar === 'function') sobrepesoIniRevisar();   // ⚖ el GM acomoda el número de quien cambió de sobrepeso (js/132)
     try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival

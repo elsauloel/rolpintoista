@@ -2408,6 +2408,11 @@ con otras acciones de un creep escondido (una frase incierta, «Alguien clava un
   lugar nuevo. Si baja o se va el sobrepeso, **recupera** (siempre es tirada − sobrepeso de ese momento).
 - Creeps e invocaciones siguen sin sobrepeso.
 
+> ✅ **Hecho (2026-11-23):** la cuenta en `FichaCalculo.calcular` (`ranurasDeMas`, `pesoTotal`); el cartel «⚖ Tenés sobrepeso» en la ficha suelta
+> (`sobrepesoVigilar`, ficha js/02) y en el mapa (js/132, también para lo que cambia la ficha lite o la Botonera); la Iniciativa −sobrepeso (la
+> tirada, la fila del orden recuerda `sobre`, y el GM la acomoda en combate con `OrdenTurnos.reubicarPorValor`); los avisos de aceptar de otro jugador
+> y del baúl, que preguntan y dejan seguir. Dudas que salieron: P313.
+
 Pedido del dueño (2026-11-22): «revisar el sobrepeso y evaluar que la mochila sobrecargada también se sume al de sobrepeso». Viene de P262 (5).
 
 **Cómo funciona hoy (diagnóstico):**
@@ -2445,3 +2450,17 @@ y la fórmula de la Carga máxima se editan en la ficha). Aprovechando el cambio
 baúl avisen y dejen seguir, como el 🎁 Dar) y poner la cuenta en el cartel: «tu equipo pesa 7 + 4 ranuras de más en la mochila = 11; tu Carga
 máxima es 8».
 **Recomendación de Claude: (a)**, por simple y porque usa la Fuerza («lo que no entra lo llevás colgado»). Mientras, queda como está.
+
+### P313 — ⚖ Lo que quedó elegido «mientras tanto» al programar el sobrepeso con la mochila (2026-11-23, Claude, cola de programación, de P312)
+
+1. **«Ya jugó: no vuelve a jugar»**: cuando el sobrepeso le baja el número a alguien que ya jugó y queda después de quien tiene el turno, se lo anota
+   como que ya jugó (como un ▼ del GM). Al llegarle de nuevo en la ronda, el mapa le pregunta al GM lo de siempre, «🔁 Le vuelve a tocar: ¿vuelve a
+   actuar? Sí / No, se saltea» (la regla del 2026-10-29 para cualquiera que bajaron después de jugar). ¿Lo salteamos sin preguntar en este caso?
+   Mientras, queda la pregunta (es la salida a mano: el GM contesta «No»).
+2. **El cartel sale en cada pantalla abierta del dueño**: si el jugador tiene el mapa y la ficha suelta abiertos a la vez, le sale en las dos (en el
+   mapa, con la Botonera o la ficha lite, una sola vez). ¿Está bien, o solo en la pantalla donde hizo el cambio?
+3. **Bajar el sobrepeso no tiene cartel** (solo la línea de la Mesa si está en el orden de turnos y el ⚖ desaparece de la ficha). ¿Querés un aviso
+   «ya no tenés sobrepeso»?
+4. **Un número de iniciativa escrito a mano**: si el GM (o el jugador) escribe el número de una fila que ya tenía el sobrepeso restado, se toma como
+   que el número nuevo ya lo tiene restado (si después el sobrepeso cambia, se ajusta desde ahí). Una fila sin tirar no se toca hasta que se tira.
+

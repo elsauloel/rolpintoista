@@ -50,17 +50,17 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261123p281"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123c66"></script>
+<script src="combatiente.js?v=20261123c68"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js?v=20261122prisa5"></script>
+<script src="ficha-calculo.js?v=20261123c68"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261120hasta2"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261123cola65"></script>
+<script src="dar-jugador.js?v=20261123c68"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -74,7 +74,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261123cola57"></script>
+<script src="ficha-resumen.js?v=20261123c68"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261122prisa5"></script>
@@ -82,8 +82,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261123c66"></script>
-<script src="orden-turnos.js?v=20261123cola63"></script>
+<script src="ficha-acciones.js?v=20261123c68"></script>
+<script src="orden-turnos.js?v=20261123c68"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -713,6 +713,36 @@ prueba('un ítem roto no da bonos; la armadura rota baja la Defensa de su pieza 
 prueba('sobrecarga: peso equipado por encima de la Carga máxima', () => {
   const c = FichaCalculo.calcular(fichaDePrueba({formulas: {crgmax: 'fue*2', eva: 'agl-sobrecarga'}, inventario: [{id: 'x', nombre: 'Yunque', tipoItem: 'otros', equipado: true, peso: 9, mods: []}]}));
   igual([c.pesoEquipado, c.sobrecarga, c.final.eva], [9, 3, 2]);
+});
+prueba('🎒⚖ la mochila pasada de ranuras pesa 1 por ranura de más y se suma al sobrepeso (2026-11-23, P312 (a))', () => {
+  const cosas = n => Array.from({length: n}, (_, i) => ({id: 'm' + i, nombre: 'Cosa ' + i, tipoItem: 'otros', equipado: false, peso: 3, ranuras: 1}));
+  const equipo = {id: 'e', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 5, mods: []};
+  // Carga máxima 6 (Fuerza 3 × 2), equipo 5, mochila de 4 ranuras
+  const sinPasar = FichaCalculo.calcular(fichaDePrueba({caps: {mochila: 4}, inventario: [equipo, ...cosas(4)]}));
+  const pasada = FichaCalculo.calcular(fichaDePrueba({caps: {mochila: 4}, inventario: [equipo, ...cosas(7)]}));   // 3 de más: 5 + 3 = 8 → 2
+  const conMochila = FichaCalculo.calcular(fichaDePrueba({caps: {mochila: 4}, inventario: [equipo, {id: 'b', nombre: 'Mochila', tipoItem: 'mochila', equipado: true, peso: 0, mods: [{stat: 'capmochila', val: 3}]}, ...cosas(7)]}));
+  const sinLimite = FichaCalculo.calcular(fichaDePrueba({caps: {mochila: 0}, inventario: [equipo, ...cosas(30)]}));
+  const trofeos = FichaCalculo.calcular(fichaDePrueba({caps: {mochila: 1}, inventario: [{id: 'mo', nombre: 'Morral', tipoItem: 'mochila', equipado: true, peso: 0, mods: [{stat: 'morral', val: 1}]}, ...cosas(3).map(x => ({...x, trofeo: true}))]}));
+  igual([sinPasar.ranurasDeMas, sinPasar.sobrecarga, pasada.ranurasDeMas, pasada.pesoTotal, pasada.sobrecarga, conMochila.ranurasDeMas, conMochila.sobrecarga, sinLimite.ranurasDeMas, trofeos.ranurasDeMas],
+    [0, 0, 3, 8, 2, 0, 0, 0, 0]);
+  const S = fichaDePrueba({caps: {mochila: 4}, inventario: [equipo, ...cosas(4)]});
+  const m = FichaEquipo.siRecibe(S, cosas(3).map(x => ({...x, id: 'n' + x.id})));
+  igual([FichaEquipo.mochilaUsada(S), FichaEquipo.capMochila(S), m.usada, m.cap, m.pasada, m.antes, m.despues, m.cuenta, S.inventario.length],
+    [4, 4, 7, 4, true, 0, 2, {peso: 5, ranuras: 3, crg: 6}, 5]);
+});
+prueba('⚖ la cuenta, el cartel y la Iniciativa con sobrepeso (2026-11-23, P312)', () => {
+  const r = Combatiente.conSobrepesoIni({formula: '1d6', rolls: [4], mod: 0, total: 4}, 3);
+  const cartel = Combatiente.sobrepesoCartel(3, {peso: 7, ranuras: 4, crg: 8});
+  igual([Combatiente.sobrepesoCuentaTxt({peso: 7, ranuras: 4, crg: 8}), Combatiente.sobrepesoCuentaTxt({peso: 10, ranuras: 0, crg: 8}),
+    r.formula, r.total, r.estados, Combatiente.conSobrepesoIni(r, 0) === r,
+    /Evasión: −3/.test(cartel), /Parry y «Poner escudo»: \+1 No2/.test(cartel), /Dodge roll/.test(cartel), /Iniciativa: −3/.test(cartel), /7 \+ 4 ranuras de más en la mochila = 11/.test(cartel)],
+    ['tu equipo pesa 7 + 4 ranuras de más en la mochila = 11; tu Carga máxima es 8', 'tu equipo pesa 10; tu Carga máxima es 8',
+     '1d6 −3 sobrepeso', 1, [{n: 'Sobrepeso −3', p: 'debuff'}], true, true, true, true, true, true]);
+  const S = fichaDePrueba({caps: {mochila: 1}, inventario: [{id: 'e', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 5, mods: []},
+    {id: 'a', nombre: 'A', tipoItem: 'otros', peso: 1}, {id: 'b', nombre: 'B', tipoItem: 'otros', peso: 1}, {id: 'c', nombre: 'C', tipoItem: 'otros', peso: 1}]});
+  const res = FichaResumen.resumen(S), est = FichaResumen.estadoSobrepeso(S)[0];
+  igual([res.sobre, res.sobreCuenta, est.sobrepeso, /5 \+ 2 ranuras de más/.test(est.detalle), /Iniciativa: −1/.test(est.detalle), FichaResumen.resumen(fichaDePrueba()).sobre],
+    [1, {peso: 5, ranuras: 2, crg: 6}, 1, true, true, 0]);
 });
 prueba('No2 máximo con un tope forzado (regla común) y Job por nivel', () => {
   const c = FichaCalculo.calcular(fichaDePrueba({efectos: [{nombre: 'Stun', activo: true, forzarNitros: 2}]}));
@@ -2866,6 +2896,44 @@ prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en
     ['abxc', 1, false, ['a'], 'axbc', 2, true, ['a', 'x'], 'abxc', 2, 'xabc', 1, false,
      'abcx', 0, false, 'axbc', 3, false, null, null]);
 });
+prueba('⚖ El sobrepeso cambia en combate: el número se ajusta y se acomoda sin repetir ni perder turno (2026-11-23, P312)', () => {
+  const R = OrdenTurnos.reubicarPorValor, ids = r => r.orden.map(o => o.id).join('');
+  // a 15, b 12 (juega), c 10, d 5. a ya jugó.
+  const orden = [{id: 'a', valor: 15}, {id: 'b', valor: 12}, {id: 'c', valor: 10}, {id: 'd', valor: 5}];
+  const ini = {orden, turno: 1, actuaron: ['a']};
+  const r1 = R(ini, 'a', 8, {enCurso: true, fila: {sobre: 7}});    // ya jugó, baja después de c: no vuelve a jugar
+  const r2 = R(ini, 'd', 11, {enCurso: true});                      // no jugó, sube antes de c (todavía no pasó): juega ahí
+  const r3 = R(ini, 'c', 13, {enCurso: true});                      // no jugó, su lugar nuevo (antes de b) ya pasó: juega en el de siempre, pendiente
+  const r4 = R(ini, 'b', 3, {enCurso: true});                       // es su turno: pendiente
+  const r5 = R(ini, 'c', 1, {enCurso: false});                      // combate sin empezar: solo el número
+  const r6 = R(ini, 'c', 11, {enCurso: true});                      // mismo lugar
+  igual([ids(r1), r1.turno, r1.actuaron, r1.movido, r1.orden[2].sobre, ids(r2), r2.turno, r2.actuaron, r2.movido,
+    ids(r3), r3.pendiente, r3.orden[2].valor, ids(r4), r4.pendiente, ids(r5), r5.orden[2].valor, r5.movido, r5.pendiente, ids(r6), r6.movido, r6.pendiente, R(ini, 'x', 3)],
+    ['bcad', 0, ['a'], true, 7, 'abdc', 1, ['a'], true,
+     'abcd', true, 13, 'abcd', true, 'abcd', 1, false, false, 'abcd', false, false, null]);
+  // a no estaba en actuaron pero jugó por lugar (turno 2): al bajar después de quien juega, queda anotado
+  const r7 = R({orden, turno: 2, actuaron: []}, 'a', 1, {enCurso: true});
+  igual([ids(r7), r7.actuaron, r7.turno], ['bcda', ['a'], 1]);
+  // Al empezar la ronda: los pendientes van a su lugar por número
+  igual(OrdenTurnos.reubicarAlEmpezar([{id: 'a', valor: 15}, {id: 'b', valor: 2}, {id: 'c', valor: 13}, {id: 'd', valor: 5}], ['b', 'c']).map(o => o.id).join(''), 'acdb');
+});
+prueba('⚖ El mapa: la tirada de Iniciativa resta el sobrepeso, el GM lo ajusta en combate y el dueño ve el cartel (2026-11-23, P312)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t132 = await leer('132-sobrepeso.js'), t09 = await leer('09-colocar-y-panel.js');
+  cierto(/Combatiente\.conSobrepesoIni\(r, sobre\)/.test(t04), 'la tirada resta el sobrepeso');
+  cierto(/OrdenTurnos\.reubicarAlEmpezar\(ordenFin, reubicarIds\)/.test(t04), 'los pendientes se acomodan al empezar la ronda');
+  cierto(/OrdenTurnos\.reubicarPorValor\(ini, fila0\.id, valor/.test(t132), 'el GM acomoda el número');
+  cierto(/Combatiente\.sobrepesoCartel\(s, r\.sobreCuenta\)/.test(t132) && /sobrepesoFichaCambio\(ch\.doc\.id, previo, d\)/.test(t09), 'el cartel del dueño');
+  const n = {antes: 0, s: 3, tirada: 14, valor: 11, enCurso: true, r: {movido: true, desde: 1, lugar: 3, yaJugo: false}};
+  igual([sobrepesoIniTextoPrueba(t132, n), sobrepesoIniTextoPrueba(t132, {...n, antes: 3, s: 0, valor: 14, r: {pendiente: true}})],
+    ['⚖ Fulano: su sobrepeso subió (0 → 3): iniciativa 14 − 3 = 11 · baja en el orden de turnos (2.º → 4.º); juega ahí esta ronda.',
+     '⚖ Fulano: ya no tiene sobrepeso: recupera su iniciativa, 14 · esta ronda juega en su lugar de siempre; desde la próxima, en el que le toca por este número.']);
+});
+// (arma sobrepesoIniTexto del js/132 aislada, con fmt de la página)
+function sobrepesoIniTextoPrueba(src, n){
+  const cuerpo = src.slice(src.indexOf('function sobrepesoIniTexto'), src.indexOf('function sobrepesoIniContar'));
+  return new Function('fmt', cuerpo + '; return sobrepesoIniTexto;')(fmt)(n, 'Fulano');
+}
 prueba('🐝 El mapa tira la iniciativa de la invocación al entrar y la saca del orden al irse (2026-11-23, P275)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t09 = await leer('09-colocar-y-panel.js'), t54 = await leer('54-soltarse-al-empezar.js');
@@ -3563,7 +3631,7 @@ prueba('⚖ sobrepeso (2026-11-11): el Parry cuesta 2 No2 (1 + 1), con Parada f�
   const antes = pesado.nitros;
   FichaAcciones.parryConArma(pesado, pesado.inventario.find(x => x.id === 'esp'), undefined, uiCombate([], {}));
   igual([par.costo, par.costoTxt, /para evitar la penalidad de sobrepeso/.test(pag.etiqueta), /penalidad de sobrepeso −/.test(pen.etiqueta),
-    pen.info.some(t => /tu equipo pesa \d+ y tu Carga máxima es/.test(t)), par.info.some(t => /\+1 No2 por sobrepeso/.test(t)), antes - pesado.nitros,
+    pen.info.some(t => /tu equipo pesa \d+; tu Carga máxima es/.test(t)), par.info.some(t => /\+1 No2 por sobrepeso/.test(t)), antes - pesado.nitros,
     Combatiente.costoParrySobrepeso(true, 3), Combatiente.costoParrySobrepeso(false, 0), Combatiente.costoParryTxt(true, 2), Combatiente.costoParryTxt(true, 0),
     ModTirada.porQue([{nombre: 'Pajaritos', activo: true, mitadPdgEva: true, polaridad: 'debuff'}], 'eva'), ModTirada.porQue([], 'eva')],
     [2, '2 No2 (1 + 1 por sobrepeso)', true, true, true, true, 2, 1, 1, '1 No2 (Parada fácil + 1 por sobrepeso)', 'gratis (Parada fácil)', 'Modificado por: Pajaritos ÷2', '']);
@@ -6517,8 +6585,8 @@ prueba('🎒 P262 (5): antes de dar, la ventana sabe si a alguien le va a quedar
   const m1 = DarJugador.mochilaTrasDar(S, uno), m3 = DarJugador.mochilaTrasDar(S, tres);
   igual([cap, m1, m3, DarJugador.mochilaTrasDar(S, {dde: 5}), S.inventario.length,
     DarJugador.mochilaAvisoTxt('Tita', m3), DarJugador.mochilaAvisoTxt('Tita', {usada: 5, cap: 2, antes: 3})],
-    [2, {usada: 2, cap: 2, antes: 1, pasada: false}, {usada: 4, cap: 2, antes: 1, pasada: true}, null, 1,
-      'A Tita le va a quedar la mochila pasada: 4 de 2 ranuras.', 'A Tita le va a quedar la mochila pasada: 5 de 2 ranuras (ya estaba pasada).']);
+    [2, {usada: 2, cap: 2, antes: 1, pasada: false, sobre: {antes: 0, despues: 0}}, {usada: 4, cap: 2, antes: 1, pasada: true, sobre: {antes: 0, despues: 1}}, null, 1,
+      'A Tita le va a quedar la mochila pasada: 4 de 2 ranuras. Cada ranura de más pesa 1: queda con sobrepeso 1.', 'A Tita le va a quedar la mochila pasada: 5 de 2 ranuras (ya estaba pasada).']);   // ⚖ (P312) cada ranura de más pesa 1
 });
 prueba('🎁 una recompensa del combate (sin la marca de regalo) sigue como siempre: XP, sin cartel', () => {
   const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 1, exp: 0}}).S;

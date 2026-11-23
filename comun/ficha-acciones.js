@@ -538,6 +538,7 @@ const FichaAcciones = (() => {
     const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, usadoG);
     let r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
     if(r && statId === 'ini') r = Combatiente.conIniFijo(r, FichaCalculo.iniFijo(S));   // 💨 la Prisa: +5 fijo al resultado (2026-11-22)
+    if(r && statId === 'ini') r = Combatiente.conSobrepesoIni(r, FichaCalculo.calcular(S).sobrecarga);   // ⚖ el sobrepeso resta a la Iniciativa (2026-11-23, P312)
     if(conG && r){
       S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1};
       if(ronda !== null && ronda !== undefined) S.meta = {...(S.meta || {}), gauchitoRonda: ronda};

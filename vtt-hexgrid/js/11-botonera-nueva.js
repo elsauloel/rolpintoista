@@ -117,9 +117,9 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261120basico2', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261123esc', '../comun/ficha-calculo.js?v=20261122prisa5', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
-  '../comun/catalogo.js?v=20261123cola60', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261120prisa3', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261122prisa5', '../comun/ficha-resumen.js?v=20261123cola57', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261122prisa5', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261122cola49', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261122prisa5',
-  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261120mae7', '../comun/lupa.js?v=20261122prisa5', '../comun/ficha-lupa.js?v=20261122cola49'];
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261123c68', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261123esc', '../comun/ficha-calculo.js?v=20261123c68', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261114sang', '../comun/ficha-habilidades.js?v=20261110vaq',
+  '../comun/catalogo.js?v=20261123cola60', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261120prisa3', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261123c68', '../comun/ficha-resumen.js?v=20261123c68', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261122prisa5', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261123c68', '../comun/inv-habilidades.js?v=20261120mae7', '../comun/inv-lupa.js?v=20261122prisa5',
+  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261123c68', '../comun/lupa.js?v=20261122prisa5', '../comun/ficha-lupa.js?v=20261122cola49'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -619,7 +619,7 @@ function bnCombateUi(){
     registrarTirada: (origen, r) => bnPublicar(origen, r),
     preguntarSobrepeso: p => {
       bnSobrepeso = p;
-      bn.raiz.querySelector('#bn-sobre-texto').innerHTML = `Tu equipo pesa <b>${fmt(p.sobre)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(p.sobre)}</b>? (tenés ${fmt(Math.max(0, num(bn.S.nitros)))} No2)`;
+      bn.raiz.querySelector('#bn-sobre-texto').innerHTML = `Te pasás por <b>${fmt(p.sobre)}</b> de tu Carga máxima. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(p.sobre)}</b>? (tenés ${fmt(Math.max(0, num(bn.S.nitros)))} No2)`;
       bn.raiz.querySelector('[data-bn-sobre="penal"]').textContent = `Tirar con −${fmt(p.sobre)}`;
       bn.raiz.querySelector('[data-bn-sobre="pagar"]').disabled = num(bn.S.nitros) < 1;
       bnAbrirCartel('bn-sobrepeso');
@@ -1211,7 +1211,7 @@ function bnCrear(){
     <div class="scrim" id="bn-sobrepeso"><div class="modal" style="max-width:440px">
       <header><h3>Tenés sobrepeso</h3><button class="iconbtn" data-bn-sobre="no">Cancelar</button></header>
       <div class="body"><p id="bn-sobre-texto" style="margin:0 0 8px"></p>
-        <p class="hint" style="margin:0">Regla en prueba: por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada.</p></div>
+        <p class="hint" style="margin:0">Por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada. Cada ranura de más de la mochila pesa 1.</p></div>
       <footer style="flex-wrap:wrap;gap:8px"><button class="btn" data-bn-sobre="penal"></button><button class="btn primary" data-bn-sobre="pagar">Pagar 1 No2 y tirar sin penalidad</button></footer>
     </div></div>
     <div class="scrim" id="bn-tipo-ataque"><div class="modal" style="max-width:360px">

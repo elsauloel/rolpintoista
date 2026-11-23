@@ -23,11 +23,13 @@ const FichaResumen = (() => {
     });
   }
   // Sobrepeso: estado derivado (no se guarda): aparece solo mientras el equipo pasa la Crg.Max. La penalidad se decide al tirar Evasión.
+  // ⚖ (2026-11-23, P312) La cuenta suma las ranuras de más de la mochila (pesan 1 cada una), y el sobrepeso también resta a la Iniciativa.
+  const cuentaSobrepeso = c => ({peso: num(c.pesoEquipado), ranuras: num(c.ranurasDeMas), crg: Number.isNaN(c.final.crgmax) ? 0 : num(c.final.crgmax)});
   function estadoSobrepeso(S){
-    const s = FichaCalculo.calcular(S).sobrecarga;
+    const c = FichaCalculo.calcular(S), s = c.sobrecarga;
     if(!(s > 0)) return [];
     return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
-      detalle: `Tu equipo pesa ${fmt(s)} de más que tu Carga máxima. Evasión: −${fmt(s)}, o pagás 1 No2 para evitarlo. Además, +1 No2 fijo: Parry y «Poner escudo» 2 No2 (con Parada fácil, 1), y el dodge roll lo de moverse + 1.`}];
+      detalle: `Te pasás por ${fmt(s)}: ${Combatiente.sobrepesoCuentaTxt(cuentaSobrepeso(c))}. Evasión: −${fmt(s)}, o pagás 1 No2 para evitarlo. Además, +1 No2 fijo: Parry y «Poner escudo» 2 No2 (con Parada fácil, 1), y el dodge roll lo de moverse + 1. Iniciativa: −${fmt(s)}.`}];
   }
   /* 🛡 Armadura rota (dueño, 2026-10-29: «esta armadura rota no es del jugador, sino del ítem, pero lo tiene que ver el jugador para saberlo… si ningún
      ítem tiene, todos tienen la durabilidad full, no aparece el estado»): derivado de las piezas puestas con puntos de rotura (`armRota`, armadura o
@@ -135,6 +137,9 @@ const FichaResumen = (() => {
       // 💨 La Prisa (2026-11-22): +5 FIJO al resultado de la tirada de Iniciativa (`ini` ya no la trae). `iniFijo` viaja siempre (aunque sea 0): así el mapa
       // sabe que el resumen es de los nuevos (Combatiente.iniFijoDeResumen); `prisa` ya no viaja desde el 2026-11-20.
       ...(() => { const f = FichaCalculo.iniFijo(S, c); return {iniFijo: f.val, ...(f.val ? {iniFijoDe: f.de} : {})}; })(),
+      // ⚖ El sobrepeso (2026-11-23, P312): viaja siempre (aunque sea 0), así el mapa sabe que el resumen es de los nuevos. Lo usan la tirada de
+      // Iniciativa (le resta), el GM (acomoda el orden de turnos si cambia en combate) y el cartel «⚖ Tenés sobrepeso» del jugador dueño (js/132).
+      sobre: n(c.sobrecarga), ...(c.sobrecarga > 0 ? {sobreCuenta: cuentaSobrepeso(c)} : {}),
       ritmo: n(c.final.ritmo), sedSangre: n(c.final.sedsangre), sedBatalla: n(c.final.sedbatalla), escurridizo: n(c.final.escurridizo), ojoCarancho: n(c.final.ojocarancho), enjambre: n(c.final.enjambre), trinchera: n(c.final.trinchera), curaMas: n(c.final.curamas), curaMasArea: n(c.final.curamasarea),   // 🥁🩸 orden de turnos (2026-11-05, vtt-hexgrid/js/102)
       pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.

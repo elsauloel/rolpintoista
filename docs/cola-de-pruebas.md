@@ -1683,7 +1683,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Mesa; J2 no esquivó (1): aplicó el daño y el Empujón él mismo; el daño (7) le sacó más que su Sigilo (6), se delató (regla de siempre) y desde ahí
   el GM lo vio. De paso: un cartel que flota sobre un token (inmunidad, «−2 EVA») ya no sale en las pantallas que no ven ese token (js/96).
   Pruebas automáticas: 1026 en verde (8 nuevas). Dudas: P287, P288. Lo que faltó probar, abajo como «Probar».
-- **🟡 en conversación (2026-11-23: se le mandó cómo funciona hoy y seis preguntas) — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
+- **⏸ movida al final (2026-11-23) — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
   la inventaste y me dejé llevar, pero no estoy seguro de entender exactamente cómo funciona. Vamos a tener que conversar de esto para
   definirlo»). Preparar una explicación de cómo funciona hoy y las preguntas para decidir; no programar hasta conversarlo.
 - **⬜ en cola — 📺 ¿El Portal trampa tiene la animación de la tele?** (dueño, 2026-11-22: «imagino que la teletransportación tiene la animación de
@@ -1867,6 +1867,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🥷 Aviso al escondido cuando el daño no alcanza para delatarlo** (dueño, 2026-11-23): «si a un personaje escondido se le hace
   daño que no alcanza para revelarlo, al usuario le tiene que aparecer: te hicieron tanto de daño, pero no alcanzó tu nivel de sigilo, por lo cual
   seguís escondido, o algo por el estilo». A quien maneja al escondido (jugador o GM por un creep), solo a él. Ver también P288.
+
+- **⬜ en cola (al final, conversación) — ☁ Definir las nubes que tapan la vista** (dueño, 2026-11-23: «yo por niebla pensaba que era tipo una nube
+  que se ponía en el territorio… la polvareda o algo así… Todo lo que son nubes, por ejemplo la Polvareda de la rata, quiero saber más o menos cómo
+  funcionarían esas cosas que ocultan la vista. No tengo bien claro las reglas de esa parte»). Explicarle cómo funcionan hoy las nubes (Polvareda,
+  Bomba de humo, varita de niebla, virote de humo, zonas con nube: qué tapan, quién ve adentro, cuánto duran, el viento) y las preguntas para
+  decidir; P264 (el creep que actúa desde una nube) va con esto. La niebla de guerra del mapa ya se le explicó aparte.
 
 ## En cola
 

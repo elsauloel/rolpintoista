@@ -351,7 +351,6 @@ function renderVitals(){
   $('#equipo-over').innerHTML = c.sobrecarga > 0
     ? `⚖ Sobrepeso: te pasás por ${fmt(c.sobrecarga)} (${esc(Combatiente.sobrepesoCuentaTxt({peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg}))}). Evasión −${fmt(c.sobrecarga)} al tirarla (o pagás 1 No2 para evitarlo), Parry, «Poner escudo» y dodge roll +1 No2, e Iniciativa −${fmt(c.sobrecarga)}.`
     : c.ranurasDeMas > 0 ? `Tu mochila está pasada por ${fmt(c.ranurasDeMas)} ranura${c.ranurasDeMas === 1 ? '' : 's'}: pesa${c.ranurasDeMas === 1 ? '' : 'n'} ${fmt(c.ranurasDeMas)} (todavía sin sobrepeso).` : '';
-  sobrepesoVigilar(c);
 }
 
 // SP máximo = el calculado (Especial × 3 + bonos) + un ajuste a mano (`S.meta.spMaxExtra`, puede ser negativo) que se fija desde el
@@ -360,23 +359,15 @@ function spMaximo(c){ return FichaBotonera.spMaximo(S, c); }   // comun/ficha-bo
 
 function nitrosMaximo(c){ return FichaBotonera.nitrosMaximo(S, c); }
 
-/* ⚖ El cartel «Tenés sobrepeso» (2026-11-23, dueño, P312: «con todo el detalle de lo que implica y Aceptar, donde sea que pase… al equiparse algo y
-   al recibir cosas en la mochila… que lo hagan pasar a tener sobrepeso o se lo suban. Lo ve el jugador dueño del personaje»). La ficha suelta lo
-   muestra cuando el sobrepeso de SU personaje sube (por lo que sea: equipar, comprar, recibir del GM, del botín, de otro jugador, del baúl). Adentro
-   del mapa (la Botonera es esta ficha en un marco) lo muestra el mapa (js/132), no el marco. La primera vez que se ve un personaje solo se anota. */
-let sobrepesoVisto = {id: null, s: 0};
-function sobrepesoVigilar(c){
+/* ⚖ El cartel del sobrepeso (2026-11-23, dueño, P312 y P313: «sale solo en la pantalla donde se hizo el cambio»): cuando el sobrepeso del personaje
+   sube, baja o se va, la ficha suelta lo muestra si el cambio lo guardó ELLA (el resumen dice qué pantalla lo guardó: Combatiente.sobrepesoAviso). Lo
+   que guarda otra persona (el GM, otro jugador) lo muestra el mapa del dueño. Adentro del mapa (la Botonera es esta ficha en un marco), el mapa
+   (js/132). Lo llama alDoc (js/12) con el resumen de antes y el de ahora; solo al dueño. */
+function sobrepesoCartelFicha(f, antes, ahora){
   try{
-    const f = typeof fichaVivo !== 'undefined' ? fichaVivo : null;
-    if(!f || !f.cargada) return;
-    const s = num(c.sobrecarga);
-    if(sobrepesoVisto.id !== f.id){ sobrepesoVisto = {id: f.id, s}; return; }
-    const antes = sobrepesoVisto.s;
-    sobrepesoVisto.s = s;
-    if(!(s > antes)) return;
-    if(window.parent !== window || f.soloLectura || !fbUsuario || f.duenoUid !== fbUsuario.uid) return;
-    const txt = Combatiente.sobrepesoCartel(s, {peso: c.pesoEquipado, ranuras: c.ranurasDeMas, crg: Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax});
-    if(typeof Confirmar !== 'undefined') Confirmar.avisar(txt, {titulo: antes > 0 ? `Tu sobrepeso subió: ${fmt(antes)} → ${fmt(s)}` : 'Tenés sobrepeso', icono: '⚖', si: 'Aceptar'});
+    if(!f || window.parent !== window || f.soloLectura || !fbUsuario || f.duenoUid !== fbUsuario.uid) return;
+    const a = Combatiente.sobrepesoAviso(antes, ahora, {yo: window.FICHA_PANTALLA, dueno: f.duenoUid});
+    if(a && typeof Confirmar !== 'undefined') Confirmar.avisar(a.texto, {titulo: a.titulo, icono: '⚖', si: 'Aceptar'});
   }catch(err){ console.error('El cartel del sobrepeso:', err); }
 }
 

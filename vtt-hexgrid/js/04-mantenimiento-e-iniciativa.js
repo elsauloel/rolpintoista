@@ -522,8 +522,8 @@ async function iniciativaSiguiente(o){
       avisoDemora = {id: termina.id, lugares: j - k, desde: k + 1, hasta: j + 1};
     }
   }
-  // ⚖ Al empezar la ronda (2026-11-23, P312): los que cambiaron de número por el sobrepeso y esta ronda jugaron en su lugar de siempre van al lugar
-  // que les toca (js/132). Nadie jugó todavía: el primero que puede jugar es el que empieza.
+  // ⚖ Al empezar la ronda (2026-11-23, P312 y P313): los que cambiaron de número por el sobrepeso en medio de la ronda (el orden no se tocó en el
+  // momento) van al lugar que les toca por su número (js/132). Nadie jugó todavía: el primero que puede jugar es el que empieza.
   const reubicarIds = nuevaRonda ? (iniciativa.reubicar || []).filter(id => ordenFin.some(x => x.id === id)) : [];
   if(reubicarIds.length){
     ordenFin = OrdenTurnos.reubicarAlEmpezar(ordenFin, reubicarIds);
@@ -1287,7 +1287,7 @@ function renderIniciativa(){
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
         // ⚖ El sobrepeso restado (2026-11-23, P312): «⚖−3» al lado del número, con la cuenta (tirada − sobrepeso) al pasar el mouse.
-        (num(o.sobre) > 0 ? `<span class="ini-sobre" title="Tiró ${fmt(num(o.valor) + num(o.sobre))} − ${fmt(num(o.sobre))} de sobrepeso = ${fmt(num(o.valor))}${(iniciativa.reubicar || []).includes(o.id) ? ' · esta ronda juega en su lugar de siempre; desde la próxima, en el que le toca por este número' : ''}" style="font-size:11px;color:#e0a040;white-space:nowrap;margin-right:2px">⚖−${fmt(num(o.sobre))}</span>` : '') +
+        (num(o.sobre) > 0 ? `<span class="ini-sobre" title="Tiró ${fmt(num(o.valor) + num(o.sobre))} − ${fmt(num(o.sobre))} de sobrepeso = ${fmt(num(o.valor))}${(iniciativa.reubicar || []).includes(o.id) ? ' · su lugar se reacomoda al pasar de ronda' : ''}" style="font-size:11px;color:#e0a040;white-space:nowrap;margin-right:2px">⚖−${fmt(num(o.sobre))}</span>` : '') +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa${num(o.sobre) > 0 ? ` (ya tiene restado ${fmt(num(o.sobre))} de sobrepeso)` : ''}">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +

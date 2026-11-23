@@ -54,14 +54,14 @@ Si lo que cargás supera tu [[Carga máxima]], tenés el estado alterado **Sobre
 
 Lo que hace, por cada punto que te pasás:
 - **[[Evasión]]: −1** al tirarla. Antes de tirar, el juego te pregunta si querés **pagar 1 No2** para evitar esa penalidad en esa tirada.
-- **Iniciativa: −1** a tu tirada (desde el 2026-11-23). El número del orden de turnos es *tu tirada − tu sobrepeso*, y la tabla lo muestra con un ⚖. Si en medio del combate te ponés o te sacás algo y el sobrepeso cambia, el número se ajusta solo (si baja, lo recuperás) y te acomoda en el orden, **sin repetir ni perder turno**: si ya jugaste esta ronda no volvés a jugar; si no jugaste, jugás igual esta ronda (si tu lugar nuevo ya pasó, en el de siempre) y desde la próxima, en tu lugar nuevo.
+- **Iniciativa: −1** a tu tirada (desde el 2026-11-23). El número del orden de turnos es *tu tirada − tu sobrepeso*, y la tabla lo muestra con un ⚖. Si en medio del combate te ponés o te sacás algo y el sobrepeso cambia, el número se ajusta solo en el momento (si baja, lo recuperás), pero **tu lugar en el orden se reacomoda recién al pasar de ronda**: esta ronda jugás donde estabas, así nadie repite ni pierde turno.
 
 Además, con sobrepeso tus reacciones cuestan **+1 No2** (fijo, te pases lo que te pases; regla del 2026-11-11, «por ahora»):
 - el **[[Parry]]** cuesta **2 No2** en lugar de 1 (también **«Poner escudo»** contra un disparo, que es un Parry);
 - el primer Parry con **Parada fácil** cuesta **1 No2** (el escudo te ahorra el Parry, pero el peso lo seguís cargando);
 - el **dodge roll** cuesta lo de moverse **+ 1 No2**.
 
-Cuando te queda sobrepeso o te sube (al equiparte algo, al recibir cosas del GM, del botín, de otro jugador, del baúl o de la tienda), te sale el cartel **«⚖ Tenés sobrepeso»** con todo esto y la cuenta. Los botones de defensa también lo dicen («2 No2 (1 + 1 por sobrepeso)») con la cuenta. *(Antes del 2026-09-24 se perdía SP máximo.)*
+Cuando te queda sobrepeso o te sube (al equiparte algo, al recibir cosas del GM, del botín, de otro jugador, del baúl o de la tienda), te sale el cartel **«⚖ Tenés sobrepeso»** con todo esto y la cuenta; si baja, «tu sobrepeso bajó», y si se va, **«⚖ Ya no tenés sobrepeso»** con lo que recuperás. Sale una sola vez, en la pantalla donde se hizo el cambio. Los botones de defensa también lo dicen («2 No2 (1 + 1 por sobrepeso)») con la cuenta. *(Antes del 2026-09-24 se perdía SP máximo.)*
 
 +++
 titulo: Nitros (No2)

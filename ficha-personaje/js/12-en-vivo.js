@@ -396,6 +396,8 @@ function fichaEscuchar(f){
         return;
       }
       const d = doc.data();
+      if(f.resumenVisto && d.resumen) sobrepesoCartelFicha(f, f.resumenVisto, d.resumen);   // ⚖ js/02 (P313)
+      if(d.resumen) f.resumenVisto = d.resumen;
       const lectura = fichaSoloLecturaPara(d.duenoUid, f);
       f.duenoUid = d.duenoUid;
       f.miniaturaDoc = typeof d.miniatura === 'string' ? d.miniatura : '';   // la que ven los tokens del mapa

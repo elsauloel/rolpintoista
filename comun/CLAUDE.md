@@ -977,8 +977,10 @@ versión parecida en más de una, es candidato a juntar.
   (`ranurasDeMas`, `pesoTotal`; las cuentas de ranuras viven ahí: `ranurasItem`, `mochilaUsadaDe`, `capMochilaDe`, `ranurasDeMasDe`, y `FichaEquipo`
   las usa). `FichaEquipo.siRecibe(S, items)` → cómo quedaría (lo usa `intercambio.js`: aceptar de otro jugador y sacar del baúl ya no se frenan,
   preguntan «… igual» con la cuenta). `Combatiente.sobrepesoCuentaTxt/sobrepesoCartel/conSobrepesoIni` (la cuenta, el cartel «⚖ Tenés sobrepeso» y la
-  tirada de Iniciativa con −N: regla nueva, cada punto resta 1). El resumen publica `sobre` (siempre) y `sobreCuenta`. `OrdenTurnos.reubicarPorValor`
-  (un número nuevo en medio del combate: nadie repite ni pierde turno; si su lugar nuevo ya pasó y no jugó, `pendiente`) y `reubicarAlEmpezar`. Dudas: P313.
+  tirada de Iniciativa con −N: regla nueva, cada punto resta 1). El resumen publica `sobre`, `sobreCuenta` y `pantalla` ({id, uid}: qué pantalla lo guardó,
+  `FichaResumen.pantallaYo`, `window.FICHA_PANTALLA`; la ficha en un marco del mapa usa el del mapa). `Combatiente.sobrepesoAviso(antes, ahora, {yo, dueno,
+  deOtro, nombre})` decide el cartel (subió / bajó / «Ya no tenés sobrepeso») y si le toca a esta pantalla (P313). `OrdenTurnos.cambiarValor` (en combate
+  cambia solo el número; `cambiaLugar`) y `reubicarAlEmpezar` (al empezar la ronda siguiente, P313).
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
   yaPaso}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda, queda en `actuaron` (P301).
   La usa el mapa para las invocaciones (js/04 `invocacionAlOrden`).

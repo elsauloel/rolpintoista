@@ -186,7 +186,7 @@ Tu **[[Fuerza]]** define tu **Carga máxima** (Crg.Max): cuánto podés cargar s
 
 - Cuenta **lo equipado** (cada ítem puesto tiene un **peso**; se suman todos) **más 1 por cada ranura de más de la [[Mochila]]**. Lo que entra en la mochila no pesa.
 - Si te pasás, tenés **Sobrepeso**: por cada punto de más, **−1 a la [[Evasión]]** (o pagás 1 No2 para evitarlo en esa tirada) y **−1 a la Iniciativa**; además el **[[Parry]]**, «Poner escudo» y el **dodge roll** cuestan **+1 No2**. Detalle en [[SP]] → «El sobrepeso lo baja». *(Antes: perdías 1 de SP máximo por punto.)*
-- Cuando te queda sobrepeso o te sube, sale el cartel **«⚖ Tenés sobrepeso»** con lo que implica y la cuenta.
+- Cuando te queda sobrepeso o te sube, sale el cartel **«⚖ Tenés sobrepeso»** con lo que implica y la cuenta (y «⚖ Ya no tenés sobrepeso» cuando se va).
 
 > [!example] Sobrecargado
 > Crg.Max 8, llevás 7 de peso puesto y la mochila tiene 24 de 20 ranuras → 7 + 4 = 11 → te pasás por 3: Evasión −3 (o pagás 1 No2), Iniciativa −3 y cada Parry te cuesta 2 No2.

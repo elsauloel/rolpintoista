@@ -25,6 +25,14 @@ const FichaResumen = (() => {
   // Sobrepeso: estado derivado (no se guarda): aparece solo mientras el equipo pasa la Crg.Max. La penalidad se decide al tirar Evasión.
   // ⚖ (2026-11-23, P312) La cuenta suma las ranuras de más de la mochila (pesan 1 cada una), y el sobrepeso también resta a la Iniciativa.
   const cuentaSobrepeso = c => ({peso: num(c.pesoEquipado), ranuras: num(c.ranurasDeMas), crg: Number.isNaN(c.final.crgmax) ? 0 : num(c.final.crgmax)});
+  /* 🖥 Qué pantalla es esta (2026-11-23, P313): un id por pestaña, `window.FICHA_PANTALLA` (el mapa lo pone al cargar, js/132; la ficha adentro de un
+     marco del mapa usa el del mapa: es la misma pantalla para el jugador), y el uid de quien la usa. */
+  function pantallaYo(){
+    let id = null;
+    try{ id = window.FICHA_PANTALLA || (window.parent !== window && window.parent.FICHA_PANTALLA) || null; }catch(e){}
+    if(!id){ id = 'p' + Math.random().toString(36).slice(2, 10); try{ window.FICHA_PANTALLA = id; }catch(e){} }
+    return {id: String(id), uid: (typeof fbUsuario !== 'undefined' && fbUsuario && fbUsuario.uid) || ''};
+  }
   function estadoSobrepeso(S){
     const c = FichaCalculo.calcular(S), s = c.sobrecarga;
     if(!(s > 0)) return [];
@@ -139,7 +147,9 @@ const FichaResumen = (() => {
       ...(() => { const f = FichaCalculo.iniFijo(S, c); return {iniFijo: f.val, ...(f.val ? {iniFijoDe: f.de} : {})}; })(),
       // ⚖ El sobrepeso (2026-11-23, P312): viaja siempre (aunque sea 0), así el mapa sabe que el resumen es de los nuevos. Lo usan la tirada de
       // Iniciativa (le resta), el GM (acomoda el orden de turnos si cambia en combate) y el cartel «⚖ Tenés sobrepeso» del jugador dueño (js/132).
-      sobre: n(c.sobrecarga), ...(c.sobrecarga > 0 ? {sobreCuenta: cuentaSobrepeso(c)} : {}),
+      // (P313) `sobreCuenta` va siempre (el cartel «ya no tenés sobrepeso» cuenta el antes y el ahora) y `pantalla` dice qué pantalla lo guardó: el
+      // cartel sale solo ahí (Combatiente.sobrepesoAviso).
+      sobre: n(c.sobrecarga), sobreCuenta: cuentaSobrepeso(c), pantalla: pantallaYo(),
       ritmo: n(c.final.ritmo), sedSangre: n(c.final.sedsangre), sedBatalla: n(c.final.sedbatalla), escurridizo: n(c.final.escurridizo), ojoCarancho: n(c.final.ojocarancho), enjambre: n(c.final.enjambre), trinchera: n(c.final.trinchera), curaMas: n(c.final.curamas), curaMasArea: n(c.final.curamasarea),   // 🥁🩸 orden de turnos (2026-11-05, vtt-hexgrid/js/102)
       pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
@@ -316,5 +326,5 @@ const FichaResumen = (() => {
     };
   }
 
-  return {estadosDePasivas, estadoSobrepeso, estadoArmaduraRota, estadosTodos, estadoActivo, costoMoverCasillero, invCostoMover, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
+  return {pantallaYo, estadosDePasivas, estadoSobrepeso, estadoArmaduraRota, estadosTodos, estadoActivo, costoMoverCasillero, invCostoMover, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
 })();

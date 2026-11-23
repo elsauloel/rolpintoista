@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261123p281"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123c68"></script>
+<script src="combatiente.js?v=20261123c69b"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -74,7 +74,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261110vaq"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261123c68"></script>
+<script src="ficha-resumen.js?v=20261123c69"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261122prisa5"></script>
@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261123c68"></script>
-<script src="orden-turnos.js?v=20261123c68"></script>
+<script src="orden-turnos.js?v=20261123c69"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2896,38 +2896,44 @@ prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en
     ['abxc', 1, false, ['a'], 'axbc', 2, true, ['a', 'x'], 'abxc', 2, 'xabc', 1, false,
      'abcx', 0, false, 'axbc', 3, false, null, null]);
 });
-prueba('⚖ El sobrepeso cambia en combate: el número se ajusta y se acomoda sin repetir ni perder turno (2026-11-23, P312)', () => {
-  const R = OrdenTurnos.reubicarPorValor, ids = r => r.orden.map(o => o.id).join('');
-  // a 15, b 12 (juega), c 10, d 5. a ya jugó.
+prueba('⚖ El sobrepeso cambia en combate: el número se ajusta en el momento y el orden recién al pasar de ronda (2026-11-23, P312 y P313)', () => {
+  const C = OrdenTurnos.cambiarValor, ids = r => r.orden.map(o => o.id).join('');
   const orden = [{id: 'a', valor: 15}, {id: 'b', valor: 12}, {id: 'c', valor: 10}, {id: 'd', valor: 5}];
   const ini = {orden, turno: 1, actuaron: ['a']};
-  const r1 = R(ini, 'a', 8, {enCurso: true, fila: {sobre: 7}});    // ya jugó, baja después de c: no vuelve a jugar
-  const r2 = R(ini, 'd', 11, {enCurso: true});                      // no jugó, sube antes de c (todavía no pasó): juega ahí
-  const r3 = R(ini, 'c', 13, {enCurso: true});                      // no jugó, su lugar nuevo (antes de b) ya pasó: juega en el de siempre, pendiente
-  const r4 = R(ini, 'b', 3, {enCurso: true});                       // es su turno: pendiente
-  const r5 = R(ini, 'c', 1, {enCurso: false});                      // combate sin empezar: solo el número
-  const r6 = R(ini, 'c', 11, {enCurso: true});                      // mismo lugar
-  igual([ids(r1), r1.turno, r1.actuaron, r1.movido, r1.orden[2].sobre, ids(r2), r2.turno, r2.actuaron, r2.movido,
-    ids(r3), r3.pendiente, r3.orden[2].valor, ids(r4), r4.pendiente, ids(r5), r5.orden[2].valor, r5.movido, r5.pendiente, ids(r6), r6.movido, r6.pendiente, R(ini, 'x', 3)],
-    ['bcad', 0, ['a'], true, 7, 'abdc', 1, ['a'], true,
-     'abcd', true, 13, 'abcd', true, 'abcd', 1, false, false, 'abcd', false, false, null]);
-  // a no estaba en actuaron pero jugó por lugar (turno 2): al bajar después de quien juega, queda anotado
-  const r7 = R({orden, turno: 2, actuaron: []}, 'a', 1, {enCurso: true});
-  igual([ids(r7), r7.actuaron, r7.turno], ['bcda', ['a'], 1]);
-  // Al empezar la ronda: los pendientes van a su lugar por número
+  const r1 = C(ini, 'a', 8, {sobre: 7}), r2 = C(ini, 'd', 11), r3 = C(ini, 'c', 11);
+  igual([ids(r1), r1.orden[0].valor, r1.orden[0].sobre, r1.cambiaLugar, ids(r2), r2.orden[3].valor, r2.cambiaLugar, r3.cambiaLugar, C(ini, 'x', 3), orden[0].valor],
+    ['abcd', 8, 7, true, 'abcd', 11, true, false, null, 15]);
+  // Al empezar la ronda: los que cambiaron van a su lugar por número; los demás no se mueven
   igual(OrdenTurnos.reubicarAlEmpezar([{id: 'a', valor: 15}, {id: 'b', valor: 2}, {id: 'c', valor: 13}, {id: 'd', valor: 5}], ['b', 'c']).map(o => o.id).join(''), 'acdb');
 });
-prueba('⚖ El mapa: la tirada de Iniciativa resta el sobrepeso, el GM lo ajusta en combate y el dueño ve el cartel (2026-11-23, P312)', async () => {
+prueba('⚖ Los carteles del sobrepeso: solo en la pantalla que guardó el cambio; subió, bajó y «ya no tenés» (2026-11-23, P313)', () => {
+  const A = Combatiente.sobrepesoAviso, cu = (p, r) => ({peso: p, ranuras: r, crg: 6});
+  const r = (s, c, id, uid) => ({sobre: s, sobreCuenta: c, pantalla: {id, uid}});
+  const sube = A(r(0, cu(5, 0)), r(3, cu(5, 4), 'P1', 'U'), {yo: 'P1', dueno: 'U'});
+  const otraPantalla = A(r(0, cu(5, 0)), r(3, cu(5, 4), 'P2', 'U'), {yo: 'P1', dueno: 'U', deOtro: true});
+  const delGMenMapa = A(r(0, cu(5, 0)), r(3, cu(5, 4), 'G', 'GM'), {yo: 'P1', dueno: 'U', deOtro: true});
+  const delGMenFicha = A(r(0, cu(5, 0)), r(3, cu(5, 4), 'G', 'GM'), {yo: 'P1', dueno: 'U'});
+  const baja = A(r(5, cu(5, 6)), r(2, cu(5, 3), 'P1', 'U'), {yo: 'P1', dueno: 'U', nombre: 'Tita'});
+  const se = A(r(5, cu(5, 6)), r(0, cu(1, 0), 'P1', 'U'), {yo: 'P1', dueno: 'U'});
+  igual([sube.titulo, sube.sube, otraPantalla, delGMenMapa && delGMenMapa.titulo, delGMenFicha, baja.titulo, /Sigue: Evasión −2/.test(baja.texto),
+    se.titulo, se.se, /Recuperás/.test(se.texto), /Evasión sin el −5/.test(se.texto), /Antes: tu equipo pesaba 5 \+ 6 ranuras de más/.test(se.texto),
+    A(r(2), r(2, cu(5, 3), 'P1', 'U'), {yo: 'P1'}), A({}, r(2), {}), /reacomoda al pasar de ronda/.test(Combatiente.sobrepesoCartel(2, cu(5, 3)))],
+    ['Tenés sobrepeso', true, null, 'Tenés sobrepeso', null, 'Tita: tu sobrepeso bajó (5 → 2)', true,
+     'Ya no tenés sobrepeso', true, true, true, true, null, null, true]);
+  igual([typeof FichaResumen.pantallaYo().id, FichaResumen.pantallaYo().id === FichaResumen.pantallaYo().id, FichaResumen.resumen(fichaDePrueba()).sobreCuenta], ['string', true, {peso: 0, ranuras: 0, crg: 6}]);
+});
+prueba('⚖ El mapa: la tirada de Iniciativa resta el sobrepeso, el GM ajusta el número y el orden espera a la ronda; los carteles (2026-11-23, P312 y P313)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t132 = await leer('132-sobrepeso.js'), t09 = await leer('09-colocar-y-panel.js');
   cierto(/Combatiente\.conSobrepesoIni\(r, sobre\)/.test(t04), 'la tirada resta el sobrepeso');
-  cierto(/OrdenTurnos\.reubicarAlEmpezar\(ordenFin, reubicarIds\)/.test(t04), 'los pendientes se acomodan al empezar la ronda');
-  cierto(/OrdenTurnos\.reubicarPorValor\(ini, fila0\.id, valor/.test(t132), 'el GM acomoda el número');
-  cierto(/Combatiente\.sobrepesoCartel\(s, r\.sobreCuenta\)/.test(t132) && /sobrepesoFichaCambio\(ch\.doc\.id, previo, d\)/.test(t09), 'el cartel del dueño');
-  const n = {antes: 0, s: 3, tirada: 14, valor: 11, enCurso: true, r: {movido: true, desde: 1, lugar: 3, yaJugo: false}};
-  igual([sobrepesoIniTextoPrueba(t132, n), sobrepesoIniTextoPrueba(t132, {...n, antes: 3, s: 0, valor: 14, r: {pendiente: true}})],
-    ['⚖ Fulano: su sobrepeso subió (0 → 3): iniciativa 14 − 3 = 11 · baja en el orden de turnos (2.º → 4.º); juega ahí esta ronda.',
-     '⚖ Fulano: ya no tiene sobrepeso: recupera su iniciativa, 14 · esta ronda juega en su lugar de siempre; desde la próxima, en el que le toca por este número.']);
+  cierto(/OrdenTurnos\.reubicarAlEmpezar\(ordenFin, reubicarIds\)/.test(t04), 'los que cambiaron se acomodan al empezar la ronda');
+  cierto(/OrdenTurnos\.cambiarValor\(ini, fila0\.id, valor/.test(t132) && /guardarIniciativa\(\{orden: ini\.orden, reubicar\}\)/.test(t132), 'el GM cambia solo el número (sin turno ni actuaron)');
+  cierto(/Combatiente\.sobrepesoAviso\(antes, r, \{yo: window\.FICHA_PANTALLA/.test(t132) && /sobrepesoFichaCambio\(ch\.doc\.id, previo, d\)/.test(t09), 'el cartel del dueño');
+  const n = {antes: 0, s: 3, tirada: 14, valor: 11, enCurso: true, cambiaLugar: true};
+  igual([sobrepesoIniTextoPrueba(t132, n), sobrepesoIniTextoPrueba(t132, {...n, antes: 3, s: 0, valor: 14, cambiaLugar: false}), sobrepesoIniTextoPrueba(t132, {...n, enCurso: false})],
+    ['⚖ Fulano: su sobrepeso subió (0 → 3): iniciativa 14 − 3 = 11 · su lugar en el orden se reacomoda al pasar de ronda.',
+     '⚖ Fulano: ya no tiene sobrepeso: recupera su iniciativa, 14 · no cambia de lugar.',
+     '⚖ Fulano: su sobrepeso subió (0 → 3): iniciativa 14 − 3 = 11.']);
 });
 // (arma sobrepesoIniTexto del js/132 aislada, con fmt de la página)
 function sobrepesoIniTextoPrueba(src, n){

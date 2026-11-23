@@ -1897,6 +1897,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 📺 la tele de un teletransporte con un token oculto, en sigilo o en la niebla, y con «reducir movimiento»** (2026-11-23): por
   código, una pantalla que no ve el token no dibuja la tele (como el Parpadeo) y con «reducir movimiento» salta sin animación; no se probó en el mapa.
 
+- **⬜ en cola — 🔒 Arreglar las reglas: la Trampa de teleport de Terreno y Formas no se puede crear** (visto en la tarea de la tele,
+  2026-11-23): `trampaDestino` está validado pero falta en la lista de campos que se pueden crear de `elementoValido` (firebase/firestore.rules),
+  así que crearla da error de permisos. Sumarlo, avisarle al dueño que pegue las reglas, y probar crearla y pisarla con la tele.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

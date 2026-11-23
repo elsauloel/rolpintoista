@@ -622,7 +622,8 @@ const Combatiente = (() => {
   const CAIDO_TXT = 'está caído: una cura no lo levanta (hace falta revivirlo)';
   /* ☥ La vida subida a mano a un caído (P256 (i), dueño, 2026-11-22: «el personaje está caído, ¿querés resucitarlo con esa cantidad de vida? Sí / No»):
      el cartel (mapa, js/10). Sí = vuelve con esa vida (como ✚ Revivir); No = no se le sube y sigue caído. */
-  const resucitarAManoTxt = (nombre, val) => `${nombre || 'El personaje'} está caído. ¿Querés resucitarlo con ${Math.round(Number(val) || 0)} de vida?\n\nSí: vuelve con esa vida (cuenta como revivirlo: se le van los estados y queda Titilando hasta su próximo turno). No: no se le sube la vida y sigue caído.`;
+  // `o.titila === false` (una invocación: revivirToken no la deja Titilando, js/98): el cartel no lo promete (cola de pruebas, 2026-11-23).
+  const resucitarAManoTxt = (nombre, val, o) => `${nombre || 'El personaje'} está caído. ¿Querés resucitarlo con ${Math.round(Number(val) || 0)} de vida?\n\nSí: vuelve con esa vida (cuenta como revivirlo: se le van los estados${o && o.titila === false ? '' : ' y queda Titilando hasta su próximo turno'}). No: no se le sube la vida y sigue caído.`;
   // El reporte en texto llano (Mesa del personaje, 📜 Historial del GM), un renglón por cosa que pasó.
   const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
   function reporteTurno(eventos){

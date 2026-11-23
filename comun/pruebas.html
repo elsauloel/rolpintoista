@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261123cola62"></script>
+<script src="zona-detalle.js?v=20261123c66"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123cola62"></script>
+<script src="combatiente.js?v=20261123c66"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -82,7 +82,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261122cola49"></script>
+<script src="ficha-acciones.js?v=20261123c66"></script>
 <script src="orden-turnos.js?v=20261123cola63"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
@@ -8590,7 +8590,7 @@ prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortant
   igual([InvCalculo.parryValor(inv([cor])) - InvCalculo.parryValor(inv()), InvCalculo.bloqueoValor(inv([cor])) - InvCalculo.bloqueoValor(inv()), InvCalculo.famExtra(inv([cor]), 'pdgcontra'), InvCalculo.famExtra(inv([pun, hac, arc, bal]), 'dmg'),
     InvCalculo.bloqueoValor(inv([hac])) - InvCalculo.bloqueoValor(inv())], [1, 1, 1, 0, 0]);
 });
-prueba('🐾 P260 (4): las armas naturales (garras, colmillos, aguijón) y el puño cuentan para la maestría de su Tipo — creep con garras, personaje sin arma, invocación con colmillos', () => {
+prueba('🐾 P260 (4): las armas naturales (garras, colmillos, aguijón) y el puño cuentan para la maestría de su Tipo — creep con garras, personaje sin arma, invocación con colmillos', async () => {
   const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);
   const pun = P('maestria-armas-punzantes'), cor = P('maestria-armas-cortantes'), hac = P('maestria-hachas');
   igual([C.familiaDeArma({nombre: 'Garras', tipoDado: 4, natural: true}), C.familiaDeArma({nombre: 'Colmillos', tipoDado: 6, natural: true}), C.familiaDeArma({nombre: 'Cuernos', tipoDado: 8, natural: true}),
@@ -8604,6 +8604,9 @@ prueba('🐾 P260 (4): las armas naturales (garras, colmillos, aguijón) y el pu
   // Personaje sin arma (el puño, Tipo 4): suma el daño de la de punzantes.
   const pj = pas => { const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false}); S.inventario = []; S.pasivas = (pas || []).map((p, i) => ({...structuredClone(p), id: 'p' + i, compras: 1})); return S; };
   igual(FichaCombate.dmgParaArma(pj([pun]), null) - FichaCombate.dmgParaArma(pj([]), null), 1);
+  // …y el cuadro del duelo y el Daño sin arma de la ficha usan esa cuenta (cola de pruebas, 2026-11-23: el duelo tiraba 1d4 + 6 sin el +1).
+  const tDuelo = await (await fetch('ficha-duelo.js', {cache: 'no-store'})).text(), tAcc = await (await fetch('ficha-acciones.js', {cache: 'no-store'})).text();
+  igual([/danoSinArmaTxt\(FichaCombate\.dmgParaArma\(getS\(\), null\)\)/.test(tDuelo), /danoSinArmaTxt\(FichaCombate\.dmgParaArma\(S, null\)\)/.test(tAcc), /final\.dmg\)/.test(tDuelo + tAcc)], [true, true, false]);
   // Invocación con colmillos de Tipo 8: la de hachas le baja el costo del segundo ataque.
   const inv = pas => InvCalculo.migrar({id: 'i1', nombre: 'Lobo', con: 6, fue: 6, agl: 4, des: 4, esp: 2, hp: 30, hpMax: 30, nitros: 10, pasivas: (pas || []).map((p, i) => pasivaParaCombatiente(p, 'p' + i)),
     equipo: [{id: 'col', nombre: 'Colmillos', tipoItem: 'arma_1m', tipoDado: 8, peso: 2, equipado: true, natural: true, mods: []}]});
@@ -9045,6 +9048,8 @@ prueba('✚ Revivir igual en todos lados (2026-11-04, dueño: «el botón de rev
      '✚ Abeja vuelve con 3 de vida (lo revivió el GM)', 7, false, true]);
 });
 prueba('☥ P256 (i): la vida subida a mano a un caído pregunta «¿resucitarlo con esa cantidad?»; Sí = el mismo ✚ Revivir (con la vida ya elegida y la animación corta); No = nada', async () => {
+  // Una invocación no queda Titilando (js/98): el cartel no lo promete (cola de pruebas, 2026-11-23).
+  igual([/Titilando/.test(Combatiente.resucitarAManoTxt('Blanco', 12)), /Titilando/.test(Combatiente.resucitarAManoTxt('Abeja', 15, {titila: false}))], [true, false]);
   igual([Combatiente.resucitarAManoTxt('Blanco', 12).split('\n')[0], Revivir.texto('Blanco', 12, {quien: 'gm', aMano: true}), Revivir.texto('Rata', 5, {quien: 'dueno', aMano: true}), Revivir.texto('X', 1, {aMano: true})],
     ['Blanco está caído. ¿Querés resucitarlo con 12 de vida?', '✚ Blanco vuelve con 12 de vida, Titilando hasta su próximo turno (lo revivió el GM, subiéndole la vida a mano)',
       '✚ Rata vuelve con 5 de vida, Titilando hasta su próximo turno (lo revivió su jugador, subiéndole la vida a mano)', '✚ X vuelve con 1 de vida, Titilando hasta su próximo turno (vida subida a mano)']);
@@ -9054,7 +9059,7 @@ prueba('☥ P256 (i): la vida subida a mano a un caído pregunta «¿resucitarlo
   const v = Combatiente.vueltaTomar(S);
   igual([S.hp, S.muerto.activo, v.forma, v.sacados.map(e => e.nombre), S.efectos.some(e => e.nombre === 'Veneno')], [12, false, 'corta', ['Veneno'], false]);
   const t10 = await (await fetch('../vtt-hexgrid/js/10-hud-y-vida.js', {cache: 'no-store'})).text(), t98 = await (await fetch('../vtt-hexgrid/js/98-vida-en-cero.js', {cache: 'no-store'})).text();
-  igual(/Combatiente\.resucitarAManoTxt\(nombreDe\(t\), val\), \{icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'\}/.test(t10) && /revivirToken\(t, \{val, aMano: true\}\)/.test(t10), true);
+  igual(/Combatiente\.resucitarAManoTxt\(nombreDe\(t\), val, \{titila: !esTokenInv\(t\)\}\), \{icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'\}/.test(t10) && /revivirToken\(t, \{val, aMano: true\}\)/.test(t10), true);
   igual(/const val = o\.val > 0 \? Math\.round\(o\.val\) : await Revivir\.elegirVida/.test(t98), true);
 });
 prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
@@ -9952,7 +9957,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
       ['Goblin jefe (creep)', 'Estandarte de guerra', true, true, true]);
     const tot = ZonaDetalle.armarInerte({radio: 3, silencio: true}, {autor: {escondido: true}, habilidadOculta: true, bando: 'creep', nombre: 'Tótem de silencio de Chamán'});
     igual([tot.icono, tot.titulo, fila(tot, 'De quién es'), fila(tot, 'Con qué se puso'), /no pueden usar habilidades que cuestan SP/.test(tot.esencial)],
-      ['🤐', 'Tótem de silencio', 'Alguien (quien la puso no está a la vista).', 'No se sabe: quien la puso no está a la vista.', true]);
+      ['🤐', 'Tótem de silencio', 'Alguien (quien lo clavó no está a la vista).', 'No se sabe: quien lo clavó no está a la vista.', true]);
     ok(!JSON.stringify(tot).includes('Chamán'));
     const viejo = ZonaDetalle.armarInerte({radio: 2, pdg: 1, dano: 1}, {autor: {nombre: 'Orco (creep)'}, bando: 'creep'});
     ok(/a mano/.test(fila(viejo, 'Con qué se puso')));   // (los clavados antes de hoy no guardan con qué)

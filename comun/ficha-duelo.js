@@ -96,7 +96,7 @@ const FichaDuelo = (() => {
     const evaEsp = d => { const c = compute(); return Combatiente.evaExtraDuelo(d, st => num(c.final[st])); };
     // La fórmula del daño del ataque (la que tira el gancho `dano` y la que muestra el botón).
     function formulaDano(d, arma){
-      let formula = arma ? FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(getS(), arma)) : FichaCombate.danoSinArmaTxt(compute().final.dmg);
+      let formula = arma ? FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(getS(), arma)) : FichaCombate.danoSinArmaTxt(FichaCombate.dmgParaArma(getS(), null));   // (el puño: con la maestría de su Tipo, P260 (4); antes final.dmg, sin ella)
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${FichaCombate.tipoAtaque(arma)}`;

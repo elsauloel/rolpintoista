@@ -100,16 +100,18 @@ const ZonaDetalle = (() => {
     return `se dispara ${c}${sp.tiraPaso ? ' (quedarse quieto no la dispara)' : el.zonaEnMantenimiento === false ? ' (quedarse quieto adentro no la vuelve a disparar)' : ''}`;
   }
 
-  function filaAutor(el, ctx, filas){
+  // `quien`: cómo se nombra a quien lo puso ('quien la puso' en una zona; 'quien lo clavó' en un tótem o un estandarte).
+  function filaAutor(el, ctx, filas, quien){
+    quien = quien || 'quien la puso';
     const a = ctx.autor || {};
     const hab = ctx.habilidad || '';
     let v;
-    if(a.escondido) v = 'Alguien (quien la puso no está a la vista).';
+    if(a.escondido) v = `Alguien (${quien} no está a la vista).`;
     else if(a.nombre) v = a.nombre;
     else v = '';
     if(v) filas.push({k: 'De quién es', v});
     else filas.push({k: 'De quién es', v: `La zona no guarda quién la puso (${A_MANO}).`, aMano: true});
-    if(ctx.habilidadOculta) filas.push({k: 'Con qué se puso', v: 'No se sabe: quien la puso no está a la vista.'});
+    if(ctx.habilidadOculta) filas.push({k: 'Con qué se puso', v: `No se sabe: ${quien} no está a la vista.`});
     else if(hab) filas.push({k: 'Con qué se puso', v: hab});
     else filas.push({k: 'Con qué se puso', v: `No lo guarda (${A_MANO}).`, aMano: true});
   }
@@ -305,7 +307,7 @@ const ZonaDetalle = (() => {
       : `Los aliados de ${quien} (${aliados}) ${area} suman +${Math.round(Number(e.pdg) || 0)} a la Probabilidad de Golpe y +${Math.round(Number(e.dano) || 0)} al daño, mientras siga en pie.`;
     filas.push({k: 'A quién afecta', v: sil ? `Solo a los rivales de ${quien} (${rivales}) que estén adentro del aura. A sus aliados, no.`
       : `Solo a los aliados de ${quien} (${aliados}) que estén adentro del aura (él incluido). A los rivales, no. Si hay varios estandartes, vale el mejor (no se suman).`});
-    filaAutor({}, ctx, filas);
+    filaAutor({}, ctx, filas, 'quien lo clavó');
     filas.push({k: 'Cuánto dura', v: 'No tiene turnos contados: queda hasta que lo rompan (al llegar a 0 de vida se va del mapa). Si quien lo clavó clava otro igual, el anterior se va.'});
     filas.push({k: 'Cuándo vale', v: sil ? 'Todo el tiempo, mientras esté en pie: el mapa avisa al querer usar una habilidad que cuesta SP adentro del aura (y deja seguir si la mesa lo decide).'
       : 'Todo el tiempo, mientras esté en pie: el bonus se suma solo al atacar desde adentro del aura (el cuadro del duelo lo muestra «🚩 bajo el estandarte»).'});

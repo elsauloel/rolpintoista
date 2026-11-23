@@ -649,7 +649,7 @@ const FichaAcciones = (() => {
   function pedirArmaYTirar(S, ui){
     const armas = FichaCombate.armasEquipadasConDano(S);
     if(!armas.length){   // sin arma: el daño sin arma (provisorio, P150)
-      const r = tirarDados(FichaCombate.danoSinArmaTxt(FichaCalculo.calcular(S).final.dmg));
+      const r = tirarDados(FichaCombate.danoSinArmaTxt(FichaCombate.dmgParaArma(S, null)));   // (con la maestría de su Tipo, P260 (4))
       if(r){ gastarUnaTirada(S, r, ui, true); ui.registrarTirada('Sin arma', r); }
       return;
     }

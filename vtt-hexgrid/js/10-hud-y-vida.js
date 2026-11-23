@@ -1573,7 +1573,7 @@ async function hudAplicar(clave, texto){
     if(nuevo !== null && nuevo > 0){
       const max = typeof maxVidaDe === 'function' ? maxVidaDe(t) : 0, val = max > 0 ? Math.min(max, Math.round(nuevo)) : Math.round(nuevo);
       hudEditando = ''; pedirDibujo();
-      if(await AvisoCombate.preguntar(Combatiente.resucitarAManoTxt(nombreDe(t), val), {icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'})){
+      if(await AvisoCombate.preguntar(Combatiente.resucitarAManoTxt(nombreDe(t), val, {titila: !esTokenInv(t)}), {icono: '☥', titulo: 'Está caído', si: 'Sí', no: 'No'})){
         if(typeof revivirToken === 'function') await revivirToken(t, {val, aMano: true});   // (sin Ctrl+Z: es una resurrección, no un cambio de número)
       }
       return;

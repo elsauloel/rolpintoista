@@ -2611,6 +2611,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sin cartel; `renderZonaBanner` devuelve el resultado); `inicioVentanaVolver` la muestra de nuevo cuando no hay otro aviso ni cuadro del duelo abierto.
   Un reloj (500 ms) la aparta mientras haya un cuadro del duelo abierto en esta pantalla (`inicioDueloAbierto`) y la vuelve a mostrar si otro aviso la
   reemplazó. «▶ Aplicar por él» del GM o aplicado al pasar el turno: la zona sigue con su botón. Un creep, sin cambios. Probado con clics (cola 2026-11-22).
+  **Recargar la página con el inicio sin aplicar** (cola 2026-11-23): antes se perdían la ventana y el renglón (la zona no se aplicaba nunca; el inicio,
+  solo al pasar el turno). Ahora el listener de momentos deja pasar el «inicio-turno» viejo de esta pantalla que sigue esperando (`inicioRecuperable`:
+  de la última media hora) y `inicioRecuperar` espera al orden de turnos y al modo del mapa (`iniciativaCargada`, `escucharModo.listo`), mira que siga
+  siendo su turno (`inicioTurnoVigente`, js/04), vuelve a abrir la ventana y, 1,5 s después, `zonasAlEmpezarTurno()` junta otra vez las zonas (sin el
+  inicio aplicado ninguna se pudo haber tirado: P274). El momento recuperado sigue recibiendo sus cambios (el GM lo aplica / pasa el turno). La frase
+  del veredicto: «Se aplicó solo al pasar el turno.» + «Lo de la zona sigue pendiente: tiralo igual.» solo mientras falte alguna. Dudas: P299, P300.
 - **🔥 El daño de una zona sin tirada: lo que lo frena, a la vista** (2026-11-23, dueño: «en el Muro de fuego, si bien no se resiste, el daño sí lo
   frena la resistencia al fuego»): el daño ya restaba la resistencia a su elemento en los tres caminos (al entrar, al cruzar, al empezar el turno: el
   cartel de la zona → `danoDuelo` → `dueloAplicarDano`); ahora el texto lo dice. `zonaCartelAntes` (js/08) le pasa a `ZonaDetalle.sinTiradaTexto` el

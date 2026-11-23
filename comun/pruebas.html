@@ -10119,10 +10119,45 @@ grupo('Empieza tu turno con la zona adentro');
     igual([/YA SE APLICÓ/.test(w.textContent), w.querySelector('[data-aviso-pb]').disabled, !!w.querySelector('[data-aviso-ok]')], [true, false, false]);
     AvisoCombate.cerrar();
   }));
+  prueba('aplicado solo al pasar el turno: «sigue pendiente» mientras falta la zona, y sin esa frase cuando ya se tiró', enFila(async () => {
+    const {f, mundo} = await armar();
+    f.inicioTurnoMomento('m5', d('t1'));
+    f.inicioTurnoMomento('m5', {...d('t1'), estado: 'listo', resultado: '✔ Se aplicó solo al pasar el turno (nadie lo había aplicado)'});
+    const w = ventana();
+    igual([/Se aplicó solo al pasar el turno\. Lo de la zona sigue pendiente: tiralo igual\./.test(w.textContent)], [true]);
+    w.querySelector('[data-aviso-pb]').click();
+    mundo.resolver({resultado: '8 de daño de fuego (lo tiró Blanco creep; entraron 8) · Quemadura'});
+    await new Promise(r => setTimeout(r, 0));
+    const w2 = ventana();
+    igual([/Se aplicó solo al pasar el turno\./.test(w2.textContent), /sigue pendiente/.test(w2.textContent), /entraron 8/.test(w2.textContent)], [true, false, true]);
+    AvisoCombate.cerrar();
+  }));
   prueba('js/08: al empezar el turno, las zonas se juntan para la ventana (no abren cartel) y el creep o la ventana que no llega siguen con el cartel', async () => {
     const t08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
     cierto(/if\(zonaJuntar\)\{ zonaJuntar\.push\(el\.id\); return; \}/.test(t08) && /zonaInicioOfrecer\(o\.id, junta\)/.test(t08) && /t\.tipo !== 'creep' && typeof inicioTurnoTarjetaSobra/.test(t08) && /15000/.test(t08));
     cierto(/if\(zonaBanner\.enInicio\)\{/.test(t08));
+  });
+  prueba('al recargar con «Empieza tu turno» sin aplicar: vuelve la ventana y se vuelven a juntar las zonas (si sigue siendo su turno)', async () => {
+    const src = await (await fetch('../vtt-hexgrid/js/16-momentos.js', {cache: 'no-store'})).text();
+    cierto(/inicioRecuperable\(d, ms\)\)\{ inicioRecuperar\(ch\.doc\.id, d\); return; \}/.test(src) && /inicioMostrados\.has\(ch\.doc\.id\)\)\{ momentoRecibido/.test(src));
+    const trozo = src.slice(src.indexOf('const inicioRecuperados = new Set()'), src.indexOf('// (fin de lo que vuelve al recargar)'));
+    const armarR = (cargada, vigente) => {
+      const m = {mostrados: [], zonas: 0, esperas: 0};
+      const f = new Function('fbUsuario', 'num', 'setTimeout', 'iniciativaCargada', 'inicioTurnoVigente', 'inicioTurnoMomento', 'zonasAlEmpezarTurno',
+        trozo + '\nreturn {inicioRecuperable, inicioRecuperar};')(
+        {uid: 'yo'}, v => Number(v) || 0, (fn, ms) => { m.esperas++; if(ms === 1500) fn(); }, cargada, () => vigente, id => { m.mostrados.push(id); return true; }, () => { m.zonas++; });
+      return {f, m};
+    };
+    const dd = (estado, para) => ({tipo: 'inicio-turno', estado, datos: {tokenId: 't1', paraUid: para, clave: 'm:7'}});
+    const {f, m} = armarR(true, true);
+    igual([f.inicioRecuperable(dd('esperando', 'yo'), Date.now() - 60000), f.inicioRecuperable(dd('listo', 'yo'), Date.now()), f.inicioRecuperable(dd('esperando', 'otro'), Date.now()),
+      f.inicioRecuperable(dd('esperando', 'yo'), Date.now() - 31 * 60 * 1000)], [true, false, false, false]);
+    f.inicioRecuperar('m1', dd('esperando', 'yo')); f.inicioRecuperar('m1', dd('esperando', 'yo'));   // (una sola vez)
+    igual([m.mostrados, m.zonas], [['m1'], 1]);
+    const b = armarR(true, false); b.f.inicioRecuperar('m2', dd('esperando', 'yo'));   // ya no es su turno: nada
+    igual([b.m.mostrados.length, b.m.zonas], [0, 0]);
+    const c = armarR(false, true); c.f.inicioRecuperar('m3', dd('esperando', 'yo'));   // el orden de turnos todavía no llegó: espera
+    igual([c.m.mostrados.length, c.m.esperas, c.m.zonas], [0, 1, 0]);
   });
 })();
 

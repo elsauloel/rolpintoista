@@ -56,6 +56,9 @@ function momentosEscuchar(){
       // 🪤 Lo mismo con una trampa sin terminar (2026-11-12, el dueño: J1 pisó una trampa con la pantalla del GM cerrada y, al abrirla, el GM
       // no veía nada y quedaba trabada): si es de la última media hora y le falta un paso, se vuelve a mostrar a quien le toque.
       const trampaPend = d.tipo === 'trampa' && d.estado !== 'listo' && Date.now() - ms < 30 * 60 * 1000;
+      // ▶ Y el «Empieza tu turno» sin aplicar de esta pantalla (2026-11-23, cola: al recargar se perdían la ventana y el renglón de la zona).
+      if(ms < momentosDesde && d.tipo === 'inicio-turno' && inicioRecuperable(d, ms)){ inicioRecuperar(ch.doc.id, d); return; }
+      if(ms < momentosDesde && d.tipo === 'inicio-turno' && inicioMostrados.has(ch.doc.id)){ momentoRecibido(ch.doc.id, d); return; }   // (el recuperado: cuando el GM lo aplica o pasa el turno)
       if(ms < momentosDesde && !sigiloPendiente && !sigiloConCartel && !trampaPend) return;
       momentoRecibido(ch.doc.id, d);
     });
@@ -264,7 +267,8 @@ function inicioVentanaDibujar(id){
   });
   const faltan = inicioFaltan(v);
   const veredicto = v.aplicado === 'no' ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'}
-    : v.aplicado === 'gm' ? {tono: 'bueno', grande: '✔ YA SE APLICÓ', chico: /solo al pasar el turno/.test(v.d.resultado || '') ? 'Se aplicó solo al pasar el turno. Lo de la zona sigue pendiente: tiralo igual.' : 'Lo aplicó el GM.'}
+    : v.aplicado === 'gm' ? {tono: 'bueno', grande: '✔ YA SE APLICÓ', chico: (/solo al pasar el turno/.test(v.d.resultado || '') ? 'Se aplicó solo al pasar el turno.' : 'Lo aplicó el GM.')
+        + (faltan.length ? ` Lo de la zona sigue pendiente: tiralo igual.` : '')}   // (con la zona ya tirada, sin «sigue pendiente»: cola 2026-11-23)
     : (!faltan.length && v.zonas.length === 1 && v.zonas[0].veredicto) ? v.zonas[0].veredicto : null;
   let botones = [], sinPie = false;
   if(!v.aplicado) botones = [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => inicioAplicarClic(id)}];
@@ -362,6 +366,29 @@ function inicioTurnoTarjetaSobra(tokenId){
   const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), ctrl = f && f.resumen && f.resumen.control;
   return ctrl ? ctrl === fbUsuario.uid : (t.duenoUid === fbUsuario.uid || !!(f && f.duenoUid === fbUsuario.uid));
 }
+/* ▶🔥 Recargar la página con «Empieza tu turno» sin aplicar (2026-11-23, cola «Zona al empezar el turno: lo que quedó sin probar»; probado en el mapa:
+   al recargar no volvían ni la ventana ni el renglón de la zona, y la zona no se aplicaba nunca —el inicio sí, solo al pasar el turno—). Si el momento
+   es de esta pantalla, sigue esperando, es de la última media hora y todavía es el turno de ese token, la ventana vuelve y las zonas de «al empezar su
+   turno» se juntan de nuevo (js/08 zonasAlEmpezarTurno). Sin el inicio aplicado ninguna zona se pudo haber tirado (el botón se habilita después de
+   «✔ Aplicar», P274): no hay riesgo de que pegue dos veces. */
+const inicioRecuperados = new Set();
+function inicioRecuperable(d, ms){
+  const dt = (d && d.datos) || {};
+  return !!(d && d.tipo === 'inicio-turno' && d.estado === 'esperando' && fbUsuario && dt.paraUid === fbUsuario.uid && dt.tokenId && Date.now() - num(ms) < 30 * 60 * 1000);
+}
+function inicioRecuperar(id, d, n){
+  if(inicioRecuperados.has(id) && !n) return;
+  inicioRecuperados.add(id);
+  // (el orden de turnos y el modo del mapa pueden llegar después que los momentos: hasta 30 s; probado en el mapa: sin esperar al modo, las zonas no se
+  // juntaban porque el mapa todavía creía estar en narrativo)
+  const listo = typeof iniciativaCargada !== 'undefined' && iniciativaCargada && (typeof escucharModo !== 'function' || escucharModo.listo === true);
+  if(!listo){ if(num(n) < 30) setTimeout(() => inicioRecuperar(id, d, num(n) + 1), 1000); return; }
+  const dt = d.datos || {};
+  if(typeof inicioTurnoVigente === 'function' && !inicioTurnoVigente(dt.tokenId, dt.clave)) return;   // ya no es su turno: lo aplica el pase de turno
+  if(!inicioTurnoMomento(id, d)) return;
+  if(typeof zonasAlEmpezarTurno === 'function') setTimeout(() => zonasAlEmpezarTurno(), 1500);   // (un respiro para que lleguen las zonas; una vez por token y ronda: zonaTurnoVisto)
+}
+// (fin de lo que vuelve al recargar)
 // 🙈 Un momento recién llegado que se escondió (js/29): a los 3 s se mira de nuevo, por si a quien nombra se lo vio enseguida (lo detectaron,
 // atacó y quedó delatado). Solo la tarjeta de la esquina: lo demás del momento ya pasó.
 const momentosNoVistoPend = new Map();

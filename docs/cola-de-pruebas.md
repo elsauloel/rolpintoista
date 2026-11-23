@@ -1758,11 +1758,30 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Blanco creep, el orden de turnos, y al final se sacaron, se borró el muro que quedaba y se devolvieron vidas, No2, SP y estados (narrativo, sin
   orden). Otras zonas «en cada Mantenimiento» sin tocar: P295. 1 prueba automática nueva (1044).
 
-- **⬜ en cola — 🪟 Zona al empezar el turno: lo que quedó sin probar** (dueño, 2026-11-22: «lo que quedó sin probar, probalo. Y si no se puede,
+- **✅ hecho (2026-11-23) — 🪟 Zona al empezar el turno: lo que quedó sin probar** (dueño, 2026-11-22: «lo que quedó sin probar, probalo. Y si no se puede,
   y si el problema es que la tirada falló para resistir, forzá la tirada con elegir el resultado manualmente»). Resistir con éxito desde el
   renglón (con «✍ Elegir manualmente»), una invocación con turno propio sobre el Muro, recargar la página antes de tirar la zona, la frase «Se
   aplicó solo al pasar el turno…», y confirmar que el botón de tirar el daño lo tira **el dueño de la zona** (dueño: «habitualmente es un
   rival. ¿Correcto?»), también cuando la zona es de un jugador.
+  *Resultado:* **probado con clics en «Claude · pruebas 2»** (GM, J1, J2, mapa «Prueba · R4 M4»). (1) **Resistir desde el renglón: ✅** — una «Nube de
+  prueba» (Res.Esp contra un número fijo, Pajaritos y 1d4) bajo Blanco J1: el renglón dice «resistió (Res.Esp 8 contra 1)», no entró daño (50) ni
+  Pajaritos, y la ventana volvió con el resultado y «Entendido». La resistencia a una zona no tiene «✍ Elegir manualmente» (la tira sola el mapa: ya
+  está en `docs/pendientes.md`, «Tiradas que todavía hace sola el mapa»); para que saliera alta, la zona se armó con dificultad 1. (2) **Invocación
+  con turno propio sobre el Muro: ✅** — la Abeja de prueba (del Jugador 1) en el orden: al Jugador 1 le sale la misma ventana «▶ Empieza tu turno»
+  con el Muro como renglón (no un cartel aparte); el daño lo tiró el GM y lo aplicó el Jugador 1 (30 → 25, Quemadura). Ojo: la ventana no dice que
+  es el turno de la abeja (P299). (3) **Recargar antes de tirar: ❌ → arreglado** — antes se perdían la ventana y el renglón, y la zona **no se
+  aplicaba nunca** (el inicio sí: al pasar el turno se aplicó solo, «Se aplicó solo al pasar el turno»). Ahora, si sigue siendo su turno, al
+  recargar vuelven la ventana y el renglón (probado: volvió la Nube con su botón y resistió). (4) **La frase: ✅** — sin aplicar, el GM pasó el turno
+  y la ventana de la abeja dijo «✔ YA SE APLICÓ · Se aplicó solo al pasar el turno. Lo de la zona sigue pendiente: tiralo igual.»; tirándola igual
+  después funcionó (21 → 13). **Arreglado en el camino:** con la zona ya tirada seguía diciendo «sigue pendiente»; ahora queda solo «Se aplicó solo al
+  pasar el turno.». (5) **Quién tira el daño: ✅** — Muro de un creep sobre la abeja: lo tira el GM, el Jugador 1 espera; Varita del muro de Blanco J2
+  con un creep empezando su turno adentro: el GM ve el cartel «El daño lo tira Blanco J2», J2 tiene el botón y el GM espera («Tirar a mano» por si no
+  responde) (60 → 57). **Visto de paso:** a la abeja la Quemadura del Muro le restó 2 apenas entró en su propio turno (25 → 23), y en la ronda
+  siguiente su inicio dijo «nada que cambie» con la Quemadura puesta — va con la tarea de abajo. Tras recargar, la tarjeta «X está en <zona>…» de la
+  Crónica quedaba «tirando» (se cerró a mano). **Por datos:** el Muro de fuego a Blanco creep (lanzado con clics desde sus Acciones), la Nube de
+  prueba, la Varita a Blanco J2 (la usó con clics), mover la abeja, Blanco J1 y Blanco creep a las zonas, y el orden de turnos; al final se borraron
+  las zonas, se vació el orden (narrativo) y se devolvieron vidas, No2, SP, estados, la mochila de J2, la abeja y las posiciones. Dudas: P299, P300.
+  2 pruebas automáticas nuevas (1049).
 - **⬜ en cola — 🔥 ¿La Quemadura del Muro pierde un turno en el mismo momento en que entra?** (dueño, 2026-11-22, sobre la captura con
   «Quemadura: 3 → 2 turnos»: «quiero creer que esa es una quemadura previa… no tendría sentido que en el momento que se le aplica la quemadura
   por la zona de muro, se baje su cantidad de turnos de 3 a 2, tendría que por lo menos durar una ronda»). Verificar de dónde venía esa

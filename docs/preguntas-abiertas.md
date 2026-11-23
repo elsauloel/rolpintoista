@@ -2264,3 +2264,19 @@ para todos (el número, solo en la cuenta)?
    para su propio bando, que lo ve en el cuadro). ¿Está bien?
 4. **La Suela gruesa del rival**: en el cartel, al rival no se le nombra la Suela gruesa de quien lo recibe (es parte de lo que lo frena, con número).
    ¿Se nombra sin número, o queda así?
+
+### P299 — 🐝 «Empieza tu turno» de una invocación no dice de quién es el turno (2026-11-23, Claude, cola de pruebas)
+
+Probando la Abeja de prueba (una invocación del Jugador 1 con turno propio en el orden) parada sobre el Muro de fuego: al empezar su turno, al Jugador 1
+le sale la ventana de siempre, «▶ Empieza tu turno», con «Lo que pasa al empezar: nada que cambie» y el renglón del Muro («le entra 3d4 de daño de
+fuego…»). En ningún lado dice que es el turno de **la abeja** y no el de su personaje (el título es el mismo; el renglón dice «le entra», sin nombre).
+Con un personaje y una invocación en el orden, el jugador puede confundirse. ¿Le sumamos el nombre («▶ Empieza el turno de Abeja de prueba», o «Abeja de
+prueba: le entra 3d4…»), o se deja así?
+
+### P300 — 🔥 «Lo frena su resistencia al fuego» cuando la resistencia es 0 (2026-11-23, Claude, cola de pruebas)
+
+El cartel y el renglón de una zona de fuego dicen «No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego)»
+también cuando quien lo recibe tiene resistencia 0 (lo vi en la pantalla del GM con Blanco creep, resistencia al fuego 0: el GM ve el número de los
+creeps, y ahí no hay nada que frene). Con un número se lee «(lo frena su resistencia al fuego 2)»; con 0 queda como si algo frenara. Opciones:
+(a) con 0, no nombrar la resistencia («le entra 1d4 de daño de fuego»); (b) dejarla como recordatorio de que existe; (c) «(sin resistencia al fuego)».
+En una invocación (que no tiene el número a mano) se seguiría diciendo como hoy.

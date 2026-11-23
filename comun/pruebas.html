@@ -8995,6 +8995,30 @@ prueba('🚩 Estandartes (2026-11-05): las áreas se ven como estados según dó
   tk.get('c1').col = 4;
   igual(nom('c1'), '');
 });
+prueba('📺 El televisor también en los teletransportes, y el Town portal solo se apaga (2026-11-23, vtt-hexgrid/js/111)', async () => {
+  const src = await (await fetch('../vtt-hexgrid/js/111-parpadeo-tv.js', {cache: 'no-store'})).text();
+  const tk = new Map([['t1', {col: 1, fila: 1}]]);
+  const f = new Function('num', 'tokens', src + '\nreturn {blinkTvEstado, blinkTvDur, blinkTvMs, BLINK_TV_APAGA, BLINK_TV_DUR, BLINK_TV_ESPERA};')(v => Number(v) || 0, tk);
+  const fx = {de: {x: 0, y: 0}, a: {x: 10, y: 0}}, sale = {...fx, sale: true};
+  // Apagado y el token todavía no llegó: se queda al final del apagado (no se prende); cuando llega, sigue; si no llega nunca, sigue igual.
+  const esp = {id: 't1', aCel: {col: 5, fila: 5}, t0: 0};
+  const m1 = f.blinkTvMs(esp, f.BLINK_TV_APAGA + 300), m2 = f.blinkTvMs(esp, f.BLINK_TV_APAGA + 900);
+  tk.get('t1').col = 5; tk.get('t1').fila = 5;
+  const m3 = f.blinkTvMs(esp, f.BLINK_TV_APAGA + 1000);
+  const nunca = {id: 't2', aCel: {col: 5, fila: 5}, t0: 0}; tk.set('t2', {col: 0, fila: 0});
+  f.blinkTvMs(nunca, f.BLINK_TV_APAGA + 10); const m4 = f.blinkTvMs(nunca, f.BLINK_TV_APAGA + f.BLINK_TV_ESPERA + 500);
+  igual([m1 === f.BLINK_TV_APAGA, m2 === f.BLINK_TV_APAGA, m3 === f.BLINK_TV_APAGA + 100, m4 > f.BLINK_TV_APAGA + 1000, f.blinkTvMs({id: 't1', t0: 0}, 50)], [true, true, true, true, 50]);
+  const e1 = f.blinkTvEstado(fx, f.BLINK_TV_DUR - 10), e2 = f.blinkTvEstado(sale, f.BLINK_TV_DUR - 10), e3 = f.blinkTvEstado(sale, 50);
+  igual([e1.fase, e1.x, e2.fase, e2.x, e2.sx < 0.001, e3.fase, e3.sx > 0.5, f.blinkTvDur(fx) === f.BLINK_TV_DUR, f.blinkTvDur(sale) > f.BLINK_TV_APAGA + 1000],
+    ['llega', 10, 'sale', 0, true, 'sale', true, true, true]);
+  // La animación sale ANTES de mover (o de borrar) el token: la Trampa de teleport y los portales, el Portal trampa / el Glifo, el Town portal.
+  const fuente = async (arch, desde, hasta) => { const t = await (await fetch('../vtt-hexgrid/js/' + arch, {cache: 'no-store'})).text(); const i = t.indexOf(desde); return t.slice(i, t.indexOf(hasta, i)); };
+  const antes = (txt, mov) => txt.indexOf('blinkTvPublicar(') > 0 && txt.indexOf('blinkTvPublicar(') < txt.indexOf(mov);
+  const t02 = await fuente('02-modo-niebla-sigilo.js', 'async function trampaTeleportar', 'function trampaEstadosParaAsistente');
+  const t19 = await fuente('19-trampa-paso-a-paso.js', 'async function trampaPortalMover', '// Le chupa el SP');
+  const t84 = await fuente('84-town-portal.js', 'async function townPortalRevisar', 'deshacerRegistrar');
+  igual([antes(t02, 't.col = c.col'), antes(t02, '.update({col'), antes(t19, '.update({col'), antes(t84, '.delete()'), /blinkTvPublicar\([^)]*null\)/.test(t84)], [true, true, true, true, true]);
+});
 prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/js/19): quién quedó agarrado y «9 − Defensa 4 = 5»', async () => {
   const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();
   const trozo = src.slice(src.indexOf('/* PURAS-INICIO'), src.indexOf('/* PURAS-FIN */'));

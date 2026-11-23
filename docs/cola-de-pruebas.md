@@ -1686,8 +1686,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⏸ movida al final (2026-11-23) — 🌫 Definir la niebla (P264), conversando** (dueño, 2026-11-22: «para esto deberíamos definir bien la niebla. Sé que vos medio que
   la inventaste y me dejé llevar, pero no estoy seguro de entender exactamente cómo funciona. Vamos a tener que conversar de esto para
   definirlo»). Preparar una explicación de cómo funciona hoy y las preguntas para decidir; no programar hasta conversarlo.
-- **⬜ en cola — 📺 ¿El Portal trampa tiene la animación de la tele?** (dueño, 2026-11-22: «imagino que la teletransportación tiene la animación de
+- **✅ hecho (2026-11-23) — 📺 ¿El Portal trampa tiene la animación de la tele?** (dueño, 2026-11-22: «imagino que la teletransportación tiene la animación de
   la tele encendiendo/apagando, ¿no?»). Verificar y, si no, sumarla (con video).
+  *Resultado:* **no la tenía**: el televisor solo lo usaban el Parpadeo y el Intercambio arcano; las trampas que teletransportan y los portales hacían
+  solo los pulsos violeta/azul con el hilo punteado, y el token saltaba. Ahora **todo teletransporte de un token** se apaga como un televisor viejo
+  donde estaba y se prende donde llega, en todas las pantallas a la vez: el Portal trampa de los creeps, el Glifo de teletransporte y la Varita del
+  portal (js/19), los portales de Invocar portal y la Trampa de teleport de Terreno y Formas (js/02; esta última hoy no se puede crear: ver abajo «Probar»);
+  el Town portal solo se apaga (el token se va del
+  mapa). Los pulsos quedan además (dicen entre qué dos puntos pasó: P289). Arreglo de paso en el televisor (también vale para el Parpadeo): si el
+  movimiento del token llega tarde a una pantalla, la tele se queda apagada esperándolo en vez de prenderse en el destino y volver a verse en la salida
+  (se vio en la prueba: la pantalla de quien pasaba por el portal volvía a dibujarlo en el portal ~3 s). Probado con clics en «Claude · pruebas 2»
+  («Prueba · R4 M4», GM + Jugador 1 + Jugador 2): Blanco J1 pisó un Glifo de teletransporte del GM (tiró Inamovible, no le salió, «🌀 Atravesar el
+  portal»); Blanco J2 usó un portal de Invocar portal de Blanco J1 (dos veces) y entró a un Town portal. En las tres pantallas: apagado en la salida →
+  apagado mientras llega el dato → prendido en el destino, sin verse nunca en el destino antes ni deslizarse. Armado por datos: el Glifo se colocó
+  llamando a la función del consumible (con los dos clics de verdad), los portales con la función de la habilidad (con los dos clics de verdad) y el
+  Town portal creando el elemento. Videos `tele-trampa-glifo.mp4` y `tele-invocar-portal.mp4` (fuera del repo). Pruebas automáticas: 1027 en verde
+  (1 nueva). Lo que faltó probar, abajo como «Probar».
 - **⬜ en cola — 🐀 Inicio de turno de alguien escondido** (dueño, 2026-11-22: «en realidad a los rivales no les debería salir nada, a sus aliados
   sí»). Revisar que sus aliados sí vean su inicio de turno (veneno, etc.).
 - **⬜ en cola — 🎲 «Tirar iniciativa» mete tokens que no van** (dueño, 2026-11-22: «acabo de probar "tirar iniciativa" y metió al tótem y al
@@ -1873,6 +1887,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   funcionarían esas cosas que ocultan la vista. No tengo bien claro las reglas de esa parte»). Explicarle cómo funcionan hoy las nubes (Polvareda,
   Bomba de humo, varita de niebla, virote de humo, zonas con nube: qué tapan, quién ve adentro, cuánto duran, el viento) y las preguntas para
   decidir; P264 (el creep que actúa desde una nube) va con esto. La niebla de guerra del mapa ya se le explicó aparte.
+
+- **⬜ en cola — Probar: 📺 la tele con el Portal cósmico** (2026-11-23): el Portal trampa de un creep donde quien la puso elige adónde manda, y el
+  caso en que lo mueve otra pantalla (un jugador mandando a un creep: paso «portal-mover»). Solo se probó el Glifo (destino fijo), que usa la misma
+  función.
+- **⬜ en cola — Probar: 📺 la tele con la Trampa de teleport de Terreno y Formas** (2026-11-23): no se pudo crear: las reglas de Firestore no dejan
+  crear un elemento con `trampaDestino` (está validado, pero falta en la lista de campos permitidos de `elementoValido`; el ⚙ sí lo deja cambiar).
+  Arreglarlo es sumar el campo a esa lista y pegar las reglas. Los portales de Invocar portal usan la misma función y sí se probaron.
+- **⬜ en cola — Probar: 📺 la tele de un teletransporte con un token oculto, en sigilo o en la niebla, y con «reducir movimiento»** (2026-11-23): por
+  código, una pantalla que no ve el token no dibuja la tele (como el Parpadeo) y con «reducir movimiento» salta sin animación; no se probó en el mapa.
 
 ## En cola
 

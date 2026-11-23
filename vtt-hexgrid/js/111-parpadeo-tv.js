@@ -9,17 +9,43 @@
 //   - en la de llegada, al revés: aparece un punto, se estira en una raya y la raya se abre hasta el token.
 // Mientras dura, calcularDisposicion (js/05) dibuja el token en la casilla que toca (`blinkTvPosToken`, con su escala), aunque su casilla nueva ya haya
 // llegado: nunca se lo ve deslizarse de una a otra. Solo lo ve quien ve al token (el que está oculto, en la niebla o en sigilo para mí, no se dibuja).
+//
+// 🌀 Todo teletransporte de un token usa este televisor (2026-11-23, dueño: «imagino que la teletransportación tiene la animación de la tele
+// encendiendo/apagando, ¿no?»): además del Parpadeo y el Intercambio arcano, la Trampa de teleport y los portales de Invocar portal
+// (`trampaTeleportar`, js/02), el Portal trampa de los creeps, el Glifo de teletransporte y la Varita del portal (`trampaPortalMover`, js/19). Los
+// pulsos violeta/azul con el hilo punteado (js/02) siguen: dicen entre qué dos puntos pasó. El Town portal (js/84) solo apaga el televisor
+// (`sale: true`): el token se va del mapa, no se prende en ningún lado; queda apagado hasta que se borra (como mucho BLINK_TV_SALE ms).
 const BLINK_TV = [];   // {id, de: {x,y}, a: {x,y}, t0}
 const blinkTvVistos = new Set();
 // Los tiempos (ms): apagar (aplastar → raya → punto que se apaga) y encender (punto → raya → abrir). Total ~0,9 s.
 const BLINK_TV_T = {aplasta: 170, achica: 170, punto: 130, pausa: 60, aparece: 90, estira: 150, abre: 170};
 const BLINK_TV_DUR = Object.values(BLINK_TV_T).reduce((a, b) => a + b, 0);
+const BLINK_TV_APAGA = BLINK_TV_T.aplasta + BLINK_TV_T.achica + BLINK_TV_T.punto;   // lo que tarda solo en apagarse
+const BLINK_TV_SALE = 6000;   // 🌀 Town portal: cuánto queda apagado esperando que se borre el token (si no se borra, vuelve a verse)
+const blinkTvDur = fx => fx && fx.sale ? BLINK_TV_APAGA + BLINK_TV_SALE : BLINK_TV_DUR;
+// ⏸ Apagado, esperando que llegue la casilla nueva (2026-11-23): el momento y el movimiento del token llegan por separado (y a la pantalla que
+// mueve, el movimiento recién sale cuando el servidor confirmó el momento). Si se terminó de apagar y el token todavía no está en la casilla de
+// llegada, la animación se queda apagada (no se prende en el destino ni vuelve a verse en la salida) hasta que llegue, como mucho BLINK_TV_ESPERA ms.
+const BLINK_TV_ESPERA = 5000;
+function blinkTvMs(fx, ahora){
+  let ms = ahora - fx.t0;
+  if(fx.sale || !fx.aCel || ms <= BLINK_TV_APAGA) return ms;
+  const t = typeof tokens !== 'undefined' && tokens.get ? tokens.get(fx.id) : null;
+  if(!t || (t.col === fx.aCel.col && t.fila === fx.aCel.fila)) return ms;
+  if(!fx.esperaT0) fx.esperaT0 = ahora;
+  if(ahora - fx.esperaT0 > BLINK_TV_ESPERA) return ms;   // no llegó nunca: sigue igual
+  fx.t0 = ahora - BLINK_TV_APAGA;   // corre el reloj: queda justo al final del apagado
+  return BLINK_TV_APAGA;
+}
 const blinkTvPoco = () => { try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
 
-// Quien salta: publica el momento (o, si no se puede, lo arranca solo acá). `de` y `a` son casillas {col, fila}.
+// Quien salta: publica el momento (o, si no se puede, lo arranca solo acá). `de` y `a` son casillas {col, fila}. Sin `a` (el Town portal): solo
+// se apaga en `de` (`sale: true`).
 async function blinkTvPublicar(id, de, a){
-  if(!id || !de || !a) return;
-  const datos = {id: String(id), de: {col: Math.round(num(de.col)), fila: Math.round(num(de.fila))}, a: {col: Math.round(num(a.col)), fila: Math.round(num(a.fila))}};
+  if(!id || !de) return;
+  const sale = !a;
+  if(sale) a = de;
+  const datos = {id: String(id), de: {col: Math.round(num(de.col)), fila: Math.round(num(de.fila))}, a: {col: Math.round(num(a.col)), fila: Math.round(num(a.fila))}, ...(sale ? {sale: true} : {})};
   let mid = null;
   try{ mid = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'blink-tv', icono: '', titulo: '', estado: 'listo', datos}) : null; }
   catch(err){ console.error('Parpadeo: no se pudo publicar la animación', err); }
@@ -56,7 +82,7 @@ function blinkTvEmpezar(dt){
   const t0 = performance.now() + espera;
   todos.forEach(x => {
     for(let i = BLINK_TV.length - 1; i >= 0; i--) if(BLINK_TV[i].id === x.id) BLINK_TV.splice(i, 1);
-    BLINK_TV.push({id: x.id, de: hexCentro(x.de.col, x.de.fila), a: hexCentro(x.a.col, x.a.fila), t0});
+    BLINK_TV.push({id: x.id, de: hexCentro(x.de.col, x.de.fila), a: hexCentro(x.a.col, x.a.fila), aCel: {col: x.a.col, fila: x.a.fila}, t0, ...(x.sale ? {sale: true} : {})});
   });
   pedirDibujo();
 }
@@ -72,6 +98,7 @@ function blinkTvEstado(fx, ms){
   t -= T.achica;
   if(t < T.punto){ const u = cl(t / T.punto); return {fase: 'sale', x: fx.de.x, y: fx.de.y, sx: 0.0001, sy: 0.0001, linea: 0, punto: 1 - u, escaneo: 0}; }
   t -= T.punto;
+  if(fx.sale) return {fase: 'sale', x: fx.de.x, y: fx.de.y, sx: 0.0001, sy: 0.0001, linea: 0, punto: 0, escaneo: 0};   // 🌀 se fue: queda apagado
   if(t < T.pausa) return {fase: 'llega', x: fx.a.x, y: fx.a.y, sx: 0.0001, sy: 0.0001, linea: 0, punto: 0, escaneo: 0};
   t -= T.pausa;
   // — Encender, en la de llegada —
@@ -87,8 +114,8 @@ function blinkTvPosToken(id){
   if(!BLINK_TV.length) return null;
   const fx = BLINK_TV.find(f => f.id === id);
   if(!fx) return null;
-  const ms = performance.now() - fx.t0;
-  if(ms >= BLINK_TV_DUR) return null;
+  const ms = blinkTvMs(fx, performance.now());
+  if(ms >= blinkTvDur(fx)) return null;
   if(ms < 0) return {x: fx.de.x, y: fx.de.y, sx: 1, sy: 1};   // (esperando que se aparte el cuadro: quieto en su casilla de antes)
   const e = blinkTvEstado(fx, ms);
   return {x: e.x, y: e.y, sx: e.sx, sy: e.sy};
@@ -98,8 +125,8 @@ function dibujarEfectosBlinkTv(z){
   if(!BLINK_TV.length) return false;
   const ahora = performance.now();
   for(let i = BLINK_TV.length - 1; i >= 0; i--){
-    const fx = BLINK_TV[i], ms = ahora - fx.t0;
-    if(ms >= BLINK_TV_DUR + 40){ BLINK_TV.splice(i, 1); continue; }
+    const fx = BLINK_TV[i], ms = blinkTvMs(fx, ahora);
+    if(ms >= blinkTvDur(fx) + 40){ BLINK_TV.splice(i, 1); continue; }
     if(ms < 0) continue;
     if(typeof disposicion !== 'undefined' && Array.isArray(disposicion) && !disposicion.some(d => d.id === fx.id)) continue;   // no lo veo: nada
     const e = blinkTvEstado(fx, ms), R = HEX * 0.68;

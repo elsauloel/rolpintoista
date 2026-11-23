@@ -686,6 +686,9 @@ async function trampaTeleportar(id, t, el, avisar){
   const c = casillaLibreCerca(d);
   if(elementoSolidoEn(d.col, d.fila)) toast('El destino del teleport ya no es transitable a pie: se usó la casilla libre más cercana');
   const antes = {col: t.col, fila: t.fila, rutaJson: t.rutaJson};
+  // 📺 Primero el televisor (js/111, 2026-11-23): se apaga donde estaba y se prende donde llega, en todas las pantallas a la vez; recién
+  // después se mueve, así nadie lo ve saltar antes de tiempo.
+  if(typeof blinkTvPublicar === 'function') await blinkTvPublicar(id, {col: t.col, fila: t.fila}, c).catch(err => console.error('Teleport: la animación', err));
   t.col = c.col; t.fila = c.fila; t.rutaJson = '[]';
   estelas.delete(id);
   renderPanel(); pedirDibujo();

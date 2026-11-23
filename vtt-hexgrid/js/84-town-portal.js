@@ -125,9 +125,13 @@ async function townPortalRevisar(tokenId, celdas){
     {titulo: 'Town portal', icono: '🌀', si: 'Entrar', no: 'Quedarse'});
   if(!entra){ townPortalEntrados.delete(tokenId); toast(`${nom} no entró al Town portal`); return; }
   try{ await coleccionElementos().doc(portal[0]).update({usoEn: Date.now()}); }catch(e){}   // los pulsos en todas las pantallas
-  await new Promise(r => setTimeout(r, 700));   // que se lo vea llegar al portal antes de desaparecer
+  // 📺 Se apaga como un televisor viejo sobre el portal (js/111, 2026-11-23; solo el apagado: no se prende en ningún lado) y después se borra.
   let guardado = null;   // ↩ para el Ctrl+Z (dueño, 2026-10-29): el token tal cual, para volver a ponerlo
   try{ const s = await coleccionTokens().doc(tokenId).get(); if(s.exists) guardado = s.data(); }catch(e){}
+  await new Promise(r => setTimeout(r, 250));   // que se lo vea parado en el portal antes de apagarse
+  // (sin esperar que el servidor confirme el momento: acá arranca enseguida y el token se borra apenas se terminó de apagar)
+  if(typeof blinkTvPublicar === 'function') blinkTvPublicar(tokenId, {col: t.col, fila: t.fila}, null).catch(err => console.error('Town portal: la animación', err));
+  await new Promise(r => setTimeout(r, (typeof BLINK_TV_APAGA === 'number' ? BLINK_TV_APAGA : 470) + 250));
   try{
     await coleccionTokens().doc(tokenId).delete();
     if(guardado) deshacerRegistrar({tipo: 'townPortal', id: tokenId, datos: guardado, nombre: nom});

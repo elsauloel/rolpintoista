@@ -2129,3 +2129,13 @@ uno hay que verlo); el daño de colisión. En la prueba de P263, Blanco J2 (Sigi
 1. ¿Más que su Sigilo está bien como umbral, o preferís otra cosa (cualquier daño, la mitad de su vida, una tirada de Sigilo contra el daño)?
 2. ¿El veneno y el sangrado también tendrían que poder delatarlo?
 3. ¿Delatarse = se sabe dónde está (como ahora: se le saca el sigilo) o solo un «?» en esa casilla, como cuando entra en sigilo a la vista?
+
+### P289 — 📺 La tele en todos los teletransportes: lo que quedó elegido (2026-11-23, Claude)
+Ahora todo teletransporte de un token se apaga como un televisor viejo donde estaba y se prende donde llega (el Portal trampa, el Glifo de
+teletransporte, la Varita del portal, Invocar portal, la Trampa de teleport), como el Parpadeo. Quedaron elegidas estas cosas, todas cambiables:
+1. **Los pulsos se quedan además de la tele**: los círculos violeta (donde entró) y azul (donde salió) con el hilo punteado, ~4 s. La tele dice «se
+   fue y apareció»; los pulsos, entre qué dos puntos pasó (sirve sobre todo si el token se va lejos o a una parte del mapa que no se está mirando).
+   ¿Te gustan juntos, o preferís solo la tele?
+2. **El Town portal solo se apaga**: el token se va del mapa, así que la tele se apaga sobre el portal y no se prende en ningún lado.
+3. **«Reducir movimiento»**: la tele no sale (el token salta, como el Parpadeo), pero los pulsos se siguen viendo como siempre (eso ya era así).
+   ¿Los achicamos también?

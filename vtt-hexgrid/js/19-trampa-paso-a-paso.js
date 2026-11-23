@@ -907,6 +907,9 @@ async function trampaPortalMover(id, dt){
   const c = dt.destino;
   let texto;
   try{
+    // 📺 El televisor del Parpadeo (js/111, 2026-11-23): se apaga donde estaba y se prende donde llega, antes de mover el token.
+    const x = tokens.get(dt.tokenId);
+    if(x && typeof blinkTvPublicar === 'function') await blinkTvPublicar(dt.tokenId, {col: x.col, fila: x.fila}, c).catch(err => console.error('Portal: la animación', err));
     await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
     texto = `El portal se lo lleva ${distanciaHex(c, c.desde)} casillas más allá.`;
   }catch(err){ console.error('No se pudo mover a la víctima del portal:', err); texto = 'El portal se lo lleva — movelo a mano al lugar elegido.'; }

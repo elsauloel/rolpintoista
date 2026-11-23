@@ -1937,6 +1937,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
   GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
 
+- **⬜ en cola — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
+  activo, primero sale «Si te movés, lo perdés. [Moverme igual] [Cancelar]» y recién si confirma se le ofrece al rival el ataque de oportunidad.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

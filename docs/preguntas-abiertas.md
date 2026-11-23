@@ -1889,6 +1889,8 @@ como un arma común: Tipo ÷ 2 y después el Tipo). No se tocó nada.
 1. ¿Los arcabuces tienen que llevar Recarga (y entonces reciben la maestría y usan virotes), o quedan afuera de la maestría?
 
 ### P266 — 💍 Puntería certera y Foco: el ataque de oportunidad se pregunta antes que el aviso «si te movés, lo perdés» (2026-11-21, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** el aviso del anillo sale **primero**, antes de ofrecerle al rival el ataque de oportunidad («está bien como lo planteás vos»). En la cola.
 Visto con clics (Blanco J1 con el Anillo de Foco Arcano, pegado a un creep): al arrastrar el token, primero sale «⚔ Te alejás de … esperando a
 ver si aprovecha el ataque de oportunidad» y el GM decide; recién después le aparece al jugador «Tenés Foco activo (+2 a PdG.Esp). Si te
 movés, lo perdés. [Moverme igual] [Cancelar]». Si el GM ya atacó y el jugador elige Cancelar, el token se queda donde estaba pero el ataque
@@ -1896,6 +1898,8 @@ de oportunidad ya se jugó. Pasa igual con Puntería certera (es la misma pieza)
 1. ¿El aviso del anillo tiene que salir primero (antes de ofrecerle al rival el ataque de oportunidad)?
 
 ### P267 — 🔮 Foco arcano: lo que quedó elegido «mientras tanto» (2026-11-21, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** (1) vale también en áreas y misiles, bien; (2) no suma al Ef.Esp, bien; (3) castear no cuenta como moverse, correcto. Queda como está.
 El Anillo de Foco Arcano quedó como el de Puntería certera (ronda 1 sin bono, «se movió» anotado en la partida, cartel «🔮 Foco», aviso antes de
 moverse, que te muevan no lo apaga). Lo propio de un anillo de casteo:
 1. **Vale para toda tirada de PdG.Esp de una habilidad o una varita**, también la Varita de misiles (cada misil suma su +2) y las áreas o

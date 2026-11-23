@@ -1721,7 +1721,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   su Tótem de silencio y Blanco creep su Estandarte (la habilidad se le dio por datos y se le sacó al final); Traer tokens, Tirar iniciativa de los
   creeps y Ordenar → 21 de 23 tokens en la lista, sin los dos. Un orden «viejo» con los dos adentro (puesto por datos): Tirar no les tira, Ordenar
   los saca, ▶ Siguiente pasa de Blanco creep a Control mental 4 salteándolos y ▶ Iniciar combate arranca con Control mental 4. Dudas: P291.
-- **⬜ en cola — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
+- **✅ explicado (2026-11-23) — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
   lo entienda»). Explicarlas con un ejemplo.
 - **⬜ en cola — 💀 Un creep que cae desde GM Tools también pierde sus estados (P270)** (dueño, 2026-11-22: «no debería ser así»; P270 decidida:
   caer en 0 = se borran los estados).
@@ -1933,6 +1933,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🎲 una invocación o un refuerzo que entra solo al orden de turnos, y ⏭ Pasar de ronda con un tótem en un orden viejo**
   (2026-11-23): por código, la invocación nueva y el refuerzo pasan por la misma regla (`iniciativaOcupaLugar`) y Pasar de ronda no le hace pasar el
   turno a un tótem o estandarte; no se probaron en el mapa (hoy ninguna invocación ni refuerzo es un objeto inerte: es solo la red de seguridad).
+
+- **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
+  GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
 
 ## En cola
 

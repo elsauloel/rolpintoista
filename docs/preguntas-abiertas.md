@@ -2159,6 +2159,8 @@ rivales no ven nada (ni «Alguien»). Quedaron elegidas estas cosas, todas cambi
 
 ### P291 — 🎲 Quién ocupa lugar en el orden de turnos: lo que quedó elegido (2026-11-23, Claude)
 
+> ✅ **Respondida (dueño, 2026-11-23):** (1), (3) y (4) bien como están; (2) «sí, quiero que lo hagas»: «➕ Sumar al orden de turnos» en el menú del token para el GM (en la cola).
+
 Ahora hay una sola regla para saber si un token va al orden de turnos (`OrdenTurnos.ocupaLugar`, en `comun/orden-turnos.js`): el **tótem y el
 estandarte no** (ni con «Traer tokens», ni con «🎲 Tirar iniciativa de los creeps», ni con Ordenar, ▶ Siguiente, ▶ Iniciar combate o ⏭ Pasar de
 ronda); los **personajes, las invocaciones, los creeps y los tokens sueltos sí**. Quedaron elegidas estas cosas, todas cambiables:

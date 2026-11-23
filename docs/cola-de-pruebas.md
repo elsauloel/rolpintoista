@@ -2244,6 +2244,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   mandaron a Blanco J1 por el mismo aviso que usan las habilidades de creep (sin pasar por el duelo). Falta verlo con un creep usando su habilidad en
   un duelo, el «+N» con más de 12 estados, un creep visto por un jugador (sin el escudo) y una invocación.
 
+- **⬜ en cola (para evaluar más adelante) — 🗺 GM Tools avisa cuando en el mapa pasan cosas que requieren ir ahí** (dueño, 2026-11-23, sobre
+  P283: «casi siempre todo esto va a suceder en el mapa. Quizás lo que debería pasar en GM Tools es que te avise que están pasando cosas en el mapa
+  que requieren que vayas ahí»). Pensar qué cosas (duelos esperando al GM, momentos pendientes, zonas por tirar…) y cómo avisarlas; conversarlo antes.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2044,6 +2044,8 @@ de «PdG con punzantes» siguen como antes: al puño de un personaje no le suman
 
 ### P283 — 🛡 Aguante de trinchera con cualquier daño: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
 
+**Punto 1 decidido (dueño, 2026-11-23): alcanza con el aviso** («casi siempre todo esto va a suceder en el mapa»). Idea para más adelante: que GM Tools avise cuando en el mapa pasan cosas que requieren ir ahí (anotada en la cola).
+
 Pedido del dueño (2026-11-22): «debería contemplarse para cualquier daño que tenga en cuenta esas defensas, independientemente si es trampa, ataque u
 otra cosa». Ahora la regla de a dónde va el bono está en un solo lugar (`Combatiente.trincheraDelGolpe`) y todo daño del mapa pasa por ahí. Quedan dos
 cosas chicas para decidir:

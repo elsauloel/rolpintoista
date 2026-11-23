@@ -1710,8 +1710,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la Crónica): lo de un escondido lo ve su bando, el GM con 👁 y quien lo esté viendo; a sus rivales, nada. Probado con clics en «Claude · pruebas 2»:
   Blanco J2 en sigilo y envenenado → el Jugador 1 ve la tarjeta con su nombre, el anillo dorado y el veneno en la Mesa; el GM, nada. Un creep en
   sigilo y envenenado → el GM ve la tarjeta con el veneno y el anillo; los jugadores, nada. Dudas: P290.
-- **⬜ en cola — 🎲 «Tirar iniciativa» mete tokens que no van** (dueño, 2026-11-22: «acabo de probar "tirar iniciativa" y metió al tótem y al
+- **✅ hecho (2026-11-23) — 🎲 «Tirar iniciativa» mete tokens que no van** (dueño, 2026-11-22: «acabo de probar "tirar iniciativa" y metió al tótem y al
   estandarte. No deberían ir»).
+  *Resultado:* entraban por «Traer tokens», que ponía en la lista **todos** los tokens del mapa; el tótem y el estandarte son creeps (con su ficha),
+  así que después «🎲 Tirar iniciativa de los creeps» también les tiraba. Ahora hay una sola regla, «¿este token ocupa lugar en la iniciativa?»
+  (`OrdenTurnos.ocupaLugar`): el tótem y el estandarte no; personajes, invocaciones, creeps y tokens sueltos sí; y si el token trae el campo
+  `iniciativa` (sí / no), manda eso (lo va a usar el token suelto paso a paso). La usan Traer tokens (no los trae y, si estaban, los saca), Tirar
+  iniciativa (no les tira), Ordenar (los saca), ▶ Siguiente y ⏭ Pasar de ronda (los saltean sin darles turno), ▶ Iniciar combate (no arranca por
+  ellos ni les llena los No2) y las invocaciones y refuerzos que entran solos. **Probado con clics** en «Claude · pruebas 2»: Control mental 4 clavó
+  su Tótem de silencio y Blanco creep su Estandarte (la habilidad se le dio por datos y se le sacó al final); Traer tokens, Tirar iniciativa de los
+  creeps y Ordenar → 21 de 23 tokens en la lista, sin los dos. Un orden «viejo» con los dos adentro (puesto por datos): Tirar no les tira, Ordenar
+  los saca, ▶ Siguiente pasa de Blanco creep a Control mental 4 salteándolos y ▶ Iniciar combate arranca con Control mental 4. Dudas: P291.
 - **⬜ en cola — 💬 Explicar P266 y P267** (dueño, 2026-11-22: «P266: elaborá esto, fuera de contexto no lo entiendo»; «P267: elaborá esto para que
   lo entienda»). Explicarlas con un ejemplo.
 - **⬜ en cola — 💀 Un creep que cae desde GM Tools también pierde sus estados (P270)** (dueño, 2026-11-22: «no debería ser así»; P270 decidida:
@@ -1921,6 +1930,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🙈 una zona de «al empezar su turno» (Muro de fuego) bajo un escondido, y el cartel flotante de inmunidad** (2026-11-23):
   no se tocaron (la zona la resuelve quien lo maneja; el cartel flotante ya no sale en una pantalla que no ve el token, P263); no se probaron
   con un escondido al empezar su turno.
+- **⬜ en cola — Probar: 🎲 una invocación o un refuerzo que entra solo al orden de turnos, y ⏭ Pasar de ronda con un tótem en un orden viejo**
+  (2026-11-23): por código, la invocación nueva y el refuerzo pasan por la misma regla (`iniciativaOcupaLugar`) y Pasar de ronda no le hace pasar el
+  turno a un tótem o estandarte; no se probaron en el mapa (hoy ninguna invocación ni refuerzo es un objeto inerte: es solo la red de seguridad).
 
 ## En cola
 

@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261122cola49"></script>
-<script src="orden-turnos.js?v=20261121caido"></script>
+<script src="orden-turnos.js?v=20261123ocupa"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2810,6 +2810,26 @@ prueba('💀 Al caer se van los estados (P257, 2026-11-21): un personaje que que
   igual([r.cayo, r.sacados.map(x => x.nombre), S.efectos.map(e => e.nombre).sort(), otra.cayo, Combatiente.vueltaTomar(S), sac.map(x => x.nombre), sc.estados.map(e => e.nombre),
     Combatiente.caidaTxt('Rata', sac), Combatiente.caidaTxt('Rata', []), Combatiente.caerLimpio(null, 'estados')],
     [true, ['Veneno', 'Bendecido'], ['Anillo puesto', 'Llama de Fénix'], false, null, ['Sangrado'], ['Vuela'], '💀 Rata cayó: se le fue 1 estado (Sangrado)', '', []]);
+});
+prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estandarte no; personajes, invocaciones, creeps y tokens sueltos sí; el campo del token manda', () => {
+  const O = OrdenTurnos;
+  const pj = {tipo: 'pj', fichaId: 'f1'}, inv = {tipo: 'pj', fichaId: 'f1~i1'}, creep = {tipo: 'creep', fichaId: 'c1'}, suelto = {tipo: 'creep', fichaId: ''};
+  const estandarte = {tipo: 'creep', fichaId: 'c2'}, pubEst = {estandarteRadio: 3, estandartePdg: 3, estandarteDano: 5}, pubTotem = {estandarteRadio: 3, estandarteSilencio: 1};
+  igual([O.ocupaLugar(pj, {}), O.ocupaLugar(inv, {}), O.ocupaLugar(creep, {nombre: 'Rata'}), O.ocupaLugar(creep, null), O.ocupaLugar(suelto, null),
+    O.ocupaLugar(estandarte, pubEst), O.ocupaLugar(estandarte, pubTotem), O.ocupaLugar(estandarte, {estandarteRadio: 0}),
+    O.ocupaLugar({...estandarte, iniciativa: true}, pubEst), O.ocupaLugar({...suelto, iniciativa: false}, null), O.ocupaLugar({trampa: true}, null), O.ocupaLugar(null, null)],
+    [true, true, true, true, true, false, false, true, true, false, false, false]);
+});
+prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, ▶ Siguiente, Iniciar combate, invocaciones y refuerzos (2026-11-23)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t86 = await leer('86-prisa.js'), t31 = await leer('31-copiar-token.js');
+  cierto(/OrdenTurnos\.ocupaLugar\(t, vinculo\(t\)\)/.test(t04) && /\[\.\.\.tokens\.keys\(\)\]\.filter\(iniciativaOcupaLugar\)/.test(t04), 'Traer tokens');
+  cierto(/enLista\.has\(id\) && OrdenTurnos\.ocupaLugar\(t, vinculo\(t\)\)/.test(t04), 'Tirar iniciativa');
+  cierto(/if\(!iniciativaOcupaLugar\(orden\[i\]\.id\)\) continue;/.test(t04), '▶ Siguiente');
+  cierto(/OrdenTurnos\.primero\(orden, id => iniciativaFueraDeJuego\(id\) \|\| !iniciativaOcupaLugar\(id\)\)/.test(t04), 'Iniciar combate');
+  cierto(/SEP_INVOCACION\) \|\| !iniciativaOcupaLugar\(tokenId\)\) return;/.test(t04), 'invocaciones');
+  cierto(/iniciativa\.orden\.filter\(o => iniciativaOcupaLugar\(o\.id\)\)/.test(t86), 'Ordenar');
+  cierto(/!iniciativaOcupaLugar\(idNuevo\)\) return;/.test(t31), 'refuerzos');
 });
 prueba('⏭ Pasar de ronda (2026-11-21): quiénes faltan en la ronda (sin los que ya jugaron ni los caídos; en un turno libre, desde quien lo tenía)', () => {
   const orden = ['a', 'b', 'c', 'd', 'e'].map(id => ({id}));

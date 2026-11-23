@@ -1010,6 +1010,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   2026-11-22 no dice nada (su `ini` puede traer el +5 adentro): ahí se lee la ficha (`cargarPiezas(BN_PIEZAS)` + `FichaGuardado.cargar`), así no se duplica.
   El botón del GM dice **«🎲 Tirar iniciativa de los creeps»** (el globo explica que con uno tira la de todos los creeps; el de los jugadores sigue «🎲 Tirar
   iniciativa»). Probado con clics en «Claude · pruebas 2».
+- **🎲 Quién ocupa lugar en el orden de turnos** (2026-11-23, dueño: «metió al tótem y al estandarte. No deberían ir»): una sola regla,
+  `OrdenTurnos.ocupaLugar(t, vinculo(t))` (comun/orden-turnos.js; en el mapa, `iniciativaOcupaLugar(id)` de js/04: un id sin token, sí). No: el tótem y
+  el estandarte (`estandarteRadio` en lo público, como `esInerte`) y una trampa; sí: personajes, invocaciones, creeps y tokens sueltos; el campo
+  `t.iniciativa` (true/false) manda sobre todo (lo va a escribir el token suelto paso a paso, cola). La usan «Traer tokens» (`iniciativaPonerTodos`: no
+  los trae y, si estaban, los saca), `iniciativaTirar` (no les tira), Ordenar (js/86: los saca), `iniciativaSiguiente` (los saltea sin darles turno, y
+  ⏭ Pasar de ronda no les hace pasar el turno), `iniciativaIniciarCombate` (`OrdenTurnos.primero` y los No2 llenos), `iniciativaPendientesRonda`,
+  `invocacionAlOrden` y `refuerzoAlOrden` (js/31). **Un camino nuevo que sume tokens al orden tiene que pasar por esta regla.** No hay botón para sumar una
+  fila suelta a mano (P291). Probado con clics en «Claude · pruebas 2».
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

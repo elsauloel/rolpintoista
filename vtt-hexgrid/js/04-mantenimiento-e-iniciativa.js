@@ -296,9 +296,13 @@ function ordenarIniciativa(lista){
   return lista.map((o, i) => ({o, i})).sort((a, b) => (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
 }
 
+// 🎲 ¿Ese token ocupa lugar en el orden de turnos? (2026-11-23: la regla es una sola, OrdenTurnos.ocupaLugar — el tótem y el estandarte no). Un
+// id que ya no tiene token, sí (se ve «(token borrado)», como siempre).
+function iniciativaOcupaLugar(id){ const t = tokens.get(id); return !t || OrdenTurnos.ocupaLugar(t, vinculo(t)); }
+// Traer tokens: todos los del mapa que ocupan lugar (los que no, como el tótem o el estandarte, se quedan afuera y, si estaban, salen).
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
-  const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
+  const lista = [...tokens.keys()].filter(iniciativaOcupaLugar).map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
   guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});   // (`iniciado` se conserva: sumar un token a mitad de combate no vuelve a ofrecer «Iniciar combate»)
 }
 
@@ -384,7 +388,7 @@ async function iniciativaDePj(fichaId){
 async function iniciativaTirar(){
   if(!fbMiembro) return;
   const enLista = new Set(iniciativa.orden.map(o => o.id));
-  const propios = [...tokens.entries()].filter(([id, t]) => enLista.has(id) && (soyGM
+  const propios = [...tokens.entries()].filter(([id, t]) => enLista.has(id) && OrdenTurnos.ocupaLugar(t, vinculo(t)) && (soyGM
     ? t.tipo === 'creep'
     : t.tipo === 'pj' && t.duenoUid === fbUsuario.uid && t.fichaId && !t.fichaId.includes(SEP_INVOCACION)));
   if(!propios.length){
@@ -472,10 +476,11 @@ async function iniciativaSiguiente(o){
     repite = ya.has(o.a) && o.a !== (termina && termina.id);   // el GM le da el turno a uno que ya jugó: juega, sin volver a contar nada
   }else{
    // ⏭ Pasar de ronda: los que todavía no jugaron esta ronda (después del que juega) pasan su turno sin jugar; la vuelta empieza en el primero.
-   if(o.pasarRonda){ for(let j = i + 1; j < n; j++) if(!ya.has(orden[j].id)) saltaRonda.push(orden[j].id); i = n - 1; }
+   if(o.pasarRonda){ for(let j = i + 1; j < n; j++) if(!ya.has(orden[j].id) && iniciativaOcupaLugar(orden[j].id)) saltaRonda.push(orden[j].id); i = n - 1; }
    for(let paso = 0; paso < 2 * n; paso++){
     i++;
     if(i >= n){ i = 0; ronda++; ya.clear(); }
+    if(!iniciativaOcupaLugar(orden[i].id)) continue;   // 🎲 un tótem o un estandarte que quedó en un orden viejo: ni juega ni pasa su turno (2026-11-23)
     if(ya.has(orden[i].id)){
       // Ya jugó esta ronda y lo movieron más abajo (dueño, 2026-10-29): el GM decide si vuelve a actuar. Sí: juega sin volver a recargar ni
       // contar turnos; no: se saltea.
@@ -515,7 +520,7 @@ async function iniciativaSiguiente(o){
     if(ordenRonda){
       ordenFin = ordenDeIds(ordenRonda.ordenIds, ordenFin);
       let k = 0;
-      while(k < ordenFin.length - 1 && iniciativaFueraDeJuego(ordenFin[k].id)) k++;
+      while(k < ordenFin.length - 1 && (iniciativaFueraDeJuego(ordenFin[k].id) || !iniciativaOcupaLugar(ordenFin[k].id))) k++;
       turnoFin = k;
     }
   }
@@ -614,6 +619,7 @@ async function combateNo2Llenos(alPaso){
     if(alPaso) alPaso(++hechos, total);
     const t = tokens.get(o.id);
     if(!t || !t.fichaId) continue;
+    if(!iniciativaOcupaLugar(o.id)) continue;   // 🎲 un tótem o un estandarte no juega: sus No2 no se tocan
     if(iniciativaFueraDeJuego(o.id)) continue;   // 💀 un caído queda como cayó: sin No2 llenos (P257, dueño, 2026-11-21)
     if(t.tipo === 'creep'){
       try{
@@ -664,7 +670,7 @@ async function iniciativaIniciarCombate(){
     const fallas = await combateNo2Llenos((k, n) => iniciandoPaso(`llenando los No2 (${k} de ${n})`));
     iniciandoPaso('empezando el turno del primero');
     if(fallas.length) toast(`No se pudieron llenar los No2 de: ${fallas.join(', ')} — hacelo a mano`);
-    const orden = iniciativa.orden, k = OrdenTurnos.primero(orden, iniciativaFueraDeJuego), sig = orden[k];
+    const orden = iniciativa.orden, k = OrdenTurnos.primero(orden, id => iniciativaFueraDeJuego(id) || !iniciativaOcupaLugar(id)), sig = orden[k];
     const paso = Math.round(num(iniciativa.paso)) + 1, mapa = mapaMostrado;
     if(!(await guardarIniciativa({turno: k, ronda: 1, paso, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, termino: null, iniciado: true, porIniciar: false, movidos: {}}))){ toast('No se pudo iniciar el combate (no se guardó el orden de turnos) — probá de nuevo'); return; }
     listo = true;
@@ -706,7 +712,7 @@ async function iniciativaSiguienteBoton(){
    mismo que pasar todos esos turnos con ▶ Siguiente (iniciativaSiguiente con `pasarRonda`): termina el turno en curso, los que faltaban pasan su
    turno sin jugar, el Mantenimiento de la ronda y el turno queda en el primero del orden. En un turno libre, lo termina y sigue igual. */
 let pasandoRonda = false;
-const iniciativaPendientesRonda = () => OrdenTurnos.pendientesRonda(iniciativa, iniciativaFueraDeJuego);
+const iniciativaPendientesRonda = () => OrdenTurnos.pendientesRonda(iniciativa, id => iniciativaFueraDeJuego(id) || !iniciativaOcupaLugar(id));
 async function iniciativaPasarRonda(){
   if(!soyGM || pasandoRonda || !iniciativa.orden.length) return;
   if(iniciandoCombate){ toast('⏳ El combate se está iniciando: esperá unos segundos'); return; }
@@ -1137,7 +1143,7 @@ const sobrepesoDeToken = t => {
 async function invocacionAlOrden(tokenId){
   const t = tokens.get(tokenId);
   if(!soyGM || !t || !iniciativa.orden.length || iniciativa.orden.some(o => o.id === tokenId)) return;
-  if(!String(t.fichaId || '').includes(SEP_INVOCACION)) return;
+  if(!String(t.fichaId || '').includes(SEP_INVOCACION) || !iniciativaOcupaLugar(tokenId)) return;
   const ok = await guardarIniciativa({orden: [...iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}), {id: tokenId, valor: 0}]});
   if(!ok) return;
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);

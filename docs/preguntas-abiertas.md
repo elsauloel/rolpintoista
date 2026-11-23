@@ -2156,3 +2156,19 @@ rivales no ven nada (ni «Alguien»). Quedaron elegidas estas cosas, todas cambi
    sepan que cambió la ronda). ¿O preferís que no les llegue nada?
 4. **El 📜 Historial del GM** sigue anotando la vida y los estados de un personaje escondido (lo escribe mirando los datos, sin saber quién lo
    ve). ¿También habría que esconderlo ahí, o es el registro del GM y está bien que lo tenga?
+
+### P291 — 🎲 Quién ocupa lugar en el orden de turnos: lo que quedó elegido (2026-11-23, Claude)
+
+Ahora hay una sola regla para saber si un token va al orden de turnos (`OrdenTurnos.ocupaLugar`, en `comun/orden-turnos.js`): el **tótem y el
+estandarte no** (ni con «Traer tokens», ni con «🎲 Tirar iniciativa de los creeps», ni con Ordenar, ▶ Siguiente, ▶ Iniciar combate o ⏭ Pasar de
+ronda); los **personajes, las invocaciones, los creeps y los tokens sueltos sí**. Quedaron elegidas estas cosas, todas cambiables:
+1. **Los tokens sueltos siguen entrando** (un NPC puede jugar; un cofre no). Hasta que llegue el «Token suelto paso a paso» con su «¿Ocupa lugar en
+   la iniciativa? Sí / No» (en cola), el GM saca a mano con ✕ el que no juega. Ojo: un token suelto del GM cuenta como creep, así que «🎲 Tirar
+   iniciativa de los creeps» lo nombra en «Sin datos de: …» (no tiene nada que tirar) y el número se escribe a mano. ¿Preferís que mientras
+   tanto no entren y se sumen a mano?
+2. **Sumar a mano algo que la regla deja afuera**: hoy el orden de turnos no tiene un botón para agregar una fila suelta (las filas salen de «Traer
+   tokens»). La regla ya mira un campo del token (`iniciativa: sí / no`) que es el que va a usar el token suelto paso a paso, pero nada lo escribe
+   todavía. ¿Querés un «➕ Sumar al orden de turnos» en el menú del token (para el GM), por si alguna vez un tótem tiene que jugar?
+3. **Un orden armado antes del arreglo** con el tótem o el estandarte adentro: siguen viéndose en la lista hasta que el GM toca Traer tokens u
+   Ordenar (ahí salen); mientras tanto Tirar no les tira y ▶ Siguiente los saltea sin darles turno (ni inicio ni fin de turno). ¿Está bien?
+4. **El Ojo de Kicillof** (la invocación que solo observa) sí entra: se mueve en su turno. ¿Lo dejamos adentro?

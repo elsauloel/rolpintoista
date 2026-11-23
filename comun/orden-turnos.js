@@ -103,6 +103,21 @@ const OrdenTurnos = (() => {
     if(orden[base]) ya.add(orden[base].id);
     return orden.slice(base + 1).filter(x => x && !ya.has(x.id) && !(fuera && fuera(x.id)));
   }
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda};
+  /* 🎲 ¿Este token ocupa lugar en la iniciativa? (2026-11-23, dueño: «acabo de probar "tirar iniciativa" y metió al tótem y al estandarte. No
+     deberían ir»). LA regla de todos los caminos automáticos del orden de turnos (Traer tokens, 🎲 Tirar iniciativa de los creeps, Ordenar,
+     ▶ Siguiente, las invocaciones y los refuerzos que entran solos). `t` = el token; `pub` = lo público de su ficha o de su creep (el vínculo).
+     1. Si el token lo dice (`t.iniciativa` true / false), manda eso: es el campo que va a llevar el token suelto paso a paso («¿Ocupa lugar en
+        la iniciativa? Sí / No», en cola) y la forma de que el GM sume a mano algo que la regla deja afuera.
+     2. Un objeto inerte no: el Estandarte de guerra y el Tótem de silencio (un creep cuyo público trae `estandarteRadio`, vtt-hexgrid/js/73).
+     3. Una trampa no (hoy las trampas son elementos, no tokens: queda por las dudas).
+     4. Todo lo demás sí: personajes, invocaciones, creeps y tokens sueltos (P291). */
+  function ocupaLugar(t, pub){
+    if(!t) return false;
+    if(t.iniciativa === true || t.iniciativa === false) return t.iniciativa;
+    if(t.trampa) return false;
+    if(t.tipo === 'creep' && pub && Math.round(num(pub.estandarteRadio)) > 0) return false;
+    return true;
+  }
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

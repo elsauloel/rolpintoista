@@ -12,8 +12,9 @@ function prisaUidDe(t){
 }
 
 // El botón Ordenar (js/04): de mayor a menor por la tirada; deja listo el «▶ Iniciar combate» (OrdenTurnos.marcasAlOrdenar) y avisa los puestos.
+// Lo que no ocupa lugar (un tótem o un estandarte que quedó de un orden viejo: OrdenTurnos.ocupaLugar, 2026-11-23) sale de la lista.
 function iniciativaOrdenar(){
-  const orden = ordenarIniciativa(iniciativa.orden);
+  const orden = ordenarIniciativa(iniciativa.orden.filter(o => iniciativaOcupaLugar(o.id)));
   guardarIniciativa({orden, turno: 0, libre: null, ...OrdenTurnos.marcasAlOrdenar(iniciativa, modoMapa)}).then(ok => { if(ok) iniciativaAvisarPuestos(orden); });
 }
 

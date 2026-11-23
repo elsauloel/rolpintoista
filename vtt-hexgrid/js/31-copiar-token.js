@@ -115,6 +115,7 @@ function llamarRefuerzos(sc, h){
 // El refuerzo entra al orden de turnos justo detrás de quien lo llamó, con su misma iniciativa (si hay orden y quien llamó está en él).
 async function refuerzoAlOrden(idQuienLlama, idNuevo){
   if(!idNuevo || !soyGM || typeof iniciativa === 'undefined' || !iniciativa.orden.length) return;
+  if(typeof iniciativaOcupaLugar === 'function' && tokens.has(idNuevo) && !iniciativaOcupaLugar(idNuevo)) return;   // 🎲 (2026-11-23) lo que no ocupa lugar, no entra
   const k = iniciativa.orden.findIndex(x => x.id === idQuienLlama);
   if(k < 0) return;
   const orden = iniciativa.orden.slice();

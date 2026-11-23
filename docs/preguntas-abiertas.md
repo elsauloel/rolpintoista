@@ -2451,7 +2451,12 @@ baúl avisen y dejen seguir, como el 🎁 Dar) y poner la cuenta en el cartel: �
 máxima es 8».
 **Recomendación de Claude: (a)**, por simple y porque usa la Fuerza («lo que no entra lo llevás colgado»). Mientras, queda como está.
 
-### P313 — ⚖ Lo que quedó elegido «mientras tanto» al programar el sobrepeso con la mochila (2026-11-23, Claude, cola de programación, de P312)
+### ✅ P313 — ⚖ Lo que quedó elegido «mientras tanto» al programar el sobrepeso con la mochila (2026-11-23, Claude, cola de programación, de P312)
+
+**Decidido (dueño, 2026-11-23)** — **cambio de opinión sobre P312**: si en medio del combate cambia el número de iniciativa (por el sobrepeso) y eso
+moviera a alguien en la tabla, **el reacomodo se hace al pasar de ronda, no en el momento** (el número se ajusta en el momento; el orden, en la
+ronda siguiente). Con eso el punto 1 ya no hace falta. **2:** el cartel sale solo en la pantalla donde se hizo el cambio. **3:** sí, cartel
+«ya no tenés sobrepeso» cuando se va. **4:** bien como quedó (el número escrito a mano ya viene con el sobrepeso restado).
 
 1. **«Ya jugó: no vuelve a jugar»**: cuando el sobrepeso le baja el número a alguien que ya jugó y queda después de quien tiene el turno, se lo anota
    como que ya jugó (como un ▼ del GM). Al llegarle de nuevo en la ronda, el mapa le pregunta al GM lo de siempre, «🔁 Le vuelve a tocar: ¿vuelve a

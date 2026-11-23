@@ -2210,11 +2210,15 @@ ronda 1 (P271). Quedaron elegidas estas cosas, todas cambiables:
    la ronda 2»), para que sirva igual a quien lo ve desde otra pantalla. ¿Te gusta así o preferís «te moviste»?
 
 ### P294 — 🔥 La Varita del muro de fuego ahora también quema al CRUZARLO (2026-11-23, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** «está bien, le pega a quien lo atraviesa».
 Para que la varita haga lo mismo que el Muro de fuego (y diga «al entrar o cruzarlo»), su muro ahora pega también a quien lo atraviesa de paso
 sin terminar adentro (antes, solo a quien terminaba el movimiento encima). Es lo mismo que hace la habilidad. ¿Está bien, o la varita (más barata,
 1d4) solo al terminar adentro?
 
 ### P295 — 🔥 Otras zonas que pegan «en cada Mantenimiento» a quien sigue adentro: ¿también al empezar su turno? (2026-11-23, Claude)
+
+> ✅ **Respondida (dueño, 2026-11-23):** «habría que verlas una por una… agruparlas de a dos; en una ronda vemos dos, en otra dos, y así». En la cola, de a dos.
 Con orden de turnos, el Muro de fuego y la Varita del muro de fuego ya pegan al empezar el turno de quien está encima. Estas siguen pegando a todos a
 la vez al pasar de ronda (no se tocaron):
 1. **Con daño**: Varita de la fogata (fuego), Varita del chorro de lava (fuego), Varita de miasma (tóxico + Veneno), Pedos Tóxicos (un duelo por

@@ -2131,6 +2131,8 @@ uno hay que verlo); el daño de colisión. En la prueba de P263, Blanco J2 (Sigi
 3. ¿Delatarse = se sabe dónde está (como ahora: se le saca el sigilo) o solo un «?» en esa casilla, como cuando entra en sigilo a la vista?
 
 ### P289 — 📺 La tele en todos los teletransportes: lo que quedó elegido (2026-11-23, Claude)
+
+> ✅ **Punto 1 decidido (dueño, 2026-11-23):** los círculos de luz del teletransporte «que queden», junto con la tele. El punto 3 («reducir movimiento») queda para verlo en la compu.
 Ahora todo teletransporte de un token se apaga como un televisor viejo donde estaba y se prende donde llega (el Portal trampa, el Glifo de
 teletransporte, la Varita del portal, Invocar portal, la Trampa de teleport), como el Parpadeo. Quedaron elegidas estas cosas, todas cambiables:
 1. **Los pulsos se quedan además de la tele**: los círculos violeta (donde entró) y azul (donde salió) con el hilo punteado, ~4 s. La tele dice «se

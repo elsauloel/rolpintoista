@@ -110,7 +110,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
-> - [ ] **📺 Mirar los círculos de luz del teletransporte, junto con la tele** (dueño, 2026-11-23, P289 punto 1: «anotalo para revisar en la compu»).
+> - [x] (2026-11-23, dueño: «que queden») **📺 Mirar los círculos de luz del teletransporte, junto con la tele** (dueño, 2026-11-23, P289 punto 1: «anotalo para revisar en la compu»).
 >   Hoy, al teletransportarse, además de la tele salen dos círculos que laten (violeta donde se fue, azul donde llega) con un hilo punteado entre los
 >   dos. Verlo en pantalla y decidir si se quedan o va solo la tele.
 > - [ ] **🐢 Mirar los círculos con «reducir movimiento»** (dueño, 2026-11-23, P289 punto 3: «no lo entiendo bien, anotalo para ver en la compu»).

@@ -2098,6 +2098,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
   rival se le nombra en el cartel del daño de una zona.
 
+- **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
+  23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

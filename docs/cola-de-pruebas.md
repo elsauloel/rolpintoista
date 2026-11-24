@@ -2082,7 +2082,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Probabilidad de golpe.» (el texto está pensado para cuando dice «PdG»). La varita de niebla no se probó (la entrada pedía una de las dos).
   El estandarte y la nube se borraron y el creep quedó como estaba.
 
-- **🟡 caso mostrado (2026-11-24), esperando la decisión del dueño — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
+- **⬜ en cola (decidido por el dueño el 2026-11-24, a programar) — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
   silencio como un estado la pondría para revisar al final, porque técnicamente el silencio es un estado, pero lo revisamos en contexto más
   tarde»). Hoy, en «Ver detalle», las filas de nombres («De quién es», «Con qué se puso») no se marcan, así que «Tótem de silencio» no muestra
   el globo del estado Silencio. Mostrarle el caso y decidir juntos.
@@ -2098,6 +2098,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de nombres (el globo saldría también en un creep o una habilidad que se llame como un término). **Recomendación de Claude: (a)** —o (b) si
   querés el globo—; (c) no, porque diría que el tótem pone un estado que no pone. Para decidir aparte: si el tótem debería respetar
   «Inmune a controles mentales» como el estado.
+  **Decidido (dueño, 2026-11-24):** «técnicamente mientras estás en el efecto [del tótem], sí te tiene que aparecer el estado de silencio. Y cuando
+  te vas, se te va el estado de silencio. Entonces ahí también se resuelve lo de la inmunidad del control mental». O sea: el aura del Tótem de
+  silencio le pone el estado Silencio (el de verdad, el del glosario) a los rivales mientras están adentro y se lo saca al salir (o al romperse
+  el tótem); con eso «Inmune a controles mentales» lo frena como al estado.
 - **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
   (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
 - **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
@@ -2263,9 +2267,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      mochilas.
   3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
      frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
-- **✅ hecho (2026-11-24: se le explicó; más piezas que la den → lista de diseño; «Ver detalle» ya no la nombra) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
+- **⬜ en cola (2026-11-24: explicado; más piezas → lista de diseño; «Ver detalle» ya no la nombra; QUEDA lo de abajo) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
   rival se le nombra en el cartel del daño de una zona.
 
+  **Pendiente (dueño, 2026-11-24):** «en la prueba del muro de fuego decía que la suela lo frenaba, y el muro de fuego es suelo y aire, así que
+  técnicamente la suela gruesa no debería frenarlo». Hoy el mapa resta la Suela gruesa también en las zonas de «piso y aire» (`frenoDe`, y el
+  cartel «su Suela gruesa N»): que solo la reste en lo que es solo del piso.
 - **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
   23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
 

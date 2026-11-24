@@ -2397,8 +2397,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   devolvió el inventario de J1, sin orden de turnos y en narrativo. 5 pruebas automáticas nuevas o cambiadas (1043). Duda: P293.
 - **➡ pasó a la lista de diseño (dueño, 2026-11-24), junto al catálogo — Probar: 🎯 la Apuntada firme con clics** (2026-11-23, P271): las dos ballestas con firme (de mira, de vigía) están archivadas; misma
   pieza que la simple (pruebas automáticas), sin clics.
-- **⬜ en cola — Probar: 🎯 el aviso de la Apuntada antes de una habilidad que mueve (Dash, Salto, Carga, Takle, Parpadeo)** (2026-11-23, P271):
+- **✅ hecho (2026-11-24) — Probar: 🎯 el aviso de la Apuntada antes de una habilidad que mueve (Dash, Salto, Carga, Takle, Parpadeo)** (2026-11-23, P271):
   sale por la misma función que el del anillo (prueba automática); con clics solo se probó caminar.
+  *Resultado:* **probado con clics** en «Claude · pruebas 2» (Jugador 1 y GM), con la Ballesta de guerra (Apuntada +2) en la mano de Blanco J1, el
+  orden de turnos en la ronda 3 y la Apuntada activa, todo armado por datos; las habilidades, dadas por datos: el Dash del Asalto y un Salto, un
+  Parpadeo y un Takle de personaje hechos como los de los creeps. Con las cuatro, al tocar «Ejecutar» sale primero, antes de cobrar y de moverse,
+  «🎯 Apuntada — Tenés Apuntada activa (+2 a PdG). Si te movés con Dash, la perdés. [Usarla igual] [Cancelar]» (el botón dice «Usarla igual», como
+  el del anillo antes de una habilidad, P273). **Cancelar**: no se mueve, no gasta No2 ni SP y la Apuntada sigue (en las dos pantallas). **Usarla
+  igual**: cobra, se mueve (el Dash hasta atravesar a un creep, el Salto 2, el Parpadeo 2, el Takle corre 2 hasta quedar pegado) y la Apuntada se
+  apaga en las dos pantallas (en el duelo del Dash: «🎯 Apuntada +2: no suma — se movió en esta ronda»). **Alejándose de un rival pegado** (el Salto
+  y el Parpadeo, con Blanco creep al lado): primero el aviso y, recién después de «Usarla igual», al GM le llega «Sin ataque de oportunidad: … se
+  alejó de Blanco creep con Salto / Parpadeo» (estas habilidades no dan oportunidad). La Carga que derriba es solo de creeps (la Carga y el Takle
+  de la clase no mueven el token): no se probó. Nada que arreglar. Al final se devolvió el equipo y las habilidades de J1, sus No2 y SP, las
+  posiciones y el giro, sin orden de turnos y en narrativo. Capturas (fuera del repo): `cola106/1-J1-Dash-aviso-antes-de-moverse.png`,
+  `cola106/4-J1-Salto-usado-sin-Apuntada.png`, `cola106/5-GM-Salto-sin-oportunidad.png`, y el aviso del Salto, el Parpadeo y el Takle. Duda: P330.
 - **⬜ en cola — Probar: 🎯 la Apuntada en un creep y en una invocación con ballesta** (2026-11-23, P271): el creep la toma de su arma en la mano
   (solo la pantalla del GM), la invocación del resumen de la ficha; con clics solo se probó un personaje.
 - **⬜ en cola — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo

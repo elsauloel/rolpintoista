@@ -2724,3 +2724,9 @@ Al hacer P292 (la vida de un creep no baja de 0 en GM Tools) se revisó la ficha
 `fijarHp`). La de una **invocación** sí puede: en su tarjeta de la ficha, el recuadro de HP acepta un número negativo escrito a mano (por ejemplo −5)
 y queda así. Lo demás (daño, estados, Pasar de ronda) ya la corta en 0. ¿Hacemos que el recuadro de una invocación también quede en 0 (con el mismo
 aviso que el de un creep), o lo dejamos como está porque es escrito a mano?
+
+### P330 — 🌀 El paso del Remolino, ¿apaga la Apuntada? (2026-11-24, Claude)
+Probando el aviso de la Apuntada antes de una habilidad que mueve (cola de pruebas, P271): el Dash, el Salto, el Parpadeo y el Takle avisan y la
+apagan. El **Remolino** (que deja moverte 1 casilla gratis antes de girar) no avisa y **no la apaga**: ese paso no cuenta como «se movió», ni para la
+Apuntada ni para Puntería certera o Foco. ¿Queda así (es un paso chiquito, parte del giro), o el paso del Remolino tendría que contar como moverse
+(con el aviso antes, como las otras)?

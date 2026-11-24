@@ -2328,6 +2328,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     (volvió a quedar afuera). El Jugador 1 no ve ➕ ni ➖ en su «⋯». Pruebas automáticas: 1116 en verde (+2).
   - Capturas (fuera del repo): `cola101/1-GM-totem-menu-sumar-al-orden.png`, `cola101/5-GM-saco-a-J2-en-su-turno-le-toca-al-totem.png`.
   - Partida como estaba: narrativo, sin orden de turnos, sin el tótem ni el Cofre, Blanco creep igual que antes.
+  - ✅ **Ajuste por P328 (2026-11-24):** sin el «➖ Sacar del orden» en el token (se saca con la ✕ de la tabla). La ✕, si saca al que tiene el turno,
+    termina su turno y empieza el del siguiente con su «Empieza el turno» (antes no), con «➖ X sale del orden de turnos (lo sacó el GM)» en la Mesa (sin
+    línea si los jugadores no lo ven), y lo deja afuera: «Traer tokens» no lo vuelve a traer hasta que el GM lo sume con ➕ (o se vacíe el orden: Limpiar
+    o el fin del combate). **Con clics:** el «⋯» de J2 (en el orden) ya no tiene ➕ ni ➖; ✕ a J2 en su turno → «Empieza el turno de Blanco creep»;
+    Traer tokens trajo a todos menos a J2; ➕ a J2 → volvió a entrar. Pruebas automáticas: 1116 en verde. Captura:
+    `cola102/1-GM-la-X-saca-a-J2-en-su-turno-y-empieza-el-del-creep.png`. Partida como estaba.
 
 - **⬜ en cola — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
   activo, primero sale «Si te movés, lo perdés. [Moverme igual] [Cancelar]» y recién si confirma se le ofrece al rival el ataque de oportunidad.
@@ -2485,6 +2491,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola — 🐝 Invocación cuyo lugar ya pasó: juega igual al final de esta ronda (P301 decidida, b)** (dueño, 2026-11-23): si al
   invocarse su tirada la ubica en un lugar que ya pasó en esta ronda, en esta ronda juega igual al final, y desde la próxima en su lugar.
+  **Lo mismo para lo sumado a mano** con el ➕ del token (P328 2, dueño, 2026-11-24): hoy usa el mismo `OrdenTurnos.entrarConTirada`
+  (`vtt-hexgrid/js/136`), así que alcanza con cambiarlo ahí; revisar que la línea de la Mesa del ➕ deje de decir «juega desde la próxima».
 - **⬜ en cola — 📦 Atacar a un objeto: sin crítico (P306 decidida, b)** (dueño, 2026-11-23): contra un token suelto con vida no hay crítico.
 - **⬜ en cola — 📦 Objeto en 0 de vida: aviso a quien lo puso para que lo saque (P307 decidida, d)** (dueño, 2026-11-23).
 - **⬜ en cola — 📦 Un token suelto sin vida no se puede atacar** (dueño, 2026-11-23: «no se debería poder atacar un token suelto»; sobre el

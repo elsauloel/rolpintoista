@@ -1055,6 +1055,9 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   (`OrdenTurnos.campoAlSumar`; solo en un creep o un token sin ficha: las reglas). Sacar (`ordenSacarAMano`): `temporalFueraDelOrden` (js/54: si era su
   turno, pasa al siguiente con su inicio) y, si tenía la marca, `iniciativa: false` (`campoAlSacar`). Línea en la Mesa (`ordenDondeQueda`, js/04) salvo
   que los jugadores no lo vean (`ordenManoPublico`). Dudas: P328. Probado con clics en «Claude · pruebas 2».
+  **Desde P328 (2026-11-24) no hay ➖ en el token**: se saca con la ✕ de la fila (`ordenSacarDeTabla`, js/136, sin confirmación): `temporalFueraDelOrden`
+  (si era su turno, empieza el del siguiente de verdad), la línea de la Mesa y `iniciativa.sacados` (`OrdenTurnos.sacado/conSacado/sinSacado`):
+  `iniciativaPonerTodos` (Traer tokens) no los trae; el ➕ lo saca de la lista; Limpiar (`sacados: []`) y el fin del combate (`limpiarIniciativa`) la vacían.
 - **🐝 Una invocación entra al orden con su tirada** (2026-11-23, dueño, P275): `invocacionAlOrden` (js/04, la pantalla del GM al aparecer el token de una
   invocación con el orden armado) tira su Iniciativa (`invocacionIniciativa`: `bnCargarPiezas` + `invDeToken` + `InvCalculo.statValor(x, 'ini')` +
   `Combatiente.conIniFijo`), la publica en la Mesa («Iniciativa · <invocación>», salvo oculta) y la ubica con `OrdenTurnos.entrarConTirada` (si su lugar ya

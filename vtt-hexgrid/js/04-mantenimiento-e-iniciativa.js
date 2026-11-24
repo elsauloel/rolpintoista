@@ -238,6 +238,7 @@ function escucharIniciativa(){
       // 💍 Quién se movió en cada ronda (2026-11-20, comun/quieto.js + js/126): {tokenId: [rondas]}. Lo anota la pantalla que mueve al token.
       movidos: d.movidos && typeof d.movidos === 'object' ? d.movidos : {},
       // ▶ Iniciar combate (2026-11-20, comun/orden-turnos.js): se ordenó y falta empezar / ya empezó.
+      sacados: Array.isArray(d.sacados) ? d.sacados.map(String).slice(-200) : [],   // ✕ lo que el GM sacó de la tabla: Traer tokens no lo trae (js/136, P328)
       porIniciar: d.porIniciar === true, iniciado: d.iniciado === true ? true : d.iniciado === false ? false : null,   // (null: un orden de antes de este botón)
     };
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda || (iniciativa.iniciado === true && !antesIniciado);   // (iniciar el combate también anuncia de quién es el turno)
@@ -273,6 +274,7 @@ async function guardarIniciativa(cambios){
     ordenPendientes: iniciativa.ordenPendientes || [], mufas: iniciativa.mufas || {}, ...(iniciativa.ordenUsados ? {ordenUsados: iniciativa.ordenUsados} : {}),   // (js/102)
     ...(iniciativa.porIniciar ? {porIniciar: true} : {}), ...(typeof iniciativa.iniciado === 'boolean' ? {iniciado: iniciativa.iniciado} : {}),   // ▶ Iniciar combate
     ...((iniciativa.reubicar || []).length ? {reubicar: iniciativa.reubicar} : {}),   // ⚖ js/132
+    ...((iniciativa.sacados || []).length ? {sacados: iniciativa.sacados} : {}),   // ✕ js/136 (P328)
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -285,6 +287,7 @@ async function guardarIniciativa(cambios){
   if(!datos.termino) delete datos.termino;
   if(!datos.ordenUsados) delete datos.ordenUsados;
   if(!(Array.isArray(datos.reubicar) && datos.reubicar.length)) delete datos.reubicar;
+  if(!(Array.isArray(datos.sacados) && datos.sacados.length)) delete datos.sacados;
   if(Array.isArray(datos.orden)) datos.orden = ordenSerial(datos.orden);   // (las filas en memoria traen `oculto: false`; ⚖ conserva `sobre`)   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
@@ -306,10 +309,11 @@ function ordenarIniciativa(lista){
 // 🎲 ¿Ese token ocupa lugar en el orden de turnos? (2026-11-23: la regla es una sola, OrdenTurnos.ocupaLugar — el tótem y el estandarte no). Un
 // id que ya no tiene token, sí (se ve «(token borrado)», como siempre).
 function iniciativaOcupaLugar(id){ const t = tokens.get(id); return !t || OrdenTurnos.ocupaLugar(t, vinculo(t)); }
-// Traer tokens: todos los del mapa que ocupan lugar (los que no, como el tótem o el estandarte, se quedan afuera y, si estaban, salen).
+// Traer tokens: todos los del mapa que ocupan lugar (los que no, como el tótem o el estandarte, se quedan afuera y, si estaban, salen). Lo que el GM
+// sacó con la ✕ tampoco (P328: queda afuera hasta que lo sume con ➕ o se vacíe el orden).
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
-  const lista = [...tokens.keys()].filter(iniciativaOcupaLugar).map(id => ({...(previos.get(id) || {}), id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
+  const lista = [...tokens.keys()].filter(id => iniciativaOcupaLugar(id) && !OrdenTurnos.sacado(iniciativa, id)).map(id => ({...(previos.get(id) || {}), id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
   guardarIniciativa({orden: ordenSerial(ordenarIniciativa(lista)), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});   // (`iniciado` se conserva: sumar un token a mitad de combate no vuelve a ofrecer «Iniciar combate»)
 }
 
@@ -1424,10 +1428,8 @@ function conectarIniciativa(){
     const orden = iniciativa.orden.map(o => o.id === b.dataset.iniOcultar ? {...o, oculto: !o.oculto} : o);
     guardarIniciativa({orden});
   });
-  caja.querySelectorAll('[data-ini-quitar]').forEach(b => b.onclick = () => {
-    const orden = iniciativa.orden.filter(o => o.id !== b.dataset.iniQuitar);
-    guardarIniciativa({orden, turno: Math.min(iniciativa.turno, Math.max(0, orden.length - 1))});
-  });
+  // ✕ (2026-11-24, P328): si era su turno, termina y empieza el del siguiente; queda afuera para Traer tokens; línea en la Mesa (js/136).
+  caja.querySelectorAll('[data-ini-quitar]').forEach(b => b.onclick = () => ordenSacarDeTabla(b.dataset.iniQuitar));
   const traer = $('#ini-traer');
   if(traer) traer.onclick = iniciativaPonerTodos;
   const ordenar = $('#ini-ordenar');
@@ -1439,7 +1441,7 @@ function conectarIniciativa(){
   const iniciar = $('#ini-iniciar');
   if(iniciar) iniciar.onclick = () => iniciativaIniciarCombate();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, reubicar: [], ...OrdenTurnos.SIN_INICIAR}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, reubicar: [], sacados: [], ...OrdenTurnos.SIN_INICIAR}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

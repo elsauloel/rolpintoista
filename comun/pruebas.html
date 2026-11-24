@@ -84,7 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261124c80"></script>
-<script src="orden-turnos.js?v=20261124orden1"></script>
+<script src="orden-turnos.js?v=20261124orden2"></script>
 <script src="ficha-mantenimiento.js?v=20261124finT"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2877,7 +2877,7 @@ prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estand
 prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, ▶ Siguiente, Iniciar combate, invocaciones y refuerzos (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t86 = await leer('86-prisa.js'), t31 = await leer('31-copiar-token.js');
-  cierto(/OrdenTurnos\.ocupaLugar\(t, vinculo\(t\)\)/.test(t04) && /\[\.\.\.tokens\.keys\(\)\]\.filter\(iniciativaOcupaLugar\)/.test(t04), 'Traer tokens');
+  cierto(/OrdenTurnos\.ocupaLugar\(t, vinculo\(t\)\)/.test(t04) && /\[\.\.\.tokens\.keys\(\)\]\.filter\(id => iniciativaOcupaLugar\(id\) && !OrdenTurnos\.sacado\(iniciativa, id\)\)/.test(t04), 'Traer tokens');
   cierto(/enLista\.has\(id\) && OrdenTurnos\.ocupaLugar\(t, vinculo\(t\)\)/.test(t04), 'Tirar iniciativa');
   cierto(/if\(!iniciativaOcupaLugar\(orden\[i\]\.id\)\) continue;/.test(t04), '▶ Siguiente');
   cierto(/OrdenTurnos\.primero\(orden, id => iniciativaFueraDeJuego\(id\) \|\| !iniciativaOcupaLugar\(id\)\)/.test(t04), 'Iniciar combate');
@@ -2910,15 +2910,21 @@ prueba('➕➖ Sumar o sacar a mano del orden de turnos (2026-11-24, P291): la m
   igual([O.campoAlSacar(pj), O.campoAlSacar(creep), O.campoAlSacar({...totem, iniciativa: true}), O.campoAlSacar(sueltoSi), O.campoAlSacar(sueltoNo), O.campoAlSacar(null)],
     [null, null, false, false, null, null]);
   igual(['12', ' 7 ', '-1', '+3', '7,5', '0', '', 'doce', '1d6', null, undefined].map(O.numeroAMano), [12, 7, -1, 3, 7.5, 0, null, null, null, null, null]);
+  // ✕ lo que el GM saca de la tabla queda afuera para Traer tokens (P328)
+  const ini = {sacados: ['a']};
+  igual([O.sacado(ini, 'a'), O.sacado(ini, 'b'), O.sacado({}, 'a'), O.conSacado(ini, 'b'), O.conSacado(ini, 'a'), O.sinSacado(ini, 'a'), O.sinSacado({}, 'a'), O.conSacado(null, 'x')],
+    [true, false, false, ['a', 'b'], ['a'], [], [], ['x']]);
 });
-prueba('➕➖ el mapa: los botones en el «⋯» del GM, entra con entrarConTirada y sale con temporalFueraDelOrden (2026-11-24, P291)', async () => {
+prueba('➕✕ el mapa: el ➕ en el «⋯» del GM, entra con entrarConTirada; la ✕ de la tabla saca con temporalFueraDelOrden y lo deja afuera (2026-11-24, P291, P328)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
-  const [t136, t10, html] = await Promise.all(['js/136-sumar-al-orden.js', 'js/10-hud-y-vida.js', 'mapa.html'].map(leer));
+  const [t136, t10, html, t04] = await Promise.all(['js/136-sumar-al-orden.js', 'js/10-hud-y-vida.js', 'mapa.html', 'js/04-mantenimiento-e-iniciativa.js'].map(leer));
   cierto(/js\/136-sumar-al-orden\.js\?v=/.test(html), 'mapa.html lo carga');
-  cierto(/ordenManoPuede\(t\) \? \(ordenManoEsta\(seleccion\)/.test(t10) && /clave === 'orden-sumar'/.test(t10) && /clave === 'orden-sacar'/.test(t10), 'los dos botones del ⋯');
+  cierto(/ordenManoPuede\(t\) && !ordenManoEsta\(seleccion\)/.test(t10) && /clave === 'orden-sumar'/.test(t10) && !/orden-sacar/.test(t10), 'el ➕ en el ⋯, sin ➖ (P328: se saca desde la tabla)');
   cierto(/return !!t && soyGM && !pausaSoloMirar\(\)/.test(t136), 'solo el GM');
   cierto(/OrdenTurnos\.entrarConTirada\(iniciativa, \{id, valor\}/.test(t136) && /OrdenTurnos\.campoAlSumar\(t, vinculo\(t\)\) === true && !\(await ordenManoMarcar\(id, true\)\)/.test(t136), 'entra en su lugar, con la marca si la regla lo deja afuera');
   cierto(/await temporalFueraDelOrden\(id\);/.test(t136) && /OrdenTurnos\.campoAlSacar\(/.test(t136), 'sale como una invocación que se va (si era su turno, pasa al siguiente)');
+  cierto(/\[data-ini-quitar\]'\)\.forEach\(b => b\.onclick = \(\) => ordenSacarDeTabla\(b\.dataset\.iniQuitar\)\)/.test(t04) && /iniciativa\.sacados = OrdenTurnos\.conSacado\(iniciativa, id\)/.test(t136), 'la ✕ de la tabla saca así y lo deja afuera (P328)');
+  cierto(/sacados: OrdenTurnos\.sinSacado\(iniciativa, id\)/.test(t136) && /reubicar: \[\], sacados: \[\],/.test(t04) && /sacados: Array\.isArray\(d\.sacados\)/.test(t04) && /\{sacados: iniciativa\.sacados\}/.test(t04), 'el ➕ lo vuelve a dejar entrar; Limpiar vacía la lista; se lee y se guarda');
   cierto(/mesaLinea\(linea, 'recordatorio'\)/.test(t136) && /ordenManoPublico\(id\)/.test(t136), 'la línea de la Mesa, sin nombrar lo que no se ve');
 });
 prueba('⚖ El sobrepeso cambia en combate: el número se ajusta en el momento y el orden recién al pasar de ronda (2026-11-23, P312 y P313)', () => {

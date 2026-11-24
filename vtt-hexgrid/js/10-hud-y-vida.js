@@ -113,10 +113,10 @@ function hudHtml(t){
     (!pausaSoloMirar() && typeof pactoPuedeQuitar === 'function' && pactoPuedeQuitar(t) ? icono('pacto-quitar', '🕊', 'Quitar el Pacto (está activo)') : '') +
     // 🤝 Dar un ítem, DDE o despojos (2026-11-21, dueño; 🎁 → 🤝 el 2026-11-23, P278: el 🎁 queda solo para el botín): el GM, sobre el token de un personaje (js/128, comun/dar-jugador.js).
     (!pausaSoloMirar() && typeof darJugadorPuede === 'function' && darJugadorPuede(t) ? icono('dar', '🤝', 'Dar un ítem (o DDE, o despojos): le entra directo a la mochila y le salta un cartel') : '') +
-    // ➕➖ Sumar o sacar a mano del orden de turnos (2026-11-24, dueño, P291): el GM, con el orden armado (js/136).
-    (typeof ordenManoPuede === 'function' && ordenManoPuede(t) ? (ordenManoEsta(seleccion)
-      ? icono('orden-sacar', '➖', 'Sacar del orden de turnos (si es su turno, termina y le toca al siguiente)')
-      : icono('orden-sumar', '➕', 'Sumar al orden de turnos: pide el número de iniciativa (o lo tira) y entra en su lugar, aunque sea un tótem o un objeto')) : '') +
+    // ➕ Sumar a mano al orden de turnos (2026-11-24, dueño, P291): el GM, con el orden armado y si no está (js/136). Para sacarlo, la ✕ de la tabla
+    // (P328: «hay muchos botones alrededor del token»).
+    (typeof ordenManoPuede === 'function' && ordenManoPuede(t) && !ordenManoEsta(seleccion)
+      ? icono('orden-sumar', '➕', 'Sumar al orden de turnos: pide el número de iniciativa (o lo tira) y entra en su lugar, aunque sea un tótem o un objeto') : '') +
     '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
@@ -1230,7 +1230,7 @@ function hudUbicar(){
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
   // (2026-11-21: también quién puede tocar la vida y los estados — al tomar o devolver 🎮 el control el HUD quedaba con los círculos como estaban,
   // apagados para el GM y prendidos para el jugador, hasta que cambiara otra cosa.)
-  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion, puedoCambiarVida(t), puedoCambiarEstados(t), soyGM && iniciativa.orden.length ? iniciativa.orden.some(o => o.id === seleccion) : null]);   // (➕➖ js/136: el botón cambia al entrar o salir del orden)
+  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion, puedoCambiarVida(t), puedoCambiarEstados(t), soyGM && iniciativa.orden.length ? iniciativa.orden.some(o => o.id === seleccion) : null]);   // (➕ js/136: el botón se va al entrar al orden y vuelve al salir)
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);
@@ -1395,7 +1395,6 @@ function hudConectar(t){
     if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
     if(clave === 'dar'){ if(typeof darJugadorAbrir === 'function') darJugadorAbrir(t); return; }   // 🤝 (js/128)
     if(clave === 'orden-sumar'){ if(typeof ordenSumarAMano === 'function') ordenSumarAMano(seleccion); return; }   // ➕ (js/136)
-    if(clave === 'orden-sacar'){ if(typeof ordenSacarAMano === 'function') ordenSacarAMano(seleccion); return; }   // ➖ (js/136)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';

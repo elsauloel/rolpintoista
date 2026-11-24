@@ -204,7 +204,14 @@ const OrdenTurnos = (() => {
     if(!/^[+-]?\d+(\.\d+)?$/.test(x)) return null;
     return Number(x);
   }
+  /* ✕ Lo que el GM saca de la tabla queda afuera (2026-11-24, dueño, P328 4): `ini.sacados` = los ids que sacó a mano; «Traer tokens» no los vuelve
+     a traer hasta que el GM los sume con ➕ (o se vacíe el orden: Limpiar o el fin del combate). Funciones puras.
+     · sacado(ini, id) → ¿lo sacó el GM? · conSacado(ini, id) / sinSacado(ini, id) → la lista nueva. */
+  const sacadosDe = ini => ini && Array.isArray(ini.sacados) ? ini.sacados.map(String) : [];
+  const sacado = (ini, id) => sacadosDe(ini).includes(String(id));
+  const conSacado = (ini, id) => [...new Set([...sacadosDe(ini), String(id)])].slice(-200);
+  const sinSacado = (ini, id) => sacadosDe(ini).filter(x => x !== String(id));
   return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, cambiarValor, reubicarAlEmpezar,
-    MAREO_HASTA, mareoHasta, esMareoHasta, mareoSeVa, campoAlSumar, campoAlSacar, numeroAMano};
+    MAREO_HASTA, mareoHasta, esMareoHasta, mareoSeVa, campoAlSumar, campoAlSacar, numeroAMano, sacado, conSacado, sinSacado};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

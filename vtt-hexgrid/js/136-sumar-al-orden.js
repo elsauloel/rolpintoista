@@ -1,14 +1,12 @@
 /* =========================================================
-   ➕➖ SUMAR O SACAR A MANO UN TOKEN DEL ORDEN DE TURNOS (2026-11-24, dueño, P291: «sí, quiero que lo hagas»).
+   ➕ SUMAR A MANO UN TOKEN AL ORDEN DE TURNOS (2026-11-24, dueño, P291: «sí, quiero que lo hagas») y ✕ SACARLO DE LA TABLA (P328).
    En el menú «⋯» del token (js/10), solo el GM y con el orden de turnos armado:
    · «➕ Sumar al orden de turnos» si el token no está. Vale aunque la regla diga que no ocupa lugar (un tótem, un estandarte, un token suelto con «No»):
      se le escribe `iniciativa: true` (OrdenTurnos.campoAlSumar) para que Ordenar, Traer tokens y ▶ Siguiente lo respeten. Pide el número: si tiene
      datos (personaje, invocación o creep), «🎲 Tirar su Iniciativa» (como «🎲 Tirar iniciativa») o «✍ Escribir el número»; sin datos (un token suelto),
      directo el número. Entra en su lugar con OrdenTurnos.entrarConTirada (lo mismo que una invocación: antes del primero que sacó menos; si su lugar ya
      pasó en esta ronda, juega desde la próxima, P301). Sin Mareo de invocación (no está entrando sola: la mete el GM). Una línea en la Mesa.
-   · «➖ Sacar del orden» si ya está: sale con temporalFueraDelOrden (js/54), lo mismo que cuando se va el token de una invocación: si era su turno,
-     primero termina su turno y le toca al siguiente (con su inicio de turno). Si tenía la marca `iniciativa: true`, vuelve a quedar afuera
-     (OrdenTurnos.campoAlSacar). Una línea en la Mesa.
+   · Sacar: con la ✕ de su fila en la tabla (P328: el ➖ del token se sacó, «hay muchos botones alrededor del token»): ordenSacarDeTabla, abajo.
    La línea no nombra a quien los jugadores no ven (oculto, en sigilo, un creep que todavía no vieron, su fila escondida): ahí solo el GM ve un aviso.
    ========================================================= */
 function ordenManoPuede(t){
@@ -85,7 +83,7 @@ async function ordenSumarAMano(id){
   const e = OrdenTurnos.entrarConTirada(iniciativa, {id, valor}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa)});
   if(!e) return;
   const orden = tiro && tiro.sobre ? e.orden.map(o => o.id === id ? {...o, sobre: tiro.sobre} : o) : e.orden;
-  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno: e.turno, actuaron: e.actuaron}))) return;
+  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno: e.turno, actuaron: e.actuaron, sacados: OrdenTurnos.sinSacado(iniciativa, id)}))) return;   // (si lo había sacado con la ✕, ya no)
   const publico = ordenManoPublico(id);
   if(tiro && publico) mesaPublicar(`Iniciativa · ${nombre}`, t.tipo === 'creep' ? {...tiro.r, desde: 'gm'} : {...tiro.r, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]});
   const linea = `➕ ${nombre} entra al orden de turnos (lo sumó el GM) con ${fmt(valor)}: queda ${ordenDondeQueda(e)}.${e.yaPaso ? ' Su lugar ya pasó en esta ronda: juega desde la próxima.' : ''}`;
@@ -93,18 +91,18 @@ async function ordenSumarAMano(id){
   else toast(`${linea} (Los jugadores no lo ven: no va a la Mesa.)`);
 }
 
-async function ordenSacarAMano(id){
-  const t = tokens.get(id);
-  if(!ordenManoPuede(t) || !ordenManoEsta(id)) return;
-  const nombre = nombreDe(t), fila = iniciativa.orden[iniciativa.turno];
-  const suTurno = !iniciativa.libre && !!fila && fila.id === id;
-  const ok = await Confirmar.preguntar(`¿Sacar a ${nombre} del orden de turnos?${suTurno ? `\n\nEs su turno: termina su turno y le toca al siguiente.` : ''}`,
-    {titulo: 'Sacar del orden', icono: '➖', si: 'Sacar'});
-  if(!ok || !ordenManoEsta(id)) return;
+/* ✕ Sacar de la tabla (2026-11-24, dueño, P328: «para quitar un token de la tabla, lo hace el GM desde la tabla misma»; el ➖ del token se sacó). La ✕
+   de cada fila: sale con temporalFueraDelOrden (js/54: si era su turno, termina y empieza el del siguiente, con su «Empieza el turno»; antes la ✕ dejaba
+   el turno en el siguiente sin su inicio), queda en `sacados` (Traer tokens no lo vuelve a traer hasta el ➕, Limpiar o el fin del combate) y, si
+   tenía la marca `iniciativa: true`, vuelve a quedar afuera. Una línea en la Mesa si los jugadores lo ven. Sin confirmación, como la ✕ de siempre. */
+async function ordenSacarDeTabla(id){
+  if(!soyGM || !ordenManoEsta(id)) return;
+  const t = tokens.get(id), nombre = t ? nombreDe(t) : 'Un token borrado';
   const publico = ordenManoPublico(id);
+  iniciativa.sacados = OrdenTurnos.conSacado(iniciativa, id);   // (lo guarda la misma escritura que lo saca: guardarIniciativa conserva `sacados`)
   await temporalFueraDelOrden(id);
-  if(OrdenTurnos.campoAlSacar(tokens.get(id)) === false) await ordenManoMarcar(id, false);
+  if(t && OrdenTurnos.campoAlSacar(t) === false) await ordenManoMarcar(id, false);
   const linea = `➖ ${nombre} sale del orden de turnos (lo sacó el GM).`;
   if(publico) mesaLinea(linea, 'recordatorio');
-  else toast(`${linea} (Los jugadores no lo ven: no va a la Mesa.)`);
+  else if(t) toast(`${linea} (Los jugadores no lo ven: no va a la Mesa.)`);
 }

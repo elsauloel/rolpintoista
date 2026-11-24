@@ -122,6 +122,16 @@
   «GM de pruebas». Las capturas lo muestran: quedan fuera del repo.
 - **Dónde se prueba** (2026-11-21, dueño): las pruebas generales van siempre en «Claude · pruebas 2»; el clon de El origen queda solo para
   las pruebas específicas que él pida.
+  **Desde el 2026-11-24 arrancan siempre en el mapa «Prueba · General»** de «Claude · pruebas 2» (dueño: un mapa fijo «para no armar y desarmar
+  cada vez»), y **al terminar se corre la vuelta**: cerrar el mapa, las fichas y GM Tools de la partida y `node herramientas/mapa-general/restaurar.js`
+  (con `MAPA_FOTO_DIR` = la carpeta de la foto, fuera del repo; leer su `LEEME.md`): deja el mapa, las fichas y los creeps como en la foto y dice si
+  quedó igual. Qué tiene: **un personaje por jugador** (Blanco J1, Blanco J2 y Blanco J3, este del Jugador 3, igual a los otros dos) a la izquierda;
+  **dos invocaciones** puestas, **la Abeja de prueba del Jugador 1, que VUELA** (pasiva Vuela) y **la Abeja de prueba 2 del Jugador 2, que no
+  vuela**; a la derecha **siete creeps del pool esencial, de nivel 1, nombrados por su rol** (Warrior · Hachero, Tanque · Escudero, Liviano ·
+  Sangrador, Rango · Tirador, Mago · Piromante, Support · Sanador, Debuffer · Maldito), todos a la vista; en el medio **seis sólidos separados**
+  (dos columnas, dos cajas, una roca grande de 7 casillas y un muro corto de 3) y **lugar libre** al sur. Narrativo, sin orden de turnos, sin
+  niebla, y publicado. Si una prueba necesita otra cosa (un ítem, una habilidad, un charco), se arma ahí y la vuelta lo saca. Si se cambia a
+  propósito el punto de partida, sacar una foto nueva (`foto.js`) y anotarlo acá.
 - **Ojo con los respaldos «restaurar todo» de una partida de prueba** (2026-11-05: se borraron los 17 tokens y el estado de «Mapa 1» de
   «Claude · pruebas»): el primer mapa puede tener un documento en `mapas/_principal` (solo el nombre, si se lo renombró), pero sus tokens y su
   estado viven en `tokens/` y `mapa/`. Un script que recorre `mapas/*` y guarda `mapas/<id>/tokens` bajo la clave `_principal` pisa lo de

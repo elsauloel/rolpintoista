@@ -2444,7 +2444,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `cola108/1-J1-empieza-el-turno-de-la-abeja-mareada-sobre-el-muro.png`, `cola108/4-J1-renglon-del-muro-con-el-resultado.png`,
   `cola108/5-J1-la-abeja-mareada-no-actua.png`, `cola108/7-J1-la-cuenta-con-la-resistencia.png`, `cola108/8-J1-ronda2-renglon-con-el-resultado.png`.
 
-- **⬜ en cola (justo después de la varita, pedido del dueño 2026-11-24) — 🗺 Armar el mapa fijo «Prueba · General» en «Claude · pruebas 2»**:
+- **✅ hecho (2026-11-24) — 🗺 Armar el mapa fijo «Prueba · General» en «Claude · pruebas 2»** (pedido del dueño el mismo día):
   un mapa listo para todas las pruebas, para no armar y desarmar cada vez. Con: **un solo personaje por jugador, los tres jugadores** (dueño: «no hace falta que cada jugador tenga varios personajes, porque eso puede dar
   a confusión»); al menos dos
   jugadores con una invocación cada uno, ya puestas; creeps de varios roles (warrior, tanque, mago, support, debuffer, rango); **varios objetos
@@ -2452,6 +2452,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   y lugar libre para movimientos, áreas y zonas. Más una **«foto» del estado inicial** guardada con un script (en el scratchpad o en `herramientas/`
   sin datos sensibles) y otro que lo **vuelve a esa foto** al terminar cada prueba (vida, estados, posiciones, giros, equipo, orden, modo).
   Después, anotarlo en `docs/memoria-claude.md` para que todas las pruebas usen ese mapa y esos scripts.
+  *Resultado:* el mapa está armado y publicado. **Jugadores** (a la izquierda, uno por cuenta): Blanco J1, Blanco J2 y **Blanco J3** (nuevo, del
+  Jugador 3, copia de Blanco J2: nivel 1, vida 50, Cuchillo de cazador); sus otras fichas no se tocaron (no tenían otras). **Invocaciones**: la Abeja
+  de prueba del Jugador 1, **con la pasiva Vuela** (lleva puesto el estado Vuela), y la **Abeja de prueba 2** del Jugador 2 (copia limpia de la otra,
+  **sin Vuela**), cada una al lado de su dueño. **Creeps** (a la derecha, del ⭐ pool esencial, nivel 1, agregados desde GM Tools y renombrados por
+  rol): Warrior · Hachero, Tanque · Escudero, Liviano · Sangrador, Rango · Tirador, Mago · Piromante, Support · Sanador y Debuffer · Maldito, a la
+  vista de los jugadores. **Sólidos** (en el medio, fijados, con 2 a 4 casillas libres entre sí): dos columnas (una al norte y otra al sur), dos
+  cajas, una roca grande de 7 casillas y un muro corto de 3 casillas en fila. **Lugar libre**: todo el sur y los pasillos del medio. Narrativo, sin
+  orden de turnos y sin niebla. **La foto y la vuelta**: `herramientas/mapa-general/` (`foto.js`, `restaurar.js`, `LEEME.md`); la foto queda fuera del
+  repo. **Probado**: se movió Blanco J1, se giró el Tanque, se borró el token del Tirador, se agregaron un token suelto y un sólido, se corrió una
+  caja, se pasó a combate con un orden de turnos, se le bajó la vida a Blanco J2 (31 + Veneno), a la Abeja (12) y al Warrior (9 + Stun); la vuelta
+  dejó todo como en la foto («quedó igual», 82 documentos) y se vio así en el mapa, en la ficha de Blanco J2 (50/50, sin estados) y en GM Tools
+  (Warrior 35, sin estados). `docs/memoria-claude.md` («Dónde se prueba») lo dice para todas las pruebas que siguen.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de la fogata y Varita del chorro de lava** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de miasma y Pedos Tóxicos** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -31,6 +31,8 @@ Ya no hace falta correr nada para que un cambio del catálogo llegue a las herra
 - **simular_peleas.py** (2026-10-10) — peleas completas 1 vs 1 y 2 vs 2 entre arquetipos con armas del catálogo real; escribe docs/balance-peleas.md.
 - **palancas_peleas.py** (2026-10-10) — prueba palancas de balance con esas peleas (sin cambiar reglas) y agrega la tabla al informe.
 - **rutas.py** — rutas del proyecto.
+- **mapa-general/** (2026-11-24, Node) — la foto del mapa de pruebas «Prueba · General» y la vuelta a ella al terminar cada prueba (ver su `LEEME.md`).
+- **clon-de-partida/** (Node) — copia una partida real a otra de pruebas (ver su `LEEME.md`).
 - **simulador-encuentro.html** (2026-10-22, no es Python: una página) — simula un encuentro completo «en el aire» entre los personajes
   reales de una partida y creeps de esa partida, con el motor de reglas de verdad (`comun/ficha-*.js`, `comun/creep-*.js`,
   `comun/combatiente.js`, `comun/critico.js`): iniciativa, turnos, No2 y SP, duelos (PdG contra Evasión o Parry, Bloqueo, crítico,

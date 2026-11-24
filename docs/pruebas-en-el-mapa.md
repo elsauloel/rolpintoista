@@ -7,6 +7,10 @@
 >
 > Cómo: partida «Claude · pruebas» (`?partida=YWjRbx7eJlqQpL1wtCKH`), las dos cuentas de Chrome (jugador y GM), la Botonera nueva del mapa y
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
+>
+> **Desde el 2026-11-24** las pruebas generales arrancan en el mapa **«Prueba · General»** de «Claude · pruebas 2» (un personaje por jugador, dos
+> invocaciones —la del Jugador 1 vuela—, siete creeps de rol distinto, sólidos y lugar libre) y al terminar se vuelve a su foto con
+> `herramientas/mapa-general/restaurar.js` (ver `docs/memoria-claude.md`, «Dónde se prueba»).
 
 ## 🧪 Pasada de pruebas del 2026-11-21: lo que había quedado sin ver de las tareas del 20 y el 21
 

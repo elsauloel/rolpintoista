@@ -2576,7 +2576,9 @@ Pedido del dueño (P285 y sus directrices del 2026-11-24). Está hecho (`comun/m
 6. **El aviso flotante** dura 7 segundos, muestra el principio del texto y se apilan hasta 3. Con «reducir movimiento» del sistema, la paloma no
    vibra: se le marca un contorno. ¿Bien?
 
-### P319 — 🤐 El Silencio del Tótem: cuando ya estaba silenciado por otra cosa (2026-11-24, Claude)
+### ✅ P319 — 🤐 El Silencio del Tótem: cuando ya estaba silenciado por otra cosa (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24): como lo recomendado** — queda así (el tótem nunca saca un Silencio que no puso él; si se lo sacan estando adentro, le vuelve a entrar).
 Desde el 2026-11-24 el aura del Tótem de silencio le pone el estado Silencio de verdad a los rivales que están adentro y se lo saca al salir
 (`vtt-hexgrid/js/134-totem-silencio.js`). Un mismo personaje no puede tener dos «Silencio» a la vez (el nuevo renueva al que hay). Quedó así,
 mientras tanto (lo conservador: nunca le saca un Silencio que no puso el tótem):

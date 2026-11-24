@@ -2776,6 +2776,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (dueño, 2026-11-24: «habría que revisarlo, cuál sería el orden que tiene sentido… al final de la cola, para chequear»). Hoy (P266) primero sale
   «Si te movés, lo perdés» y después la reacción de quien vigila. Explicarle el caso paso a paso y decidir el orden antes de probarlo.
 
+- **⬜ en cola (investigar a fondo) — ▶ El «Empieza tu turno» queda abierto después de terminar el combate, y al aplicarlo igual corre un inicio de
+  turno** (visto el 2026-11-24 en la prueba de caídas; dueño: «investigar a fondo el origen de este posible error»): al Jugador 1 le quedó abierto el
+  cartel después de que el GM vació el orden y pasó a narrativo; al tocar «Aplicar» se le aplicó igual (le bajó un turno a sus estados). Buscar el
+  origen (¿el cartel no se entera de que el combate terminó / el orden se vació?), ver si pasa con otros carteles de turno (la tarjeta de la Crónica
+  que queda «tirando» tras recargar, ya en la cola) y arreglarlo: que al terminar el combate se cierren solos y no apliquen nada.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

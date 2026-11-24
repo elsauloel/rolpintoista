@@ -2206,13 +2206,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirando en otra pantalla…» también en la pantalla que lo estaba mandando; ahora dice «🌀 El portal se lo está llevando…». Visto: en la pantalla de
   la víctima (y la del GM en el caso 2) el cartel de la trampa tapa la casilla de donde sale, así que ahí la tele se ve solo al llegar (entrada
   nueva al final de la cola), y la tele arranca 3 a 6 s después del clic.
-- **⬜ en cola — Probar: 📺 la tele con la Trampa de teleport de Terreno y Formas** (2026-11-23): no se pudo crear: las reglas de Firestore no dejan
-  crear un elemento con `trampaDestino` (está validado, pero falta en la lista de campos permitidos de `elementoValido`; el ⚙ sí lo deja cambiar).
-  Arreglarlo es sumar el campo a esa lista y pegar las reglas. Los portales de Invocar portal usan la misma función y sí se probaron.
+- **✅ hecho (2026-11-24) — Probar: 📺 la tele con la Trampa de teleport de Terreno y Formas** (2026-11-23). Probado con clics en «Claude ·
+  pruebas 2» (GM de pruebas, Jugador 1, Jugador 2), con video. El GM la arma con 🪤 Trampas (paso 7 «Teleport»), marca el destino y la pone: se
+  crea sin error de permisos. Blanco J1 la pisa: «¡Cayó en la trampa!», los pulsos violeta/azul y la tele (se apaga en la trampa, se prende en el
+  destino) en las pantallas del GM y del Jugador 2, y el token queda en el destino en las tres; la Mesa dice «🌀 Teleport de prueba: Blanco J1 fue
+  teletransportado…». **Arreglado:** con 🪤 Trampas el clic en el mapa no dibujaba nada (solo miraba «Formas libres» desde 2026-09-28), así que no
+  se podía poner la trampa; ahora sí (`dibujaElemento()`, js/14). Visto: en la pantalla del Jugador 1 el cartel «¡Cayó en la trampa!» sale antes
+  y tapa la tele (se ve solo, oscurecida, la llegada): es lo de la entrada «📺 El cartel de la trampa tapa la tele del Portal cósmico».
 - **⬜ en cola — Probar: 📺 la tele de un teletransporte con un token oculto, en sigilo o en la niebla, y con «reducir movimiento»** (2026-11-23): por
   código, una pantalla que no ve el token no dibuja la tele (como el Parpadeo) y con «reducir movimiento» salta sin animación; no se probó en el mapa.
 
-- **🟡 a medias (2026-11-23: ya está en `firebase/firestore.rules`, junto con lo del token suelto; **el dueño ya pegó las reglas (2026-11-23)**: falta probar crearla y pisarla) — 🔒 Arreglar las reglas: la Trampa de teleport de Terreno y Formas no se puede crear** (visto en la tarea de la tele,
+- **✅ hecho (2026-11-24: con las reglas pegadas se crea sin error de permisos y al pisarla teletransporta; probado con clics, ver «Probar: 📺 la tele con la Trampa de teleport») — 🔒 Arreglar las reglas: la Trampa de teleport de Terreno y Formas no se puede crear** (visto en la tarea de la tele,
   2026-11-23): `trampaDestino` está validado pero falta en la lista de campos que se pueden crear de `elementoValido` (firebase/firestore.rules),
   así que crearla da error de permisos. Sumarlo, avisarle al dueño que pegue las reglas, y probar crearla y pisarla con la tele.
 

@@ -211,7 +211,7 @@ lienzo.addEventListener('pointerdown', e => {
     }
     // Terreno/Formas activo: crea un elemento nuevo (flor de un clic;
     // línea/libre se arman arrastrando, ver pointermove/soltar).
-    if(herramientaActiva === 'elemento'){
+    if(dibujaElemento()){
       elementoSeleccionar(null);
       dibujandoElemento = {tipo: elemTipo, origen: casillaClic, celdas: new Map([['0,0', {dq: 0, dr: 0}]])};
       lienzo.style.cursor = 'crosshair';
@@ -390,7 +390,7 @@ lienzo.addEventListener('pointermove', e => {
       lienzo.style.cursor = elHover.fijado ? 'default' : (puedeManipularElemento(elHover) ? 'grab' : 'pointer');
       return;
     }
-    if(herramientaActiva === 'lapiz' || herramientaActiva === 'elemento'){ lienzo.style.cursor = 'crosshair'; return; }
+    if(herramientaActiva === 'lapiz' || dibujaElemento()){ lienzo.style.cursor = 'crosshair'; return; }
   }
   lienzo.style.cursor = id ? (puedoMover(tokens.get(id)) ? 'grab' : 'pointer') : (moverFondo && soyGM && fondo ? 'move' : 'default');
 });

@@ -33,6 +33,9 @@ const HERRAMIENTAS = [
   {id: 'bitacora', icono: '📖', nombre: 'Bitácora', detalle: 'Notas compartidas de la partida', lista: true, atajo: 'Ctrl+B'},
 ];
 let herramientaActiva = '';
+// ¿La herramienta activa dibuja un elemento con el mouse? Formas libres y Trampas (2026-11-24: desde que Trampas es su propio modo,
+// 2026-09-28, el clic en el mapa no la dibujaba —el mouse solo miraba 'elemento'— y no se podía poner una trampa desde Terreno y Formas).
+function dibujaElemento(){ return herramientaActiva === 'elemento' || herramientaActiva === 'trampa'; }
 // Salir de una herramienta de dibujo (lápiz/terreno/formas): clic derecho
 // en el mapa, Esc, la ✕ de su ventanita, o tocar el mismo botón de nuevo.
 // Borrador de Terreno/Formas (ver `borradorElemento`): crearlo de verdad o tirarlo.

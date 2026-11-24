@@ -3001,6 +3001,16 @@ function sobrepesoIniTextoPrueba(src, n){
   const cuerpo = src.slice(src.indexOf('function sobrepesoIniTexto'), src.indexOf('function sobrepesoIniContar'));
   return new Function('fmt', cuerpo + '; return sobrepesoIniTexto;')(fmt)(n, 'Fulano');
 }
+prueba('🪤 Terreno y Formas → Trampas: el clic en el mapa dibuja la trampa (antes solo dibujaba en Formas libres, 2026-11-24)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const [t05, t06, t14] = await Promise.all(['05-vista-y-dibujo.js', '06-mouse.js', '14-herramientas-y-arranque.js'].map(leer));
+  const def = t14.slice(t14.indexOf('function dibujaElemento()'), t14.indexOf('\n', t14.indexOf('function dibujaElemento()')));
+  const f = h => new Function('herramientaActiva', def + '; return dibujaElemento();')(h);
+  igual(['elemento', 'trampa', 'lapiz', 'zonapersistente', ''].map(f), [true, true, false, false, false]);
+  cierto(/if\(dibujaElemento\(\)\)\{\n\s+elementoSeleccionar\(null\);\n\s+dibujandoElemento = /.test(t06), 'el clic empieza a dibujar también en Trampas');
+  cierto(/herramientaActiva === 'lapiz' \|\| dibujaElemento\(\)/.test(t06), 'cursor en cruz');
+  cierto(/origenBorrador && dibujaElemento\(\) && fbUsuario/.test(t05), 'el borrador se ve mientras se dibuja');
+});
 prueba('🐝 El mapa tira la iniciativa de la invocación al entrar y la saca del orden al irse (2026-11-23, P275)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t09 = await leer('09-colocar-y-panel.js'), t54 = await leer('54-soltarse-al-empezar.js');

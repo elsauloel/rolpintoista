@@ -462,7 +462,7 @@ function dibujarLienzo(){
   // el resto de lo que se eligió en el panel, para ver cómo va a quedar.
   const listaElementos = [...elementos.entries()];
   const origenBorrador = dibujandoElemento || borradorElemento;
-  if(origenBorrador && herramientaActiva === 'elemento' && fbUsuario){
+  if(origenBorrador && dibujaElemento() && fbUsuario){
     listaElementos.push([ID_BORRADOR, {
       tipo: origenBorrador.tipo, origen: origenBorrador.origen, celdas: [...origenBorrador.celdas.values()], rotacion: 0,
       color: elemColor, alfa: elemAlfa, solido: elemSolido, invisible: !!(soyGM && elemInvisible), verEntero: !!(elemSolido && elemVerEntero),

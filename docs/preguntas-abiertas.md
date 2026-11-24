@@ -2656,7 +2656,13 @@ fila de J1, así que el ▼ de J2 queda apagado: no puede demorarlo. Con el 👁
    es justo para eso.
 2. ¿O el ▼ del que juega se deja apretar igual, y se demora por debajo del siguiente aunque el GM no lo vea (el GM no se entera a quién le toca)?
 
-### P326 — 🙈 La zona de un creep le pega a un jugador escondido: ¿quién tira el daño? (2026-11-24, Claude)
+### ✅ P326 — 🙈 La zona de un creep le pega a un jugador escondido: ¿quién tira el daño? (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24), distinto de lo recomendado:** «prefiero que el daño lo tire el propietario de la zona, que se revele que hay
+alguien ahí pero no se descubra. El personaje puede seguir moviéndose. Que en ese caso, si pasa daño, diga "el muro le hizo N de daño a un
+personaje oculto". Es un punto medio entre descubrirlo y que no pase nada; además evita trampitas y gente que se haga la pilla». O sea: tira
+el dueño de la zona (el GM si es de un creep), el cuadro / la Crónica / la Mesa dicen «a un personaje oculto» (sin nombre), el token sigue sin
+verse y el escondido sigue escondido (si el daño no lo delata). Lo mismo para el caso inmune («…no le hizo nada a un personaje oculto»).
 Probado con clics (cola de pruebas): Blanco J1 en Sigilo, parado sobre el Muro de fuego de un creep; al empezar su turno el muro le pega 3d4 de
 fuego. Hoy ese daño va al cuadro del duelo y lo tira el GM (P245: «el daño de una zona lo tira el dueño de quien la creó»), así que al GM se le abre
 «Blanco creep VS Blanco J1», y la Crónica y la Mesa le dicen que el muro le pegó. El GM sabe que J1 está escondido, pero así sabe **dónde**. Lo mismo

@@ -2683,6 +2683,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `vtt-hexgrid/js/08` (`zonaResolverBanner`: `porDuelo` mira solo `t.oculto`; `zonaMomentoAbrir` no marca `datos.escondido`; `danoDirectoAvisar`,
   la línea de la Mesa), `zonaCartelAntes` («El daño lo tira Blanco creep»). Esperar la respuesta de P326; no tocar lo de la tabla de turnos.
 
+- **⬜ en cola (investigar) — 👂 «Pasos a tu espalda» le salió al GM cuando el escondido se delató sin moverse** (visto el 2026-11-24, con el Muro
+  de fuego: «Protector 4 oye pasos…»; dueño: «no lo entiendo bien, ponelo al final de la cola para investigarlo en su momento»). De paso, mirar
+  por qué la Quemadura del Muro entró con 2 cargas y le sacó 2 de vida en el momento.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
@@ -2876,3 +2880,6 @@ Cada línea nueva que se termine de diseñar se suma al final.
   (se le copió el Barrido de creep). Detalle en `pruebas-en-el-mapa.md`.
 - [x] **Coletazo de una bestia** (2026-11-08): un ataque entero por rival en el sentido de las agujas del reloj, pulso y cuadro desde cada token,
   críticos, Veneno y Empujón al que pega, nada al que esquiva; el empujón contra un token choca una sola vez. Sin errores. Detalle en `pruebas-en-el-mapa.md`.
+  **Decidido (dueño, 2026-11-24, P326):** tira el daño el dueño de la zona; el GM sabe que le pegó «a un personaje oculto», sin nombre ni
+  token: «el muro le hizo N de daño a un personaje oculto». El escondido sigue escondido y se puede seguir moviendo. Lo mismo con el inmune
+  (la Crónica y la Mesa sin nombre; «esto es fácil de resolver, supongo»).

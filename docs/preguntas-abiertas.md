@@ -2655,3 +2655,15 @@ fila de J1, así que el ▼ de J2 queda apagado: no puede demorarlo. Con el 👁
 1. ¿Queda así (para demorar a alguien por debajo de un escondido, el GM prende el 👁 un momento)? **Recomendación:** dejarlo así: es raro y el 👁
    es justo para eso.
 2. ¿O el ▼ del que juega se deja apretar igual, y se demora por debajo del siguiente aunque el GM no lo vea (el GM no se entera a quién le toca)?
+
+### P326 — 🙈 La zona de un creep le pega a un jugador escondido: ¿quién tira el daño? (2026-11-24, Claude)
+Probado con clics (cola de pruebas): Blanco J1 en Sigilo, parado sobre el Muro de fuego de un creep; al empezar su turno el muro le pega 3d4 de
+fuego. Hoy ese daño va al cuadro del duelo y lo tira el GM (P245: «el daño de una zona lo tira el dueño de quien la creó»), así que al GM se le abre
+«Blanco creep VS Blanco J1», y la Crónica y la Mesa le dicen que el muro le pegó. El GM sabe que J1 está escondido, pero así sabe **dónde**. Lo mismo
+pasa con cualquier zona con daño de dados que puso el GM o un creep. Las áreas ya tienen su solución (P263: el escondido va aparte y el bando que
+la lanzó no ve nada), pero las zonas quedaron afuera a propósito.
+1. ¿Quién tira el daño cuando el que recibe está escondido para el que puso la zona? **Recomendación:** que lo tire solo la pantalla de quien lo
+   maneja (el jugador), sin cuadro del duelo, con el dado a la vista para él (como las zonas de número fijo de P245), y que el GM no vea nada: ni
+   el duelo, ni la Crónica «… está en Muro de fuego», ni la línea de la Mesa (lo ve solo su bando, como el duelo oculto). Si el daño lo delata, desde
+   ahí todo normal.
+2. ¿Y si el GM prende el 👁? **Recomendación:** que vea todo, como en el duelo oculto, pero sin tener que tirar él.

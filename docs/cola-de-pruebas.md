@@ -2261,9 +2261,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `Combatiente.terminarTurnoEstados`, `FichaMantenimiento.finTurno`, prueba nueva; `comun/pruebas.html` 1112 en verde). Con ▶ Siguiente: J1 y J2 vieron
   la tarjeta aparte «Turno de Blanco J1 · Terminó el turno de Blanco J1: Tropezado: se terminó» y la línea de la Mesa; el GM no vio nada de J1 (solo
   «Empieza el turno de Blanco J2»).
-- **⬜ en cola — Probar: 🙈 una zona de «al empezar su turno» (Muro de fuego) bajo un escondido, y el cartel flotante de inmunidad** (2026-11-23):
-  no se tocaron (la zona la resuelve quien lo maneja; el cartel flotante ya no sale en una pantalla que no ve el token, P263); no se probaron
-  con un escondido al empezar su turno.
+- **❌ Probado con clics (2026-11-24) — 🙈 una zona de «al empezar su turno» (Muro de fuego) bajo un escondido, y el cartel flotante de inmunidad**
+  (2026-11-23). En «Claude · pruebas 2», modo combate, orden Blanco J1 → Blanco J2, Blanco J1 en Sigilo (Sigilo 6) parado sobre el Muro de fuego
+  de Blanco creep; GM de pruebas con el 👁 apagado, Jugador 1 y Jugador 2 mirando.
+  - ✅ Al empezar su turno, a Jugador 1 le sale el renglón «🔥 Muro de fuego: estás adentro al empezar tu turno» dentro de «▶ Empieza tu turno», y
+    lo resuelve él con «🔥 Tirar el daño (3d4)». El token sigue sin verse para el GM (ni el cartel flotante).
+  - ❌ **Lo delata ante el GM: el daño va al cuadro del duelo de siempre y lo tira el GM** (es una zona de un creep). Al GM se le abre «Muro de
+    fuego: el daño · Blanco creep VS Blanco J1» con «🎲 Tirar el daño», y además ve en la Crónica «🔥 Blanco J1 está en Muro de fuego…» (desde que
+    empieza el turno, antes de tirar) y en la Mesa «Blanco creep le hizo Muro de fuego: el daño a Blanco J1. Le bajó 6 de vida». Como el GM sabe
+    dónde está su muro, sabe dónde está J1. Lo mismo ve Jugador 2 (está bien: es su aliado). Arreglo grande y con dudas: entrada nueva al final
+    de la cola y P326.
+  - ✅ **No lo delata** (6 de daño, Sigilo 6): sigue escondido, Jugador 1 ve «🥷 Seguís escondido · Te hicieron 6 de daño, pero no alcanzó tu
+    Sigilo (6)» y la Quemadura; el GM no ve el token, ni la casilla, ni el cartel flotante (sí todo lo de arriba).
+  - ✅ **Lo delata** (10 de daño, puesto a mano con «✍ Otro valor»): «🕶 Blanco J1 se delató y salió del sigilo» para todos, el token aparece y
+    todo sigue normal.
+  - ✅ **Inmune** (resistencia al fuego 99): el daño entra 0 y el cartel «INMUNE AL FUEGO» flota sobre el token para Jugador 1 y Jugador 2; a la
+    pantalla del GM le llega el aviso pero no dibuja nada (no ve el token). (La Crónica y la Mesa del GM igual dicen que el muro le pegó: ver arriba.)
+  - Aparte: «🩺 Cómo quedó el grupo» le mostró al GM «En la zona: Muro de fuego» de Blanco J1 escondido: va con P324.
+  - Capturas (fuera del repo, en el mismo momento): `4-aplicado-GM.png` y `4-aplicado-J1.png`.
 - **⬜ en cola — Probar: 🎲 una invocación o un refuerzo que entra solo al orden de turnos, y ⏭ Pasar de ronda con un tótem en un orden viejo**
   (2026-11-23): por código, la invocación nueva y el refuerzo pasan por la misma regla (`iniciativaOcupaLugar`) y Pasar de ronda no le hace pasar el
   turno a un tótem o estandarte; no se probaron en el mapa (hoy ninguna invocación ni refuerzo es un objeto inerte: es solo la red de seguridad).
@@ -2661,6 +2676,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (revisar en detalle con el dueño) — Responder P325: demorar cuando el que sigue es un escondido** (dueño, 2026-11-24: «ponela para
   revisar en la cola bien en detalle porque no la termino de entender»). Explicarla con un ejemplo paso a paso (quién juega, qué botón, qué pasa).
   Ver primero la entrada de arriba (el GM ve a los escondidos en la tabla), que quizás la resuelve sola.
+- **⬜ en cola — 🙈 La zona de un creep que le pega a un jugador escondido no tiene que delatarlo ante el GM (P326)** (prueba con clics,
+  2026-11-24): hoy, con Blanco J1 en Sigilo sobre el Muro de fuego de un creep, el daño (3d4) va al cuadro del duelo y lo tira el GM; y el GM ve en
+  la Crónica «Blanco J1 está en Muro de fuego…» y en la Mesa el daño con el nombre. El GM sabe que J1 está escondido (está bien), pero así sabe
+  **dónde**. Lo mismo vale para cualquier zona con daño de dados del GM (y probablemente al entrar caminando, no solo al empezar el turno). Dónde:
+  `vtt-hexgrid/js/08` (`zonaResolverBanner`: `porDuelo` mira solo `t.oculto`; `zonaMomentoAbrir` no marca `datos.escondido`; `danoDirectoAvisar`,
+  la línea de la Mesa), `zonaCartelAntes` («El daño lo tira Blanco creep»). Esperar la respuesta de P326; no tocar lo de la tabla de turnos.
 
 ## En cola
 

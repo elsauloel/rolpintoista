@@ -2395,7 +2395,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   igual» lo movió y la apagó en las tres; el segundo arrastre ya no preguntó; la 🔍, «no suma: se movió en esta ronda»; ronda siguiente, el cartel
   otra vez. Con el Anillo de Puntería certera (por datos) en la ronda 4: un solo aviso «Puntería certera y Apuntada… las perdés». Al final se
   devolvió el inventario de J1, sin orden de turnos y en narrativo. 5 pruebas automáticas nuevas o cambiadas (1043). Duda: P293.
-- **⬜ en cola — Probar: 🎯 la Apuntada firme con clics** (2026-11-23, P271): las dos ballestas con firme (de mira, de vigía) están archivadas; misma
+- **➡ pasó a la lista de diseño (dueño, 2026-11-24), junto al catálogo — Probar: 🎯 la Apuntada firme con clics** (2026-11-23, P271): las dos ballestas con firme (de mira, de vigía) están archivadas; misma
   pieza que la simple (pruebas automáticas), sin clics.
 - **⬜ en cola — Probar: 🎯 el aviso de la Apuntada antes de una habilidad que mueve (Dash, Salto, Carga, Takle, Parpadeo)** (2026-11-23, P271):
   sale por la misma función que el del anillo (prueba automática); con clics solo se probó caminar.
@@ -2796,6 +2796,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🩸 la vida de un creep no baja de 0 con una habilidad o un Flash que cuestan vida (P292)** (2026-11-24): GM Tools ya no
   deja la vida negativa por ningún camino; no se probó con clics una habilidad ni un Flash con costo en vida (de todos modos no dejan usarlos si
   no sobra vida), ni el mapa del GM mirando a un creep que estaba guardado en negativo antes de abrir GM Tools.
+
+- **⬜ en cola — ❤ La vida de una invocación escrita a mano no baja de 0 (P329 decidida)** (dueño, 2026-11-24: «sí»): en la ficha suelta, el
+  recuadro de HP de una invocación deja escribir un negativo; que quede en 0 con el mismo aviso que GM Tools.
 
 ## En cola
 

@@ -2716,7 +2716,9 @@ todas cambiables:
    cuando se va una invocación). La ✕ de la tabla, en cambio, lo saca y el turno queda en el siguiente sin «Empieza el turno» (sin recargar No2 ni
    bajar cooldowns). ¿Hacemos que la ✕ haga lo mismo que el ➖?
 
-### P329 — 🩸 La vida de una invocación escrita a mano puede quedar negativa (2026-11-24, Claude)
+### ✅ P329 — 🩸 La vida de una invocación escrita a mano puede quedar negativa (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24): sí** — la vida de una invocación escrita a mano tampoco baja de 0 (queda en 0 con el mismo aviso que los creeps). En la cola.
 
 Al hacer P292 (la vida de un creep no baja de 0 en GM Tools) se revisó la ficha suelta: la vida de un **personaje** nunca baja de 0 (todo pasa por
 `fijarHp`). La de una **invocación** sí puede: en su tarjeta de la ficha, el recuadro de HP acepta un número negativo escrito a mano (por ejemplo −5)

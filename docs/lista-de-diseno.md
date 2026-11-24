@@ -35,6 +35,8 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 - [ ] **🧬 Razas** (y las marcas de las pasivas «racial / criatura / solo personajes», de abajo).
 - [ ] **👹 Creeps** — los roles y sus ideas: [`diseno-roles-creep.md`](diseno-roles-creep.md); los humanoides nuevos:
   [`creeps-humanoides.md`](creeps-humanoides.md); la auditoría de skills: [`auditoria-skills-creep.md`](auditoria-skills-creep.md).
+- [ ] **🎯 La «Apuntada firme» de las ballestas** (dueño, 2026-11-24, junto al catálogo): las dos ballestas que la tienen (de mira, de vigía) están
+  archivadas; decidir si vuelven al catálogo ampliado (y entonces probarla con clics: misma pieza que la apuntada simple).
 - [ ] **📦 Catálogo y tiers más altos del equipo** — [`hoja-de-ruta-rework-catalogo.md`](hoja-de-ruta-rework-catalogo.md) (fases, lo decidido, lo
   pendiente), [`rework-armas.md`](rework-armas.md), [`rework-anillos.md`](rework-anillos.md), [`talismanes.md`](talismanes.md).
 - [ ] **📋 Lo de diseño que ya estaba en pendientes** — [`pendientes.md`](pendientes.md), secciones «4. Diseño pendiente», «5. Contenido a

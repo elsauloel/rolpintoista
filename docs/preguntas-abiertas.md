@@ -2674,7 +2674,11 @@ la lanzó no ve nada), pero las zonas quedaron afuera a propósito.
    ahí todo normal.
 2. ¿Y si el GM prende el 👁? **Recomendación:** que vea todo, como en el duelo oculto, pero sin tener que tirar él.
 
-### P327 — 😵 La invocación o el refuerzo que saca más iniciativa que quien lo invocó: ¿queda mareado en su primer turno de la ronda siguiente? (2026-11-24, Claude, cola de programación)
+### ✅ P327 — 😵 La invocación o el refuerzo que saca más iniciativa que quien lo invocó: ¿queda mareado en su primer turno de la ronda siguiente? (2026-11-24, Claude, cola de programación)
+
+**Decidido (dueño, 2026-11-24):** «lo importante es que la primera vez que le toque actuar a una invocación, no puede actuar. Tan simple como
+eso». O sea: el Mareo de invocación le hace perder **solo su primer turno** (nunca más de uno), en cualquier orden y con P301 b; se va al
+terminar ese turno o al empezar el turno de quien la invocó, lo que pase primero. Vale igual para los refuerzos (con o sin el creep que los llamó).
 
 Desde hoy (lo definiste vos), una invocación o un refuerzo entra al orden con su tirada y queda con **Mareo de invocación hasta que empieza el próximo
 turno de quien lo invocó** (antes: solo su primer turno propio). Aplicado así, literal. Un caso que queda raro: si saca **más** que quien lo invocó, su

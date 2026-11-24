@@ -1938,7 +1938,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   salto de la Cadena de rayos (8 a Blanco J2, salta 4 a Blanco J1), «Daño directo: no lo frena la Defensa ni la Defensa especial», 4 (42 → 38); y el
   control, un hachazo de 10: «10 − Defensa 1 − 🛡 Aguante de trinchera 2 = 7» (38 → 31). Quedó todo como estaba (vidas, pasivas, habilidades, posiciones).
 
-- **⬜ en cola — 🏷 Conversación de diseño: etiquetas y filtros para las pasivas** (dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
+- **🟡 propuesta lista (2026-11-24), esperando la conversación con el dueño → docs/etiquetas-pasivas.md — 🏷 Conversación de diseño: etiquetas y filtros para las pasivas** (dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
   filtros. Por ejemplo, Aguante de trinchera es buena para warrior y para tanque y para melee en general, entonces pueden estar esos tags. Buscar
   cierto universo de tags para poder crear filtros a la hora de elegir pasivas»). Hoy `etiquetas` sueltas (ofensiva, defensiva, stat, utilidad,
   resistencia, regeneración, visión, percepción, racial). Preparar una propuesta (rol: warrior, tanque, liviano, rango, mago, support, debuffer;

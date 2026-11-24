@@ -2427,6 +2427,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo
   camino que el Muro de fuego (renglón de «Empieza tu turno» de quien la maneja); con clics, solo un personaje y un creep.
 
+- **⬜ en cola (justo después de la varita, pedido del dueño 2026-11-24) — 🗺 Armar el mapa fijo «Prueba · General» en «Claude · pruebas 2»**:
+  un mapa listo para todas las pruebas, para no armar y desarmar cada vez. Con: los personajes de todas las cuentas de prueba; al menos dos
+  jugadores con una invocación cada uno, ya puestas; creeps de varios roles (warrior, tanque, mago, support, debuffer, rango); **varios objetos
+  sólidos (columnas, cajas…) con espacio entre sí**, para probar lo que interactúa con ellos (empujones, choques, línea de visión, coberturas…);
+  y lugar libre para movimientos, áreas y zonas. Más una **«foto» del estado inicial** guardada con un script (en el scratchpad o en `herramientas/`
+  sin datos sensibles) y otro que lo **vuelve a esa foto** al terminar cada prueba (vida, estados, posiciones, giros, equipo, orden, modo).
+  Después, anotarlo en `docs/memoria-claude.md` para que todas las pruebas usen ese mapa y esos scripts.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de la fogata y Varita del chorro de lava** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de miasma y Pedos Tóxicos** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

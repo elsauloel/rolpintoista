@@ -2589,7 +2589,12 @@ mientras tanto (lo conservador: nunca le saca un Silencio que no puso el tótem)
 3. **Le sacan el Silencio del tótem estando adentro** (Purificar, «Limpiar», a mano): vuelve a entrarle al segundo, mientras siga adentro.
 ¿Está bien así? **Recomendación de Claude:** sí; lo único discutible es el 3 (si una limpieza debería protegerlo un rato del aura).
 
-### P320 — 🙈 Un área le pega a alguien escondido: ¿los talismanes de quien la lanzó le avisan? (2026-11-24, Claude)
+### ✅ P320 — 🙈 Un área le pega a alguien escondido: ¿los talismanes de quien la lanzó le avisan? (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24): como lo propuesto.** (1) Lo que le pasa a quien lanzó el área por sus talismanes (la quemadura del diablito,
+curarse, el Orbe salvaje…) pasa igual, pero sin que el aviso deje en evidencia que le pegó a alguien escondido (p. ej. que le aparezca al GM
+recién al terminar el turno, o sin decir por qué). (2) Lo que le cae al escondido por esos talismanes (el Maldito de la Cabeza reducida, el +2 de
+la Botella…) lo ve solo su bando, como el resto de su duelo secreto.
 Probado con clics en «Claude · pruebas 2»: el Grito espeluznante de un creep le pegó 1 de daño a Blanco J1 escondido (no alcanzó para delatarlo,
 bien) y el GM no vio el duelo. Pero el creep lleva la **Botella con un diablito**: al aplicar el daño sumó +2 y, como en los dados salió un 1, a la
 pantalla del GM le llegó el cartel «😈 El diablito se ríe: 2 de fuego para Control mental 4» y la línea en la Mesa. O sea: el GM se enteró de que el

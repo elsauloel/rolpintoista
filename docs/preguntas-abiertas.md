@@ -2549,6 +2549,11 @@ y alguien los subió para usarlos).
 
 ### P318 — 🕊️ Ajustes de los mensajes (P285): lo que quedó elegido «mientras tanto» (2026-11-24, Claude)
 
+**Respuestas del dueño (2026-11-24):** (2) «en la crónica se debería poder leer el mensaje directamente» (la tarjeta de la Crónica muestra el
+texto del mensaje; el aviso nuevo también queda). (4) «habría que corregirlo»: `/r Nombre hola` no tiene que mandar el nombre como texto. El
+resto (1, 3, 5, 6) sin objeciones: queda como está. Varias conversaciones: la propuesta (a)(b)(c) le gusta; (d) cambia: **un jugador sí
+puede borrar lo suyo**; chat grupal con nombre opcional, archivar en vez de cerrar, sin salirse de un chat grupal por ahora.
+
 Pedido del dueño (P285 y sus directrices del 2026-11-24). Está hecho (`comun/mensajes.js`); quedan cosas chicas para decidir:
 1. **El 📣 mensaje a todo el grupo vive en la Mesa** (es una línea de la Mesa, como una tirada, sin reglas nuevas de Firebase). Por eso se borra
    igual que las tiradas: con el 🗑, con «Registro nuevo» **y con la limpieza automática de lo viejo** (los secretos no se borran solos). Lo ve

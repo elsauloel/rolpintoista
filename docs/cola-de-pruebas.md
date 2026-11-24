@@ -2380,7 +2380,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   dueño diga (o en una partida descartable): que se vayan los mensajes viejos (secretos y 📣) y queden los del combate anterior y el actual.
 - **⬜ en cola — 🕊️ Responder P318: los ajustes de los mensajes** (2026-11-24): lo público que vive en la Mesa (se borra como las tiradas), Crónica +
   aviso en el mapa, el «leído» de lo público por navegador, `/r`, lo mío en la Mesa, el aviso de 7 s. Ver `docs/preguntas-abiertas.md`.
-- **⬜ en cola — 🕊️ Varias conversaciones a la vez: propuesta para el dueño** (dueño, 2026-11-24: «no sé bien cómo se gestiona ahora el hecho de tener
+- **⬜ en cola (propuesta aprobada por el dueño el 2026-11-24, ver P318) — 🕊️ Varias conversaciones a la vez: programar** — (a) un mensaje a varios
+  arma un chat de grupo de verdad (nombre opcional; las respuestas les llegan a todos); (b) la lista en tres partes: 📣 Todo el grupo · 👥 chats
+  de grupo · 🔒 de a dos, cada una con su numerito; (c) archivar (cada uno para sí, hasta que llegue algo nuevo; «▸ Archivadas»); (d) **un
+  jugador puede borrar lo suyo** (dueño: «diría que sí»); el GM sigue pudiendo borrar todo; no se puede salir de un chat de grupo por ahora.
+  Pedido original: (dueño, 2026-11-24: «no sé bien cómo se gestiona ahora el hecho de tener
   más de una conversación abierta. Y si un jugador inicia una conversación con otros 2 jugadores, eso se genera como si fuera un chat grupal. Entonces
   habría que encontrar alguna forma de gestionar conversaciones simultáneas, cómo pasar de una a otra, cómo se cierran, cómo se borran, etc.»).
   *Cómo está hoy:* un mensaje a dos jugadores NO es un chat grupal: se guarda uno solo, pero cada uno lo ve en su conversación de a dos con quien lo
@@ -2396,6 +2400,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Preguntas: (1) ¿chat grupal de verdad para un mensaje a varios? (recomendación: sí); (2) ¿con nombre opcional? (sí, opcional); (3) ¿archivar
   en vez de cerrar? (sí: cerrar no tiene sentido si después llega algo); (4) ¿un jugador puede borrar lo suyo? (recomendación: no por ahora; alcanza
   con archivar y el 🗑 del GM); (5) ¿alguien se puede salir de un chat de grupo? (no por ahora).
+
+- **⬜ en cola — 🔒 Revisar el email escrito en `docs/workflow-firebase.md`** (dueño, 2026-11-24: «esto no lo entiendo bien. Anotá en la cola
+  revisarlo cuando le toque»): en un documento del repo (que es público) figura escrito un email de una cuenta de Gmail del proyecto. Explicarle
+  al dueño qué es, para qué está ahí y si conviene sacarlo (el repo es público: no van emails).
 
 ## En cola
 

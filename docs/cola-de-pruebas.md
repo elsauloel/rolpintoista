@@ -2299,6 +2299,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Subir a la biblioteca» con los botoncitos (sin subir). Falta ver «+ Pasiva» de una invocación y subir una pasiva de verdad (y borrarla después)
   para ver que la Biblioteca la muestre filtrable con sus etiquetas.
 
+- **⬜ en cola — 🏷 Responder P315: ¿el asistente de personaje nuevo marca la clase elegida en el filtro de pasivas?** (dueño, 2026-11-24: «anotá
+  las nuevas preguntas en la cola»). Recomendación: sí. Ver `docs/preguntas-abiertas.md`.
+- **⬜ en cola — 🏷 Responder P316: ¿el «✎ Etiquetas» de la biblioteca usa los mismos botoncitos en vez de texto libre?** (dueño, 2026-11-24).
+  Recomendación: sí (así se etiqueta la corrección de Regeneración, hoy «🏷 sin etiquetar»).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

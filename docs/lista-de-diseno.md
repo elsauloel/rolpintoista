@@ -37,3 +37,6 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
   (consumibles con efectos que sube el grupo, y si se ven en el catálogo sin el 👁).
 - [ ] **👢 Más piezas que den Suela gruesa** (dueño, 2026-11-24). Hoy la da una sola: «Suelas de cuero de dragón del pantano» (pies, Buena
   Calidad, Suela gruesa 2). Cada punto resta 1 al daño de lo que se pisa (zonas y trampas del piso).
+- [ ] **🪤 Revisar la creación de trampas** (dueño, 2026-11-24): que el creador de trampas del programa (⚙ Terreno y Formas → 🪤 Trampas, y donde
+  más se armen) ofrezca **funciones simples**: daño, aplicar algún estado y alguna otra básica; las trampas de **mecánicas más complejas o efectos
+  específicos se resuelven a mano** («✋ A mano»). Revisar qué ofrece hoy el paso a paso y simplificarlo.

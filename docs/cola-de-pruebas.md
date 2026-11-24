@@ -1931,8 +1931,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «10 − Defensa 5 = 5 de daño (60 → 55 HP)»; con la pasiva (dada con «+ Pasiva»), en el «Daño» de la ficha completa y en el de la tarjeta, golpe que
   entra y golpe frenado entero, suma «🛡 el Aguante de trinchera no se cuenta acá (lo cuenta el mapa): si tiene enemigos pegados, sumalo a mano». Quedó
   como estaba (60 de vida, sin la pasiva).
-- **⬜ en cola — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
+- **✅ hecho (2026-11-24) — 🛡 Probar: el Aguante de trinchera con el escudo elemental y el rayo en cadena** (2026-11-22, misma tarea): no tienen que sumarlo
   (son directos); se revisó el código y se probó solo con el Terreno incendiado.
+  *Resultado:* anda bien, sin cambios. Probado con clics en «Claude · pruebas 2» con la pasiva en Blanco J1 y dos creeps pegados (el duelo decía
+  «🛡 Aguante de trinchera +2: 2 enemigos pegados»): el Escudo ígneo de un creep, al entrar al anillo, 1d6 = 5 × 1,5 = 8 y le entraron 8 (50 → 42); el
+  salto de la Cadena de rayos (8 a Blanco J2, salta 4 a Blanco J1), «Daño directo: no lo frena la Defensa ni la Defensa especial», 4 (42 → 38); y el
+  control, un hachazo de 10: «10 − Defensa 1 − 🛡 Aguante de trinchera 2 = 7» (38 → 31). Quedó todo como estaba (vidas, pasivas, habilidades, posiciones).
 
 - **⬜ en cola — 🏷 Conversación de diseño: etiquetas y filtros para las pasivas** (dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
   filtros. Por ejemplo, Aguante de trinchera es buena para warrior y para tanque y para melee en general, entonces pueden estar esos tags. Buscar

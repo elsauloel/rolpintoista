@@ -2616,7 +2616,9 @@ salió bien (empató y ganó), pero el jugador no eligió su tirada.
    **Recomendación:** sí; y si pasa mucho más (2–3 minutos), que lo resuelva solo igual.
 2. ¿O alcanza con un aviso en su pantalla antes de que se cumplan (P287, punto 4, ya lo preguntaba)?
 
-### P322 — 👁 Con «Revelar lo oculto» prendido, ¿los creeps «ven» al escondido? (2026-11-24, Claude)
+### ✅ P322 — 👁 Con «Revelar lo oculto» prendido, ¿los creeps «ven» al escondido? (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24): «tenés razón»** — el ojo es solo para mirar (como con las trampas). En la cola de programación.
 Revisando qué hace «👁 Revelar lo oculto» (cola de pruebas, 2026-11-24): es la **visión del GM**, pero el mapa del GM usa esa misma visión para
 algunas cosas del juego. Por código (no probado con clics): con el ojo prendido, (a) un área que tira un creep alcanza al escondido como un **duelo
 normal** y no como el duelo aparte de P263 (lo de «No hay nadie adentro del área» y que lo resuelva quien lo maneja); (b) el GM puede **elegir de

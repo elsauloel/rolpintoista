@@ -2526,6 +2526,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   ya prendido** (2026-11-24): por código, la invocación y la nube se marcan igual que el personaje en Sigilo (contorno rojo y 👁); el área con el
   ojo prendido va como duelo normal (P322). No se probaron con clics.
 
+- **⬜ en cola — 👁 «Revelar lo oculto» es solo para mirar (P322 decidida)** (dueño, 2026-11-24: «tenés razón»): con el ojo prendido, un área de
+  un creep le pega al escondido como un duelo común (no como su duelo aparte) y el GM lo puede elegir de objetivo. Que el ojo no cambie nada del
+  juego: el escondido sigue con su duelo aparte y no se lo puede elegir de objetivo por estar revelado (como ya se decidió con las trampas).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

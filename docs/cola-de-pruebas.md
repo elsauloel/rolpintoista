@@ -2624,6 +2624,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Mesa, si se ve el rastro o la casilla) y que: un personaje escondido que se mueve fuera de su turno (o con movimiento libre) deje su línea en la
   Mesa, que el GM pueda leer con el nombre, pero sin casilla, rastro ni nada que diga dónde está. Un creep escondido no avisa a los jugadores.
 
+- **⬜ en cola (revisar con tiempo) — 🩺 Responder P324: «Cómo quedó el grupo» muestra al escondido al GM con el ojo apagado** (dueño, 2026-11-24:
+  «anotá lo anterior en la cola»). Recomendación: dejarlo así (sirve para acomodar estados de todo el grupo y no dice dónde está).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2424,8 +2424,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   las pantallas). Nada que arreglar. Al final se sacaron las ballestas y se devolvieron el creep (tal cual), los No2 de la Abeja, las posiciones y
   los giros, sin orden de turnos y en narrativo. Capturas (fuera del repo): `cola107/1-GM-cartel-Apuntada-del-creep.png`,
   `cola107/3-GM-aviso-al-mover-el-creep.png`, `cola107/4-J1-cartel-Apuntada-de-la-Abeja.png`, `cola107/6-J1-aviso-al-mover-la-Abeja.png`.
-- **⬜ en cola — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo
+- **✅ hecho (2026-11-24) — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo
   camino que el Muro de fuego (renglón de «Empieza tu turno» de quien la maneja); con clics, solo un personaje y un creep.
+  *Resultado (con clics en «Claude · pruebas 2», GM de pruebas y Jugador 1):* Blanco creep con la varita (dada por datos) levantó el muro desde sus
+  Acciones; el Jugador 1 puso a la Abeja de prueba con el combate empezado: tiró su iniciativa (2) y entró entre el creep (30) y Blanco J1 (0), con
+  el Mareo; se la paró sobre el muro por datos. **Ronda 1 (mareada, resistencia al fuego 0):** al Jugador 1 le salió «▶ Empieza el turno de Abeja de
+  prueba» (P299) con «🐝 Es el turno de Abeja de prueba», «Lo que pasa al empezar: nada que cambie» y el renglón «🔥 Varita del muro de fuego: Abeja de
+  prueba está adentro al empezar su turno — No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego). El daño
+  lo tira Blanco creep.»; el botón del daño, apagado hasta «✔ Aplicar» (P274). En el cuadro del duelo tiró el GM (por el creep) y aplicó el Jugador 1:
+  2 → vida 30 → 28, sin fila de resistencia. El renglón quedó «2 de daño de fuego (lo tiró Blanco creep; entraron 2)». **El mareo no frena la zona:**
+  el muro le pegó igual; al querer atacar con la Abeja salió «😵 Abeja de prueba recién llega: está mareada — No actúa en su primer turno», y al
+  terminar su turno, en la Mesa, «ya no está mareada». **Ronda 2 (resistencia al fuego 2, por datos en su cuchillo):** el mismo renglón; el GM tiró 4,
+  la cuenta del Jugador 1 «− Resistencia al fuego 2 = pasa 2», la del GM «cuánto, lo ve su bando» → vida 28 → 26. **Quemadura:** la varita no deja
+  ninguna (no la tiene; lo del Muro de la habilidad no aplica). Lo que todavía no está, porque está en la cola («Ajustes de la Varita del muro de
+  fuego…»): el daño sigue en **1d4** (no 2d4), el texto dice «lo frena» (no «lo frena en parte») y el GM no ve el número de la resistencia de una
+  invocación de jugador. Con una invocación el renglón **nombra la resistencia aunque sea 0** (no se lee su número; así quedó en P300): duda P331.
+  La ventana del turno no dice que la Abeja está mareada: duda P332. Nada que arreglar en esta prueba. Al final, la partida como estaba (sin muro, el
+  creep sin la varita, la Abeja con 30 de vida, sin estados y en su casilla, narrativo, sin orden). Capturas (fuera del repo):
+  `cola108/1-J1-empieza-el-turno-de-la-abeja-mareada-sobre-el-muro.png`, `cola108/4-J1-renglon-del-muro-con-el-resultado.png`,
+  `cola108/5-J1-la-abeja-mareada-no-actua.png`, `cola108/7-J1-la-cuenta-con-la-resistencia.png`, `cola108/8-J1-ronda2-renglon-con-el-resultado.png`.
 
 - **⬜ en cola (justo después de la varita, pedido del dueño 2026-11-24) — 🗺 Armar el mapa fijo «Prueba · General» en «Claude · pruebas 2»**:
   un mapa listo para todas las pruebas, para no armar y desarmar cada vez. Con: **un solo personaje por jugador, los tres jugadores** (dueño: «no hace falta que cada jugador tenga varios personajes, porque eso puede dar
@@ -2834,6 +2851,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🌀 El paso gratis del Remolino cuenta como moverse (P330 decidida)** (dueño, 2026-11-24): con Apuntada, Puntería certera o Foco
   activos, el paso de 1 casilla del Remolino antes de girar muestra el aviso «Si te movés, lo perdés» y, si sigue, lo pierde (como las otras
   habilidades que mueven, P266/P271).
+- **⬜ en cola — 🐝 El cuadro del duelo dice «personaje» debajo de una invocación** (visto el 2026-11-24, probando la Abeja sobre el muro de la
+  varita): en «Objetivo», debajo de «Abeja de prueba», dice «personaje». Que diga «invocación» (o «invocación de Blanco J1»).
 
 ## En cola
 

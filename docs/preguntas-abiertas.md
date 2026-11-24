@@ -2732,3 +2732,17 @@ Probando el aviso de la Apuntada antes de una habilidad que mueve (cola de prueb
 apagan. El **Remolino** (que deja moverte 1 casilla gratis antes de girar) no avisa y **no la apaga**: ese paso no cuenta como «se movió», ni para la
 Apuntada ni para Puntería certera o Foco. ¿Queda así (es un paso chiquito, parte del giro), o el paso del Remolino tendría que contar como moverse
 (con el aviso antes, como las otras)?
+
+### P331 — 🔥 Una invocación con resistencia al fuego 0 sobre un muro: «lo frena su resistencia al fuego» (2026-11-24, Claude, cola de pruebas)
+
+Probando la Abeja de prueba (resistencia al fuego 0) sobre el muro de la Varita del muro de fuego, el renglón de «▶ Empieza el turno de Abeja de
+prueba» dice «le entra 1d4 de daño de fuego (lo frena su resistencia al fuego)», aunque no tiene nada. Con un personaje o un creep (P300) con 0 ya no
+la nombra; con una invocación quedó así a propósito porque el renglón no lee su número (la cuenta del duelo sí lo usa bien: con 2, «− Resistencia al
+fuego 2»). Opciones: (a) leer también el número de la invocación, para que con 0 no la nombre (como los demás); (b) dejarlo así.
+
+### P332 — 😵 La invocación mareada: ¿la ventana del turno lo dice? (2026-11-24, Claude, cola de pruebas)
+
+En su primer turno (mareada), la ventana «▶ Empieza el turno de Abeja de prueba» dice «Lo que pasa al empezar: nada que cambie» y el renglón del muro.
+Que no actúa recién se ve al intentar algo («😵 Abeja de prueba recién llega: está mareada — No actúa en su primer turno»). ¿Sumamos un renglón en la
+ventana («😵 Está mareada: en este turno no actúa; la zona igual le pega»), o alcanza con el cartel al intentar actuar?
+

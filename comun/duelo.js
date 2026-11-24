@@ -4467,7 +4467,16 @@ const Duelo = (() => {
      resistencia con el valor de su stat (`cfg.valorOculto(d, stat)`, el mismo de una tirada a mano), no se mueve en el dodge roll, acepta el daño,
      tira y aplica los efectos. Antes de eso, el GM con 👁 Revelar lo oculto lo ve y lo puede resolver a mano. */
   const OCULTO_MS = 40 * 1000;
-  const ocultoVisto = new Map();   // id → {firma, desde, hecho}
+  const OCULTO_SIGUE_MS = 4000;
+  const ocultoVisto = new Map();   // id → {firma, desde, hecho, tomado}
+  /* El reloj de un duelo oculto (2026-11-24, cola de pruebas: con clics, cada paso esperaba otros 40 s —tirar, aceptar el daño, los efectos—
+     y el empujón llegaba a los 2 minutos y medio). Cada paso nuevo arranca sus 40 s; pero si la pantalla del GM ya lo tomó una vez (nadie
+     contestaba), los pasos que siguen van enseguida (OCULTO_SIGUE_MS, lo justo para que rueden los dados): «pasado eso, lo hace por él» (P287). */
+  function ocultoReloj(v, firma, ahora){
+    if(v && v.firma === firma) return v;
+    const tomado = !!(v && (v.hecho || v.tomado));
+    return {firma, desde: tomado ? ahora - OCULTO_MS + OCULTO_SIGUE_MS : ahora, hecho: false, tomado};
+  }
   function firmaOculto(d){
     return [d.estado, d.fase, d.pdg ? 1 : 0, d.eva ? 1 : 0, d.empate && d.empate.moneda ? 1 : 0, d.dano ? (d.dano.aceptado ? 2 : 1) : 0,
       (d.efectos || []).map(e => `${e.res ? 1 : 0}${e.aplicado ? 1 : 0}${e.aplicar || ''}`).join('.')].join('|');
@@ -4477,8 +4486,8 @@ const Duelo = (() => {
     for(const d of todosDuelos){
       if(!esOculto(d) || d.estado === 'resuelto' || d.estado === 'cancelado'){ ocultoVisto.delete(d.id); continue; }
       const f = firmaOculto(d);
-      let v = ocultoVisto.get(d.id);
-      if(!v || v.firma !== f){ v = {firma: f, desde: ahora, hecho: false}; ocultoVisto.set(d.id, v); }
+      const v = ocultoReloj(ocultoVisto.get(d.id), f, ahora);
+      ocultoVisto.set(d.id, v);
       if(v.hecho || ahora - v.desde < OCULTO_MS) continue;
       if(cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) continue;   // lo lleva la pantalla del GM que está en ese mapa
       v.hecho = true;

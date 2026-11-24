@@ -2160,9 +2160,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   duelo oculto aunque ya se había delatado; el mapa del GM sí las mostraba). Ahora, si el golpe lo delata, el duelo queda anotado y lo que sigue va a
   la vista de todos (`comun/duelo.js`, `vtt-hexgrid/js/13`; prueba automática nueva, 1102 en verde). Las tiradas de antes de delatarse siguen siendo
   solo de su bando (igual que en el mapa). Capturas: cola90.
-- **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
+- **✅ hecho (2026-11-24) — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
   probó con la pantalla del GM todavía con el código de antes (tiró la Evasión de J2, aceptó el daño y aplicó el Empujón solo); con el código
   nuevo solo se probó con el creep.
+  **Probado con clics en «Claude · pruebas 2»** (GM de pruebas sin 👁 y Jugador 1, que no tocó nada): Blanco J1 en Sigilo, pegado a Arcano 2
+  (Nova arcana: daño y Empujón) y, aparte, adentro de una Niebla en el cono de Hunter 5 (Abanico: solo daño; a los dos se les bajó el daño a 1d4
+  mientras duró la prueba, para que no se delatara). **Lo que anduvo:** a los ~45 s la pantalla del GM tiró sola la Evasión («solo: no
+  contestó»), aceptó el daño, lo aplicó (Nova 2, Abanico 2 − Defensa 1 = 1) y siguió escondido; el GM no vio cuadro, Crónica ni Mesa de J1; el
+  Jugador 1 vio todo su duelo y lo que pasó. Con un daño mayor que su Sigilo (12 y 7 con el 2d6 de siempre) se delató y desde ahí todo a la vista, bien.
+  **❌ → arreglado, dos cosas:** (1) **cada paso esperaba otros 40 s** (tirar, aceptar el daño, los efectos): el empujón llegaba a los 2 minutos
+  y medio. Ahora, si la pantalla del GM ya lo tomó una vez, los pasos que siguen van enseguida (unos 4 s, lo que tardan los dados; `comun/duelo.js`,
+  `ocultoReloj`): el daño entra ~10 s después de la Evasión. (2) **El Inamovible lo delataba**: Blanco J1 lleva unas botas con Inamovible 33 %, y
+  al empujarlo se abría para todos el cuadro «✨ Inamovible: Nova arcana: empuja a Blanco J1», también en la pantalla del GM, con el nombre, y
+  quedaba esperando (15 minutos) a que alguien lo tirara. Ahora ese cuadro va marcado como el duelo oculto (`vtt-hexgrid/js/21` y `js/78`): lo ve
+  solo su bando (y el GM con 👁) y, si nadie lo tira, a los 40 s la pantalla del GM lo tira sola. Probado de nuevo con clics: no salió (4 en el
+  d6), lo empujó 2 casillas y siguió escondido; el GM no vio nada. Pruebas automáticas nuevas (1104 en verde). Capturas: cola91 (la «0-…» es la de
+  antes del arreglo). Sin probar: el caso de P321 (vence mientras resuelve otro duelo) y un área con un estado.
 
 - **⬜ en cola — 🥷 Aviso al escondido cuando el daño no alcanza para delatarlo** (dueño, 2026-11-23): «si a un personaje escondido se le hace
   daño que no alcanza para revelarlo, al usuario le tiene que aparecer: te hicieron tanto de daño, pero no alcanzó tu nivel de sigilo, por lo cual

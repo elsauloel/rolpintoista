@@ -98,13 +98,18 @@ function inamovibleEfecto(pct, que, quien, fuente){
   return {nombre: 'Inamovible', caras: d.caras, exitos: d.exitos, firme: true,
     detalle: `${que || 'Lo quieren mover'}. ${quien} es ${Combatiente.chanceEtiqueta('Inamovible', fuente, pct)}: ${Combatiente.chanceSale(pct)} en 1d${d.caras}; si sale, no se mueve.`.slice(0, 200)};
 }
+// 🙈 El empujón de un duelo oculto (2026-11-24, cola de pruebas: la Nova arcana a Blanco J1 escondido, que no se delató, le abrió al GM el cuadro
+// «Inamovible: … empuja a Blanco J1» con el nombre). Mientras se aplica lo de un escondido (js/130, `areaOcultaActiva`), el cuadro de Inamovible
+// va marcado como el duelo oculto: lo ven su bando y el GM con 👁, y si nadie lo tira, la pantalla del GM lo tira sola (comun/duelo.js, 40 s).
+function inamovibleGrupo(id, escondido){ return escondido && id ? {id: `oculto-inamovible-${id}`.slice(0, 40), oculto: true} : null; }
 async function inamovibleSale(t, pct, que){
   pct = Combatiente.chancePct(pct);
   if(pct <= 0) return false;
   const quien = nombreDe(t), id = tokenIdDeObj(t);
   const ef = inamovibleEfecto(pct, que, quien, chanceFuente(t, 'inamovible'));
   if(!ef || !id || t.oculto || typeof contiendaDuelo !== 'function' || typeof yoDeToken !== 'function') return inamovibleCartel(t, pct, que);
-  const c = await contiendaDuelo({yo: yoDeToken(id), deTokenId: id, aTokenId: id, esperar: true, extra: {secundario: true}, hab: {
+  const grupo = inamovibleGrupo(id, typeof areaOcultaActiva === 'function' && areaOcultaActiva());
+  const c = await contiendaDuelo({yo: yoDeToken(id), deTokenId: id, aTokenId: id, esperar: true, extra: {secundario: true}, ...(grupo ? {grupo} : {}), hab: {
     nombre: `Inamovible: ${que || 'lo quieren mover'}`.slice(0, 60), objetivo: 'uno mismo', tira: null, contra: [], dano: null, efectos: [ef],
     detalle: `${chanceEtq(t, 'inamovible', 'Inamovible', pct)}: lo tira quien maneja a ${quien}.`.slice(0, 200)}});
   if(c.falla) return inamovibleCartel(t, pct, que);   // el cuadro no se pudo abrir: el cartel de antes

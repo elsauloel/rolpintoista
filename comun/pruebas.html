@@ -112,7 +112,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261124ojo"></script>
+<script src="duelo.js?v=20261124c91"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261124c80"></script>
@@ -10859,6 +10859,27 @@ grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comu
     cierto(/const OCULTO_MS = 40 \* 1000/.test(src) && /setInterval\(revisarOcultos, 5000\)/.test(src));
     cierto(/const puedeAtq = esMio\(d\.atacante\) \|\| soyGM\(\) \|\| porOcultoAtq\(d\)/.test(src));
     cierto(!/anunciarMesa\(anuncio\);/.test(src) && !/mesaPublicar\(publicar\.origen, publicar\.r\)/.test(src));   // todas las líneas pasan por la marca
+  });
+  prueba('los 40 s: si la pantalla del GM ya tomó un duelo oculto, los pasos que siguen van enseguida (comun/duelo.js, cola de pruebas 2026-11-24)', async () => {
+    const src = await traer('duelo.js');
+    const trozo = src.slice(src.indexOf('  const OCULTO_MS'), src.indexOf('  async function revisarOcultos'));
+    const reloj = new Function(trozo + '\nreturn {ocultoReloj, OCULTO_MS, OCULTO_SIGUE_MS};')();
+    const a = reloj.ocultoReloj(undefined, 'contacto', 1000);   // recién llega: sus 40 s
+    const b = reloj.ocultoReloj(a, 'contacto', 9000);   // nada cambió: el mismo reloj
+    const c = reloj.ocultoReloj({...a, hecho: true}, 'dano', 50000);   // el GM tiró por él: el paso que sigue, a los 4 s
+    const e = reloj.ocultoReloj(c, 'efectos', 60000);   // y el siguiente también
+    const j = reloj.ocultoReloj(a, 'dano', 20000);   // contestó el jugador (el GM no lo tomó): otros 40 s
+    igual([a.desde, b === a, c.tomado, 54000 - c.desde >= reloj.OCULTO_MS, 53000 - c.desde >= reloj.OCULTO_MS, e.tomado, 64000 - e.desde >= reloj.OCULTO_MS, j.tomado, j.desde],
+      [1000, true, true, true, false, true, true, false, 20000]);
+    cierto(/const v = ocultoReloj\(ocultoVisto\.get\(d\.id\), f, ahora\);/.test(src));
+  });
+  prueba('el Inamovible de un empujón a un escondido va marcado como su duelo oculto (js/21, js/78)', async () => {
+    const [m21, m78] = await Promise.all([traer('../vtt-hexgrid/js/21-chance.js'), traer('../vtt-hexgrid/js/78-choque-pesado.js')]);
+    const trozo = m21.slice(m21.indexOf('function inamovibleGrupo'), m21.indexOf('async function inamovibleSale'));
+    const g = new Function(trozo + '\nreturn inamovibleGrupo;')();
+    igual([g('tok1', true), g('tok1', false), g('', true)], [{id: 'oculto-inamovible-tok1', oculto: true}, null, null]);
+    cierto(/inamovibleGrupo\(id, typeof areaOcultaActiva === 'function' && areaOcultaActiva\(\)\)/.test(m21) && /\.\.\.\(grupo \? \{grupo\} : \{\}\), hab: \{/.test(m21));
+    cierto(/async function contiendaDuelo\(\{yo, deTokenId, aTokenId, hab, pdgCompartido, esperar, extra, grupo\}\)/.test(m78) && /\.\.\.\(grupo \? \{grupo\} : \{\}\)\},/.test(m78));
   });
   prueba('el mapa: js/29 filtra lo marcado y js/13 lanza aparte a los que no ve', async () => {
     const [m29, m13, m14, m05] = await Promise.all([traer('../vtt-hexgrid/js/29-accion-incierta.js'), traer('../vtt-hexgrid/js/13-tokens-portal-duelo.js'), traer('../vtt-hexgrid/js/14-herramientas-y-arranque.js'), traer('../vtt-hexgrid/js/05-vista-y-dibujo.js')]);

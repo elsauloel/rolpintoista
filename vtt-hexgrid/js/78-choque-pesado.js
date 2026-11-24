@@ -393,12 +393,12 @@ function arrastreZonasMomento(id, d){
    la tirada de quien la usa, ya hecha (la Fuerza del Salto para todos; el valor fijo de Tolerar). Con `esperar`, → {gana: 'atacante'|'defensor', d} |
    {cancelado} | {aMano} | {tiempo} | {falla}; sin `esperar`, → {id} apenas se abre (o {falla}). */
 const CONTIENDA_TOPE_MS = 15 * 60000;
-async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, esperar, extra}){
+async function contiendaDuelo({yo, deTokenId, aTokenId, hab, pdgCompartido, esperar, extra, grupo}){   // `grupo`: {id, oculto} para que lo vea solo el bando de un escondido (js/21)
   const t = tokens.get(aTokenId);
   if(!t || !hab) return {falla: true};
   let id = null;
   try{
-    id = await Duelo.crear({yo, ataque: {hab, habNombre: hab.nombre, ...(extra || {})}, ...(pdgCompartido ? {pdgCompartido} : {})},
+    id = await Duelo.crear({yo, ataque: {hab, habNombre: hab.nombre, ...(extra || {})}, ...(pdgCompartido ? {pdgCompartido} : {}), ...(grupo ? {grupo} : {})},
       {id: aTokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, deTokenId || '');
   }catch(err){ console.error(`${hab.nombre}: no se pudo abrir el duelo`, err); }
   if(!id){ toast(`${hab.nombre}: no se pudo abrir el duelo — resolvelo a mano con la mesa`); return {falla: true}; }

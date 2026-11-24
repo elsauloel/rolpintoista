@@ -182,7 +182,7 @@
   vamos a poner en los cuadros de detalle cada caso específico, sino que vamos a poner las reglas generales»).
 - **Tres listas** (dueño, 2026-11-24, «para ordenar el desarrollo»): **desarrollo** = la cola (`docs/cola-de-pruebas.md`, «🛠 Cola de
   programación»); **para ver en la compu** = `docs/pendientes.md` «🖥 Para recordarle al dueño…»; **diseño** = `docs/lista-de-diseno.md` (catálogo,
-  tiers altos, razas, creeps, pasivas… lo que necesita tiempo y dedicación). Cada cosa nueva va a la lista que le corresponde.
+  tiers altos, razas, creeps, pasivas… lo que necesita tiempo y dedicación). Cada cosa nueva va a la lista que le corresponde. La cola queda en su orden de siempre; **la de diseño y la de la compu van ordenadas de lo más corto / simple a lo más largo** (dueño, 2026-11-24): lo nuevo se ubica según eso.
 - **«Cuando esté en la compu»**: lo que el dueño deja para revisar en la compu va a `docs/pendientes.md`, sección «🖥 Para recordarle al dueño
   cuando esté en la compu». Cuando escriba que está en la compu (o pida «la lista de pendientes de la compu»), pasarle esa lista entera y
   revisarla una por una.

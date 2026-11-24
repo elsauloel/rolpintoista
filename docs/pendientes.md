@@ -819,43 +819,25 @@
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
 > Una de las **tres listas** (dueño, 2026-11-24): desarrollo → `cola-de-pruebas.md`; compu → acá; diseño → `lista-de-diseno.md`.
+> **Orden (dueño, 2026-11-24): de lo más corto / simple a lo más largo**, para ir de menos a más. Lo hecho (✅), abajo de todo.
 
 - [ ] **📜 Chequear la ficha lite** (dueño, 2026-11-24, a raíz de si Sigilo aparece como derivado de Destreza: en la ficha sí). Mirar en la
   ficha lite (el 📜 de un token o la F en el mapa) que estén los stats derivados, Sigilo incluido, y lo que falte o sobre.
-- [x] **📋 Pegar las reglas de Firestore (2026-11-23; ✅ pegadas por el dueño el 2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
-  suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
-  jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos
-  (la Trampa de teleport de Terreno y Formas no se podía crear). Mientras no estén pegadas no se rompe nada: el token suelto se pone (o se guarda) sin
-  la iniciativa ni la vida y avisa «faltan pegar las reglas». Después: las dos entradas «Probar … 📦» de `docs/cola-de-pruebas.md`.
-
+- [ ] **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
+  y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
+- [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
+- [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.
 - [ ] **✨ Mirar las cuatro animaciones de resurrección (2026-11-20)** — Ankh, Fénix, Revive y Pacto ya están en el mapa (`vtt-hexgrid/CLAUDE.md`,
   «Las animaciones de resurrección»). Claude mandó un video corto de cada una (y uno con las cuatro seguidas): mirarlos en la compu y decir qué
   cambiar. Para verlas en vivo, en una partida de pruebas: matar a un personaje con el Pacto activo, con un Ankh de Reencarnación en el cinturón o
   con el Elixir de Fénix tomado; o que un aliado le use un Revive (el frasquito sale de su token) o el GM el ✚ del token. A mirar en especial: si
   el ave del Fénix se lee como ave, si el latido del Revive «parece un corazón que arranca», si el polvo del Ankh se lee como una espiral, y si
   molesta que a las otras pantallas la animación les llegue alrededor de un segundo después que a la de quien revive.
-
-- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
-  el GM cambie SOLO el campo `nombre` de un token de personaje (dos lugares: los tokens del primer mapa y los de los mapas guardados). Mientras no
-  estén pegadas no se rompe nada: la pantalla del GM lo intenta y, si no puede, calla (sin error); los nombres los corrige igual la pantalla del
-  jugador dueño al abrir el mapa o su ficha.
-
-- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
-  `descubierta` en una trampa (dos lugares: los elementos del mapa de siempre y los de los mapas guardados). Mientras no estén pegadas, «Volver a
-  ocultar» y «✋ No la detectó» andan igual por un camino de respaldo (el mapa vuelve a colocar la misma trampa, tarda unos segundos más) si la
-  trampa es del GM o la puso una habilidad / un consumible; con una trampa hecha a mano por un jugador avisa «faltan pegar las reglas».
-
-- [ ] **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
-  y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
-- [ ] **Seguir la revisión del bloque 4, de a uno, en el mapa «Prueba · Carteles»** (pausada el 2026-11-12, dueño: «dejemos esto para la próxima
-  vez que te diga que estoy en la compu»). Hechos: Retirada (queda), Inamovible (al cuadro del duelo, en cola), Recuperarse (queda). **Sigue:
-  Reflejos** (el escenario puede quedar armado), después el dado del Escudo elemental, el Malviaje, soltarse, la Confusión y la tirada extra de una
-  zona; y después, de a una, las zonas con su propio cartel. El escenario de **Reflejos** quedó armado: Rockardo (copia) con las **Botas de zapador** (33 %), una Trampa de oso escondida
-  debajo de él y otra debajo de Larry (copia); arrastrarlo a la marca verde. Al terminar la serie, deshacer los cambios de prueba: a Rockardo (copia)
-  sacarle las Botas de zapador (`refl-zapador`) y volver a equipar los «soquetes de lona»; los No2 de Larry (copia); borrar las Ratas de carteles 1 y 2,
-  las dos Trampas de oso (Reflejos) y el mapa «Prueba · Carteles» si ya no hace falta.
-- [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
-- [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.
+- [ ] **Zonas que todavía usan su propio cartel** (2026-11-10, dueño: «ponelo en la lista de pendientes para ver en la compu»). En la auditoría
+  de tiradas (`docs/auditoria-tiradas.md`, tandas 1 y 2) las zonas con «tirada de la zona» pasaron al cuadro del duelo; estas siguen con el
+  cartel de la zona (y sus dados salen solos o con un «Aplicar»), porque el duelo todavía no las maneja: el **hielo** (una tirada por paso), las
+  zonas de **cura** y de **luz**, un **estado con chance** (la Varita de miasma), las que dejan **«soltarse»**, la **tirada extra sin tabla**, las de
+  **trampas** y las de **número fijo** (también su daño). Ver juntos: ¿pasan al cuadro del duelo o queda un cartel de zonas estandarizado?
 - [ ] **Auditoría de tiradas (`docs/auditoria-tiradas.md`), las preguntas abiertas** (2026-11-10, dueño: «cuando esté en la compu… las vamos a
   revisar una por una»). Los bloques 1, 2 y 3 (resistencias, daños y chances) se pasan al cuadro del duelo como ruta de trabajo, por tandas;
   quedan para revisar juntos:
@@ -864,6 +846,29 @@
   2. ~~**Choque por empujón:** el daño del choque, ¿lo tira quien empujó o el empujado?~~ ✅ decidido el 2026-11-11 (cada uno tira su propia Constitución; cola de programación 5).
   3. **Sigilo:** ¿está bien que el GM tire a escondidas la Destreza de quien está escondido (para no delatarlo)?
   4. ~~**Saque rápido:** sigue callado ¿o pasa a tener botón?~~ ✅ decidido el 2026-11-11: se tira solo; si sale, un aviso; si falla, solo Mesa y Crónica.
+- [ ] **Seguir la revisión del bloque 4, de a uno, en el mapa «Prueba · Carteles»** (pausada el 2026-11-12, dueño: «dejemos esto para la próxima
+  vez que te diga que estoy en la compu»). Hechos: Retirada (queda), Inamovible (al cuadro del duelo, en cola), Recuperarse (queda). **Sigue:
+  Reflejos** (el escenario puede quedar armado), después el dado del Escudo elemental, el Malviaje, soltarse, la Confusión y la tirada extra de una
+  zona; y después, de a una, las zonas con su propio cartel. El escenario de **Reflejos** quedó armado: Rockardo (copia) con las **Botas de zapador** (33 %), una Trampa de oso escondida
+  debajo de él y otra debajo de Larry (copia); arrastrarlo a la marca verde. Al terminar la serie, deshacer los cambios de prueba: a Rockardo (copia)
+  sacarle las Botas de zapador (`refl-zapador`) y volver a equipar los «soquetes de lona»; los No2 de Larry (copia); borrar las Ratas de carteles 1 y 2,
+  las dos Trampas de oso (Reflejos) y el mapa «Prueba · Carteles» si ya no hace falta.
+
+**Hecho:**
+
+- [x] **📋 Pegar las reglas de Firestore (2026-11-23; ✅ pegadas por el dueño el 2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
+  suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
+  jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos
+  (la Trampa de teleport de Terreno y Formas no se podía crear). Mientras no estén pegadas no se rompe nada: el token suelto se pone (o se guarda) sin
+  la iniciativa ni la vida y avisa «faltan pegar las reglas». Después: las dos entradas «Probar … 📦» de `docs/cola-de-pruebas.md`.
+- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): el GM le pone al día el nombre a un token de personaje** — `firebase/firestore.rules` deja que
+  el GM cambie SOLO el campo `nombre` de un token de personaje (dos lugares: los tokens del primer mapa y los de los mapas guardados). Mientras no
+  estén pegadas no se rompe nada: la pantalla del GM lo intenta y, si no puede, calla (sin error); los nombres los corrige igual la pantalla del
+  jugador dueño al abrir el mapa o su ficha.
+- [x] (2026-11-21: pegadas por el dueño; probado como GM de pruebas) **📋 Pegar las reglas de Firestore (2026-11-20): «🙈 Volver a ocultar» una trampa** — `firebase/firestore.rules` deja que el GM apague
+  `descubierta` en una trampa (dos lugares: los elementos del mapa de siempre y los de los mapas guardados). Mientras no estén pegadas, «Volver a
+  ocultar» y «✋ No la detectó» andan igual por un camino de respaldo (el mapa vuelve a colocar la misma trampa, tarda unos segundos más) si la
+  trampa es del GM o la puso una habilidad / un consumible; con una trampa hecha a mano por un jugador avisa «faltan pegar las reglas».
 - [x] **Revisar en el mapa el cartel de las trampas** — ✅ decidido el 2026-11-11 (dueño, probándolo en la compu: «los menús de las trampas me parecen bien»): las trampas quedan con su propio cartel paso a paso, igual para todas (no pasan al cuadro del duelo). Las trampas en flor (mitad centro / mitad toda el área) siguen en prueba. (2026-11-10, dueño: «me gustaría revisarlo en el mapa… las trampas pueden ser una
   excepción: pueden tener su propio menú de trampas, estandarizado para todas»). Hoy cada trampa usa el cartel paso a paso
   (`vtt-hexgrid/js/19-trampa-paso-a-paso.js`: la víctima tira su resistencia y quien la puso tira el daño, con su botón). Ver si queda como
@@ -871,11 +876,6 @@
   mitad «toda el área»).
 - [x] **Revisar el Golpe de escudo** — ✅ decidido desde el celular el 2026-11-10 (dueño: «la 2 me parece correcto… y no puede ser golpe
   crítico»): **1d10 + el peso del escudo + Dmg**, nunca crítico (antes: tantos d10 como el peso).
-- [ ] **Zonas que todavía usan su propio cartel** (2026-11-10, dueño: «ponelo en la lista de pendientes para ver en la compu»). En la auditoría
-  de tiradas (`docs/auditoria-tiradas.md`, tandas 1 y 2) las zonas con «tirada de la zona» pasaron al cuadro del duelo; estas siguen con el
-  cartel de la zona (y sus dados salen solos o con un «Aplicar»), porque el duelo todavía no las maneja: el **hielo** (una tirada por paso), las
-  zonas de **cura** y de **luz**, un **estado con chance** (la Varita de miasma), las que dejan **«soltarse»**, la **tirada extra sin tabla**, las de
-  **trampas** y las de **número fijo** (también su daño). Ver juntos: ¿pasan al cuadro del duelo o queda un cartel de zonas estandarizado?
 - [x] **Probar el Escudo elemental de rayo (eléctrico)** — ✅ **decidido y programado el 2026-11-09**: el salto va solo a los de afuera del anillo (guía de diseño); el mapa «Prueba · Escudo de rayo» de «Claude · pruebas» quedó armado para que el dueño lo vea. (dueño, 2026-11-09, desde el celular: «cuando esté en la compu, recordame que pruebe el escudo
   de rayo»). Su duda: si dos personajes están pegados al que lleva el escudo, los dos reciben el golpe inicial **y además** el salto del rayo, y
   quizás sea mucho. **Regla (aprobada 2026-11-09):** quien recibe el golpe inicial del escudo no puede ser objetivo del salto; el salto va solo a

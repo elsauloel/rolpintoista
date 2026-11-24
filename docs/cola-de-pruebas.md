@@ -2617,6 +2617,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   2026-11-24): hoy los pulsos violeta y azul del portal le aparecen al GM aunque no vea al token que pasa (delatan que alguien lo usó y hacia dónde).
   Que se vean solo en las pantallas que ven al token (el portal en sí se sigue viendo). Con «reducir movimiento», un destello corto sin ondas.
 
+- **⬜ en cola — 🦶 Un escondido que se mueve fuera de su turno: aviso en la Mesa, sin decir dónde** (dueño, 2026-11-24): «hoy si un jugador
+  escondido usa "movimiento libre", el juego lo botonea. Si un jugador mueve su token fuera de su turno, también debe aparecer un mensaje en la
+  mesa. No importa que se "revele" que hay un jugador escondido, porque el GM siempre sabe que hay un jugador escondido; no debe saber dónde… a
+  diferencia de los jugadores, que quizás no tienen por qué saber cuántos creeps hay hasta que se revelan». Revisar qué pasa hoy (qué dice la
+  Mesa, si se ve el rastro o la casilla) y que: un personaje escondido que se mueve fuera de su turno (o con movimiento libre) deje su línea en la
+  Mesa, que el GM pueda leer con el nombre, pero sin casilla, rastro ni nada que diga dónde está. Un creep escondido no avisa a los jugadores.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -202,7 +202,8 @@ function resolverGolpe(golpe, defensa, efectos, o){
   // 🛡 El escudo que llegó a 0 se va de la lista ahí mismo (dueño, 2026-11-09; Combatiente.quitarEscudosGastados).
   const escudosFuera = Array.isArray(efectos) ? Combatiente.quitarEscudosGastados(efectos) : [];
   return conExtra({recibido, absorbido, defensa, llega, ...(escudosFuera.length ? {escudosFuera} : {}), ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
-    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})});
+    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {}),
+    ...(o && o.perfEsp && !perfora ? {perfora: num(o.perfEsp.pasan), perfEsp: o.perfEsp} : {})});   // 🛡 (P283, 2026-11-24: para el aviso del golpe)
 }
 
 function leerGolpe(texto){
@@ -220,7 +221,9 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   if(Array.isArray(r.escudosFuera) && r.escudosFuera.length) extra.push(`se gastó ${r.escudosFuera.join(', ')}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
-  const trinG = Combatiente.trincheraEnPartes(r.defPartes), defTxt = `${trinG && trinG.esp ? 'Defensa especial' : 'Defensa'} ${fmt(r.defensa)}${trinG ? ` (con ${Combatiente.trincheraCorto(trinG.v)})` : ''}`;   // 🛡 (2026-11-22)
+  const pe = r.perfEsp;
+  const trinG = Combatiente.trincheraEnPartes(r.defPartes), defTxt = pe ? `Defensa especial ${fmt(num(pe.total) + num(r.defensa) - num(pe.resta))}${num(pe.trin) > 0 ? ` (con ${Combatiente.trincheraCorto(pe.trin)})` : ''}`   // 🛡 la real, no lo que frenó (P283)
+    : `${trinG && trinG.esp ? 'Defensa especial' : 'Defensa'} ${fmt(r.defensa)}${trinG ? ` (con ${Combatiente.trincheraCorto(trinG.v)})` : ''}`;   // 🛡 (2026-11-22)
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · ${defTxt} lo frenó entero`;
   return `${nombre}: ${fmt(golpe)} − ${defTxt} → ${fmt(Combatiente.danoAVida(r))} de daño (vida ${Combatiente.vidaCambioTxt(previo, nuevo, r)})${suf}`;   // la Vida extra cuenta como vida (P227; dueño, 2026-11-18: «104/35 → 100/35»)
 }
@@ -286,7 +289,8 @@ function defEstadosNota(estados, porStack){
 }
 function defensaPartes(c){
   const p = [];
-  if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)});
+  if(c.ignoraDef && c.o && c.o.perfEsp) p.push(...Combatiente.perforaEspPartes(c.o.perfEsp, c.o.perfEsp.trinTxt));   // 🛡 la Perfora contra la Defensa especial, con el Aguante adentro (P283, 2026-11-24)
+  else if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)});
     if(c.trinchera && num(c.trincheraEsp) > 0) p.push({txt: `${Combatiente.trincheraTxt(c.trinchera).replace(/ \+\d+/, '')} (a la Defensa especial)`, v: num(c.trincheraEsp)}); }
   else{
     const nota = defEstadosNota(c.estados, c.porStack);

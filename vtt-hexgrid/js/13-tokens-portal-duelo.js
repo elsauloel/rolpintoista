@@ -2250,9 +2250,15 @@ async function dueloAplicarDano(d, o){
   if(dn.defensaManual === 'no'){ aplicar = base.mitad ? Math.ceil(golpe / 2) : golpe; ignoraDef = true; }
   else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn, perfN) / 2) : Math.max(0, golpe - dmn, perfN); ignoraDef = true; }   // (la Perfora vale también contra la Defensa escrita a mano, 2026-10-27)
   // …y contra la Defensa especial: de lo que llega, esos N pasan siempre; el resto va contra la Defensa especial como siempre.
-  if(frenaAm && perfEst.esp > 0 && armadmg > 0){
-    const resta = Math.min(armadmg, Math.max(0, aplicar - perfEst.esp));
-    if(resta < armadmg){ freno = freno.replace(`Defensa especial ${armadmg}`, `Defensa especial ${armadmg} (pasan ${Math.min(perfEst.esp, aplicar)} por Armas perforantes)`); restaIgnorando = resta; }
+  // 🛡 Con el Aguante de trinchera ADENTRO de la Defensa especial, como en la común (P283 punto 2; dueño, 2026-11-24: opción a): si la Perfora deja pasar
+  // más, lo que frena ya lleva el Aguante y js/10 no lo vuelve a restar (`oD` va sin `frenaEsp`, con `perfEsp` para los renglones de la cuenta).
+  const trinEspP = frenaAm && trinD ? num(trinD.def) : 0;
+  const perfEsp = frenaAm && perfEst.esp > 0 ? Combatiente.perforaContraEsp(aplicar, armadmg, trinEspP, perfEst.esp) : null;
+  if(perfEsp){
+    restaIgnorando = perfEsp.resta;
+    const pasanTxt = `(pasa${perfEsp.pasan === 1 ? '' : 'n'} ${perfEsp.pasan} por Armas perforantes)`;
+    freno = armadmg ? freno.replace(`Defensa especial ${armadmg}`, `Defensa especial ${armadmg}${trinEspP ? ` + ${Combatiente.trincheraCorto(trinEspP)}` : ''} ${pasanTxt}`)
+      : [freno, `${Combatiente.trincheraCorto(trinEspP)} ${pasanTxt}`].filter(Boolean).join(' − ');
   }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).
@@ -2293,7 +2299,7 @@ async function dueloAplicarDano(d, o){
     const rr = res.r || {};
     if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
     else{
-      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota, 0, x.res));
+      (rr.defPartes || []).forEach(x => R(x.s !== undefined ? x.s : '−', x.txt, x.v, x.nota, 0, x.res));   // (`s: ''`: un renglón sin número, la Perfora contra la Defensa especial)
       if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? (ignoraDef ? 'pasa' : 'pasa la Defensa') : (ignoraDef ? 'lo frena entero' : 'la Defensa lo frena entero'), rr.llega);
       if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
       // ❤ La Vida extra es vida (dueño, 2026-11-18): no se resta como un escudo; lo que se lleva cuenta en «entra a la vida».
@@ -2304,7 +2310,7 @@ async function dueloAplicarDano(d, o){
     return cuenta;
   };
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(frenaAm ? {frenaEsp: true} : {}), ...(resEl ? {resTxt: [...(resElem ? [`${Combatiente.resElementalNombre(elDano)}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(frenaAm && !perfEsp ? {frenaEsp: true} : {}), ...(perfEsp ? {perfEsp: {...perfEsp, trinTxt: trinD ? Combatiente.trincheraTxt(trinD) : ''}} : {}), ...(resEl ? {resTxt: [...(resElem ? [`${Combatiente.resElementalNombre(elDano)}${resElem < 0 ? ' (vulnerable)' : ''}`] : []), ...(suelaD ? ['Suela gruesa'] : [])].join(' y ')} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     if(simular) oD.simular = true;
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
@@ -2407,7 +2413,7 @@ async function dueloAplicarDano(d, o){
       if(typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
     const cuenta = armarCuenta(res);
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, ...(desgasteDur ? {desgasteDur} : {}), cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), ...vidaCampos(res.r), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, ...(desgasteDur ? {desgasteDur} : {}), cuenta, defensa: crit ? (perfEsp ? perfEsp.def : restaIgnorando) : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), ...vidaCampos(res.r), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

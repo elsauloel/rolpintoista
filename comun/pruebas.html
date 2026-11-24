@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261123p281"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261123c69b"></script>
+<script src="combatiente.js?v=20261124c76"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -8711,6 +8711,26 @@ prueba('🛡 Aguante de trinchera con cualquier daño (dueño, 2026-11-22): a la
   igual([(t10.match(/Combatiente\.trincheraDelGolpe\(/g) || []).length, (t10.match(/\+ tg\.def;/g) || []).length, /trinEsp = ignoraDef && o && o\.frenaEsp/.test(t10), /trincheraEnPartes\(r\.defPartes\), defTxt/.test(t10), /de Aguante de trinchera` : ''\]/.test(t10)], [3, 3, false, true, true]);
   igual([/const trinZ = Combatiente\.trincheraEnPartes\(r\.defPartes\)/.test(t08), /- trinV;/.test(t08), /Aguante de trinchera no se cuenta acá/.test(g01)], [true, true, true]);
 });
+prueba('🛡 La Perfora contra la Defensa especial cuenta el Aguante de trinchera adentro, como en la común (P283 punto 2; dueño, 2026-11-24: opción a)', async () => {
+  const C = Combatiente;
+  // Defensa común: 8 de daño, Defensa 6, Aguante +2 (la Defensa ya lo lleva), Perfora 3 → pasan 3; sin Aguante, 8 − 6 = 2 → también pasan 3; si pasa más, nada.
+  igual([C.perforaPasa(8, 6 + 2, 3), C.perforaPasa(8, 6, 3), C.perforaPasa(12, 6 + 2, 3)], [3, 3, 0]);
+  // Defensa especial 6, Aguante +2, Armas perforantes 3: frena 5 y pasan 3 (antes el Aguante se restaba después y entraba 1); sin Aguante, lo mismo.
+  igual(C.perforaContraEsp(8, 6, 2, 3), {resta: 5, pasan: 3, def: 6, trin: 2, total: 8});
+  igual(C.perforaContraEsp(8, 6, 0, 3), {resta: 5, pasan: 3, def: 6, trin: 0, total: 6});
+  igual([8 - C.perforaContraEsp(8, 6, 2, 3).resta, 8 - C.perforaContraEsp(8, 6, 0, 3).resta], [3, 3]);
+  // Si la Perfora no cambia nada (pasa más igual), sin Perfora, o sin ninguna defensa: null (va como siempre). Solo con el Aguante (Defensa especial 0) también cuenta.
+  igual([C.perforaContraEsp(12, 6, 2, 3), C.perforaContraEsp(8, 6, 2, 0), C.perforaContraEsp(8, 0, 0, 3), C.perforaContraEsp(4, 0, 2, 3)], [null, null, null, {resta: 1, pasan: 3, def: 0, trin: 2, total: 2}]);
+  // Los renglones de la cuenta: la Defensa especial real (6, no «5»), el Aguante aparte y lo que pasa; el Aguante se sigue reconociendo en el aviso.
+  const filas = C.perforaEspPartes(C.perforaContraEsp(8, 6, 2, 3), '🛡 Aguante de trinchera +2: 2 enemigos pegados');
+  igual(filas, [{txt: 'Defensa especial', v: 6}, {txt: '🛡 Aguante de trinchera: 2 enemigos pegados (a la Defensa especial)', v: 2}, {s: '', txt: 'La Defensa especial (8) frenaba más: pasan 3 por Armas perforantes'}]);
+  igual(C.trincheraEnPartes(filas), {v: 2, esp: true});
+  igual(C.perforaEspPartes(C.perforaContraEsp(8, 6, 0, 3)), [{txt: 'Defensa especial', v: 6}, {s: '', txt: 'La Defensa especial (6) frenaba más: pasan 3 por Armas perforantes'}]);
+  igual([C.perforaEspPartes(null), C.perforaEspPartes(C.perforaContraEsp(6, 6, 0, 1)).pop().txt], [[], 'La Defensa especial (6) frenaba más: pasa 1 por Armas perforantes']);
+  // El mapa: el daño del duelo lo usa y, en ese caso, no le pide a js/10 que vuelva a sumar el Aguante; js/10 dibuja esos renglones.
+  const [t13, t10] = await Promise.all(['../vtt-hexgrid/js/13-tokens-portal-duelo.js', '../vtt-hexgrid/js/10-hud-y-vida.js'].map(async u => (await fetch(u, {cache: 'no-store'})).text()));
+  igual([/Combatiente\.perforaContraEsp\(aplicar, armadmg, trinEspP, perfEst\.esp\)/.test(t13), /frenaAm && !perfEsp \? \{frenaEsp: true\}/.test(t13), /R\(x\.s !== undefined \? x\.s : '−'/.test(t13), /Combatiente\.perforaEspPartes\(c\.o\.perfEsp/.test(t10)], [true, true, true, true]);
+});
 prueba('⚔ Las cinco maestrías nuevas (dueño, 2026-11-20): punzantes, cortantes, hachas, arcos y ballestas — cada bono solo con un arma de esa familia; personaje, creep e invocación; la 🔍 y el costo', () => {
   const C = Combatiente, P = id => PASIVAS_BASE.find(p => p.poolId === id);
   const pun = P('maestria-armas-punzantes'), cor = P('maestria-armas-cortantes'), hac = P('maestria-hachas'), arc = P('maestria-arcos'), bal = P('maestria-ballestas');
@@ -10092,7 +10112,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const t10 = await (await fetch('../vtt-hexgrid/js/10-hud-y-vida.js', {cache: 'no-store'})).text(), tdu = await (await fetch('duelo.js', {cache: 'no-store'})).text();
     ok(/sinNumero: !verNum/.test(t08) && /const verNum = Combatiente\.verResDe\(soyGM, t\.tipo\)/.test(t08) && /revelado \|\| \{\}\)\[elZ\]/.test(t08));
     ok(/resultado: resTxt\}/.test(t08) && /const resTxt = Combatiente\.resSinNumero\(resultadoZ\)/.test(t08) && /Combatiente\.resSinNumero\(cz\.cuenta\)/.test(t08));
-    ok(/v: num\(c\.restaExtra\), res: 1\}/.test(t10) && /R\('−', x\.txt, x\.v, x\.nota, 0, x\.res\)/.test(t13));
+    ok(/v: num\(c\.restaExtra\), res: 1\}/.test(t10) && /R\(x\.s !== undefined \? x\.s : '−', x\.txt, x\.v, x\.nota, 0, x\.res\)/.test(t13));
     ok(/const dn = resTapar\(d\) \? danoSinRes\(d\.dano\) : d\.dano;/.test(tdu) && /const dn = danoSinRes\(d\.dano\);/.test(tdu) && /const dn = danoSinRes\(m\.dano\)/.test(tdu));
   });
   prueba('🔥 con resistencia 0 al elemento, el cartel y el renglón no la nombran (P300, dueño, 2026-11-23, opción a); sin el número, como antes', async () => {

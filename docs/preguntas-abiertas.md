@@ -2615,3 +2615,14 @@ salió bien (empató y ganó), pero el jugador no eligió su tirada.
 1. ¿Los 40 s tendrían que esperar mientras el jugador está resolviendo otro duelo (empezar a contar recién cuando se le abre el del escondido)?
    **Recomendación:** sí; y si pasa mucho más (2–3 minutos), que lo resuelva solo igual.
 2. ¿O alcanza con un aviso en su pantalla antes de que se cumplan (P287, punto 4, ya lo preguntaba)?
+
+### P322 — 👁 Con «Revelar lo oculto» prendido, ¿los creeps «ven» al escondido? (2026-11-24, Claude)
+Revisando qué hace «👁 Revelar lo oculto» (cola de pruebas, 2026-11-24): es la **visión del GM**, pero el mapa del GM usa esa misma visión para
+algunas cosas del juego. Por código (no probado con clics): con el ojo prendido, (a) un área que tira un creep alcanza al escondido como un **duelo
+normal** y no como el duelo aparte de P263 (lo de «No hay nadie adentro del área» y que lo resuelva quien lo maneja); (b) el GM puede **elegir de
+objetivo** a un personaje en sigilo o adentro de una nube, y la línea de tiro no lo descarta. Con el ojo apagado, todo como siempre.
+1. ¿El ojo tendría que ser **solo para mirar** (el creep sigue sin ver al escondido: el área va aparte y no se lo elige de objetivo; si el GM
+   quiere, lo hace a mano)? **Recomendación:** sí, solo para mirar, como ya se decidió con las trampas de los jugadores («es su visión, no las
+   revela a nadie»).
+2. Lo de la Mesa se decide una vez, al llegar: lo que llegó con el ojo apagado no aparece al prenderlo (y lo que vio con el ojo prendido no se
+   borra al apagarlo). **Recomendación:** dejarlo así (el cuadro del duelo, el mapa y el orden de turnos sí cambian al toque).

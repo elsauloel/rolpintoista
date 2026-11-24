@@ -366,11 +366,34 @@ function renderOjo(){
   $('#btn-ojo-menu').classList.toggle('revelando', ojoRevelando);
   b.classList.toggle('primary', ojoRevelando);
   b.textContent = ojoRevelando ? '👁 Ocultar de nuevo' : '👁 Revelar lo oculto';
+  // 👁 (2026-11-24, dueño: «revisemos bien qué hace exactamente revelar lo oculto»): mientras está prendido, un cartelito fijo arriba del mapa
+  // (el botón del ojo solo se ponía rojo); lo que se ve solo por eso lleva un contorno rojo punteado y un 👁 (reveladoPorOjo, js/05).
+  let cartel = document.getElementById('ojo-revelando-cartel');
+  if(ojoRevelando && !cartel){
+    cartel = document.createElement('div');
+    cartel.id = 'ojo-revelando-cartel';
+    cartel.title = 'Ves a los personajes e invocaciones en sigilo, invisibles o adentro de una nube, las trampas de los jugadores, los duelos y las áreas de un escondido y lo que hacen. Lo que ves solo por esto lleva un contorno rojo punteado y un 👁. Los mensajes secretos entre jugadores siguen privados.';
+    cartel.innerHTML = '👁 Revelando lo oculto <button type="button">Apagar</button>';
+    cartel.querySelector('button').onclick = () => $('#btn-ojo').click();
+    document.body.appendChild(cartel);
+  }
+  if(cartel) cartel.hidden = !ojoRevelando;
 }
+/* 👁 ¿Esta pantalla ve esto SOLO porque el GM está revelando lo oculto? (2026-11-24): se mira lo mismo con el ojo apagado. Sirve para marcarlo
+   distinto (el token y la trampa con un contorno rojo punteado y un 👁; el área en rojo; la fila del orden de turnos y el duelo con un 👁).
+   Con «Como jugador» (js/05 dibuja con soyGM en falso) no marca nada. */
+function conOjoApagado(f){
+  if(!soyGM || !ojoRevelando) return false;
+  ojoRevelando = false;
+  try{ return !!f(); }catch(err){ return false; } finally { ojoRevelando = true; }
+}
+const reveladoPorOjo = t => !!t && conOjoApagado(() => !tokenVisiblePorNiebla(t) || ocultoPorSigiloParaMi(t));
+const elementoReveladoPorOjo = el => !!el && conOjoApagado(() => !puedeVerElemento(el));
 $('#btn-ojo').onclick = async () => {
   if(!soyGM) return;
   ojoRevelando = !ojoRevelando;
   renderOjo(); renderIniciativa(); pedirDibujo();
+  if(typeof Duelo !== 'undefined' && Duelo.refiltrarOcultos) Duelo.refiltrarOcultos();   // 🙈 el duelo de un escondido aparece (o se va) al toque
   if(!ojoRevelando){
     toast('Volvés a no ver lo oculto');
     // También se avisa a la mesa (línea común, sin el destello del ojo): lo oculto vuelve a estarlo.
@@ -386,7 +409,8 @@ $('#btn-ojo').onclick = async () => {
     });
   }catch(err){
     console.error('No se pudo avisar a los jugadores:', err);
-    ojoRevelando = false; renderOjo(); pedirDibujo();
+    ojoRevelando = false; renderOjo(); renderIniciativa(); pedirDibujo();
+    if(typeof Duelo !== 'undefined' && Duelo.refiltrarOcultos) Duelo.refiltrarOcultos();
     toast('No se pudo avisar a los jugadores, así que no se reveló nada');
   }
 };

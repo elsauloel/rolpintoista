@@ -131,6 +131,7 @@ const Duelo = (() => {
 #duelo-fondo.min{display:none}
 .duelo-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(880px,100%);max-height:96vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
 .duelo-interpuesto{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:rgba(227,168,90,.14);border:1px solid #e3a85a;color:#ffe2b0;font-weight:700;text-align:center}
+.duelo-por-ojo{background:rgba(216,82,75,.16);border:1px dashed #D8524B;color:#ffd0c8}
 .duelo-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2b3347;font-weight:800;font-size:18px;letter-spacing:.03em}
 .duelo-cab .bt{display:flex;gap:6px}
 .duelo-cab button{background:#232b40;border:0;color:#c7cee2;font-size:16px;cursor:pointer;border-radius:8px;padding:4px 10px}
@@ -2272,6 +2273,16 @@ const Duelo = (() => {
     return !(d.id && ocultoNoVisto.has(d.id) && d.estado !== 'esperando' && d.estado !== 'empate');
   }
   const porOcultoAtq = d => !!(d && esOculto(d) && esMio(d.defensor));   // quien maneja al escondido hace lo del atacante
+  // 👁 El GM prendió o apagó «Revelar lo oculto» (2026-11-24): la lista se vuelve a mirar al toque (antes esperaba al próximo cambio de un duelo).
+  // Al apagarlo, el duelo oculto que tenía abierto se cierra (sigue en curso: lo resuelve quien maneja al escondido).
+  function refiltrarOcultos(){
+    listaDuelos = todosDuelos.filter(veoOculto);
+    if(actual && actual.dato && esOculto(actual.dato) && !listaDuelos.some(d => d.id === actual.id)){ cerrar(); return; }
+    if(actual && actual.dato && esOculto(actual.dato)) dibujar();
+    dibujarChips();
+  }
+  // ¿Lo ve solo porque el GM está revelando lo oculto? (para el 👁 del cuadro y de su botón)
+  const ocultoPorOjo = d => !!(esOculto(d) && !esMio(d.defensor) && cfgEscuchar.veOcultoPorOjo && (() => { try{ return cfgEscuchar.veOcultoPorOjo(d); }catch(err){ return false; } })());
   // La marca de la Mesa de un duelo oculto: `oculta-<pj|creep>:<desde de siempre>` y la ficha del escondido (vtt-hexgrid/js/29 la filtra).
   function ocultaMesa(id, desde, d){
     const info = ocultosInfo.get(id) || (d && esOculto(d) ? {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || '')} : null);
@@ -3509,6 +3520,7 @@ const Duelo = (() => {
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
       <div class="duelo-cuerpo">
+        ${ocultoPorOjo(d) ? `<div class="duelo-interpuesto duelo-por-ojo">👁 Lo ves porque estás revelando lo oculto: <b>${_esc(d.defensor.nombre)}</b> está escondido y este duelo lo ve solo su bando. Si hace falta, lo podés resolver a mano (✋).</div>` : ''}
         ${d.defensor && d.defensor.interpuesto ? `<div class="duelo-interpuesto">🛡 Ahora le pega a <b>${_esc(d.defensor.nombre)}</b>: se interpuso${d.defensor.interpuesto.aliado ? ` por ${_esc(d.defensor.interpuesto.aliado)}` : ''}</div>` : ''}
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
@@ -4077,7 +4089,7 @@ const Duelo = (() => {
       // Mientras un paso espera a los dados, el botón no lo adelanta (ni el «💥 Crítico» que viene después).
       if(btxt.textContent && [...pasosEnEspera].some(k => k.startsWith(id + ':'))) return;
       el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
-      btxt.textContent = txt;
+      btxt.textContent = (ocultoPorOjo(d) ? '👁 ' : '') + txt;   // 👁 lo ve solo porque el GM revela lo oculto
       btxt.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';
       bx.title = enCurso(d) ? (d.hab ? 'Cancelar la ejecución' : 'Cancelar el duelo') : (d.hab ? 'Cerrar' : 'Terminar duelo');
     });
@@ -4513,5 +4525,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

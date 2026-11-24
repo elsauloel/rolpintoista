@@ -137,6 +137,7 @@ function inciertaDecidir(t, id){
   const des = String(t.desde || '');
   if(des === 'incierta-pj'){
     if(!soyGM) return {modo: 'ver', firme: true};   // su bando: el detalle
+    if(ojoRevelando) return {modo: 'ver', firme: true};   // 👁 el GM revelando lo oculto: el detalle (ya ve la trampa, 2026-11-24)
     const tok = tokenPorFicha(t.ficha, 'pj');
     return {modo: tok && !tok.oculto && !ocultoPorSigiloParaMi(tok) ? 'incierta' : 'nada', firme: true};
   }

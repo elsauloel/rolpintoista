@@ -100,6 +100,9 @@ function dueloVeOculto(d){
   if(soyGM && ojoRevelando) return true;
   return typeof loVeoAhora === 'function' && loVeoAhora(t);
 }
+// 👁 ¿Lo ve solo porque el GM está revelando lo oculto? (2026-11-24: el cuadro y su botón lo dicen con un 👁; el círculo va en rojo)
+const dueloOcultoPorOjo = d => typeof conOjoApagado === 'function' && conOjoApagado(() => !dueloVeOculto(d));
+const areaOcultaPorOjo = a => typeof conOjoApagado === 'function' && conOjoApagado(() => !areaOcultaLaVeo(a));
 // El círculo de un área contra un escondido: solo para quien ve ese duelo.
 function areaOcultaLaVeo(a){
   const id = a && (a.objetivos || [])[0], t = id ? tokens.get(id) : null;

@@ -111,6 +111,21 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   El botón cuadrado se resalta si la niebla está prendida o en "Como
   jugador", y va en rojo mientras se está revelando lo oculto. Reemplaza a
   los tres botones sueltos que había, para que la cabecera entre en una línea.
+- **👁 Qué revela «Revelar lo oculto»** (relevado el 2026-11-24, dueño: «revisemos bien qué hace exactamente revelar lo oculto»). Es la visión del
+  GM, mientras está prendido (`ojoRevelando`, js/03; se apaga al recargar); no revela nada a nadie. **Ve:** los personajes e invocaciones en
+  Sigilo o invisibles (`tokenVisiblePorNiebla`, `ocultoPorSigiloParaMi`) y adentro de una nube (`tapadoPorNiebla`), con su estela y su fila del
+  orden de turnos; las trampas de los jugadores sin descubrir (`puedeVerElemento`, js/07); el duelo y el círculo del área de un escondido
+  (`dueloVeOculto`, js/130; `Duelo.refiltrarOcultos` lo vuelve a mirar al toque al prender o apagar, y al apagarlo cierra el que tenía abierto) y lo
+  puede resolver a mano como cualquier duelo; las líneas de la Mesa y los momentos de un escondido (`escondidoLoVeo`, js/29) y el detalle de la
+  trampa que puso un jugador (`incierta-pj`). **Ya lo veía siempre** (sin el ojo): los tokens ocultos por el GM, los creeps, lo invisible para los
+  jugadores, lo que está bajo tierra y lo que tapa la niebla de guerra (salvo con «Como jugador», que dibuja como un jugador y no aplica el ojo).
+  **Queda privado a propósito:** los mensajes secretos entre jugadores (`comun/mensajes.js`). **Cómo se nota:** un cartelito fijo arriba
+  «👁 Revelando lo oculto · Apagar» (`#ojo-revelando-cartel`), y lo que se ve SOLO por el ojo (`reveladoPorOjo` / `elementoReveladoPorOjo`, que
+  miran lo mismo con el ojo apagado con `conOjoApagado`) va con un contorno rojo punteado y un 👁: el token (js/05), la trampa (`ojoMarcaCeldas`),
+  la fila del orden de turnos (js/04), el cartel de la casilla («👁 la ves porque estás revelando lo oculto», js/104), el área (en rojo,
+  `areaOcultaPorOjo`) y el duelo (un cartel arriba y un 👁 en su botón; `cfg.veOcultoPorOjo`, comun/duelo.js). Lo de la Mesa se decide al llegar:
+  lo que llegó con el ojo apagado no aparece al prenderlo. Abierto: P322 (con el ojo prendido, un área de un creep alcanza al escondido como duelo
+  normal y se lo puede elegir de objetivo). Probado con clics en «Claude · pruebas 2» (GM, Jugador 1 y Jugador 2).
 - **🌫 Niebla de guerra** (2026-09-19, primer paso; diseño en `../docs/preguntas-abiertas.md`
   P47–P54). Doc `campanas/{id}/mapa/niebla` (o `mapas/{id}/estado/niebla`) =
   `{activa, descubiertas:[celdas empaquetadas con nbPack], actualizado}`.

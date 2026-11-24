@@ -29,7 +29,8 @@ function hexInfoDatos(celda){
       const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
       quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
     }
-    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta && trampaEsDelGM(el))}).map(x => ({...x, elId: id})));   // (elId: para «👁 Revelar», js/122)
+    const porOjo = typeof elementoReveladoPorOjo === 'function' && elementoReveladoPorOjo(el);   // 👁 la trampa de un jugador, solo por Revelar lo oculto
+    items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta && trampaEsDelGM(el))}).map(x => ({...x, elId: id, ...(porOjo ? {porOjo: true} : {})})));   // (elId: para «👁 Revelar», js/122)
   });
   // Las auras de los tokens que se ven (un estandarte oculto o tapado por la niebla no se delata).
   const seVe = x => !(x.oculto && !soyGM) && !x.bajoTierra && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x));
@@ -62,7 +63,7 @@ try { hexInfoAbierto = localStorage.getItem('hex-info-abierto') === '1'; } catch
 const hexInfoVacio = d => d.items.length === 1 && d.items[0].titulo === 'Nada la afecta';
 function hexInfoLista(d){
   const fila = x => `<li class="hi-${esc(x.clase || 'otro')}${x.oculto ? ' hi-oculto' : ''}"><span class="hi-ico">${esc(x.icono)}</span>` +
-    `<span class="hi-txt"><b>${esc(x.titulo)}</b>${x.oculto ? ' <em>👁 los jugadores no lo ven</em>' : ''}${x.detalle ? `<small>${esc(x.detalle)}</small>` : ''}</span></li>`;
+    `<span class="hi-txt"><b>${esc(x.titulo)}</b>${x.oculto ? ' <em>👁 los jugadores no lo ven</em>' : ''}${x.porOjo ? ' <em class="hi-por-ojo">👁 la ves porque estás revelando lo oculto</em>' : ''}${x.detalle ? `<small>${esc(x.detalle)}</small>` : ''}</span></li>`;
   return `<ul>${d.items.map(fila).join('')}</ul>`;
 }
 function hexInfoHtml(d, celda){

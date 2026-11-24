@@ -2134,9 +2134,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   vio); J1 en una Niebla, a 3 casillas: el GM, «No hay nadie adentro del área»; J1 ganó la Evasión, no llegó a salir, recibió 3 (a mano, menos que
   su Sigilo) y Escarcha, y siguió en Sigilo. En las tres, el GM sin toasts, Mesa ni Crónica del escondido. **Visto**: en la línea, mientras J1
   resolvía el duelo de la Abeja, a los 40 s la pantalla del GM tiró sola la Evasión de J1 («solo: no contestó»): ver P321. Capturas: cola88.
-- **⬜ en cola — Probar: 🙈 el GM con 👁 Revelar lo oculto ve el duelo de un personaje escondido y lo resuelve a mano** (2026-11-22, P263).
+- **✅ hecho (2026-11-24) — Probar: 🙈 el GM con 👁 Revelar lo oculto ve el duelo de un personaje escondido y lo resuelve a mano** (2026-11-22, P263).
   **Y (dueño, 2026-11-24):** revisar bien qué hace exactamente «👁 Revelar lo oculto», para garantizar que además de personajes ocultos
   revele trampas y otras cosas que el GM pudiera no ver.
+  **Resultado:** el inventario de lo que revela está en `vtt-hexgrid/CLAUDE.md` («👁 Qué revela…»). Ya revelaba a los personajes e invocaciones
+  en Sigilo, invisibles o adentro de una nube, las trampas de los jugadores, el duelo y el área de un escondido y sus líneas de la Mesa. **Faltaba
+  y se sumó:** el detalle de la trampa que pone un jugador en la Mesa (antes, ni con el ojo); que el duelo de un escondido aparezca al toque al
+  prender el ojo (antes esperaba a que el duelo cambiara) y se cierre al apagarlo; y **que se note**: un cartelito fijo arriba «👁 Revelando lo
+  oculto · Apagar», y lo que se ve solo por el ojo va con contorno rojo punteado y un 👁 (token, trampa, fila del orden de turnos, cartel de la
+  casilla, área en rojo y el cuadro del duelo con un aviso arriba). Los mensajes secretos entre jugadores siguen privados (sin tocar).
+  **Probado con clics en «Claude · pruebas 2» (GM, Jugador 1 y Jugador 2):** Blanco J1 en Sigilo y una trampa suya; con el ojo apagado el GM no
+  veía ninguno; prendido, los dos con su contorno rojo y su 👁, el cartel de la casilla con «la ves porque estás revelando lo oculto» y J1 con 👁 en
+  el orden de turnos; apagado (con el botón del cartelito), todo como antes. Con el ojo apagado, la Bola de fuego de un creep sobre J1: al GM «No
+  hay nadie adentro del área» y sin duelo; al prender el ojo le apareció el botón «👁 ✨ Ver ejecución: Arcano 3 → Blanco J1», lo abrió (con el
+  aviso arriba) y lo resolvió a mano (✍ la Evasión de J1, otro valor de daño menor al Sigilo, la Quemadura): J1 siguió escondido. Los jugadores
+  no vieron nada nuevo (solo el aviso de siempre del ojo). Quedó una pregunta: P322 (con el ojo prendido, un área alcanza al escondido como
+  duelo normal y se lo puede elegir de objetivo). Capturas: cola89. Lo que no se probó con clics, al final de la cola.
 - **⬜ en cola — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263): solo con pruebas automáticas.
 - **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
   probó con la pantalla del GM todavía con el código de antes (tiró la Evasión de J2, aceptó el daño y aplicó el Empujón solo); con el código
@@ -2508,6 +2521,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola (revisar con tiempo) — ⏱ Responder P321: ¿los 40 s del duelo de un escondido esperan mientras el jugador resuelve otro duelo?**
   (dueño, 2026-11-24: «ponela al final de la cola para revisarla con tiempo»). Recomendación: sí, y que pasados 2–3 minutos se resuelva solo igual.
+
+- **⬜ en cola — Probar: 👁 Revelar lo oculto con una invocación en Sigilo, con un personaje adentro de una nube y con un área tirada con el ojo
+  ya prendido** (2026-11-24): por código, la invocación y la nube se marcan igual que el personaje en Sigilo (contorno rojo y 👁); el área con el
+  ojo prendido va como duelo normal (P322). No se probaron con clics.
 
 ## En cola
 

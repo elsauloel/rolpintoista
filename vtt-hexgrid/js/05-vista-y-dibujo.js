@@ -310,6 +310,19 @@ function trazarPuntos(pts){
   ctx.closePath();
 }
 
+// 👁 Lo que el GM ve solo por «Revelar lo oculto» (2026-11-24): contorno rojo punteado y un 👁 en un circulito (la trampa de un jugador).
+function ojoMarcaCeldas(celdas, p, z, borde){
+  ctx.save();
+  borde(celdas);
+  ctx.setLineDash([7 / z, 5 / z]); ctx.strokeStyle = 'rgba(232,90,80,1)'; ctx.lineWidth = 3 / z; ctx.stroke(); ctx.setLineDash([]);
+  const r = Math.max(6 / z, HEX * 0.22), mx = p.x - HEX * 0.42, my = p.y - HEX * 0.42;
+  ctx.beginPath(); ctx.arc(mx, my, r, 0, 2 * Math.PI); ctx.fillStyle = 'rgba(142,35,35,.95)'; ctx.fill();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.font = `${r * 1.35}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
+  ctx.fillText('👁', mx, my + r * 0.08);
+  ctx.restore();
+}
+
 // Dónde va cada token: si varios comparten casilla, se acomodan en ronda.
 function calcularDisposicion(){
   // Tokens ocultos (solo el GM los prepara y los muestra cuando corresponde):
@@ -566,6 +579,7 @@ function dibujarLienzo(){
       // Su ficha redonda con un cepo (dueño, 2026-10-08), como el arma en el piso: la ve quien ve la trampa.
       const cT = typeof trampaCentro === 'function' ? trampaCentro(el) : celdas[0];
       trampaFichaDibujar(hexCentro(cT.col, cT.fila), z, disp);
+      if(typeof elementoReveladoPorOjo === 'function' && elementoReveladoPorOjo(el)) ojoMarcaCeldas(celdas, hexCentro(cT.col, cT.fila), z, bordeCeldas);   // 👁 la ve solo por Revelar lo oculto
       // 🎯 Se dispara solo en el centro (2026-11-10): esa casilla con un borde dorado punteado, para quien ve la trampa sin disparar.
       if(!disp && celdas.length > 1 && typeof trampaDisparoCentro === 'function' && trampaDisparoCentro(el)){
         trazarCeldas([cT]); ctx.setLineDash([7 / z, 5 / z]); ctx.strokeStyle = 'rgba(255,210,90,.95)'; ctx.lineWidth = 3 / z; ctx.stroke(); ctx.setLineDash([]);
@@ -1002,6 +1016,13 @@ function dibujarLienzo(){
     if(typeof estoicoDibujar === 'function' && estoicoDibujar(d.id, x, y, rad, z)) animando = true;   // 🗿 el ±2 🛡 del Estoicismo (js/85)
     if(typeof provocadoDibujar === 'function' && provocadoDibujar(d.id, x, y, rad, z)) animando = true;   // 😤 contra quién va un provocado (js/77)   // ⬆⬇ recibió un buff o un debuff (js/75)
 
+    const porOjo = reveladoPorOjo(t);   // 👁 (2026-11-24) lo ve solo porque el GM está revelando lo oculto: contorno rojo punteado y un 👁
+    if(porOjo){
+      const ga = ctx.globalAlpha; ctx.globalAlpha = 1;
+      trazarPuntos(verticesHex(x, y, rad + 9 / z));
+      ctx.setLineDash([7 / z, 5 / z]); ctx.strokeStyle = 'rgba(232,90,80,1)'; ctx.lineWidth = 3 / z; ctx.stroke(); ctx.setLineDash([]);
+      ctx.globalAlpha = ga;
+    }
     if(seleccion === d.id){
       trazarPuntos(verticesHex(x, y, rad + 5 / z));
       ctx.strokeStyle = '#EDE3D2'; ctx.lineWidth = 2.5 / z; ctx.stroke();
@@ -1026,6 +1047,7 @@ function dibujarLienzo(){
     {
       const marcas = [];
       if(t.oculto) marcas.push('🙈');
+      if(porOjo) marcas.push('👁');
       if(enSigilo(t) && typeof iconosEstadosDibujar !== 'function') marcas.push('🥷');   // (con los íconos de estados, el Sigilo va en la ronda: 🕶, js/88)
       if(modoMapa === 'combate' && tokenSinArma(t) && typeof iconosEstadosDibujar !== 'function') marcas.push('✋');   // ✋ nada en la mano (paso 5): pega sin arma (con js/88, va en la ronda de los estados: 2026-11-01)
       if(marcas.length){
@@ -1307,13 +1329,14 @@ function dibujarLienzo(){
     if(typeof areaDeOtroMapa === 'function' && areaDeOtroMapa(a)) return;   // 🗺 un área de otro mapa no se dibuja acá
     if(a.hab && a.hab.zonaId) return;   // 💨 la tanda de duelos de una zona (js/112): ya se ve la nube
     if(a.hab && a.hab.oculta && typeof areaOcultaLaVeo === 'function' && !areaOcultaLaVeo(a)) return;   // 🙈 el área contra alguien escondido (P263): solo quien lo ve
-    if(!(a.centro && (a.centro.cono || Array.isArray(a.centro.linea)))){ dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z); return; }
+    const porOjo = !!(a.hab && a.hab.oculta && typeof areaOcultaPorOjo === 'function' && areaOcultaPorOjo(a));   // 👁 solo por Revelar lo oculto: en rojo
+    if(!(a.centro && (a.centro.cono || Array.isArray(a.centro.linea)))){ dibujarAuraHex(a.centro, {radio: a.radio, color: porOjo ? '#D8524B' : '#9B7BD4'}, z); return; }
     // El cono de una habilidad (Sonic Boom) o su línea recta (Varita láser): sus casillas, en el mismo violeta.
     const celdas = Array.isArray(a.centro.linea) ? a.centro.linea.map(k => nbUnpack(k)) : zonasSigilo({col: a.centro.col, fila: a.centro.fila, rotacion: num(a.centro.rot)}).cono;
     ctx.beginPath();
     celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
-    ctx.fillStyle = 'rgba(155,123,212,.28)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(155,123,212,.9)'; ctx.lineWidth = 2 / z; ctx.stroke();
+    ctx.fillStyle = porOjo ? 'rgba(216,82,75,.22)' : 'rgba(155,123,212,.28)'; ctx.fill();
+    ctx.strokeStyle = porOjo ? 'rgba(216,82,75,.9)' : 'rgba(155,123,212,.9)'; ctx.lineWidth = 2 / z; ctx.stroke();
   });
 
   if(typeof lineaPreview !== 'undefined' && lineaPreview) dibujarLineaPreview(z);   // la línea recta que se está apuntando

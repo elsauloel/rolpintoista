@@ -112,7 +112,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261124p320"></script>
+<script src="duelo.js?v=20261124ojo"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261124c80"></script>
@@ -10942,6 +10942,45 @@ grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hex
     const a = mostrado.pasos[0].texto;
     f('m2', {estado: 'esperando', datos: {paraUid: 'gm', n: 2, quien: 'Control mental 4'}});
     igual([a, /Salió un 1/.test(mostrado.pasos[0].texto)], ['El diablito de la Botella se te ríe y te hace 2 de daño de fuego.', true]);
+  });
+})();
+
+grupo('👁 Revelar lo oculto del GM: qué ve y cómo lo marca (2026-11-24, vtt-hexgrid/js/03, js/05, js/29, js/130, comun/duelo.js)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  // Lo de js/03 con un mundo chiquito: el GM no ve a un personaje en sigilo ni la trampa de un jugador, salvo con el ojo.
+  async function mundoOjo(gm, ojo){
+    const src = await traer('../vtt-hexgrid/js/03-asistente-trampa.js');
+    const trozo = src.slice(src.indexOf('function conOjoApagado'), src.indexOf('$(\'#btn-ojo\').onclick'));
+    return new Function('soyGM', 'ojoInicial', 'let ojoRevelando = ojoInicial;\n' +
+      'const tokenVisiblePorNiebla = t => !(soyGM && !ojoRevelando && t.sigilo);\n' +
+      'const ocultoPorSigiloParaMi = t => soyGM && !ojoRevelando && !!t.sigilo;\n' +
+      'const puedeVerElemento = el => !(el.trampaJugador && !(soyGM && ojoRevelando));\n' +
+      trozo + '\nreturn {reveladoPorOjo, elementoReveladoPorOjo, conOjoApagado, ojo: () => ojoRevelando};')(gm, ojo);
+  }
+  prueba('con el ojo prendido marca solo lo que el GM ve por eso; apagado, o siendo jugador, no marca nada', async () => {
+    const GO = await mundoOjo(true, true), G = await mundoOjo(true, false), J = await mundoOjo(false, true);
+    const esc = {sigilo: true}, vis = {}, tr = {trampaJugador: true}, trGM = {};
+    igual([GO.reveladoPorOjo(esc), GO.reveladoPorOjo(vis), GO.elementoReveladoPorOjo(tr), GO.elementoReveladoPorOjo(trGM), GO.ojo()], [true, false, true, false, true]);
+    igual([G.reveladoPorOjo(esc), G.elementoReveladoPorOjo(tr), J.reveladoPorOjo(esc), J.elementoReveladoPorOjo(tr)], [false, false, false, false]);
+    igual(GO.conOjoApagado(() => { throw new Error('x'); }), false);   // un error no lo deja apagado
+    igual(GO.ojo(), true);
+  });
+  prueba('el GM con el ojo ve el detalle de la trampa que puso un jugador (incierta-pj); sin el ojo, como antes', async () => {
+    const m29 = await traer('../vtt-hexgrid/js/29-accion-incierta.js');
+    const trozo = m29.slice(m29.indexOf('function inciertaDecidir'), m29.indexOf('  if(soyGM || des === \'incierta\''));
+    const hacer = (gm, ojo, oculto) => new Function('soyGM', 'ojoRevelando', 'tokenPorFicha', 'ocultoPorSigiloParaMi', trozo + '\n return {modo: \'resto\'}; }\nreturn inciertaDecidir;')(
+      gm, ojo, () => ({oculto: false}), () => oculto);
+    const m = (gm, ojo, oculto) => hacer(gm, ojo, oculto)({desde: 'incierta-pj', ficha: 'f1'}).modo;
+    igual([m(false, false, false), m(true, false, false), m(true, false, true), m(true, true, true), m(true, true, false)], ['ver', 'incierta', 'nada', 'ver', 'ver']);
+  });
+  prueba('el duelo y el área de un escondido: se vuelven a mirar al prender el ojo, con su 👁, y el área en rojo', async () => {
+    const [m03, m05, m130, m14, m04, m104, duelo] = await Promise.all(['../vtt-hexgrid/js/03-asistente-trampa.js', '../vtt-hexgrid/js/05-vista-y-dibujo.js', '../vtt-hexgrid/js/130-area-oculta.js',
+      '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../vtt-hexgrid/js/04-mantenimiento-e-iniciativa.js', '../vtt-hexgrid/js/104-hex-info.js', 'duelo.js'].map(traer));
+    cierto(/Duelo\.refiltrarOcultos\(\)/.test(m03) && /return \{refiltrarOcultos, /.test(duelo) && /function refiltrarOcultos\(\)\{\n\s+listaDuelos = todosDuelos\.filter\(veoOculto\)/.test(duelo));
+    cierto(/veOcultoPorOjo: d =>/.test(m14) && /const dueloOcultoPorOjo = d =>/.test(m130) && /ocultoPorOjo\(d\) \? `<div class="duelo-interpuesto duelo-por-ojo">/.test(duelo));
+    cierto(/const porOjo = reveladoPorOjo\(t\)/.test(m05) && /if\(porOjo\) marcas\.push\('👁'\)/.test(m05) && /elementoReveladoPorOjo\(el\)\) ojoMarcaCeldas/.test(m05) && /areaOcultaPorOjo\(a\)/.test(m05));
+    cierto(/reveladoPorOjo\(t\) \? '<span title="Lo ves porque estás revelando lo oculto">👁<\/span> '/.test(m04) && /porOjo: true/.test(m104));
   });
 })();
 

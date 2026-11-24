@@ -2411,8 +2411,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de la clase no mueven el token): no se probó. Nada que arreglar. Al final se devolvió el equipo y las habilidades de J1, sus No2 y SP, las
   posiciones y el giro, sin orden de turnos y en narrativo. Capturas (fuera del repo): `cola106/1-J1-Dash-aviso-antes-de-moverse.png`,
   `cola106/4-J1-Salto-usado-sin-Apuntada.png`, `cola106/5-GM-Salto-sin-oportunidad.png`, y el aviso del Salto, el Parpadeo y el Takle. Duda: P330.
-- **⬜ en cola — Probar: 🎯 la Apuntada en un creep y en una invocación con ballesta** (2026-11-23, P271): el creep la toma de su arma en la mano
+- **✅ hecho (2026-11-24) — Probar: 🎯 la Apuntada en un creep y en una invocación con ballesta** (2026-11-23, P271): el creep la toma de su arma en la mano
   (solo la pantalla del GM), la invocación del resumen de la ficha; con clics solo se probó un personaje.
+  Probado con clics en «Claude · pruebas 2», con una Ballesta de guerra (Apuntada +2) puesta por datos en la mano de Blanco creep y de la Abeja de
+  prueba (Jugador 1), con orden de turnos. **Creep**: al empezar una ronda sin haberse movido, al GM le salió el cartel dorado «🎯 Apuntada» sobre el
+  creep (a Jugador 1 y Jugador 2, nada); la 🔍 de Atacar con la ballesta, en las Acciones, dice «🎯 Apuntada +2 — suma: no se movió en esta ronda»;
+  el duelo contra Blanco J2 la mostró («apuntada (no se movió): +2 PdG») y la tirada la sumó (1d6+1 +2 → 7, le ganó a una Evasión de 5). Al
+  arrastrarlo el GM: «Blanco creep tiene Apuntada activa (+2 a PdG). Si lo movés, la pierde. [Moverme igual] [Cancelar]» (los jugadores no ven el
+  cartel); Cancelar lo deja quieto y con la Apuntada; «Moverme igual» lo mueve y la pierde. **Invocación**: lo mismo desde la pantalla de Jugador 1
+  (el cartel le sale a él y al GM, no a Jugador 2); la 🔍 de la Abeja dice que suma; el duelo contra el creep sumó +2 (1d4 +2 → 4); al arrastrarla,
+  «Abeja de prueba tiene Apuntada activa (+2 a PdG). Si lo movés, la pierde.» y con «Moverme igual» la pierde («se movió en esta ronda», en todas
+  las pantallas). Nada que arreglar. Al final se sacaron las ballestas y se devolvieron el creep (tal cual), los No2 de la Abeja, las posiciones y
+  los giros, sin orden de turnos y en narrativo. Capturas (fuera del repo): `cola107/1-GM-cartel-Apuntada-del-creep.png`,
+  `cola107/3-GM-aviso-al-mover-el-creep.png`, `cola107/4-J1-cartel-Apuntada-de-la-Abeja.png`, `cola107/6-J1-aviso-al-mover-la-Abeja.png`.
 - **⬜ en cola — Probar: 🔥 una invocación con turno propio sobre el muro de la Varita del muro de fuego** (2026-11-23, P272): va por el mismo
   camino que el Muro de fuego (renglón de «Empieza tu turno» de quien la maneja); con clics, solo un personaje y un creep.
 

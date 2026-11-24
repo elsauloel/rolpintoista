@@ -2854,6 +2854,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🐝 El cuadro del duelo dice «personaje» debajo de una invocación** (visto el 2026-11-24, probando la Abeja sobre el muro de la
   varita): en «Objetivo», debajo de «Abeja de prueba», dice «personaje». Que diga «invocación» (o «invocación de Blanco J1»).
 
+- **⬜ en cola — 🔥 El renglón de una zona lee la resistencia de una invocación (P331 decidida)** (dueño, 2026-11-24): hoy, con una invocación en
+  resistencia 0, el renglón igual dice «lo frena su resistencia al fuego» porque no lee su número; que lo lea, y con 0 no la nombre (como P300).
+- **⬜ en cola — 😵 El Mareo de invocación se ve como estado (P332 decidida)** (dueño, 2026-11-24): que la invocación recién llegada muestre el
+  iconito 😵 alrededor del token y que «Mareo de invocación» aparezca entre sus estados (ventana ◎, ficha). Sin vincularlo a las zonas.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261124suela"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261124c85"></script>
+<script src="combatiente.js?v=20261124agu"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -9689,6 +9689,12 @@ prueba('🕶 Aviso al escondido (2026-11-11): nombra a quien lo puede notar; «A
   igual([Combatiente.sigiloAvisoTitulo('Rata de prueba 1', true), Combatiente.sigiloAvisoTitulo('Rata de prueba 1', false), Combatiente.sigiloAvisoTitulo('', true)],
     ['Rata de prueba 1 podría haberte notado', 'Alguien podría haberte notado', 'Alguien podría haberte notado']);
 });
+prueba('🥷 Daño que no alcanza para delatar (2026-11-24): igual o menos que el Sigilo, y con algo de vida sacada; el cartel con la cuenta', () => {
+  igual([Combatiente.sigiloAguanta(3, 6), Combatiente.sigiloAguanta(6, 6), Combatiente.sigiloAguanta(7, 6), Combatiente.sigiloAguanta(0, 6), Combatiente.sigiloAguanta(-2, 6), Combatiente.sigiloAguanta(1, 0)],
+    [true, true, false, false, false, false]);
+  igual(Combatiente.sigiloAguantaTxt(3, 6), '🥷 Te hicieron 3 de daño, pero no alcanzó tu Sigilo (6): seguís escondido.');
+  igual(Combatiente.sigiloAguantaTxt(2, 5, {creep: true, nombre: 'Rata 1'}), '🥷 A Rata 1 le hicieron 2 de daño, pero no alcanzó su Sigilo (5): sigue escondido.');
+});
 
 prueba('🐝 Táctica de enjambre (dueño, 2026-11-20): +1 PdG por cada aliado pegado a quien ataca, sin tope; cuesta 2 de job; personaje, creep e invocación', () => {
   const C = Combatiente, pas = PASIVAS_BASE.find(p => p.nombre === 'Táctica de enjambre');
@@ -10981,6 +10987,60 @@ grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hex
     const a = mostrado.pasos[0].texto;
     f('m2', {estado: 'esperando', datos: {paraUid: 'gm', n: 2, quien: 'Control mental 4'}});
     igual([a, /Salió un 1/.test(mostrado.pasos[0].texto)], ['El diablito de la Botella se te ríe y te hace 2 de daño de fuego.', true]);
+  });
+})();
+
+grupo('🥷 Aviso al escondido cuando el daño no alcanza para delatarlo (2026-11-24, vtt-hexgrid/js/03 y js/16)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  // js/03 con un mundo chiquito: sigiloDelatarPorDano → sigiloAguantaAvisar, ¿a quién le publica?
+  async function mundo(tok, valor){
+    const src = await traer('../vtt-hexgrid/js/03-asistente-trampa.js');
+    const trozo = src.slice(src.indexOf('function sigiloValorDe'), src.indexOf('// Cada vez que algo se movió o cambió de sigilo'));
+    const publicados = [], quitados = [];
+    const f = new Function('tokens', 'fichasPub', 'miembros', 'Combatiente', 'momentoAbrir', 'publicados', 'quitados', 'valor',
+      'const SEP_INVOCACION = "~", sigiloRompiendo = new Set(), num = x => Number(x) || 0;\n' +
+      'const enSigilo = t => !!t.sigilo, nombreDe = t => t.nombre, toast = () => {}, sigiloAviso = () => {}, puedoCambiarEstados = () => true;\n' +
+      'const estadoDe = t => ({estados: [{nombre: "Sigilo"}]}), hudEstadoCambiar = async () => { quitados.push(1); };\n' +
+      'const creepPrivadoDe = () => ({}), CreepCalculo = {statValor: () => valor};\n' +
+      trozo + '\nreturn sigiloDelatarPorDano;');
+    const tokens = new Map([['t1', tok]]);
+    const fichasPub = new Map([['f1', {duenoUid: 'j1', resumen: {sigilo: valor}}], ['f2', {duenoUid: 'j1', resumen: {sigilo: valor, control: 'gm'}}]]);
+    const miembros = new Map([['gm', {gm: true}], ['j1', {}], ['j2', {}]]);
+    const momentoAbrir = async m => { publicados.push(m); return 'x'; };
+    return {delatar: f(tokens, fichasPub, miembros, Combatiente, momentoAbrir, publicados, quitados, valor), publicados, quitados};
+  }
+  prueba('no alcanza: el cartel con la cuenta, solo a quien lo maneja (su dueño; con 🎮 el GM; un creep, el GM); sin sacarle el Sigilo', async () => {
+    const a = await mundo({fichaId: 'f1', tipo: 'pj', nombre: 'Blanco J1', sigilo: true}, 6);
+    igual(await a.delatar('t1', 3, 'Grito espeluznante'), false);
+    igual([a.publicados.length, a.publicados[0].tipo, a.publicados[0].datos.paraUids, a.publicados[0].datos.textoAviso, a.quitados.length],
+      [1, 'sigilo-aguanta', ['j1'], '🥷 Te hicieron 3 de daño, pero no alcanzó tu Sigilo (6): seguís escondido.', 0]);
+    const b = await mundo({fichaId: 'f2', tipo: 'pj', nombre: 'Blanco J1', sigilo: true}, 6);
+    await b.delatar('t1', 6, 'Zona');
+    igual(b.publicados[0].datos.paraUids, ['gm']);
+    const c = await mundo({fichaId: 'c1', tipo: 'creep', nombre: 'Rata 1', sigilo: true}, 5);
+    await c.delatar('t1', 2, 'Nova arcana');
+    igual([c.publicados[0].datos.paraUids, c.publicados[0].datos.textoAviso], [['gm'], '🥷 A Rata 1 le hicieron 2 de daño, pero no alcanzó su Sigilo (5): sigue escondido.']);
+  });
+  prueba('lo delata (más que su Sigilo) o no le sacó vida: no sale el cartel', async () => {
+    const a = await mundo({fichaId: 'f1', tipo: 'pj', nombre: 'Blanco J1', sigilo: true}, 6);
+    igual(await a.delatar('t1', 7, 'Nova arcana'), true);
+    igual([a.publicados.length, a.quitados.length], [0, 1]);
+    const b = await mundo({fichaId: 'f1', tipo: 'pj', nombre: 'Blanco J1', sigilo: true}, 6);
+    igual([await b.delatar('t1', 0, 'Nova arcana'), b.publicados.length], [false, 0]);
+    const c = await mundo({fichaId: 'f1', tipo: 'pj', nombre: 'Blanco J1', sigilo: false}, 6);
+    igual([await c.delatar('t1', 2, 'Nova arcana'), c.publicados.length], [false, 0]);
+  });
+  prueba('js/16: el momento «sigilo-aguanta» no va a la Crónica de nadie; al centro solo para los de paraUids', async () => {
+    const src = await traer('../vtt-hexgrid/js/16-momentos.js');
+    const i = src.indexOf("if(d.tipo === 'sigilo-aguanta'){");
+    igual(i > 0, true);
+    const trozo = src.slice(i, src.indexOf('// 🕶 El sigilo de un personaje (2026-11-11, js/116)', i));
+    const correr = uid => { const pasos = []; const momentosFeed = {delete: () => pasos.push('fuera')};
+      new Function('d', 'id', 'fbUsuario', 'momentosFeed', 'renderMomentosFeed', 'momentoAvisoCentro', trozo + '\nreturn "siguió";')(
+        {tipo: 'sigilo-aguanta', datos: {paraUids: ['j1']}}, 'm1', {uid}, momentosFeed, () => {}, () => pasos.push('centro'));
+      return pasos; };
+    igual([correr('j1'), correr('gm'), correr('j2')], [['fuera', 'centro'], ['fuera'], ['fuera']]);
   });
 })();
 

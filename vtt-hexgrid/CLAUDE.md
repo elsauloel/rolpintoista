@@ -1069,6 +1069,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Lo que no se guarda (quién puso un Veneno): P314 (dueño: no hace falta). **Ajuste** (2026-11-23): «Nombre: N»; el corto nunca pierde el número (la
   vida por turno, los stacks y los números que publican ahora la ficha, GM Tools y `modificarCreep`, con `EstadoCorto.pub`); el Sobrepeso «−X a Evasión,
   salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −X a Iniciativa»; al pie de los dos globos, `hoverDetallePie()` (dónde ver el detalle: ◎ o E).
+- **🥷 «Seguís escondido»: el daño que no alcanza para delatarlo** (2026-11-24, dueño: «te hicieron tanto de daño, pero no alcanzó tu nivel de sigilo,
+  por lo cual seguís escondido»): en `sigiloDelatarPorDano` (js/03, el chequeo de todo daño que puede delatar: áreas, zonas, trampas), si le sacó vida
+  sin pasar su Sigilo, `sigiloAguantaAvisar` publica un momento `sigilo-aguanta` con `paraUids` = quien lo maneja (`sigiloManejaUids`: un personaje o
+  su invocación, `resumen.control` o su dueño; un creep, los GM). js/16 no lo pone en la Crónica de nadie y lo abre al centro solo para ellos (espera
+  a que se cierre otro aviso, como `zona-dano`). Los textos, `Combatiente.sigiloAguanta/sigiloAguantaTxt`. Probado con clics en «Claude · pruebas 2».
 - **🤐 El Tótem de silencio pone el estado Silencio de verdad** (2026-11-24, dueño: «mientras estás en el efecto, te tiene que aparecer el estado de
   silencio. Y cuando te vas, se te va»; `js/134-totem-silencio.js`): a los rivales de quien lo clavó que están adentro del aura de un tótem en pie, el
   estado «Silencio» de siempre con `totemSilencio`, `permanente` y `hasta` = «mientras esté en el aura del tótem» (sin turnos; el globo lo dice así,

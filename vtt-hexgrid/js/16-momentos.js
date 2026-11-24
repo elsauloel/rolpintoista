@@ -160,6 +160,12 @@ function momentoRecibido(id, d){
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }
+  // 🥷 El daño no alcanzó para delatarlo (js/03 sigiloAguantaAvisar): SOLO a quien maneja al escondido; nadie más, ni en la Crónica.
+  if(d.tipo === 'sigilo-aguanta'){
+    momentosFeed.delete(id); renderMomentosFeed();
+    if(fbUsuario && d.datos && Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)) momentoAvisoCentro(id, d);
+    return;
+  }
   // 🕶 El sigilo de un personaje (2026-11-11, js/116): privado (el GM y quien maneja al escondido); la Percepción la tira el GM y el Sigilo, el jugador.
   if(d.tipo === 'sigilo-pedido' && typeof sigiloMomentoVisible === 'function' && !sigiloMomentoVisible(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   if(d.tipo === 'sigilo-pedido' && typeof sigiloJugadorMomento === 'function' && sigiloJugadorMomento(id, d) && !(percepcionBanner && percepcionBanner.momentoId === id)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
@@ -691,7 +697,7 @@ function momentoAvisoCentro(id, d, espera){
   // 📣 El aviso de un daño directo (P246, js/08) no tapa otro aviso abierto: espera a que se cierre (hasta 1 minuto), así dos que llegan juntos
   // (el Espejito y el salto del rayo, por ejemplo) se leen uno detrás del otro.
   // (Una sola vez por aviso: el mismo momento vuelve a llegar cuando el servidor le pone la hora.)
-  if(d && d.tipo === 'zona-dano'){
+  if(d && (d.tipo === 'zona-dano' || d.tipo === 'sigilo-aguanta')){
     if(!espera && avisosDanoVistos.has(id)) return;
     avisosDanoVistos.add(id);
     if(typeof AvisoCombate !== 'undefined' && AvisoCombate.abierto && AvisoCombate.abierto() && num(espera) < 85){

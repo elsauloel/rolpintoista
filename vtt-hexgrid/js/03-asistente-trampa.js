@@ -267,7 +267,7 @@ async function sigiloDelatarPorDano(id, saco, origen){
   saco = Math.round(num(saco));
   if(!t || saco <= 0 || !enSigilo(t) || sigiloRompiendo.has(id)) return false;
   const valor = sigiloValorDe(t);
-  if(saco <= valor) return false;
+  if(saco <= valor){ sigiloAguantaAvisar(t, saco, valor, origen); return false; }
   const txt = `${origen ? origen + ': ' : ''}el golpe le sacó ${saco} de vida, más que su Sigilo (${valor})`;
   const e = estadoDe(t);
   const idx = e ? e.estados.findIndex(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo') : -1;
@@ -280,6 +280,26 @@ async function sigiloDelatarPorDano(id, saco, origen){
     return true;
   }catch(err){ console.error('No se pudo sacar el sigilo:', err); toast(`✋ ${nombreDe(t)} se delató (${txt}): sacale el Sigilo a mano`); return false; }
   finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
+}
+/* 🥷 El daño no alcanzó para delatarlo (dueño, 2026-11-23): un cartel corto con la cuenta, SOLO a quien maneja al escondido (un personaje o su
+   invocación: quien tiene 🎮 el control, si no su dueño; un creep: el GM). Nadie más lo ve, ni en la Crónica (js/16, tipo 'sigilo-aguanta'). Lo
+   publica la pantalla que aplicó el daño (la suya, la del GM o la que resolvió el duelo oculto): cualquier daño que pasa por sigiloDelatarPorDano. */
+function sigiloManejaUids(t){
+  if(!t) return [];
+  if(t.tipo === 'creep'){ const gms = []; for(const [uid, m] of miembros) if(m && m.gm) gms.push(uid); return gms; }
+  const f = fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
+  const u = (f && f.resumen && f.resumen.control) || (f && f.duenoUid) || t.duenoUid || '';
+  return u ? [u] : [];
+}
+function sigiloAguantaAvisar(t, saco, valor, origen){
+  if(!t || !Combatiente.sigiloAguanta(saco, valor) || typeof momentoAbrir !== 'function') return;
+  const para = sigiloManejaUids(t);
+  if(!para.length) return;
+  const creep = t.tipo === 'creep', txt = Combatiente.sigiloAguantaTxt(saco, valor, {creep, nombre: nombreDe(t)});
+  momentoAbrir({tipo: 'sigilo-aguanta', icono: '🥷', titulo: creep ? `${nombreDe(t)} sigue escondido` : 'Seguís escondido', estado: 'listo', resultado: txt,
+    datos: {paraUids: para, aviso: true, tituloAviso: creep ? `${nombreDe(t)} sigue escondido` : 'Seguís escondido', textoAviso: txt,
+      veredicto: {tono: 'neutro', grande: `🥷 −${Math.round(num(saco))}`, chico: `${origen ? origen + ': ' : ''}${Math.round(num(saco))} de daño, Sigilo ${Math.round(num(valor))}`}}})
+    .catch(err => console.error('El aviso del sigilo que aguanta:', err));
 }
 // Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo
 // manejar (mi personaje; el GM, sus creeps) quedó dentro de un cono rival, pierde el sigilo.

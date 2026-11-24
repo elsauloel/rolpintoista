@@ -2177,9 +2177,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   d6), lo empujó 2 casillas y siguió escondido; el GM no vio nada. Pruebas automáticas nuevas (1104 en verde). Capturas: cola91 (la «0-…» es la de
   antes del arreglo). Sin probar: el caso de P321 (vence mientras resuelve otro duelo) y un área con un estado.
 
-- **⬜ en cola — 🥷 Aviso al escondido cuando el daño no alcanza para delatarlo** (dueño, 2026-11-23): «si a un personaje escondido se le hace
+- **✅ hecho (2026-11-24) — 🥷 Aviso al escondido cuando el daño no alcanza para delatarlo** (dueño, 2026-11-23): «si a un personaje escondido se le hace
   daño que no alcanza para revelarlo, al usuario le tiene que aparecer: te hicieron tanto de daño, pero no alcanzó tu nivel de sigilo, por lo cual
   seguís escondido, o algo por el estilo». A quien maneja al escondido (jugador o GM por un creep), solo a él. Ver también P288.
+  Hecho: cartel al centro «🥷 Seguís escondido — Te hicieron 3 de daño, pero no alcanzó tu Sigilo (6): seguís escondido.» (un creep, al GM: «A Rata 1
+  le hicieron…: sigue escondido»). Sale con todo daño que pasa por el chequeo de delatarse (áreas, ondas, conos, líneas, zonas, trampas) cuando le
+  sacó vida sin pasar su Sigilo; si lo delata, no sale (queda el «se delató»). Solo a quien lo maneja (quien tiene 🎮 el control, si no su dueño; un
+  creep, el GM): nadie más lo ve, ni en la Crónica (`vtt-hexgrid/js/03` `sigiloAguantaAvisar`, js/16 tipo `sigilo-aguanta`, textos en
+  `Combatiente.sigiloAguantaTxt`). Probado con clics en «Claude · pruebas 2» (GM sin el ojo y Jugador 1): la Nova arcana con 1d4 le sacó 3 a Blanco J1
+  escondido → a J1 le salió el cartel, el GM no vio nada; control con 1d4+8 (12) → «se delató», sin cartel. Pruebas automáticas nuevas (1108 en verde).
+  Capturas: cola92. Sin probar con clics: zonas, trampas y un creep escondido (en la cola).
 
 - **⬜ en cola (al final, conversación) — ☁ Definir las nubes que tapan la vista** (dueño, 2026-11-23: «yo por niebla pensaba que era tipo una nube
   que se ponía en el territorio… la polvareda o algo así… Todo lo que son nubes, por ejemplo la Polvareda de la rata, quiero saber más o menos cómo
@@ -2557,6 +2564,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de su personaje y entre paréntesis el del usuario: «Bizzante (copia) (Saulo.eche)». Si tiene más de un personaje, el principal (caso muy
   excepcional; «es una tarea pendiente revisar ciertas gestiones para usuarios con más de un personaje… cuando llegue el turno lo revisamos todo
   junto»). Si es el GM: «GM (nombre de usuario)». Igual que el «Larry (ElSaulo)» de las sugerencias de /m.
+
+- **⬜ en cola — Probar: 🥷 el aviso «Seguís escondido» con una zona, una trampa y un creep escondido** (2026-11-24): con clics se probó solo un
+  área (la Nova arcana) contra un personaje. Falta: una zona que pega poco (al entrar y en el Mantenimiento), una trampa, un creep escondido (el
+  cartel le tiene que salir al GM) y un personaje con 🎮 el control del GM (le sale al GM, no al jugador).
 
 ## En cola
 

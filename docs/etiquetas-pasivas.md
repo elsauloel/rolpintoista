@@ -288,3 +288,17 @@ Boceto (la ventana de siempre de la Biblioteca, con las familias en filas):
 ## Respuestas del dueño
 
 *(Vacío: se completa en la conversación.)*
+
+
+## ✅ Decisiones del dueño (2026-11-24)
+
+- **Los tres grupos (Rol, Estilo, Función): sí.** Las **marcas aparte (racial, criatura, solo personajes) NO por ahora**: «no tenemos muy delimitadas
+  esas categorías y es un asunto pendiente de diseño que llevará tiempo y dedicación» (a la cola, como diseño).
+- Pocas pasivas de Mago / Support / Debuffer: **pendiente de diseño** («meterle tiempo y dedicación»), a la cola.
+- 2 (Rol con las 7 clases, sin Híbrido): **sí**. 3 (Cualquiera; sin estilo = cualquiera; «sumar las de Cualquiera» tildado): **sí**.
+- 4 (abrir con el rol ya marcado): **sí**, pero los personajes de los jugadores todavía no dicen en ningún lado qué clase son: eso va a la cola
+  para trabajarlo más adelante (mientras tanto, solo se pre-marca donde el rol se conoce, como en los creeps).
+- 5 (el asistente de personaje nuevo usa estos mismos filtros): **sí**. 6 (sacar «stat»): **sí**. 9 (las subidas las etiqueta quien sube, con
+  algunas pre-marcadas; el dueño corrige al auditar): **sí**.
+- 7: **por ahora queda Vista de halcón**; diseñar Largo alcance arcano, a la cola.
+- 8: revisar la tabla de las 47 **en tandas de a 10**, a la cola.

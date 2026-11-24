@@ -2272,6 +2272,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   descripción de un estado no entre en el recuadro, debería haber alguna forma de poder leer el texto completo. En este caso no tengo cómo saber
   cómo termina ese texto»). Hoy se corta con «…» (p. ej. la de Vida extra). Que se pueda desplegar o ver completa.
 
+- **⬜ en cola (diseño, con tiempo) — 🏷 Marcas de las pasivas: racial, criatura, solo personajes** (dueño, 2026-11-24: «no tenemos muy
+  delimitadas esas categorías y es un asunto pendiente de diseño que llevará tiempo y dedicación»). Ver `docs/etiquetas-pasivas.md`.
+- **⬜ en cola (diseño, con tiempo) — 🧙 Más pasivas para Mago, Support y Debuffer** (dueño, 2026-11-24: «pendiente para meterle tiempo y
+  dedicación de diseño»): hoy tienen 5–6 pasivas propias cada uno contra 23 del Warrior; tampoco hay ninguna de control.
+- **⬜ en cola (más adelante) — 🧑 Que el personaje de un jugador diga qué clase / rol es** (dueño, 2026-11-24, de la pregunta 4 de las etiquetas):
+  hoy no lo dice en ningún lado; hace falta para abrir «+ Pasiva» con su rol ya marcado (y quizás para otras cosas).
+- **⬜ en cola (diseño) — 🔭 Diseñar «Largo alcance arcano»** (dueño, 2026-11-24): hoy da lo mismo que Vista de halcón (+1 Rango); Vista de
+  halcón queda. Propuesta de partida: algo propio del Mago, p. ej. +1 al alcance solo de habilidades y varitas.
+- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 1 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
+  al dueño las pasivas 1–10 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 2 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
+  al dueño las pasivas 11–20 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 3 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
+  al dueño las pasivas 21–30 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 4 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
+  al dueño las pasivas 31–40 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 5 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
+  al dueño las pasivas 41–47 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

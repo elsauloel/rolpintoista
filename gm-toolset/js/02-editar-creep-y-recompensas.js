@@ -143,6 +143,9 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s => s.id === b.dataset.pasivacreep);
     if(!sc) return;
     Biblioteca.abrir({tipo: 'pasivas', titulo: `Pasiva para ${sc.nombre}`, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
+      // 🏷 Filtros por Rol, Estilo y Función, con el rol del creep ya marcado si se conoce (de la biblioteca de la que salió; 2026-11-24).
+      ...(typeof FiltroPasivas !== 'undefined' ? {filtro: FiltroPasivas.paraBiblioteca(FiltroPasivas.rolesDeCreep(sc,
+        {base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [], subidos: typeof creepsSubidos !== 'undefined' ? creepsSubidos : []}))} : {}),
       alElegir: datos => agregarPasivaACreep(sc, datos), subtitulo: e2 => (e2.datos && e2.datos.detalle ? ` · ${e2.datos.detalle.slice(0, 60)}` : '')});
     return;
   }

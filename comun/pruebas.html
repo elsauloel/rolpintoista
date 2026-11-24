@@ -123,13 +123,13 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261120hasta"></script>
-<script src="pasivas.js?v=20261122prisa5"></script>
+<script src="pasivas.js?v=20261124tags"></script>
 <script src="skills-clase.js?v=20261114sang"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
 <script src="skills-creep-base.js?v=20261121muro"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
-<script src="biblioteca.js?v=20261103ref"></script>
+<script src="biblioteca.js?v=20261124tags"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261123esc"></script>
@@ -5686,7 +5686,7 @@ prueba('personaje nuevo paso a paso: sin nombre no avanza; la clase sugiere el r
     [['Idea', 'Imagen', 'Atributos', 'Habilidades', 'Pasivas', 'Talentos', 'Equipo', 'Historia', 'Resumen'], 'Ponele un nombre a tu personaje.', [3, 3, 3, 3, 3], 33, true, true, 'Aurelia', 'Warrior', 33, 1, 1,
      ['Persuadir 1'], [arma.nombre], 300 - num(arma.precioCompra), true, true, false]);
 });
-prueba('personaje nuevo: pool custom (2 de Job), una habilidad propia armada en su paso a paso y las pasivas por categoría', async () => {
+prueba('personaje nuevo: pool custom (2 de Job), una habilidad propia armada en su paso a paso y las pasivas con los filtros de Rol, Estilo y Función', async () => {
   let datos = null, pedida = null;
   const custom = [{id: 'cx', nombre: 'Rayo casero', costo: '2', detalle: 'Un rayo.'}];
   AsistentePersonaje.abrir({
@@ -5705,14 +5705,44 @@ prueba('personaje nuevo: pool custom (2 de Job), una habilidad propia armada en 
   v.clic('[data-ap-abrir="_custom"]'); v.clic('[data-ap-hab="_custom:cx"]');
   const conPool = v.q('.ap-contador').textContent;
   v.ir('Pasivas');
-  const chips = [...v.mia.querySelectorAll('[data-ap-catpasiva]')].map(b => b.textContent);
-  v.clic('[data-ap-catpasiva="recursos"]');
+  const chips = [...v.mia.querySelectorAll('[data-fp-tag]')].map(b => b.textContent);
+  v.clic('[data-fp-tag="recursos"]');
   const recursos = [...v.mia.querySelectorAll('[data-ap-pasiva] b')].map(b => b.textContent);
   await new Promise(r => setTimeout(r, 0));
   v.ir('Equipo'); const dde300 = v.q('#ap-dde').value; v.escribir('#ap-dde', '450');
   v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
-  igual([pedida, trasCrear, armada, conPool, chips.length, recursos, datos && datos.habilidades.map(h => h.nombre + ' ' + h.jobCosto), categoriaDePasiva({etiquetas: ['resistencia']}), categoriaDePasiva({regenHp: 2}), dde300, datos && datos.meta.dde],
-    [null, 'Job: 2 de 3 (habilidades + pasivas)', true, 'Job: 4 de 3 (habilidades + pasivas) · 1 de más', 6, ['Reserva de poder', 'Impulso'], ['Mi grito 2', 'Rayo casero 2'], 'defensiva', 'recuperacion', '300', 450]);
+  igual([pedida, trasCrear, armada, conPool, chips.length, recursos, datos && datos.habilidades.map(h => h.nombre + ' ' + h.jobCosto), FiltroPasivas.sugeridas({mods: [{stat: 'resmg', val: 1}]}), FiltroPasivas.sugeridas({regenHp: 2}), dde300, datos && datos.meta.dde],
+    [null, 'Job: 2 de 3 (habilidades + pasivas)', true, 'Job: 4 de 3 (habilidades + pasivas) · 1 de más', 24, ['Reserva de poder', 'Recuperación mental', 'Impulso', 'Sed de batalla'], ['Mi grito 2', 'Rayo casero 2'], ['resistencias'], ['aguante'], '300', 450]);
+});
+/* ---------- 🏷 Etiquetas y filtros de las pasivas (2026-11-24, dueño; docs/etiquetas-pasivas.md) ---------- */
+prueba('pasivas: las 47 de fábrica con Rol y Función (sin «stat» ni las palabras viejas); racial y criatura se conservan, sin ser filtro', () => {
+  const F = FiltroPasivas, viejas = ['stat', 'ofensiva', 'defensiva', 'utilidad', 'resistencia', 'regeneración', 'visión', 'movimiento'];
+  const sinRol = PASIVAS_BASE.filter(p => !F.GRUPOS[0].tags.some(t => p.etiquetas.includes(t))).map(p => p.nombre);
+  const sinFuncion = PASIVAS_BASE.filter(p => !F.GRUPOS[2].tags.some(t => p.etiquetas.includes(t))).map(p => p.nombre);
+  const conViejas = PASIVAS_BASE.filter(p => p.etiquetas.some(t => viejas.includes(t))).map(p => p.nombre);
+  const raras = PASIVAS_BASE.flatMap(p => p.etiquetas).filter(t => !F.TODAS.has(t));
+  igual([PASIVAS_BASE.length, sinRol, sinFuncion, conViejas, [...new Set(raras)].sort(), F.TODAS.has('racial'), typeof categoriaDePasiva],
+    [47, [], [], [], ['criatura', 'racial'], false, 'undefined']);
+});
+prueba('pasivas: filtrar — mismo grupo = cualquiera, grupos distintos = todos; «sumar las de Cualquiera»; sin estilo cuenta como cualquiera; sin etiquetar nunca se esconde', () => {
+  const F = FiltroPasivas, n = (f, o) => PASIVAS_BASE.filter(p => F.pasa(p.etiquetas, f, o)).length;
+  const nombres = f => PASIVAS_BASE.filter(p => F.pasa(p.etiquetas, f)).map(p => p.nombre);
+  igual([n([]), n(['tanque']), n(['tanque'], {cualquiera: false}), n(['tanque', 'mago'], {cualquiera: false}), n(['tanque', 'cuerpo a cuerpo']),
+    nombres(['sigilo']), F.pasa(['tanque', 'defensa'], ['distancia']), F.pasa(['tanque', 'cuerpo a cuerpo'], ['distancia']),
+    F.pasa(['stat', 'ofensiva'], ['mago', 'mágico', 'curación']), F.pasa([], ['warrior']), F.pasa(['cualquiera', 'carga'], ['shooter']),
+    F.pasa(['cualquiera', 'carga'], ['shooter'], {cualquiera: false}), F.pasa(['mago', 'ataque'], ['cualquiera'])],
+    [47, 24, 15, 20, 24, ['Paso ligero'], true, false, true, true, true, false, false]);
+});
+prueba('pasivas: rótulos de una fila, etiquetas sugeridas al subir y el rol de un creep (de la biblioteca de la que salió; el Híbrido = warrior y tanque)', () => {
+  const F = FiltroPasivas, base = [{poolId: 'esencial-m1-1-piromante', etiquetas: ['esencial', 'mágico', 'nivel 1']}, {poolId: 'b2', etiquetas: ['bosque', 'apoyo']}];
+  igual([F.rotular(['defensa', 'racial', 'tanque', 'cuerpo a cuerpo']), F.rotular(['stat', 'ofensiva']), F.rotular([]),
+    F.sugeridas({mods: [{stat: 'pdgmg', val: 1}, {stat: 'def', val: 1}]}), F.sugeridas({mods: [{stat: 'nitros', val: 1}], regenHp: 2}),
+    F.paraSubir(PASIVAS_BASE.find(p => p.poolId === 'robustez')), F.paraSubir({mods: [{stat: 'hpmax', val: 5}], etiquetas: ['stat', 'defensiva']}),
+    F.rolesDeCreep({bibOrigen: {id: 'base-esencial-m1-1-piromante'}}, {base}), F.rolesDeCreep({bibOrigen: {id: 'base-esencial-h2-3-saltador'}}, {base}),
+    F.rolesDeCreep({bibOrigen: {id: 'base-b2'}}, {base}), F.rolesDeCreep({bibOrigen: {id: 'x9'}}, {base, subidos: [{id: 'x9', etiquetas: ['melee', 'tanque']}]}),
+    F.rolesDeCreep({nombre: 'Rata'}, {base})],
+    ['🛡 Tanque · 🤜 Cuerpo a cuerpo · Defensa · racial', '🏷 sin etiquetar · stat · ofensiva', '🏷 sin etiquetar', ['mágico', 'ataque', 'defensa'], ['recursos', 'aguante'],
+     ['cualquiera', 'tanque', 'warrior', 'aguante'], ['aguante'], ['mago'], ['warrior', 'tanque'], ['support'], ['warrior', 'tanque'], []]);
 });
 prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno y turnos; púas: daño y efecto adicional) o armar de cero', async () => {
   let res = null;
@@ -6370,6 +6400,39 @@ async function conFbFalsoYa(datos, fn){
   window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora', delete: () => '__borrar'}}};
   try{ return await fn(); }finally{ Object.assign(window, antes); }
 }
+/* ---------- 🏷 Las pasivas en la Biblioteca (necesitan el Firebase de mentira) ---------- */
+prueba('pasivas: «+ Pasiva» (la Biblioteca) con las filas por familia, el rol marcado, «Mostrando N de M», el buscador y una subida sin etiquetas nuevas que no se esconde', () => conFbFalso({
+  'biblioteca_pasivas/v1': {nombre: 'Pasiva vieja', etiquetas: ['stat', 'ofensiva'], descripcion: '+1 a algo', nivel: 1, json: JSON.stringify({nombre: 'Pasiva vieja', detalle: '+1 a algo', jobCosto: 1, mods: []})},
+}, async () => {
+  await Biblioteca.abrir({tipo: 'pasivas', titulo: 'Prueba pasivas', base: PASIVAS_BASE, alElegir: () => {}, filtro: FiltroPasivas.paraBiblioteca(['tanque'])});
+  const pie = () => document.querySelector('#bib-chips .fp-pie').textContent, filas = () => [...document.querySelectorAll('#bib-lista .bib-fila .tit')].map(x => x.textContent.trim().split(' · ')[0].trim());
+  const clic = sel => document.querySelector('#bib-chips ' + sel).click();
+  const familias = [...document.querySelectorAll('#bib-chips .fp-nom')].map(x => x.textContent), marcados = [...document.querySelectorAll('#bib-chips .bib-chip.on[data-fp-tag]')].map(b => b.dataset.fpTag);
+  const p1 = pie(), vieja1 = filas().includes('Pasiva vieja'), tagVieja = [...document.querySelectorAll('#bib-lista .bib-fila')].find(f => f.textContent.includes('Pasiva vieja')).querySelector('.tags').textContent;
+  clic('[data-fp-cualquiera]'); const p2 = pie();
+  clic('[data-fp-tag="cuerpo a cuerpo"]'); const p3 = pie();
+  clic('[data-fp-limpiar]'); const p4 = pie();
+  const b = document.getElementById('bib-buscar'); b.value = 'trinchera'; b.dispatchEvent(new Event('input')); const p5 = pie(), f5 = filas();
+  b.value = ''; b.dispatchEvent(new Event('input'));
+  document.getElementById('bib-x').click();
+  igual([familias, marcados, p1, vieja1, tagVieja, p2, p3, p4, p5, f5],
+    [['🎭 Rol', '🤺 Estilo', '🧩 Función'], ['tanque'], 'Mostrando 25 de 48 · ✕ Limpiar filtros', true, '🏷 sin etiquetar · stat · ofensiva', 'Mostrando 16 de 48 · ✕ Limpiar filtros',
+     'Mostrando 16 de 48 · ✕ Limpiar filtros', 'Mostrando 48 de 48', 'Mostrando 1 de 48', ['Aguante de trinchera']]);
+}));
+const DB_SUBIR_PASIVA = {};
+prueba('pasivas: «Subir a la biblioteca» etiqueta con los mismos botoncitos, en fila, con las sugeridas ya marcadas', () => conFbFalso(DB_SUBIR_PASIVA, async () => {
+  let subido = null;
+  Biblioteca.guardar({tipo: 'pasivas', datos: {nombre: 'Mi pasiva', detalle: '+1 PdG.Esp', jobCosto: 1, mods: [{stat: 'pdgmg', val: 1}]}, nombre: 'Mi pasiva', nivel: 1,
+    grupos: FiltroPasivas.grupos(), gruposEnFila: true, rotulos: FiltroPasivas.ROTULO, etiquetas: FiltroPasivas.paraSubir({mods: [{stat: 'pdgmg', val: 1}]}), alSubir: r => { subido = r; }});
+  const caja = document.getElementById('bibg-tags');
+  const menus = caja.querySelectorAll('[data-bibggrupo]').length, rotulos = [...caja.querySelectorAll('.bib-chip.on')].map(c => c.textContent);
+  caja.querySelector('[data-bibgtag="mago"]').click();
+  const campo = document.getElementById('bibg-etiquetas').value;
+  document.getElementById('bibg-ok').click();
+  for(let i = 0; i < 20 && !subido; i++) await new Promise(r => setTimeout(r, 0));
+  const guardado = Object.values(DB_SUBIR_PASIVA).find(d => d.nombre === 'Mi pasiva');
+  igual([menus, rotulos, campo, !!subido, guardado && guardado.etiquetas], [0, ['🔮 Mágico', 'Ataque'], 'mágico, ataque, mago', true, ['mágico', 'ataque', 'mago']]);
+}));
 /* ---------- Un aviso tomado que no se pierde y el guardado de la sesión (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs») ---------- */
 // Una sesión de mentira para FichaSesion.guardar: `commits` = lo que se mandó a escribir; cada commit espera a que se lo libere (`soltar()`).
 function sesionFalsa(partes){
@@ -8617,8 +8680,8 @@ prueba('💨 Prisa (2026-11-22), creep e invocación: la Prisa vieja se lee como
 });
 prueba('🛡 Aguante de trinchera (dueño, 2026-11-20): +1 Defensa y +1 Defensa especial por cada enemigo pegado, sin tope; 2 de job; personaje, creep e invocación', () => {
   const C = Combatiente, pas = PASIVAS_BASE.find(p => p.poolId === 'aguante-de-trinchera');
-  igual([!!pas, pas.nombre, pas.jobCosto, pas.mods.map(m => m.stat + m.val).join(' '), /Automatizado en el mapa/.test(pas.detalle), FichaCalculo.STAT_LABEL.trinchera, CreepCalculo.STAT_LABEL.trinchera, categoriaDePasiva(pas)],
-    [true, 'Aguante de trinchera', 2, 'trinchera1', true, 'Aguante de trinchera', 'Aguante de trinchera', 'defensiva']);
+  igual([!!pas, pas.nombre, pas.jobCosto, pas.mods.map(m => m.stat + m.val).join(' '), /Automatizado en el mapa/.test(pas.detalle), FichaCalculo.STAT_LABEL.trinchera, CreepCalculo.STAT_LABEL.trinchera, pas.etiquetas.join(',')],
+    [true, 'Aguante de trinchera', 2, 'trinchera1', true, 'Aguante de trinchera', 'Aguante de trinchera', 'tanque,warrior,cuerpo a cuerpo,defensa']);
   igual([C.trincheraBono(1, 0), C.trincheraBono(0, 3), C.trincheraBono(1, 1), C.trincheraBono(1, 2), C.trincheraBono(1, 6), C.trincheraBono(2, 3)],
     [null, null, {def: 1, n: 1}, {def: 2, n: 2}, {def: 6, n: 6}, {def: 6, n: 3}]);
   igual([C.trincheraTxt(C.trincheraBono(1, 2)), C.trincheraTxt(C.trincheraBono(1, 1)), C.trincheraTxt(null)], ['🛡 Aguante de trinchera +2: 2 enemigos pegados', '🛡 Aguante de trinchera +1: 1 enemigo pegado', '']);

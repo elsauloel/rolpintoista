@@ -2493,3 +2493,25 @@ sigilo sale como «alguien que no se ve» para los jugadores (ya lo hace así co
 zonas, las trampas, las habilidades sobre sí, GM Tools, los avisos a la ficha), por eso no se hizo de una.
 
 **Mientras tanto (lo conservador):** la ventana ◎ muestra solo lo que ya existe; no se inventa el origen de los que no lo traen.
+
+### P315 — 🏷 ¿El asistente de personaje nuevo marca el rol de la clase que se eligió? (2026-11-24, Claude, al programar las etiquetas de las pasivas)
+
+En el asistente de personaje nuevo, la clase se elige en el primer paso (Warrior, Tanque, Asalto…), así que ahí sí se sabe el rol cuando se llega a
+«Pasivas». El pedido decía que en los personajes de los jugadores no se marque ningún rol (todavía no dicen su clase en la ficha), así que no se marca.
+
+**Recomendación:** marcarlo en el asistente (es justo el momento en que el jugador eligió la clase; se saca con un clic y el «Mostrando N de 47» dice
+cuántas quedan afuera).
+
+**Mientras tanto (lo conservador):** el asistente abre las pasivas sin ningún rol marcado, como «+ Pasiva» en la ficha.
+
+### P316 — 🏷 Las pasivas subidas antes de las etiquetas nuevas, y el «✎ Etiquetas» del dueño (2026-11-24, Claude)
+
+Hoy hay una sola pasiva subida a la Biblioteca: la **corrección de Regeneración** (auditada), sin etiquetas. Como reemplaza a la de fábrica, en
+«+ Pasiva» se ve como «🏷 sin etiquetar» y aparece con cualquier filtro (nunca se esconde). Para que se filtre como las demás, hay que ponerle
+etiquetas: el dueño puede hacerlo con «✎ Etiquetas» en la Biblioteca (hoy es un campo de texto: escribir `cualquiera, tanque, warrior, aguante`).
+
+**Pregunta:** ¿que «✎ Etiquetas» del dueño use también los botoncitos por familia (como «Subir a la biblioteca»)? **Recomendación:** sí, para no tener
+que escribir las palabras a mano.
+
+**Mientras tanto (lo conservador):** las que no tienen ninguna etiqueta nueva se muestran siempre, marcadas «🏷 sin etiquetar»; una pasiva con
+etiquetas nuevas en una familia y ninguna en otra cuenta como «cualquiera» en la que le falta.

@@ -255,6 +255,8 @@ function abrirPasivaNueva(){
     textoCrearDeCero: '+ Crear de cero',
     alCrearDeCero: () => openEditor('pasivas', null),
     alElegir: agregarPasivaDeCatalogo,
+    // 🏷 Filtros por Rol, Estilo y Función (comun/pasivas.js). Sin rol marcado: un personaje todavía no dice su clase (2026-11-24).
+    ...(typeof FiltroPasivas !== 'undefined' ? {filtro: FiltroPasivas.paraBiblioteca([])} : {}),
     subtitulo: e => { const ya = pasivaYaComprada(e.datos, e); return ya ? ` · ya la tenés ×${pasivaCompras(ya)}: la próxima copia cuesta ${fmt(FichaLupa.jobCostoProxima(ya))} Job` : ` · ${fmt(jobCostoPasiva(e.datos.jobCosto))} Job`; },
   });
 }
@@ -314,6 +316,8 @@ function proponerPasiva(id){
   const o = origenDePasiva(p);
   Biblioteca.guardar({tipo: 'pasivas', datos, nombre: p.nombre, nivel: datos.jobCosto, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
     basadoEn: o ? {id: o.id, nombre: p.nombre} : null,
+    // 🏷 Se etiqueta con los mismos botoncitos de «+ Pasiva»; arrancan marcadas las que ya tiene o las sugeridas por lo que suma (2026-11-24).
+    ...(typeof FiltroPasivas !== 'undefined' ? {grupos: FiltroPasivas.grupos(), gruposEnFila: true, rotulos: FiltroPasivas.ROTULO, etiquetas: FiltroPasivas.paraSubir(p)} : {}),
     alSubir: r => { p.bibOrigen = {tipo: 'pasivas', id: r.id, version: r.version}; delete p.bibIgnorada; refresh(); cargarPasivasSubidas(); }});
 }
 

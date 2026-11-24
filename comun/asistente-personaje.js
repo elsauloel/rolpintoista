@@ -83,7 +83,8 @@ const AsistentePersonaje = (() => {
     S.meta.nivel = 1;
     ATTRS.forEach(a => { S.attrs[a] = MIN_ATTR; });
     const st = {
-      claseId: '', claseOtra: '', concepto: '', historia: '', catPasiva: '',
+      claseId: '', claseOtra: '', concepto: '', historia: '',
+      fp: typeof FiltroPasivas !== 'undefined' ? FiltroPasivas.inicial([]) : null, buscaPasiva: '',   // 🏷 filtros de las pasivas (2026-11-24)
       habs: new Map(),        // `${claseId}:${habId}` → {claseId, habId}
       pasivas: new Set(),     // índice en ctx.pasivas()
       talentos: [],           // [{nombre, puntos}]
@@ -191,25 +192,30 @@ const AsistentePersonaje = (() => {
           return `<h4><button type="button" class="ap-chip" data-ap-abrir="_custom">${abierta ? '▾' : '▸'} 🧩 Pool custom (${lista.length}) · 2 de Job c/u</button></h4>${abierta ? `<div class="ap-grid">${lista.map(h => tarjetaHab('_custom', h, false)).join('')}</div>` : ''}`;
         })();
     }
-    // Las pasivas, agrupadas por categoría (comun/pasivas.js: CATEGORIAS_PASIVA, categoriaDePasiva) y con un filtro arriba.
+    // Las pasivas, con los mismos filtros que «+ Pasiva» (comun/pasivas.js, FiltroPasivas: Rol, Estilo y Función; 2026-11-24, reemplaza a las 5
+    // categorías) y un buscador. Sin rol marcado al abrir (todavía no se decidió marcar el de la clase elegida: P315).
+    const etiquetasDe = p => (p.meta && Array.isArray(p.meta.etiquetas) && p.meta.etiquetas.length ? p.meta.etiquetas : (p.datos || {}).etiquetas) || [];
+    const sinTildes = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const pasivaVisible = p => {
+      const d = p.datos || {};
+      if(st.buscaPasiva && !sinTildes(d.nombre + ' ' + (d.detalle || '')).includes(sinTildes(st.buscaPasiva))) return false;
+      return !st.fp || FiltroPasivas.pasa(etiquetasDe(p), st.fp.filtros, st.fp);
+    };
     function pasoPasivas(){
       const jt = jobTotal(), ju = jobUsado();
-      const cats = typeof CATEGORIAS_PASIVA !== 'undefined' ? CATEGORIAS_PASIVA : [{id: 'utilidad', nombre: 'Pasivas'}];
-      const catDe = d => typeof categoriaDePasiva === 'function' ? categoriaDePasiva(d) : 'utilidad';
-      const conIndice = pasivasLista.map((p, i) => ({p, i, cat: catDe(p.datos || {})}));
       const tarjeta = ({p, i}) => {
         const d = p.datos || {}, on = st.pasivas.has(i);
-        return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt((d.jobCosto === 0 || d.jobCosto === '0') ? 0 : Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small></button>`;
+        const tags = st.fp ? FiltroPasivas.rotular(etiquetasDe(p)) : '';
+        return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt((d.jobCosto === 0 || d.jobCosto === '0') ? 0 : Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small>${tags ? `<small class="ap-tags" style="opacity:.75;display:block;margin-top:3px">${esc(tags)}</small>` : ''}</button>`;
       };
-      const chip = (id, txt, n) => `<button type="button" class="ap-chip${st.catPasiva === id ? ' on' : ''}" data-ap-catpasiva="${id}"${st.catPasiva === id ? ' style="border-style:solid;border-color:var(--pap-laton);color:var(--pap-laton)"' : ''}>${esc(txt)}${n !== undefined ? ` (${n})` : ''}</button>`;
-      const visibles = cats.filter(c => !st.catPasiva || c.id === st.catPasiva);
-      return guia('Las pasivas funcionan solas, siempre: más vida, más SP, regenerar… Comparten el Job con las habilidades.')
+      const todas = pasivasLista.map((p, i) => ({p, i}));
+      const visibles = todas.filter(x => pasivaVisible(x.p) || st.pasivas.has(x.i));   // (una ya elegida no se esconde)
+      if(st.fp) FiltroPasivas.css();
+      return guia('Las pasivas funcionan solas, siempre: más vida, más SP, regenerar… Comparten el Job con las habilidades. Los filtros ayudan a encontrar; podés elegir cualquiera.')
         + contador(`Job: ${ju} de ${jt} (habilidades + pasivas)${ju > jt ? ` · ${ju - jt} de más` : ''}`, ju > jt)
-        + `<div class="ap-chips" style="margin-bottom:6px">${chip('', 'Todas')}${cats.map(c => chip(c.id, c.nombre, conIndice.filter(x => x.cat === c.id).length)).join('')}</div>`
-        + visibles.map(c => {
-          const lista = conIndice.filter(x => x.cat === c.id);
-          return lista.length ? `<h4>${esc(c.nombre)}</h4><div class="ap-grid">${lista.map(tarjeta).join('')}</div>` : '';
-        }).join('');
+        + `<div class="pap-fila" style="margin:4px 0 6px"><input id="ap-busca-pasiva" type="search" placeholder="Buscar por nombre o descripción…" value="${esc(st.buscaPasiva)}"></div>`
+        + (st.fp ? `<div class="ap-fp" style="margin-bottom:8px">${FiltroPasivas.filasHtml(st.fp, {chip: 'ap-chip', on: 'on', n: visibles.length, total: todas.length})}</div>` : '')
+        + (visibles.length ? `<div class="ap-grid">${visibles.map(tarjeta).join('')}</div>` : '<div class="ap-aviso">No hay pasivas con ese filtro.</div>');
     }
     function pasoTalentos(){
       const it = intTotal(), iu = intUsado();
@@ -323,6 +329,10 @@ const AsistentePersonaje = (() => {
         else if(t.id === 'ap-concepto') st.concepto = t.value;
         else if(t.id === 'ap-clase-otra') st.claseOtra = t.value;
         else if(t.id === 'ap-historia') st.historia = t.value;
+        else if(t.id === 'ap-busca-pasiva'){   // el buscador de las pasivas: redibuja y le devuelve el foco
+          st.buscaPasiva = t.value; api.redibujar();
+          const i = api.raiz.querySelector('#ap-busca-pasiva'); if(i){ i.focus(); const n = i.value.length; try{ i.setSelectionRange(n, n); }catch(err){} }
+        }
         else if(t.id === 'ap-dde'){   // sin redibujar (se perdería el foco): solo el contador de lo que se gasta
           st.dde = Math.max(0, Math.round(num(t.value))); st.ddeTocado = true;
           const g = api.raiz.querySelector('[data-ap-gasto]'), total = totalCompra();
@@ -338,6 +348,7 @@ const AsistentePersonaje = (() => {
         catch(err){ if(err && err.message !== 'cancelado' && ctx.toast) ctx.toast('No se pudo usar esa imagen'); }
       },
       alClic: e => {
+        if(st.fp && FiltroPasivas.clic(e.target, st.fp)){ api.redibujar(); return; }
         const b = e.target.closest('button'); if(!b) return;
         const d = b.dataset;
         if(d.apClase !== undefined){ st.claseId = st.claseId === d.apClase ? '' : d.apClase; api.redibujar(); return; }
@@ -353,7 +364,6 @@ const AsistentePersonaje = (() => {
         }
         if(d.apHabQuitar){ S.habilidades = (S.habilidades || []).filter(h => h.id !== d.apHabQuitar); api.redibujar(); return; }
         if(d.apAbrir){ if(st.abiertas.has(d.apAbrir)) st.abiertas.delete(d.apAbrir); else st.abiertas.add(d.apAbrir); api.redibujar(); return; }
-        if(d.apCatpasiva !== undefined){ st.catPasiva = d.apCatpasiva; api.redibujar(); return; }
         if(d.apPasiva !== undefined){ const i = num(d.apPasiva); if(st.pasivas.has(i)) st.pasivas.delete(i); else st.pasivas.add(i); api.redibujar(); return; }
         if(d.apTalento){ st.talentos.push({nombre: d.apTalento, puntos: intUsado() < intTotal() ? 1 : 0}); api.redibujar(); return; }
         if(d.apTalentoPropio){ const i = api.raiz.querySelector('#ap-talento-propio'), n = i && i.value.trim(); if(n){ st.talentos.push({nombre: n.slice(0, 40), puntos: 0}); api.redibujar(); } return; }
@@ -369,6 +379,7 @@ const AsistentePersonaje = (() => {
       alTecla: e => {
         if(e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
         e.preventDefault();
+        if(e.target.id === 'ap-busca-pasiva') return;   // (Enter en el buscador no pasa de paso)
         if(e.target.id === 'ap-talento-propio'){ const n = e.target.value.trim(); if(n){ st.talentos.push({nombre: n.slice(0, 40), puntos: 0}); api.redibujar(); } return; }
         if(api.paso() < PASOS.length - 1) api.irA(api.paso() + 1);
       },

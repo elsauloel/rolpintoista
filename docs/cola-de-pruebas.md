@@ -1938,12 +1938,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   salto de la Cadena de rayos (8 a Blanco J2, salta 4 a Blanco J1), «Daño directo: no lo frena la Defensa ni la Defensa especial», 4 (42 → 38); y el
   control, un hachazo de 10: «10 − Defensa 1 − 🛡 Aguante de trinchera 2 = 7» (38 → 31). Quedó todo como estaba (vidas, pasivas, habilidades, posiciones).
 
-- **🟡 propuesta lista (2026-11-24), esperando la conversación con el dueño → docs/etiquetas-pasivas.md — 🏷 Conversación de diseño: etiquetas y filtros para las pasivas** (dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
+- **✅ hecho (2026-11-24) — 🏷 Etiquetas y filtros para las pasivas** → docs/etiquetas-pasivas.md. Las 47 de fábrica con Rol, Estilo y Función
+  (sin «stat»; racial y criatura quedan como etiquetas sueltas, sin filtro); «+ Pasiva» (personajes, invocaciones y creeps) con filas de botoncitos
+  por familia, «sumar las de Cualquiera», «Mostrando N de 47», «✕ Limpiar filtros» y el buscador; el rol del creep viene marcado si se sabe (de la
+  biblioteca de la que salió); el asistente de personaje nuevo usa los mismos filtros (y un buscador); «Subir a la biblioteca» etiqueta con los
+  mismos botoncitos, con las sugeridas marcadas. Lo que no tiene etiquetas nuevas se ve siempre, «🏷 sin etiquetar» (P316). Probado con clics.
+  (Pedido original: dueño, 2026-11-22: «que las habilidades pasivas tengan tags y
   filtros. Por ejemplo, Aguante de trinchera es buena para warrior y para tanque y para melee en general, entonces pueden estar esos tags. Buscar
   cierto universo de tags para poder crear filtros a la hora de elegir pasivas»). Hoy `etiquetas` sueltas (ofensiva, defensiva, stat, utilidad,
   resistencia, regeneración, visión, percepción, racial). Preparar una propuesta (rol: warrior, tanque, liviano, rango, mago, support, debuffer;
   estilo: cuerpo a cuerpo, distancia, mágico; función: daño, defensa, movilidad, control, curación, sigilo…) y los filtros del catálogo de
-  «+ Pasiva»; conversarlo con el dueño antes de programar.
+  «+ Pasiva»; conversarlo con el dueño antes de programar.)
 
 - **⬜ en cola — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
   ese caso raro de la perforación y defensa especial»; P283, punto 2): hoy el Aguante se resta después de lo que «pasa siempre» por Perfora, así
@@ -2290,6 +2295,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   al dueño las pasivas 31–40 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
 - **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 5 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
   al dueño las pasivas 41–47 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
+
+- **⬜ en cola — Probar: 🏷 «+ Pasiva» de una invocación y subir una pasiva con etiquetas de verdad** (2026-11-24, de las etiquetas de las pasivas):
+  con clics se probó «+ Pasiva» en la ficha, en un creep de GM Tools (con su rol marcado) y en el asistente de personaje nuevo, y la ventana de
+  «Subir a la biblioteca» con los botoncitos (sin subir). Falta ver «+ Pasiva» de una invocación y subir una pasiva de verdad (y borrarla después)
+  para ver que la Biblioteca la muestre filtrable con sus etiquetas.
 
 ## En cola
 

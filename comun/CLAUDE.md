@@ -25,8 +25,17 @@ versión parecida en más de una, es candidato a juntar.
   titulo, alElegir, alCrearDeCero})` y `Biblioteca.guardar({tipo, datos,
   nombre, nivel})`; `Biblioteca.abrir` acepta `base` (entradas del código que siempre están, aunque Firebase falle) y `subtitulo(entrada)`. Crea su propio HTML. Depende de `sesion.js`. La usan `ficha.html` (pasivas) y
   `gm-tools.html` (creeps).
+  **`opts.filtro`** (2026-11-24, las pasivas): un filtro a medida `{inicial(), html(fp, {n, total}), pasa(e, fp), clic(el, fp), rotular?(e)}` en vez de los
+  chips sueltos; el conteo «Mostrando N de M» va en su pie. `guardar` acepta `etiquetas` (las que vienen marcadas), `gruposEnFila` (cada familia en su
+  renglón, sin «Otros») y `rotulos`.
 - **`creeps-base.js`** — `CREEPS_BASE`: 173 creeps (60 por escenario + 20 goblins + 14 kobolds + 15 hombres cabra + 20 debuffers + 30 humanos + tramperos/sigilosos, a auditar), en la biblioteca de creeps de gm-tools.
 - **`pasivas.js`** — `PASIVAS_BASE`: catálogo base de pasivas de Job (bonos a stats con escalones y regeneración de HP). La ficha lo ofrece en "+ Pasiva → catálogo"; se suma a las aprobadas desde Firebase (`biblioteca_pasivas`).
+  **🏷 Etiquetas y filtros** (2026-11-24, `docs/etiquetas-pasivas.md`): `FiltroPasivas` — tres familias (`GRUPOS`: 🎭 Rol = las 7 clases + `cualquiera`,
+  🤺 Estilo, 🧩 Función) en la lista `etiquetas` de cada pasiva; `pasa(etiquetas, filtros, {cualquiera})` (mismo grupo = o, grupos distintos = y;
+  sin etiqueta de una familia = cualquiera en esa familia; «sumar las de Cualquiera»), `rotular` («🏷 sin etiquetar» si no tiene ninguna nueva),
+  `sugeridas(datos)`/`paraSubir(datos)` (por lo que suma), `rolesDeCreep(sc, {base, subidos})` (por su `bibOrigen`; el Híbrido esencial = warrior y
+  tanque), `filasHtml`/`clic`/`inicial` (las filas de botoncitos, también en el asistente de personaje nuevo) y `paraBiblioteca(roles)` (el
+  `opts.filtro` de `Biblioteca.abrir`). Retira `CATEGORIAS_PASIVA`/`categoriaDePasiva`. `racial` y `criatura` quedan como etiquetas sueltas, sin filtro.
 - **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
   partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida
   actuales (`fbMiembro`, `fbPartida`). `fbEntrarAPartida()` es lo que cada
@@ -1302,8 +1311,8 @@ versión parecida en más de una, es candidato a juntar.
   escribe nada: `ctx = {base, clases, pool, habilidad, editarHabilidad, pasivas, pasiva, tienda, ddeInicial, imagen, alCrear, toast}` (la ficha:
   `abrirPersonajeNuevo`, js/12). Pedidos del dueño del mismo día: en Habilidades, «＋ Crear una habilidad nueva» (abre el paso a paso de
   habilidades de `ficha-editor.js` sobre el personaje en armado: `editarHabilidad(S, id, alCambiar)`; queda en `S.habilidades`, con Editar/Quitar) y
-  el 🧩 Pool custom (2 de Job); en Pasivas, categorías con filtro (`CATEGORIAS_PASIVA` y `categoriaDePasiva(p)` en `pasivas.js`: Ofensivas,
-  Defensivas, Recuperación, Recursos, Utilidad — salen de las etiquetas y de lo que suma); en Equipo, el DDE inicial en una caja editable (300 o el
+  el 🧩 Pool custom (2 de Job); en Pasivas, desde el 2026-11-24 los mismos filtros que «+ Pasiva» (`FiltroPasivas`: Rol, Estilo y Función,
+  sin rol marcado, P315) y un buscador (`#ap-busca-pasiva`; la elegida no se esconde); en Equipo, el DDE inicial en una caja editable (300 o el
   del GM; el texto invita a preguntarle al GM). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
   de creeps de GM Tools).
 - **`item-corto.js`** (`ItemCorto`, 2026-10-02, pedido del dueño) — **cómo se ve un ítem o una trampa en una grilla para elegir**: solo lo que hace

@@ -43,7 +43,7 @@ const Biblioteca = (() => {
   // Etiquetas sugeridas al guardar (cada uno puede escribir las suyas).
   const SUGERENCIAS = {
     trampas: ['foso', 'veneno', 'explosiva', 'alarma', 'mágica', 'mecánica', 'atrapa', 'fuego amigo'],
-    pasivas: ['stat', 'regeneración', 'resistencia', 'defensiva', 'ofensiva', 'utilidad', 'visión', 'situacional'],
+    pasivas: [],   // (2026-11-24: las pasivas se etiquetan con las familias de comun/pasivas.js, FiltroPasivas; ya no con estas sueltas)
     habs_creep: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'área', 'rápida', 'lenta', 'sigilo', 'trampas'],
     creeps: ['bandidos', 'bosque', 'cavernas', 'infierno', 'pantano', 'montaña', 'desierto', 'ciudad', 'mar',
       'bestia', 'no-muerto', 'demonio', 'humanoide', 'elemental', 'jefe',
@@ -206,6 +206,8 @@ const Biblioteca = (() => {
       pintarLista();
     });
     q('bib-chips').addEventListener('click', e => {
+      const stF = estado[actual];
+      if(stF && stF.opts.filtro && stF.opts.filtro.clic(e.target, stF.fp)){ pintarChips(); pintarLista(); return; }
       const g = e.target.closest('[data-bibgrupo]');
       if(g){
         const st = estado[actual];
@@ -250,10 +252,16 @@ const Biblioteca = (() => {
     });
   }
 
-  const tagsGuardar = {grupos: [], abierto: null};
+  const tagsGuardar = {grupos: [], abierto: null, enFila: false, rotulos: null};
   function pintarTagsGuardar(){
     const sel = new Set(limpiarEtiquetas(document.getElementById('bibg-etiquetas').value));
-    const chip = t => `<button type="button" class="bib-chip${sel.has(t.toLowerCase()) ? ' on' : ''}" data-bibgtag="${esc(t)}">${esc(t)}</button>`;
+    const chip = t => `<button type="button" class="bib-chip${sel.has(t.toLowerCase()) ? ' on' : ''}" data-bibgtag="${esc(t)}">${esc((tagsGuardar.rotulos && tagsGuardar.rotulos[t]) || t)}</button>`;
+    // `enFila` (las pasivas, 2026-11-24): cada familia en su renglón, con los botoncitos a la vista (sin menú desplegable).
+    if(tagsGuardar.enFila){
+      document.getElementById('bibg-tags').innerHTML = `<div style="display:flex;flex-direction:column;gap:5px;width:100%">${tagsGuardar.grupos.filter(g => g.nombre !== 'Otros').map(g =>   // (las sueltas de antes no se ofrecen; se pueden escribir igual)
+        `<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-size:12px;font-weight:700;min-width:84px;opacity:.85">${esc(g.nombre)}</span>${g.tags.map(chip).join('')}</div>`).join('')}</div>`;
+      return;
+    }
     document.getElementById('bibg-tags').innerHTML = tagsGuardar.grupos.map(g => {
       const n = g.tags.filter(t => sel.has(t.toLowerCase())).length;
       return `<div class="bib-grupo${tagsGuardar.abierto === g.nombre ? ' abierto' : ''}">
@@ -311,6 +319,12 @@ const Biblioteca = (() => {
 
   function pintarChips(){
     const st = estado[actual];
+    if(st.opts.filtro){   // 🏷 un filtro a medida (las pasivas: filas por familia, comun/pasivas.js); el conteo va en su pie
+      const cont = document.getElementById('bib-chips');
+      cont.className = '';
+      cont.innerHTML = st.opts.filtro.html(st.fp, {n: filtrada(st).length, total: listaVista(st).length});
+      return;
+    }
     const cuenta = {};
     listaVista(st).forEach(e => e.etiquetas.forEach(t => { cuenta[t] = (cuenta[t] || 0) + 1; }));
     const tags = Object.keys(cuenta).sort((a, b) => a.localeCompare(b, 'es'));
@@ -342,6 +356,7 @@ const Biblioteca = (() => {
   }
   // Con grupos: dentro de un grupo alcanza con una de las etiquetas elegidas (o); entre grupos deben cumplirse todos (y).
   function pasaFiltros(st, e){
+    if(st.opts.filtro) return st.opts.filtro.pasa(e, st.fp);
     if(!st.opts.grupos) return [...st.filtros].every(t => e.etiquetas.includes(t));
     const porGrupo = {};
     agruparEtiquetas(st, [...new Set(listaVista(st).flatMap(x => x.etiquetas))]).forEach(g => g.tags.forEach(t => { porGrupo[t] = g.nombre; }));
@@ -358,20 +373,24 @@ const Biblioteca = (() => {
     const tec = st.opts.tecnico ? st.opts.tecnico(e) : conCorto ? ItemCorto.tecnicoHtml(e.descripcion || '') : '';
     return `<div class="desc">${cuerpo(e)}</div>${tec ? `<details class="bib-tec"><summary>Ver detalles técnicos</summary>${tec}</details>` : ''}`;
   }
+  // Lo que queda a la vista con los filtros y el buscador.
+  function filtrada(st){
+    return listaVista(st).filter(e => pasaFiltros(st, e)
+      && (!st.texto || (e.nombre + ' ' + e.descripcion).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(st.texto)));
+  }
   function pintarLista(){
     const st = estado[actual];
     const propuestas = st.vista === 'propuestas';
-    const f = listaVista(st).filter(e =>
-      pasaFiltros(st, e)
-      && (!st.texto || (e.nombre + ' ' + e.descripcion).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(st.texto)));
-    document.getElementById('bib-cuenta').textContent = `${f.length} de ${listaVista(st).length}`;
+    const f = filtrada(st);
+    document.getElementById('bib-cuenta').textContent = st.opts.filtro ? '' : `${f.length} de ${listaVista(st).length}`;
+    if(st.opts.filtro) pintarChips();   // (el «Mostrando N de M» cambia con el buscador)
     document.getElementById('bib-lista').innerHTML = f.length ? f.map(e => `
       <div class="bib-fila">
         <div class="info">
           <div class="tit">${esc(e.nombre)}${st.opts.subtitulo ? esc(st.opts.subtitulo(e)) : (e.nivel !== undefined && e.nivel !== null ? ` · Lv ${esc(e.nivel)}` : '')}
             ${!propuestas && !e.auditado ? '<span class="bib-sinaud" title="Lo subió alguien del grupo y todavía no lo revisó el dueño. Se puede usar igual.">🔶 sin auditar</span>' : ''}
             ${e.version > 1 ? `<span class="bib-ver" title="Veces que se corrigió">v${esc(e.version)}</span>` : ''}</div>
-          <div class="tags">${e.etiquetas.map(esc).join(' · ') || 'sin etiquetas'}${(propuestas || !e.base) && e.autorNombre ? ` · de ${esc(e.autorNombre)}` : ''}${e.editorNombre ? ` · corregido por ${esc(e.editorNombre)}` : ''}</div>
+          <div class="tags">${st.opts.filtro && st.opts.filtro.rotular ? esc(st.opts.filtro.rotular(e)) : (e.etiquetas.map(esc).join(' · ') || 'sin etiquetas')}${(propuestas || !e.base) && e.autorNombre ? ` · de ${esc(e.autorNombre)}` : ''}${e.editorNombre ? ` · corregido por ${esc(e.editorNombre)}` : ''}</div>
           ${cuerpoDe(st, e)}
         </div>
         <div class="acc">
@@ -455,6 +474,8 @@ const Biblioteca = (() => {
     estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: ''};
     const st = estado[tipo];
     st.opts = opts; st.vista = 'oficial'; st.filtros.clear(); st.texto = ''; st.grupoAbierto = null; if(opts.pools && !st.pool) st.pool = 'esencial';
+    // `opts.filtro` (2026-11-24, las pasivas): un filtro a medida {inicial(), html(fp, {n, total}), pasa(e, fp), clic(el, fp), rotular?(e)}.
+    st.fp = opts.filtro ? opts.filtro.inicial() : null;
     const q = id => document.getElementById(id);
     q('bib-titulo').textContent = `📚 ${opts.titulo || 'Biblioteca'}`;
     q('bib-buscar').value = '';
@@ -522,7 +543,7 @@ const Biblioteca = (() => {
       + (dueno ? ' Como sos el dueño, entra ya auditado.' : ' Queda marcado 🔶 sin auditar hasta que lo revise el dueño.');
     q('bibg-aviso').textContent = avisoTxt();
     q('bibg-nombre').value = opts.nombre || '';
-    q('bibg-etiquetas').value = '';
+    q('bibg-etiquetas').value = (opts.etiquetas || []).join(', ');   // `opts.etiquetas`: las que vienen marcadas (las pasivas: sugeridas)
     q('bibg-desc').value = '';
     q('bibg-cual').onclick = e => {
       const b = e.target.closest('[data-bibgcual]'); if(!b) return;
@@ -543,7 +564,7 @@ const Biblioteca = (() => {
     const conocidas = new Set(SUGERENCIAS[tipo] || []);
     (defGrupos || []).forEach(g => g.tags.forEach(t => conocidas.add(t)));
     tagsGuardar.grupos = armarGruposTags(defGrupos, conocidas);
-    tagsGuardar.abierto = null;
+    tagsGuardar.abierto = null; tagsGuardar.enFila = !!opts.gruposEnFila; tagsGuardar.rotulos = opts.rotulos || null;
     pintarTagsGuardar();
     cargar(tipo, false).then(() => {
       [...(st.oficial || []), ...(st.propuestas || [])].forEach(e => e.etiquetas.forEach(t => conocidas.add(t)));

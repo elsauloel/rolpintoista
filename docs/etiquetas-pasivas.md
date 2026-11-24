@@ -302,3 +302,21 @@ Boceto (la ventana de siempre de la Biblioteca, con las familias en filas):
   algunas pre-marcadas; el dueño corrige al auditar): **sí**.
 - 7: **por ahora queda Vista de halcón**; diseñar Largo alcance arcano, a la cola.
 - 8: revisar la tabla de las 47 **en tandas de a 10**, a la cola.
+
+## ✅ Programado (2026-11-24)
+
+- **Las 47 de fábrica** (`comun/pasivas.js`) llevan las etiquetas de la tabla de la sección 3 (Rol, Estilo y Función), sin «stat» ni las palabras
+  viejas (ofensiva, defensiva, utilidad…). **racial** (Inmunidad tóxica) y **criatura** (Vuela) quedan como estaban, como etiquetas sueltas: no son
+  filtro ni se ofrecen al subir (las marcas aparte quedaron para diseñar más adelante).
+- **«+ Pasiva»** (personaje, invocación y creep; la ventana de la Biblioteca): las tres filas de botoncitos, «sumar las de 🌐 Cualquiera» tildado,
+  «Mostrando N de 47», «✕ Limpiar filtros» y el buscador de siempre. Cada fila muestra sus etiquetas con su rótulo.
+- **Rol ya marcado**: solo en los **creeps** cuyo rol se sabe (los que salieron de la biblioteca de creeps: el rol sale de las etiquetas de esa
+  entrada; el Híbrido esencial = Warrior y Tanque). Un creep armado a mano o sin origen abre sin rol. Personajes, invocaciones y el asistente de
+  personaje nuevo abren sin rol marcado (P315).
+- **El asistente de personaje nuevo** dejó sus 5 categorías: usa las mismas filas (con su propio buscador); una pasiva ya elegida no se esconde.
+- **Subir una pasiva** («⬆ Subir» de la ficha): las etiquetas se eligen con los mismos botoncitos, cada familia en su renglón; arrancan marcadas las
+  que ya tenía (una copia de fábrica) o, si no tiene, las sugeridas por lo que suma. Se puede seguir escribiendo una propia en el campo de texto.
+- **Lo ya subido sin etiquetas nuevas** (hoy solo la corrección de **Regeneración**): se ve siempre, con «🏷 sin etiquetar», con cualquier filtro;
+  así nunca queda escondida. Una pasiva con etiquetas de una familia y ninguna de otra cuenta como «cualquiera» en la que le falta (P316).
+- Pruebas automáticas: 5 nuevas en `comun/pruebas.html` (1075 en verde). Con clics: «+ Pasiva» en la ficha, en un creep de GM Tools (Escudero:
+  Tanque marcado) y el paso Pasivas del asistente; la ventana de subir, sin subir nada. Falta con clics: la invocación y una subida real (en la cola).

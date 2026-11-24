@@ -2348,12 +2348,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «¿Ataque de oportunidad?»; «No, dejarlo pasar» → J1 terminó su camino sin otro aviso. Pruebas automáticas: 1117 en verde. Capturas:
   `cola103/1-J1-primero-el-aviso-del-anillo.png`, `cola103/2-GM-recien-despues-le-ofrecen-la-oportunidad.png`. Partida como estaba.
 
-- **⬜ en cola — Probar: 💀 un personaje que cae desde la Botonera del mapa o en su pase de turno** (2026-11-23, P270): ahora deja la línea «💀 X cayó:
+- **✅ hecho (2026-11-24) — Probar: 💀 un personaje que cae desde la Botonera del mapa o en su pase de turno** (2026-11-23, P270): ahora deja la línea «💀 X cayó:
   se le fueron N estados (…)» (`caidaContarPj`, vtt-hexgrid/js/11); antes los sacaba sin contarlo. Probarlo con J1 envenenado y poca vida (⏭ Pasar
   de ronda) y con un golpe que lo deja en 0 desde su Botonera: una sola línea, sin la repetida de js/98.
-- **⬜ en cola — Probar: 💀 un creep que cae desde GM Tools por una habilidad o un estado** (2026-11-23, P270): el corte es el mismo para cualquier
+  *Resultado:* **probado con clics** en «Claude · pruebas 2» (GM y Jugador 1). (1) Blanco J1 con 2 de vida, Veneno ×4 y Bendecido, en combate y
+  con su inicio de turno pendiente: el GM tocó ⏭ Pasar de ronda → el veneno lo dejó en 0 y quedó UNA sola línea «💀 Blanco J1 cayó: se le fueron 2
+  estados (Veneno, Bendecido)», igual en las dos pantallas; sin la «💔 quedó en 0» de js/98 ni otra repetida (mirado otra vez 20 s después). (2) Con
+  Maldito y 2 de vida, desde su Botonera: Ejecutar una habilidad de 3 SP → el aviso «Estás Maldito… quedás caído» → Aceptar → 0 de vida y UNA sola
+  línea «💀 Blanco J1 cayó: se le fueron 2 estados (Maldito, Bendecido)». (La habilidad de prueba se sacó al terminar.) Capturas:
+  `cola104/1-J1-cae-por-veneno-al-pasar-de-ronda.png`, `cola104/2-J1-cae-desde-su-Botonera-una-sola-linea.png`. Partida como estaba.
+- **✅ hecho (2026-11-24) — Probar: 💀 un creep que cae desde GM Tools por una habilidad o un estado** (2026-11-23, P270): el corte es el mismo para cualquier
   camino (`gmCaidasRevisar`), pero con clics solo se probaron el recuadro de HP, «Daño» y ⟳ Pasar de ronda. Falta: una habilidad que le cuesta vida,
   un estado con daño al aplicarse, y un creep oculto o en Sigilo (tiene que salir solo el toast al GM, sin línea en la Mesa).
+  *Resultado:* **probado con clics** en «Claude · pruebas 2» (GM con GM Tools y el mapa, Jugador 1 con el mapa), con los dos «Blanco creep». (1) Con
+  Maldito y 3 de vida, Ejecutar «Piel de hierro» (cooldown 3) desde sus Acciones → 0 de vida, toast y UNA línea «💀 Blanco creep cayó: se le fueron 2
+  estados (Maldito, Piel de hierro)» en la Mesa de las tres pantallas (el buff que recién se había puesto también se va). (2) Con 1 de vida, «+ Estado» →
+  Veneno severo (hace daño al ponerlo) → ✔ Listo → 0, toast y UNA línea «… se le fue 1 estado (Veneno severo)». (3) Lo mismo con su token oculto por el
+  GM: el toast al GM y ninguna línea nueva en la Mesa (ni en GM Tools, ni en el mapa del GM, ni en el de Jugador 1). Capturas:
+  `cola104/3-GMTools-creep-cae-por-habilidad.png`, `cola104/4-GMTools-creep-oculto-solo-el-aviso.png`. Los dos creeps y el token quedaron como estaban.
 
 - **⬜ en cola — 🩸 GM Tools: la vida de un creep no baja de 0 (P292)** (dueño, 2026-11-23: «corregilo para que la vida no baje de cero»): hoy «Daño»
   la deja en negativo (999 → −989). Que quede en 0, como en el mapa, en todos los caminos de GM Tools.

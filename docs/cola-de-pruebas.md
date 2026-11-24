@@ -2760,6 +2760,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   aviso en tercera persona), el rival que contesta «Sí, atacar» (el bono tiene que quedar perdido aunque no termine de moverse) y alejarse en la mira
   de alguien en vigilancia.
 
+- **⬜ en cola (revisar con el dueño) — 👁 Alejarse en la mira de alguien en vigilancia, con un bono de «quieto» activo: ¿en qué orden?**
+  (dueño, 2026-11-24: «habría que revisarlo, cuál sería el orden que tiene sentido… al final de la cola, para chequear»). Hoy (P266) primero sale
+  «Si te movés, lo perdés» y después la reacción de quien vigila. Explicarle el caso paso a paso y decidir el orden antes de probarlo.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

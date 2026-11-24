@@ -137,7 +137,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261123cola57"></script>
-<script src="mensajes.js?v=20261124msj3"></script>
+<script src="mensajes.js?v=20261124msj4"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -10654,7 +10654,9 @@ grupo('✉ Mensajes secretos');
     igual(M.sugerencias(P, 'j2').map(c => c.nombre), ['Blanco J2']);
     igual(M.sugerencias(P, 'nan').map(c => c.nombre), ['Rata Ñandú']);   // sin tildes ni eñes
     igual(M.sugerencias(P, 'mas').map(c => [c.nombre, c.uid]), [['Máster', 'gm']]);
-    igual(M.sugerencias(P, '').length, 6);
+    igual(M.sugerencias(P, '').length, 3);   // una fila por persona
+    igual(M.sugerencias(P, 'jug').map(c => c.uid), ['j2']);   // también por el nombre de la persona
+    igual(M.sugerencias(P, 'rat').map(c => c.uid), ['j2']);   // o por el de cualquiera de sus personajes
   });
   prueba('comando: /m y /r (mayúscula o minúscula); una tirada o «/mapa» no lo son', () => igual(
     ['/m hola', '/R x', '  /r', '/mapa', '2d6+3', 'm hola', '/m'].map(t => !!M.comando(t)), [true, true, true, false, false, false, true]));
@@ -10707,7 +10709,7 @@ grupo('✉ Mensajes secretos');
     igual(M.parsear('/m Todos hola', P).persona, null);
     igual(M.sugerencias(P, 'to', 8, {grupo: true}).map(c => [c.nombre, c.tipo]), [['Todo el grupo', 'grupo']]);   // uno solo (son lo mismo)
     igual(M.sugerencias(P, 'todos', 8, {grupo: true}).map(c => c.nombre), ['Todos']);
-    igual(M.sugerencias(P, '', 8).length, 6);
+    igual(M.sugerencias(P, '', 8).length, 3);
   });
   prueba('/r responde al último que me escribió, sin nombre (P285.2); /m sigue con el nombre', () => {
     igual(M.ultimoQueMeEscribio(lst, 'yo'), 'j1');

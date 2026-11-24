@@ -59,7 +59,8 @@ const Mensajes = (() => {
       const n = norm(c.nombre);
       if(f && !n.startsWith(f) && !n.split(/\s+/).some(w => w.startsWith(f))) return false;
       // «Todo el grupo» y «Todos» son lo mismo: se sugiere uno solo (dueño, 2026-11-24, «¿es un error?»).
-      const k = c.tipo === 'grupo' ? GRUPO : c.uid + '|' + n;
+      // Una sola fila por persona (dueño, 2026-11-24: con que aparezca «Larry (ElSaulo)» una sola vez, alcanza; se encuentra por cualquiera de los dos nombres).
+      const k = c.uid;
       if(vistos.has(k)) return false;
       vistos.add(k);
       return true;
@@ -738,11 +739,15 @@ const Mensajes = (() => {
     if(!sug){ sug = document.createElement('div'); sug.className = 'msj-sug'; document.body.appendChild(sug);
       sug.addEventListener('mousedown', ev => { const b = ev.target.closest('[data-sug]'); if(b){ ev.preventDefault(); elegirSug(Number(b.dataset.sug)); } }); }
     sug.innerHTML = '<div class="msj-sug-tit">🕊️ Mensaje secreto para… (↑↓ y Enter o Tab)</div>' + sugLista.map((c, i) => `<button type="button" data-sug="${i}" class="${i === sugI ? 'activa' : ''}">` +
-      `<span>${c.tipo === 'grupo' ? '📣' : c.tipo === 'personaje' ? '🎭' : (c.persona.gm ? '👑' : '👤')} ${e(c.nombre)}</span><span class="msj-sug-a">${c.tipo === 'grupo' ? 'público, lo ven todos' : c.tipo === 'personaje' ? '→ ' + e(etiqueta(c.persona)) : (c.persona.personajes.length ? e(c.persona.personajes.join(', ')) : (c.persona.gm ? 'GM' : ''))}</span></button>`).join('');
+      `<span>${c.tipo === 'grupo' ? '📣 ' + e(c.nombre) : (c.persona.gm ? '👑 ' : '🎭 ') + e(rotuloSug(c.persona))}</span><span class="msj-sug-a">${c.tipo === 'grupo' ? 'público, lo ven todos' : ''}</span></button>`).join('');
     const r = input.getBoundingClientRect();
     sug.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 370)) + 'px';
     sug.style.bottom = (window.innerHeight - r.top + 6) + 'px';
     sug.style.top = 'auto';
+  }
+  // «Larry (ElSaulo)»: sus personajes y, entre paréntesis, la persona; sin personajes, la persona sola (y «(GM)» si lo es).
+  function rotuloSug(p){
+    return p.personajes.length ? p.personajes.join(', ') + ' (' + p.nombre + ')' : p.nombre + (p.gm ? ' (GM)' : '');
   }
   function elegirSug(i){
     const c = sugLista[i], input = sugInput;

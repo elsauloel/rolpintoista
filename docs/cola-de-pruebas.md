@@ -2428,7 +2428,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   camino que el Muro de fuego (renglón de «Empieza tu turno» de quien la maneja); con clics, solo un personaje y un creep.
 
 - **⬜ en cola (justo después de la varita, pedido del dueño 2026-11-24) — 🗺 Armar el mapa fijo «Prueba · General» en «Claude · pruebas 2»**:
-  un mapa listo para todas las pruebas, para no armar y desarmar cada vez. Con: los personajes de todas las cuentas de prueba; al menos dos
+  un mapa listo para todas las pruebas, para no armar y desarmar cada vez. Con: **un solo personaje por jugador, los tres jugadores** (dueño: «no hace falta que cada jugador tenga varios personajes, porque eso puede dar
+  a confusión»); al menos dos
   jugadores con una invocación cada uno, ya puestas; creeps de varios roles (warrior, tanque, mago, support, debuffer, rango); **varios objetos
   sólidos (columnas, cajas…) con espacio entre sí**, para probar lo que interactúa con ellos (empujones, choques, línea de visión, coberturas…);
   y lugar libre para movimientos, áreas y zonas. Más una **«foto» del estado inicial** guardada con un script (en el scratchpad o en `herramientas/`

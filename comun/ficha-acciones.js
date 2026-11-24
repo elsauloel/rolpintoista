@@ -339,7 +339,7 @@ const FichaAcciones = (() => {
     const formula = (it.tiradaExtra || '').trim();
     if(formula){
       const r = tirarDados(formula);
-      if(r) out.push({origen: it.nombre, r});
+      if(r) out.push({origen: it.nombre, r, formula: true});
     }
     return out;
   }
@@ -466,7 +466,7 @@ const FichaAcciones = (() => {
       // Cura estados por grupo (P180): Vendas, Antídoto, Té de tilo, Sales aromáticas, Ungüento de la Turca, Mate cebado; el Cura Plus, todos.
       const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(S.efectos, Combatiente.curaDeItem(it)) : null;
       if(curados && curados.sacados.length) S.efectos = curados.quedan;
-      ui.tirarExtra(it);
+      const extra = ui.tirarExtra(it);   // 🎲 devuelve {formula: r} si tiró la fórmula del ítem (la de un consumible a mano va a su línea de la Mesa, P284)
       const spRestaurado = restaurarSpDeConsumo(S, it);
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
       const armRotaTxt = num(it.reparaArmRota) > 0 ? repararArmRota(S, it.reparaArmRota) : '';
@@ -491,8 +491,8 @@ const FichaAcciones = (() => {
       if(armRotaTxt) partes.push(armRotaTxt);
       if(reviveTxt) partes.push(reviveTxt);
       if(curadosTxt) partes.push(curadosTxt);
-      const aMano = Combatiente.consumoAMano(it) ? Combatiente.consumoAManoMesa(it) : '';   // ✋ un consumible propio: lo resuelve la mesa (2026-11-22)
-      if(aMano) partes.push('✋ el efecto, a mano');
+      const aMano = Combatiente.consumoAMano(it) ? Combatiente.consumoAManoMesa(it, extra && extra.formula) : '';   // ✋ un consumible propio: lo resuelve la mesa (2026-11-22)
+      if(aMano) partes.push(`✋ el efecto, a mano${Combatiente.consumoTirada(it) ? ` · 🎲 ${Combatiente.consumoTirada(it)}${extra && extra.formula ? ` = ${extra.formula.total}` : ''}` : ''}`);
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
       // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
       const quien = (S.meta && S.meta.nombre) || 'Alguien';

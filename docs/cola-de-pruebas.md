@@ -2000,9 +2000,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   a un jugador» con Blanco J1 ya marcado. Lo que falló antes fue la prueba: buscaba un botón con el texto «Dar un ítem», y el botón muestra solo el
   ícono (el texto está en el globo al pasar el mouse). No hizo falta cambiar nada.
 
-- **⬜ en cola — 🎲 Consumible propio con una tirada opcional** (dueño, 2026-11-22, P284: «no estaría mal agregarle como opción tirar un dado»):
+- **✅ hecho (2026-11-24) — 🎲 Consumible propio con una tirada opcional** (dueño, 2026-11-22, P284: «no estaría mal agregarle como opción tirar un dado»):
   en el asistente, un campo opcional «Tirada al consumirlo» (por ejemplo 1d6, 2d4+1); al consumirlo se tira sola y sale en la Mesa junto al
   «✋ a mano». Sin tirada, como ahora.
+  *Resultado:* el campo «🎲 Tirada al consumirlo (opcional)» está en el paso «Unidades» del consumible a mano; si no es una fórmula de dados lo marca
+  en rojo y no deja guardar (vuelve a ese paso). Se guarda en `tiradaExtra`, que ya tiran todos los caminos de Consumir (ficha y Botonera del mapa):
+  se tira sola con los dados de siempre, a nombre de quien lo consume, y la línea «✋ a mano» de la Mesa suma «🎲 2d4+1 = 6». El Ver dice
+  «🎲 al consumirlo: 2d4+1». Sigue sin ir al catálogo (P317). Sin «✍ Elegir manualmente» (las tiradas parecidas, la de las varitas a mano, tampoco lo
+  tienen). Probado con clics con Jugador 1: crear uno con 2d4+1 (y uno mal escrito) y otro sin tirada, Ver, consumirlos en la ficha y en la
+  Botonera del mapa, y la Mesa vista desde la pantalla del GM de pruebas. La ficha quedó como estaba. 4 pruebas nuevas en `comun/pruebas.html` (1085 en verde).
 
 - **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) (al final, a propósito) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (dueño,
   2026-11-22: «vamos a dejar al final de la cola probar este sistema en el mapa con los clics una vez que estén pegadas las reglas de Firebase…
@@ -2336,6 +2342,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   referís con el catálogo propio del personaje… revisar qué es eso y después revisar también el caso particular»). Explicarle al dueño qué es,
   para qué sirve y quién lo ve (con captura); después, el caso particular: hoy deja guardar ahí un consumible «a mano» (P317: esos no van al
   catálogo compartido). Decidir con el dueño si también se saca de ahí.
+
+- **⬜ en cola — Probar: 🎲 el consumible a mano con tirada desde el cinturón y armado en GM Tools** (2026-11-24, del consumible con tirada): con clics se
+  probó crearlo en la ficha y consumirlo de la mochila (ficha y Botonera del mapa). Falta: pasarlo al cinturón y consumirlo de ahí, y armarlo en GM Tools
+  («✎ Ítem custom» → 🤝 Dar a un jugador) con su tirada y que al jugador le llegue y le tire al consumirlo.
 
 ## En cola
 

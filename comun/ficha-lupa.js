@@ -293,7 +293,7 @@ const FichaLupa = (() => {
       if(it.curahp) ef += lupaFila('Vida', `${lupaSigno(num(it.curahp))} HP`);
       if(num(it.curaspPct) > 0) ef += lupaFila('SP', `${fmt(num(it.curaspPct))}% del máximo`);
       if(it.efectoNombre) ef += lupaFila('Estado', esc(it.efectoNombre));
-      if(Combatiente.consumoAMano(it)) ef += lupaFila('✋ A mano', 'lo resuelve la mesa') + lupaNota(esc(Combatiente.consumoAManoQueHace(it)));   // un consumible propio (2026-11-22)
+      if(Combatiente.consumoAMano(it)) ef += lupaFila('✋ A mano', 'lo resuelve la mesa') + (Combatiente.consumoTirada(it) ? lupaFila('🎲 Al consumirlo', esc(Combatiente.consumoTirada(it))) : '') + lupaNota(esc(Combatiente.consumoAManoQueHace(it)));   // un consumible propio (2026-11-22)
       return {titulo: it.nombre, html: lupaSeccion('Costo', h) + (ef ? lupaSeccion('Efecto', ef) : '')};
     }
     return {titulo: '', html: ''};
@@ -358,7 +358,7 @@ const FichaLupa = (() => {
       if(key === 'inventario' && !it.equipado) L.push(linea('Ranuras', fmt(ranurasDe(it))));
       if(num(it.precioCompra)) L.push(linea('Precio de compra', fmt(num(it.precioCompra))));
       if(precioVentaDe(it)) L.push(linea('Precio de venta', fmt(precioVentaDe(it))));
-      if(it.consumible) L.push(linea('Consumible', Combatiente.consumoAMano(it) ? `${fmt(num(it.unidades))} unidades · ✋ el efecto lo resuelve la mesa`   // ✋ un consumible propio (2026-11-22)
+      if(it.consumible) L.push(linea('Consumible', Combatiente.consumoAMano(it) ? `${fmt(num(it.unidades))} unidades · ✋ el efecto lo resuelve la mesa${Combatiente.consumoTirada(it) ? ` · ${Combatiente.consumoTiradaTxt(it)}` : ''}`   // ✋ un consumible propio (2026-11-22)
         : `${fmt(num(it.unidades))} unidades · ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP al consumir`));
       const otrosMods = (it.mods||[]).filter(m => m.stat && m.stat !== 'def' && !TIPOS_IDS.includes(m.stat));
       if(otrosMods.length) L.push(linea('Otros modificadores', otrosMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));

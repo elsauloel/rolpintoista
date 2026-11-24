@@ -2070,6 +2070,8 @@ para que diga claro que el Aguante frenó 2 de los 3 que pasaban (hoy muestra «
 ### P284 — ✋ Consumibles propios, a mano: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (1) y (3) «están bien resueltas», como están. (2) «no estaría mal agregarle como opción tirar un dado»: el consumible propio puede llevar una tirada opcional que sale al consumirlo (en la cola).
+> ✅ **(2) aplicada (2026-11-24):** el asistente tiene «🎲 Tirada al consumirlo (opcional)» en el paso Unidades; al consumirlo se tira sola (a nombre de
+> quien lo consume) y sale en la Mesa junto al «✋ a mano»; el Ver dice «🎲 al consumirlo: 2d4+1». Ver `docs/cola-de-pruebas.md`.
 
 Pedido del dueño (2026-11-22): «que +ítem te deje crear ítems consumibles, pero sin automatización… que los efectos de los consumibles custom se
 resuelvan a mano». Ya está: en el asistente de ítems, la categoría Consumible tiene un camino corto (qué es · unidades · precio/peso · listo) y el ítem

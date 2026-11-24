@@ -124,7 +124,9 @@ versión parecida en más de una, es candidato a juntar.
   un botón de `cfg.botones` con `alCatalogo: true` no se muestra mientras se arma un consumible, y `cfg.sinAMano` —el editor del catálogo
   de fábrica— manda Consumible directo a `cfg.onConsumible`; la regla es `Combatiente.noVaAlCatalogo(item)` / `CONSUMO_A_MANO_NO_SUBE`, y la
   respetan `FichaEditor.subirAlCatalogo`, `EditarItem.subir`/`abrir`, `publicarEnCatalogoGM` y, como última puerta, `Biblioteca.guardar`
-  con `tipo: 'items'`; `paso-a-paso.js` acepta `extras[].visible(api)`): categoría y descripción → lo
+  con `tipo: 'items'`; `paso-a-paso.js` acepta `extras[].visible(api)`; 🎲 desde el 2026-11-24, P284: «Tirada al consumirlo» opcional en el paso
+  Unidades, en `tiradaExtra`, validada con `Combatiente.consumoTiradaValida`; la tiran sola los caminos de Consumir y `consumoAManoMesa(it, r)` la suma
+  a la línea ✋ — `ui.tirarExtra` devuelve `{formula: r}` —; el Ver: `consumoTiradaTxt`): categoría y descripción → lo
   práctico según la categoría (armas: Tipo, empuñadura, peso/daño, bonos,
   efectos al golpear; defensa: Defensa y resistencias a crítico; el resto:
   bonos) → estado al equipar, precio/lugar → resumen. Lo usan

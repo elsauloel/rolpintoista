@@ -492,11 +492,12 @@ function tirarExtraDeItem(it){
     tiro = true;
   }
   const formula = (it.tiradaExtra || '').trim();
+  let rF = null;
   if(formula){
     const r = tirarDados(formula);
-    if(r){ registrarTirada(it.nombre, r); tiro = true; }
+    if(r){ registrarTirada(it.nombre, r); tiro = true; rF = r; }
   }
-  return tiro;
+  return {tiro, formula: rF};   // 🎲 la fórmula tirada va también a la línea ✋ de un consumible a mano (P284, 2026-11-24)
 }
 
 /* Ejecutar una habilidad tira SOLO la primera tirada que le corresponde: el stat vinculado (PdG, PdG.Esp u otro) o,

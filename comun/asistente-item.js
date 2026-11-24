@@ -13,7 +13,8 @@
    ✋ Consumible propio, a mano (2026-11-22, dueño): la categoría Consumible tiene un camino corto — nombre y qué hace en palabras ·
    cuántas unidades · peso/ranuras/precio · resumen — SIN efectos automáticos: el ítem lleva `consumible: true`, `consumoAMano: true` y
    la nota «✋ A mano: el efecto lo resuelve la mesa.» al final del Detalle (Combatiente.consumoAManoDetalle). Se consume como cualquier
-   consumible; la Mesa muestra qué hace. cfg.onConsumible(d), si está, ofrece en el resumen el formulario completo de esa herramienta
+   consumible; la Mesa muestra qué hace. 🎲 Opcional (2026-11-24, P284): «Tirada al consumirlo» (`tiradaExtra`, una fórmula de dados validada con
+   Combatiente.consumoTiradaValida) que se tira sola al consumirlo y sale en la Mesa junto al «✋ a mano». cfg.onConsumible(d), si está, ofrece en el resumen el formulario completo de esa herramienta
    (el de los consumibles con efectos automáticos: curar, estado al consumir…).
    Necesita comun/efectos-golpe.js (efectos al golpear).
 
@@ -378,6 +379,10 @@ const AsistenteItem = (() => {
         cfg.unidadesNota || (q.ctx === 'ficha' ? 'Las que vas a tener en la mochila.' : 'Las que vienen juntas.'));
       h += efecto(`<b>Se usa como cualquier consumible</b>: va a la mochila, se puede pasar al cinturón («→ Cinturón») y se consume con su botón, en la ficha o en la Botonera del mapa. Cuesta los No2 de siempre (1 del cinturón, 2 de la mochila). Cada uso gasta una unidad; en 0 desaparece.`);
       h += efecto(`<b>${e(CONSUMO_A_MANO)}</b> No cura, no pone estados ni toca nada solo: al consumirlo, la Mesa muestra su nombre y lo que hace (la descripción del primer paso) para que la mesa lo resuelva.`);
+      // 🎲 Una tirada opcional al consumirlo (2026-11-24, dueño, P284 (2)): va en `tiradaExtra`; se tira sola al consumirlo, con los dados de siempre.
+      h += campo('🎲 Tirada al consumirlo (opcional)', input('tiradaExtra', d.tiradaExtra || '', 'placeholder="ej. 1d6, 2d4+1" style="max-width:160px"'),
+        'Si la ponés, <b>se tira sola</b> cada vez que alguien lo consume (con los dados de siempre, a nombre de quien lo usa) y sale en la Mesa junto al «✋ a mano», para que la mesa lo resuelva con el número a la vista. Vacía: no se tira nada.');
+      h += `<div class="aa-nota" id="aa-cons-tirada-ok" style="color:#d95a6e">${tiradaConsumoOk(d.tiradaExtra) ? '' : TIRADA_CONSUMO_MAL}</div>`;
     }
 
     if(paso.id === 'tipo'){
@@ -709,7 +714,8 @@ const AsistenteItem = (() => {
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
         ${g === 'defensa' && !esOrbe(d) ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
-        ${g === 'consumible' ? fila('Unidades', f(Math.max(1, Math.round(n(d.unidades)) || 1))) + fila('Al consumirlo', '✋ a mano: lo resuelve la mesa (cuesta los No2 de siempre)') : fila('Bonos', e(bonos || 'ninguno'))}
+        ${g === 'consumible' ? fila('Unidades', f(Math.max(1, Math.round(n(d.unidades)) || 1))) + fila('Al consumirlo', '✋ a mano: lo resuelve la mesa (cuesta los No2 de siempre)')
+          + (String(d.tiradaExtra || '').trim() ? fila('Tirada', tiradaConsumoOk(d.tiradaExtra) ? `🎲 ${e(String(d.tiradaExtra).replace(/\s+/g, ''))}, sola al consumirlo` : `<span style="color:#d95a6e">${e(d.tiradaExtra)}: no es una fórmula de dados</span>`) : '') : fila('Bonos', e(bonos || 'ninguno'))}
         ${cfg.conEstadoEquipar && g !== 'consumible' ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
         ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))}${Math.round(n(d.durExtra)) > 0 ? ` (Resistente ×${Math.round(n(d.durExtra))})` : Math.round(n(d.durExtra)) < 0 ? ` (Frágil ×${-Math.round(n(d.durExtra))})` : ' (lo normal: 6 por punto de Peso)'}`) : ''}
@@ -724,6 +730,9 @@ const AsistenteItem = (() => {
 
   const orbeHtml = d => n(d.orbeResguardo) || d.orbeSalvaje || n(d.orbeCustodio) || n(d.orbeAbsorcion) ? `⚙ Automatizado: ${[n(d.orbeResguardo) ? `Vida extra ${Math.round(n(d.orbeResguardo))}, una vez por turno` : '', d.orbeSalvaje ? `la tirada de 1d6 y los dados del daño ×2 con ${d.orbeSalvaje === 'domado' ? 'un 5 o un 6' : 'un 6'} (el doble de un arma sin daño, a mano)` : '', n(d.orbeCustodio) ? `la Vida extra ${Math.round(n(d.orbeCustodio))} al aliado (si hay varios al lado, se elige)` : '', n(d.orbeAbsorcion) ? `los ${Math.round(n(d.orbeAbsorcion))} SP del daño mágico o elemental` : ''].filter(Boolean).join('; ')}.` : 'Sin efecto al usar una varita: solo sus bonos (si tiene).';
   const aManoTxt = es => { const a = es && es.aMano; return a ? [String(a.texto || '').trim(), String(a.tirada || '').trim() ? `tira ${String(a.tirada).trim()}` : ''].filter(Boolean).join(' · ') : ''; };
+  // 🎲 La tirada de un consumible a mano: una fórmula con al menos un dado (Combatiente.consumoTiradaValida; vacía vale: no lleva tirada).
+  const tiradaConsumoOk = t => typeof Combatiente !== 'undefined' && Combatiente.consumoTiradaValida ? Combatiente.consumoTiradaValida(t) : tiradaValida(t);
+  const TIRADA_CONSUMO_MAL = 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).';
   const tiradaValida = t => { const x = String(t || '').replace(/\s+/g, ''); return !x || (typeof parseDados === 'function' ? !!parseDados(x) : /^\d*d\d+([+-]\d+)?$/i.test(x)); };
   function amanoHtml(){
     const am = (st.d.especial && st.d.especial.aMano) || {}, txt = String(am.texto || '').trim(), tir = String(am.tirada || '').trim();
@@ -891,6 +900,7 @@ const AsistenteItem = (() => {
       if(c === 'peso') poner('aa-carga', cargaHtml());
       if(c === 'peso' || c === 'durExtra') poner('aa-dur', durHtml());
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
+      if(c === 'tiradaExtra') poner('aa-cons-tirada-ok', tiradaConsumoOk(t.value) ? '' : TIRADA_CONSUMO_MAL);
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
     if(t.dataset.aaEsp1 && d.especial){
@@ -968,6 +978,7 @@ const AsistenteItem = (() => {
       d.unidades = Math.max(1, Math.round(n(d.unidades)) || 1);
       d.peso = Math.max(0, n(d.peso)); d.ranuras = Math.max(1, Math.round(n(d.ranuras)) || 1);
       d.detalle = conNotaAMano(d.detalle);
+      d.tiradaExtra = String(d.tiradaExtra || '').replace(/\s+/g, '');   // 🎲 vacía = sin tirada (queda '' para pisar la de antes al fusionar)
     }else if(grupoDe(d.tipoItem) === 'arma'){
       delete d.especial;
       d.peso = Math.max(1, n(d.peso) || 1);
@@ -1021,6 +1032,9 @@ const AsistenteItem = (() => {
   function guardar(){
     const falta = faltaAlgo();
     if(falta){ ir(0); if(st.api) st.api.aviso(falta); return false; }
+    if(grupoDe(st.d.tipoItem) === 'consumible' && !tiradaConsumoOk(st.d.tiradaExtra)){   // 🎲 la tirada al consumirlo, mal escrita: a su paso
+      const i = pasos().findIndex(p => p.id === 'unidades'); ir(Math.max(0, i)); if(st.api) st.api.aviso(TIRADA_CONSUMO_MAL); return false;
+    }
     const yo = st;
     if(yo.cfg.onGuardar(limpio(), yo.destino) === false) return false;
     if(st === yo) st = null;   // la ventana se cierra sola (paso-a-paso)

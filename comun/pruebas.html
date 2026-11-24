@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261123p281"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261124c76"></script>
+<script src="combatiente.js?v=20261124c80"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261123c68"></script>
+<script src="ficha-acciones.js?v=20261124c80"></script>
 <script src="orden-turnos.js?v=20261123c69"></script>
 <script src="ficha-mantenimiento.js?v=20261123esc"></script>
 <script src="estado-preguntas.js"></script>
@@ -115,7 +115,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261123cola60"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261122cola49"></script>
+<script src="ficha-lupa.js?v=20261124c80"></script>
 <script src="ficha-editor.js"></script>
 <script src="capas.js"></script>
 <script src="creep-lupa.js?v=20261122prisa5"></script>
@@ -3473,6 +3473,31 @@ prueba('✋ Combatiente.consumoAMano*: la nota va una sola vez y la descripción
     Combatiente.consumoAMano({consumoAMano: true, tipoItem: 'arma_1m'}), Combatiente.consumoAManoDetalle('')],
     ['Hace X. ✋ A mano: el efecto lo resuelve la mesa.', 'Hace X.', true, false, false, '✋ A mano: el efecto lo resuelve la mesa.']);
 });
+prueba('🎲 Combatiente.consumoTirada* (P284, 2026-11-24): una fórmula con al menos un dado; vacía vale (sin tirada); la línea de la Mesa la suma con su resultado', () => {
+  const V = Combatiente.consumoTiradaValida, it = {consumible: true, consumoAMano: true, tiradaExtra: ' 2d4 + 1 ', detalle: Combatiente.consumoAManoDetalle('Te hace cantar.')};
+  igual([V('1d6'), V('2d4+1'), V(''), V('5'), V('dado'), V('2x4'), Combatiente.consumoTirada(it), Combatiente.consumoTirada({tiradaExtra: 'hola'}), Combatiente.consumoTiradaTxt(it),
+    Combatiente.consumoTiradaTxt({tiradaExtra: ''}), Combatiente.consumoAManoMesa(it, {total: 7}), Combatiente.consumoAManoMesa(it), Combatiente.consumoAManoMesa({...it, tiradaExtra: ''}, {total: 7})],
+    [true, true, true, false, false, false, '2d4+1', '', '🎲 al consumirlo: 2d4+1', '', '«Te hace cantar.» · ✋ a mano: lo resuelve la mesa · 🎲 2d4+1 = 7',
+     '«Te hace cantar.» · ✋ a mano: lo resuelve la mesa · 🎲 2d4+1', '«Te hace cantar.» · ✋ a mano: lo resuelve la mesa']);
+});
+prueba('🎲 un consumible a mano con tirada (P284): al consumirlo se tira sola (como en el mapa: tiradasDeItem) y la línea ✋ lleva el resultado; sin tirada, como antes', async () => {
+  const det = Combatiente.consumoAManoDetalle('Te hace cantar.');
+  const S = fichaBotonera({hp: 10, nitros: 9, efectos: [], cinturon: [{id: 'c', nombre: 'Caramelo', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 1, tiradaExtra: '2d4+1', detalle: det},
+    {id: 's', nombre: 'Chicle', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 1, tiradaExtra: '', detalle: det}]}), reg = [], anuncios = [], tiros = [];
+  const ui = {...uiConsumo(S, reg), anunciar: a => anuncios.push(a), tirarExtra: it => { const L = FichaAcciones.tiradasDeItem(S, it); L.forEach(t => tiros.push(t)); const f = L.find(t => t.formula); return {formula: f ? f.r : null}; }};
+  await FichaAcciones.consumir(S, 'c', false, ui);
+  await FichaAcciones.consumir(S, 's', false, ui);
+  const r = tiros[0] && tiros[0].r;
+  igual([tiros.length, tiros[0].origen, r.formula, r.total >= 3 && r.total <= 9, anuncios[0].resultado, anuncios[1].resultado, reg.some(t => new RegExp('✋ el efecto, a mano · 🎲 2d4\\+1 = ' + r.total).test(t)), S.hp, S.cinturon.length],
+    [1, 'Caramelo', '2d4+1', true, `«Te hace cantar.» · ✋ a mano: lo resuelve la mesa · 🎲 2d4+1 = ${r.total}`, '«Te hace cantar.» · ✋ a mano: lo resuelve la mesa', true, 10, 0]);
+});
+prueba('🎲 el Ver de un consumible a mano con tirada dice «🎲 al consumirlo: 2d4+1» (y la 🔍 de la Botonera también); sin tirada, no', () => {
+  const det = Combatiente.consumoAManoDetalle('Te hace cantar.');
+  const S = fichaBotonera({cinturon: [{id: 'c', nombre: 'Caramelo', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, tiradaExtra: '2d4+1', detalle: det},
+    {id: 's', nombre: 'Chicle', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, detalle: det}]});
+  const a = FichaLupa.ver(S, 'cinturon', S.cinturon[0]).html, b = FichaLupa.ver(S, 'cinturon', S.cinturon[1]).html, l = FichaLupa.contenido(S, 'cons:cinturon:c').html;
+  igual([a.includes('🎲 al consumirlo: 2d4+1'), b.includes('🎲'), l.includes('2d4+1')], [true, false, true]);
+});
 prueba('🛡 Cuero duro (2026-11-05, dueño: «Cuero duro queda»): +1 Res. crítico Tipo 6 y Tipo 8; Ojo para las grietas no existe', () => {
   const P = id => PASIVAS_BASE.find(p => p.poolId === id);
   const f0 = FichaCalculo.calcular(fichaBotonera({})).final, f = FichaCalculo.calcular(fichaBotonera({pasivas: [{...P('cuero-duro')}]})).final;
@@ -4747,6 +4772,30 @@ prueba('✋ asistente de ítems: un Consumible nuevo va por el camino corto (Qu�
   igual([tabs, aviso, guardado.tipoItem, guardado.consumible, guardado.consumoAMano, guardado.unidades, guardado.mods, guardado.equipado, guardado.detalle, hayForm, alForm],
     [['Qué es', 'Unidades', 'Precio', 'Listo'], 'Contá en la descripción qué hace: es lo que la mesa va a resolver a mano', 'consumibles', true, true, 3, [], false,
      'Te da ánimo para seguir. ✋ A mano: el efecto lo resuelve la mesa.', true, null]);
+});
+// (Sin «await» en el medio: las pruebas asíncronas corren a la vez y el asistente es uno solo.)
+const asistenteConsumoTirada = (valor, guardar) => {
+  let guardado = null;
+  const base = {nombre: 'Mate milagroso', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, tiradaExtra: '1d6', detalle: Combatiente.consumoAManoDetalle('Te da ánimo.')};
+  AsistenteItem.abrir({contexto: 'ficha', nuevo: false, draft: structuredClone(base), stats: [{id: 'pdg', label: 'PdG'}], onGuardar: d => { guardado = AsistenteItem.fusionar(base, d); }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.indexOf('Unidades')}"]`).click();
+  const enCaja = q('[data-aa-c="tiradaExtra"]').value;
+  const t = q('[data-aa-c="tiradaExtra"]'); t.value = valor; t.dispatchEvent(new Event('input', {bubbles: true}));
+  const nota = q('#aa-cons-tirada-ok').textContent;
+  q('[data-pap="guardar"]').click();
+  const r = {enCaja, nota, guardado, aviso: (q('.pap-aviso') || {}).textContent, enUnidades: !!q('[data-aa-c="tiradaExtra"]')};
+  if(AsistenteItem.abierto()) AsistenteItem.cerrar();
+  return r;
+};
+prueba('🎲 asistente de ítems: «Tirada al consumirlo» (paso Unidades) mal escrita avisa en rojo, no guarda y queda en ese paso', () => {
+  const r = asistenteConsumoTirada('dos dados');
+  igual([r.enCaja, r.nota, r.guardado, r.aviso, r.enUnidades], ['1d6', 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).', null, 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).', true]);
+});
+prueba('🎲 asistente de ítems: «Tirada al consumirlo» bien escrita se guarda sin espacios; borrarla al editar la saca', () => {
+  const a = asistenteConsumoTirada('2d4 + 1'), b = asistenteConsumoTirada('');
+  igual([a.nota, a.guardado && a.guardado.tiradaExtra, b.guardado && b.guardado.tiradaExtra, Combatiente.consumoTirada(b.guardado || {})], ['', '2d4+1', '', '']);
 });
 prueba('✋ asistente de ítems: al editar un consumible propio la nota no aparece en la descripción; pasarlo a otra categoría le saca la marca', async () => {
   let guardado = null;

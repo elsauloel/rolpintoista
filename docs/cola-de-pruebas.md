@@ -2583,6 +2583,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   donde sale: ahí se ve solo la llegada. La de un tercero lo ve entero. Propuesta: apartar el cartel (como se aparta el cuadro del duelo) mientras
   dura la tele, y quizás también centrar la vista. Además, la tele arranca 3 a 6 s después de elegir el destino (lo que tardan los avisos entre
   pantallas, más en el caso «portal-mover»): ver si se puede acortar.
+  **Dueño (2026-11-24):** «se tendrían que minimizar los menús, enfocar en los tokens durante la animación, y después volver a abrir el menú». Y
+  el mínimo 11 del Portal (Rara) contra la Res.CC de un nivel 1: «es una trampa rara, y entiendo que cara, así que está bien».
 
 ## En cola
 

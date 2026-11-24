@@ -2135,6 +2135,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   su Sigilo) y Escarcha, y siguió en Sigilo. En las tres, el GM sin toasts, Mesa ni Crónica del escondido. **Visto**: en la línea, mientras J1
   resolvía el duelo de la Abeja, a los 40 s la pantalla del GM tiró sola la Evasión de J1 («solo: no contestó»): ver P321. Capturas: cola88.
 - **⬜ en cola — Probar: 🙈 el GM con 👁 Revelar lo oculto ve el duelo de un personaje escondido y lo resuelve a mano** (2026-11-22, P263).
+  **Y (dueño, 2026-11-24):** revisar bien qué hace exactamente «👁 Revelar lo oculto», para garantizar que además de personajes ocultos
+  revele trampas y otras cosas que el GM pudiera no ver.
 - **⬜ en cola — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263): solo con pruebas automáticas.
 - **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
   probó con la pantalla del GM todavía con el código de antes (tiró la Evasión de J2, aceptó el daño y aplicó el Empujón solo); con el código
@@ -2503,6 +2505,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   aparezca una mini explicación: había alguien oculto, te hizo esta tirada a escondidas, sacaste uno y el diablito te hace daño. Pero que lo
   diga de última, al final del turno». Revisar también los otros talismanes que quedaron con texto «sin nombre» (Espejito, Relicario, Cruz de
   plata, Orbe salvaje) por si conviene lo mismo.
+
+- **⬜ en cola (revisar con tiempo) — ⏱ Responder P321: ¿los 40 s del duelo de un escondido esperan mientras el jugador resuelve otro duelo?**
+  (dueño, 2026-11-24: «ponela al final de la cola para revisarla con tiempo»). Recomendación: sí, y que pasados 2–3 minutos se resuelva solo igual.
 
 ## En cola
 

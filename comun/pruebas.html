@@ -137,7 +137,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261123cola57"></script>
-<script src="mensajes.js?v=20261124msj2"></script>
+<script src="mensajes.js?v=20261124msj3"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -10705,7 +10705,8 @@ grupo('✉ Mensajes secretos');
     const a = M.parsear('/m Todo el grupo vamos', P, {grupo: true}), b = M.parsear('/m todos', P, {grupo: true});
     igual([a.persona.uid, a.persona.grupo, a.texto, b.persona.uid, b.texto], [M.GRUPO, true, 'vamos', M.GRUPO, '']);
     igual(M.parsear('/m Todos hola', P).persona, null);
-    igual(M.sugerencias(P, 'to', 8, {grupo: true}).map(c => [c.nombre, c.tipo]), [['Todo el grupo', 'grupo'], ['Todos', 'grupo']]);
+    igual(M.sugerencias(P, 'to', 8, {grupo: true}).map(c => [c.nombre, c.tipo]), [['Todo el grupo', 'grupo']]);   // uno solo (son lo mismo)
+    igual(M.sugerencias(P, 'todos', 8, {grupo: true}).map(c => c.nombre), ['Todos']);
     igual(M.sugerencias(P, '', 8).length, 6);
   });
   prueba('/r responde al último que me escribió, sin nombre (P285.2); /m sigue con el nombre', () => {

@@ -58,7 +58,8 @@ const Mensajes = (() => {
     return candidatos(pers, o).filter(c => {
       const n = norm(c.nombre);
       if(f && !n.startsWith(f) && !n.split(/\s+/).some(w => w.startsWith(f))) return false;
-      const k = c.uid + '|' + n;
+      // «Todo el grupo» y «Todos» son lo mismo: se sugiere uno solo (dueño, 2026-11-24, «¿es un error?»).
+      const k = c.tipo === 'grupo' ? GRUPO : c.uid + '|' + n;
       if(vistos.has(k)) return false;
       vistos.add(k);
       return true;

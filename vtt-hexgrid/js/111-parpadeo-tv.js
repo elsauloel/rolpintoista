@@ -82,7 +82,7 @@ function blinkTvEmpezar(dt){
   const t0 = performance.now() + espera;
   todos.forEach(x => {
     for(let i = BLINK_TV.length - 1; i >= 0; i--) if(BLINK_TV[i].id === x.id) BLINK_TV.splice(i, 1);
-    BLINK_TV.push({id: x.id, de: hexCentro(x.de.col, x.de.fila), a: hexCentro(x.a.col, x.a.fila), aCel: {col: x.a.col, fila: x.a.fila}, t0, ...(x.sale ? {sale: true} : {})});
+    BLINK_TV.push({id: x.id, de: hexCentro(x.de.col, x.de.fila), a: hexCentro(x.a.col, x.a.fila), deCel: {col: x.de.col, fila: x.de.fila}, aCel: {col: x.a.col, fila: x.a.fila}, t0, ...(x.sale ? {sale: true} : {})});
   });
   pedirDibujo();
 }
@@ -109,6 +109,20 @@ function blinkTvEstado(fx, ms){
   const u = suave(cl(t / T.abre));
   return {fase: 'llega', x: fx.a.x, y: fx.a.y, sx: 1.18 - 0.18 * u, sy: RAYA + (1 - RAYA) * u, linea: 1 - u, punto: 0, escaneo: 1 - u};
 }
+// 🙈 Cada lado, solo si esta pantalla vería al token AHÍ (2026-11-24, probado con clics: el token sale de adentro de una nube y llega afuera; si
+// la casilla nueva llegaba mientras se apagaba, quien no lo veía en la nube alcanzaba a ver el final del apagado en la salida). Se mira con el
+// token puesto un instante en esa casilla (la misma regla de calcularDisposicion: oculto, sigilo, la nube, la niebla de guerra).
+function blinkTvVeoEn(id, cel){
+  const t = typeof tokens !== 'undefined' && tokens.get ? tokens.get(id) : null;
+  if(!t || !cel) return true;
+  if(!soyGM && t.oculto) return false;
+  if(typeof tokenVisiblePorNiebla !== 'function') return true;
+  const c0 = t.col, f0 = t.fila;
+  t.col = cel.col; t.fila = cel.fila;
+  try{ return !!tokenVisiblePorNiebla(t); }catch(e){ return true; }
+  finally{ t.col = c0; t.fila = f0; }
+}
+const blinkTvLadoVisto = (fx, e) => blinkTvVeoEn(fx.id, e.fase === 'sale' ? fx.deCel : fx.aCel);
 // Para calcularDisposicion (js/05): dónde y con qué escala se dibuja el token mientras dura (o null: como siempre).
 function blinkTvPosToken(id){
   if(!BLINK_TV.length) return null;
@@ -118,6 +132,7 @@ function blinkTvPosToken(id){
   if(ms >= blinkTvDur(fx)) return null;
   if(ms < 0) return {x: fx.de.x, y: fx.de.y, sx: 1, sy: 1};   // (esperando que se aparte el cuadro: quieto en su casilla de antes)
   const e = blinkTvEstado(fx, ms);
+  if(!blinkTvLadoVisto(fx, e)) return {x: e.x, y: e.y, sx: 0.0001, sy: 0.0001};   // 🙈 ese lado no lo veo: nada
   return {x: e.x, y: e.y, sx: e.sx, sy: e.sy};
 }
 // Encima de los tokens: la raya que brilla, el punto blanco y unas líneas de barrido que titilan.
@@ -130,6 +145,7 @@ function dibujarEfectosBlinkTv(z){
     if(ms < 0) continue;
     if(typeof disposicion !== 'undefined' && Array.isArray(disposicion) && !disposicion.some(d => d.id === fx.id)) continue;   // no lo veo: nada
     const e = blinkTvEstado(fx, ms), R = HEX * 0.68;
+    if(!blinkTvLadoVisto(fx, e)) continue;   // 🙈 la salida (o la llegada) queda donde esta pantalla no lo ve
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     if(e.linea > 0.01){   // la raya: blanca en el centro, celeste alrededor

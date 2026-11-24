@@ -970,6 +970,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   token todavía no está en la casilla de llegada (el momento y el movimiento llegan por separado, y a la pantalla que mueve el movimiento recién sale
   cuando el servidor confirmó el momento), se queda apagada hasta que llegue (`BLINK_TV_ESPERA`, 5 s como mucho); vale también para el Parpadeo y el
   Intercambio. Probado con clics en «Claude · pruebas 2» (el Glifo, Invocar portal, el Town portal; GM, J1, J2).
+  **🙈 Cada lado, solo si se lo ve ahí** (2026-11-24, probado con clics: la salida de adentro de una niebla): `blinkTvVeoEn(id, casilla)` pone el
+  token un instante en esa casilla y mira `tokenVisiblePorNiebla`; `blinkTvPosToken` y `dibujarEfectosBlinkTv` no dibujan la parte de la salida
+  (o de la llegada) donde esta pantalla no lo vería. Antes miraba solo dónde estaba el token ahora: si la casilla nueva llegaba mientras se apagaba,
+  quien no lo veía en la nube alcanzaba a ver el final del apagado. Probado: en Sigilo, el GM no ve nada y J1/J2 todo; saliendo de la niebla, el GM
+  solo la llegada; entrando, solo la salida; con «reducir movimiento», salta sin tele en las tres. Los pulsos del portal: P323.
 
 - **🎲 La chance del estado de una zona, a la vista** (2026-11-19, #19 de `docs/auditoria-tiradas.md`; dueño: «aunque se tire sola, debe aparecer la
   instancia de chance de que salga, se debe ver el dado rodando y el resultado»): en el cartel de la zona (js/08, `zonaResolverBanner`), un estado con

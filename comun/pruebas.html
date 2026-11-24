@@ -9511,6 +9511,23 @@ prueba('📺 El televisor también en los teletransportes, y el Town portal solo
   const t84 = await fuente('84-town-portal.js', 'async function townPortalRevisar', 'deshacerRegistrar');
   igual([antes(t02, 't.col = c.col'), antes(t02, '.update({col'), antes(t19, '.update({col'), antes(t84, '.delete()'), /blinkTvPublicar\([^)]*null\)/.test(t84)], [true, true, true, true, true]);
 });
+prueba('🙈 La tele, cada lado solo si esta pantalla vería al token ahí (2026-11-24, vtt-hexgrid/js/111)', async () => {
+  const src = await (await fetch('../vtt-hexgrid/js/111-parpadeo-tv.js', {cache: 'no-store'})).text();
+  // Una nube en (0,0): quien mira no ve al token adentro. El token ya llegó a (5,0) (afuera).
+  const tk = new Map([['t1', {col: 5, fila: 0}]]);
+  const visible = t => !(t.col === 0 && t.fila === 0);
+  const f = new Function('num', 'tokens', 'soyGM', 'tokenVisiblePorNiebla', src + '\nreturn {blinkTvVeoEn, blinkTvLadoVisto, blinkTvEstado, BLINK_TV_DUR};')(v => Number(v) || 0, tk, false, visible);
+  const fx = {id: 't1', de: {x: 0, y: 0}, a: {x: 10, y: 0}, deCel: {col: 0, fila: 0}, aCel: {col: 5, fila: 0}};
+  const sale = f.blinkTvEstado(fx, 100), llega = f.blinkTvEstado(fx, f.BLINK_TV_DUR - 10);
+  igual([f.blinkTvVeoEn('t1', {col: 0, fila: 0}), f.blinkTvVeoEn('t1', {col: 5, fila: 0}), f.blinkTvLadoVisto(fx, sale), f.blinkTvLadoVisto(fx, llega),
+    tk.get('t1').col, tk.get('t1').fila], [false, true, false, true, 5, 0]);   // y el token queda donde estaba
+  // Al revés (entra a la nube): la salida se ve, la llegada no.
+  const fx2 = {...fx, deCel: {col: 5, fila: 0}, aCel: {col: 0, fila: 0}};
+  igual([f.blinkTvLadoVisto(fx2, sale), f.blinkTvLadoVisto(fx2, llega)], [true, false]);
+  // Un token oculto por el GM: un jugador no ve ningún lado.
+  tk.get('t1').oculto = true;
+  igual(f.blinkTvLadoVisto(fx2, sale), false);
+});
 prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/js/19): quién quedó agarrado y «9 − Defensa 4 = 5»', async () => {
   const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();
   const trozo = src.slice(src.indexOf('/* PURAS-INICIO'), src.indexOf('/* PURAS-FIN */'));

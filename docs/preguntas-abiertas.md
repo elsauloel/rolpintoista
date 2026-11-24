@@ -2628,3 +2628,12 @@ objetivo** a un personaje en sigilo o adentro de una nube, y la línea de tiro n
    revela a nadie»).
 2. Lo de la Mesa se decide una vez, al llegar: lo que llegó con el ojo apagado no aparece al prenderlo (y lo que vio con el ojo prendido no se
    borra al apagarlo). **Recomendación:** dejarlo así (el cuadro del duelo, el mapa y el orden de turnos sí cambian al toque).
+
+### P323 — 🌀 Los pulsos del portal, ¿también para quien no ve al que lo usa? (2026-11-24, Claude)
+Probado con clics (la tele con un token oculto): el Jugador 1, en Sigilo, pasó por un portal de Invocar portal. El GM no vio la tele ni el token
+(bien), pero sí vio los **pulsos violeta/azul con el hilo punteado** entre los dos portales: se entera de que alguien de los jugadores usó el portal
+y hacia dónde (no quién). Con la Trampa de teleport pasa algo parecido: la Mesa dice «Alguien fue teletransportado…». Además, esos pulsos se
+siguen animando con «reducir movimiento» (la tele no).
+1. ¿Los pulsos del portal tendrían que verse solo en las pantallas que ven al token (como la tele)? **Recomendación:** sí, para quien no lo ve,
+   nada (el portal en sí se sigue viendo).
+2. Con «reducir movimiento», ¿los pulsos sin animación (un destello quieto) o sin nada? **Recomendación:** un destello corto, sin ondas.

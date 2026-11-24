@@ -2426,6 +2426,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   revisarlo cuando le toque»): en un documento del repo (que es público) figura escrito un email de una cuenta de Gmail del proyecto. Explicarle
   al dueño qué es, para qué está ahí y si conviene sacarlo (el repo es público: no van emails).
 
+- **⬜ en cola — 📖 El globo de «Probabilidad de Golpe» repite el nombre** (dueño, 2026-11-24, de la prueba del glosario): hoy el globo arranca
+  con «Probabilidad de golpe.» (el texto está pensado para cuando la tarjeta dice «PdG»). Que quede algo como «Probabilidad de Golpe (PdG): …».
+  Revisar si otras entradas del glosario (`comun/glosario.js`) tienen el mismo problema.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

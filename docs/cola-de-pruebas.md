@@ -2102,6 +2102,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   te vas, se te va el estado de silencio. Entonces ahí también se resuelve lo de la inmunidad del control mental». O sea: el aura del Tótem de
   silencio le pone el estado Silencio (el de verdad, el del glosario) a los rivales mientras están adentro y se lo saca al salir (o al romperse
   el tótem); con eso «Inmune a controles mentales» lo frena como al estado.
+  **Y (dueño, 2026-11-24):** el título no se marca con el glosario, y la descripción del tótem queda igual («a fines prácticos sucede
+  lo mismo, solo que mecánicamente aparece el estado o no»). Opción (a) para el texto.
 - **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
   (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
 - **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas

@@ -2010,27 +2010,40 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tienen). Probado con clics con Jugador 1: crear uno con 2d4+1 (y uno mal escrito) y otro sin tirada, Ver, consumirlos en la ficha y en la
   Botonera del mapa, y la Mesa vista desde la pantalla del GM de pruebas. La ficha quedó como estaba. 4 pruebas nuevas en `comun/pruebas.html` (1085 en verde).
 
-- **⬜ en cola (reglas pegadas por el dueño el 2026-11-23) (al final, a propósito) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (dueño,
+- **✅ hecho (2026-11-24) — ✉ Probar los mensajes secretos en el mapa, con clics, con las reglas de Firebase pegadas** (las reglas pegadas son las del repo: mandar no dio «faltan pegar las reglas»; los casos, abajo) (dueño,
   2026-11-22: «vamos a dejar al final de la cola probar este sistema en el mapa con los clics una vez que estén pegadas las reglas de Firebase…
   cuando llegue el turno de esa tarea, vamos a chequear que las reglas estén actualizadas y vamos a proceder con las pruebas»). Primer paso:
   verificar que las reglas pegadas sean las del repo (que mandar un mensaje no dé «faltan pegar las reglas»); si no, avisarle al dueño y esperar.
   Los casos, uno por renglón, son los «Probar: 🕊️ …» de abajo.
 
-- **⬜ en cola — Probar: 🕊️ mandar un mensaje secreto de verdad** (2026-11-22, de los mensajes secretos; con las reglas pegadas): el Jugador 1 le
+- **✅ hecho (2026-11-24) — Probar: 🕊️ mandar un mensaje secreto de verdad** (2026-11-22, de los mensajes secretos; con las reglas pegadas): el Jugador 1 le
   manda al Jugador 2 con la ventanita; al Jugador 2 le aparece en la Mesa (fila fucsia), en la Crónica del mapa y en el 🕊️ con el globito.
-- **⬜ en cola — Probar: 🕊️ el GM no lee lo de dos jugadores** (2026-11-22, con las reglas pegadas): el Jugador 1 le escribe al Jugador 2; en la
+  *Resultado:* desde la paloma del mapa del Jugador 1 → «Mensaje secreto» → Jugador 2; al Jugador 2 le salió todo eso, más el aviso flotante y la
+  paloma vibrando; tocar el aviso abrió la conversación y el globito bajó a 0.
+- **✅ hecho (2026-11-24) — Probar: 🕊️ el GM no lee lo de dos jugadores** (2026-11-22, con las reglas pegadas): el Jugador 1 le escribe al Jugador 2; en la
   pantalla del GM no aparece nada (ni Mesa, ni Crónica, ni 🕊️), y una lectura directa del GM por la API la rechaza.
-- **⬜ en cola — Probar: 🕊️ un mensaje a varios** (2026-11-22, con las reglas pegadas): el GM le escribe a los dos jugadores a la vez; cada uno lo ve
+  *Resultado:* en el mapa del GM, nada (ni fila, ni Crónica, ni globito, ni aviso); leer ese mensaje directo con la cuenta del GM: «permission-denied».
+- **✅ hecho (2026-11-24) — Probar: 🕊️ un mensaje a varios** (2026-11-22, con las reglas pegadas): el GM le escribe a los dos jugadores a la vez; cada uno lo ve
   con «También para…» y su respuesta le llega solo al GM.
-- **⬜ en cola — Probar: 🕊️ el comando /m y /r de verdad** (2026-11-22, con las reglas pegadas): `/m Blanco J2 hola` (por el personaje) y `/r` + el
+  *Resultado:* así: «Solo lo ves vos (y Jugador 1)» en la Mesa y «También para: …» en la conversación; la respuesta del Jugador 2 le llegó solo al GM.
+- **✅ hecho (2026-11-24) — Probar: 🕊️ el comando /m y /r de verdad** (2026-11-22, con las reglas pegadas): `/m Blanco J2 hola` (por el personaje) y `/r` + el
   nombre del usuario; que salga, que no aparezca en la Mesa de nadie más y que `/m Nombre` sin texto abra la ventanita con esa persona marcada.
-- **⬜ en cola — Probar: 🕊️ leído / sin leer en dos pantallas** (2026-11-22, con las reglas pegadas): el Jugador 2 con el mapa y la ficha abiertos;
+  *Resultado:* `/m Blanco J2 …` del Jugador 1 le llegó al Jugador 2; `/r …` (ya sin nombre, P285.2) del Jugador 2 le llegó al Jugador 1 (el último que
+  le había escrito); el GM no vio ninguno de los dos; `/m Blanco J2` sin texto abrió la ventanita con el Jugador 2 marcado. También `/m Todos …` (público).
+- **✅ hecho (2026-11-24) — Probar: 🕊️ leído / sin leer en dos pantallas** (2026-11-22, con las reglas pegadas): el Jugador 2 con el mapa y la ficha abiertos;
   al abrir la conversación en una, el globito baja en las dos.
-- **⬜ en cola — Probar: 🕊️ el GM borra con el 🗑 de la Mesa y con 🆕 Registro nuevo** (2026-11-22, con las reglas pegadas): que desaparezcan de la
+  *Resultado:* un secreto: las dos pantallas en 1, se leyó en el mapa y las dos quedaron en 0. Un 📣 público: las dos en 1, se leyó en la ficha y las
+  dos en 0 (en el mismo navegador; ver P318.3).
+- **✅ hecho en parte (2026-11-24) — Probar: 🕊️ el GM borra con el 🗑 de la Mesa y con 🆕 Registro nuevo** (2026-11-22, con las reglas pegadas): que desaparezcan de la
   Mesa y de las conversaciones de los jugadores (el 🗑, todos; el Registro nuevo, los de antes del combate anterior).
+  *Resultado:* el 🗑 del GM en «Claude · pruebas 2» («Historial borrado (1 tiradas y 1 mensajes secretos)»): se fueron de la Mesa de los tres, de la
+  conversación abierta del Jugador 2 en vivo, y por la API no quedó ninguno (tampoco el 📣 público). Ojo: el 🗑 borró además toda la Mesa de esa
+  partida. **«Registro nuevo» no se probó**: borra de verdad las tiradas, el 📜 historial y los mensajes de antes del combate anterior de la partida
+  de pruebas; queda abajo, al final de la cola, para cuando el dueño diga.
 - **⬜ en cola — Probar: 🕊️ «Borrar la partida» se lleva los mensajes** (2026-11-22, con las reglas pegadas): en una partida de prueba descartable.
+  (2026-11-24: sigue en cola: hace falta crear una partida descartable con dos cuentas adentro y borrarla; no se hizo en esta tanda.)
 
-- **⬜ en cola — 🕊️ Ajustes de los mensajes secretos (P285)** (dueño, 2026-11-22):
+- **✅ hecho (2026-11-24) — 🕊️ Ajustes de los mensajes secretos (P285)** (dueño, 2026-11-22):
   1. **Mensaje público:** «que también exista la posibilidad de mandar un mensaje público» (a toda la mesa; que se vea distinto de una tirada).
   2. **`/r` responde al último que me escribió**, sin poner el nombre («me gusta la sugerencia»); `/m` sigue con el nombre.
   3. **La paloma flotante, siempre a la vista y la ruta principal** para abrir los mensajes («más que la Mesa; de última que sean ambas»):
@@ -2041,6 +2054,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      la conversación, pero al mismo tiempo los mensajes que uno puede ver también le tienen que aparecer en la mesa del log. Y cuando recibís un
      mensaje, el botón tiene que también vibrar un poquito. Y alguna especie de notificación flotante de te llega un mensaje». Se hace junto con
      las pruebas de los mensajes de arriba.
+  *Resultado (todo en `comun/mensajes.js`, sin reglas nuevas):* **la paloma** está siempre a la vista (mapa, ficha y GM Tools); con un numerito rojo
+  (secretos + públicos sin leer) abre esa conversación; sin nada nuevo abre la ventana con «🕊️ Mensaje secreto» y «📣 Mensaje a todo el grupo», y la
+  lista: «📣 Todo el grupo» arriba y una conversación por persona. **📣 A todo el grupo:** una casilla en la ventanita de mandar, la conversación del
+  grupo, o `/m Todos texto`; sale en la Mesa de todos (también del GM) en dorado, distinto de una tirada y de un secreto (es una línea de la Mesa,
+  así que se borra como las tiradas: P318.1). **En la Mesa** cada uno ve lo que le llega, lo que mandó (otro tono, sin brillo) y lo público, una sola
+  vez; el GM sigue sin ver lo de dos jugadores. **Al llegar uno**, la paloma vibra un poquito y sale encima un aviso («🕊️ Te llegó un mensaje de X» /
+  «📣 X le escribió a todo el grupo», con el principio del texto) que al tocarlo abre la conversación y se va solo a los 7 s (con «reducir movimiento»,
+  sin vibrar). **`/r texto`** responde al último que te mandó un secreto. Probado con clics con las tres cuentas en «Claude · pruebas 2» (los
+  renglones «Probar: 🕊️ …» de arriba), con video de la paloma vibrando y el aviso. Los mensajes de prueba se borraron. Dudas: P318. Pruebas
+  automáticas: 1090 en verde.
 - **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de una zona con daño** (2026-11-22): el Muro de fuego (o una zona con daño de elemento) en el
   mapa: que se marquen Defensa, Defensa especial y la resistencia al elemento en «Qué frena el daño», y Suela gruesa si es del piso.
 - **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de un estandarte y de una nube** (2026-11-22): el Estandarte de guerra (PdG / Probabilidad de
@@ -2351,6 +2374,28 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🎲 el consumible a mano con tirada desde el cinturón y armado en GM Tools** (2026-11-24, del consumible con tirada): con clics se
   probó crearlo en la ficha y consumirlo de la mochila (ficha y Botonera del mapa). Falta: pasarlo al cinturón y consumirlo de ahí, y armarlo en GM Tools
   («✎ Ítem custom» → 🤝 Dar a un jugador) con su tirada y que al jugador le llegue y le tire al consumirlo.
+
+- **⬜ en cola — Probar: 🕊️ «Registro nuevo» se lleva los mensajes de antes del combate anterior** (2026-11-24, de los ajustes de los mensajes): no se
+  probó porque borra de verdad, en «Claude · pruebas 2», las tiradas, el 📜 historial y los mensajes de antes del combate anterior. Probarlo cuando el
+  dueño diga (o en una partida descartable): que se vayan los mensajes viejos (secretos y 📣) y queden los del combate anterior y el actual.
+- **⬜ en cola — 🕊️ Responder P318: los ajustes de los mensajes** (2026-11-24): lo público que vive en la Mesa (se borra como las tiradas), Crónica +
+  aviso en el mapa, el «leído» de lo público por navegador, `/r`, lo mío en la Mesa, el aviso de 7 s. Ver `docs/preguntas-abiertas.md`.
+- **⬜ en cola — 🕊️ Varias conversaciones a la vez: propuesta para el dueño** (dueño, 2026-11-24: «no sé bien cómo se gestiona ahora el hecho de tener
+  más de una conversación abierta. Y si un jugador inicia una conversación con otros 2 jugadores, eso se genera como si fuera un chat grupal. Entonces
+  habría que encontrar alguna forma de gestionar conversaciones simultáneas, cómo pasar de una a otra, cómo se cierran, cómo se borran, etc.»).
+  *Cómo está hoy:* un mensaje a dos jugadores NO es un chat grupal: se guarda uno solo, pero cada uno lo ve en su conversación de a dos con quien lo
+  mandó («También para: …») y, si responde, le contesta solo a él. La ventana de la paloma tiene a la izquierda «📣 Todo el grupo» y una
+  conversación por persona (la más reciente arriba, con su numerito); se pasa de una a otra con un clic. No se cierran ni se archivan, y un jugador
+  no puede borrar nada: solo el GM borra todo junto (🗑 / Registro nuevo), sin leerlos.
+  *Propuesta (a decidir, sin programar):* (a) **chats de grupo de verdad**: un mensaje a varios abre una conversación con todos ellos («Jugador 1,
+  Jugador 2 y vos»), y las respuestas les llegan a todos los del chat; se le puede poner nombre («Los del plan»). (b) La lista de la paloma con tres
+  partes: 📣 Todo el grupo · chats de grupo · de a dos, cada una con su numerito y una línea con lo último. (c) **Archivar** (cada uno, para sí): la
+  conversación se esconde de la lista hasta que llegue algo nuevo; abajo, «Ver archivadas». (d) **Borrar**: un jugador borra solo lo que mandó él
+  (o nada, y queda el 🗑 del GM); el GM sigue borrando todo sin leer. Boceto:
+  `🕊️ Mensajes  [＋ Nuevo]` / `📣 Todo el grupo (2)` / `👥 Los del plan — J1, J2 y vos (1)` / `🔒 GM de pruebas` / `🔒 Jugador 1` / `▸ Archivadas (3)`.
+  Preguntas: (1) ¿chat grupal de verdad para un mensaje a varios? (recomendación: sí); (2) ¿con nombre opcional? (sí, opcional); (3) ¿archivar
+  en vez de cerrar? (sí: cerrar no tiene sentido si después llega algo); (4) ¿un jugador puede borrar lo suyo? (recomendación: no por ahora; alcanza
+  con archivar y el 🗑 del GM); (5) ¿alguien se puede salir de un chat de grupo? (no por ahora).
 
 ## En cola
 

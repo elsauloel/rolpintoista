@@ -89,18 +89,29 @@ versión parecida en más de una, es candidato a juntar.
   una herramienta se borran solas las de más de 48 h (como mucho una vez
   por hora por navegador). Nadie más puede borrar. El 🗑 borra también los
   mensajes secretos (`Mensajes.borrar(null)`).
-- **`mensajes.js`** (`Mensajes`, 2026-11-22) — 🕊️ **mensajes secretos entre usuarios** (persona a persona, por uid). Lo arranca
-  `mesaEscuchar` (en los iframes del mapa no hace nada). Mandar: el 🕊️ que suma al `#mesa-tirar` de cualquier Mesa (`abrirMandar`: una
-  casilla por persona, el usuario y sus personajes) o `/m` / `/r` + nombre + texto en `#mesa-formula`, con autocompletado (`sugerencias`,
-  `fragmento`; el `submit` se toma en captura antes que la tirada libre; `parsear` elige el nombre más largo que calce, de personaje o de usuario).
-  Recibir: `Mensajes.mesa(docs, tope)` mezcla en `mesaProcesar` las filas de lo que ME llegó (`desde: 'mensaje'`, `_mensaje: true`; `mesaRender`
-  las dibuja con `mesaHtml`, fucsia con brillo, y no cuentan como acción, tirada ni dado 3D); al llegar uno nuevo llama a `window.mensajesCronica(m)`
-  si la página lo define (el mapa, js/16: tarjeta `cronicaHtml`); el 🕊️ flotante (`#msj-flotante`; en el mapa dentro de `#lienzo-caja`, en la ficha
-  y GM Tools fijo y corrido a la izquierda de la Mesa si la tapa) con el globito de los sin leer, y la ventana de conversaciones
-  (`abrirConversacion(uid)`: marca leído con `arrayUnion` en `leidoPor`). `borrar(antesDe|null)` (solo GM, por `mensajes_indice`, sin leer) lo
-  llaman el 🗑 de la Mesa y `Registro.nuevo`. Sin las reglas pegadas: `faltanReglas()` y el aviso `AVISO_REGLAS`. `_cargar(lista, {nuevos})`
-  carga mensajes en memoria para pruebas y capturas (no escribe). Lo puro (`personas`, `parsear`, `armarDoc`, `conversaciones`, `mezclarEnMesa`…)
-  probado en `pruebas.html`. Colecciones y reglas: `docs/workflow-firebase.md`. Sin sonido (queda para la música). Dudas: P285.
+- **`mensajes.js`** (`Mensajes`, 2026-11-22; ajustes P285 el 2026-11-24) — 🕊️ **mensajes secretos entre usuarios** (persona a persona, por uid) y
+  📣 **mensajes a todo el grupo**. Lo arranca `mesaEscuchar` (en los iframes del mapa no hace nada). **La paloma** (`#msj-flotante`, siempre a la
+  vista; en el mapa dentro de `#lienzo-caja`, en la ficha y GM Tools fijo y corrido a la izquierda de la Mesa si la tapa) es la ruta principal:
+  con algo sin leer (globito rojo: secretos + públicos) abre esa conversación (`abrirDesdePaloma`); si no, la ventana de conversaciones con
+  «🕊️ Mensaje secreto» / «📣 Mensaje a todo el grupo». La ventana (`abrirConversacion(uid | Mensajes.GRUPO)`) tiene arriba «📣 Todo el grupo»
+  y una conversación por persona; marca leído (secretos: `arrayUnion` en `leidoPor`; públicos: por navegador, `localStorage`
+  `msjPublicoVisto:<partida>`, con el evento `storage` para las otras pestañas). Mandar: la ventanita (`abrirMandar({para, publico})`: la casilla
+  «📣 Todo el grupo» o una por persona), el 🕊️ al pie de la Mesa, `/m Nombre texto` (también `/m Todos` / `/m Todo el grupo` → público) y
+  **`/r texto` = responder al último que me mandó un secreto** (`ultimoQueMeEscribio`; sin texto abre esa conversación). Autocompletado solo
+  con `/m` (`sugerencias(pers, frag, max, {grupo: true})`). **El público no tiene colección propia**: es una línea de la Mesa (`tiradas`,
+  `desde: 'publico'`, el texto en `texto`; `armarPublico`), así que lo ven todos y se borra como las tiradas; `escucharPublicos` lo escucha
+  aparte (`where desde == 'publico'`) para la conversación del grupo y el aviso. **En la Mesa** (`Mensajes.mesa(docs, tope)` en `mesaProcesar`):
+  los secretos que me llegaron (fucsia con brillo), los que mandé yo (`mesa-mensaje-mio`, sin brillo, borde punteado) y los públicos
+  (`mesa-publico`, dorado; `publicoHtml`); todos `_mensaje: true` (no son acción, tirada ni dado 3D) y sin duplicarse. El GM no ve lo de dos
+  jugadores (las reglas). **Al llegar uno** (secreto o público de otro): la paloma vibra (`msj-vibra`, ~1,4 s; con «reducir movimiento», un
+  contorno en vez de la animación) y sale un aviso flotante encima de ella (`#msj-avisos`, «🕊️ Te llegó un mensaje de X» / «📣 X le escribió a
+  todo el grupo», con el principio del texto; tocarlo abre la conversación; se va solo a los 7 s; como mucho 3). Además, un secreto llama a
+  `window.mensajesCronica(m)` si la página la define (el mapa, js/16: tarjeta `cronicaHtml`). `borrar(antesDe|null)` (solo GM, por
+  `mensajes_indice`, sin leer) lo llaman el 🗑 de la Mesa y `Registro.nuevo`. Sin las reglas pegadas: `faltanReglas()` y `AVISO_REGLAS`.
+  `_cargar(lista, {nuevos, publicos})` carga mensajes en memoria para pruebas y capturas (no escribe). Lo puro (`personas`, `parsear`,
+  `armarDoc`, `armarPublico`, `ultimoQueMeEscribio`, `publicosNoLeidos`, `conversaciones`, `mezclarEnMesa`…) probado en `pruebas.html`. El mapa
+  no esconde nombres en una línea `publico` (js/29). Colecciones y reglas: `docs/workflow-firebase.md`. Sin sonido (queda para la música). Dudas:
+  P285 (aplicada), P318; varias conversaciones a la vez: en la cola.
 - **`grilla-dados.js`** — la grilla de dados estilo Roll20 (D4…D100 × 1–6)
   que se abre al costado del botón "🎲 Dados"; cada clic es una tirada
   libre que se publica en la Mesa.

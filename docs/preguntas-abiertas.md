@@ -2084,7 +2084,11 @@ queda marcado «✋ A mano: el efecto lo resuelve la mesa.». Quedan tres cosas 
 3. **Mismo nombre que uno del catálogo**: el cinturón junta las pilas por nombre; un consumible propio que se llame igual que uno de fábrica
    (ej. «Poción de vida») se apilaría con él. Mientras tanto queda así (es raro); ¿avisamos al crearlo?
 
-### P285 — 🕊️ Mensajes secretos: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+### ✅ P285 — 🕊️ Mensajes secretos: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
+
+> ✅ **Aplicada (2026-11-24):** paloma siempre a la vista y ruta principal (con algo sin leer abre esa conversación; si no, «Mensaje secreto» /
+> «Mensaje a todo el grupo»); 📣 mensaje público; `/r` responde al último que me escribió; además (directrices del 2026-11-24) los mensajes
+> en la Mesa de quien puede verlos, la paloma que vibra y el aviso flotante. Lo nuevo que quedó elegido: P318.
 
 > ✅ **Respondida (dueño, 2026-11-22):** (1) «está bien que se borre» así; (2) «me gusta la sugerencia»: `/r` responde al último que me escribió; (3) «la paloma flotante me gusta que quede y que de hecho esa sea la ruta principal para abrir el mensaje, más que la Mesa; de última que sean ambas»; (4) paloma en todos lados, bien; (5) no hace falta «responder a todos». Lo que cambia, en la cola.
 
@@ -2542,3 +2546,22 @@ consumible propio «✋ a mano») hay que tocar el 👁 (ver el catálogo comple
 y alguien los subió para usarlos).
 
 **Mientras tanto (lo conservador):** queda como está: se ven con el 👁.
+
+### P318 — 🕊️ Ajustes de los mensajes (P285): lo que quedó elegido «mientras tanto» (2026-11-24, Claude)
+
+Pedido del dueño (P285 y sus directrices del 2026-11-24). Está hecho (`comun/mensajes.js`); quedan cosas chicas para decidir:
+1. **El 📣 mensaje a todo el grupo vive en la Mesa** (es una línea de la Mesa, como una tirada, sin reglas nuevas de Firebase). Por eso se borra
+   igual que las tiradas: con el 🗑, con «Registro nuevo» **y con la limpieza automática de lo viejo** (los secretos no se borran solos). Lo ve
+   también quien entra después a la partida. ¿Está bien? **Recomendación:** sí; si se quiere que duren como los secretos, hace falta una
+   colección propia y reglas nuevas.
+2. **En el mapa, al llegar un secreto salen dos cosas**: la tarjeta de la Crónica (la de antes, con brillo) y el aviso flotante nuevo junto a la
+   paloma. ¿Las dos o solo el aviso? **Recomendación:** dejar las dos un par de sesiones y ver si molesta. **Mientras tanto:** las dos (un
+   📣 público solo da el aviso, no la tarjeta).
+3. **«Leído» de lo público es por navegador**: si el mismo jugador lo leyó en otra compu, ahí le sigue apareciendo sin leer. Lo público que ya
+   estaba antes de abrir por primera vez no cuenta como sin leer. ¿Alcanza? **Recomendación:** sí.
+4. **`/r` responde al último que te mandó un secreto** (no a un 📣 público). `/r` sin texto abre esa conversación. Si alguien escribe por
+   costumbre `/r Nombre hola`, el nombre va como parte del texto, al último que le escribió. ¿Bien? **Recomendación:** sí.
+5. **Lo que mandé, en mi Mesa con otro tono** (sin brillo, borde punteado: «🕊️ Tu mensaje secreto para X»), para que no se confunda con lo que
+   me llega. ¿Bien?
+6. **El aviso flotante** dura 7 segundos, muestra el principio del texto y se apilan hasta 3. Con «reducir movimiento» del sistema, la paloma no
+   vibra: se le marca un contorno. ¿Bien?

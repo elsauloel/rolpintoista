@@ -145,6 +145,11 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   leerlos** (saca el id de acá y borra `mensajes/<id>` y esta línea): con el 🗑 de la Mesa (todos), con 🆕 Registro nuevo (los de antes del
   combate anterior, como las tiradas) y al borrar la partida (`index.html`). No se borran solos. Sin estas reglas pegadas, el juego avisa
   «Faltan pegar las reglas de Firestore de los mensajes…».
+- 📣 **Mensajes a todo el grupo** (2026-11-24, P285.1): no tienen colección propia. Son una línea de la Mesa, `campanas/{id}/tiradas/{auto}` con
+  `desde: 'publico'`, `origen: '📣 Mensaje a todo el grupo'`, el texto en `texto` (≤1000) y sin dados (`rolls: []`, `total: 0`): entran por la
+  regla de siempre de `tiradas` (no hizo falta pegar reglas nuevas). Los lee cualquier miembro (también el GM y quien entre después) y se
+  borran como las tiradas (🗑, 🆕 Registro nuevo y la limpieza automática de lo viejo). El «leído» de lo público es por navegador
+  (`localStorage`), porque una línea de la Mesa no se edita.
 - `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
   hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente, detalle,
   polaridad}], invocaciones[{id, nombre, hp, hpMax, nitros, nitrosMax,

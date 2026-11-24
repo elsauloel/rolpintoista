@@ -1228,10 +1228,15 @@ async function invocacionAlOrden(tokenId){
 }
 // Lo que cuenta la Crónica al entrar (la usan las pruebas y los refuerzos, js/31): dónde quedó, con qué sacó, si juega en esta ronda y el mareo.
 // `invocador` (2026-11-24): el token de quien la invocó (js/135).
-function invocacionAlOrdenLineas(e, r, sinMareo, invocador){
+// Dónde quedó quien entró (`e` = lo que devolvió OrdenTurnos.entrarConTirada): «después de X», «antes de Y», «en el primer lugar» o «en el N.º lugar»
+// (sin nombrar a los que los demás no ven). También lo usa el ➕ Sumar al orden de turnos (js/136).
+function ordenDondeQueda(e){
   const antes = e.orden[e.lugar - 1], despues = e.orden[e.lugar + 1];
   const nom = f => { const tt = f && tokens.get(f.id); return tt && !ocultoParaMesa(f.id) ? nombreDe(tt) : ''; };
-  const donde = e.lugar === 0 ? 'primera del orden' : nom(antes) ? `después de ${nom(antes)}` : nom(despues) ? `antes de ${nom(despues)}` : `${e.lugar + 1}.ª del orden`;
+  return e.lugar === 0 ? 'en el primer lugar' : nom(antes) ? `después de ${nom(antes)}` : nom(despues) ? `antes de ${nom(despues)}` : `en el ${e.lugar + 1}.º lugar`;
+}
+function invocacionAlOrdenLineas(e, r, sinMareo, invocador){
+  const donde = ordenDondeQueda(e);
   return [
     r ? `🎲 Sacó ${fmt(num(r.total))} de iniciativa: queda ${donde}.` : 'Sin su Iniciativa a mano: entra al final del orden (el GM escribe el número).',
     ...(e.yaPaso ? ['Su lugar ya pasó en esta ronda: juega desde la próxima.'] : []),

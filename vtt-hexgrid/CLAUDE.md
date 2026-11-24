@@ -1046,8 +1046,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `t.iniciativa` (true/false) manda sobre todo (lo va a escribir el token suelto paso a paso, cola). La usan «Traer tokens» (`iniciativaPonerTodos`: no
   los trae y, si estaban, los saca), `iniciativaTirar` (no les tira), Ordenar (js/86: los saca), `iniciativaSiguiente` (los saltea sin darles turno, y
   ⏭ Pasar de ronda no les hace pasar el turno), `iniciativaIniciarCombate` (`OrdenTurnos.primero` y los No2 llenos), `iniciativaPendientesRonda`,
-  `invocacionAlOrden` y `refuerzoAlOrden` (js/31). **Un camino nuevo que sume tokens al orden tiene que pasar por esta regla.** No hay botón para sumar una
-  fila suelta a mano (P291). Probado con clics en «Claude · pruebas 2».
+  `invocacionAlOrden` y `refuerzoAlOrden` (js/31). **Un camino nuevo que sume tokens al orden tiene que pasar por esta regla.** Para sumar a mano lo que
+  la regla deja afuera: el ➕ del «⋯» (abajo). Probado con clics en «Claude · pruebas 2».
+- **➕➖ Sumar o sacar a mano del orden de turnos** (2026-11-24, dueño, P291; `js/136-sumar-al-orden.js`): en el «⋯» del token (js/10, `orden-sumar` /
+  `orden-sacar`; la firma del HUD mira si está en el orden), solo el GM con el orden armado (`ordenManoPuede`). Sumar (`ordenSumarAMano`): «🎲 Tirar su
+  Iniciativa» (`ordenManoTirar`: `iniciativaDeCreep`, `iniciativaDePj` con el sobrepeso, `invocacionIniciativa`) o «✍ Escribir el número»
+  (`OrdenTurnos.numeroAMano`); entra con `OrdenTurnos.entrarConTirada` (P301), sin Mareo; si la regla lo deja afuera le escribe `iniciativa: true`
+  (`OrdenTurnos.campoAlSumar`; solo en un creep o un token sin ficha: las reglas). Sacar (`ordenSacarAMano`): `temporalFueraDelOrden` (js/54: si era su
+  turno, pasa al siguiente con su inicio) y, si tenía la marca, `iniciativa: false` (`campoAlSacar`). Línea en la Mesa (`ordenDondeQueda`, js/04) salvo
+  que los jugadores no lo vean (`ordenManoPublico`). Dudas: P328. Probado con clics en «Claude · pruebas 2».
 - **🐝 Una invocación entra al orden con su tirada** (2026-11-23, dueño, P275): `invocacionAlOrden` (js/04, la pantalla del GM al aparecer el token de una
   invocación con el orden armado) tira su Iniciativa (`invocacionIniciativa`: `bnCargarPiezas` + `invDeToken` + `InvCalculo.statValor(x, 'ini')` +
   `Combatiente.conIniFijo`), la publica en la Mesa («Iniciativa · <invocación>», salvo oculta) y la ubica con `OrdenTurnos.entrarConTirada` (si su lugar ya

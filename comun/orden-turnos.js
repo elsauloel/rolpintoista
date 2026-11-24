@@ -190,7 +190,21 @@ const OrdenTurnos = (() => {
     if(quien.invocador && o.empieza && o.empieza === quien.invocador) return 'empieza';
     return '';
   }
+  /* ➕➖ Sumar o sacar a mano un token del orden de turnos (2026-11-24, dueño, P291: «sí, quiero que lo hagas»; el menú «⋯» del token, solo el GM,
+     vtt-hexgrid/js/136). Funciones puras.
+     · campoAlSumar(t, pub) → true si hay que escribirle `iniciativa: true` al token para que la regla lo deje adentro (un tótem, un estandarte, un
+       token suelto con «No»: si no, Ordenar o Traer tokens lo volverían a sacar y ▶ Siguiente lo saltearía); null si la regla ya lo deja adentro.
+     · campoAlSacar(t) → false si el token tenía `iniciativa: true` (lo que se sumó a mano, o un suelto con «Sí»: vuelve a quedar afuera para Traer
+       tokens); null si no tiene la marca (un personaje, una invocación o un creep: sale como con la ✕ de la tabla y Traer tokens lo vuelve a traer).
+     · numeroAMano(texto) → el número escrito («12», «-1», «7,5» → 7.5) o null si no es un número. */
+  const campoAlSumar = (t, pub) => !t ? null : ocupaLugar(t, pub) ? null : true;
+  const campoAlSacar = t => t && t.iniciativa === true ? false : null;
+  function numeroAMano(texto){
+    const x = String(texto === undefined || texto === null ? '' : texto).trim().replace(',', '.');
+    if(!/^[+-]?\d+(\.\d+)?$/.test(x)) return null;
+    return Number(x);
+  }
   return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, cambiarValor, reubicarAlEmpezar,
-    MAREO_HASTA, mareoHasta, esMareoHasta, mareoSeVa};
+    MAREO_HASTA, mareoHasta, esMareoHasta, mareoSeVa, campoAlSumar, campoAlSacar, numeroAMano};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

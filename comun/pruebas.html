@@ -84,7 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261124c80"></script>
-<script src="orden-turnos.js?v=20261124mareo3"></script>
+<script src="orden-turnos.js?v=20261124orden1"></script>
 <script src="ficha-mantenimiento.js?v=20261124finT"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2898,6 +2898,28 @@ prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en
     ids(r5), r5.orden[3].valor, r5.yaPaso, ids(r6), r6.turno, r6.yaPaso, E({orden}, {id: 'a', valor: 3}), E({orden}, null)],
     ['abxc', 1, false, ['a'], 'axbc', 2, true, ['a', 'x'], 'abxc', 2, 'xabc', 1, false,
      'abcx', 0, false, 'axbc', 3, false, null, null]);
+});
+prueba('➕➖ Sumar o sacar a mano del orden de turnos (2026-11-24, P291): la marca del token y el número escrito', () => {
+  const O = OrdenTurnos;
+  const pj = {tipo: 'pj', fichaId: 'f1'}, creep = {tipo: 'creep', fichaId: 'c1'}, totem = {tipo: 'creep', fichaId: 'c2'}, pubTotem = {estandarteRadio: 3, estandarteSilencio: 1};
+  const sueltoNo = {tipo: 'creep', fichaId: '', iniciativa: false}, sueltoSi = {tipo: 'pj', fichaId: '', iniciativa: true}, sueltoViejo = {tipo: 'creep', fichaId: ''};
+  igual([O.campoAlSumar(pj, {}), O.campoAlSumar(creep, {}), O.campoAlSumar(totem, pubTotem), O.campoAlSumar(sueltoNo, null), O.campoAlSumar(sueltoSi, null),
+    O.campoAlSumar(sueltoViejo, null), O.campoAlSumar(null, null)], [null, null, true, true, null, null, null]);
+  // con la marca puesta, la regla lo deja adentro (Ordenar, Traer tokens y ▶ Siguiente lo respetan)
+  igual([O.ocupaLugar({...totem, iniciativa: true}, pubTotem), O.ocupaLugar({...sueltoNo, iniciativa: true}, null)], [true, true]);
+  igual([O.campoAlSacar(pj), O.campoAlSacar(creep), O.campoAlSacar({...totem, iniciativa: true}), O.campoAlSacar(sueltoSi), O.campoAlSacar(sueltoNo), O.campoAlSacar(null)],
+    [null, null, false, false, null, null]);
+  igual(['12', ' 7 ', '-1', '+3', '7,5', '0', '', 'doce', '1d6', null, undefined].map(O.numeroAMano), [12, 7, -1, 3, 7.5, 0, null, null, null, null, null]);
+});
+prueba('➕➖ el mapa: los botones en el «⋯» del GM, entra con entrarConTirada y sale con temporalFueraDelOrden (2026-11-24, P291)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
+  const [t136, t10, html] = await Promise.all(['js/136-sumar-al-orden.js', 'js/10-hud-y-vida.js', 'mapa.html'].map(leer));
+  cierto(/js\/136-sumar-al-orden\.js\?v=/.test(html), 'mapa.html lo carga');
+  cierto(/ordenManoPuede\(t\) \? \(ordenManoEsta\(seleccion\)/.test(t10) && /clave === 'orden-sumar'/.test(t10) && /clave === 'orden-sacar'/.test(t10), 'los dos botones del ⋯');
+  cierto(/return !!t && soyGM && !pausaSoloMirar\(\)/.test(t136), 'solo el GM');
+  cierto(/OrdenTurnos\.entrarConTirada\(iniciativa, \{id, valor\}/.test(t136) && /OrdenTurnos\.campoAlSumar\(t, vinculo\(t\)\) === true && !\(await ordenManoMarcar\(id, true\)\)/.test(t136), 'entra en su lugar, con la marca si la regla lo deja afuera');
+  cierto(/await temporalFueraDelOrden\(id\);/.test(t136) && /OrdenTurnos\.campoAlSacar\(/.test(t136), 'sale como una invocación que se va (si era su turno, pasa al siguiente)');
+  cierto(/mesaLinea\(linea, 'recordatorio'\)/.test(t136) && /ordenManoPublico\(id\)/.test(t136), 'la línea de la Mesa, sin nombrar lo que no se ve');
 });
 prueba('⚖ El sobrepeso cambia en combate: el número se ajusta en el momento y el orden recién al pasar de ronda (2026-11-23, P312 y P313)', () => {
   const C = OrdenTurnos.cambiarValor, ids = r => r.orden.map(o => o.id).join('');

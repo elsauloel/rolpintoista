@@ -2311,8 +2311,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     clics, el caso «saca más»:** orden J2 25 · creep 20 · J1 0, turno de J1; la Abeja saca 2 (más que J1) y entra antes de él (su lugar ya pasó).
     Ronda 2: le toca antes que a J1, está mareada y no se mueve; al terminar su turno, «😵 Abeja de prueba ya no está mareada: terminó su primer
     turno» en la Mesa. Ronda 3: se mueve sin cartel. Perdió un solo turno. Captura: `cola100/1-J1-saca-mas-que-J1-ronda-2-pierde-su-primer-turno.png`.
-- **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
+- **✅ hecho (2026-11-24) — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
   GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
+  - Dónde: en el «⋯» del token, solo el GM y con el orden de turnos armado (`vtt-hexgrid/js/136-sumar-al-orden.js`). Un jugador no lo ve.
+  - Sumar: si tiene datos (personaje, invocación, creep, tótem) pregunta «🎲 Tirar su Iniciativa» (la de siempre, a la Mesa) o «✍ Escribir el
+    número»; un token suelto, directo el número. Entra en su lugar como una invocación (`OrdenTurnos.entrarConTirada`; si su lugar ya pasó en esta
+    ronda, juega desde la próxima: P301 b sigue en la cola), sin Mareo, con «➕ X entra al orden de turnos (lo sumó el GM) con N: queda después de Y»
+    en la Mesa. Un tótem o un suelto «No» quedan marcados (`iniciativa: true`) para que Ordenar, Traer tokens y ▶ Siguiente los respeten.
+  - Sacar: pregunta (y avisa si es su turno) y sale con `temporalFueraDelOrden` (js/54): si era su turno, termina y le toca al siguiente con su
+    «Empieza el turno». «➖ X sale del orden de turnos (lo sacó el GM)» en la Mesa. Lo marcado vuelve a quedar afuera. Si los jugadores no lo ven,
+    sin línea en la Mesa (solo un aviso al GM). Dudas: P328.
+  - **Probado con clics** en «Claude · pruebas 2» (GM y Jugador 1), con el combate en marcha (J2 25 · Blanco creep 20 · J1 10, turno de J2): sumé un
+    Tótem de silencio con 15 (quedó después de Blanco creep) y un token suelto «No» (Cofre) con 30 (primero; su lugar ya pasaba: juega desde la
+    próxima). ▶ Siguiente: J2 → creep → **tótem** → J1 → ronda 2 → **Cofre**. Saqué a Blanco creep (no era su turno) y a Blanco J2 **en su turno**
+    (le tocó al tótem, J2 quedó como que ya jugó). Volví a sumar a Blanco creep con «🎲 Tirar su Iniciativa» (sacó 4, a la Mesa) y saqué al tótem
+    (volvió a quedar afuera). El Jugador 1 no ve ➕ ni ➖ en su «⋯». Pruebas automáticas: 1116 en verde (+2).
+  - Capturas (fuera del repo): `cola101/1-GM-totem-menu-sumar-al-orden.png`, `cola101/5-GM-saco-a-J2-en-su-turno-le-toca-al-totem.png`.
+  - Partida como estaba: narrativo, sin orden de turnos, sin el tótem ni el Cofre, Blanco creep igual que antes.
 
 - **⬜ en cola — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
   activo, primero sale «Si te movés, lo perdés. [Moverme igual] [Cancelar]» y recién si confirma se le ofrece al rival el ataque de oportunidad.
@@ -2718,6 +2733,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 😵 el Mareo de invocación que se va sin que la invocación juegue** (2026-11-24, ajustado por P327): con una invocación
   mareada, ✕ a la invocación en el orden (o Limpiar) → a los ~3 s se le va el mareo, con la línea en la Mesa; y con ⏭ Pasar de ronda o caída, cuando
   su turno pasa sin jugar. No se probó con clics (sí el caso normal y el de «saca más que su invocador»).
+
+- **⬜ en cola — Probar: ➕ Sumar al orden a mano una invocación y un personaje con «🎲 Tirar su Iniciativa», y un token oculto** (2026-11-24, P291):
+  con clics se probaron el tótem y el Cofre con el número escrito y Blanco creep tirando. Falta: una invocación (sin Mareo) y un personaje con
+  sobrepeso (la fila lleva el «⚖−N»), y sumar o sacar un token oculto o un creep que los jugadores no vieron (sin línea en la Mesa, solo el aviso al GM).
 
 ## En cola
 

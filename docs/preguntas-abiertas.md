@@ -2192,6 +2192,7 @@ rivales no ven nada (ni «Alguien»). Quedaron elegidas estas cosas, todas cambi
 ### P291 — 🎲 Quién ocupa lugar en el orden de turnos: lo que quedó elegido (2026-11-23, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-23):** (1), (3) y (4) bien como están; (2) «sí, quiero que lo hagas»: «➕ Sumar al orden de turnos» en el menú del token para el GM (en la cola).
+> ✅ **(2) Aplicada (2026-11-24):** «➕ Sumar al orden de turnos» / «➖ Sacar del orden» en el «⋯» del token, para el GM (`vtt-hexgrid/js/136`). Dudas: P328.
 
 Ahora hay una sola regla para saber si un token va al orden de turnos (`OrdenTurnos.ocupaLugar`, en `comun/orden-turnos.js`): el **tótem y el
 estandarte no** (ni con «Traer tokens», ni con «🎲 Tirar iniciativa de los creeps», ni con Ordenar, ▶ Siguiente, ▶ Iniciar combate o ⏭ Pasar de
@@ -2692,3 +2693,18 @@ mareada: no actúa. Recién actúa en la ronda 3 (o en la 2 si J1 la deja jugar 
 2. ¿O al revés: si saca más que quien la invocó, entra justo después de él (para que su primer turno caiga siempre después del de su invocador)?
 3. Refuerzos: si el creep que lo llamó no está en el orden (lo raro: un creep copiado a mano no es un refuerzo), el refuerzo queda con el mareo de
    antes (solo su primer turno), porque el GM no tiene turno propio. ¿Está bien?
+
+### P328 — ➕➖ Sumar o sacar a mano del orden de turnos: lo que quedó elegido (2026-11-24, Claude)
+
+Desde hoy el GM tiene en el «⋯» de cualquier token «➕ Sumar al orden de turnos» (o «➖ Sacar del orden» si ya está). Quedaron elegidas estas cosas,
+todas cambiables:
+1. **El número**: si el token tiene datos (personaje, invocación, creep, tótem) se elige entre «🎲 Tirar su Iniciativa» (la tirada de siempre, que va a
+   la Mesa) y «✍ Escribir el número»; un token suelto no tiene nada que tirar, así que pide el número directo. ¿Está bien?
+2. **Si su lugar ya pasó** en esta ronda (por ejemplo, entra con 30 cuando ya está jugando el de 25), juega desde la próxima, igual que hoy las
+   invocaciones. Cuando se haga P301 b (en la cola), ¿lo hacemos igual para esto (juega al final de esta ronda)?
+3. **Sin Mareo**: lo que se suma a mano no queda mareado (tampoco una invocación que el GM suma a mano): no está entrando sola. ¿Está bien?
+4. **Sacar a un personaje, una invocación o un creep** es como la ✕ de la tabla: «Traer tokens» lo vuelve a traer. Lo que la regla deja afuera (el
+   tótem, un token suelto con «No») y se sumó a mano, al sacarlo vuelve a quedar afuera. ¿O preferís que sacar sea «para siempre» hasta que lo sumes?
+5. **La ✕ de la tabla y el que tiene el turno**: el «➖ Sacar del orden» termina su turno y le da el turno al siguiente con su «Empieza el turno» (como
+   cuando se va una invocación). La ✕ de la tabla, en cambio, lo saca y el turno queda en el siguiente sin «Empieza el turno» (sin recargar No2 ni
+   bajar cooldowns). ¿Hacemos que la ✕ haga lo mismo que el ➖?

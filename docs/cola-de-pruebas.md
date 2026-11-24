@@ -2650,6 +2650,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   turno del GM»**. Si el creep ya está revelado en la tabla: «Es el turno de <creep>». Revisar qué muestra hoy (la tabla, el aviso de «le toca a…»,
   la Crónica) y ajustarlo.
 
+- **⬜ en cola — 👑 El GM siempre ve a los jugadores en la tabla de turnos, aunque estén escondidos** (dueño, 2026-11-24): «el GM nunca deja de
+  ver los nombres de los jugadores en la tabla, porque el GM sí sabe lo que está pasando. Esconderlos de la tabla de turnos es solamente creeps
+  para jugadores». O sea: un personaje (o invocación) escondido sigue apareciendo con su nombre en el orden de turnos del GM, aunque el ojo esté
+  apagado; lo que el GM no sabe es **dónde** está (token, casilla, rastro). Revisar y deshacer lo que hoy lo esconde de la tabla y de los textos
+  del cambio de turno para el GM (la fila del orden, «↩ Volver a…», el cartel «Es el turno de…», «Queda 1 turno sin jugar (…)», las tarjetas
+  de Iniciar combate / Demorar / Pasar de ronda, P263 y lo del 2026-11-24 en «escondido y ▶ Iniciar combate…»). Preguntarle antes, con ejemplos,
+  qué más del escondido puede ver el GM (p. ej. lo de su inicio de turno: estados, vida) y qué no (dónde está, a quién le pegó si no se delató).
+  Con esto P325 probablemente deja de hacer falta.
+- **⬜ en cola (revisar en detalle con el dueño) — Responder P325: demorar cuando el que sigue es un escondido** (dueño, 2026-11-24: «ponela para
+  revisar en la cola bien en detalle porque no la termino de entender»). Explicarla con un ejemplo paso a paso (quién juega, qué botón, qué pasa).
+  Ver primero la entrada de arriba (el GM ve a los escondidos en la tabla), que quizás la resuelve sola.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

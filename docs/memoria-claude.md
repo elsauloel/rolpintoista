@@ -178,6 +178,9 @@
   y los ignora). Es un tropiezo de GitHub: el código queda subido, pero el sitio sigue con la versión anterior hasta que una publicación salga
   bien. **Al terminar cada tanda de trabajo, revisar que la ÚLTIMA publicación de `nueva-version` haya salido bien** (herramienta de GitHub:
   `actions_list` / `list_workflow_runs`) y, si falló, volver a lanzarla (`actions_run_trigger` / `rerun_failed_jobs`).
+- **Lo oculto, para el GM** (dueño, 2026-11-24): el GM siempre sabe que hay un jugador escondido y quién es (lo ve en la tabla de turnos con su
+  nombre); lo que no tiene que saber es **dónde** está. Esconder de la tabla de turnos es solo para los creeps que los jugadores no ven («Es el
+  turno del GM»).
 - **«Ver detalle» dice las reglas generales, no cada caso específico** (dueño, 2026-11-24, al sacar la Suela gruesa del Muro de fuego: «no
   vamos a poner en los cuadros de detalle cada caso específico, sino que vamos a poner las reglas generales»).
 - **Tres listas** (dueño, 2026-11-24, «para ordenar el desarrollo»): **desarrollo** = la cola (`docs/cola-de-pruebas.md`, «🛠 Cola de

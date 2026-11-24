@@ -818,6 +818,8 @@
 
 ## 🖥 Para recordarle al dueño cuando esté en la compu
 
+> Una de las **tres listas** (dueño, 2026-11-24): desarrollo → `cola-de-pruebas.md`; compu → acá; diseño → `lista-de-diseno.md`.
+
 - [x] **📋 Pegar las reglas de Firestore (2026-11-23; ✅ pegadas por el dueño el 2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
   suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
   jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos
@@ -1170,6 +1172,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+
+> Desde el 2026-11-24 los temas de diseño nuevos van a [`lista-de-diseno.md`](lista-de-diseno.md); lo de acá se va pasando allá al retomarlo.
 
 - [ ] **👁 Revelar algo oculto solo para un jugador** (dueño, 2026-11-20: «revelar es siempre para todos, eso es correcto, aunque dejá en pendiente la posibilidad de que se revele solo para un jugador»). Conversación de diseño: hoy una trampa detectada la ven todos; pensar «detectada solo por Fulano» (P254 f).
 - [x] **✨ Animaciones de resurrección** (dueño, 2026-11-20): hechas las cuatro (Revive, Ankh, Fénix, Pacto), 2026-11-20, `vtt-hexgrid/js/125-resurreccion-fx.js`. Falta que el dueño mire los videos (sección 🖥).

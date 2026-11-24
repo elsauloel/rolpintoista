@@ -178,6 +178,9 @@
   y los ignora). Es un tropiezo de GitHub: el código queda subido, pero el sitio sigue con la versión anterior hasta que una publicación salga
   bien. **Al terminar cada tanda de trabajo, revisar que la ÚLTIMA publicación de `nueva-version` haya salido bien** (herramienta de GitHub:
   `actions_list` / `list_workflow_runs`) y, si falló, volver a lanzarla (`actions_run_trigger` / `rerun_failed_jobs`).
+- **Tres listas** (dueño, 2026-11-24, «para ordenar el desarrollo»): **desarrollo** = la cola (`docs/cola-de-pruebas.md`, «🛠 Cola de
+  programación»); **para ver en la compu** = `docs/pendientes.md` «🖥 Para recordarle al dueño…»; **diseño** = `docs/lista-de-diseno.md` (catálogo,
+  tiers altos, razas, creeps, pasivas… lo que necesita tiempo y dedicación). Cada cosa nueva va a la lista que le corresponde.
 - **«Cuando esté en la compu»**: lo que el dueño deja para revisar en la compu va a `docs/pendientes.md`, sección «🖥 Para recordarle al dueño
   cuando esté en la compu». Cuando escriba que está en la compu (o pida «la lista de pendientes de la compu»), pasarle esa lista entera y
   revisarla una por una.

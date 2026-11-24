@@ -56,6 +56,8 @@
 >
 > **Pruebas pendientes en el mapa → [`docs/pruebas-en-el-mapa.md`](docs/pruebas-en-el-mapa.md)** (protocolo del dueño, 2026-10-09): lo que hay que ver en el mapa, si no se puede (Chrome desconectado, falta una cuenta), no se prueba «por detrás»: se anota ahí y se prueba apenas se pueda, con capturas.
 >
+> **Tres listas (dueño, 2026-11-24)**: desarrollo → la cola, [`docs/cola-de-pruebas.md`](docs/cola-de-pruebas.md) («🛠 Cola de programación»); para ver en la compu → [`docs/pendientes.md`](docs/pendientes.md) «🖥»; diseño (catálogo, tiers altos, razas, creeps…) → [`docs/lista-de-diseno.md`](docs/lista-de-diseno.md).
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

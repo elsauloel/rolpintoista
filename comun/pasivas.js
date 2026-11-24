@@ -277,7 +277,7 @@ const FiltroPasivas = (() => {
 .fp-nom{font-size:12px;font-weight:700;min-width:84px;opacity:.85}
 .fp-sumar{margin-left:6px;font-style:italic}
 .fp-pie{font-size:12px;opacity:.85;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.fp-sinet{font-size:11px;font-weight:600;color:#c9a45a;margin-left:6px}`;
+.fp-filas .ap-chip.on{border-style:solid;border-color:var(--pap-laton,#c98545);color:var(--pap-laton,#c98545);background:rgba(201,133,69,.15);font-weight:700}`;
     document.head.appendChild(s);
   }
   // El filtro para la ventana de la Biblioteca (`opts.filtro` de Biblioteca.abrir): `roles` = los que vienen marcados.

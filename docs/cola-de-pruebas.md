@@ -2036,6 +2036,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   3. **La paloma flotante, siempre a la vista y la ruta principal** para abrir los mensajes («más que la Mesa; de última que sean ambas»):
      que se vea aunque no haya mensajes.
   (Respondido además: se borran con el 🗑 y con «Registro nuevo», bien; paloma en todos lados, bien; sin «responder a todos».)
+  4. **Directrices del dueño (2026-11-24, ya lo probó un poco):** «el botón redondo de la paloma sea el lugar para iniciar una conversación,
+     para iniciar un mensaje. También para escribir un mensaje que sea para todo el grupo. Y esa misma paloma con un numerito rojo es para abrir
+     la conversación, pero al mismo tiempo los mensajes que uno puede ver también le tienen que aparecer en la mesa del log. Y cuando recibís un
+     mensaje, el botón tiene que también vibrar un poquito. Y alguna especie de notificación flotante de te llega un mensaje». Se hace junto con
+     las pruebas de los mensajes de arriba.
 - **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de una zona con daño** (2026-11-22): el Muro de fuego (o una zona con daño de elemento) en el
   mapa: que se marquen Defensa, Defensa especial y la resistencia al elemento en «Qué frena el daño», y Suela gruesa si es del piso.
 - **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de un estandarte y de una nube** (2026-11-22): el Estandarte de guerra (PdG / Probabilidad de

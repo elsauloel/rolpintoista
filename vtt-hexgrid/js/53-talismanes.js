@@ -17,6 +17,10 @@
      lleva hasta su próximo turno, una vez por turno (`talResguardo`, el mismo hook).
    Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`, `orbeCustodio`, `orbeSalvaje`, `alDanoEsp`); un creep, en su
    equipo (CreepCalculo.talisman, solo el GM). */
+// 🙈 (P320, 2026-11-24) ¿El golpe fue a alguien escondido? Entonces lo que le llega a quien atacó no dice contra quién ni por qué (js/130).
+const talNeutro = () => typeof areaOcultaNeutro === 'function' && areaOcultaNeutro();
+// Una línea de la Mesa a la vista aunque se esté aplicando lo de un escondido (lo que le pasa a quien atacó, con texto neutro).
+function talLineaAfuera(texto){ const f = () => mesaLinea(texto, 'recordatorio'); return typeof areaOcultaAfuera === 'function' ? areaOcultaAfuera(f) : f(); }
 function talismanDe(t, campo){
   if(!t || !t.fichaId) return 0;
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc && typeof CreepCalculo !== 'undefined' && CreepCalculo.talisman ? num(CreepCalculo.talisman(sc, campo)) : 0; }
@@ -35,7 +39,9 @@ async function talEspejito(d, entro){
       : ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
     const txt = `🪞 El Espejito de ${d.defensor.nombre} le devuelve ${monto} a ${d.atacante.nombre} (el ${pct} % del daño especial que le entró)`;
     // 📣 (P246) el aviso a quien atacó, con la cuenta, y la línea en la Mesa (js/08); si no hay cuenta, la línea de siempre.
-    if(!danoDirectoCuentaYAviso(ta, monto, res, {nombre: `el Espejito de ${d.defensor.nombre}`, titulo: 'Espejito', icono: '🪞', detalle: `el ${pct} % del daño especial que le entró a ${d.defensor.nombre}`}))
+    const neutro = talNeutro();   // 🙈 (P320) a quien atacó no se le dice de quién es el Espejito
+    if(!danoDirectoCuentaYAviso(ta, monto, res, neutro ? {nombre: 'un Espejito', titulo: 'Espejito', icono: '🪞', detalle: `el ${pct} % del daño especial que hiciste`}
+      : {nombre: `el Espejito de ${d.defensor.nombre}`, titulo: 'Espejito', icono: '🪞', detalle: `el ${pct} % del daño especial que le entró a ${d.defensor.nombre}`}))
       try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
     return {monto, recibido: num(res.r.recibido)};
   }catch(err){ console.error('El Espejito:', err); try{ mesaLinea(`🪞 El Espejito de ${d.defensor.nombre}: ${monto} a ${d.atacante.nombre}, a mano`, 'recordatorio'); }catch(e){} return null; }
@@ -53,6 +59,7 @@ async function talRelicario(d, mato){
     const sube = Math.max(0, num(r.nuevo) - num(r.previo)), exc = num(r.excedente);
     const txt = [sube ? `se cura ${sube}` : '', exc ? `Vida extra ${exc}` : '', !sube && !exc ? 'ya estaba con la vida y la Vida extra al tope' : ''].filter(Boolean).join(' y ');
     try{ mesaLinea(`🩸 El Relicario de ${d.atacante.nombre} late por matar a ${d.defensor.nombre} con daño especial: ${txt}`, 'recordatorio'); }catch(err){}
+    if(talNeutro()) try{ await talLineaAfuera(`🩸 El Relicario de ${d.atacante.nombre} late: ${txt}`); }catch(err){}   // 🙈 (P320) quien atacó lo siente, sin saber por qué
     return {n};
   }catch(err){ console.error('El Relicario:', err); return null; }
 }
@@ -108,7 +115,7 @@ function talSalvajeRodar(d){
 async function talSalvajeAnunciar(d, sv, o){
   if(!sv) return;
   const ta = tokens.get(d.atacante && d.atacante.tokenId);
-  const txt = sv.mult > 1 ? `¡el daño especial sale ${sv.mult === 3 ? 'triple' : 'doble'}!` : sv.propio ? `el mismo daño que le entre a ${d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
+  const txt = sv.mult > 1 ? `¡el daño especial sale ${sv.mult === 3 ? 'triple' : 'doble'}!` : sv.propio ? `el mismo daño que le entre a ${talNeutro() ? 'su objetivo' : d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
   if(!(o && o.sinDados)) try{ await mesaPublicar(`${d.atacante.nombre} · ${sv.nombre}`, {formula: '1d6', rolls: [sv.d], mod: 0, total: sv.d, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
   try{ mesaLinea(`🔮 ${sv.nombre} de ${d.atacante.nombre} (1d6 → ${sv.d}${sv.manual ? ', a mano' : ''}): ${txt}`, 'recordatorio'); }catch(err){}
 }
@@ -183,8 +190,11 @@ async function talBotella(d, n, rolls){
   const f = ta.tipo === 'creep' ? null : fichasPub.get(String(ta.fichaId).split(SEP_INVOCACION)[0]);
   const paraUid = ta.tipo === 'creep' ? fbUsuario.uid : (f && f.resumen && f.resumen.control) || (f && f.duenoUid) || ta.duenoUid;
   try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: +${n} al daño especial… pero salió un 1 en los dados y el diablito se ríe: ${n} de fuego para ${d.atacante.nombre}`, 'recordatorio'); }catch(err){}
+  // 🙈 (P320) contra un escondido: la quemadura le llega igual a quien la lleva, pero sin decir que fue por el daño que hizo.
+  const neutro = talNeutro();
   await momentoAbrir({tipo: 'diablito', icono: '😈', titulo: `El diablito de la Botella se ríe de ${d.atacante.nombre}`, estado: 'esperando',
-    resultado: `Salió un 1 en los dados del daño especial: ${n} de fuego para ${d.atacante.nombre}.`, datos: {tokenId: d.atacante.tokenId, n, paraUid, quien: d.atacante.nombre}});
+    resultado: neutro ? `${n} de fuego para ${d.atacante.nombre}.` : `Salió un 1 en los dados del daño especial: ${n} de fuego para ${d.atacante.nombre}.`,
+    datos: {tokenId: d.atacante.tokenId, n, paraUid, quien: d.atacante.nombre, ...(neutro ? {sinPorque: true} : {})}});
 }
 const diablitosVistos = new Set();
 function diablitoMomento(id, d){
@@ -192,7 +202,7 @@ function diablitoMomento(id, d){
   if(d.estado !== 'esperando' || !fbUsuario || dt.paraUid !== fbUsuario.uid || diablitosVistos.has(id)) return false;
   diablitosVistos.add(id);
   const base = {clave: 'diablito:' + id, icono: '😈', titulo: 'El diablito se ríe'};
-  const paso = {titulo: 'La Botella', texto: `Salió un 1 en los dados de tu daño especial: el diablito se te ríe y te hace ${dt.n} de daño de fuego.`};
+  const paso = {titulo: 'La Botella', texto: dt.sinPorque ? `El diablito de la Botella se te ríe y te hace ${dt.n} de daño de fuego.` : `Salió un 1 en los dados de tu daño especial: el diablito se te ríe y te hace ${dt.n} de daño de fuego.`};
   AvisoCombate.mostrar({...base, pasos: [paso], botones: [{texto: `🔥 Aplicar ${dt.n} de fuego`, id: 'diablito-aplicar', alClic: async () => {
     const b = document.getElementById('diablito-aplicar'); if(b){ b.disabled = true; b.textContent = 'Aplicando…'; }
     const t = tokens.get(dt.tokenId);
@@ -365,5 +375,7 @@ async function talContrahechizo(d){
   const txt = `${d.defensor.nombre} resiste ${d.hab.nombre || 'la habilidad'} y le rebota a ${d.atacante.nombre}: ${notas.join(', ')} (1 turno)`;
   try{ mesaLinea(`✝️ Cruz de plata: ${txt}`, 'recordatorio'); }catch(err){}
   try{ momentoAbrir({tipo: 'zona-renueva', icono: '✝️', titulo: 'Cruz de plata', estado: 'listo', resultado: txt, datos: {}}); }catch(err){}
+  // 🙈 (P320) si quien la resistió está escondido, las dos de arriba van solo a su bando (js/130); a quien la lanzó, sin decir quién.
+  if(talNeutro()) try{ await talLineaAfuera(`✝️ Una Cruz de plata le rebota ${d.hab.nombre || 'la habilidad'} a ${d.atacante.nombre}: ${notas.join(', ')} (1 turno)`); }catch(err){}
 }
 

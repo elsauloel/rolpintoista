@@ -29,7 +29,7 @@ async function momentoAbrir(m){   // → id del momento (o null si no se pudo: s
     const ref = await coleccionMomentos().add({
       tipo: String(m.tipo || ''), icono: String(m.icono || ''), titulo: String(m.titulo || '').slice(0, 200),
       ...(m.resultado ? {resultado: String(m.resultado).slice(0, 400)} : {}),
-      estado: String(m.estado || ''), resuelve: String(m.resuelve || ''), datos: m.datos || {},
+      estado: String(m.estado || ''), resuelve: String(m.resuelve || ''), datos: (typeof momentoMarcaOculta === 'function' ? momentoMarcaOculta(m.datos) : m.datos) || {},   // 🙈 (js/130, P320)
       creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
     return ref.id;
@@ -126,7 +126,7 @@ function momentoRecibido(id, d){
   // 🙈 Lo que le pasa a alguien escondido (su turno, «▶ Empieza tu turno», Provocado; js/04): solo a los que lo ven (su bando, el GM con 👁, quien lo
   // vea ahora); a sus rivales, nada (2026-11-23, dueño). A quien va dirigido le llega siempre.
   if(d.datos && (d.datos.escondido || d.datos.sinEscondido) && typeof momentoEscondidoVer === 'function' && !momentoEscondidoVer(d)
-    && !(d.datos.paraUid && fbUsuario && d.datos.paraUid === fbUsuario.uid)){ momentosFeed.delete(id); renderMomentosFeed(); return; }
+    && !(d.datos.paraUid && fbUsuario && d.datos.paraUid === fbUsuario.uid) && !(Array.isArray(d.datos.paraUids) && fbUsuario && d.datos.paraUids.includes(fbUsuario.uid))){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   if(d.tipo === 'pergamino-grupal' && typeof pergaminoGrupalMomento === 'function') pergaminoGrupalMomento(id, d);   // 📜 Aplicar o a mano (js/25, 2026-11-03)
   if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM

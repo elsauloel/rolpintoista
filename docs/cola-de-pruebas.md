@@ -2471,12 +2471,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Jugador 1. Falta: una invocación que entra al aura (lo pone la pantalla de su dueño), un personaje que el GM maneja con 🎮 el control (lo pone la
   pantalla del GM, no la del jugador) y el Jugador 1 con el mapa abierto en dos pestañas (que no quede doble).
 
-- **⬜ en cola — 🙈 Los talismanes de quien lanza un área delatan al escondido** (2026-11-24, de la prueba del golpe que no lo delata; P320):
+- **✅ hecho (2026-11-24) — 🙈 Los talismanes de quien lanza un área delatan al escondido** (2026-11-24, de la prueba del golpe que no lo delata; P320):
   cuando un área le pega a alguien que el bando que la lanzó no ve, lo que hacen los talismanes de quien la lanzó al aplicar el daño
   (`vtt-hexgrid/js/53-talismanes.js`, llamado desde `dueloAplicarDano`, js/13) va a la Mesa sin la marca del duelo oculto: la Botella con un
   diablito («+2… el diablito se ríe», y su cartel para aplicar la quemadura a quien la lleva), la Cabeza reducida / el Muñeco vudú («Fulano queda
   Maldito», **con el nombre del escondido**), y seguramente el Espejito, el Relicario, el Orbe salvaje y los anillos elementales (no probados).
   Visto con clics: el GM se enteró de que el Grito le pegó a alguien por la Botella, y del nombre por la Cabeza reducida. Arreglarlo depende de P320.
+  **Hecho** (P320 decidida): mientras la pantalla del GM aplica lo de un golpe a un escondido (`vtt-hexgrid/js/130`, `areaOcultaCon`), todo lo que
+  salta con el golpe va solo a su bando: las líneas de la Mesa (`comun/mesa.js` pregunta `mesaLineaMarca`), los momentos (`datos.escondido`, js/16)
+  y, en la pantalla que no lo ve, ningún toast (js/01). Lo de quien lanzó el área le llega igual, sin decir contra quién ni por qué: el diablito
+  («El diablito de la Botella se te ríe y te hace 2 de daño de fuego»), «un Espejito», el Relicario y la Cruz de plata con una línea neutra. El «se
+  delató» se mira antes que los talismanes y va siempre a la vista; desde ahí, todo normal. También el Orbe del custodio / de resguardo y la Cruz
+  de plata ahora corren en un duelo oculto (antes no pasaban). Pruebas automáticas: 1098 en verde. **Probado con clics** en «Claude · pruebas 2»
+  (GM y Jugador 1, sin 👁): Control mental 4 con la Botella y una Cabeza reducida prestada, el Grito con un 1 en el daño contra Blanco J1 escondido
+  → el GM no vio ni toast ni línea ni Crónica de J1; le salió solo el cartel neutro del diablito (y aplicó la quemadura); J1 vio su duelo, «+2 de la
+  Botella», «Blanco J1 queda Maldito», 3 de daño, Maldito y Pánico, y siguió en Sigilo. Control: Nova arcana de 9 → se delató y la Cabeza reducida
+  salió a la vista para todos, después del «se delató». Capturas en la carpeta de la prueba (cola87). Lo que no se probó con clics: Espejito,
+  Relicario, Orbe salvaje, anillos, Cruz de plata (solo pruebas automáticas y lectura de código).
 
 ## En cola
 

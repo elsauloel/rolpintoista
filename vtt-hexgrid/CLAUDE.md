@@ -2706,6 +2706,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   flota sobre un token (`ganchoEvaEmpezar`, js/96: inmunidades, «−2 EVA») no sale en una pantalla que no ve ese token. La Mesa: js/29
   `mesaOcultaVer` (las líneas `oculta-<pj|creep>:<desde>`: su bando, el GM con 👁 o quien lo ve; decidido una vez por línea, `mesaOcultaDecision`).
   Si el daño le saca más que su Sigilo, se delata como siempre (`sigiloDelatarPorDano`; P288). Dudas: P287.
+- **🙈 Lo que salta con el golpe a un escondido no lo delata** (2026-11-24, P320, dueño: «como propusiste»; `js/130-area-oculta.js`, al final):
+  `dueloAplicarDano` (js/13) corre con `areaOcultaCon(d, …)` y los ganchos del duelo `aplicarEfecto`, `habResistida` y `orbeSalvajeAnunciar` (js/14),
+  también. Mientras dura: `mesaLineaMarca(desde)` (la piden `mesaLinea` y `mesaPublicar` de comun/mesa.js) marca la línea `oculta-<pj|creep>:<desde>`
+  con la ficha del escondido; `momentoMarcaOculta` (js/16 `momentoAbrir`) le pone `datos.escondido` (a quien va dirigido, `paraUid` o `paraUids`, le
+  llega igual); `areaOcultaCalla` frena `toast` (js/01) en la pantalla que no lo ve. Lo de quien lanzó va con `areaOcultaAfuera` y texto neutro
+  (`talNeutro`, `talLineaAfuera`, js/53: el diablito con `sinPorque`, «un Espejito», Relicario, Cruz de plata, «su objetivo» en el Orbe salvaje). El
+  «se delató» se mira antes de los talismanes, va afuera, y `areaOcultaDelatado` corta la marca. El contexto es de la pantalla: lo de un escondido
+  espera a que termine lo que corre y viceversa (como mucho 8 s). comun/duelo.js: `pdgEspGanado` y `habResistida` recorren `todosDuelos` (también los
+  ocultos) y el d6 del Orbe salvaje va con `conOculta`. Probado con clics en «Claude · pruebas 2».
 - **🙈 El inicio de turno de un escondido: a sus aliados sí, a sus rivales no** (2026-11-23, dueño: «en realidad a los rivales no les debería salir
   nada, a sus aliados sí»). **Una sola regla de «quién ve a quién»**: `NoVisto.loVeElEscondido({tipo, soyGM, ojo, loVe})` (comun/no-visto.js) — lo de
   un escondido lo ve su bando (personaje o invocación → los jugadores; creep → el GM), el GM con 👁 y quien lo ve ahora (`loVeoAhora`). En js/29:

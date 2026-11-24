@@ -1757,8 +1757,8 @@ const Duelo = (() => {
     salvajeTirando = d.id;
     try{
       window.DUELO_RETENER = false;
-      if(typeof mesaPublicar === 'function') await mesaPublicar(`${d.atacante.nombre} · 🔮 ${sv.nombre}${r.formula.includes('manual') ? ' (manual)' : ''}`, {...r, quien: d.atacante.nombre,
-        ...(d.atacante.tipo === 'creep' ? {desde: 'gm'} : {})}).catch(() => {});
+      if(typeof mesaPublicar === 'function') await mesaPublicar(`${d.atacante.nombre} · 🔮 ${sv.nombre}${r.formula.includes('manual') ? ' (manual)' : ''}`, conOculta(d.id, {...r, quien: d.atacante.nombre,
+        ...(d.atacante.tipo === 'creep' ? {desde: 'gm'} : {})})).catch(() => {});   // 🙈 (P320) contra un escondido, marcada como el resto de su duelo
       await new Promise(res => esperarDados(res));
       const dado = Math.max(1, Math.min(6, Math.round(_num(r.total))));
       const x = typeof Combatiente !== 'undefined' && Combatiente.orbeSalvaje ? Combatiente.orbeSalvaje({orbeSalvaje: sv.domado ? 'domado' : true}, dado)
@@ -4323,15 +4323,16 @@ const Duelo = (() => {
       }
       flechaPrimera = false;
       if(cfgEscuchar.pdgEspGanado){   // 🔮 ganó una tirada de PdG.Esp (el Orbe del custodio, 2026-10-18), en la pantalla de quien la tiró
-        listaDuelos.forEach(d => {
+        // 🙈 (P320, 2026-11-24) también contra un escondido (todosDuelos): lo de quien la lanzó pasa igual; su texto no nombra al otro.
+        todosDuelos.forEach(d => {
           if(!d.contacto || d.contacto.gana !== 'atacante' || !d.hab || !d.hab.tira || d.hab.tira.stat !== 'pdgmg' || pdgEspAvisado.has(d.id)) return;
           pdgEspAvisado.add(d.id);
           if(!pdgEspPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.pdgEspGanado(d); }catch(err){ console.error('Duelo: pdgEspGanado', err); }
         });
         pdgEspPrimera = false;
       }
-      if(cfgEscuchar.habResistida && soyGM()){   // 🔮 el defensor le ganó la Res.Esp a una habilidad (el Contrahechizo, 2026-10-18): la pantalla del GM
-        listaDuelos.forEach(d => {
+      if(cfgEscuchar.habResistida && soyGM()){   // 🙈 también los duelos ocultos (P320; js/130 marca lo que nombra al escondido) · 🔮 el defensor le ganó la Res.Esp a una habilidad (el Contrahechizo, 2026-10-18): la pantalla del GM
+        todosDuelos.forEach(d => {
           if(!d.contacto || d.contacto.gana !== 'defensor' || !d.hab || resistidaAvisada.has(d.id)) return;
           resistidaAvisada.add(d.id);
           if(!resistidaPrimera) try{ cfgEscuchar.habResistida(d); }catch(err){ console.error('Duelo: habResistida', err); }

@@ -14,6 +14,7 @@ const esc = s => String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;'
 
 let toastT;
 function toast(msg){
+  if(typeof areaOcultaCalla === 'function' && areaOcultaCalla()) return;   // 🙈 lo de un golpe a alguien escondido que esta pantalla no ve (js/130, P320)
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), Math.max(2600, String(msg).length * 55));   // un cartel largo dura más
 }

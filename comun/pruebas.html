@@ -112,7 +112,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261123cola60"></script>
+<script src="duelo.js?v=20261124p320"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261124c80"></script>
@@ -10872,6 +10872,76 @@ grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comu
       ['normal', 'nada', 'reporte', 'reporte', 'nada', 'mapa', 'mapa']);
     cierto(/const ocultosArea = typeof areaOcultosDe === 'function' \? areaOcultosDe\(hab, objetivos\) : \[\]/.test(m13) && /areaLanzarOcultos\(\{hab, casteador, h, radio, ocultos: ocultosArea, deArea: refArea\.id\}\)/.test(m13));
     cierto(/a\.hab && a\.hab\.oculta \? \{oculto: true\} : \{\}/.test(m13) && /veOculto: d =>/.test(m14) && /areaOcultaLaVeo\(a\)/.test(m05));
+  });
+})();
+
+grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hexgrid/js/130, js/53, js/13, js/16, comun/mesa.js, comun/duelo.js)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  // js/130 con un tablero chiquito: Blanco J1 escondido (el GM no lo ve); la pantalla es la del GM.
+  async function mundo320(o){
+    const src = await traer('../vtt-hexgrid/js/130-area-oculta.js');
+    const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'u1', escondido: true}], ['rata', {tipo: 'creep', fichaId: 'c1', duenoUid: 'gm'}]]);
+    return new Function('tokens', 'fbUsuario', 'soyGM', 'ojoRevelando', 'loVeoAhora', 'areaDanoCompartible', 'creepPrivadoDe', 'CreepCalculo', 'fichasPub', 'SEP_INVOCACION', 'num',
+      src + '\nreturn {areaOcultaCon, areaOcultaAfuera, areaOcultaDelatado, mesaLineaMarca, momentoMarcaOculta, areaOcultaCalla, areaOcultaNeutro, ctx: () => areaOcultaCtx};')(
+      tokens, {uid: o.uid}, !!o.gm, false, t => !t.escondido, () => true, () => null, {statValor: () => 0}, new Map(), '~', Number);
+  }
+  const DO = {id: 'x', grupo: {oculto: true}, atacante: {tokenId: 'rata', tipo: 'creep'}, defensor: {tokenId: 'j1', tipo: 'pj', ref: 'f1'}};
+  const DV = {id: 'y', grupo: {}, atacante: {tokenId: 'rata', tipo: 'creep'}, defensor: {tokenId: 'j1', tipo: 'pj', ref: 'f1'}};
+  prueba('mientras se aplica lo de un duelo oculto: la Mesa marcada, el momento para los que lo ven y la pantalla del GM callada', async () => {
+    const w = await mundo320({uid: 'gm', gm: true});
+    let dentro = null;
+    await w.areaOcultaCon(DO, async () => { dentro = [w.mesaLineaMarca('recordatorio'), w.mesaLineaMarca('alerta roja'), w.momentoMarcaOculta({paraUid: 'gm'}), w.areaOcultaCalla(), w.areaOcultaNeutro()]; });
+    igual(dentro, [{desde: 'oculta-pj:recordatorio', ficha: 'f1'}, {desde: 'oculta-pj:recordatorio', ficha: 'f1'}, {paraUid: 'gm', escondido: {tipo: 'pj', tokenId: 'j1'}}, true, true]);
+    igual([w.mesaLineaMarca('recordatorio'), w.momentoMarcaOculta({a: 1}), w.areaOcultaCalla(), w.areaOcultaNeutro(), w.ctx()], [null, {a: 1}, false, false, null]);
+  });
+  prueba('un duelo a la vista no marca nada; la pantalla que lo ve (su jugador) no se calla', async () => {
+    const gm = await mundo320({uid: 'gm', gm: true}), j1 = await mundo320({uid: 'u1'});
+    let a = null, b = null;
+    await gm.areaOcultaCon(DV, async () => { a = [gm.mesaLineaMarca('recordatorio'), gm.areaOcultaCalla()]; });
+    await j1.areaOcultaCon(DO, async () => { b = [!!j1.mesaLineaMarca('recordatorio'), j1.areaOcultaCalla()]; });
+    igual([a, b], [[null, false], [true, false]]);
+  });
+  prueba('lo de quien lanzó (afuera) y lo que sigue después de delatarse va a la vista', async () => {
+    const w = await mundo320({uid: 'gm', gm: true});
+    let r = [];
+    await w.areaOcultaCon(DO, async () => {
+      await w.areaOcultaAfuera(async () => { r.push(w.mesaLineaMarca('recordatorio'), w.areaOcultaCalla(), w.areaOcultaNeutro()); });
+      r.push(!!w.mesaLineaMarca('recordatorio'));
+      w.areaOcultaDelatado();
+      r.push(w.mesaLineaMarca('recordatorio'), w.areaOcultaCalla(), w.areaOcultaNeutro());
+    });
+    igual(r, [null, false, true, true, null, false, false]);
+  });
+  prueba('dos a la vez (uno a la vista y uno escondido): no se mezclan las marcas', async () => {
+    const w = await mundo320({uid: 'gm', gm: true});
+    const vistos = [];
+    const p1 = w.areaOcultaCon(DO, async () => { await new Promise(r => setTimeout(r, 200)); vistos.push(['oculto', !!w.mesaLineaMarca('recordatorio')]); });
+    const p2 = w.areaOcultaCon(DV, async () => { vistos.push(['visto', !!w.mesaLineaMarca('recordatorio')]); });
+    await Promise.all([p1, p2]);
+    igual(vistos, [['oculto', true], ['visto', false]]);
+  });
+  prueba('las piezas enganchadas: la Mesa, los toasts, los momentos, el «se delató» antes de los talismanes y los textos neutros', async () => {
+    const [mesa, m01, m16, m13, m14, m53, duelo] = await Promise.all(['mesa.js', '../vtt-hexgrid/js/01-base-y-mapas.js', '../vtt-hexgrid/js/16-momentos.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js',
+      '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../vtt-hexgrid/js/53-talismanes.js', 'duelo.js'].map(traer));
+    cierto(/window\.mesaLineaMarca\(desde \|\| 'recordatorio'\)/.test(mesa) && /window\.mesaLineaMarca\(r\.desde === 'gm' \? 'gm' : 'mapa'\)/.test(mesa));
+    cierto(/areaOcultaCalla\(\)\) return;/.test(m01) && /momentoMarcaOculta\(m\.datos\)/.test(m16) && /d\.datos\.paraUids\.includes\(fbUsuario\.uid\)\)\)\{ momentosFeed/.test(m16));
+    const iDel = m13.indexOf('const sali = await'), iTal = m13.indexOf("if(typeof talEspejito === 'function' && !res.r.invulnerable)");
+    cierto(iDel > 0 && iTal > iDel && /return areaOcultaCon\(d, \(\) => dueloAplicarDanoBase\(d, o\)\)/.test(m13));
+    cierto(/areaOcultaCon\(d, \(\) => dueloAplicarEfecto\(d, ef\)\)/.test(m14) && /areaOcultaCon\(d, \(\) => talContrahechizo\(d\)\)/.test(m14) && /areaOcultaCon\(m, \(\) => talSalvajeAnunciar/.test(m14));
+    cierto(/sinPorque/.test(m53) && /nombre: 'un Espejito'/.test(m53) && /Una Cruz de plata le rebota/.test(m53) && /'su objetivo'/.test(m53));
+    cierto(/todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'atacante'/.test(duelo) && /todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'defensor'/.test(duelo));
+    cierto(/conOculta\(d\.id, \{\.\.\.r, quien: d\.atacante\.nombre/.test(duelo));
+  });
+  prueba('el diablito de la Botella: contra un escondido, el cartel dice solo la quemadura', async () => {
+    const m53 = await traer('../vtt-hexgrid/js/53-talismanes.js');
+    const trozo = m53.slice(m53.indexOf('const diablitosVistos'), m53.indexOf('// 💍 Los anillos elementales'));
+    let mostrado = null;
+    const f = new Function('fbUsuario', 'AvisoCombate', 'tokens', trozo + '\nreturn diablitoMomento;')({uid: 'gm'}, {mostrar: o => { mostrado = o; }}, new Map());
+    f('m1', {estado: 'esperando', datos: {paraUid: 'gm', n: 2, quien: 'Control mental 4', sinPorque: true}});
+    const a = mostrado.pasos[0].texto;
+    f('m2', {estado: 'esperando', datos: {paraUid: 'gm', n: 2, quien: 'Control mental 4'}});
+    igual([a, /Salió un 1/.test(mostrado.pasos[0].texto)], ['El diablito de la Botella se te ríe y te hace 2 de daño de fuego.', true]);
   });
 })();
 

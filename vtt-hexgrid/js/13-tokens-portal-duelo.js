@@ -2133,7 +2133,13 @@ function sueltoHooksDuelo(lado){
     },
   };
 }
+// 🙈 (P320, 2026-11-24) el daño de un duelo oculto se aplica con el contexto de js/130: lo que salta con el golpe (talismanes, anillos, drenaje…) no lo
+// delata. La vista previa no escribe nada: va directo.
 async function dueloAplicarDano(d, o){
+  if((o && o.simular) || typeof areaOcultaCon !== 'function') return dueloAplicarDanoBase(d, o);
+  return areaOcultaCon(d, () => dueloAplicarDanoBase(d, o));
+}
+async function dueloAplicarDanoBase(d, o){
   const simular = !!(o && o.simular);
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
@@ -2365,6 +2371,15 @@ async function dueloAplicarDano(d, o){
     const rayoMag = dn.magico && num(dn.magico.total) > 0 && !String(dn.magico.tipo || '').includes(' y ') && Combatiente.elementoDe(dn.magico.tipo) === 'rayo' ? num(dn.magico.total) : 0;
     const saltaSolo = !!(d.hab && d.hab.cadena) || !!(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto) || !!(!d.hab && dn.magico && dn.magico.cadena);   // (su cadena ya recorre el charco, P214)
     if((golpeRayo || rayoMag) && !saltaSolo && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo ? num(res.r.recibido) : (magico ? num(magico.recibido) : 0)).catch(err => console.error('El rayo por el agua:', err));
+    // 🕶 Un golpe de área que le saca más vida que su Sigilo lo delata (dueño, 2026-11-01; js/03 sigiloDelatarPorDano). Lo que sacó: el golpe y lo
+    // elemental del arma especial, si lo hubo. (P320, 2026-11-24: antes de los talismanes y del Espejo, así lo que sigue ya va a la vista si se delató;
+    // el «se delató» va siempre a la vista: `areaOcultaAfuera`.)
+    if(d.hab && ['area', 'onda', 'cono', 'linea'].includes(d.hab.objetivo) && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function'){
+      const sacoDel = Math.max(0, num(res.previo) - num(res.nuevo)) + (magico ? Math.max(0, num(magico.hpAntes) - num(magico.hpDespues)) : 0);
+      const delatar = () => sigiloDelatarPorDano(d.defensor.tokenId, sacoDel, d.hab.nombre);
+      const sali = await (typeof areaOcultaAfuera === 'function' ? areaOcultaAfuera(delatar) : delatar()).catch(err => { console.error('El sigilo que se delata:', err); return false; });
+      if(sali && typeof areaOcultaDelatado === 'function') areaOcultaDelatado();
+    }
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
     // 🔮 Talismanes (js/53): el Espejito (el daño especial que ENTRÓ) y el Relicario (si el daño especial lo dejó en 0).
@@ -2378,10 +2393,6 @@ async function dueloAplicarDano(d, o){
       if(botella > 0) await talBotella(d, botella, [...(habMagica ? (dn.rolls || []) : []), ...(dn.magico ? (dn.magico.rolls || []) : [])]).catch(err => console.error('La Botella:', err));
     }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
-    // 🕶 Un golpe de área que le saca más vida que su Sigilo lo delata (dueño, 2026-11-01; js/03 sigiloDelatarPorDano). Lo que sacó: el golpe y lo
-    // elemental del arma especial, si lo hubo.
-    if(d.hab && ['area', 'onda', 'cono', 'linea'].includes(d.hab.objetivo) && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function')
-      await sigiloDelatarPorDano(d.defensor.tokenId, perdio + (magico ? Math.max(0, num(magico.hpAntes) - num(magico.hpDespues)) : 0), d.hab.nombre).catch(err => console.error('El sigilo que se delata:', err));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)

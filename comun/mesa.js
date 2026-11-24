@@ -42,9 +42,11 @@ let mesaTextoPendiente = '';
 async function mesaLinea(texto, desde, quien){
   if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
   mesaAntes(`${quien || ''} ${texto || ''}`);
+  // 🙈 (P320, 2026-11-24) mientras el mapa aplica lo de un golpe a alguien escondido, la línea va marcada como las de su duelo (vtt-hexgrid/js/130).
+  const marca = typeof window !== 'undefined' && typeof window.mesaLineaMarca === 'function' ? window.mesaLineaMarca(desde || 'recordatorio') : null;
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(quien || '').slice(0, 60), origen: String(texto || '').slice(0, 400),
-      formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+      formula: '', rolls: [], mod: 0, total: 0, desde: marca ? marca.desde : (desde || 'recordatorio'), ...(marca && marca.ficha ? {ficha: marca.ficha} : {}), cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('No se pudo anotar en la Mesa:', err); }
 }
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
@@ -66,6 +68,11 @@ async function mesaPublicar(origen, r){
     return;
   }
   mesaAntes(`${r.quien || ''} ${origen || ''}`);
+  // 🙈 (P320) lo mismo que `mesaLinea`: una tirada que sale mientras el mapa aplica lo de un golpe a alguien escondido, marcada.
+  if(!/^oculta-/.test(String(r.desde || '')) && typeof window.mesaLineaMarca === 'function'){
+    const marca = window.mesaLineaMarca(r.desde === 'gm' ? 'gm' : 'mapa');
+    if(marca) r = {...r, desde: marca.desde, ficha: marca.ficha};
+  }
   const texto = mesaTextoPendiente;
   mesaTextoPendiente = '';
   const quien = String(r.quien || mesaQuien(origen) || '');

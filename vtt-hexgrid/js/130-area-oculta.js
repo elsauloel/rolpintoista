@@ -115,3 +115,69 @@ function dueloValorOculto(d, ladoN, stat){
   const f = fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
   return f && f.resumen ? num(f.resumen[stat === 'evasion' ? 'eva' : stat]) : 0;
 }
+
+/* ---------- 🙈 Lo que se dispara con el golpe a un escondido, sin delatarlo (2026-11-24, P320, dueño: «como propusiste») ----------
+   El daño de un duelo oculto lo aplica la pantalla del GM (comun/duelo.js), y con él saltan los talismanes, los anillos, el Orbe salvaje, la Cabeza
+   reducida, el drenaje… que escribían en la Mesa para todos, abrían momentos y mostraban toasts (visto con clics: el diablito de la Botella le avisó
+   al GM que el grito le pegó a alguien; la Cabeza reducida nombró al escondido). Mientras se aplica lo de un duelo oculto hay un «contexto»
+   (`areaOcultaCon`): cada línea de la Mesa (`mesaLinea`, `mesaPublicar`: comun/mesa.js pregunta a `mesaLineaMarca`) va marcada como las del duelo
+   oculto (la ve su bando, el GM con 👁 y quien lo ve), cada momento lleva `datos.escondido` (js/16; a quien va dirigido le llega igual) y, en una
+   pantalla que no lo ve, no sale ningún toast (js/01). Lo que le pasa a QUIEN LANZÓ el área pasa igual y le llega con un texto que no dice contra
+   quién ni por qué (`areaOcultaAfuera` + los textos de js/53). Si se delata (el daño le saca más que su Sigilo), desde ahí todo normal
+   (`areaOcultaDelatado`). */
+let areaOcultaCtx = null;
+function areaOcultaDe(d){
+  if(!d || !d.grupo || !d.grupo.oculto || !d.defensor) return null;
+  const tipo = d.defensor.tipo === 'creep' ? 'creep' : 'pj';
+  return {tipo, ficha: String(d.defensor.ref || d.defensor.fichaId || '').slice(0, 80), tokenId: String(d.defensor.tokenId || ''), veo: !!dueloVeOculto(d), delatado: false};
+}
+// ¿Lo de este duelo va marcado? (sí mientras corre lo de un duelo oculto y el escondido no se delató)
+function areaOcultaActiva(){ return !!(areaOcultaCtx && !areaOcultaCtx.delatado && !areaOcultaCtx.afuera); }
+// Corre `fn` con el contexto del duelo `d` (si no es oculto, igual que siempre). El contexto es de la pantalla entera: para que no marque lo de otro
+// duelo que se aplica al mismo tiempo (un área que le pega a uno que se ve y a uno escondido), lo de un escondido espera a que termine lo que está
+// corriendo y lo demás espera a que termine lo del escondido (como mucho 8 s cada uno: después sigue igual, para no trabar nada).
+let areaOcultaEnCurso = 0;
+async function areaOcultaEsperar(cond, ms){
+  const t0 = Date.now();
+  while(!cond() && Date.now() - t0 < ms) await new Promise(r => setTimeout(r, 120));
+}
+async function areaOcultaCon(d, fn){
+  const c = areaOcultaDe(d);
+  if(!c){
+    if(areaOcultaCtx) await areaOcultaEsperar(() => !areaOcultaCtx, 8000);
+    areaOcultaEnCurso++;
+    try{ return await fn(); }
+    finally{ areaOcultaEnCurso--; }
+  }
+  if(areaOcultaCtx || areaOcultaEnCurso > 0) await areaOcultaEsperar(() => !areaOcultaCtx && areaOcultaEnCurso === 0, 8000);
+  const antes = areaOcultaCtx;
+  areaOcultaCtx = c;
+  try{ return await fn(); }
+  finally{ areaOcultaCtx = antes; }
+}
+// Lo que va a la vista aunque se esté aplicando un duelo oculto: lo de quien lanzó (con texto neutro) y el «se delató».
+async function areaOcultaAfuera(fn){
+  const c = areaOcultaCtx;
+  if(!c) return fn();
+  const antes = c.afuera;
+  c.afuera = true;
+  try{ return await fn(); }
+  finally{ c.afuera = antes; }
+}
+// Se delató: desde acá, todo a la vista.
+function areaOcultaDelatado(){ if(areaOcultaCtx) areaOcultaCtx.delatado = true; }
+// La marca de una línea de la Mesa (comun/mesa.js la pide): `oculta-<pj|creep>:<desde>` y la ficha del escondido, o null.
+function mesaLineaMarca(desde){
+  if(!areaOcultaActiva()) return null;
+  const base = /^[a-z-]{1,20}$/.test(String(desde || '')) && !/^oculta-/.test(String(desde)) ? String(desde) : 'recordatorio';
+  return {desde: `oculta-${areaOcultaCtx.tipo}:${base}`.slice(0, 40), ficha: areaOcultaCtx.ficha};
+}
+// Un momento abierto mientras tanto: solo para los que lo ven (js/16 momentoEscondidoVer).
+function momentoMarcaOculta(datos){
+  if(!areaOcultaActiva() || (datos && (datos.escondido || datos.sinEscondido))) return datos;
+  return {...(datos || {}), escondido: {tipo: areaOcultaCtx.tipo, tokenId: areaOcultaCtx.tokenId}};
+}
+// ¿Esta pantalla se calla (los toasts)? Solo la que no ve al escondido.
+function areaOcultaCalla(){ return areaOcultaActiva() && !areaOcultaCtx.veo; }
+// ¿Hace falta el texto neutro para quien lanzó? (mientras dure lo de un duelo oculto, aunque se haya delatado no: ahí ya se sabe)
+function areaOcultaNeutro(){ return !!(areaOcultaCtx && !areaOcultaCtx.delatado); }

@@ -2232,8 +2232,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   discutir cómo resolverlo. En principio se me ocurre que cuando un creep hace blink out, le aparezca al GM qué hacer con la experiencia o algo
   así»). Revisar cómo «Batalla terminada» decide quién escapó, contarle el caso y conversar la solución antes de programar.
 
-- **⬜ en cola — Probar: 🙈 inicio de turno de un escondido con 👁 Revelar lo oculto** (2026-11-23): por código, con el 👁 prendido el GM ve la
-  tarjeta, «▶ Aplicar por él» y el reporte de la Mesa de un personaje escondido; no se probó en el mapa (prender el 👁 avisa a todos).
+- **✅ hecho (2026-11-24) — Probar: 🙈 inicio de turno de un escondido con 👁 Revelar lo oculto** (2026-11-23): probado con clics en «Claude · pruebas 2»
+  (GM de pruebas, Jugador 1 y Jugador 2), con Blanco J1 en Sigilo y un veneno de 3 turnos (−1 de vida al empezar), orden Blanco J2 → Blanco J1.
+  (a) **Con el 👁 apagado**: al empezar el turno de J1, el GM no vio nada (ni la tarjeta, ni la fila del orden, ni la línea de la Mesa al aplicar); el
+  Jugador 1 vio su «▶ Empieza tu turno» (veneno 3 → 2, vida 50 → 49) y lo aplicó; el Jugador 2 (su aliado) vio la tarjeta y la línea, como siempre.
+  (b) **Con el 👁 prendido**: el GM vio la tarjeta «Empieza el turno de Blanco J1 · ▶ Aplicar por él» y la fila con el 👁; con el Jugador 1 sin tocar
+  nada, «▶ Aplicar por él» lo aplicó (veneno 2 → 1, vida 49 → 48), el GM vio la línea en la Mesa y al Jugador 1 su ventana le pasó a «✔ Ya se aplicó
+  (lo aplicó el GM)». Los jugadores no vieron nada nuevo, salvo la línea de siempre «El GM está revelando lo oculto». Como dice P322 (2), la línea
+  de la Mesa del turno anterior (llegada con el ojo apagado) no apareció al prenderlo. Sin arreglos. Duda aparte: P324 («Cómo quedó el grupo»).
 - **⬜ en cola — Probar: 🙈 escondido y ▶ Iniciar combate / ⏬ Demorar / ⟳ Pasar de ronda / ↩ fin del turno libre** (2026-11-23): las cuatro
   tarjetas usan la misma regla (a los que lo ven, con su nombre; a los rivales, la de siempre sin él); solo se probó con ▶ Siguiente.
 - **⬜ en cola — Probar: 🙈 el fin de turno de un escondido con algo que contar** (2026-11-23): si al terminar su turno le pasa algo (un estado

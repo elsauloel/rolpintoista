@@ -2639,3 +2639,11 @@ siguen animando con «reducir movimiento» (la tele no).
 1. ¿Los pulsos del portal tendrían que verse solo en las pantallas que ven al token (como la tele)? **Recomendación:** sí, para quien no lo ve,
    nada (el portal en sí se sigue viendo).
 2. Con «reducir movimiento», ¿los pulsos sin animación (un destello quieto) o sin nada? **Recomendación:** un destello corto, sin ondas.
+
+### P324 — 🙈 «Cómo quedó el grupo» al empezar el combate, ¿muestra al escondido? (2026-11-24, Claude)
+
+Probando el inicio de turno de un escondido (cola de pruebas, 2026-11-24): al pasar a combate, la ventana del GM «🩺 Cómo quedó el grupo»
+(`vtt-hexgrid/js/81`) mostró a Blanco J1, en Sigilo, con su vida, sus estados y «No vencen: Sigilo», **con el 👁 apagado**. Es una herramienta del GM
+para ajustar los turnos de los estados (como GM Tools, que también tiene las fichas), pero en el mapa todo lo demás de ese escondido se le tapa.
+1. ¿Se deja así (es la ficha del grupo, no el mapa) o el escondido sale solo con el 👁 prendido? **Recomendación:** dejarlo así: es para que el GM
+   acomode los estados de todos al empezar, y no dice dónde está.

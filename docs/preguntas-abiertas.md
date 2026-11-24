@@ -2057,6 +2057,8 @@ cosas chicas para decidir:
    Mientras tanto queda así (es un caso muy raro). ¿Lo emparejo?
    **Decidido (dueño, 2026-11-24): (a)** — emparejarlo con la Defensa común: el Aguante se suma a la Defensa especial antes de contar la Perfora
    («pasan N siempre» es siempre). De paso, la cuenta muestra la Defensa especial real (no lo que frenó).
+   ✅ **Aplicado (2026-11-24):** `Combatiente.perforaContraEsp` / `perforaEspPartes` (comun/combatiente.js), usados por el daño del duelo (vtt-hexgrid/js/13)
+   y su cuenta (js/10). Probado con clics en «Claude · pruebas 2».
 
 **Diagnóstico (2026-11-24):** el caso existe de verdad, pero es raro: hoy lo único que «perfora» la Defensa especial es el estado **Armas perforantes**
 (lo da el Armero, creep Support, desde nivel 2) y solo cuenta en una habilidad con daño especial (no directo) contra alguien con Aguante de trinchera

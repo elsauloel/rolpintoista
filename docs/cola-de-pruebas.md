@@ -1954,9 +1954,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   estilo: cuerpo a cuerpo, distancia, mágico; función: daño, defensa, movilidad, control, curación, sigilo…) y los filtros del catálogo de
   «+ Pasiva»; conversarlo con el dueño antes de programar.)
 
-- **🟡 diagnóstico hecho (2026-11-24), esperando la respuesta del dueño (P283 punto 2) — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
+- **✅ hecho (2026-11-24) — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
   ese caso raro de la perforación y defensa especial»; P283, punto 2): hoy el Aguante se resta después de lo que «pasa siempre» por Perfora, así
   que puede frenar parte de eso. Explicarle el caso con números y proponer.
+  **Hecho (dueño eligió la (a), P283 punto 2):** contra la Defensa especial, el Aguante se suma a la Defensa especial antes de contar la Perfora, como en
+  la común (`Combatiente.perforaContraEsp`; en ese caso js/10 no lo vuelve a restar). La cuenta del daño muestra la Defensa especial real, el Aguante en
+  su renglón y «La Defensa especial (8) frenaba más: pasan 3 por Armas perforantes» (antes decía «Defensa especial 4/5», también sin Aguante). Ejemplo
+  probado con clics en «Claude · pruebas 2» (8 de daño, Defensa especial 6, Aguante +2, Armas perforantes 3): antes entraba 1, ahora 3; sin el Aguante,
+  3; sin Perfora, igual que siempre (lo frena entero). Pruebas automáticas en verde (1076).
 
 - **⬜ en cola — Probar: ⬆ Subir al catálogo un consumible propio** (2026-11-22, de los consumibles a mano): no se probó con clics para no
   sumar un ítem de prueba a la biblioteca compartida. Ver que suba con su «✋ A mano» y que, tomado del catálogo, se consuma igual.

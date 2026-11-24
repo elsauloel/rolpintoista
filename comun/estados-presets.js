@@ -323,12 +323,12 @@ const ESTADOS_PRESET = [
     detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
   // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).
   // Mareo de invocación (2026-10-06, dueño): una invocación nueva entra al final del orden de turnos y su primer turno no hace nada.
-  // (2026-11-24, dueño: dura «hasta el inicio del próximo turno del personaje que los haya invocado»; vale también para los refuerzos. El mapa le pone
-  // `permanente` + `hasta` + `mareoDe` y se lo saca: vtt-hexgrid/js/135. Sin quien la invocó en el orden de turnos, `turnos: 1` como antes.)
+  // (2026-11-24, dueño, P327: «la primera vez que le toque actuar a una invocación, no puede actuar»; vale también para los refuerzos. El mapa le pone
+  // `permanente` + `hasta` + `mareoDe` y se lo saca al terminar su primer turno o al empezar el de quien la invocó: vtt-hexgrid/js/135.)
   // `soloSistema` (2026-10-08, dueño): no aparece en los menús para elegir un estado (solo lo pone el mapa a una invocación recién llegada).
   // (dueño, 2026-10-20: «no es que no tiene nitros»: tiene sus No2 y puede reaccionar —dodge roll, Parry, Evasión—; lo que no puede es actuar en su turno.)
   {nombre:'Mareo de invocación', polaridad:'debuff', turnos:1, mareado:true, soloSistema:true,
-    detalle:'Recién invocada: hasta que empiece el próximo turno de quien la invocó no puede actuar (ni moverse, ni atacar, ni usar habilidades o consumibles), aunque le toque jugar antes. Tiene sus No2 y sí puede reaccionar: dodge roll, Parry, Evasión. ⚙ Automatizado: se lo pone el mapa al sumarla al orden de turnos (a una invocación y a un refuerzo), le frena las acciones (la mesa puede dejarlas pasar) y se lo saca al empezar el turno de quien la invocó.'},
+    detalle:'Recién llega: no actúa en su primer turno (ni moverse, ni atacar, ni usar habilidades o consumibles). Tiene sus No2 y sí puede reaccionar: dodge roll, Parry, Evasión. ⚙ Automatizado: se lo pone el mapa a una invocación o un refuerzo al sumarlo al orden de turnos, le frena las acciones (la mesa puede dejarlas pasar) y se lo saca al terminar su primer turno (o antes, si empieza el turno de quien lo invocó: nunca pierde más de un turno).'},
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},

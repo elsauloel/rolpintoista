@@ -2306,6 +2306,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     mareada…» en la Mesa de todos (desde entonces dice «mareado» para un creep).
   - Capturas (fuera del repo): `cola99/2-J1-le-toca-a-la-abeja-y-esta-mareada.png`, `cola99/5-GM-le-toca-al-refuerzo-y-esta-mareado.png`.
   - Partida como estaba: narrativo, sin orden, la Abeja en su casilla, sin el refuerzo ni el Chillido de prueba, Blanco creep 60/60 sin estados.
+  - ✅ **Ajuste por P327 (2026-11-24):** el mareo le hace perder **solo su primer turno**: se va al terminarlo o al empezar el turno de quien la
+    invocó, lo que pase primero (invocaciones y refuerzos, con o sin quien los llamó en el orden). Cartel: «No actúa en su primer turno». **Con
+    clics, el caso «saca más»:** orden J2 25 · creep 20 · J1 0, turno de J1; la Abeja saca 2 (más que J1) y entra antes de él (su lugar ya pasó).
+    Ronda 2: le toca antes que a J1, está mareada y no se mueve; al terminar su turno, «😵 Abeja de prueba ya no está mareada: terminó su primer
+    turno» en la Mesa. Ronda 3: se mueve sin cartel. Perdió un solo turno. Captura: `cola100/1-J1-saca-mas-que-J1-ronda-2-pierde-su-primer-turno.png`.
 - **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
   GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
 
@@ -2710,9 +2715,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de fuego: «Protector 4 oye pasos…»; dueño: «no lo entiendo bien, ponelo al final de la cola para investigarlo en su momento»). De paso, mirar
   por qué la Quemadura del Muro entró con 2 cargas y le sacó 2 de vida en el momento.
 
-- **⬜ en cola — Probar: 😵 el Mareo de invocación que se va porque quien invocó salió del orden o cayó** (2026-11-24): con una invocación
-  mareada, ✕ al invocador en el orden (o Limpiar, o dejarlo en 0 de vida) → a los ~3 s se le va el mareo, con la línea en la Mesa. Y con ⏭ Pasar
-  de ronda, cuando el turno del invocador pasa sin jugar. No se probó con clics (sí el caso normal: invocación y refuerzo).
+- **⬜ en cola — Probar: 😵 el Mareo de invocación que se va sin que la invocación juegue** (2026-11-24, ajustado por P327): con una invocación
+  mareada, ✕ a la invocación en el orden (o Limpiar) → a los ~3 s se le va el mareo, con la línea en la Mesa; y con ⏭ Pasar de ronda o caída, cuando
+  su turno pasa sin jugar. No se probó con clics (sí el caso normal y el de «saca más que su invocador»).
 
 ## En cola
 

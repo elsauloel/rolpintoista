@@ -246,7 +246,7 @@ function escucharIniciativa(){
     if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); if(typeof zonasAlEmpezarTurno === 'function') zonasAlEmpezarTurno(); }   // 🔓 js/54 · 🔥 el Muro de fuego (js/08)
     iniciativaCargada = true;
     if(typeof sobrepesoIniRevisar === 'function') sobrepesoIniRevisar();   // ⚖ js/132: ¿alguien cambió de sobrepeso? (el GM acomoda su número)
-    if(typeof mareoRevisarLuego === 'function') mareoRevisarLuego();   // 😵 js/135: ¿quien invocó se fue del orden o cayó? (el mareo se va)
+    if(typeof mareoRevisarLuego === 'function') mareoRevisarLuego();   // 😵 js/135: ¿una mareada salió del orden? (el mareo se va)
   }, err => console.error('Error escuchando la iniciativa:', err));
 }
 
@@ -569,11 +569,14 @@ async function iniciativaSiguiente(o){
   const grupos = [];   // cada uno, las líneas de un token (turnoMarcar) o sueltas (de todos)
   const suelta = l => turnoMarcar(l, '', null);
   if(termina && !terminaRepetido) grupos.push(await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
+  // 😵 Terminó su primer turno: se le va el Mareo de invocación (P327, js/135).
+  if(termina && typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar({termina: termina.id}))); }catch(err){ console.error('Mareo de invocación:', err); }
   // 🫨 Al terminar el turno de quien arrastró, los que arrastró recuperan el equilibrio (js/78; dueño, 2026-11-05).
   if(termina && typeof desequilibradosFinTurno === 'function') try{ grupos.push(suelta(await desequilibradosFinTurno(termina.id))); }catch(err){ console.error('Desequilibrado:', err); }
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
   for(const id of salteados.filter(x => x !== (orden[i] || {}).id)){
     grupos.push(await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`));
+    if(typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar({termina: id}))); }catch(err){ console.error('Mareo de invocación:', err); }   // 😵 su primer turno pasó
   }
   // ⏭ Los que se saltearon al pasar de ronda: su turno pasa igual, sin jugar (lo más parecido a apretar ▶ Siguiente con cada uno: P269). Quien demoró
   // su turno con ▼ ya lo había empezado (no se repite el inicio).
@@ -582,7 +585,7 @@ async function iniciativaSiguiente(o){
     if(!(iniciativa.empezados || []).includes(id)) grupos.push(await inicioDeTurno(id, k));
     grupos.push(await finDeTurno(id, k));
     if(!iniciativaFueraDeJuego(id)) grupos.push(turnoMarcar(await zonasDelQueLaTiro(id, null), id));
-    if(!iniciativaFueraDeJuego(id) && typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar(id))); }catch(err){ console.error('Mareo de invocación:', err); }   // 😵 su turno pasó: el mareo de los suyos se va
+    if(typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar({termina: id})), ...(iniciativaFueraDeJuego(id) ? [] : await mareoRevisar({empieza: id}))); }catch(err){ console.error('Mareo de invocación:', err); }   // 😵 su turno pasó: el suyo y el de los que invocó se van
   }
   if(o.pasarRonda){
     const nomP = id => { const tk = tokens.get(id), fila = orden.find(x => x.id === id); return tk && publico(fila, tk) ? nombreDe(tk) : ''; };
@@ -602,8 +605,8 @@ async function iniciativaSiguiente(o){
   if(sigEmpezado) grupos.push(deSig([`${nomSig || 'Sigue'}: retoma el turno que había demorado (no vuelve a recargar).`]));
   else if(repite) grupos.push(deSig([`${nomSig || 'Alguien'} vuelve a actuar: ya había jugado esta ronda, así que no recarga ni cuenta turnos.`]));
   grupos.push(deSig(lineasZonas), deSig(lineasInicio));
-  // 😵 Empieza el turno de quien invocó: a sus invocaciones y refuerzos se les va el Mareo de invocación (2026-11-24, js/135).
-  if(sig.id && !sinInicio && typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar(sig.id))); }catch(err){ console.error('Mareo de invocación:', err); }
+  // 😵 Empieza el turno de quien invocó: a sus invocaciones y refuerzos se les va el Mareo de invocación si todavía lo tenían (2026-11-24, js/135).
+  if(sig.id && !sinInicio && typeof mareoRevisar === 'function') try{ grupos.push(...(await mareoRevisar({empieza: sig.id}))); }catch(err){ console.error('Mareo de invocación:', err); }
   if(ordenRonda && ordenRonda.lineas.length){
     ordenRonda.lineas.forEach(l => mesaLinea(l, 'recordatorio'));
     (ordenRonda.cambios || []).filter(c => c.desde !== c.hasta).forEach(c => { if(typeof ordenAvisar === 'function') ordenAvisar(c, c.por || '', ''); });
@@ -712,7 +715,7 @@ async function iniciativaIniciarCombate(){
     const lineasZonas = turnoMarcar(await zonasDelQueLaTiro(sig.id, null), sig.id, escSig);
     const pendiente = await inicioTurnoPendiente(sig.id, clave);
     const lineasInicio = turnoMarcar(pendiente ? [] : await inicioDeTurno(sig.id, clave), sig.id, escSig);
-    const mareos = typeof mareoRevisar === 'function' ? await mareoRevisar(sig.id).catch(err => { console.error('Mareo de invocación:', err); return []; }) : [];   // 😵 js/135
+    const mareos = typeof mareoRevisar === 'function' ? await mareoRevisar({empieza: sig.id}).catch(err => { console.error('Mareo de invocación:', err); return []; }) : [];   // 😵 js/135
     await turnoTarjetasAbrir(tarjeta, {tokenId: sig.id, escondido: escSig}, [lineasZonas, lineasInicio, ...mareos],
       {pre: [LLENOS], titRivales: escSig ? 'Ronda 1 · Empieza el combate' : '', preRivales: [LLENOS, 'Sigue el orden de turnos.']});
   }catch(err){ console.error('Iniciar combate:', err); toast(listo ? 'El combate se inició, pero falló el inicio del turno del primero — mirá la consola' : 'No se pudo iniciar el combate — probá de nuevo (el botón sigue ahí)'); }
@@ -1172,8 +1175,8 @@ const sobrepesoValorDeToken = t => {
   return r && r.sobre !== undefined ? Math.max(0, num(r.sobre)) : null;
 };
 
-/* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra con «Mareo de invocación» (desde el 2026-11-24, hasta que empiece el próximo
-   turno de quien la invocó: js/135; antes, su primer turno no hacía nada).
+/* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra con «Mareo de invocación»: no actúa en su primer turno (desde el 2026-11-24,
+   P327: se va al terminar ese turno o al empezar el de quien la invocó, lo que pase primero; js/135).
    Lo hace la pantalla del GM al ver aparecer el token.
    🐝 Con su tirada de iniciativa (2026-11-23, dueño, P275: «al realizar una invocación, esta venga acompañada de una tirada de iniciativa y que
    automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada»): antes entraba al final con 0. Ahora tira la Iniciativa
@@ -1207,7 +1210,7 @@ async function invocacionAlOrden(tokenId){
   if(r && !ocultoParaMesa(tokenId)) mesaPublicar(`Iniciativa · ${nombre}`, {...r, ficha: fichaId});
   if(!r) toast(`🐝 ${nombre} entró al final del orden con 0: no se pudo leer su Iniciativa. Escribí el número a mano.`);
   const sinMareo = !!((vinculo(t) || {}).resumen || {}).sinMareo;   // 👁 el Ojo de Kicillof entra sin mareo (2026-10-20)
-  // 😵 (2026-11-24, dueño) mareada hasta que empiece el próximo turno de quien la invocó: el personaje dueño (js/135).
+  // 😵 (2026-11-24, dueño, P327) pierde solo su primer turno; quien la invocó es el personaje dueño (js/135).
   const invocador = typeof mareoDuenoDeInvocacion === 'function' ? mareoDuenoDeInvocacion(t.fichaId) : '';
   try{
     if(!sinMareo) await editarPersonajeMapa(fichaId, S => {
@@ -1224,7 +1227,7 @@ async function invocacionAlOrden(tokenId){
     datos: {lineas: invocacionAlOrdenLineas(e, r, sinMareo, invocador)}});
 }
 // Lo que cuenta la Crónica al entrar (la usan las pruebas y los refuerzos, js/31): dónde quedó, con qué sacó, si juega en esta ronda y el mareo.
-// `invocador` (2026-11-24): el token de quien la invocó (el mareo dura hasta que empiece su próximo turno, js/135).
+// `invocador` (2026-11-24): el token de quien la invocó (js/135).
 function invocacionAlOrdenLineas(e, r, sinMareo, invocador){
   const antes = e.orden[e.lugar - 1], despues = e.orden[e.lugar + 1];
   const nom = f => { const tt = f && tokens.get(f.id); return tt && !ocultoParaMesa(f.id) ? nombreDe(tt) : ''; };

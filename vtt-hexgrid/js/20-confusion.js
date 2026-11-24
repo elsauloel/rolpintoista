@@ -207,10 +207,9 @@ function stunAntes(tokenId, seguir, o){
   if(!Combatiente.stuneado(est)){
     if(!Combatiente.mareado(est) || (o && o.reaccion)) return false;
     // Mareo de invocación (dueño, 2026-10-20): recién invocada no actúa en su turno; tiene sus No2 y puede reaccionar.
-    // (2026-11-24, dueño) dura hasta que empiece el próximo turno de quien la invocó (`hasta`, js/135); uno viejo sin `hasta`, su primer turno.
-    const mareo = est.find(OrdenTurnos.esMareoHasta), hasta = mareo ? Combatiente.hastaTxt(mareo) : '';
-    AvisoCombate.mostrar({icono: '😵', titulo: `${nombreDe(t)} recién llega: está ${t.tipo === 'creep' ? 'mareado' : 'mareada'}`, pasos: [{titulo: hasta ? `No actúa ${hasta}` : 'En su primer turno no actúa',
-      texto: `${hasta ? `${hasta[0].toUpperCase()}${hasta.slice(1)}` : 'Hasta que empiece su próximo turno'} no puede moverse, atacar ni usar habilidades o consumibles. Tiene sus No2 y sí puede reaccionar: dodge roll, Parry, Evasión.`}],
+    // (2026-11-24, dueño, P327: «la primera vez que le toque actuar a una invocación, no puede actuar»): pierde solo su primer turno (js/135).
+    AvisoCombate.mostrar({icono: '😵', titulo: `${nombreDe(t)} recién llega: está ${t.tipo === 'creep' ? 'mareado' : 'mareada'}`, pasos: [{titulo: 'No actúa en su primer turno',
+      texto: 'No puede moverse, atacar ni usar habilidades o consumibles. Sí puede reaccionar: dodge roll, Parry, Evasión.'}],
       botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},
         {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
     return true;

@@ -57,7 +57,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261123c68"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
-<script src="estados-presets.js?v=20261124mareo"></script>
+<script src="estados-presets.js?v=20261124mareo3"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
@@ -84,7 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261124c80"></script>
-<script src="orden-turnos.js?v=20261124mareo"></script>
+<script src="orden-turnos.js?v=20261124mareo3"></script>
 <script src="ficha-mantenimiento.js?v=20261124finT"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -3020,33 +3020,44 @@ prueba('🐝 El mapa tira la iniciativa de la invocación al entrar y la saca de
   cierto(/includes\(SEP_INVOCACION\) && typeof temporalFueraDelOrden === 'function'/.test(t09), 'al irse el token, sale del orden (pantalla del GM)');
   cierto(/fueraDelOrdenSacando\.has\(id\)/.test(t54), 'una sola vez aunque lo pidan dos caminos');
 });
-prueba('😵 El Mareo de invocación dura hasta que empieza el próximo turno de quien invocó (2026-11-24): las reglas puras', () => {
-  const O = OrdenTurnos, enOrden = id => ['j1', 'abeja', 'rata'].includes(id), fuera = id => id === 'rata';
-  const e = {nombre: 'Mareo de invocación', activo: true, mareado: true, permanente: true, turnos: 0, hasta: O.mareoHasta('Blanco J1'), mareoDe: 'j1'};
-  igual([e.hasta, O.mareoHasta(''), O.esMareoHasta(e), O.esMareoHasta({nombre: 'Mareo de invocación', hasta: e.hasta}), O.esMareoHasta({nombre: 'Mareo de invocación', turnos: 1, mareado: true}),
-    O.esMareoHasta({...e, activo: false}), Combatiente.hastaTxt(e), Combatiente.mareado([e])],
-    ['que empiece el próximo turno de Blanco J1', 'que empiece el próximo turno de quien la invocó', true, true, false, false, 'hasta que empiece el próximo turno de Blanco J1', true]);
-  igual([O.mareoSeVa('j1', {empieza: 'j1', enOrden, fuera}), O.mareoSeVa('j1', {empieza: 'abeja', enOrden, fuera}), O.mareoSeVa('j1', {empieza: '', enOrden, fuera}),
-    O.mareoSeVa('rata', {empieza: 'abeja', enOrden, fuera}), O.mareoSeVa('otro', {empieza: 'abeja', enOrden, fuera}), O.mareoSeVa('', {empieza: 'j1', enOrden, fuera})],
-    ['empieza', '', '', 'caido', 'fuera', 'fuera']);
-  // Su propio turno no lo descuenta (permanente): sigue mareada hasta que se lo saca el turno de quien invocó.
+prueba('😵 El Mareo de invocación: pierde SOLO su primer turno (2026-11-24, P327): las reglas puras', () => {
+  const O = OrdenTurnos, enOrden = id => ['j1', 'abeja', 'rata'].includes(id);
+  const e = {nombre: 'Mareo de invocación', activo: true, mareado: true, permanente: true, turnos: 0, hasta: O.mareoHasta(), mareoDe: 'j1'};
+  igual([e.hasta, O.esMareoHasta(e), O.esMareoHasta({nombre: 'Mareo de invocación', hasta: e.hasta}), O.esMareoHasta({nombre: 'Mareo de invocación', hasta: 'que empiece el próximo turno de X'}),
+    O.esMareoHasta({nombre: 'Mareo de invocación', turnos: 1, mareado: true}), O.esMareoHasta({...e, activo: false}), Combatiente.hastaTxt(e), Combatiente.mareado([e])],
+    ['que termine su primer turno', true, true, true, false, false, 'hasta que termine su primer turno', true]);
+  const yo = {yo: 'abeja', invocador: 'j1'};
+  igual([O.mareoSeVa(yo, {termina: 'abeja', enOrden}), O.mareoSeVa(yo, {empieza: 'j1', enOrden}), O.mareoSeVa(yo, {empieza: 'abeja', enOrden}), O.mareoSeVa(yo, {termina: 'j1', enOrden}),
+    O.mareoSeVa({yo: 'otra', invocador: 'j1'}, {enOrden}), O.mareoSeVa({yo: 'abeja', invocador: ''}, {termina: 'abeja', enOrden}), O.mareoSeVa({yo: 'abeja', invocador: ''}, {empieza: 'j1', enOrden})],
+    ['termino', 'empieza', '', '', 'fuera', 'termino', '']);
+  // Su propio inicio de turno no lo descuenta (permanente): lo saca el mapa al terminar ese turno.
   const lista = [{...e, recien: true}];
-  const k1 = Combatiente.empezarTurnoEstados(lista, {hp: 'hpTurno', stacks: 'stacksTurno'}), k2 = Combatiente.empezarTurnoEstados(k1.quedan, {hp: 'hpTurno', stacks: 'stacksTurno'});
-  igual([k1.quedan.length, k2.quedan.length, Combatiente.mareado(k2.quedan)], [1, 1, true]);
+  const k1 = Combatiente.empezarTurnoEstados(lista, {hp: 'hpTurno', stacks: 'stacksTurno'});
+  igual([k1.quedan.length, Combatiente.mareado(k1.quedan)], [1, true]);
+  // «Saca más que su invocador» (no pierde dos turnos): J1 (10) invoca la Abeja, que saca 15 → su lugar ya pasó (P301). Ronda 2: le toca a la Abeja
+  // antes que a J1 → pierde ese turno y al terminarlo se le va; cuando empieza el turno de J1 ya no está mareada; ronda 3 actúa.
+  const sim = (orden, entra) => {   // orden de la ronda siguiente; → [quién juega, ¿mareada?] y los turnos que perdió
+    let mareada = true, perdidos = 0; const out = [];
+    for(const r of [2, 3]) for(const id of orden){
+      if(mareada && O.mareoSeVa({yo: 'abeja', invocador: 'j1'}, {empieza: id, enOrden}) === 'empieza') mareada = false;
+      if(id === 'abeja'){ out.push([r, mareada]); if(mareada) perdidos++; if(mareada && O.mareoSeVa({yo: 'abeja', invocador: 'j1'}, {termina: 'abeja', enOrden}) === 'termino') mareada = false; }
+    }
+    return {out, perdidos};
+  };
+  igual(sim(['abeja', 'j1', 'rata']), {out: [[2, true], [3, false]], perdidos: 1});   // saca más: pierde uno solo
   const pre = ESTADOS_PRESET.find(p => p.nombre === 'Mareo de invocación');
-  cierto(/hasta que empiece el próximo turno de quien la invocó/.test(pre.detalle), 'el detalle del preset dice la regla nueva');
+  cierto(/no actúa en su primer turno/.test(pre.detalle), 'el detalle del preset dice la regla');
 });
-prueba('😵 El mapa: la invocación y el refuerzo quedan mareados hasta el turno de quien invocó; el refuerzo tira su iniciativa (2026-11-24)', async () => {
+prueba('😵 El mapa: la invocación y el refuerzo pierden solo su primer turno; el refuerzo tira su iniciativa (2026-11-24, P327)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const [t04, t31, t135, t20, mapa] = await Promise.all(['04-mantenimiento-e-iniciativa.js', '31-copiar-token.js', '135-mareo-invocacion.js', '20-confusion.js', '../mapa.html'].map(leer));
-  cierto(/mareoEstadoNuevo\(pre, invocador\)/.test(t04) && /mareoDuenoDeInvocacion\(t\.fichaId\)/.test(t04), 'la invocación: mareada hasta el turno de su dueño');
-  cierto(/if\(sig\.id && !sinInicio && typeof mareoRevisar === 'function'\)/.test(t04), '▶ Siguiente: al empezar el turno de quien invocó se le va');
-  cierto(/const mareos = typeof mareoRevisar === 'function' \? await mareoRevisar\(sig\.id\)/.test(t04), 'Iniciar combate también');
-  cierto(/mareoRevisarLuego\(\)/.test(t04), 'si quien invocó se fue del orden o cayó, se le va');
-  cierto(/OrdenTurnos\.entrarConTirada\(iniciativa, \{id: idNuevo/.test(t31) && /iniciativaDeCreep\(sc\)/.test(t31) && /mesaPublicar\(`Iniciativa · \$\{nombre\}`, \{\.\.\.r, desde: 'gm'\}\)/.test(t31), 'el refuerzo tira su iniciativa y entra en su lugar');
-  cierto(/mareoEstadoNuevo\(pre, invocador\)/.test(t31), 'el refuerzo queda mareado hasta el turno del creep que lo llamó');
-  cierto(/permanente: true, turnos: 0, hasta: OrdenTurnos\.mareoHasta/.test(t135) && /OrdenTurnos\.mareoSeVa\(inv, \{empieza, enOrden: mareoEnOrden, fuera: iniciativaFueraDeJuego\}\)/.test(t135), 'el estado y cuándo se va');
-  cierto(/est\.find\(OrdenTurnos\.esMareoHasta\)/.test(t20), 'el cartel dice hasta cuándo');
+  cierto(/mareoEstadoNuevo\(pre, invocador\)/.test(t04) && /mareoDuenoDeInvocacion\(t\.fichaId\)/.test(t04), 'la invocación entra mareada');
+  cierto(/mareoRevisar\(\{termina: termina\.id\}\)/.test(t04), '▶ Siguiente: al terminar su turno se le va');
+  cierto(/mareoRevisar\(\{empieza: sig\.id\}\)/.test(t04), 'o al empezar el turno de quien invocó');
+  cierto(/mareoRevisar\(\{termina: id\}\)/.test(t04), 'también si su turno pasa sin jugar');
+  cierto(/OrdenTurnos\.entrarConTirada\(iniciativa, \{id: idNuevo/.test(t31) && /iniciativaDeCreep\(sc\)/.test(t31) && /mareoEstadoNuevo\(pre, invocador\)/.test(t31), 'el refuerzo tira su iniciativa y entra mareado');
+  cierto(/permanente: true, turnos: 0, hasta: OrdenTurnos\.mareoHasta\(\)/.test(t135) && /OrdenTurnos\.mareoSeVa\(\{yo: id, invocador: inv\}/.test(t135), 'el estado y cuándo se va');
+  cierto(/No actúa en su primer turno/.test(t20), 'el cartel lo dice corto');
   cierto(/js\/135-mareo-invocacion\.js\?v=/.test(mapa), 'el mapa lo carga');
 });
 prueba('⏭ Pasar de ronda (2026-11-21): quiénes faltan en la ronda (sin los que ya jugaron ni los caídos; en un turno libre, desde quien lo tenía)', () => {

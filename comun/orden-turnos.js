@@ -172,24 +172,25 @@ const OrdenTurnos = (() => {
     }
     return l;
   }
-  /* 😵 El Mareo de invocación dura hasta que empieza el próximo turno de quien la invocó (2026-11-24, dueño: «una invocación o un refuerzo, el turno
-     en que entra, tira su iniciativa automáticamente y se ubica en el orden pertinente de la lista de turnos, pero tiene Mareo de invocación hasta el
-     inicio del próximo turno del personaje que los haya invocado»). El estado lleva `hasta` = MAREO_HASTA_PRE + el nombre (se ve en el globo y viaja en
-     el resumen público) y `mareoDe` = el token de quien invocó (en los datos completos). Puro:
-     · mareoHasta(nombre) → el texto de `hasta`; esMareoHasta(e) → ¿es un mareo de los nuevos (que se va con el turno de otro)?
-     · mareoSeVa(invocador, {empieza, enOrden(id), fuera(id)}) → por qué se va ahora: 'empieza' (empieza el turno de quien invocó), 'fuera' (quien
-       invocó no está o ya no está en el orden: su turno no va a llegar), 'caido' (quien invocó está caído: se saltea), o '' (sigue mareada). */
-  const MAREO_HASTA_PRE = 'que empiece el próximo turno de ';
-  const mareoHasta = nombre => MAREO_HASTA_PRE + (String(nombre || '').trim() || 'quien la invocó');
-  const esMareoHasta = e => !!e && e.activo !== false && (!!e.mareoDe || String(e.hasta || '').startsWith(MAREO_HASTA_PRE));
-  function mareoSeVa(invocador, o){
-    o = o || {};
-    if(invocador && o.empieza && o.empieza === invocador) return 'empieza';
-    if(!invocador || (typeof o.enOrden === 'function' && !o.enOrden(invocador))) return 'fuera';
-    if(typeof o.fuera === 'function' && o.fuera(invocador)) return 'caido';
+  /* 😵 El Mareo de invocación: pierde SOLO su primer turno (2026-11-24, dueño, P327: «lo importante es que la primera vez que le toque actuar a una
+     invocación, no puede actuar. Tan simple como eso»). Se va con lo que pase primero: al TERMINAR su primer turno propio o al EMPEZAR el turno de
+     quien la invocó (así nunca pierde más de un turno: tampoco si saca más que su invocador ni con P301 b). Vale igual para los refuerzos. El estado
+     lleva `hasta` = MAREO_HASTA (se ve en el globo y viaja en el resumen público) y `mareoDe` = el token de quien invocó ('' si no está en el orden).
+     · esMareoHasta(e) → ¿es un mareo de los nuevos (que lo saca el mapa)? (también los del primer día, con «que empiece el próximo turno de…»)
+     · mareoSeVa({yo, invocador}, {empieza, termina, enOrden(id)}) → por qué se va ahora: 'termino' (terminó su turno), 'empieza' (empieza el turno de
+       quien invocó), 'fuera' (ella ya no está en el orden de turnos: su turno no va a llegar), o '' (sigue mareada). */
+  const MAREO_HASTA = 'que termine su primer turno';
+  const MAREO_HASTA_VIEJO = 'que empiece el próximo turno de ';
+  const mareoHasta = () => MAREO_HASTA;
+  const esMareoHasta = e => !!e && e.activo !== false && ('mareoDe' in e || String(e.hasta || '') === MAREO_HASTA || String(e.hasta || '').startsWith(MAREO_HASTA_VIEJO));
+  function mareoSeVa(quien, o){
+    quien = quien || {}; o = o || {};
+    if(!quien.yo || (typeof o.enOrden === 'function' && !o.enOrden(quien.yo))) return 'fuera';
+    if(o.termina && o.termina === quien.yo) return 'termino';
+    if(quien.invocador && o.empieza && o.empieza === quien.invocador) return 'empieza';
     return '';
   }
   return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, cambiarValor, reubicarAlEmpezar,
-    MAREO_HASTA_PRE, mareoHasta, esMareoHasta, mareoSeVa};
+    MAREO_HASTA, mareoHasta, esMareoHasta, mareoSeVa};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

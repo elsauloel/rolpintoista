@@ -92,8 +92,7 @@ function pegarToken(){
    cada refuerzo («una vez que ponés ejecutar, te ofrezca el mapa hacer clic donde quieras que aparezcan»). Cada uno es una copia recién llegada
    del creep (duplicarCreepDesdeMapa con `refuerzo`), visible, mirando para el mismo lado, y entra al orden de turnos con su propia tirada de
    Iniciativa (2026-11-24, dueño: «una invocación o un refuerzo, el turno en que entra, tira su iniciativa automáticamente y se ubica en el orden
-   pertinente… pero tiene Mareo de invocación hasta el inicio del próximo turno del personaje que los haya invocado»; antes entraba justo detrás de
-   quien lo llamó, con su mismo número y sin mareo). Esc o clic derecho: el primero cancela; después, termina con los que ya llegaron. */
+   pertinente…»; P327: con Mareo de invocación, no actúa en su primer turno; antes entraba justo detrás de quien lo llamó, con su mismo número y sin mareo). Esc o clic derecho: el primero cancela; después, termina con los que ya llegaron. */
 function llamarRefuerzos(sc, h){
   const cant = Math.max(1, Math.min(6, Math.round(num(h.refuerzos && h.refuerzos.cant)) || 1));
   const orig = [...tokens.entries()].find(([, t]) => t.tipo === 'creep' && t.fichaId === sc.id);
@@ -116,8 +115,8 @@ function llamarRefuerzos(sc, h){
 }
 /* 📣 El refuerzo entra al orden de turnos (2026-11-24): como una invocación (js/04 invocacionAlOrden), tira su Iniciativa (la del creep, con lo fijo
    como la Prisa sumado al resultado), la tirada va a la Mesa («Iniciativa · <refuerzo>») y entra en su lugar con OrdenTurnos.entrarConTirada (antes del
-   primero que sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima: P301). Queda con Mareo de invocación hasta que empiece el próximo
-   turno del creep que lo llamó (js/135; sin él en el orden, el mareo de antes: su primer turno). `n` = lo que devolvió duplicarCreepDesdeMapa. */
+   primero que sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima: P301). Queda con Mareo de invocación: pierde solo su primer turno
+   (se va al terminarlo o al empezar el turno del creep que lo llamó, lo que pase primero; js/135). `n` = lo que devolvió duplicarCreepDesdeMapa. */
 async function refuerzoAlOrden(idQuienLlama, idNuevo, n){
   if(!idNuevo || !soyGM || typeof iniciativa === 'undefined' || !iniciativa.orden.length) return;
   if(typeof iniciativaOcupaLugar === 'function' && tokens.has(idNuevo) && !iniciativaOcupaLugar(idNuevo)) return;   // 🎲 (2026-11-23) lo que no ocupa lugar, no entra

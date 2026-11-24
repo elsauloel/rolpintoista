@@ -2082,10 +2082,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Probabilidad de golpe.» (el texto está pensado para cuando dice «PdG»). La varita de niebla no se probó (la entrada pedía una de las dos).
   El estandarte y la nube se borraron y el creep quedó como estaba.
 
-- **⬜ en cola — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
+- **🟡 caso mostrado (2026-11-24), esperando la decisión del dueño — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
   silencio como un estado la pondría para revisar al final, porque técnicamente el silencio es un estado, pero lo revisamos en contexto más
   tarde»). Hoy, en «Ver detalle», las filas de nombres («De quién es», «Con qué se puso») no se marcan, así que «Tótem de silencio» no muestra
   el globo del estado Silencio. Mostrarle el caso y decidir juntos.
+  **Lo que se vio (2026-11-24, con clics en «Claude · pruebas 2», J1 y GM, un tótem clavado por el Blanco creep):** el tótem **no le pone el
+  estado Silencio a nadie**: es un aura de lugar que hace lo mismo (al querer usar una habilidad que cuesta SP adentro, avisa y deja seguir si la
+  mesa lo decide), pero el personaje no queda con el estado (no aparece en su ficha, no se resiste y no lo frena «Inmune a controles mentales»,
+  que sí frena al estado). La palabra sale solo en el título («🤐 Tótem de silencio») y en «Con qué se puso»; ninguna de las dos se marca. La
+  frase de arriba dice «no pueden usar habilidades que cuestan SP», sin nombrar el Silencio, y no hay fila «Estado que deja». Lo único marcado
+  en toda la tarjeta: Evasión y Defensa (en «Cómo se rompe»). El globo del estado, si se marcara, diría «Silenciado: no puede usar habilidades
+  que cuestan SP mientras dure».
+  **Opciones:** (a) dejarlo así: es un nombre, y la frase de arriba ya explica el efecto; (b) sumar a la frase de arriba «(como el estado
+  Silencio, pero por estar adentro)» con su globo, para que se entienda que es el mismo efecto sin ser el estado; (c) marcar también las filas
+  de nombres (el globo saldría también en un creep o una habilidad que se llame como un término). **Recomendación de Claude: (a)** —o (b) si
+  querés el globo—; (c) no, porque diría que el tótem pone un estado que no pone. Para decidir aparte: si el tótem debería respetar
+  «Inmune a controles mentales» como el estado.
 - **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
   (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
 - **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas

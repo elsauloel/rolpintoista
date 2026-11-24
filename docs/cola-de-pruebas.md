@@ -2812,6 +2812,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — ❤ La vida de una invocación escrita a mano no baja de 0 (P329 decidida)** (dueño, 2026-11-24: «sí»): en la ficha suelta, el
   recuadro de HP de una invocación deja escribir un negativo; que quede en 0 con el mismo aviso que GM Tools.
 
+- **⬜ en cola — 🌀 El paso gratis del Remolino cuenta como moverse (P330 decidida)** (dueño, 2026-11-24): con Apuntada, Puntería certera o Foco
+  activos, el paso de 1 casilla del Remolino antes de girar muestra el aviso «Si te movés, lo perdés» y, si sigue, lo pierde (como las otras
+  habilidades que mueven, P266/P271).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

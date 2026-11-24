@@ -102,7 +102,7 @@ const FichaEquipo = (() => {
   // igual que ya esté en el cinturón o forman una nueva. Lo que no entra queda en la mochila (y si la pila de la mochila se vacía, se va).
   // → {movidas, quedan, libre} (libre: las ranuras que quedan después).
   function alCinturon(S, it, cantidad){
-    if(!it) return {movidas: 0, quedan: 0, libre: cinturonLibre(S)};
+    if(!it) return {movidas: 0, quedan: 0, libre: cinturonLibre(S), noEntran: 0};
     const tiene = it.consumible ? Math.max(0, num(it.unidades)) : 1;
     const quiere = Math.min(tiene, cantidad === undefined ? tiene : Math.max(0, Math.round(num(cantidad))));
     const movidas = cuantasEntran(S, it, quiere);
@@ -119,13 +119,20 @@ const FichaEquipo = (() => {
       if(it.consumible) it.unidades = tiene - movidas;
       if(!it.consumible || num(it.unidades) <= 0) S.inventario = (S.inventario || []).filter(x => x !== it);
     }
-    return {movidas, quedan: (it.consumible ? Math.max(0, num(it.unidades)) : (movidas ? 0 : 1)), libre: cinturonLibre(S)};
+    // noEntran: las que se pidieron y no entraron (por el cinturón lleno). `quedan` puede ser más: con «→ Cinturón» se pide 1 y el resto
+    // de la pila se queda en la mochila porque no se pidió, no porque no entre (cola de pruebas, 2026-11-24).
+    return {movidas, quedan: (it.consumible ? Math.max(0, num(it.unidades)) : (movidas ? 0 : 1)), libre: cinturonLibre(S), noEntran: Math.max(0, quiere - movidas)};
   }
-  // El aviso de un paso al cinturón (lo mismo en la ficha y en el mapa).
+  // El aviso de un paso al cinturón (lo mismo en la ficha y en el mapa). «Lleno» solo cuando de verdad algo no entró (o quedó justo lleno).
   function textoAlCinturon(S, it, r){
-    const lleno = `el cinturón está lleno (${cinturonUsado(S)}/${capCinturon(S)})`;
-    if(!r.movidas) return `${it.nombre}: no entra, ${lleno}`;
-    return `${it.nombre}: ${r.movidas === 1 ? '1 unidad pasó' : r.movidas + ' unidades pasaron'} al cinturón` + (r.quedan ? ` · ${r.quedan} quedan en la mochila (${lleno})` : '');
+    const cuenta = `${cinturonUsado(S)}/${capCinturon(S)}`;
+    if(!r.movidas) return `${it.nombre}: no entra, el cinturón está lleno (${cuenta})`;
+    const unid = k => k === 1 ? '1 unidad' : k + ' unidades';
+    const pasaron = `${it.nombre}: ${r.movidas === 1 ? '1 unidad pasó' : r.movidas + ' unidades pasaron'} al cinturón (${cuenta})`;
+    const noEntran = r.noEntran === undefined ? 0 : num(r.noEntran);
+    if(noEntran > 0) return `${pasaron} · ${unid(noEntran)} no ${noEntran === 1 ? 'entró' : 'entraron'}: el cinturón está lleno y ${noEntran === 1 ? 'queda' : 'quedan'} en la mochila`;
+    const quedan = num(r.quedan);
+    return pasaron + (quedan ? ` · ${quedan === 1 ? 'queda 1' : 'quedan ' + quedan} en la mochila` : '') + (num(r.libre) <= 0 ? ' · el cinturón quedó lleno' : '');
   }
 
   /* ---------- Vaina (cinturón) y Correas laterales (mochila), 2026-10-05 ----------

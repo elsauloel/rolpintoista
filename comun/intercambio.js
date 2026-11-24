@@ -271,7 +271,7 @@ const Intercambio = (() => {
       if(destino === 'equipar'){ if(entraEnManos(S, nuevo)){ nuevo.equipado = true; nuevo.aMano = false; return ' (equipado en la mano)'; } return ' (a la mochila: no le quedaba una mano libre)'; }   // ✋ (2026-11-01)
       if((destino === 'mano' || (!destino && host && host.enCombate())) && nuevo.consumible && typeof FichaEquipo !== 'undefined'){   // al cinturón si entra
         const r = FichaEquipo.alCinturon(S, nuevo, num(it.unidades) || 1);
-        if(r.movidas) return ' (al cinturón)';
+        if(r.movidas) return r.noEntran ? ` (${r.movidas} al cinturón y ${r.quedan} a la mochila: el cinturón quedó lleno)` : ' (al cinturón)';
       }
       return '';
     }

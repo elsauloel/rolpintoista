@@ -61,7 +61,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261123c68"></script>
+<script src="dar-jugador.js?v=20261124c79"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -3620,7 +3620,7 @@ prueba('editor común: un consumible marcado como equipado pasa al cinturón; un
   t.ir('resumen'); t.boton('crear').click(); await espera();
   t.sacar();
   igual([S.inventario.length, S.cinturon.map(i => i.nombre + ' ' + i.equipado), S.efectos.map(e => e.nombre + ' ' + e.turnos), t.avisos.slice(-2)],
-    [0, ['Elixir false'], ['Bendición 3'], ['Elixir: 1 unidad pasó al cinturón', 'Bendición activado']]);
+    [0, ['Elixir false'], ['Bendición 3'], ['Elixir: 1 unidad pasó al cinturón (1/5)', 'Bendición activado']]);
 });
 
 grupo('Combate suelto (Parry, Bloqueo, Fuerza del golpe, Evasión, Daño)');
@@ -6008,7 +6008,29 @@ prueba('cinturón (dueño, 2026-10-04): 1 ranura = 1 unidad, base 5; lleno no en
   const otra = {...poc(1), id: 'p9', nombre: 'Pergamino de fuego'}; S.inventario = [otra];
   const r3 = FichaEquipo.alCinturon(S, otra);
   igual([r1, tras1, r2.movidas, /no entra, el cinturón está lleno \(5\/5\)/.test(txt), r3.movidas, S.inventario.length, S.cinturon.length, FichaEquipo.BASE_CINTURON],
-    [{movidas: 2, quedan: 5, libre: 0}, [5, 5, 1, 5, 5, 1], 0, true, 1, 0, 2, 5]);
+    [{movidas: 2, quedan: 5, libre: 0, noEntran: 5}, [5, 5, 1, 5, 5, 1], 0, true, 1, 0, 2, 5]);
+});
+prueba('«→ Cinturón» de a una (cola de pruebas, 2026-11-24): el aviso dice «lleno» solo si de verdad no entra; con el cinturón equipado, su tope', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const poc = (n, id) => ({id, nombre: 'Poción de vida', tipoItem: 'consumibles', consumible: true, unidades: n, ranuras: 1, curahp: 5});
+  const it = poc(4, 'm1'); S.inventario = [it]; S.cinturon = [];
+  const t1 = FichaEquipo.textoAlCinturon(S, it, FichaEquipo.alCinturon(S, it, 1));
+  S.cinturon[0].unidades = 4;                      // casi lleno: 4/5, quedan 3 en la mochila
+  const r2 = FichaEquipo.alCinturon(S, it, 1), t2 = FichaEquipo.textoAlCinturon(S, it, r2);
+  const r3 = FichaEquipo.alCinturon(S, it, 1), t3 = FichaEquipo.textoAlCinturon(S, it, r3);
+  S.cinturon[0].unidades = 3;                      // varias: pide 2 (todas), entran 2
+  const r4 = FichaEquipo.alCinturon(S, it), t4 = FichaEquipo.textoAlCinturon(S, it, r4);
+  S.cinturon[0].unidades = 4; const it5 = poc(3, 'm5'); S.inventario = [it5];   // pide 3, entra 1
+  const t5 = FichaEquipo.textoAlCinturon(S, it5, FichaEquipo.alCinturon(S, it5));
+  S.inventario.push({nombre: 'Cinturón de utilidad', tipoItem: 'cinturon', equipado: true, mods: [{stat: 'capcinturon', val: 3}]});   // con el cinturón puesto: 8
+  const t6 = FichaEquipo.textoAlCinturon(S, it5, FichaEquipo.alCinturon(S, it5, 1));
+  igual([t1, r2.noEntran, t2, r3.movidas, t3, t4, t5, t6], [
+    'Poción de vida: 1 unidad pasó al cinturón (1/5) · quedan 3 en la mochila', 0,
+    'Poción de vida: 1 unidad pasó al cinturón (5/5) · quedan 2 en la mochila · el cinturón quedó lleno', 0,
+    'Poción de vida: no entra, el cinturón está lleno (5/5)',
+    'Poción de vida: 2 unidades pasaron al cinturón (5/5) · el cinturón quedó lleno',
+    'Poción de vida: 1 unidad pasó al cinturón (5/5) · 2 unidades no entraron: el cinturón está lleno y quedan en la mochila',
+    'Poción de vida: 1 unidad pasó al cinturón (6/8) · queda 1 en la mochila']);
 });
 prueba('cinturón de un creep (2026-10-04): 5 ranuras, cargar (lleno no entra), usar cura, deja su estado y cobra 1 No2', () => {
   const sc = creepPrueba({nitros: 3, hp: 10, hpMax: 20});

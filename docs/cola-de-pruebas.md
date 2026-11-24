@@ -1986,8 +1986,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   había ningún consumible a mano subido. Probado con clics en «Claude · pruebas 2» (Jugador 1 en su ficha: un arma tiene el ⬆, el consumible no, ni al
   editarlo; el Cuchillo sí; el consumible de prueba se eliminó; GM en GM Tools: igual) y el editor del catálogo sin guardar. Pruebas automáticas 1079/1079.
 
-- **⬜ en cola — 🎒 Aviso equivocado al pasar al cinturón** (visto en la tarea de consumibles propios, 2026-11-22): al mover 1 unidad con
+- **✅ hecho (2026-11-24) — 🎒 Aviso equivocado al pasar al cinturón** (visto en la tarea de consumibles propios, 2026-11-22): al mover 1 unidad con
   «→ Cinturón», el aviso dice «el cinturón está lleno (1/5)» aunque no lo está. Revisar y corregir el texto.
+  *Resultado:* el aviso tomaba «quedan unidades en la mochila» como «no entraron», y con «→ Cinturón» (que mueve de a una) siempre quedan. Ahora
+  `FichaEquipo.alCinturon` devuelve además cuántas de las pedidas no entraron y el aviso dice «lleno» solo entonces: «1 unidad pasó al cinturón (1/5) ·
+  quedan 3 en la mochila»; la que lo llena suma «· el cinturón quedó lleno»; lleno de verdad, «no entra, el cinturón está lleno (5/5)»; si entra parte,
+  «1 unidad pasó… · 2 unidades no entraron: el cinturón está lleno y quedan en la mochila». Recibir de otro jugador al cinturón dice también cuántas
+  fueron a la mochila. Probado con clics con Blanco J1 (antes y después): de a una con el cinturón vacío, varias seguidas, casi lleno, lleno, y con el
+  Cinturón de utilidad equipado (6/8). La ficha quedó como estaba. Los creeps ya lo decían bien. Prueba nueva en `comun/pruebas.html` (1080 en verde).
 - **✅ hecho (2026-11-23) — 🤝 Revisar el botón «Dar un ítem» del «⋯» del token** (visto en la misma tarea): con un clic el ayudante no encontró el botón y
   abrió la ventana por función. Ver si el botón está y se puede tocar (se cruza con el cambio de 🎁 a 🤝).
   *Resultado:* el botón está y anda: el GM toca el token de Blanco J1, el «⋯», y ahí aparece (ahora 🤝, entre 😇 y ↩); con un clic de verdad abre «Dar

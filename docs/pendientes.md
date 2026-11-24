@@ -820,6 +820,8 @@
 
 > Una de las **tres listas** (dueño, 2026-11-24): desarrollo → `cola-de-pruebas.md`; compu → acá; diseño → `lista-de-diseno.md`.
 
+- [ ] **📜 Chequear la ficha lite** (dueño, 2026-11-24, a raíz de si Sigilo aparece como derivado de Destreza: en la ficha sí). Mirar en la
+  ficha lite (el 📜 de un token o la F en el mapa) que estén los stats derivados, Sigilo incluido, y lo que falte o sobre.
 - [x] **📋 Pegar las reglas de Firestore (2026-11-23; ✅ pegadas por el dueño el 2026-11-23): el token suelto paso a paso (iniciativa y vida) y la Trampa de teleport** — `firebase/firestore.rules`
   suma a los tokens `iniciativa` (sí / no), `hp` y `hpMax` (la vida de un objeto, de 0 a 9999), y deja que el GM los cambie en el token suelto de un
   jugador (el daño de un ataque lo escribe la pantalla del GM); de paso, `trampaDestino` en la lista de campos que se pueden crear de los elementos

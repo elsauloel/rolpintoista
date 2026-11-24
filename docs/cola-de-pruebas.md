@@ -2326,6 +2326,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🏷 Responder P316: ¿el «✎ Etiquetas» de la biblioteca usa los mismos botoncitos en vez de texto libre?** (dueño, 2026-11-24).
   Recomendación: sí (así se etiqueta la corrección de Regeneración, hoy «🏷 sin etiquetar»).
 
+- **⬜ en cola — 📒 Revisar qué es el «catálogo propio» de un personaje («+ Ítem al catálogo» de la ficha)** (dueño, 2026-11-24: «no sé a qué te
+  referís con el catálogo propio del personaje… revisar qué es eso y después revisar también el caso particular»). Explicarle al dueño qué es,
+  para qué sirve y quién lo ve (con captura); después, el caso particular: hoy deja guardar ahí un consumible «a mano» (P317: esos no van al
+  catálogo compartido). Decidir con el dueño si también se saca de ahí.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

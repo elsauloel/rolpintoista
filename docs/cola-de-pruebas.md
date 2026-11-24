@@ -2122,9 +2122,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de quien lanza el área publican en la Mesa para todos. En (1), al GM le salió «😈 La Botella de Control mental 4: … el diablito se ríe» y el cartel
   «El diablito se ríe» (o sea: le pegó a alguien); en (3), «🔮 Cabeza reducida de jíbaro de Arcano 3: Blanco J1 queda Maldito», con el nombre, antes
   de que se delatara. Capturas en la carpeta de la prueba (cola86).
-- **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
+- **✅ hecho (2026-11-24) — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
   (Shockwave, Nova arcana). Mirar la Lanza arcana (chispas solo sobre los que se ven), un cono y un área con dodge roll (el escondido se mueve solo
   en su pantalla).
+  Probado con clics en «Claude · pruebas 2» (GM de pruebas y Jugador 1, sin 👁), Blanco J1 en Sigilo y Arcano 3 lanzando (a Arcano 3 se le prestaron
+  la Bola de fuego y el Hálito polar mientras duró la prueba). (1) **Línea, Lanza arcana**, con la Abeja de J1 a la vista y J1 escondido detrás: el
+  GM vio el duelo y el dodge roll de la Abeja y nada de J1; la lanza y sus chispas, solo sobre la Abeja. J1 tuvo los dos duelos (el suyo como botón
+  abajo), ganó la Evasión y se movió fuera de la línea: el GM no vio el movimiento. (2) **Área con centro y dodge roll, Bola de fuego** sobre J1 solo:
+  al GM, «No hay nadie adentro del área»; J1 su duelo, ganó, arrastró su token 2 casillas y «logró salir»; el GM, nada. (3) **Cono, Hálito polar**
+  (con dodge roll): como el cono es el mismo que el de detección, un escondido solo puede estar adentro si está en una nube (si no, el creep ya lo
+  vio); J1 en una Niebla, a 3 casillas: el GM, «No hay nadie adentro del área»; J1 ganó la Evasión, no llegó a salir, recibió 3 (a mano, menos que
+  su Sigilo) y Escarcha, y siguió en Sigilo. En las tres, el GM sin toasts, Mesa ni Crónica del escondido. **Visto**: en la línea, mientras J1
+  resolvía el duelo de la Abeja, a los 40 s la pantalla del GM tiró sola la Evasión de J1 («solo: no contestó»): ver P321. Capturas: cola88.
 - **⬜ en cola — Probar: 🙈 el GM con 👁 Revelar lo oculto ve el duelo de un personaje escondido y lo resuelve a mano** (2026-11-22, P263).
 - **⬜ en cola — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263): solo con pruebas automáticas.
 - **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se

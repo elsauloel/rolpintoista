@@ -2606,3 +2606,12 @@ nombre, antes de que se delatara. Lo mismo pasaría con otros talismanes y anill
    **Recomendación:** que pasen (es su equipo y lo siente), pero sin nombrar a nadie: «el diablito se ríe» sin decir a quién le pegó.
 2. **Lo que le pasa al escondido por esos talismanes** (Maldito de la Cabeza reducida, el +2 de la Botella): que vaya marcado como el resto del duelo
    oculto (lo ve solo su bando, o quien lo vea). **Recomendación:** sí.
+
+### P321 — 🙈 El escondido con dos duelos a la vez: ¿cuentan los 40 segundos? (2026-11-24, Claude)
+Probado con clics: la Lanza arcana de un creep le pegó en la misma línea a la Abeja de Blanco J1 (a la vista) y a Blanco J1 (escondido). Al
+Jugador 1 se le abrió primero el duelo de la Abeja; el de Blanco J1 quedó como botón abajo («Ver ejecución…»). Mientras resolvía el de la Abeja
+(tirar la Evasión, el dodge roll), pasaron los 40 segundos y la pantalla del GM tiró sola la Evasión de Blanco J1 («solo: no contestó»). Esta vez
+salió bien (empató y ganó), pero el jugador no eligió su tirada.
+1. ¿Los 40 s tendrían que esperar mientras el jugador está resolviendo otro duelo (empezar a contar recién cuando se le abre el del escondido)?
+   **Recomendación:** sí; y si pasa mucho más (2–3 minutos), que lo resuelva solo igual.
+2. ¿O alcanza con un aviso en su pantalla antes de que se cumplan (P287, punto 4, ya lo preguntaba)?

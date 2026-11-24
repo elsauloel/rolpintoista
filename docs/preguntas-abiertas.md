@@ -2527,7 +2527,11 @@ que escribir las palabras a mano.
 **Mientras tanto (lo conservador):** las que no tienen ninguna etiqueta nueva se muestran siempre, marcadas «🏷 sin etiquetar»; una pasiva con
 etiquetas nuevas en una familia y ninguna en otra cuenta como «cualquiera» en la que le falta.
 
-### P317 — 🧪 Los consumibles que sube el grupo no se ven en el catálogo abierto (2026-11-24, Claude)
+### ✅ P317 — 🧪 Los consumibles que sube el grupo no se ven en el catálogo abierto (2026-11-24, Claude)
+
+**Dueño (2026-11-24):** pasa a la lista de diseño («no sé bien si quiero que cualquiera pueda subir consumibles»). Y **decidido**: los
+consumibles propios «a mano» **no van al catálogo**: «es para uso específico, narrativo de la partida. No quiero que nada de eso vaya al
+catálogo». O sea: un consumible a mano no se puede subir al catálogo (sin «⬆ Subir al catálogo»), y el editor del catálogo de fábrica no los ofrece.
 
 En el «Catálogo del fabricante» de la ficha (sin tienda) los consumibles se esconden salvo los esenciales; para ver uno subido por el grupo (por ejemplo un
 consumible propio «✋ a mano») hay que tocar el 👁 (ver el catálogo completo). En una tienda se ve solo si el GM lo pone.

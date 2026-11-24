@@ -32,3 +32,6 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
   dedicación de diseño»): hoy tienen 5–6 pasivas propias cada uno contra 23 del Warrior; tampoco hay ninguna de control.
 - **🔭 Diseñar «Largo alcance arcano»** (dueño, 2026-11-24): hoy da lo mismo que Vista de halcón (+1 Rango); Vista de
   halcón queda. Propuesta de partida: algo propio del Mago, p. ej. +1 al alcance solo de habilidades y varitas.
+- [ ] **🧪 ¿Quién puede subir consumibles al catálogo?** (P317, dueño, 2026-11-24: «no sé bien si quiero que cualquiera pueda subir
+  consumibles»). Ya decidido: los consumibles propios «a mano» (narrativos, de la partida) no van nunca al catálogo. Queda por pensar el resto
+  (consumibles con efectos que sube el grupo, y si se ven en el catálogo sin el 👁).

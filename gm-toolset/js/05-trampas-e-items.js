@@ -274,7 +274,7 @@ function abrirEditorArmaCreep(scId){
     draft: armaDeCreepComoDraft(sc),
     portador: () => portadorCreep(scId),
     tiers: Object.keys(TIER_COLOR),
-    botones: [{texto: '⬆ Subir al catálogo', accion: d => EditarItem.subir(d, {catalogo: catalogoGMCompleto(), alSubir: () => cargarItemsSubidosGM()})}],
+    botones: [{texto: '⬆ Subir al catálogo', alCatalogo: true, accion: d => EditarItem.subir(d, {catalogo: catalogoGMCompleto(), alSubir: () => cargarItemsSubidosGM()})}],
     onGuardar: d => {
       const actual = S.creeps.find(s => s.id === scId);
       if(!actual){ toast('Ese creep ya no está'); return true; }
@@ -301,12 +301,12 @@ function abrirItemCustomGM(){
     conRanuras: true,
     textoGuardar: 'Crear y equipar',
     botones: [{
-      texto: '⬆ Subir al catálogo',
+      texto: '⬆ Subir al catálogo', alCatalogo: true,   // 🚫 no se muestra con un consumible a mano (P317)
       accion: d => publicarEnCatalogoGM(itemComoEntradaCatalogoGM(d)),
     }],
     onGuardar: (d, scId) => {
-      // ✋ Un consumible propio no va al equipo de un creep (su cinturón usa los del catálogo): se sube al catálogo o se da a un jugador.
-      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: subilo con «⬆ Subir al catálogo» o dáselo a un jugador con 🤝 Dar a un jugador'); return false; }
+      // ✋ Un consumible propio no va al equipo de un creep (su cinturón usa los del catálogo) ni al catálogo (P317): se da a un jugador.
+      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: dáselo a un jugador con 🤝 Dar a un jugador (los consumibles a mano son de la partida: no van al catálogo)'); return false; }
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
       if(CreepCalculo.vaAlEquipo(d)){ ponerEquipoEnCreep(sc, d); const nuevo = sc.equipo[sc.equipo.length - 1]; hacerLugarEnManosCreep(sc, nuevo, true).then(() => renderAll()); }   // (una varita va al equipo; ✋ hace lugar)

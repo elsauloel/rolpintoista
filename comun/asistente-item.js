@@ -40,7 +40,8 @@
      conPresetEstado, conLugar (equipado / mochila), conMano (mano preferida)
      imagenADatos file => Promise<dataURL> — opcional (si no, se lee tal cual)
      precioTxt   d => texto extra sobre el precio — opcional
-     botones     [{texto, accion(d, boton)}] extra en el pie — opcional
+     botones     [{texto, accion(d, boton), alCatalogo?}] extra en el pie — opcional (`alCatalogo`: no se muestra con un consumible a mano, P317)
+     sinAMano    true = no se arman consumibles a mano: elegir Consumible abre cfg.onConsumible (el editor del catálogo de fábrica, P317)
      textoGuardar, onGuardar(d, destino) → false para no cerrar
      onFormulario(d) — si está, el resumen ofrece el formulario completo
      onConsumible(d) — el formulario completo de consumibles (con efectos automáticos), ofrecido en el resumen de un consumible
@@ -263,7 +264,7 @@ const AsistenteItem = (() => {
           ir(yo.api.paso() + 1);
         }
       },
-      extras: (cfg.botones || []).map((x, i) => ({id: 'extra' + i, texto: x.texto, alClic: () => { if(st === yo) x.accion(limpio(), enVentana(`[data-pap-extra="extra${i}"]`)); }})),
+      extras: (cfg.botones || []).map((x, i) => ({id: 'extra' + i, texto: x.texto, visible: x.alCatalogo ? () => !aManoEnCurso() : undefined, alClic: () => { if(st === yo) x.accion(limpio(), enVentana(`[data-pap-extra="extra${i}"]`)); }})),
       confirmarCancelar: () => JSON.stringify(yo.d) === yo.inicial ? '' : (cfg.nuevo ? '¿Cancelar? El ítem que estás armando se descarta.' : '¿Descartar los cambios de este ítem?'),
       alGuardar: () => guardar(), alCrear: () => guardar(),
       alCancelar: () => { if(st === yo) st = null; },
@@ -287,6 +288,8 @@ const AsistenteItem = (() => {
 
   function ir(i){ if(st && st.api) st.api.irA(i); }   // lo que falta lo avisa la ventana (puedeIr)
   function dibujar(){ if(st && st.api) st.api.redibujar(); }
+  // 🚫 ¿Lo que se está armando es un consumible propio a mano? Esos no van al catálogo (P317): un botón con `alCatalogo` no se muestra.
+  const aManoEnCurso = () => !!(st && st.d && (grupoDe(st.d.tipoItem) === 'consumible' || st.d.consumoAMano));
 
   function avisar(msg){
     if(typeof toast === 'function') toast(msg); else alert(msg);
@@ -833,6 +836,12 @@ const AsistenteItem = (() => {
       cerrar(); cb(copia); return;
     }
     if(ds.aaCat){
+      // `sinAMano` (el editor del catálogo de fábrica, P317): ahí no se arman consumibles a mano; Consumible va al formulario completo.
+      if(st.cfg.sinAMano && ds.aaCat === 'consumibles' && st.cfg.onConsumible){
+        const cb = st.cfg.onConsumible, copia = {...limpio(), tipoItem: 'consumibles'};
+        delete copia.consumoAMano; copia.detalle = sinNotaAMano(copia.detalle);
+        cerrar(); cb(copia); return;
+      }
       d.tipoItem = ds.aaCat;
       if(d.tipoItem === 'consumibles') d.unidades = Math.max(1, Math.round(n(d.unidades)) || 1);
       if(grupoDe(d.tipoItem) === 'arma' && !n(d.peso)) d.peso = 1;

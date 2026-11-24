@@ -409,10 +409,10 @@ input[type=checkbox]{width:auto}
 <script src="../comun/plantillas.js?v=20261111dur6"></script>
 <script src="../comun/glosario.js?v=20261123cola57"></script>
 <script src="../comun/item-corto.js?v=20261112sind2"></script>
-<script src="../comun/biblioteca.js?v=20261124tags"></script>
-<script src="../comun/combatiente.js?v=20261124c76"></script>
+<script src="../comun/biblioteca.js?v=20261124cola78"></script>
+<script src="../comun/combatiente.js?v=20261124cola78"></script>
 <script src="../comun/ficha-calculo.js?v=20261123c68"></script>   <!-- 📖 el glosario de los bonos (Defensa especial, Campo de visión…) los toma de acá (2026-11-03) -->
-<script src="../comun/paso-a-paso.js?v=20261010a"></script>
+<script src="../comun/paso-a-paso.js?v=20261124cola78"></script>
 <script src="../comun/estado-preguntas.js?v=20261104b"></script>
 <script src="../comun/estados-presets.js?v=20261120hasta2"></script>
 <script src="../comun/estados-aplicar.js?v=20261120hasta"></script>
@@ -420,8 +420,8 @@ input[type=checkbox]{width:auto}
 <script src="../comun/elegir-trampa.js?v=20261028x"></script>
 <script src="../comun/duelo.js?v=20261123cola60"></script>   <!-- solo sus estilos: el editor de la Ejecución es el cuadro del duelo (2026-10-15) -->
 <script src="../comun/asistente-duelo-hab.js?v=20261109muere"></script>   <!-- la Ejecución ✨ de un arma especial (asistente de ítems) -->
-<script src="../comun/asistente-item.js?v=20261122cola49"></script>
-<script src="../comun/editar-item.js?v=20261122cola49"></script>
+<script src="../comun/asistente-item.js?v=20261124cola78"></script>
+<script src="../comun/editar-item.js?v=20261124cola78"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -800,6 +800,7 @@ function verItem(id){
   btn.className = enTienda ? 'btn ghost' : 'btn primary';
   btn.dataset.item = item.id;
   btn.style.display = tiendaActual ? '' : 'none';
+  $('#ver-editar').style.display = Combatiente.noVaAlCatalogo(item) ? 'none' : '';   // 🚫 un consumible a mano no se sube (P317)
   $('#scrim-ver').classList.add('open');
 }
 

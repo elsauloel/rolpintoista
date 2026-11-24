@@ -537,8 +537,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **🕊️ Mensajes secretos** (2026-11-22): GM Tools carga `comun/mensajes.js` (después de `mesa.js`): el 🕊️ al pie de la Mesa, el `/m` y el 🕊️
   flotante a la izquierda de la Mesa. El GM no lee lo que se mandan dos jugadores (las reglas). Ver `comun/CLAUDE.md`.
 - **✋ Consumible propio en «✎ Ítem custom»** (2026-11-22): la categoría Consumible está (camino corto del asistente, `consumoAMano`), pero «Crear y
-  equipar» avisa que no se le equipa a un creep: se sube con ⬆ (`itemComoEntradaCatalogoGM` lo manda como consumible) o se da con 🤝 Dar a un jugador
-  (P284). El generador de tiendas guarda la marca en `agregarItemCreado`.
+  equipar» avisa que no se le equipa a un creep: se da con 🤝 Dar a un jugador (P284). Desde el 2026-11-24 (P317) no se sube al catálogo: el ⬆ no
+  aparece con un consumible y `publicarEnCatalogoGM` lo frena. El generador de tiendas guarda la marca en `agregarItemCreado`.
 
 - **💀 Un creep que cae desde GM Tools pierde sus estados** (2026-11-23, P270: «si un creep cae desde GM Tools… no debería ser así»): `gmCaidasRevisar`
   (js/11) corre al principio de `renderAll` y de cada `gmGuardarTick`, mira cada creep contra la última vida que le vio (`gmCaidaHp`) y, si pasó de

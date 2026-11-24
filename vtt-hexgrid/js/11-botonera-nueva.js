@@ -1042,7 +1042,7 @@ function bnVer(key, id){
   // Como la ficha: un ítem de un personaje que no podés guardar se edita como copia para subir ("Editar y subir"), sin Eliminar.
   const ajeno = !puede && (key === 'inventario' || key === 'cinturon');
   const editar = r.querySelector('[data-bn-ver="editar"]');
-  editar.style.display = '';
+  editar.style.display = ajeno && Combatiente.noVaAlCatalogo(it) ? 'none' : '';   // 🚫 un consumible a mano ajeno no se edita para subir (P317)
   editar.textContent = ajeno ? '✎ Editar y subir' : 'Editar';
   editar.title = ajeno ? 'Editá una copia y subila al catálogo compartido (no cambia este ítem)' : '';
   r.querySelector('[data-bn-ver="borrar"]').style.display = puede ? '' : 'none';

@@ -107,6 +107,7 @@ const EditarItem = (() => {
   /* ---------- Subir ---------- */
   function subir(item, op){
     op = op || {};
+    if(item && item.consumoAMano){ avisar('Los consumibles a mano son de la partida: no van al catálogo'); return; }   // 🚫 P317
     if(!disponible()){ avisar('La biblioteca compartida no está disponible en esta página'); return; }
     const d = completar(item, op.catalogo);
     if(!String(d.nombre || '').trim()){ avisar('Poné un nombre antes de subirlo al catálogo'); return; }
@@ -120,6 +121,7 @@ const EditarItem = (() => {
   /* ---------- Editar y subir ---------- */
   function abrir(cfg){
     if(!cfg || !cfg.item) return;
+    if(cfg.item.consumoAMano){ avisar('Los consumibles a mano son de la partida: no van al catálogo'); return; }   // 🚫 P317
     const copia = normalizar(cfg.item);
     const cat = delCatalogo(copia, cfg.catalogo);
     const completa = completar(cfg.item, cfg.catalogo);

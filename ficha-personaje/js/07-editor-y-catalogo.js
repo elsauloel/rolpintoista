@@ -523,7 +523,7 @@ function openViewer(key, id){
   const ajeno = verItemAjeno(key);
   $('#view-edit-btn').textContent = ajeno ? '✎ Editar y subir' : 'Editar';
   $('#view-edit-btn').title = ajeno ? 'Editá una copia y subila al catálogo compartido (no cambia este ítem)' : '';
-  $('#view-edit-btn').style.display = '';
+  $('#view-edit-btn').style.display = ajeno && Combatiente.noVaAlCatalogo(it) ? 'none' : '';   // 🚫 un consumible a mano ajeno no se edita para subir (P317)
   $('#view-del-btn').style.display = ajeno ? 'none' : '';
   $('#view-baja-btn').style.display = (key === 'catalogo' && ajeno) ? '' : 'none';
   $('#scrim-view').classList.add('open');

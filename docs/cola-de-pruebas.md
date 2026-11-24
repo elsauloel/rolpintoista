@@ -1973,8 +1973,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   consume igual que la original (−1 No2, la Mesa «usó … · ✋ a mano: lo resuelve la mesa», en 0 desaparece). Al final el Jugador 1 la descartó con
   «🗑 Descartar» en la Auditoría de lo subido (la biblioteca quedó sin nada de prueba) y su ficha volvió a como estaba. Pruebas automáticas 1078/1078.
 
-- **⬜ en cola — Probar: un consumible propio en el editor del catálogo (`datos/catalogo-editor.html`)** (2026-11-22): no se abrió; ver que se
+- **✅ hecho (2026-11-24): ya no aplica — Probar: un consumible propio en el editor del catálogo (`datos/catalogo-editor.html`)** (2026-11-22): no se abrió; ver que se
   guarde como consumible con su marca ✋.
+  *Resultado:* el catálogo de fábrica no lleva consumibles a mano (P317): en el editor, elegir Consumible abre el formulario de siempre (con efectos), sin ✋;
+  visto con clics sin guardar nada (el catálogo quedó igual, 1530 ítems, sin ninguna escritura).
+- **✅ hecho (2026-11-24) — 🧪 Los consumibles a mano no van al catálogo (P317)** (dueño, 2026-11-24: «es para uso específico, narrativo de la partida. No
+  quiero que nada de eso vaya al catálogo»). *Resultado:* un consumible propio «a mano» ya no muestra «⬆ Subir al catálogo» en ningún lado: el asistente de
+  ítems (al elegir Consumible el botón desaparece; vuelve si se elige otra categoría), el editor de la mochila y el cinturón de la ficha, «✎ Ítem custom» de
+  GM Tools, y el «✎ Editar y subir» del Ver (ficha, Botonera del mapa, GM Tools y tienda) no aparece para esos ítems. Si algún camino lo intenta igual, no
+  sube y avisa «Los consumibles a mano son de la partida: no van al catálogo» (`Combatiente.noVaAlCatalogo`, y la última puerta en `Biblioteca.guardar`).
+  El resto de los ítems sube como siempre. En «✎ Ítem custom», el aviso de «no se le equipa a un creep» ahora dice que se da con 🤝. En la biblioteca no
+  había ningún consumible a mano subido. Probado con clics en «Claude · pruebas 2» (Jugador 1 en su ficha: un arma tiene el ⬆, el consumible no, ni al
+  editarlo; el Cuchillo sí; el consumible de prueba se eliminó; GM en GM Tools: igual) y el editor del catálogo sin guardar. Pruebas automáticas 1079/1079.
 
 - **⬜ en cola — 🎒 Aviso equivocado al pasar al cinturón** (visto en la tarea de consumibles propios, 2026-11-22): al mover 1 unidad con
   «→ Cinturón», el aviso dice «el cinturón está lleno (1/5)» aunque no lo está. Revisar y corregir el texto.

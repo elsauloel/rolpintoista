@@ -15,7 +15,7 @@
      alClic?(e, api), alInput?(e, api), alCambio?(e, api), alTecla?(e, api): los eventos del contenido (el elemento real es e.composedPath()[0]),
      alGuardar?(api) / alCrear?(api) → false para no cerrar (puede ser una promesa),
      alCancelar?(api), confirmarCancelar?: texto (o función → texto, '' = no preguntar) antes de descartar (por defecto, solo al crear),
-     extras?: [{id, texto, alClic(api)}] botones más en el pie (a la izquierda de Siguiente),
+     extras?: [{id, texto, alClic(api), visible?(api)}] botones más en el pie (a la izquierda de Siguiente; `visible` falso = no se dibuja),
      textoCrear?, textoGuardar?, ancho? (px, 1100; o 'completo' = toda la pantalla), z? (z-index, 90), contenedor? (un elemento o un ShadowRoot: adentro de los recuadros
        del mapa; por defecto, document.body), aislado? (los clics y teclas no salen de la ventana; por defecto, sí adentro de un ShadowRoot,
        para que el recuadro del mapa no los atienda también).
@@ -135,7 +135,7 @@ const PasoAPaso = (() => {
           ${avisoTxt ? `<div class="pap-aviso">${esc(avisoTxt)}</div>` : ''}${p.ayuda ? `<p class="pap-ayuda">${p.ayuda}</p>` : ''}
           <div class="pap-paso"></div></div>
         <div class="pap-pie"><button type="button" class="pap-btn tenue" data-pap="atras"${actual === 0 ? ' disabled' : ''}>← Atrás</button>
-          <span class="der">${(o.extras || []).map(x => `<button type="button" class="pap-btn" data-pap-extra="${esc(x.id)}">${esc(x.texto)}</button>`).join('')}
+          <span class="der">${(o.extras || []).filter(x => !x.visible || x.visible(api)).map(x => `<button type="button" class="pap-btn" data-pap-extra="${esc(x.id)}">${esc(x.texto)}</button>`).join('')}
             ${ultimo ? '' : `<button type="button" class="pap-btn${o.crear ? ' primario' : ''}" data-pap="sig">Siguiente →</button>`}
             ${o.crear ? (ultimo ? `<button type="button" class="pap-btn primario" data-pap="crear">${esc(o.textoCrear || '✔ Crear')}</button>` : '')
               : `<button type="button" class="pap-btn primario" data-pap="guardar">${esc(o.textoGuardar || 'Guardar')}</button>`}</span></div>`;

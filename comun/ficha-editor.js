@@ -259,6 +259,7 @@ const FichaEditor = (() => {
      (mismo id, o mismo nombre), se puede elegir que sea una CORRECCIÓN de ese ítem: lo reemplaza para todos.
      `key` = 'catalogo' si es un ítem del catálogo (se sube tal cual); si no, es un ítem de un personaje (mochila, cinturón). */
   function subirAlCatalogo(S, draft, key, {toast, alSubir}){
+    if(Combatiente.noVaAlCatalogo(draft)){ toast(Combatiente.CONSUMO_A_MANO_NO_SUBE); return; }   // 🚫 P317
     if(!String(draft.nombre || '').trim()){ toast('Poné un nombre antes de subirlo al catálogo'); return; }
     if(!draft.tipoItem){ toast('Elegí una categoría antes de subirlo al catálogo'); return; }
     const datos = key === 'catalogo' ? structuredClone(draft) : itemComoEntradaDeCatalogo(draft);
@@ -801,7 +802,7 @@ const FichaEditor = (() => {
         alGuardar: () => { guardar(); }, alCrear: () => { guardar(); },
         alCancelar: () => cerrar(),
         extras: [
-          ...(esItem ? [{id: 'catalogo', texto: '⬆ Subir al catálogo', alClic: () => { if(editing === ed) subirAlCatalogo(S(), ed.draft, ed.key, {toast, alSubir: ctx.alSubirCatalogo}); }}] : []),
+          ...(esItem ? [{id: 'catalogo', texto: '⬆ Subir al catálogo', visible: () => !Combatiente.noVaAlCatalogo(ed.draft), alClic: () => { if(editing === ed) subirAlCatalogo(S(), ed.draft, ed.key, {toast, alSubir: ctx.alSubirCatalogo}); }}] : []),
           ...(ed.id ? [{id: 'eliminar', texto: 'Eliminar', alClic: () => eliminar()}] : []),
         ],
       });
@@ -1102,7 +1103,7 @@ Catálogo: ${c.detalle || '—'}`, {titulo: 'Actualizar desde el catálogo', si:
         conMano: enInventario,
         textoGuardar: original ? 'Guardar' : 'Crear',
         botones: [
-          ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirAlCatalogo(S(), AsistenteItem.fusionar(base, d), 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
+          ...(enInventario ? [{texto: '⬆ Subir al catálogo', alCatalogo: true, accion: d => subirAlCatalogo(S(), AsistenteItem.fusionar(base, d), 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
           ...(enInventario && original && difiereDelCatalogo(original) ? [{texto: '↻ Actualizar desde el catálogo', accion: async () => {
             if(!(await actualizarDesdeCatalogo(key, id))) return;
             AsistenteItem.cerrar(); ctx.alCambiar([key]); toast(`↻ ${original.nombre}: actualizado con la versión del catálogo`);

@@ -120,7 +120,11 @@ versión parecida en más de una, es candidato a juntar.
   rival sigue siendo manual a propósito — la herramienta solo recuerda y
   tira, no toca el estado del objetivo.
 - **`asistente-item.js`** (`AsistenteItem`) — crear o editar un ítem de
-  equipo paso a paso (los consumibles, solo los propios «a mano»: ver abajo, 2026-11-22): categoría y descripción → lo
+  equipo paso a paso (los consumibles, solo los propios «a mano»: ver abajo, 2026-11-22; **no van al catálogo**, P317, 2026-11-24:
+  un botón de `cfg.botones` con `alCatalogo: true` no se muestra mientras se arma un consumible, y `cfg.sinAMano` —el editor del catálogo
+  de fábrica— manda Consumible directo a `cfg.onConsumible`; la regla es `Combatiente.noVaAlCatalogo(item)` / `CONSUMO_A_MANO_NO_SUBE`, y la
+  respetan `FichaEditor.subirAlCatalogo`, `EditarItem.subir`/`abrir`, `publicarEnCatalogoGM` y, como última puerta, `Biblioteca.guardar`
+  con `tipo: 'items'`; `paso-a-paso.js` acepta `extras[].visible(api)`): categoría y descripción → lo
   práctico según la categoría (armas: Tipo, empuñadura, peso/daño, bonos,
   efectos al golpear; defensa: Defensa y resistencias a crítico; el resto:
   bonos) → estado al equipar, precio/lugar → resumen. Lo usan

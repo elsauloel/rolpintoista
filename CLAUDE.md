@@ -221,6 +221,10 @@ Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.m
   `comun/asistente-item.js`. Desde el 2026-11-22 incluye los **consumibles
   propios, a mano** (`consumoAMano`: sin efectos automáticos, la mesa lo
   resuelve); los consumibles de fábrica con efectos siguen en el formulario.
+  **Los consumibles a mano son de la partida: no van al catálogo** (P317,
+  2026-11-24): sin «⬆ Subir al catálogo» (`Combatiente.noVaAlCatalogo`;
+  un botón del asistente con `alCatalogo` se esconde) y el editor del
+  catálogo de fábrica no los ofrece (`sinAMano`).
 - Los efectos de arma que se aplican al personaje **golpeado** (Rompe
   armadura, Envenenar, Sangrado…) van en `efectosGolpe` del arma: al tirar
   el Daño se **recuerdan** resaltados en la Mesa y, si tienen porcentaje,

@@ -131,6 +131,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-creep-base.js?v=20261121muro"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
 <script src="biblioteca.js?v=20261124tags"></script>
+<script src="editar-item.js"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script src="no-visto.js?v=20261123esc"></script>
@@ -4680,6 +4681,28 @@ prueba('asistente de ítems en la ventana común: sin categoría ni nombre no av
   clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
   igual([aviso, pestanas[1], titulo, guardado && guardado.nombre, guardado && guardado.tipoDado, AsistenteItem.abierto(), mia.isConnected],
     ['Primero elegí qué tipo de ítem es', '2. Tipo', `Ítem nuevo · paso ${pestanas.length} de ${pestanas.length}: Listo`, 'Hacha de prueba', 6, false, false]);
+});
+prueba('🚫 los consumibles a mano no van al catálogo (P317): sin «⬆ Subir» en el asistente, el editor de fábrica los manda al formulario y nada los sube', async () => {
+  const pie = () => [...[...document.querySelectorAll('.pap')].pop().querySelectorAll('[data-pap-extra]')].map(b => b.textContent);
+  const botones = [{texto: '⬆ Subir al catálogo', alCatalogo: true, accion: () => {}}, {texto: 'Otro', accion: () => {}}];
+  AsistenteItem.abrir({contexto: 'ficha', nuevo: true, stats: [], botones, onGuardar: () => true});
+  const mia = [...document.querySelectorAll('.pap')].pop();
+  mia.querySelector('[data-aa-cat="arma_1m"]').click(); const conArma = pie();
+  mia.querySelector('[data-aa-cat="consumibles"]').click(); const conCons = pie();
+  AsistenteItem.cerrar();
+  let alFormulario = null;
+  AsistenteItem.abrir({contexto: 'catalogo', nuevo: true, stats: [], sinAMano: true, onConsumible: d => { alFormulario = d; }, onGuardar: () => true});
+  [...document.querySelectorAll('.pap')].pop().querySelector('[data-aa-cat="consumibles"]').click();
+  const cerrado = !AsistenteItem.abierto();
+  const avisos = []; const t0 = window.toast; window.toast = m => avisos.push(m);
+  const subidas = []; const g0 = Biblioteca.guardar; Biblioteca.guardar = o => subidas.push(o);
+  try{
+    EditarItem.subir({nombre: 'Poción rara', tipoItem: 'consumibles', consumible: true, consumoAMano: true}, {catalogo: []});
+    EditarItem.abrir({item: {nombre: 'Poción rara', tipoItem: 'consumibles', consumible: true, consumoAMano: true}, catalogo: []});
+    FichaEditor.subirAlCatalogo({catalogo: []}, {nombre: 'Poción rara', tipoItem: 'consumibles', consumible: true, consumoAMano: true}, 'inventario', {toast: m => avisos.push(m)});
+  } finally { window.toast = t0; Biblioteca.guardar = g0; }
+  igual([conArma, conCons, cerrado, alFormulario && alFormulario.tipoItem, alFormulario && alFormulario.consumoAMano, subidas.length, avisos.length, avisos[0], Combatiente.noVaAlCatalogo({consumoAMano: true}), Combatiente.noVaAlCatalogo({tipoItem: 'consumibles', curahp: 5})],
+    [['⬆ Subir al catálogo', 'Otro'], ['Otro'], true, 'consumibles', undefined, 0, 3, 'Los consumibles a mano son de la partida: no van al catálogo', true, false]);
 });
 prueba('asistente de ítems: una varita del catálogo se edita como arma especial (sin Tipo ni daño físico) y conserva su hechizo', async () => {
   let guardado = null;

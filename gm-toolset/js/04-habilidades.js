@@ -178,6 +178,7 @@ function verItemDatos(item){
   const delCatalogo = !!(item.id && catalogoGMCompleto().some(c => c.id === item.id));
   $('#veritem-baja').style.display = delCatalogo ? '' : 'none';
   $('#veritem-dar').style.display = itemDelCatalogoGM(item) && fbMiembro && fbMiembro.gm ? '' : 'none';   // 🤝 (comun/dar-jugador.js, 2026-11-21)
+  $('#veritem-editar').style.display = Combatiente.noVaAlCatalogo(item) ? 'none' : '';   // 🚫 un consumible a mano no se sube (P317)
   $('#scrim-ver-item').classList.add('open');
 }
 
@@ -329,6 +330,7 @@ function slugItemCatalogo(s){
 // ⬆ Sube un ítem al catálogo compartido (biblioteca de Firebase, tipo `items`; paso 5 de docs/plan-subida-unificada.md):
 // disponible al instante para todos. Si tiene el nombre de un ítem del catálogo, se puede elegir que sea una corrección.
 function publicarEnCatalogoGM(nuevo){
+  if(Combatiente.noVaAlCatalogo(nuevo)){ toast(Combatiente.CONSUMO_A_MANO_NO_SUBE); return; }   // 🚫 P317
   const cat = ItemsSubidos.mezclar(structuredClone(CATALOGO_BASE), itemsSubidosGM);
   Biblioteca.guardar({tipo: 'items', datos: nuevo, nombre: nuevo.nombre, nivel: 0, basadoEn: ItemsSubidos.basadoEn(nuevo, cat),
     alSubir: () => cargarItemsSubidosGM()});

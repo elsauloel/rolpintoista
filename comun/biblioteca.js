@@ -517,6 +517,8 @@ const Biblioteca = (() => {
    */
   function guardar(opts){
     if(!hayMesa()){ aviso('Entrá primero a una partida para usar la biblioteca.'); return; }
+    // 🚫 Un consumible propio a mano es de la partida: no va al catálogo (P317). La última puerta, por si algún camino lo intenta igual.
+    if(opts.tipo === 'items'){ const d = opts.datosPara ? opts.datosPara('nuevo') : opts.datos; if(d && d.consumoAMano){ aviso('Los consumibles a mano son de la partida: no van al catálogo'); return; } }
     asegurarVentana();
     const tipo = opts.tipo;
     const q = id => document.getElementById(id);

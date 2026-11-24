@@ -2066,10 +2066,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   sin vibrar). **`/r texto`** responde al último que te mandó un secreto. Probado con clics con las tres cuentas en «Claude · pruebas 2» (los
   renglones «Probar: 🕊️ …» de arriba), con video de la paloma vibrando y el aviso. Los mensajes de prueba se borraron. Dudas: P318. Pruebas
   automáticas: 1090 en verde.
-- **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de una zona con daño** (2026-11-22): el Muro de fuego (o una zona con daño de elemento) en el
+- **✅ hecho (2026-11-24) — Probar: 📖 glosario en «Ver detalle» de una zona con daño** (2026-11-22): el Muro de fuego (o una zona con daño de elemento) en el
   mapa: que se marquen Defensa, Defensa especial y la resistencia al elemento en «Qué frena el daño», y Suela gruesa si es del piso.
-- **⬜ en cola — Probar: 📖 glosario en «Ver detalle» de un estandarte y de una nube** (2026-11-22): el Estandarte de guerra (PdG / Probabilidad de
+  Probado con clics en «Claude · pruebas 2»: el Blanco creep levantó un Muro de fuego de 4 casillas desde la Botonera; «Ver detalle» desde el GM
+  y desde el Jugador 1. En «Qué frena el daño» salen marcadas, cada una con su globo al pasar el mouse, **Defensa**, **Defensa especial**,
+  **resistencia al fuego** (el globo dice que es lo único que frena el daño directo de ese elemento) y **Suela gruesa** (es del piso). En el
+  resto de la tarjeta: Quemadura, Fuego amigo y «vuela» (en Altura); el GM ve además «daño de fuego directo» en la descripción de la habilidad
+  (el jugador no la ve: es de un creep). Cada término una sola vez. Nada que arreglar. El muro se borró y el creep quedó como estaba.
+- **✅ hecho (2026-11-24) — Probar: 📖 glosario en «Ver detalle» de un estandarte y de una nube** (2026-11-22): el Estandarte de guerra (PdG / Probabilidad de
   Golpe) y la nube de una Bomba de humo o de la varita.
+  Probado con clics en «Claude · pruebas 2», desde el GM y desde el Jugador 1: **Estandarte de guerra** (lo clavó el Blanco creep): se marcan
+  **Probabilidad de Golpe** (en la frase de arriba), **Evasión** y **Defensa** (en «Cómo se rompe»), con su globo. **Bomba de humo** (la del
+  Blanco creep): se marcan **Fuego amigo** y **Sigilo** (en «Estado que deja»); el GM ve además «por la espalda» en la descripción. Los globos
+  quedan por encima de la tarjeta y se leen enteros. Detalle menor, sin tocar: el globo de «Probabilidad de Golpe» empieza repitiendo
+  «Probabilidad de golpe.» (el texto está pensado para cuando dice «PdG»). La varita de niebla no se probó (la entrada pedía una de las dos).
+  El estandarte y la nube se borraron y el creep quedó como estaba.
 
 - **⬜ en cola — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
   silencio como un estado la pondría para revisar al final, porque técnicamente el silencio es un estado, pero lo revisamos en contexto más

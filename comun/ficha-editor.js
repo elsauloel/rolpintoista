@@ -95,6 +95,7 @@ const FichaEditor = (() => {
       precioCompra: num(draft.precioCompra),
       unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
       consumible: !!draft.consumible, curahp: num(draft.curahp), curaspPct: num(draft.curaspPct),
+      ...(draft.consumoAMano ? {consumoAMano: true} : {}),   // ✋ un consumible propio sigue siendo «a mano» en el catálogo (2026-11-24)
       efectoNombre: draft.efectoNombre || '', efectoTurnos: num(draft.efectoTurnos),
       efectoHpTurno: num(draft.efectoHpTurno), efectoEscudo: num(draft.efectoEscudo), efectoStacks: Math.max(1, num(draft.efectoStacks) || 1), efectoPermanente: !!draft.efectoPermanente,
       efectoDetalle: draft.efectoDetalle || '', efectoMods: structuredClone(draft.efectoMods || []),

@@ -11,11 +11,17 @@
     if(!el.classList || !el.classList.contains('scrim')) return;
     const abierta = el.classList.contains('open'), antes = String(c.oldValue || '').split(/\s+/).includes('open');
     if(abierta === antes) return;
-    el.style.zIndex = '';   // su capa de siempre (al cerrarse, queda así)
+    // Vuelve a su capa de siempre (al cerrarse, queda así). Solo se deshace lo que subió este archivo: una capa propia puesta en la
+    // ventana (`style="z-index:99700"`, como la de ⬆ Subir a la biblioteca, que tiene que quedar encima del asistente de ítems) se respeta
+    // (2026-11-24: antes se borraba y «⬆ Subir al catálogo» quedaba detrás del asistente, sin poder tocarse).
+    if(el.dataset.capaZ !== undefined){
+      if(el.style.zIndex === el.dataset.capaZ) el.style.zIndex = el.dataset.capaAntes || '';
+      delete el.dataset.capaZ; delete el.dataset.capaAntes;
+    }
     if(!abierta) return;
     const otras = [...document.querySelectorAll('.scrim.open')].filter(x => x !== el).map(zDe);
     const max = otras.length ? Math.max(...otras) : -Infinity;
-    if(max >= zDe(el)) el.style.zIndex = String(max + 1);
+    if(max >= zDe(el)){ el.dataset.capaAntes = el.style.zIndex; el.style.zIndex = String(max + 1); el.dataset.capaZ = el.style.zIndex; }
   }));
   const iniciar = () => obs.observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class'], attributeOldValue: true});
   if(document.body) iniciar(); else document.addEventListener('DOMContentLoaded', iniciar);

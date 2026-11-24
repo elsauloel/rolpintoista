@@ -117,6 +117,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261122cola49"></script>
 <script src="ficha-editor.js"></script>
+<script src="capas.js"></script>
 <script src="creep-lupa.js?v=20261122prisa5"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js"></script>
@@ -3539,6 +3540,25 @@ prueba('los pasos de una habilidad dependen de cómo se ejecuta; lo del sistema 
 prueba('un ítem de la mochila convertido en entrada de catálogo: id del nombre, sin lo de la instancia', () => {
   const e = FichaEditor.itemComoEntradaDeCatalogo({nombre: 'Hacha Ñandú', tipoItem: 'arma_1m', peso: 2, tipoDado: 10, equipado: true, cargaActual: 1, mods: [{stat: '', val: 1}, {stat: 'pdg', val: 1}]});
   igual([e.id, e.tier, e.tipoDado, e.equipado, e.cargaActual, e.mods], ['new-hacha-nandu', 'A definir', 10, undefined, undefined, [{stat: 'pdg', val: 1}]]);
+});
+prueba('⬆ un consumible propio subido desde la mochila sigue siendo «✋ a mano» en el catálogo (2026-11-24)', () => {
+  const e = FichaEditor.itemComoEntradaDeCatalogo({nombre: 'Poción rara', tipoItem: 'consumibles', consumible: true, consumoAMano: true, unidades: 2, detalle: 'Ve el futuro. ✋ A mano: el efecto lo resuelve la mesa.'});
+  const comun = FichaEditor.itemComoEntradaDeCatalogo({nombre: 'Poción común', tipoItem: 'consumibles', consumible: true, curahp: 5});
+  igual([e.consumoAMano, e.unidades, Combatiente.consumoAMano(e), 'consumoAMano' in comun], [true, 2, true, false]);
+});
+prueba('🪟 capas: una ventana con su capa propia (z-index en el HTML) no la pierde al abrirse encima de otra (2026-11-24)', async () => {
+  const pap = document.createElement('div'); pap.style.cssText = 'position:fixed;z-index:95;display:none'; document.body.appendChild(pap);
+  const a = document.createElement('div'); a.className = 'scrim'; a.style.cssText = 'position:fixed;z-index:50;display:none'; document.body.appendChild(a);
+  const b = document.createElement('div'); b.className = 'scrim'; b.style.zIndex = '99700'; b.style.position = 'fixed'; b.style.display = 'none'; document.body.appendChild(b);
+  const c = document.createElement('div'); c.className = 'scrim'; c.style.cssText = 'position:fixed;z-index:50;display:none'; document.body.appendChild(c);
+  const tic = () => new Promise(r => setTimeout(r, 0));
+  b.classList.add('open'); await tic(); const zB = b.style.zIndex;
+  a.classList.add('open'); c.classList.add('open'); await tic(); const zC = c.style.zIndex;
+  c.classList.remove('open'); await tic(); const zCcerrada = c.style.zIndex;
+  b.classList.remove('open'); await tic(); const zBcerrada = b.style.zIndex;
+  b.classList.add('open'); await tic(); const zB2 = b.style.zIndex;
+  [pap, a, b, c].forEach(x => x.remove());
+  igual([zB, zC, zCcerrada, zBcerrada, zB2], ['99700', '99702', '50', '99700', '99702']);
 });
 
 // El componente del editor en un recuadro de prueba (fuera de la pantalla): abrir, cambiar campos, guardar y eliminar.

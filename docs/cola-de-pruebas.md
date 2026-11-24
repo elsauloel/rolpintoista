@@ -1963,8 +1963,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   probado con clics en «Claude · pruebas 2» (8 de daño, Defensa especial 6, Aguante +2, Armas perforantes 3): antes entraba 1, ahora 3; sin el Aguante,
   3; sin Perfora, igual que siempre (lo frena entero). Pruebas automáticas en verde (1076).
 
-- **⬜ en cola — Probar: ⬆ Subir al catálogo un consumible propio** (2026-11-22, de los consumibles a mano): no se probó con clics para no
+- **✅ hecho (2026-11-24) — Probar: ⬆ Subir al catálogo un consumible propio** (2026-11-22, de los consumibles a mano): no se probó con clics para no
   sumar un ítem de prueba a la biblioteca compartida. Ver que suba con su «✋ A mano» y que, tomado del catálogo, se consuma igual.
+  *Resultado:* había dos fallas, arregladas: (1) en la ficha, la ventana «⬆ Subir a la biblioteca» se abría **detrás** del asistente de ítems y no se podía
+  tocar (`comun/capas.js` le borraba su capa propia; ahora la respeta: vale para cualquier ítem y también en GM Tools); (2) al subirlo desde la mochila se
+  perdía la marca ✋ (`itemComoEntradaDeCatalogo`): en el catálogo salía «+0 HP al consumir» y la copia tomada ya no era «a mano». Con los arreglos, probado
+  con clics en «Claude · pruebas 2» (Jugador 1, «Poción de prueba (borrar)», 2 unidades): subió 🔶 sin auditar; en el catálogo (con el 👁: los consumibles
+  que no son esenciales no se ven sin él, P317) y su Ver dice «2 unidades · ✋ el efecto lo resuelve la mesa»; comprada a 0 DDE, la copia es ✋ a mano y se
+  consume igual que la original (−1 No2, la Mesa «usó … · ✋ a mano: lo resuelve la mesa», en 0 desaparece). Al final el Jugador 1 la descartó con
+  «🗑 Descartar» en la Auditoría de lo subido (la biblioteca quedó sin nada de prueba) y su ficha volvió a como estaba. Pruebas automáticas 1078/1078.
 
 - **⬜ en cola — Probar: un consumible propio en el editor del catálogo (`datos/catalogo-editor.html`)** (2026-11-22): no se abrió; ver que se
   guarde como consumible con su marca ✋.

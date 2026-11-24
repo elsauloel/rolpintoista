@@ -2526,3 +2526,13 @@ que escribir las palabras a mano.
 
 **Mientras tanto (lo conservador):** las que no tienen ninguna etiqueta nueva se muestran siempre, marcadas «🏷 sin etiquetar»; una pasiva con
 etiquetas nuevas en una familia y ninguna en otra cuenta como «cualquiera» en la que le falta.
+
+### P317 — 🧪 Los consumibles que sube el grupo no se ven en el catálogo abierto (2026-11-24, Claude)
+
+En el «Catálogo del fabricante» de la ficha (sin tienda) los consumibles se esconden salvo los esenciales; para ver uno subido por el grupo (por ejemplo un
+consumible propio «✋ a mano») hay que tocar el 👁 (ver el catálogo completo). En una tienda se ve solo si el GM lo pone.
+
+**Pregunta:** ¿un consumible subido por el grupo debería verse en el catálogo abierto sin el 👁? **Recomendación:** sí, los subidos por el grupo (son pocos
+y alguien los subió para usarlos).
+
+**Mientras tanto (lo conservador):** queda como está: se ven con el 👁.

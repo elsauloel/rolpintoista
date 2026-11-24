@@ -76,12 +76,22 @@ const Mensajes = (() => {
     const c = comando(texto);
     if(!c) return null;
     const resto = c.resto;
-    if(c.cmd === 'r') return {responder: true, persona: (o && o.ultimo) || null, texto: resto.trim(), resto};
+    if(c.cmd === 'r'){
+      // P318.4 (dueño, 2026-11-24: «habría que corregirlo»): si después de /r viene el nombre de alguien de la partida, no va como texto: se
+      // le responde a esa persona (sin el nombre en el mensaje). Si no, al último que me escribió.
+      const n = calzar(resto, pers);
+      if(n && n.persona) return {responder: true, persona: n.persona, porNombre: true, texto: n.texto, resto};
+      return {responder: true, persona: (o && o.ultimo) || null, texto: resto.trim(), resto};
+    }
+    return calzar(resto, pers, o) || {persona: null, texto: '', resto};
+  }
+  // El nombre más largo (de persona o personaje) con el que empieza `resto` → {persona, por, texto, resto}, {ambiguo…} o null si no calza ninguno.
+  function calzar(resto, pers, o){
     const calzan = candidatos(pers, o).filter(k => {
       const n = k.nombre;
       return n && resto.length >= n.length && norm(resto.slice(0, n.length)) === norm(n) && (resto.length === n.length || /[\s:,]/.test(resto[n.length]));
     });
-    if(!calzan.length) return {persona: null, texto: '', resto};
+    if(!calzan.length) return null;
     const largo = Math.max(...calzan.map(k => k.nombre.length));
     const mejores = calzan.filter(k => k.nombre.length === largo);
     const uids = [...new Set(mejores.map(k => k.uid))];
@@ -179,7 +189,7 @@ const Mensajes = (() => {
       <button type="button" class="momento-x" data-momento-cerrar="${e(k)}" title="Cerrar (el mensaje queda en el 🕊️)">✕</button>
       <div class="msj-cronica-tit">🕊️ ¡Mensaje secreto!</div>
       <div class="msj-cronica-de">de <b>${e(m.deNombre || '?')}</b></div>
-      <div class="msj-cronica-txt">${e(String(m.texto || '').length > 220 ? String(m.texto).slice(0, 217) + '…' : m.texto)}</div>
+      <div class="msj-cronica-txt">${e(m.texto)}</div>
       <div class="msj-cronica-pie">🔒 Solo para vos · tocá para responder</div>
     </div>`;
   }
@@ -244,7 +254,7 @@ const Mensajes = (() => {
 .msj-cronica .momento-x{color:#ffe3f3!important}
 .msj-cronica-tit{font-weight:800;font-size:15px;letter-spacing:.03em;text-shadow:0 0 8px rgba(255,255,255,.6);padding-right:18px}
 .msj-cronica-de{margin-top:2px;font-size:12.5px}
-.msj-cronica-txt{margin-top:5px;background:rgba(0,0,0,.25);border-radius:6px;padding:6px 8px;white-space:pre-wrap;word-break:break-word}
+.msj-cronica-txt{margin-top:5px;background:rgba(0,0,0,.25);border-radius:6px;padding:6px 8px;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow-y:auto}
 .msj-cronica-pie{margin-top:5px;font-size:11px;opacity:.9}
 .mensajes-boton-mesa{flex:0 0 auto;font-size:15px!important;padding-left:9px!important;padding-right:9px!important}
 #msj-flotante{z-index:44;width:58px;height:58px;border-radius:50%;border:2px solid #ffb3e0;cursor:pointer;font-size:27px;line-height:1;color:#fff;

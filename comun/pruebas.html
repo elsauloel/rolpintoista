@@ -137,7 +137,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261123cola57"></script>
-<script src="mensajes.js?v=20261124msj"></script>
+<script src="mensajes.js?v=20261124msj2"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -10714,7 +10714,9 @@ grupo('✉ Mensajes secretos');
     igual(M.ultimoQueMeEscribio([m('2', 'yo', ['j1'], 900)], 'yo'), '');
     const gm = P.find(x => x.uid === 'gm');
     const r = M.parsear('/r dale, voy', P, {ultimo: gm}), r0 = M.parsear('/R', P, {ultimo: null}), r2 = M.parsear('/r Blanco J1 hola', P, {ultimo: gm});
-    igual([r.responder, r.persona.uid, r.texto, r0.responder, r0.persona, r2.persona.uid, r2.texto], [true, 'gm', 'dale, voy', true, null, 'gm', 'Blanco J1 hola']);
+    igual([r.responder, r.persona.uid, r.texto, r0.responder, r0.persona, r2.persona.uid, r2.texto, !!r2.porNombre], [true, 'gm', 'dale, voy', true, null, 'j1', 'hola', true]);
+    const r3 = M.parsear('/r Ana: dale', P, {ultimo: gm}), r4 = M.parsear('/r Analía vino', P, {ultimo: gm});   // P318.4: el nombre no va en el texto
+    igual([r3.persona.uid, r3.texto, r4.persona.uid, r4.texto], ['j1', 'dale', 'gm', 'Analía vino']);
     igual([M.fragmento('/r bl', P), M.fragmento('/m bl', P)], [null, 'bl']);
     igual(M.comando('/R hola').cmd, 'r');
   });
@@ -10731,6 +10733,8 @@ grupo('✉ Mensajes secretos');
     const pub = M.publicoHtml({uid: 'j1', jugador: '<i>Ana</i>', texto: 'a <b>todos</b>'}, 'yo');
     cierto(/&lt;i&gt;Ana/.test(pub) && /a &lt;b&gt;todos/.test(pub) && /a todo el grupo/.test(pub) && /Tu mensaje/.test(M.publicoHtml({uid: 'yo', texto: 'x'}, 'yo')));
     cierto(/data-mensaje-abrir="j1"/.test(c) && /animation-delay:-1200ms/.test(c) && /data-momento-cerrar="msj:9"/.test(c));
+    const largo = 'x'.repeat(600) + 'FIN';   // P318.2: en la Crónica se lee entero
+    cierto(/x{600}FIN/.test(M.cronicaHtml('msj:10', {...x, texto: largo}, 0, 9000)) && !/…/.test(M.cronicaHtml('msj:10', {...x, texto: largo}, 0, 9000)));
   });
   prueba('las reglas: solo leen los lectores, el GM borra sin leer por el índice, y quien recibe solo se suma a leidoPor', async () => {
     const r = await (await fetch('../firebase/firestore.rules', {cache: 'no-store'})).text();

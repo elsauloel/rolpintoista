@@ -2056,6 +2056,13 @@ cosas chicas para decidir:
    después, así que puede frenar parte de lo que «pasaba siempre». (Contra la Defensa común sí está bien: la Perfora se cuenta con el Aguante incluido.)
    Mientras tanto queda así (es un caso muy raro). ¿Lo emparejo?
 
+**Diagnóstico (2026-11-24):** el caso existe de verdad, pero es raro: hoy lo único que «perfora» la Defensa especial es el estado **Armas perforantes**
+(lo da el Armero, creep Support, desde nivel 2) y solo cuenta en una habilidad con daño especial (no directo) contra alguien con Aguante de trinchera
+y enemigos pegados. Ejemplo: daño especial 8, Defensa especial 6, Aguante +2, Perfora 3 → hoy entran **1** (la cuenta dice «pasan 3» y después el
+Aguante resta 2); contra la Defensa común, con los mismos números, entran **3**. Opciones: (a) emparejarlo, contar el Aguante dentro de la Defensa
+especial antes de la Perfora (entran 3, como en la común; recomendada); (b) dejarlo así (entra 1); (c) dejar el resultado pero arreglar la cuenta
+para que diga claro que el Aguante frenó 2 de los 3 que pasaban (hoy muestra «Defensa especial 5», que confunde). Espera la respuesta del dueño.
+
 ### P284 — ✋ Consumibles propios, a mano: lo que quedó elegido «mientras tanto» (2026-11-22, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-22):** (1) y (3) «están bien resueltas», como están. (2) «no estaría mal agregarle como opción tirar un dado»: el consumible propio puede llevar una tirada opcional que sale al consumirlo (en la cola).

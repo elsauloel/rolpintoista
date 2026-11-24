@@ -1954,7 +1954,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   estilo: cuerpo a cuerpo, distancia, mágico; función: daño, defensa, movilidad, control, curación, sigilo…) y los filtros del catálogo de
   «+ Pasiva»; conversarlo con el dueño antes de programar.)
 
-- **⬜ en cola — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
+- **🟡 diagnóstico hecho (2026-11-24), esperando la respuesta del dueño (P283 punto 2) — 🛡 Revisar el caso raro: arma que perfora contra la Defensa especial con Aguante de trinchera** (dueño, 2026-11-22: «revisar
   ese caso raro de la perforación y defensa especial»; P283, punto 2): hoy el Aguante se resta después de lo que «pasa siempre» por Perfora, así
   que puede frenar parte de eso. Explicarle el caso con números y proponer.
 

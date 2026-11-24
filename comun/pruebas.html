@@ -9519,6 +9519,14 @@ prueba('🪤 Trampas pendientes y la cuenta del daño (2026-11-12, vtt-hexgrid/j
     ['9 de daño − Defensa 0 = 9 a la vida', 9, '9 de daño − Defensa 4 = 5 a la vida', 5, '9 de daño (ignora la Defensa) = 9 a la vida',
      '9 de daño − Defensa 2 = 7 − Escudo especial (escudo) 5 = 2 a la vida', 2, 0]);
 });
+prueba('🌀 El portal de una trampa, mientras se lo lleva: no dice «se está tirando en otra pantalla» (2026-11-24, vtt-hexgrid/js/19)', async () => {
+  const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();
+  const trozo = src.slice(src.indexOf('/* PURAS-INICIO'), src.indexOf('/* PURAS-FIN */'));
+  const f = new Function('num', trozo + '\nreturn {trampaTirandoTxt};')(v => Number(v) || 0);
+  igual([f.trampaTirandoTxt({fase: 'portal'}), f.trampaTirandoTxt({fase: 'portal-mover'}), f.trampaTirandoTxt({fase: 'salva'}), f.trampaTirandoTxt({fase: 'dano'})],
+    ['🌀 El portal se lo está llevando…', '🌀 El portal se lo está llevando…', 'Se está tirando en otra pantalla…', 'Se está tirando en otra pantalla…']);
+  igual(/dt\.tirando \? trampaTirandoTxt\(dt\)/.test(src), true);
+});
 prueba('❤ La Vida extra se muestra como vida: «104/35 → 100/35» (2026-11-18, Combatiente.vidaConExtra / vidaCambioTxt / danoAVida)', async () => {
   const C = Combatiente;
   const src = await (await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'})).text();

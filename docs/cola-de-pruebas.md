@@ -2194,9 +2194,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Bomba de humo, varita de niebla, virote de humo, zonas con nube: qué tapan, quién ve adentro, cuánto duran, el viento) y las preguntas para
   decidir; P264 (el creep que actúa desde una nube) va con esto. La niebla de guerra del mapa ya se le explicó aparte.
 
-- **⬜ en cola — Probar: 📺 la tele con el Portal cósmico** (2026-11-23): el Portal trampa de un creep donde quien la puso elige adónde manda, y el
+- **✅ hecho (2026-11-24) — Probar: 📺 la tele con el Portal cósmico** (2026-11-23): el Portal trampa de un creep donde quien la puso elige adónde manda, y el
   caso en que lo mueve otra pantalla (un jugador mandando a un creep: paso «portal-mover»). Solo se probó el Glifo (destino fijo), que usa la misma
   función.
+  Probado con clics en «Claude · pruebas 2» (GM de pruebas, Jugador 1, Jugador 2), con video. (1) El Portal de un creep, lo pisa Blanco J1: pierde
+  la Res.CC, el GM toca «🌀 Elegir adónde lo mandás» y una casilla a 3; la tele (se apaga donde estaba, se prende donde llega) en las tres pantallas
+  y el token queda en el destino; después, Pajaritos 1 turno. Con las Botas de estibador, el Inamovible (5 o 6 en 1d6) lo dejó en el lugar y el
+  Pajaritos entró igual. (2) El Portal de Blanco J1, lo pisa un creep: el Jugador 1 elige el destino, la pantalla del GM mueve al creep
+  («portal-mover»), la tele en las tres y Pajaritos. (3) El creep gana la Res.CC (✋ 15 contra 11): «¡Lo resistió!», no se mueve, sin tele y sin
+  Pajaritos (como dice la trampa: ganar la Res.CC frena las dos cosas). **Arreglado:** mientras el portal lo llevaba, el cartel decía «Se está
+  tirando en otra pantalla…» también en la pantalla que lo estaba mandando; ahora dice «🌀 El portal se lo está llevando…». Visto: en la pantalla de
+  la víctima (y la del GM en el caso 2) el cartel de la trampa tapa la casilla de donde sale, así que ahí la tele se ve solo al llegar (entrada
+  nueva al final de la cola), y la tele arranca 3 a 6 s después del clic.
 - **⬜ en cola — Probar: 📺 la tele con la Trampa de teleport de Terreno y Formas** (2026-11-23): no se pudo crear: las reglas de Firestore no dejan
   crear un elemento con `trampaDestino` (está validado, pero falta en la lista de campos permitidos de `elementoValido`; el ⚙ sí lo deja cambiar).
   Arreglarlo es sumar el campo a esa lista y pegar las reglas. Los portales de Invocar portal usan la misma función y sí se probaron.
@@ -2568,6 +2577,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🥷 el aviso «Seguís escondido» con una zona, una trampa y un creep escondido** (2026-11-24): con clics se probó solo un
   área (la Nova arcana) contra un personaje. Falta: una zona que pega poco (al entrar y en el Mantenimiento), una trampa, un creep escondido (el
   cartel le tiene que salir al GM) y un personaje con 🎮 el control del GM (le sale al GM, no al jugador).
+
+- **⬜ en cola — 📺 El cartel de la trampa tapa la tele del Portal cósmico** (visto probando la tele, 2026-11-24): en la pantalla de la víctima (y en
+  la de quien la maneja: el GM con un creep) el cartel de la trampa queda abierto en el medio mientras el portal se lo lleva, y tapa la casilla de
+  donde sale: ahí se ve solo la llegada. La de un tercero lo ve entero. Propuesta: apartar el cartel (como se aparta el cuadro del duelo) mientras
+  dura la tele, y quizás también centrar la vista. Además, la tele arranca 3 a 6 s después de elegir el destino (lo que tardan los avisos entre
+  pantallas, más en el caso «portal-mover»): ver si se puede acortar.
 
 ## En cola
 

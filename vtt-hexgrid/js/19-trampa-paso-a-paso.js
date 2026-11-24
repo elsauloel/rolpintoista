@@ -430,7 +430,7 @@ function trampaDibujar(id){
   let botones = [];
   const mia = falta && trampaMeToca(id, dt);
   if(falta){
-    pasos.push({titulo: falta.titulo, texto: rodando ? '🎲 Rodando…' : dt.tirando ? 'Se está tirando en otra pantalla…' : mia ? falta.texto.replace(/^Tira /, 'Tirá ') : falta.texto, espera: true});
+    pasos.push({titulo: falta.titulo, texto: rodando ? '🎲 Rodando…' : dt.tirando ? trampaTirandoTxt(dt) : mia ? falta.texto.replace(/^Tira /, 'Tirá ') : falta.texto, espera: true});
     if(falta.boton && mia){   // en otra pantalla (quien eligió el portal) se ve, sin botón
       const x = tokens.get(dt.tokenId);
       const f = dt.fase === 'salva' && x ? formulaParaValor(trampaValorStat(x, dt.salva.stat)) : null;
@@ -511,6 +511,12 @@ function trampaPendienteDelToken(lista, tokenId, ahora){
     if(ahora - ms < 30 * 60 * 1000) return {id, d};
   }
   return null;
+}
+// 🌀 Lo que dice el paso mientras una pantalla lo está resolviendo (función pura). En el portal nadie tira nada: la pantalla que eligió (o la que
+// maneja a la víctima) lo está mandando, y la de quien eligió también veía «en otra pantalla» (visto probando la tele, 2026-11-24).
+function trampaTirandoTxt(dt){
+  const f = dt && dt.fase;
+  return f === 'portal' || f === 'portal-mover' ? '🌀 El portal se lo está llevando…' : 'Se está tirando en otra pantalla…';
 }
 /* PURAS-FIN */
 function trampasPendientesLista(){

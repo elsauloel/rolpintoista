@@ -2552,6 +2552,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   un creep le pega al escondido como un duelo común (no como su duelo aparte) y el GM lo puede elegir de objetivo. Que el ojo no cambie nada del
   juego: el escondido sigue con su duelo aparte y no se lo puede elegir de objetivo por estar revelado (como ya se decidió con las trampas).
 
+- **⬜ en cola — 🕊️ En los mensajes, «Personaje (usuario)» en vez del usuario solo** (dueño, 2026-11-24, con captura del chat «Todo el grupo»):
+  donde hoy dice el nombre del usuario (p. ej. arriba de cada mensaje del grupo, y en la lista de conversaciones), que aparezca primero el nombre
+  de su personaje y entre paréntesis el del usuario: «Bizzante (copia) (Saulo.eche)». Si tiene más de un personaje, el principal (caso muy
+  excepcional; «es una tarea pendiente revisar ciertas gestiones para usuarios con más de un personaje… cuando llegue el turno lo revisamos todo
+  junto»). Si es el GM: «GM (nombre de usuario)». Igual que el «Larry (ElSaulo)» de las sugerencias de /m.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

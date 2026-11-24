@@ -2627,6 +2627,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (revisar con tiempo) — 🩺 Responder P324: «Cómo quedó el grupo» muestra al escondido al GM con el ojo apagado** (dueño, 2026-11-24:
   «anotá lo anterior en la cola»). Recomendación: dejarlo así (sirve para acomodar estados de todo el grupo y no dice dónde está).
 
+- **⬜ en cola — 👑 «Es el turno del GM» cuando los jugadores no saben de qué creep es el turno** (dueño, 2026-11-24): al iniciar el combate, es
+  probable que los jugadores no vean muchos creeps en la lista de turnos (tras la niebla, u ocultos). Cuando le toca a uno que los jugadores no
+  ven (sea por la niebla o porque está escondido; no tienen por qué saber cuál de los dos), el aviso de turno / la tabla tiene que decir **«Es el
+  turno del GM»**. Si el creep ya está revelado en la tabla: «Es el turno de <creep>». Revisar qué muestra hoy (la tabla, el aviso de «le toca a…»,
+  la Crónica) y ajustarlo.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -2607,6 +2607,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   4. **Rango: máximo 5 casillas desde el punto de origen** (hoy 8). Actualizar el texto de la trampa en el catálogo.
   El escenario de prueba sigue puesto en «Claude · pruebas» (mapa «Prueba · Tormenta y Meteoro»): sacarlo cuando el dueño diga, o usarlo para probar esto.
 
+- **⬜ en cola — 🌀 Los pulsos del portal, solo para quien ve al token; con «reducir movimiento», un destello corto (P323 decidida)** (dueño,
+  2026-11-24): hoy los pulsos violeta y azul del portal le aparecen al GM aunque no vea al token que pasa (delatan que alguien lo usó y hacia dónde).
+  Que se vean solo en las pantallas que ven al token (el portal en sí se sigue viendo). Con «reducir movimiento», un destello corto sin ondas.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

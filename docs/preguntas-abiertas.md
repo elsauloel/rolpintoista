@@ -2554,6 +2554,11 @@ texto del mensaje; el aviso nuevo también queda). (4) «habría que corregirlo�
 resto (1, 3, 5, 6) sin objeciones: queda como está. Varias conversaciones: la propuesta (a)(b)(c) le gusta; (d) cambia: **un jugador sí
 puede borrar lo suyo**; chat grupal con nombre opcional, archivar en vez de cerrar, sin salirse de un chat grupal por ahora.
 
+> ✅ **Aplicado (2026-11-24):** (2) la tarjeta de la Crónica muestra el mensaje entero (antes se cortaba a 220 letras; si es muy largo, se
+> desplaza adentro de la tarjeta). (4) `/r Nombre hola`: si lo que sigue a `/r` empieza con el nombre de alguien de la partida (persona o
+> personaje, como lo reconoce `/m`), el nombre sale del texto y se le responde **a esa persona**; si no calza ningún nombre, va todo como texto
+> al último que te escribió.
+
 Pedido del dueño (P285 y sus directrices del 2026-11-24). Está hecho (`comun/mensajes.js`); quedan cosas chicas para decidir:
 1. **El 📣 mensaje a todo el grupo vive en la Mesa** (es una línea de la Mesa, como una tirada, sin reglas nuevas de Firebase). Por eso se borra
    igual que las tiradas: con el 🗑, con «Registro nuevo» **y con la limpieza automática de lo viejo** (los secretos no se borran solos). Lo ve

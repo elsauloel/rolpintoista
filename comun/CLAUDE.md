@@ -97,7 +97,8 @@ versión parecida en más de una, es candidato a juntar.
   y una conversación por persona; marca leído (secretos: `arrayUnion` en `leidoPor`; públicos: por navegador, `localStorage`
   `msjPublicoVisto:<partida>`, con el evento `storage` para las otras pestañas). Mandar: la ventanita (`abrirMandar({para, publico})`: la casilla
   «📣 Todo el grupo» o una por persona), el 🕊️ al pie de la Mesa, `/m Nombre texto` (también `/m Todos` / `/m Todo el grupo` → público) y
-  **`/r texto` = responder al último que me mandó un secreto** (`ultimoQueMeEscribio`; sin texto abre esa conversación). Autocompletado solo
+  **`/r texto` = responder al último que me mandó un secreto** (`ultimoQueMeEscribio`; sin texto abre esa conversación; P318.4: si después de
+  `/r` viene el nombre de alguien —`calzar`, lo mismo que `/m`—, el nombre sale del texto y se le responde a esa persona). Autocompletado solo
   con `/m` (`sugerencias(pers, frag, max, {grupo: true})`). **El público no tiene colección propia**: es una línea de la Mesa (`tiradas`,
   `desde: 'publico'`, el texto en `texto`; `armarPublico`), así que lo ven todos y se borra como las tiradas; `escucharPublicos` lo escucha
   aparte (`where desde == 'publico'`) para la conversación del grupo y el aviso. **En la Mesa** (`Mensajes.mesa(docs, tope)` en `mesaProcesar`):
@@ -106,7 +107,7 @@ versión parecida en más de una, es candidato a juntar.
   jugadores (las reglas). **Al llegar uno** (secreto o público de otro): la paloma vibra (`msj-vibra`, ~1,4 s; con «reducir movimiento», un
   contorno en vez de la animación) y sale un aviso flotante encima de ella (`#msj-avisos`, «🕊️ Te llegó un mensaje de X» / «📣 X le escribió a
   todo el grupo», con el principio del texto; tocarlo abre la conversación; se va solo a los 7 s; como mucho 3). Además, un secreto llama a
-  `window.mensajesCronica(m)` si la página la define (el mapa, js/16: tarjeta `cronicaHtml`). `borrar(antesDe|null)` (solo GM, por
+  `window.mensajesCronica(m)` si la página la define (el mapa, js/16: tarjeta `cronicaHtml`, con el texto entero desde P318.2). `borrar(antesDe|null)` (solo GM, por
   `mensajes_indice`, sin leer) lo llaman el 🗑 de la Mesa y `Registro.nuevo`. Sin las reglas pegadas: `faltanReglas()` y `AVISO_REGLAS`.
   `_cargar(lista, {nuevos, publicos})` carga mensajes en memoria para pruebas y capturas (no escribe). Lo puro (`personas`, `parsear`,
   `armarDoc`, `armarPublico`, `ultimoQueMeEscribio`, `publicosNoLeidos`, `conversaciones`, `mezclarEnMesa`…) probado en `pruebas.html`. El mapa

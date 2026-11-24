@@ -2040,8 +2040,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   conversación abierta del Jugador 2 en vivo, y por la API no quedó ninguno (tampoco el 📣 público). Ojo: el 🗑 borró además toda la Mesa de esa
   partida. **«Registro nuevo» no se probó**: borra de verdad las tiradas, el 📜 historial y los mensajes de antes del combate anterior de la partida
   de pruebas; queda abajo, al final de la cola, para cuando el dueño diga.
-- **⬜ en cola — Probar: 🕊️ «Borrar la partida» se lleva los mensajes** (2026-11-22, con las reglas pegadas): en una partida de prueba descartable.
-  (2026-11-24: sigue en cola: hace falta crear una partida descartable con dos cuentas adentro y borrarla; no se hizo en esta tanda.)
+- **✅ hecho (2026-11-24, «hacelo», dueño) — Probar: 🕊️ «Borrar la partida» se lleva los mensajes** (2026-11-22, con las reglas pegadas): en una partida de prueba descartable.
+  *Resultado:* el GM de pruebas creó «Claude · descartable (borrar)», el Jugador 1 y el Jugador 2 se sumaron con «Unirse», se mandaron dos secretos y
+  un 📣 (el índice tenía 2); «Borrar la partida» (con el nombre revisado antes de confirmar) la borró sin errores. Para mirar adentro se volvió a crear
+  vacía con el mismo id: 0 secretos, 0 en el índice, 0 públicos; después se la borró de nuevo. Las tres cuentas siguen en «Claude · pruebas 2».
 
 - **✅ hecho (2026-11-24) — 🕊️ Ajustes de los mensajes secretos (P285)** (dueño, 2026-11-22):
   1. **Mensaje público:** «que también exista la posibilidad de mandar un mensaje público» (a toda la mesa; que se vea distinto de una tirada).
@@ -2375,10 +2377,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   probó crearlo en la ficha y consumirlo de la mochila (ficha y Botonera del mapa). Falta: pasarlo al cinturón y consumirlo de ahí, y armarlo en GM Tools
   («✎ Ítem custom» → 🤝 Dar a un jugador) con su tirada y que al jugador le llegue y le tire al consumirlo.
 
-- **⬜ en cola — Probar: 🕊️ «Registro nuevo» se lleva los mensajes de antes del combate anterior** (2026-11-24, de los ajustes de los mensajes): no se
+- **✅ hecho (2026-11-24, con permiso del dueño) — Probar: 🕊️ «Registro nuevo» se lleva los mensajes de antes del combate anterior** (2026-11-24, de los ajustes de los mensajes): no se
   probó porque borra de verdad, en «Claude · pruebas 2», las tiradas, el 📜 historial y los mensajes de antes del combate anterior. Probarlo cuando el
   dueño diga (o en una partida descartable): que se vayan los mensajes viejos (secretos y 📣) y queden los del combate anterior y el actual.
-- **⬜ en cola — 🕊️ Responder P318: los ajustes de los mensajes** (2026-11-24): lo público que vive en la Mesa (se borra como las tiradas), Crónica +
+  *Resultado:* en «Claude · pruebas 2»: mensajes A (secreto y 📣) → 🆕 Registro nuevo (A queda: pasa a ser «el combate anterior») → mensajes B →
+  🆕 Registro nuevo otra vez: A se fue (de la Mesa, de las conversaciones y de Firebase) y B quedó, para el Jugador 1 y el Jugador 2. Se borró además
+  el registro viejo de esa partida (tiradas e historial de antes).
+- **✅ hecho (2026-11-24) — 🕊️ P318.2 y P318.4: la Crónica con el mensaje entero y `/r` con nombre** (dueño, 2026-11-24: «en la crónica se debería poder
+  leer el mensaje directamente»; «habría que corregirlo»). *Resultado:* la tarjeta de la Crónica ya no corta el texto (un mensaje de 418 letras se lee
+  entero; si es muy largo, se desplaza adentro de la tarjeta); el aviso flotante sigue. `/r Blanco J2 recibido, vamos` le llegó al Jugador 2 como
+  «recibido, vamos» (sin el nombre): si después de `/r` viene el nombre de alguien de la partida, se le responde a esa persona; si no, al último
+  que te escribió. Probado con clics en «Claude · pruebas 2».
+- **✅ respondida (dueño, 2026-11-24; aplicada la parte que cambiaba, arriba) — 🕊️ Responder P318: los ajustes de los mensajes** (2026-11-24): lo público que vive en la Mesa (se borra como las tiradas), Crónica +
   aviso en el mapa, el «leído» de lo público por navegador, `/r`, lo mío en la Mesa, el aviso de 7 s. Ver `docs/preguntas-abiertas.md`.
 - **⬜ en cola (propuesta aprobada por el dueño el 2026-11-24, ver P318) — 🕊️ Varias conversaciones a la vez: programar** — (a) un mensaje a varios
   arma un chat de grupo de verdad (nombre opcional; las respuestas les llegan a todos); (b) la lista en tres partes: 📣 Todo el grupo · 👥 chats

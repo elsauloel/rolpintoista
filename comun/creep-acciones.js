@@ -525,7 +525,7 @@ const CreepAcciones = (() => {
     else h.cdActual = (o.doble ? Combatiente.cdFlash(num(h.cd), false) : num(h.cd)) + Math.max(0, num(ex.cd));   // ⏳ en turno ajeno, un 50 % más (mínimo +1; 2026-11-03)
     const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
-    if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
+    if(costoHp > 0) sc.hp = Math.max(0, num(sc.hp) - costoHp);   // 🩸 no baja de 0 (P292)
     const curaMas = Math.max(0, num(C().modTotal(sc, 'curamas')));   // 💚 Manos de curandero (2026-11-06): +5 a cada cura que da, también sobre sí mismo
     if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp) + curaMas);   // cura sobre sí mismo
     // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): se cura N + su Constitución, le saca el debuff que se eligió antes de cobrar

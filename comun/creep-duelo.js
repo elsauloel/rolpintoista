@@ -40,7 +40,7 @@ const CreepDuelo = (() => {
       if(p.hp > 0 && num(c.hp) <= p.hp) return {error: `${c.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`};
       if(sp){ if(C().spActual(c) < num(p.sp)) return {error: `${c.nombre}: no le alcanza el SP para ${h.nombre} (cuesta ${fmt(num(p.sp))})`}; c.sp = Math.max(0, C().spActual(c) - num(p.sp)); }
       else if(hh) hh.cdActual = p.cd;
-      if(p.hp > 0) c.hp = num(c.hp) - p.hp;
+      if(p.hp > 0) c.hp = Math.max(0, num(c.hp) - p.hp);   // 🩸 no baja de 0 (P292)
       return p;
     });
   }

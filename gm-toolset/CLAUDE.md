@@ -547,3 +547,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   tokens los guarda `tokensGMEscuchar` en `tokensGMInfo`, js/09). Así cubre todos los caminos (el recuadro de HP, «Daño», el Mantenimiento, las
   habilidades, los estados…) sin tocar cada uno; **un camino nuevo que cambie la vida no tiene que hacer nada**, salvo redibujar. Lo que llega del mapa ya
   viene limpio: no se repite la línea. Un creep que se ve por primera vez (al cargar) solo se anota. Dudas: P292.
+- **🩸 La vida de un creep no baja de 0** (2026-11-24, P292: «corregilo para que la vida no baje de cero»): «Daño» (`aplicarDanioCreep`), el recuadro de HP
+  (`resolverDeltaHp`: un «−N» de más deja 0 con aviso), la vida que cuesta una habilidad (`CreepAcciones.ejecutarHab`) o un Flash (`CreepDuelo`). Red de
+  seguridad: `gmVidaNoNegativa` (js/11) dentro de `gmCaidasRevisar` deja en 0 lo que llegue negativo por cualquier camino, antes de mirar la caída; un creep
+  guardado de antes en negativo se ve en 0 al cargar y se vuelve a guardar solo (`gmVidaCorregida` en `gmProcesarSnapshot`). Dudas: P329.

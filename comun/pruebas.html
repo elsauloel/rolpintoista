@@ -53,7 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261124finT"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
-<script src="creep-acciones.js?v=20261122prisa5"></script>
+<script src="creep-acciones.js?v=20261124vida0"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261123c68"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
@@ -2864,6 +2864,41 @@ prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mism
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
   cierto(/r\.cayo && \(r\.sacados \|\| \[\]\)\.length/.test(f02) && /Combatiente\.caidaTxt\(/.test(f02), 'la ficha suelta cuenta la caída');
   cierto((m11.match(/caidaContarPj\(/g) || []).length >= 3, 'la Botonera nueva y el pase de turno cuentan la caída');
+});
+prueba('🩸 GM Tools: la vida de un creep no baja de 0 (P292, 2026-11-24): «Daño» 999, el recuadro con −50 y un creep guardado en negativo', async () => {
+  const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
+  const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js');
+  const ca = await leer('comun/creep-acciones.js'), cd = await leer('comun/creep-duelo.js');
+  const trozo = (txt, ini, fin) => txt.slice(txt.indexOf(ini), txt.indexOf(fin, txt.indexOf(ini)));
+  // «Daño» (la ficha completa y la tarjeta usan el mismo aplicarDanioCreep)
+  const fDano = trozo(g01, 'function aplicarDanioCreep', '\n}\n') + '\n}';
+  const toasts = [];
+  const mkCreep = hp => ({id: 'c1', nombre: 'Rata', hp, hpMax: 10, estados: []});
+  const correr = (codigo, nombre, S, extra = {}) => new Function('S', 'toast', 'fmt', 'num', 'renderAll', 'creepDefensaEfectiva', 'CreepCalculo', 'registrarEvento', 'deltaBase',
+    codigo + '\nreturn ' + nombre + ';')(S, t => toasts.push(t), fmt, num, () => {}, () => 2, {modTotal: () => 0}, () => {}, extra.deltaBase || new WeakMap());
+  const S1 = {creeps: [mkCreep(5)]};
+  correr(fDano, 'aplicarDanioCreep', S1)({dataset: {danocreep: 'c1'}, value: '999'});
+  // El recuadro de HP: «-50» con 20 deja 0 y avisa; «-5» con 20 deja 15 sin aviso
+  const fHp = trozo(g01, 'function resolverDeltaHp', '\n}\n') + '\n}';
+  const S2 = {creeps: [mkCreep(20)]}, inp = {dataset: {id: 'c1'}, value: '-50'};
+  const n0 = toasts.length;
+  correr(fHp, 'resolverDeltaHp', S2)(inp);
+  const avisoHp = toasts.slice(n0).join(' ');
+  const S3 = {creeps: [mkCreep(20)]};
+  correr(fHp, 'resolverDeltaHp', S3)({dataset: {id: 'c1'}, value: '-5'});
+  igual([S1.creeps[0].hp, S2.creeps[0].hp, inp.value, /no baja de 0/.test(avisoHp), S3.creeps[0].hp], [0, 0, 0, true, 15]);
+  // La red de seguridad (gmCaidasRevisar): un creep guardado en −989 se ve en 0 sin «cayó»; uno que pasa de 5 a −10 queda en 0 y cae como siempre
+  const fCaida = trozo(g11, 'const gmCaidaHp = new Map();', 'async function gmProcesarSnapshot');
+  const lista = [{id: 'v', nombre: 'Viejo', hp: -989, hpMax: 10, estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 2}]}, {id: 'n', nombre: 'Nuevo', hp: 5, hpMax: 10, estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 2}]}];
+  const revisar = new Function('creepsReales', 'gmVivo', 'CreepCalculo', 'tokensGMInfo', 'toast', 'mesaLinea', 'num', fCaida + '\nreturn gmCaidasRevisar;')(
+    () => lista, {activo: true}, {vidaAlDia(){}}, new Map(), () => {}, () => {}, num);
+  revisar();
+  const viejo = [lista[0].hp, lista[0].estados.length];
+  lista[1].hp = -10; revisar();
+  igual([viejo, lista[1].hp, lista[1].estados.length], [[0, 1], 0, 0]);
+  // Lo que cuesta vida: una habilidad y un Flash (creep-acciones / creep-duelo) tampoco la dejan en negativo
+  cierto(/if\(costoHp > 0\) sc\.hp = Math\.max\(0, num\(sc\.hp\) - costoHp\)/.test(ca) && /if\(p\.hp > 0\) c\.hp = Math\.max\(0, num\(c\.hp\) - p\.hp\)/.test(cd), 'habilidad y Flash con costo en vida');
+  cierto(/if\(gmVidaCorregida\.delete\(sc\.id\)\) gmVivo\.ultimo\[sc\.id\]\.json = '';/.test(g11), 'el guardado en negativo se vuelve a guardar en 0 al cargar');
 });
 prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estandarte no; personajes, invocaciones, creeps y tokens sueltos sí; el campo del token manda', () => {
   const O = OrdenTurnos;

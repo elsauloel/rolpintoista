@@ -2211,6 +2211,8 @@ ronda); los **personajes, las invocaciones, los creeps y los tokens sueltos sí*
 ### P292 — 💀 Un creep que cae desde GM Tools: lo que quedó elegido (2026-11-23, Claude)
 
 > ✅ **Respondida (dueño, 2026-11-23):** (1) «prácticamente irrelevante… los jugadores matan a los creeps»: queda como está; (2) «sí, corregilo para que la vida no baje de cero» en GM Tools (en la cola).
+> ✅ **(2) Aplicada (2026-11-24):** en GM Tools la vida de un creep queda en 0 por cualquier camino («Daño», el recuadro de HP con aviso, habilidades y
+> Flash que cuestan vida); un creep guardado con vida negativa se ve y se guarda en 0. Dudas: P329.
 
 Desde hoy un creep que llega a 0 por cualquier camino de GM Tools pierde sus estados como en el mapa (P270), con la línea «💀 X cayó: se le fueron N
 estados (…)». Quedaron elegidas estas cosas, todas cambiables:
@@ -2713,3 +2715,10 @@ todas cambiables:
 5. **La ✕ de la tabla y el que tiene el turno**: el «➖ Sacar del orden» termina su turno y le da el turno al siguiente con su «Empieza el turno» (como
    cuando se va una invocación). La ✕ de la tabla, en cambio, lo saca y el turno queda en el siguiente sin «Empieza el turno» (sin recargar No2 ni
    bajar cooldowns). ¿Hacemos que la ✕ haga lo mismo que el ➖?
+
+### P329 — 🩸 La vida de una invocación escrita a mano puede quedar negativa (2026-11-24, Claude)
+
+Al hacer P292 (la vida de un creep no baja de 0 en GM Tools) se revisó la ficha suelta: la vida de un **personaje** nunca baja de 0 (todo pasa por
+`fijarHp`). La de una **invocación** sí puede: en su tarjeta de la ficha, el recuadro de HP acepta un número negativo escrito a mano (por ejemplo −5)
+y queda así. Lo demás (daño, estados, Pasar de ronda) ya la corta en 0. ¿Hacemos que el recuadro de una invocación también quede en 0 (con el mismo
+aviso que el de un creep), o lo dejamos como está porque es escrito a mano?

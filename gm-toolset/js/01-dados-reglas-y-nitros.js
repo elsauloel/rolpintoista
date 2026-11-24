@@ -328,6 +328,8 @@ function resolverDeltaHp(input){
     input.value = fmt(base);
     return;
   }
+  // 🩸 La vida no baja de 0 (2026-11-24, P292: «corregilo para que la vida no baje de cero»), como en el mapa: «-50» con 20 deja 0, con aviso.
+  if(val < 0){ toast(`${sc.nombre || 'Creep'}: tenía ${fmt(base)} de vida y le restaste ${fmt(base - val)}: la vida no baja de 0, queda en 0`); val = 0; }
   // El HP del creep es lo que más se toca en combate: queda anotado con
   // el antes y el después, que es lo que después uno quiere reconstruir.
   const previo = num(sc.hp);
@@ -381,7 +383,7 @@ function aplicarDanioCreep(input){
   });
 
   const previo = num(sc.hp);
-  sc.hp = previo - recibido;
+  sc.hp = Math.max(0, previo - recibido);   // 🩸 no baja de 0, como en el mapa (P292)
   input.value = '';
 
   const extra = [];

@@ -328,6 +328,9 @@ function gmCaidasRevisar(){
   creepsReales().forEach(sc => {
     if(!sc || !sc.id) return;
     vistos.add(sc.id);
+    // 🩸 La vida no baja de 0 (2026-11-24, P292): la red de seguridad de todos los caminos, y un creep guardado de antes con vida negativa se ve
+    // (y se guarda) en 0. Antes de mirar la caída, así «cayó» sigue igual.
+    gmVidaNoNegativa(sc);
     const antes = gmCaidaHp.get(sc.id);
     gmCaidaHp.set(sc.id, num(sc.hp));
     if(antes === undefined || !gmVivo.activo) return;
@@ -343,6 +346,15 @@ function gmCaidasRevisar(){
     }, 0);
   });
   for(const id of [...gmCaidaHp.keys()]) if(!vistos.has(id)) gmCaidaHp.delete(id);
+}
+// 🩸 Deja en 0 la vida de un creep que quedó negativa (por un camino viejo o un creep guardado así). → true si la corrigió.
+// Los que se corrigen al cargar se anotan en gmVidaCorregida para guardarlos ya en 0 (gmProcesarSnapshot).
+const gmVidaCorregida = new Set();
+function gmVidaNoNegativa(sc){
+  if(!sc || !(Number(sc.hp) < 0)) return false;
+  sc.hp = 0;
+  if(sc.id) gmVidaCorregida.add(sc.id);
+  return true;
 }
 // ¿Los jugadores lo conocen? Como creepCaidaContar del mapa: con token no oculto que ya se vio (revelado) y sin estar en sigilo al caer. Si no, solo el GM.
 function gmCaidaPublica(sc, sigilo){
@@ -363,6 +375,8 @@ async function gmProcesarSnapshot(snap){
       renderAll();  // normaliza los creeps
       S.creeps.forEach((sc, i) => {
         gmMarcarGuardado(sc, i, docs[i].data().firma || '');
+        // 🩸 Guardado de antes con la vida negativa (P292): ya se ve en 0; se vuelve a guardar solo, en 0.
+        if(gmVidaCorregida.delete(sc.id)) gmVivo.ultimo[sc.id].json = '';
         // Creeps guardados con el formato viejo (vida en números a la vista de
         // todos): se vuelven a publicar solos con solo el porcentaje.
         const r = docs[i].data().resumen;

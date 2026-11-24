@@ -2367,8 +2367,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   GM: el toast al GM y ninguna línea nueva en la Mesa (ni en GM Tools, ni en el mapa del GM, ni en el de Jugador 1). Capturas:
   `cola104/3-GMTools-creep-cae-por-habilidad.png`, `cola104/4-GMTools-creep-oculto-solo-el-aviso.png`. Los dos creeps y el token quedaron como estaban.
 
-- **⬜ en cola — 🩸 GM Tools: la vida de un creep no baja de 0 (P292)** (dueño, 2026-11-23: «corregilo para que la vida no baje de cero»): hoy «Daño»
+- **✅ hecho (2026-11-24) — 🩸 GM Tools: la vida de un creep no baja de 0 (P292)** (dueño, 2026-11-23: «corregilo para que la vida no baje de cero»): hoy «Daño»
   la deja en negativo (999 → −989). Que quede en 0, como en el mapa, en todos los caminos de GM Tools.
+  *Resultado:* dejaban vida negativa «Daño» (la tarjeta y la ficha completa, `aplicarDanioCreep`, js/01), el recuadro de HP con un «−N» más grande que
+  la vida (`resolverDeltaHp`: ahora queda en 0 con el aviso «tenía 20 de vida y le restaste 50: la vida no baja de 0, queda en 0»), la vida que
+  cuesta una habilidad (`CreepAcciones.ejecutarHab`) y la de un Flash (`CreepDuelo`); los estados con daño y Pasar de ronda ya la cortaban en 0. Además,
+  una red de seguridad en `gmCaidasRevisar` (js/11, `gmVidaNoNegativa`): cualquier camino que la deje negativa se ve en 0, y un creep guardado de antes
+  con vida negativa se ve en 0 al abrir GM Tools y se vuelve a guardar solo en 0. La caída (P270) sigue igual. La ficha suelta de un personaje ya no
+  dejaba vida negativa; la de una invocación sí, escrita a mano: P329. **Probado con clics** en «Claude · pruebas 2» con el GM de pruebas: «Daño» 999 en
+  la tarjeta (60 → 0, «💀 … cayó: se le fue 1 estado (Afortunado)»), «Daño» 999 en la ficha completa (30 → 0), el recuadro con −50 (20 → 0 y el aviso;
+  −5 sigue dejando 15), Veneno severo con 1 de vida (0 y cae), Pasar de ronda con Veneno ×6 y 2 de vida (0 y cae) y un creep guardado en −989 (al
+  recargar se ve en 0 y en Firebase queda 0). Capturas: `cola105/1-GMTools-dano-999-queda-en-0.png`, `cola105/2-GMTools-recuadro-menos-50-queda-en-0.png`,
+  `cola105/4-GMTools-pasar-de-ronda-veneno.png`, `cola105/5-GMTools-creep-guardado-en-negativo-se-ve-en-0.png`. El creep, el turno y el contador de
+  rondas quedaron como estaban. 1 prueba automática nueva (1118).
 
 - **✅ hecho (2026-11-23) — 🎯 Apuntadas de las ballestas como el anillo (P271)** (dueño, 2026-11-23): (1) sumarles el cartel dorado al activarse y el aviso
   «si te movés, la perdés» antes de moverse (la misma pieza que Puntería certera); (2) **ninguna Apuntada vale en la ronda 1**: la firme ya no
@@ -2781,6 +2792,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cartel después de que el GM vació el orden y pasó a narrativo; al tocar «Aplicar» se le aplicó igual (le bajó un turno a sus estados). Buscar el
   origen (¿el cartel no se entera de que el combate terminó / el orden se vació?), ver si pasa con otros carteles de turno (la tarjeta de la Crónica
   que queda «tirando» tras recargar, ya en la cola) y arreglarlo: que al terminar el combate se cierren solos y no apliquen nada.
+
+- **⬜ en cola — Probar: 🩸 la vida de un creep no baja de 0 con una habilidad o un Flash que cuestan vida (P292)** (2026-11-24): GM Tools ya no
+  deja la vida negativa por ningún camino; no se probó con clics una habilidad ni un Flash con costo en vida (de todos modos no dejan usarlos si
+  no sobra vida), ni el mapa del GM mirando a un creep que estaba guardado en negativo antes de abrir GM Tools.
 
 ## En cola
 

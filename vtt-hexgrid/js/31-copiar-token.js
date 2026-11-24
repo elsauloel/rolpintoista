@@ -51,7 +51,7 @@ async function duplicarCreepDesdeMapa(creepId, o){
   lote.set(nuevo.collection('privado').doc('ficha'), {json});
   if(imagen) lote.set(nuevo.collection('privado').doc('imagen'), {dato: imagen});
   await lote.commit();
-  return {id: nuevo.id, nombre: sc.nombre};
+  return {id: nuevo.id, nombre: sc.nombre, sc};   // (`sc`: lo que quedó guardado; los refuerzos tiran su Iniciativa con eso)
 }
 async function pegarTokenEn(c, celda, fichaId, nombre){
   return coleccionTokens().add({
@@ -90,8 +90,10 @@ function pegarToken(){
 /* ---------- 📣 Llamar refuerzos (2026-10-16, dueño: la «Plaga en la galería» de las ratas) ----------
    Una habilidad de creep con `refuerzos: {cant}` (✨ automática): al ejecutarla, el GM elige en el mapa, con un clic por cada uno, dónde aparece
    cada refuerzo («una vez que ponés ejecutar, te ofrezca el mapa hacer clic donde quieras que aparezcan»). Cada uno es una copia recién llegada
-   del creep (duplicarCreepDesdeMapa con `refuerzo`), visible, mirando para el mismo lado, y entra al orden de turnos justo detrás de quien lo
-   llamó (con su misma iniciativa). Esc o clic derecho: el primero cancela; después, termina con los que ya llegaron. */
+   del creep (duplicarCreepDesdeMapa con `refuerzo`), visible, mirando para el mismo lado, y entra al orden de turnos con su propia tirada de
+   Iniciativa (2026-11-24, dueño: «una invocación o un refuerzo, el turno en que entra, tira su iniciativa automáticamente y se ubica en el orden
+   pertinente… pero tiene Mareo de invocación hasta el inicio del próximo turno del personaje que los haya invocado»; antes entraba justo detrás de
+   quien lo llamó, con su mismo número y sin mareo). Esc o clic derecho: el primero cancela; después, termina con los que ya llegaron. */
 function llamarRefuerzos(sc, h){
   const cant = Math.max(1, Math.min(6, Math.round(num(h.refuerzos && h.refuerzos.cant)) || 1));
   const orig = [...tokens.entries()].find(([, t]) => t.tipo === 'creep' && t.fichaId === sc.id);
@@ -106,20 +108,38 @@ function llamarRefuerzos(sc, h){
       const n = await duplicarCreepDesdeMapa(sc.id, {refuerzo: true});
       const ref = await pegarTokenEn({nombre: n.nombre, color: (tOrig && tOrig.color) || '#9A867E', tipo: 'creep', rotacion: (tOrig && tOrig.rotacion) || 0, oculto: false}, c, n.id, n.nombre);
       llegaron++;
-      await refuerzoAlOrden(orig ? orig[0] : '', ref && ref.id);
+      await refuerzoAlOrden(orig ? orig[0] : '', ref && ref.id, n);
     }catch(err){ console.error('No se pudo traer el refuerzo:', err); toast('No se pudo traer el refuerzo — mirá la consola'); return; }
     if(i + 1 < cant) otro(i + 1); else fin();
   }, `<b>📣 ${esc(h.nombre)}: elegí dónde aparece${cant > 1 ? ` (${i + 1} de ${cant})` : ''}</b> <span>clic en el mapa · Esc o clic derecho ${i ? 'terminan' : 'cancelan'}</span>`, true, i ? fin : null);
   otro(0);
 }
-// El refuerzo entra al orden de turnos justo detrás de quien lo llamó, con su misma iniciativa (si hay orden y quien llamó está en él).
-async function refuerzoAlOrden(idQuienLlama, idNuevo){
+/* 📣 El refuerzo entra al orden de turnos (2026-11-24): como una invocación (js/04 invocacionAlOrden), tira su Iniciativa (la del creep, con lo fijo
+   como la Prisa sumado al resultado), la tirada va a la Mesa («Iniciativa · <refuerzo>») y entra en su lugar con OrdenTurnos.entrarConTirada (antes del
+   primero que sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima: P301). Queda con Mareo de invocación hasta que empiece el próximo
+   turno del creep que lo llamó (js/135; sin él en el orden, el mareo de antes: su primer turno). `n` = lo que devolvió duplicarCreepDesdeMapa. */
+async function refuerzoAlOrden(idQuienLlama, idNuevo, n){
   if(!idNuevo || !soyGM || typeof iniciativa === 'undefined' || !iniciativa.orden.length) return;
   if(typeof iniciativaOcupaLugar === 'function' && tokens.has(idNuevo) && !iniciativaOcupaLugar(idNuevo)) return;   // 🎲 (2026-11-23) lo que no ocupa lugar, no entra
-  const k = iniciativa.orden.findIndex(x => x.id === idQuienLlama);
-  if(k < 0) return;
-  const orden = iniciativa.orden.slice();
-  orden.splice(k + 1, 0, {id: idNuevo, valor: num(orden[k].valor)});
-  await guardarIniciativa({orden: ordenSerial(orden), turno: k + 1 <= iniciativa.turno ? iniciativa.turno + 1 : iniciativa.turno});
+  if(iniciativa.orden.some(o => o.id === idNuevo)) return;
+  let r = null, sc = null;
+  try{
+    sc = n && n.sc ? CreepCalculo.normalizar(structuredClone(n.sc)) : null;
+    const dato = sc ? iniciativaDeCreep(sc) : null;
+    const fo = dato ? formulaParaValor(num(dato.base)) : null;
+    if(dato) r = Combatiente.conIniFijo((fo && tirarDados(fo.formula)) || {formula: '0', rolls: [], mod: 0, total: 0}, dato.fijo && dato.fijo.val ? dato.fijo : null);
+  }catch(err){ console.error('No se pudo tirar la iniciativa del refuerzo:', err); }
+  const e = OrdenTurnos.entrarConTirada(iniciativa, {id: idNuevo, valor: r ? num(r.total) : 0}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa), alFinal: !r});
+  if(!e) return;
+  if(!(await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron}))) return;
+  const nombre = (n && n.nombre) || (tokens.has(idNuevo) ? nombreDe(tokens.get(idNuevo)) : 'Refuerzo');
+  if(r) mesaPublicar(`Iniciativa · ${nombre}`, {...r, desde: 'gm'});
+  else toast(`📣 ${nombre} entró al final del orden con 0: no se pudo leer su Iniciativa. Escribí el número a mano.`);
+  const invocador = iniciativa.orden.some(o => o.id === idQuienLlama) || e.orden.some(o => o.id === idQuienLlama) ? idQuienLlama : '';
+  try{
+    const pre = estadosPresetCreep().find(p => p.nombre === 'Mareo de invocación');
+    if(pre && n && n.id) await modificarCreep(n.id, x => { x.estados = Array.isArray(x.estados) ? x.estados : []; Combatiente.agregarEstado(x.estados, mareoEstadoNuevo(pre, invocador)); });
+  }catch(err){ console.error('No se pudo marear al refuerzo:', err); }
+  momentoAbrir({tipo: 'turno', icono: '📣', titulo: `${nombre} entra al orden de turnos`, estado: 'listo', datos: {lineas: invocacionAlOrdenLineas(e, r, false, invocador)}});
 }
 

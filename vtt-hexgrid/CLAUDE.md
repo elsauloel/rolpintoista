@@ -291,8 +291,9 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   (`expuestoPub`, js/17) ni dodge roll (`tokenExpuesto`, js/13).
 - **📣 Llamar refuerzos** (2026-10-16, dueño; js/31): una habilidad de creep ✨ con `refuerzos: {cant}` → `CreepAcciones.terminarHab` llama
   `ui.refuerzos` → `llamarRefuerzos(sc, h)`: un `elegirDestino` por cada uno (casilla libre), `duplicarCreepDesdeMapa(id, {refuerzo: true})`
-  (vida y No2 llenos, sin estados, cooldowns como al empezar, sin las habilidades de refuerzos; «… (refuerzo)») y `refuerzoAlOrden` (detrás de
-  quien llamó, misma iniciativa). La usa la «Plaga en la galería» de las ratas.
+  (vida y No2 llenos, sin estados, cooldowns como al empezar, sin las habilidades de refuerzos; «… (refuerzo)») y `refuerzoAlOrden` (desde el
+  2026-11-24: tira su Iniciativa y entra en su lugar con `OrdenTurnos.entrarConTirada`, mareado hasta el próximo turno de quien lo llamó; antes, detrás de
+  quien llamó con su misma iniciativa). La usa la «Plaga en la galería» de las ratas.
 - **▶ Es su turno** (2026-10-15, dueño): clic derecho del GM en una fila de la iniciativa → `iniciativaDarTurno(id)` (js/04) pregunta
   (Confirmar.elegir) *Turno normal* = `iniciativaSiguiente({a: id})` (el mismo pase de turno, directo a ese, sin cambiar de ronda) o *Turno
   libre* = `iniciativa.libre = {id, vuelve}` (turno se mueve sin fin/inicio de turno ni `paso`; ▶ Siguiente pasa a ser «↩ Volver a…» →
@@ -1053,6 +1054,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   pasó en la ronda, a `actuaron`: juega desde la próxima); sin datos, al final con 0 y un aviso al GM. Mareo y Crónica como antes
   (`invocacionAlOrdenLineas`). Al borrarse el token de una invocación que está en el orden, la pantalla del GM la saca (`escucharTokens` js/09 →
   `temporalFueraDelOrden` js/54, que ahora va una sola vez por token: `fueraDelOrdenSacando`). Dudas: P301–P304. Probado con clics en «Claude · pruebas 2».
+- **😵 El Mareo de invocación dura hasta el próximo turno de quien invocó** (2026-11-24, dueño: «una invocación o un refuerzo, el turno en que entra,
+  tira su iniciativa automáticamente y se ubica en el orden… pero tiene Mareo de invocación hasta el inicio del próximo turno del personaje que los haya
+  invocado»; `js/135-mareo-invocacion.js`). `invocacionAlOrden` (js/04) y `refuerzoAlOrden` (js/31, que ahora también tira su Iniciativa) le ponen
+  `mareoEstadoNuevo(pre, invocador)`: el preset con `permanente`, `hasta` = «que empiece el próximo turno de X» (`OrdenTurnos.mareoHasta`) y `mareoDe`
+  (el token de quien invocó: el personaje dueño, `mareoDuenoDeInvocacion`, o el creep que llamó). Sin quien invocó en el orden, el de antes (`turnos: 1`).
+  Mientras dura, `stunAntes` (js/20) frena las acciones con el cartel «No actúa hasta…». Lo saca la pantalla del GM con `mareoRevisar(id)`: en
+  `iniciativaSiguiente` (al empezar el turno de quien invocó, y cuando su turno pasa sin jugar al ⏭ Pasar de ronda) e `iniciativaIniciarCombate`, y
+  `mareoRevisarLuego()` desde `escucharIniciativa` (quien invocó salió del orden o está caído: `OrdenTurnos.mareoSeVa`). Línea en la tarjeta del turno y
+  en la Mesa. Dudas: P327. Probado con clics en «Claude · pruebas 2» (la Abeja de J1 y un refuerzo de Blanco creep).
 - **⚖ El sobrepeso** (2026-11-23, dueño, P312 y P313; `js/132-sobrepeso.js`): (1) los carteles al jugador dueño cuando el `sobre` publicado de un
   personaje suyo cambia («Tenés sobrepeso / subió / bajó / Ya no tenés sobrepeso», `Combatiente.sobrepesoAviso`), solo si el cambio lo guardó esta
   pantalla (`window.FICHA_PANTALLA`, lo pone js/132 al cargar) o lo guardó otra persona (`sobrepesoFichaCambio`, desde `escucharVinculables` js/09;

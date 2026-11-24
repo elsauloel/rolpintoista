@@ -2279,7 +2279,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     pantalla del GM le llega el aviso pero no dibuja nada (no ve el token). (La Crónica y la Mesa del GM igual dicen que el muro le pegó: ver arriba.)
   - Aparte: «🩺 Cómo quedó el grupo» le mostró al GM «En la zona: Muro de fuego» de Blanco J1 escondido: va con P324.
   - Capturas (fuera del repo, en el mismo momento): `4-aplicado-GM.png` y `4-aplicado-J1.png`.
-- **⬜ en cola — Probar: 🎲 una invocación o un refuerzo que entra solo al orden de turnos, y ⏭ Pasar de ronda con un tótem en un orden viejo**
+- **✅ hecho (2026-11-24) — Probar: 🎲 una invocación o un refuerzo que entra solo al orden de turnos, y ⏭ Pasar de ronda con un tótem en un orden viejo**
   (2026-11-23): por código, la invocación nueva y el refuerzo pasan por la misma regla (`iniciativaOcupaLugar`) y Pasar de ronda no le hace pasar el
   turno a un tótem o estandarte; no se probaron en el mapa (hoy ninguna invocación ni refuerzo es un objeto inerte: es solo la red de seguridad).
 
@@ -2287,6 +2287,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   a partir de ahora no deberían ni entrar a la lista de turnos»). Y se define: **una invocación o un refuerzo, el turno en que entra, tira su
   iniciativa automáticamente y se ubica en el orden; tiene Mareo de invocación hasta el inicio del próximo turno de quien lo invocó**. Armarlo
   junto con la prueba.
+  - ✅ **Programado (2026-11-24):** el Mareo de invocación ya no es «su primer turno»: dura hasta que empieza el próximo turno de quien la invocó
+    (una invocación → el personaje dueño; un refuerzo → el creep que lo llamó). Si le toca jugar antes, no actúa (el cartel de siempre ahora dice
+    «No actúa hasta que empiece el próximo turno de X», con «Hacerlo igual»); reacciona igual. Al empezar el turno de quien invocó se le va, con su
+    línea en la tarjeta del turno y en la Mesa («😵 Abeja de prueba ya no está mareada: empezó el turno de Blanco J1»). También se va si quien invocó
+    sale del orden o está caído. Los refuerzos ahora tiran su iniciativa y entran en su lugar (antes: justo detrás de quien los llamó, con su mismo
+    número y sin mareo). Si quien invocó no está en el orden, el mareo de antes (su primer turno). `vtt-hexgrid/js/135`, `OrdenTurnos.mareoSeVa`.
+    Duda nueva: P327 (si saca más que quien la invocó, pierde también su primer turno de la ronda siguiente).
+  - ✅ **Invocación, con clics** en «Claude · pruebas 2» (GM y Jugador 1): orden Blanco J1 30 · Blanco J2 25 · Blanco creep 0, turno de J1. J1 pone
+    la Abeja con 👥 → «Ponerlo en el mapa»: tira 1d4 = 4 (va a la Mesa) y entra entre J2 y el creep, con el estado «Mareo de invocación · hasta que
+    empiece el próximo turno de Blanco J1» (se ve en el globo del iconito 😵). ▶ Siguiente hasta su turno: el inicio de su turno no le saca el mareo;
+    J1 la quiere mover y sale «Abeja de prueba recién llega: está mareada · No actúa hasta que empiece el próximo turno de Blanco J1»; no se mueve.
+    Ronda 2, empieza el turno de J1: el mareo se va (línea en la tarjeta del GM) y el 😵 desaparece del token.
+  - ✅ **Refuerzo, con clics** (ningún creep de la partida llama refuerzos: se le sumó a Blanco creep un «Chillido de prueba» y después se sacó).
+    Orden J1 30 · Blanco creep 20 · J2 10 · Abeja 4, turno del creep: Acciones → Ejecutar → clic en una casilla libre. Llega «Blanco creep
+    (refuerzo)», tira 1d4+1 = 5 (en la Mesa) y entra entre J2 y la Abeja, mareado «hasta que empiece el próximo turno de Blanco creep». En su turno
+    el GM lo quiere mover: el cartel del mareo, no se mueve. Ronda 3: J1 juega, empieza el turno del creep → «😵 Blanco creep (refuerzo) ya no está
+    mareada…» en la Mesa de todos (desde entonces dice «mareado» para un creep).
+  - Capturas (fuera del repo): `cola99/2-J1-le-toca-a-la-abeja-y-esta-mareada.png`, `cola99/5-GM-le-toca-al-refuerzo-y-esta-mareado.png`.
+  - Partida como estaba: narrativo, sin orden, la Abeja en su casilla, sin el refuerzo ni el Chillido de prueba, Blanco creep 60/60 sin estados.
 - **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
   GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
 
@@ -2690,6 +2709,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (investigar) — 👂 «Pasos a tu espalda» le salió al GM cuando el escondido se delató sin moverse** (visto el 2026-11-24, con el Muro
   de fuego: «Protector 4 oye pasos…»; dueño: «no lo entiendo bien, ponelo al final de la cola para investigarlo en su momento»). De paso, mirar
   por qué la Quemadura del Muro entró con 2 cargas y le sacó 2 de vida en el momento.
+
+- **⬜ en cola — Probar: 😵 el Mareo de invocación que se va porque quien invocó salió del orden o cayó** (2026-11-24): con una invocación
+  mareada, ✕ al invocador en el orden (o Limpiar, o dejarlo en 0 de vida) → a los ~3 s se le va el mareo, con la línea en la Mesa. Y con ⏭ Pasar
+  de ronda, cuando el turno del invocador pasa sin jugar. No se probó con clics (sí el caso normal: invocación y refuerzo).
 
 ## En cola
 

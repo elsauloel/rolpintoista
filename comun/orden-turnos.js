@@ -172,6 +172,24 @@ const OrdenTurnos = (() => {
     }
     return l;
   }
-  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, cambiarValor, reubicarAlEmpezar};
+  /* 😵 El Mareo de invocación dura hasta que empieza el próximo turno de quien la invocó (2026-11-24, dueño: «una invocación o un refuerzo, el turno
+     en que entra, tira su iniciativa automáticamente y se ubica en el orden pertinente de la lista de turnos, pero tiene Mareo de invocación hasta el
+     inicio del próximo turno del personaje que los haya invocado»). El estado lleva `hasta` = MAREO_HASTA_PRE + el nombre (se ve en el globo y viaja en
+     el resumen público) y `mareoDe` = el token de quien invocó (en los datos completos). Puro:
+     · mareoHasta(nombre) → el texto de `hasta`; esMareoHasta(e) → ¿es un mareo de los nuevos (que se va con el turno de otro)?
+     · mareoSeVa(invocador, {empieza, enOrden(id), fuera(id)}) → por qué se va ahora: 'empieza' (empieza el turno de quien invocó), 'fuera' (quien
+       invocó no está o ya no está en el orden: su turno no va a llegar), 'caido' (quien invocó está caído: se saltea), o '' (sigue mareada). */
+  const MAREO_HASTA_PRE = 'que empiece el próximo turno de ';
+  const mareoHasta = nombre => MAREO_HASTA_PRE + (String(nombre || '').trim() || 'quien la invocó');
+  const esMareoHasta = e => !!e && e.activo !== false && (!!e.mareoDe || String(e.hasta || '').startsWith(MAREO_HASTA_PRE));
+  function mareoSeVa(invocador, o){
+    o = o || {};
+    if(invocador && o.empieza && o.empieza === invocador) return 'empieza';
+    if(!invocador || (typeof o.enOrden === 'function' && !o.enOrden(invocador))) return 'fuera';
+    if(typeof o.fuera === 'function' && o.fuera(invocador)) return 'caido';
+    return '';
+  }
+  return {yaJugo, neto, mover, aplicar, intercambiar, costoToque, enCurso, marcasAlOrdenar, porIniciar, primero, SIN_INICIAR, pendientesRonda, ocupaLugar, entrarConTirada, cambiarValor, reubicarAlEmpezar,
+    MAREO_HASTA_PRE, mareoHasta, esMareoHasta, mareoSeVa};
 })();
 if(typeof window !== 'undefined') window.OrdenTurnos = OrdenTurnos;

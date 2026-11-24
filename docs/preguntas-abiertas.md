@@ -2673,3 +2673,18 @@ la lanzó no ve nada), pero las zonas quedaron afuera a propósito.
    el duelo, ni la Crónica «… está en Muro de fuego», ni la línea de la Mesa (lo ve solo su bando, como el duelo oculto). Si el daño lo delata, desde
    ahí todo normal.
 2. ¿Y si el GM prende el 👁? **Recomendación:** que vea todo, como en el duelo oculto, pero sin tener que tirar él.
+
+### P327 — 😵 La invocación o el refuerzo que saca más iniciativa que quien lo invocó: ¿queda mareado en su primer turno de la ronda siguiente? (2026-11-24, Claude, cola de programación)
+
+Desde hoy (lo definiste vos), una invocación o un refuerzo entra al orden con su tirada y queda con **Mareo de invocación hasta que empieza el próximo
+turno de quien lo invocó** (antes: solo su primer turno propio). Aplicado así, literal. Un caso que queda raro: si saca **más** que quien lo invocó, su
+lugar está antes que el de él. Ejemplo: Blanco J1 (10) invoca la Abeja en su turno y la Abeja saca 15. Hoy su lugar ya pasó en esta ronda (P301: juega
+desde la próxima; P301 b, en la cola: juega igual al final de esta ronda). En la ronda 2 le toca a la Abeja **antes** que a J1, así que todavía está
+mareada: no actúa. Recién actúa en la ronda 3 (o en la 2 si J1 la deja jugar después de él). Con P301 b serían dos turnos mareada seguidos.
+**Mientras tanto quedó lo literal** (lo más conservador: tu regla tal cual).
+1. ¿Queda así, literal? **Recomendación:** que el mareo se vaya con lo que pase primero: el inicio del turno de quien invocó **o** el final del
+   primer turno propio de la invocación. Así nunca pierde más de un turno: si le toca antes que su invocador, pierde ese y listo; si le toca
+   después, como ahora.
+2. ¿O al revés: si saca más que quien la invocó, entra justo después de él (para que su primer turno caiga siempre después del de su invocador)?
+3. Refuerzos: si el creep que lo llamó no está en el orden (lo raro: un creep copiado a mano no es un refuerzo), el refuerzo queda con el mareo de
+   antes (solo su primer turno), porque el GM no tiene turno propio. ¿Está bien?

@@ -140,7 +140,7 @@ function inciertaDecidir(t, id){
     const tok = tokenPorFicha(t.ficha, 'pj');
     return {modo: tok && !tok.oculto && !ocultoPorSigiloParaMi(tok) ? 'incierta' : 'nada', firme: true};
   }
-  if(soyGM || des === 'incierta') return {modo: 'ver', firme: true};
+  if(soyGM || des === 'incierta' || des === 'publico') return {modo: 'ver', firme: true};   // 📣 un mensaje a todo el grupo (comun/mensajes.js) lo ven todos, tal cual
   if(des === 'incierta-creep'){
     const tok = tokenPorFicha(t.ficha, 'creep') || creepPorNombre(t.quien);
     return {modo: !tok || creepConocido(tok) ? 'incierta' : 'nada', firme: true};

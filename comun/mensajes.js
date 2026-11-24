@@ -37,20 +37,25 @@ const Mensajes = (() => {
       personajes: [...new Set(fs.filter(f => f.duenoUid === m.uid).map(f => String(f.nombre || '').trim()).filter(Boolean))],
     })).sort((a, b) => (b.gm - a.gm) || a.nombre.localeCompare(b.nombre, 'es'));
   }
-  // Cada nombre que sirve para elegir a alguien: el del usuario y el de cada personaje.
-  function candidatos(pers){
+  // 📣 Todo el grupo (2026-11-24, P285.1): el mensaje público. No es una persona: va a la Mesa de todos (colección `tiradas`, desde 'publico').
+  const GRUPO = '*grupo*';
+  const GRUPO_PERSONA = {uid: GRUPO, nombre: 'Todo el grupo', gm: false, personajes: [], grupo: true};
+  const GRUPO_NOMBRES = ['Todo el grupo', 'Todos'];
+  // Cada nombre que sirve para elegir a alguien: el del usuario y el de cada personaje (con o.grupo, también «Todo el grupo» y «Todos»).
+  function candidatos(pers, o){
     const out = [];
     (pers || []).forEach(p => {
       out.push({uid: p.uid, nombre: p.nombre, tipo: 'usuario', persona: p});
       p.personajes.forEach(n => out.push({uid: p.uid, nombre: n, tipo: 'personaje', persona: p}));
     });
+    if(o && o.grupo) GRUPO_NOMBRES.forEach(n => out.push({uid: GRUPO, nombre: n, tipo: 'grupo', persona: GRUPO_PERSONA}));
     return out;
   }
   // Lo que sugiere el autocompletado para las primeras letras (del nombre entero o de cualquiera de sus palabras).
-  function sugerencias(pers, frag, max){
+  function sugerencias(pers, frag, max, o){
     const f = norm(frag).trim();
     const vistos = new Set();
-    return candidatos(pers).filter(c => {
+    return candidatos(pers, o).filter(c => {
       const n = norm(c.nombre);
       if(f && !n.startsWith(f) && !n.split(/\s+/).some(w => w.startsWith(f))) return false;
       const k = c.uid + '|' + n;
@@ -59,17 +64,20 @@ const Mensajes = (() => {
       return true;
     }).sort((a, b) => (norm(a.nombre).startsWith(f) ? 0 : 1) - (norm(b.nombre).startsWith(f) ? 0 : 1)).slice(0, max || 8);
   }
-  // ¿Es un comando de mensaje? `/m` o `/r` (mayúscula o minúscula), solo o seguido de un espacio. → {resto} o null.
+  // ¿Es un comando de mensaje? `/m` o `/r` (mayúscula o minúscula), solo o seguido de un espacio. → {cmd: 'm'|'r', resto} o null.
   function comando(texto){
     const m = /^\s*\/([mr])(?:\s([\s\S]*))?$/i.exec(String(texto || ''));
-    return m ? {resto: (m[2] || '').replace(/^\s+/, '')} : null;
+    return m ? {cmd: m[1].toLowerCase(), resto: (m[2] || '').replace(/^\s+/, '')} : null;
   }
   // `/m Nombre texto` → {persona, por, texto} (el nombre más largo que calce), {ambiguo, opciones} o {persona: null}. null si no es comando.
-  function parsear(texto, pers){
+  // `/r texto` (P285.2, 2026-11-24): responde al último que me escribió, sin nombre → {responder: true, persona (o.ultimo, o null), texto}.
+  // o = {grupo: true (acepta «Todo el grupo»/«Todos»), ultimo: la persona del último que me escribió}.
+  function parsear(texto, pers, o){
     const c = comando(texto);
     if(!c) return null;
     const resto = c.resto;
-    const calzan = candidatos(pers).filter(k => {
+    if(c.cmd === 'r') return {responder: true, persona: (o && o.ultimo) || null, texto: resto.trim(), resto};
+    const calzan = candidatos(pers, o).filter(k => {
       const n = k.nombre;
       return n && resto.length >= n.length && norm(resto.slice(0, n.length)) === norm(n) && (resto.length === n.length || /[\s:,]/.test(resto[n.length]));
     });
@@ -81,9 +89,9 @@ const Mensajes = (() => {
     return {persona: mejores[0].persona, por: mejores[0], texto: resto.slice(largo).replace(/^[\s:,]+/, '').trim(), resto};
   }
   // Para el autocompletado: lo que se está escribiendo del nombre (puede ser ''), o null si no hay que sugerir nada.
-  function fragmento(texto, pers){
-    if(!/^\s*\/[mr]\s/i.test(String(texto || ''))) return null;
-    const p = parsear(texto, pers);
+  function fragmento(texto, pers, o){
+    if(!/^\s*\/m\s/i.test(String(texto || ''))) return null;   // (el /r no lleva nombre)
+    const p = parsear(texto, pers, o);
     if(p && p.persona && p.resto.length > p.por.nombre.length) return null;   // ya eligió y siguió escribiendo el mensaje
     return p ? p.resto : null;
   }
@@ -100,6 +108,22 @@ const Mensajes = (() => {
     return {de: yo, deNombre: String(yoNombre || '?').slice(0, 40), para: uids, paraNombres: lista.map(p => String(p.nombre || '?').slice(0, 40)),
       lectores: [yo, ...uids], texto: t, leidoPor: [yo]};
   }
+  // 📣 El mensaje público: una línea de la Mesa (colección `tiradas`, sin reglas nuevas) que ven todos los de la partida. Sin `cuando`.
+  function armarPublico(yo, yoNombre, texto){
+    const t = String(texto || '').trim();
+    if(!t) throw new Error('Escribí el mensaje.');
+    if(t.length > TEXTO_MAX) throw new Error(`El mensaje es muy largo (máximo ${TEXTO_MAX} letras).`);
+    return {uid: yo, jugador: String(yoNombre || '?').slice(0, 60), quien: '', origen: '📣 Mensaje a todo el grupo', formula: '', rolls: [], mod: 0, total: 0,
+      desde: 'publico', texto: t};
+  }
+  // Quién me escribió último (un mensaje secreto en el que estoy en `para`) → su uid, o ''.
+  function ultimoQueMeEscribio(lista, yo){
+    let u = '', t = -1;
+    (lista || []).forEach(m => { if(m && m.de !== yo && (m.para || []).includes(yo) && ms(m.cuando) >= t){ t = ms(m.cuando); u = m.de; } });
+    return u;
+  }
+  // Los públicos de otros que llegaron después de `visto` (ms).
+  const publicosNoLeidos = (pubs, yo, visto) => (pubs || []).filter(m => m && m.uid !== yo && ms(m.cuando) > (Number(visto) || 0)).length;
   const sinLeer = (m, yo) => !!(m && m.de !== yo && Array.isArray(m.para) && m.para.includes(yo) && !(Array.isArray(m.leidoPor) && m.leidoPor.includes(yo)));
   // Las conversaciones de `yo`: una por persona. Lo que mandé va en la de cada destinatario; lo que me mandaron, en la de quien lo mandó.
   // → [{uid, nombre, msgs (de más viejo a más nuevo), noLeidos, ultima}] (la de lo más reciente primero).
@@ -117,23 +141,36 @@ const Mensajes = (() => {
     return lst.sort((a, b) => b.ultima - a.ultima);
   }
   const noLeidos = (lista, yo) => (lista || []).filter(m => sinLeer(m, yo)).length;
-  // Las filas de la Mesa con los mensajes que ME llegaron, mezcladas por hora con las tiradas (que vienen de la más nueva a la más vieja).
-  // Si la Mesa ya muestra su tope de tiradas, solo los mensajes desde la más vieja que se ve (así no se amontonan los de hace días).
+  // Las filas de la Mesa con los mensajes secretos que puedo ver (los que ME llegaron y los que mandé: P285, 2026-11-24), mezcladas por hora con
+  // las tiradas (que vienen de la más nueva a la más vieja). Si la Mesa ya muestra su tope de tiradas, solo los mensajes desde la más vieja que se
+  // ve (así no se amontonan los de hace días). Los 📣 públicos ya vienen entre las tiradas: se marcan como mensaje (no son una acción ni se animan).
   function mezclarEnMesa(docs, lista, yo, tope){
-    const recibidos = (lista || []).filter(m => m && m.de !== yo && (m.para || []).includes(yo));
-    if(!recibidos.length) return docs;
+    docs = (docs || []).map(d => d && !d._mensaje && (d.data() || {}).desde === 'publico' ? {id: d.id, _mensaje: true, _publico: true, data: o => d.data(o)} : d);
+    const mios = (lista || []).filter(m => m && (m.de === yo || (m.para || []).includes(yo)));
+    if(!mios.length) return docs;
     const hora = d => ms((d.data({serverTimestamps: 'estimate'}) || {}).cuando);
     const desde = docs.length && docs.length >= (tope || 30) ? hora(docs[docs.length - 1]) : 0;
-    const pseudo = recibidos.filter(m => ms(m.cuando) >= desde).map(m => ({id: 'msj-' + m.id, _mensaje: true, data: () => ({...m, desde: 'mensaje', mensajeId: m.id})}));
+    const pseudo = mios.filter(m => ms(m.cuando) >= desde).map(m => ({id: 'msj-' + m.id, _mensaje: true, data: () => ({...m, desde: 'mensaje', mensajeId: m.id})}));
     return [...docs, ...pseudo].sort((a, b) => hora(b) - hora(a));
   }
   const tambienPara = (m, yo) => (m.para || []).map((u, i) => u === yo ? null : (m.paraNombres || [])[i] || '?').filter(Boolean);
-  // La fila de la Mesa de un mensaje que me llegó.
+  // La fila de la Mesa de un mensaje secreto: uno que me llegó o uno que mandé yo.
   function mesaHtml(t, yo){
+    if(t.de === yo){
+      return `<div class="msj-mesa-tit">🕊️ Tu mensaje secreto para <b>${e((t.paraNombres || []).join(', ') || '?')}</b></div>` +
+        `<div class="msj-mesa-txt">${e(t.texto)}</div>` +
+        `<div class="msj-mesa-pie">🔒 Solo lo ven ustedes · tocá para abrir la conversación</div>`;
+    }
     const otros = tambienPara(t, yo);
     return `<div class="msj-mesa-tit">🕊️ Mensaje secreto de <b>${e(t.deNombre || '?')}</b></div>` +
       `<div class="msj-mesa-txt">${e(t.texto)}</div>` +
       `<div class="msj-mesa-pie">🔒 Solo lo ves vos${otros.length ? ` (y ${e(otros.join(', '))})` : ''} · tocá para responder</div>`;
+  }
+  // La fila de la Mesa de un 📣 mensaje a todo el grupo (la ven todos).
+  function publicoHtml(t, yo){
+    return `<div class="msj-mesa-tit">📣 ${t.uid === yo ? 'Tu mensaje' : `<b>${e(t.jugador || '?')}</b>`} a todo el grupo</div>` +
+      `<div class="msj-mesa-txt">${e(t.texto)}</div>` +
+      `<div class="msj-mesa-pie">👥 Lo ven todos los de la partida · tocá para abrir la conversación del grupo</div>`;
   }
   // La tarjeta de la Crónica (el mapa la redibuja cada medio segundo: las animaciones arrancan en negativo según la edad, así no vuelven a empezar).
   function cronicaHtml(k, m, edad, queda){
@@ -150,12 +187,26 @@ const Mensajes = (() => {
   /* ---------- Estado ---------- */
   let iniciado = false, faltanReglas = false, avisadoReglas = false, primera = true;
   const msgs = new Map();
+  const pubs = new Map();   // 📣 los mensajes a todo el grupo (líneas `publico` de la Mesa)
+  let primeraPub = true;
   let miembros = [], fichas = [];
   let latirHasta = 0;
   const yo = () => (typeof fbUsuario !== 'undefined' && fbUsuario) ? fbUsuario.uid : '';
   const yoNombre = () => (typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.nombre) || '?';
   const soyGM = () => !!(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm);
   const lista = () => [...msgs.values()];
+  const listaPub = () => [...pubs.values()].sort((a, b) => ms(a.cuando) - ms(b.cuando));
+  // Hasta cuándo vi los 📣 públicos (por navegador; no se guarda en Firebase: la Mesa no se edita). Sin dato: desde ahora (lo viejo no cuenta).
+  const claveVisto = () => 'msjPublicoVisto:' + (typeof fbRutaCampana === 'function' ? fbRutaCampana('') : '');
+  function vistoPub(){
+    try{ const v = Number(localStorage.getItem(claveVisto())); if(v) return v; localStorage.setItem(claveVisto(), String(Date.now())); }catch(err){}
+    return Date.now();
+  }
+  function marcarVistoPub(){
+    const ult = listaPub().reduce((mx, m) => Math.max(mx, ms(m.cuando)), Date.now());
+    try{ localStorage.setItem(claveVisto(), String(ult)); }catch(err){}
+  }
+  const noLeidosPub = () => publicosNoLeidos(listaPub(), yo(), vistoPub());
   const misPersonas = () => personas(miembros, fichas, yo());
   const persona = uid => misPersonas().find(p => p.uid === uid) || null;
   const etiqueta = p => p ? p.nombre + (p.gm ? ' (GM)' : '') : '?';
@@ -252,7 +303,37 @@ const Mensajes = (() => {
 .msj-sug .msj-sug-tit{font-size:11px;color:#d9b9cb;padding:4px 8px 3px}
 .msj-sug button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;background:none;border:none;color:inherit;padding:6px 8px;border-radius:6px;cursor:pointer;font:inherit}
 .msj-sug button.activa,.msj-sug button:hover{background:#3a1f33}
-.msj-sug .msj-sug-a{font-size:11.5px;color:#d9b9cb}`;
+.msj-sug .msj-sug-a{font-size:11.5px;color:#d9b9cb}
+.mesa-tirada.mesa-mensaje.mesa-mensaje-mio{animation:none;background:#4a1438!important;border-style:dashed!important}
+.mesa-tirada.mesa-publico{cursor:pointer;color:#fff7df!important;border:1px solid #ffcf5a!important;border-left:5px solid #ffcf5a!important;border-radius:7px;background:linear-gradient(100deg,#4a3208,#6e4a0c 60%,#4a3208)!important}
+.mesa-tirada.mesa-publico .msj-mesa-tit{font-weight:700;letter-spacing:.02em}
+.mesa-tirada.mesa-publico .msj-mesa-txt{margin-top:3px;font-size:13px;line-height:1.35;white-space:pre-wrap;word-break:break-word}
+.mesa-tirada.mesa-publico .msj-mesa-pie{margin-top:4px;font-size:10.5px;opacity:.85}
+.mesa-tirada.mesa-publico:hover{filter:brightness(1.15)}
+@keyframes msj-vibra{0%,100%{transform:none}12%{transform:translateX(-3px) rotate(-9deg)}25%{transform:translateX(3px) rotate(9deg)}37%{transform:translateX(-3px) rotate(-7deg)}50%{transform:translateX(2px) rotate(6deg)}62%{transform:translateX(-2px) rotate(-4deg)}75%{transform:translateX(1px) rotate(2deg)}}
+#msj-flotante.msj-vibra{animation:msj-vibra .7s ease-in-out 2}
+#msj-flotante.msj-vibra.msj-hay{animation:msj-vibra .7s ease-in-out 2,msj-boton-late 1.8s ease-in-out infinite}
+#msj-avisos{z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none;width:300px}
+@keyframes msj-aviso-entra{0%{transform:translateY(14px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+.msj-aviso{pointer-events:auto;cursor:pointer;box-sizing:border-box;width:100%;color:#fff;border:2px solid #ffb3e0;border-radius:12px;padding:9px 12px;font:13px/1.35 system-ui,sans-serif;
+  background:linear-gradient(135deg,#c2187d,#6d0c4c);box-shadow:0 8px 24px rgba(0,0,0,.55);animation:msj-aviso-entra .35s ease-out both;transition:opacity .5s,transform .5s}
+.msj-aviso.publico{border-color:#ffe29a;background:linear-gradient(135deg,#8a5a0c,#4a3208)}
+.msj-aviso.sale{opacity:0;transform:translateY(8px)}
+.msj-aviso-tit{font-weight:800;font-size:13.5px}
+.msj-aviso-txt{margin-top:3px;opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msj-aviso-pie{margin-top:3px;font-size:11px;opacity:.8}
+@media (prefers-reduced-motion: reduce){#msj-flotante.msj-vibra,#msj-flotante.msj-vibra.msj-hay{animation:none;outline:3px solid #fff;outline-offset:2px}.msj-aviso{animation:none}}
+.msj-lista button.grupo{border-color:#6e5520;background:#2e2412}
+.msj-lista button.grupo.activa{border-color:#ffcf5a;background:#45340f}
+.msj-burbuja.suya.pub,.msj-burbuja.mia.pub{border-color:#ffcf5a}
+.msj-burbuja.mia.pub{background:linear-gradient(135deg,#9a6a10,#6e4a0c)}
+.msj-burbuja .msj-de{display:block;font-size:11px;font-weight:700;opacity:.9;margin-bottom:2px}
+.msj-inicio{margin:auto;display:flex;flex-direction:column;gap:12px;align-items:stretch;padding:20px;max-width:360px;text-align:center;color:#d9b9cb;font-size:13px}
+.msj-inicio .msj-btn{padding:11px 16px;font-size:14.5px}
+.msj-inicio .msj-btn.grupo{background:#ffcf5a;border-color:#ffcf5a;color:#2a1c00}
+.msj-para label.grupo{border-color:#6e5520;background:#2e2412}
+.msj-para label.grupo.marcado{border-color:#ffcf5a;background:#45340f}
+.msj-para label.apagado{opacity:.45}`;
     document.head.appendChild(st);
   }
 
@@ -307,6 +388,31 @@ const Mensajes = (() => {
       return false;
     }
   }
+  // 📣 A todo el grupo: una línea de la Mesa (la ven todos, como una tirada; con su propio color).
+  async function enviarPublico(texto){
+    let doc;
+    try{ doc = armarPublico(yo(), yoNombre(), texto); }
+    catch(err){ avisar(err.message); return false; }
+    try{ await fbDb.collection(fbRutaCampana('tiradas')).add({...doc, cuando: firebase.firestore.FieldValue.serverTimestamp()}); return true; }
+    catch(err){ console.error('Mensajes: no se pudo mandar al grupo', err); avisar('No se pudo mandar el mensaje al grupo — revisá la conexión'); return false; }
+  }
+  function escucharPublicos(){
+    fbDb.collection(fbRutaCampana('tiradas')).where('desde', '==', 'publico').onSnapshot(snap => {
+      const nuevos = [];
+      snap.docChanges().forEach(ch => {
+        if(ch.type === 'removed'){ pubs.delete(ch.doc.id); return; }
+        const m = {id: ch.doc.id, ...ch.doc.data({serverTimestamps: 'estimate'})};
+        if(ch.type === 'added' && !primeraPub && m.uid !== yo()) nuevos.push(m);
+        pubs.set(m.id, m);
+      });
+      primeraPub = false;
+      if(nuevos.length){
+        if(convAbierta && convSel === GRUPO && document.visibilityState === 'visible') marcarVistoPub();
+        else nuevos.forEach(m => avisarLlegada({uid: GRUPO, publico: true, nombre: m.jugador, texto: m.texto}));
+      }
+      redibujar();
+    }, err => console.error('Mensajes: no se pudieron leer los mensajes al grupo', err));
+  }
   async function marcarLeidos(uid){
     const pend = lista().filter(m => m.de === uid && sinLeer(m, yo()));
     if(!pend.length) return;
@@ -342,7 +448,10 @@ const Mensajes = (() => {
   function alCambiar(nuevos){
     nuevos.forEach(m => {
       if(convAbierta && convSel === m.de && document.visibilityState === 'visible') marcarLeidos(m.de);
-      else if(typeof window.mensajesCronica === 'function'){ try{ window.mensajesCronica(m); }catch(err){ console.error(err); } }
+      else{
+        if(typeof window.mensajesCronica === 'function'){ try{ window.mensajesCronica(m); }catch(err){ console.error(err); } }
+        avisarLlegada({uid: m.de, nombre: m.deNombre, texto: m.texto});
+      }
     });
     if(nuevos.length) latirHasta = Date.now() + 2800;
     redibujar();
@@ -357,24 +466,24 @@ const Mensajes = (() => {
   let boton = null;
   function dibujarBoton(){
     if(!iniciado) return;
-    const todos = lista(), n = noLeidos(todos, yo());
+    const todos = lista(), n = noLeidos(todos, yo()) + noLeidosPub();
     if(!boton){
       boton = document.createElement('button');
       boton.type = 'button';
       boton.id = 'msj-flotante';
-      boton.title = 'Mensajes secretos';
+      boton.title = 'Mensajes';
       boton.innerHTML = '🕊️<span class="msj-globo" hidden></span>';
-      boton.onclick = () => abrirConversacion();
+      boton.onclick = () => abrirDesdePaloma();
       const caja = document.getElementById('lienzo-caja');   // el mapa: abajo a la derecha del lienzo (la Mesa va en la columna de al lado)
       if(caja){ boton.style.cssText = 'position:absolute;right:18px;bottom:18px'; caja.appendChild(boton); }
       else{ boton.style.cssText = 'position:fixed;right:18px;bottom:18px'; document.body.appendChild(boton); setInterval(ubicarBoton, 1000); window.addEventListener('resize', ubicarBoton); }
     }
-    boton.hidden = !todos.length;
+    boton.hidden = false;   // P285.3 (2026-11-24): siempre a la vista; es la ruta principal para mandar y para leer
     boton.classList.toggle('msj-hay', n > 0);
     const g = boton.querySelector('.msj-globo');
     g.hidden = !n;
     g.textContent = n > 99 ? '99+' : String(n);
-    boton.title = n ? `Mensajes secretos · ${n} sin leer` : 'Mensajes secretos';
+    boton.title = n ? `Mensajes · ${n} sin leer (tocá para leerlos)` : 'Mensajes: mandá uno secreto o a todo el grupo';
     if(latirHasta > Date.now()){ g.classList.remove('late'); void g.offsetWidth; g.classList.add('late'); latirHasta = 0; }
     ubicarBoton();
   }
@@ -390,6 +499,41 @@ const Mensajes = (() => {
     }
     boton.style.right = derecha + 'px';
     boton.style.bottom = abajo + 'px';
+    if(avisos && avisos.style.position === 'fixed') avisos.style.right = derecha + 'px';
+  }
+
+  /* ---------- Al llegar uno: la paloma vibra y sale un aviso flotante (P285, dueño 2026-11-24) ---------- */
+  let avisos = null;
+  const AVISO_MS = 7000;
+  function vibrar(){
+    if(!boton) return;
+    boton.classList.remove('msj-vibra'); void boton.offsetWidth; boton.classList.add('msj-vibra');
+    clearTimeout(vibrar.t); vibrar.t = setTimeout(() => boton && boton.classList.remove('msj-vibra'), 1500);
+  }
+  // {uid (de quién, o GRUPO), publico, nombre, texto}
+  function avisarLlegada(a){
+    if(!iniciado) return;
+    dibujarBoton();
+    vibrar();
+    if(!avisos){
+      avisos = document.createElement('div');
+      avisos.id = 'msj-avisos';
+      const caja = document.getElementById('lienzo-caja');
+      if(caja && boton && boton.parentNode === caja){ avisos.style.cssText = 'position:absolute;right:18px;bottom:88px'; caja.appendChild(avisos); }
+      else{ avisos.style.cssText = `position:fixed;right:${(boton && boton.style.right) || '18px'};bottom:88px`; document.body.appendChild(avisos); }
+    }
+    const d = document.createElement('div');
+    d.className = 'msj-aviso' + (a.publico ? ' publico' : '');
+    d.dataset.abrir = a.uid;
+    d.title = 'Tocá para abrir la conversación';
+    const txt = String(a.texto || '');
+    d.innerHTML = `<div class="msj-aviso-tit">${a.publico ? `📣 ${e(a.nombre || '?')} le escribió a todo el grupo` : `🕊️ Te llegó un mensaje de ${e(a.nombre || '?')}`}</div>` +
+      `<div class="msj-aviso-txt">${e(txt.length > 90 ? txt.slice(0, 87) + '…' : txt)}</div><div class="msj-aviso-pie">Tocá para abrirlo</div>`;
+    const sacar = () => { d.classList.add('sale'); setTimeout(() => d.remove(), 500); };
+    d.addEventListener('click', () => { d.remove(); abrirConversacion(a.uid); });
+    avisos.appendChild(d);
+    while(avisos.children.length > 3) avisos.firstChild.remove();
+    setTimeout(sacar, AVISO_MS);
   }
 
   /* ---------- Ventanas ---------- */
@@ -408,12 +552,13 @@ const Mensajes = (() => {
     estilos();
     if(abierta) cerrarVentana(abierta);
     const marcados = new Set((o && o.para) || []);
+    let grupo = !!(o && o.publico);
     const v = document.createElement('div');
     v.className = 'msj-fondo';
-    v.innerHTML = `<div class="msj-caja" role="dialog" aria-modal="true"><header><h3>🕊️ Mensaje secreto</h3><button type="button" class="msj-x" title="Cerrar">✕</button></header>
-      <div class="msj-nota">🔒 Lo leen solo vos y a quienes se lo mandes (el GM tampoco, si no se lo mandás). No sale en la Mesa de nadie más.</div>
+    v.innerHTML = `<div class="msj-caja" role="dialog" aria-modal="true"><header><h3>🕊️ Mensaje nuevo</h3><button type="button" class="msj-x" title="Cerrar">✕</button></header>
+      <div class="msj-nota msj-nota-priv"></div>
       <div class="msj-aviso-reglas" ${faltanReglas ? '' : 'hidden'}>${e(AVISO_REGLAS)}</div>
-      <div class="msj-nota"><b>Para:</b> marcá uno o varios.</div>
+      <div class="msj-nota"><b>Para:</b> todo el grupo, o marcá uno o varios (secreto).</div>
       <div class="msj-para"></div>
       <button type="button" class="msj-todos">Marcar a todos</button>
       <textarea maxlength="${TEXTO_MAX}" placeholder="Escribí el mensaje… (Ctrl+Enter para mandarlo)">${e((o && o.texto) || '')}</textarea>
@@ -421,21 +566,30 @@ const Mensajes = (() => {
       <footer><button type="button" class="msj-btn no">Cancelar</button><button type="button" class="msj-btn si">🕊️ Enviar</button></footer></div>`;
     const pintar = () => {
       const ps = misPersonas();
-      v.querySelector('.msj-para').innerHTML = ps.length ? ps.map(p => `<label class="${marcados.has(p.uid) ? 'marcado' : ''}"><input type="checkbox" data-uid="${e(p.uid)}" ${marcados.has(p.uid) ? 'checked' : ''}>` +
-        `<span><span class="msj-quien">${e(etiqueta(p))}</span><br><span class="msj-pjs">${p.personajes.length ? '🎭 ' + e(p.personajes.join(', ')) : (p.gm ? 'el GM' : 'sin personaje')}</span></span></label>`).join('')
-        : '<div class="msj-nota">No hay nadie más en la partida.</div>';
-      v.querySelector('.msj-todos').textContent = ps.length && ps.every(p => marcados.has(p.uid)) ? 'Desmarcar a todos' : 'Marcar a todos';
+      v.querySelector('.msj-para').innerHTML = `<label class="grupo ${grupo ? 'marcado' : ''}"><input type="checkbox" data-grupo="1" ${grupo ? 'checked' : ''}>` +
+        `<span><span class="msj-quien">📣 Todo el grupo</span><br><span class="msj-pjs">Mensaje público: sale en la Mesa de todos (también del GM)</span></span></label>` +
+        (ps.length ? ps.map(p => `<label class="${marcados.has(p.uid) && !grupo ? 'marcado' : ''}${grupo ? ' apagado' : ''}"><input type="checkbox" data-uid="${e(p.uid)}" ${marcados.has(p.uid) && !grupo ? 'checked' : ''}>` +
+        `<span><span class="msj-quien">🔒 ${e(etiqueta(p))}</span><br><span class="msj-pjs">${p.personajes.length ? '🎭 ' + e(p.personajes.join(', ')) : (p.gm ? 'el GM' : 'sin personaje')}</span></span></label>`).join('')
+        : '<div class="msj-nota">No hay nadie más en la partida.</div>');
+      v.querySelector('.msj-todos').textContent = ps.length && ps.every(p => marcados.has(p.uid)) ? 'Desmarcar a todos' : 'Marcar a todos (secreto)';
+      v.querySelector('.msj-todos').hidden = grupo;
+      v.querySelector('.msj-nota-priv').innerHTML = grupo ? '📣 <b>Público:</b> lo ven todos los de la partida, en la Mesa.'
+        : '🔒 <b>Secreto:</b> lo leen solo vos y a quienes se lo mandes (el GM tampoco, si no se lo mandás). Les aparece en su Mesa y en su 🕊️.';
+      v.querySelector('h3').textContent = grupo ? '📣 Mensaje a todo el grupo' : '🕊️ Mensaje secreto';
+      v.querySelector('.si').textContent = grupo ? '📣 Enviar a todos' : '🕊️ Enviar';
     };
     const cuenta = () => {
       const t = v.querySelector('textarea').value;
       v.querySelector('.msj-cuenta').textContent = `${t.length} / ${TEXTO_MAX}`;
-      v.querySelector('.si').disabled = !t.trim() || !marcados.size;
+      v.querySelector('.si').disabled = !t.trim() || (!grupo && !marcados.size);
     };
     pintar(); cuenta();
     v.pintar = pintar;
     v.addEventListener('change', ev => {
+      if(ev.target.closest('input[data-grupo]')){ grupo = ev.target.checked; pintar(); cuenta(); return; }
       const c = ev.target.closest('input[data-uid]');
       if(!c) return;
+      grupo = false;
       if(c.checked) marcados.add(c.dataset.uid); else marcados.delete(c.dataset.uid);
       pintar(); cuenta();
     });
@@ -444,14 +598,16 @@ const Mensajes = (() => {
       const b = v.querySelector('.si');
       if(b.disabled) return;
       b.disabled = true;
-      const ok = await enviar([...marcados], v.querySelector('textarea').value);
-      if(ok){ cerrarVentana(v); if(abierta === v) abierta = null; avisar(`🕊️ Mensaje secreto enviado`); }
+      const publico = grupo;
+      const ok = publico ? await enviarPublico(v.querySelector('textarea').value) : await enviar([...marcados], v.querySelector('textarea').value);
+      if(ok){ cerrarVentana(v); if(abierta === v) abierta = null; avisar(publico ? '📣 Mensaje enviado a todo el grupo' : '🕊️ Mensaje secreto enviado'); }
       else cuenta();
     };
     v.querySelector('textarea').addEventListener('keydown', ev => { if(ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)){ ev.preventDefault(); mandar(); } });
     v.addEventListener('click', ev => {
       if(ev.target === v || ev.target.closest('.msj-x, .no')){ cerrarVentana(v); if(abierta === v) abierta = null; return; }
       if(ev.target.closest('.msj-todos')){
+        grupo = false;
         const ps = misPersonas();
         if(ps.every(p => marcados.has(p.uid))) marcados.clear(); else ps.forEach(p => marcados.add(p.uid));
         pintar(); cuenta(); return;
@@ -464,20 +620,30 @@ const Mensajes = (() => {
     return v;
   }
 
-  // Las conversaciones (el 🕊️ flotante, tocar un mensaje en la Mesa o en la Crónica).
-  function abrirConversacion(uid){
+  // La paloma: con algo sin leer, abre esa conversación; si no, la ventana con «Mensaje nuevo» y «A todo el grupo» a mano (P285, 2026-11-24).
+  function abrirDesdePaloma(){
+    const convs = conversaciones(lista(), yo(), misPersonas());
+    const c = convs.find(x => x.noLeidos);
+    if(c) return abrirConversacion(c.uid);
+    if(noLeidosPub()) return abrirConversacion(GRUPO);
+    convSel = '';
+    abrirConversacion('', {inicio: true});
+  }
+  // Las conversaciones (el 🕊️ flotante, tocar un mensaje en la Mesa, en la Crónica o en el aviso). uid = GRUPO: la del grupo.
+  function abrirConversacion(uid, o){
     estilos();
     if(abierta){ cerrarVentana(abierta); abierta = null; }
     if(!convAbierta){
       const v = document.createElement('div');
       v.className = 'msj-fondo';
-      v.innerHTML = `<div class="msj-caja ancha" role="dialog" aria-modal="true"><header><h3>🕊️ Mensajes secretos</h3><button type="button" class="msj-btn msj-nuevo">＋ Mensaje nuevo</button><button type="button" class="msj-x" title="Cerrar">✕</button></header>
+      v.innerHTML = `<div class="msj-caja ancha" role="dialog" aria-modal="true"><header><h3>🕊️ Mensajes</h3><button type="button" class="msj-btn msj-nuevo">＋ Mensaje nuevo</button><button type="button" class="msj-x" title="Cerrar">✕</button></header>
         <div class="msj-aviso-reglas" ${faltanReglas ? '' : 'hidden'}>${e(AVISO_REGLAS)}</div>
-        <div class="msj-nota" style="padding-bottom:8px">🔒 Cada conversación la leen solo los que están en ella: el GM no puede leer lo que se mandan dos jugadores.</div>
+        <div class="msj-nota" style="padding-bottom:8px">🔒 Cada conversación secreta la leen solo los que están en ella: el GM no puede leer lo que se mandan dos jugadores. 📣 La del grupo la ven todos.</div>
         <div class="msj-conv"><div class="msj-lista"></div><div class="msj-hilo"></div></div></div>`;
       v.addEventListener('click', ev => {
         if(ev.target === v || ev.target.closest('.msj-x')){ cerrarConv(); return; }
         if(ev.target.closest('.msj-nuevo')){ cerrarConv(); abrirMandar({}); return; }
+        if(ev.target.closest('.msj-nuevo-grupo')){ cerrarConv(); abrirMandar({publico: true}); return; }
         const b = ev.target.closest('[data-conv]');
         if(b){ convSel = b.dataset.conv; dibujarConv(true); return; }
         if(ev.target.closest('.msj-mandar-hilo')) responder();
@@ -486,7 +652,7 @@ const Mensajes = (() => {
       convAbierta = v;
     }
     const convs = conversaciones(lista(), yo(), misPersonas());
-    convSel = uid || convSel || (convs.find(c => c.noLeidos) || convs[0] || {}).uid || '';
+    convSel = (o && o.inicio) ? '' : (uid || convSel || (convs.find(c => c.noLeidos) || convs[0] || {}).uid || '');
     dibujarConv(true);
   }
   function cerrarConv(){ if(convAbierta){ convAbierta.remove(); convAbierta = null; } }
@@ -496,28 +662,45 @@ const Mensajes = (() => {
     if(!v) return;
     const ps = misPersonas();
     const convs = conversaciones(lista(), yo(), ps);
-    if(convSel && !convs.some(c => c.uid === convSel)) convs.push({uid: convSel, nombre: (persona(convSel) || {}).nombre || '?', msgs: [], noLeidos: 0, ultima: 0});
+    if(convSel && convSel !== GRUPO && !convs.some(c => c.uid === convSel)) convs.push({uid: convSel, nombre: (persona(convSel) || {}).nombre || '?', msgs: [], noLeidos: 0, ultima: 0});
     const ta = v.querySelector('.msj-responder textarea');
-    if(ta) borradorHilo[convSel] = ta.value;
-    v.querySelector('.msj-lista').innerHTML = convs.length ? convs.map(c => { const p = persona(c.uid);
-      return `<button type="button" data-conv="${e(c.uid)}" class="${c.uid === convSel ? 'activa' : ''}"><b>${e(p ? etiqueta(p) : c.nombre)}</b><span class="msj-l-pjs">${e(p ? personajesTxt(p) : '')}</span>${c.noLeidos ? `<span class="msj-l-n">${c.noLeidos}</span>` : ''}</button>`; }).join('')
-      : '<div class="msj-l-vacia">Todavía no hay mensajes. Mandá uno con «＋ Mensaje nuevo», con el 🕊️ de la Mesa o escribiendo en la Mesa <b>/m</b> y el nombre.</div>';
-    const c = convs.find(x => x.uid === convSel);
-    const hilo = v.querySelector('.msj-hilo');
-    if(!c){ hilo.innerHTML = '<div class="msj-hilo-vacio">Elegí una conversación.</div>'; return; }
-    const p = persona(c.uid);
+    if(ta) borradorHilo[ta.dataset.conv || convSel] = ta.value;
+    const nPub = noLeidosPub();
+    v.querySelector('.msj-lista').innerHTML = `<button type="button" data-conv="${GRUPO}" class="grupo ${convSel === GRUPO ? 'activa' : ''}"><b>📣 Todo el grupo</b><span class="msj-l-pjs">Público: lo ven todos</span>${nPub ? `<span class="msj-l-n">${nPub}</span>` : ''}</button>` +
+      (convs.length ? convs.map(c => { const p = persona(c.uid);
+      return `<button type="button" data-conv="${e(c.uid)}" class="${c.uid === convSel ? 'activa' : ''}"><b>🔒 ${e(p ? etiqueta(p) : c.nombre)}</b><span class="msj-l-pjs">${e(p ? personajesTxt(p) : '')}</span>${c.noLeidos ? `<span class="msj-l-n">${c.noLeidos}</span>` : ''}</button>`; }).join('')
+      : '<div class="msj-l-vacia">Todavía no hay mensajes secretos. Mandá uno con «＋ Mensaje nuevo» o escribiendo en la Mesa <b>/m</b> y el nombre.</div>');
     const hora = m => { const t = ms(m.cuando); if(!t) return ''; const d = new Date(t); return d.toLocaleDateString('es-AR', {day: '2-digit', month: '2-digit'}) + ' ' + d.toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit', hour12: false}); };
+    const hilo = v.querySelector('.msj-hilo');
+    const enganchar = (nta) => {
+      const caja = hilo.querySelector('.msj-hilo-msgs');
+      if(caja) caja.scrollTop = caja.scrollHeight;
+      nta.dataset.conv = convSel;
+      nta.value = borradorHilo[convSel] || '';
+      nta.addEventListener('keydown', ev => { if(ev.key === 'Enter' && !ev.shiftKey){ ev.preventDefault(); responder(); } });
+      if(enfocar) nta.focus();
+    };
+    if(convSel === GRUPO){
+      const ps = listaPub();
+      hilo.innerHTML = `<div class="msj-hilo-cab"><b>📣 Todo el grupo</b> <span class="msj-l-pjs" style="display:inline;color:#d9b9cb">· público: sale en la Mesa de todos, también del GM</span></div>` +
+        `<div class="msj-hilo-msgs">${ps.length ? ps.map(m => { const mia = m.uid === yo();
+          return `<div class="msj-burbuja pub ${mia ? 'mia' : 'suya'}">${mia ? '' : `<span class="msj-de">${e(m.jugador || '?')}</span>`}${e(m.texto)}<span class="msj-hora">${e(hora(m))}</span></div>`; }).join('')
+          : '<div class="msj-hilo-vacio">Todavía nadie le escribió al grupo. Escribí abajo.</div>'}</div>` +
+        `<div class="msj-responder"><textarea maxlength="${TEXTO_MAX}" placeholder="Escribile a todo el grupo… (Enter manda, Shift+Enter baja de renglón)"></textarea><button type="button" class="msj-btn si msj-mandar-hilo">📣 Enviar</button></div>`;
+      enganchar(hilo.querySelector('textarea'));
+      if(nPub && document.visibilityState === 'visible'){ marcarVistoPub(); dibujarBoton(); setTimeout(() => { if(convAbierta && convSel === GRUPO) dibujarConv(); }, 0); }
+      return;
+    }
+    const c = convs.find(x => x.uid === convSel);
+    if(!c){ hilo.innerHTML = `<div class="msj-inicio"><div>¿Qué querés mandar?</div><button type="button" class="msj-btn si msj-nuevo">🕊️ Mensaje secreto</button>` +
+      `<button type="button" class="msj-btn grupo msj-nuevo-grupo">📣 Mensaje a todo el grupo</button><div>O elegí una conversación de la izquierda. En la Mesa también podés escribir <b>/m</b> y el nombre, o <b>/r</b> para responderle al último que te escribió.</div></div>`; return; }
+    const p = persona(c.uid);
     hilo.innerHTML = `<div class="msj-hilo-cab">Con <b>${e(p ? etiqueta(p) : c.nombre)}</b> <span class="msj-l-pjs" style="display:inline;color:#d9b9cb">· ${e(p ? personajesTxt(p) : '')}</span></div>` +
       `<div class="msj-hilo-msgs">${c.msgs.length ? c.msgs.map(m => { const mia = m.de === yo(); const otros = mia ? (m.paraNombres || []).filter((n, i) => m.para[i] !== c.uid) : tambienPara(m, yo());
         return `<div class="msj-burbuja ${mia ? 'mia' : 'suya'}">${otros.length ? `<span class="msj-tambien">${mia ? 'También a' : 'También para'}: ${e(otros.join(', '))}</span>` : ''}${e(m.texto)}<span class="msj-hora">${e(hora(m))}</span></div>`; }).join('')
         : '<div class="msj-hilo-vacio">Todavía no se mandaron nada. Escribí abajo.</div>'}</div>` +
       `<div class="msj-responder"><textarea maxlength="${TEXTO_MAX}" placeholder="Responder a ${e(p ? p.nombre : c.nombre)}… (Enter manda, Shift+Enter baja de renglón)"></textarea><button type="button" class="msj-btn si msj-mandar-hilo">Enviar</button></div>`;
-    const caja = hilo.querySelector('.msj-hilo-msgs');
-    caja.scrollTop = caja.scrollHeight;
-    const nta = hilo.querySelector('textarea');
-    nta.value = borradorHilo[convSel] || '';
-    nta.addEventListener('keydown', ev => { if(ev.key === 'Enter' && !ev.shiftKey){ ev.preventDefault(); responder(); } });
-    if(enfocar) nta.focus();
+    enganchar(hilo.querySelector('textarea'));
     if(c.noLeidos && document.visibilityState === 'visible') marcarLeidos(c.uid);
   }
   async function responder(){
@@ -526,7 +709,7 @@ const Mensajes = (() => {
     const ta = v.querySelector('.msj-responder textarea'), b = v.querySelector('.msj-mandar-hilo');
     if(!ta.value.trim()) return;
     b.disabled = true;
-    const ok = await enviar([convSel], ta.value);
+    const ok = convSel === GRUPO ? await enviarPublico(ta.value) : await enviar([convSel], ta.value);
     b.disabled = false;
     if(ok){ ta.value = ''; borradorHilo[convSel] = ''; }
   }
@@ -535,16 +718,16 @@ const Mensajes = (() => {
   let sug = null, sugLista = [], sugI = 0, sugInput = null;
   function cerrarSug(){ if(sug){ sug.remove(); sug = null; } sugLista = []; }
   function mostrarSug(input){
-    const f = fragmento(input.value, misPersonas());
+    const f = fragmento(input.value, misPersonas(), {grupo: true});
     if(f === null){ cerrarSug(); return; }
-    sugLista = sugerencias(misPersonas(), f, 8);
+    sugLista = sugerencias(misPersonas(), f, 8, {grupo: true});
     if(!sugLista.length){ cerrarSug(); return; }
     sugInput = input;
     if(sugI >= sugLista.length) sugI = 0;
     if(!sug){ sug = document.createElement('div'); sug.className = 'msj-sug'; document.body.appendChild(sug);
       sug.addEventListener('mousedown', ev => { const b = ev.target.closest('[data-sug]'); if(b){ ev.preventDefault(); elegirSug(Number(b.dataset.sug)); } }); }
     sug.innerHTML = '<div class="msj-sug-tit">🕊️ Mensaje secreto para… (↑↓ y Enter o Tab)</div>' + sugLista.map((c, i) => `<button type="button" data-sug="${i}" class="${i === sugI ? 'activa' : ''}">` +
-      `<span>${c.tipo === 'personaje' ? '🎭' : (c.persona.gm ? '👑' : '👤')} ${e(c.nombre)}</span><span class="msj-sug-a">${c.tipo === 'personaje' ? '→ ' + e(etiqueta(c.persona)) : (c.persona.personajes.length ? e(c.persona.personajes.join(', ')) : (c.persona.gm ? 'GM' : ''))}</span></button>`).join('');
+      `<span>${c.tipo === 'grupo' ? '📣' : c.tipo === 'personaje' ? '🎭' : (c.persona.gm ? '👑' : '👤')} ${e(c.nombre)}</span><span class="msj-sug-a">${c.tipo === 'grupo' ? 'público, lo ven todos' : c.tipo === 'personaje' ? '→ ' + e(etiqueta(c.persona)) : (c.persona.personajes.length ? e(c.persona.personajes.join(', ')) : (c.persona.gm ? 'GM' : ''))}</span></button>`).join('');
     const r = input.getBoundingClientRect();
     sug.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 370)) + 'px';
     sug.style.bottom = (window.innerHeight - r.top + 6) + 'px';
@@ -553,7 +736,7 @@ const Mensajes = (() => {
   function elegirSug(i){
     const c = sugLista[i], input = sugInput;
     if(!c || !input) return;
-    const m = /^(\s*\/[mr]\s+)/i.exec(input.value);
+    const m = /^(\s*\/m\s+)/i.exec(input.value);
     input.value = (m ? m[1] : '/m ') + c.nombre + ' ';
     cerrarSug();
     input.focus();
@@ -566,11 +749,11 @@ const Mensajes = (() => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'btn mensajes-boton-mesa';
-    b.title = 'Mandar un mensaje secreto (o escribí /m y el nombre)';
+    b.title = 'Mandar un mensaje secreto o a todo el grupo (o escribí /m y el nombre; /r responde al último que te escribió)';
     b.textContent = '🕊️';
     b.onclick = () => abrirMandar({});
     form.appendChild(b);
-    input.placeholder = 'Tirada libre (2d6+3) o /m Nombre mensaje';
+    input.placeholder = 'Tirada libre (2d6+3), /m Nombre mensaje o /r respuesta';
     input.addEventListener('input', () => { sugI = 0; mostrarSug(input); });
     input.addEventListener('blur', () => setTimeout(cerrarSug, 150));
     input.addEventListener('keydown', ev => {
@@ -582,11 +765,24 @@ const Mensajes = (() => {
     // El comando va antes que la tirada libre de cada herramienta (fase de captura, en el documento).
     document.addEventListener('submit', ev => {
       if(ev.target !== form) return;
-      const p = parsear(input.value, misPersonas());
+      const ult = ultimoQueMeEscribio(lista(), yo());
+      const p = parsear(input.value, misPersonas(), {grupo: true, ultimo: ult ? (persona(ult) || {uid: ult, nombre: (lista().find(m => m.de === ult) || {}).deNombre || '?'}) : null});
       if(!p) return;
       ev.preventDefault();
       ev.stopImmediatePropagation();
       cerrarSug();
+      if(p.responder){
+        if(!p.persona){ avisar('Todavía nadie te mandó un mensaje secreto para responder: usá /m y el nombre.'); return; }
+        if(!p.texto){ input.value = ''; abrirConversacion(p.persona.uid); return; }
+        if(faltanReglas){ avisar(AVISO_REGLAS); return; }
+        enviar([p.persona.uid], p.texto).then(ok => { if(ok){ input.value = ''; avisar(`🕊️ Respuesta secreta para ${p.persona.nombre}`); } });
+        return;
+      }
+      if(p.persona && p.persona.grupo){
+        if(!p.texto){ input.value = ''; abrirMandar({publico: true}); return; }
+        enviarPublico(p.texto).then(ok => { if(ok){ input.value = ''; avisar('📣 Mensaje enviado a todo el grupo'); } });
+        return;
+      }
       if(p.ambiguo){ avisar('Hay más de una persona con ese nombre: elegila en la ventanita del 🕊️.'); abrirMandar({}); return; }
       if(!p.persona){ avisar('¿A quién? Escribí /m y las primeras letras del nombre (de la persona o de su personaje) y elegilo de la lista.'); mostrarSug(input); return; }
       if(!p.texto){ abrirMandar({para: [p.persona.uid]}); input.value = ''; return; }
@@ -606,18 +802,21 @@ const Mensajes = (() => {
     conectarMesa();
     escucharNombres();
     escuchar();
+    escucharPublicos();
+    window.addEventListener('storage', ev => { if(ev.key === claveVisto()) redibujar(); });   // lo del grupo leído en otra pestaña
     dibujarBoton();
   }
 
   // Para las pruebas y las capturas armadas con datos en memoria (no escribe nada): carga mensajes como si hubieran llegado.
   function _cargar(lst, o){
+    if(o && o.publicos){ o.publicos.forEach(m => { const ya = pubs.has(m.id); pubs.set(m.id, m); if(!ya && o.nuevos && m.uid !== yo()) avisarLlegada({uid: GRUPO, publico: true, nombre: m.jugador, texto: m.texto}); }); redibujar(); }
     const nuevos = [];
     (lst || []).forEach(m => { const ya = msgs.has(m.id); msgs.set(m.id, m); if(!ya && o && o.nuevos && m.de !== yo()) nuevos.push(m); });
     alCambiar(nuevos);
   }
 
-  return {TEXTO_MAX, PARA_MAX, CRONICA_MS, AVISO_REGLAS, personas, candidatos, sugerencias, comando, parsear, fragmento, armarDoc, sinLeer,
-    conversaciones, noLeidos, mezclarEnMesa, mesaHtml, cronicaHtml,
-    iniciar, abrirMandar, abrirConversacion, borrar, faltanReglas: () => faltanReglas, _cargar, yo,
-    mesa: (docs, tope) => iniciado ? mezclarEnMesa(docs, lista(), yo(), tope) : docs};
+  return {TEXTO_MAX, PARA_MAX, CRONICA_MS, AVISO_REGLAS, GRUPO, personas, candidatos, sugerencias, comando, parsear, fragmento, armarDoc, armarPublico,
+    ultimoQueMeEscribio, publicosNoLeidos, sinLeer, conversaciones, noLeidos, mezclarEnMesa, mesaHtml, publicoHtml, cronicaHtml,
+    iniciar, abrirMandar, abrirConversacion, abrirDesdePaloma, borrar, faltanReglas: () => faltanReglas, _cargar, yo,
+    mesa: (docs, tope) => mezclarEnMesa(docs, iniciado ? lista() : [], yo(), tope)};
 })();

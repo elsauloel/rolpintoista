@@ -137,7 +137,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="no-visto.js?v=20261123esc"></script>
 <script src="zonas-riesgo.js?v=20261120zr"></script>
 <script src="quieto.js?v=20261123cola57"></script>
-<script src="mensajes.js?v=20261122msj"></script>
+<script src="mensajes.js?v=20261124msj"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -10659,7 +10659,7 @@ grupo('✉ Mensajes secretos');
   prueba('comando: /m y /r (mayúscula o minúscula); una tirada o «/mapa» no lo son', () => igual(
     ['/m hola', '/R x', '  /r', '/mapa', '2d6+3', 'm hola', '/m'].map(t => !!M.comando(t)), [true, true, true, false, false, false, true]));
   prueba('parsear: elige a la persona por el nombre más largo que calce, del personaje o del usuario', () => {
-    const a = M.parsear('/m Blanco J1 hola che', P), b = M.parsear('/R blanco j2: dale', P), c = M.parsear('/m Ana  ¿venís?', P), d = M.parsear('/m Máster', P);
+    const a = M.parsear('/m Blanco J1 hola che', P), b = M.parsear('/M blanco j2: dale', P), c = M.parsear('/m Ana  ¿venís?', P), d = M.parsear('/m Máster', P);
     igual([a.persona.uid, a.texto, a.por.tipo, b.persona.uid, b.texto, c.persona.uid, c.texto, d.persona.uid, d.texto], ['j1', 'hola che', 'personaje', 'j2', 'dale', 'j1', '¿venís?', 'gm', '']);
     igual([M.parsear('/m Nadie hola', P).persona, M.parsear('/m Blanco hola', P).persona, M.parsear('2d6', P)], [null, null, null]);
     const amb = M.personas([{uid: 'yo'}, {uid: 'a', nombre: 'Pepe'}, {uid: 'b', nombre: 'Pepe'}], [], 'yo');
@@ -10683,17 +10683,53 @@ grupo('✉ Mensajes secretos');
     igual(cv.map(c => [c.uid, c.msgs.map(x => x.id).join(','), c.noLeidos]), [['j1', '1,2,3', 1], ['gm', '4,2', 1]]);
     igual([M.noLeidos(lst, 'yo'), M.sinLeer(lst[2], 'yo'), M.sinLeer(lst[1], 'yo')], [2, false, false]);
   });
-  prueba('mezclarEnMesa: solo lo que ME llegó, por hora con las tiradas; con la Mesa llena, desde la tirada más vieja que se ve', () => {
+  prueba('mezclarEnMesa: lo que me llegó y lo que mandé (P285), por hora con las tiradas; lo ajeno no; con la Mesa llena, desde la tirada más vieja que se ve', () => {
     const doc = (id, t) => ({id, data: () => ({cuando: t, desde: 'mapa'})});
     const r = M.mezclarEnMesa([doc('a', 350), doc('b', 150)], lst, 'yo', 30);
-    igual(r.map(d => d.id), ['a', 'msj-3', 'b', 'msj-1', 'msj-4']);
+    igual(r.map(d => d.id), ['a', 'msj-3', 'msj-2', 'b', 'msj-1', 'msj-4']);
     igual([r[1]._mensaje, r[1].data().desde], [true, 'mensaje']);
-    igual(M.mezclarEnMesa([doc('a', 350), doc('b', 150)], lst, 'yo', 2).map(d => d.id), ['a', 'msj-3', 'b']);
+    igual(M.mezclarEnMesa([doc('a', 350), doc('b', 150)], lst, 'yo', 2).map(d => d.id), ['a', 'msj-3', 'msj-2', 'b']);
+  });
+  prueba('📣 mezclarEnMesa: un mensaje a todo el grupo que viene entre las tiradas queda marcado como mensaje (no es una acción ni se anima), sin repetirse', () => {
+    const pub = {id: 'p1', data: () => ({cuando: 250, desde: 'publico', uid: 'j1', jugador: 'Ana', texto: 'hola a todos'})};
+    const r = M.mezclarEnMesa([{id: 'a', data: () => ({cuando: 350, desde: 'mapa'})}, pub], [], 'yo', 30);
+    igual(r.map(d => [d.id, !!d._mensaje, !!d._publico, d.data().desde]), [['a', false, false, 'mapa'], ['p1', true, true, 'publico']]);
+    igual(M.mezclarEnMesa(r, [], 'yo', 30).map(d => d.id), ['a', 'p1']);   // pasar dos veces no lo duplica
+  });
+  prueba('📣 armarPublico: una línea de la Mesa con desde «publico», sin dados; sin texto o muy largo, no', () => {
+    igual(M.armarPublico('yo', 'Yo', '  ¡a la carga!  '), {uid: 'yo', jugador: 'Yo', quien: '', origen: '📣 Mensaje a todo el grupo', formula: '', rolls: [], mod: 0, total: 0, desde: 'publico', texto: '¡a la carga!'});
+    const motivo = f => { try{ f(); return ''; }catch(e){ return e.message; } };
+    cierto(/Escribí/.test(motivo(() => M.armarPublico('yo', 'Yo', '  '))) && /largo/.test(motivo(() => M.armarPublico('yo', 'Yo', 'x'.repeat(M.TEXTO_MAX + 1)))));
+  });
+  prueba('📣 /m Todo el grupo y /m Todos: el grupo; la sugerencia aparece solo si se pide', () => {
+    const a = M.parsear('/m Todo el grupo vamos', P, {grupo: true}), b = M.parsear('/m todos', P, {grupo: true});
+    igual([a.persona.uid, a.persona.grupo, a.texto, b.persona.uid, b.texto], [M.GRUPO, true, 'vamos', M.GRUPO, '']);
+    igual(M.parsear('/m Todos hola', P).persona, null);
+    igual(M.sugerencias(P, 'to', 8, {grupo: true}).map(c => [c.nombre, c.tipo]), [['Todo el grupo', 'grupo'], ['Todos', 'grupo']]);
+    igual(M.sugerencias(P, '', 8).length, 6);
+  });
+  prueba('/r responde al último que me escribió, sin nombre (P285.2); /m sigue con el nombre', () => {
+    igual(M.ultimoQueMeEscribio(lst, 'yo'), 'j1');
+    igual(M.ultimoQueMeEscribio([m('1', 'j1', ['yo'], 100), m('4', 'gm', ['yo'], 500), m('2', 'yo', ['j1'], 900)], 'yo'), 'gm');
+    igual(M.ultimoQueMeEscribio([m('2', 'yo', ['j1'], 900)], 'yo'), '');
+    const gm = P.find(x => x.uid === 'gm');
+    const r = M.parsear('/r dale, voy', P, {ultimo: gm}), r0 = M.parsear('/R', P, {ultimo: null}), r2 = M.parsear('/r Blanco J1 hola', P, {ultimo: gm});
+    igual([r.responder, r.persona.uid, r.texto, r0.responder, r0.persona, r2.persona.uid, r2.texto], [true, 'gm', 'dale, voy', true, null, 'gm', 'Blanco J1 hola']);
+    igual([M.fragmento('/r bl', P), M.fragmento('/m bl', P)], [null, 'bl']);
+    igual(M.comando('/R hola').cmd, 'r');
+  });
+  prueba('📣 publicosNoLeidos: los de otros después de lo que vi; los míos no cuentan', () => {
+    const pubs = [{uid: 'j1', cuando: 100}, {uid: 'yo', cuando: 300}, {uid: 'gm', cuando: 400}];
+    igual([M.publicosNoLeidos(pubs, 'yo', 0), M.publicosNoLeidos(pubs, 'yo', 150), M.publicosNoLeidos(pubs, 'yo', 400)], [2, 1, 0]);
   });
   prueba('mesaHtml y cronicaHtml: escapan el texto; la tarjeta abre la conversación con quien lo mandó y su animación sigue según la edad', () => {
     const x = {...m('9', 'j1', ['yo', 'j2'], 1), texto: '<b>ojo</b>', deNombre: 'Ana'};
     const h = M.mesaHtml(x, 'yo'), c = M.cronicaHtml('msj:9', x, 1200, 9000);
     cierto(/&lt;b&gt;ojo/.test(h) && !/<b>ojo/.test(h) && /y J2/.test(h) && /Mensaje secreto de <b>Ana/.test(h));
+    const mio = M.mesaHtml({...m('8', 'yo', ['j1', 'gm'], 1), texto: 'x'}, 'yo');
+    cierto(/Tu mensaje secreto para <b>J1, GM/.test(mio), 'lo mío dice para quién');
+    const pub = M.publicoHtml({uid: 'j1', jugador: '<i>Ana</i>', texto: 'a <b>todos</b>'}, 'yo');
+    cierto(/&lt;i&gt;Ana/.test(pub) && /a &lt;b&gt;todos/.test(pub) && /a todo el grupo/.test(pub) && /Tu mensaje/.test(M.publicoHtml({uid: 'yo', texto: 'x'}, 'yo')));
     cierto(/data-mensaje-abrir="j1"/.test(c) && /animation-delay:-1200ms/.test(c) && /data-momento-cerrar="msj:9"/.test(c));
   });
   prueba('las reglas: solo leen los lectores, el GM borra sin leer por el índice, y quien recibe solo se suma a leidoPor', async () => {
@@ -10709,7 +10745,10 @@ grupo('✉ Mensajes secretos');
   prueba('la Mesa, el registro y la Crónica los usan (mesa.js, mesa-historial.js, registro.js, js/16)', async () => {
     const t = async u => (await fetch(u, {cache: 'no-store'})).text();
     const [mesa, hist, reg, m16] = await Promise.all([t('mesa.js'), t('mesa-historial.js'), t('registro.js'), t('../vtt-hexgrid/js/16-momentos.js')]);
-    cierto(/Mensajes\.mesa\(snap\.docs, MESA_MAX\)/.test(mesa) && /t\.desde === 'mensaje'/.test(mesa) && /Mensajes\.iniciar\(\)/.test(mesa) && /"mensaje"\]/.test(mesa));
+    cierto(/Mensajes\.mesa\(snap\.docs, MESA_MAX\)/.test(mesa) && /t\.desde === 'mensaje'/.test(mesa) && /Mensajes\.iniciar\(\)/.test(mesa) && /"mensaje", "publico"\]/.test(mesa));
+    cierto(/Mensajes\.publicoHtml/.test(mesa) && /mesa-mensaje-mio/.test(mesa), 'la Mesa dibuja lo público y lo mío');
+    const m29 = await t('../vtt-hexgrid/js/29-accion-incierta.js');
+    cierto(/des === 'publico'\) return \{modo: 'ver'/.test(m29), 'el mapa no esconde nombres en un mensaje al grupo');
     cierto(/Mensajes\.borrar\(null\)/.test(hist) && /Mensajes\.borrar\(hasta\)/.test(reg));
     cierto(/window\.mensajesCronica = /.test(m16) && /Mensajes\.cronicaHtml\(k, d\.mensaje/.test(m16) && /data-mensaje-abrir/.test(m16));
   });

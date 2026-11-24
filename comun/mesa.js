@@ -225,7 +225,7 @@ function mesaPonerTurno(n){
 
 // Líneas del sistema: no son una tirada real (ni la propia ni la de nadie), así que no cuentan
 // como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
-const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep", "mensaje"];
+const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep", "mensaje", "publico"];
 
 // 🔍 El recuadro con el detalle de un duelo (2026-11-03, dueño): título, la frase y el paso a paso; se cierra con Aceptar, la ✕, Esc o un clic afuera.
 function mesaDueloDetalle(origen, frase, lineas){
@@ -274,13 +274,16 @@ function mesaRender(docs){
     const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
     if(nueva && fbUsuario && t.uid !== fbUsuario.uid) hayAjena = true;
     // 🕊️ Un mensaje secreto que ME llegó (comun/mensajes.js, 2026-11-22): solo en mi Mesa, con su color y su brillo; tocarlo abre la conversación.
-    if(t.desde === 'mensaje'){
-      if(nueva) hayAjena = true;
+    // Desde el 2026-11-24 (P285) también los que mandé yo (otro tono, sin brillo) y los 📣 a todo el grupo (los ven todos; vienen entre las tiradas).
+    if(t.desde === 'mensaje' || t.desde === 'publico'){
+      const yoUid = fbUsuario ? fbUsuario.uid : '';
+      const mio = t.desde === 'publico' ? t.uid === yoUid : t.de === yoUid;
+      if(nueva && !mio) hayAjena = true;
       const div = document.createElement('div');
-      div.className = 'mesa-tirada mesa-sistema mesa-mensaje' + (nueva ? ' nueva' : '');
-      div.title = 'Mensaje secreto: tocá para abrir la conversación y responder';
-      div.innerHTML = Mensajes.mesaHtml(t, fbUsuario ? fbUsuario.uid : '');
-      div.addEventListener('click', () => Mensajes.abrirConversacion(t.de));
+      div.className = 'mesa-tirada mesa-sistema ' + (t.desde === 'publico' ? 'mesa-publico' : 'mesa-mensaje' + (mio ? ' mesa-mensaje-mio' : '')) + (nueva ? ' nueva' : '');
+      div.title = t.desde === 'publico' ? 'Mensaje a todo el grupo: tocá para abrir la conversación del grupo' : 'Mensaje secreto: tocá para abrir la conversación y responder';
+      div.innerHTML = t.desde === 'publico' ? Mensajes.publicoHtml(t, yoUid) : Mensajes.mesaHtml(t, yoUid);
+      div.addEventListener('click', () => Mensajes.abrirConversacion(t.desde === 'publico' ? Mensajes.GRUPO : mio ? (t.para || [])[0] : t.de));
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;

@@ -35,3 +35,5 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 - [ ] **🧪 ¿Quién puede subir consumibles al catálogo?** (P317, dueño, 2026-11-24: «no sé bien si quiero que cualquiera pueda subir
   consumibles»). Ya decidido: los consumibles propios «a mano» (narrativos, de la partida) no van nunca al catálogo. Queda por pensar el resto
   (consumibles con efectos que sube el grupo, y si se ven en el catálogo sin el 👁).
+- [ ] **👢 Más piezas que den Suela gruesa** (dueño, 2026-11-24). Hoy la da una sola: «Suelas de cuero de dragón del pantano» (pies, Buena
+  Calidad, Suela gruesa 2). Cada punto resta 1 al daño de lo que se pisa (zonas y trampas del piso).

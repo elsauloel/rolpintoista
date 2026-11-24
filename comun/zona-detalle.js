@@ -209,7 +209,7 @@ const ZonaDetalle = (() => {
       else if(el.zonaDirecto) fr.push('No lo frenan la Defensa ni la Defensa especial (va directo).');
       else fr.push(elem ? 'No lo frenan la Defensa ni la Defensa especial (va directo).' : 'Nada: va directo a la vida.');
       if(elem) fr.push(`Sí le resta la ${f.res} de quien lo recibe (con 99 o más, es inmune; si es negativa, entra de más).`);
-      if(f.suela) fr.push('También la Suela gruesa (es del piso).');
+      // Sin la Suela gruesa (dueño, 2026-11-24): «Ver detalle» dice las reglas generales, no cada caso específico de una pieza.
       if(el.zonaDano && /d/i.test(el.zonaDano)) fr.push('El daño lo tira quien la puso (o el GM por él).');
       filas.push({k: 'Qué frena el daño', v: fr.join(' ')});
     }

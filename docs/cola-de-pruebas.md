@@ -2251,7 +2251,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      mochilas.
   3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
      frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
-- **⬜ en cola — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
+- **✅ hecho (2026-11-24: se le explicó; más piezas que la den → lista de diseño; «Ver detalle» ya no la nombra) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
   rival se le nombra en el cartel del daño de una zona.
 
 - **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del

@@ -920,7 +920,8 @@ const Combatiente = (() => {
      puso). `hastaTxt(e)` → 'hasta el fin del turno de Fulano' ('' si no tiene: cada pantalla sigue con su «no vence», su «∞» o sus turnos);
      `hastaPub(e)` → {hasta} para los resúmenes públicos de un token ({} si no tiene). Cualquier estado nuevo de ese tipo lo usa poniendo `hasta` en su spec. */
   const hastaDe = e => (e && e.permanente && e.hasta ? String(e.hasta).trim().slice(0, 80) : '');
-  const hastaTxt = e => { const h = hastaDe(e); return h ? `hasta ${h}` : ''; };
+  // 🤐 Lo que ya empieza con «mientras» va tal cual (el Silencio del Tótem, 2026-11-24: «mientras esté en el aura del tótem»).
+  const hastaTxt = e => { const h = hastaDe(e); return h ? (/^mientras\b/i.test(h) ? h : `hasta ${h}`) : ''; };
   const hastaPub = e => { const h = hastaDe(e); return h ? {hasta: h} : {}; };
   /* ⚔ Al EMPEZAR un combate, lo que se cuenta «en este turno» arranca en cero (2026-11-20, dueño, jugando: «Rocardo empezó su turno, el primer turno del
      combate… cuando quiso atacar le aparecía como que ya había atacado una vez, que le costaba 10 nitros. Pero él no había atacado»). Esas cuentas las

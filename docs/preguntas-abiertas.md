@@ -2575,3 +2575,14 @@ Pedido del dueño (P285 y sus directrices del 2026-11-24). Está hecho (`comun/m
    me llega. ¿Bien?
 6. **El aviso flotante** dura 7 segundos, muestra el principio del texto y se apilan hasta 3. Con «reducir movimiento» del sistema, la paloma no
    vibra: se le marca un contorno. ¿Bien?
+
+### P319 — 🤐 El Silencio del Tótem: cuando ya estaba silenciado por otra cosa (2026-11-24, Claude)
+Desde el 2026-11-24 el aura del Tótem de silencio le pone el estado Silencio de verdad a los rivales que están adentro y se lo saca al salir
+(`vtt-hexgrid/js/134-totem-silencio.js`). Un mismo personaje no puede tener dos «Silencio» a la vez (el nuevo renueva al que hay). Quedó así,
+mientras tanto (lo conservador: nunca le saca un Silencio que no puso el tótem):
+1. **Entra al aura con un Silencio que ya tenía** (una Runa, un golpe): no se le pone el del tótem; queda el suyo, con sus turnos. Si ese se le
+   vence estando adentro, ahí entra el del tótem. Al salir, el suyo no se toca.
+2. **Le cae otro Silencio estando adentro** (con turnos): reemplaza al del tótem (el nuevo renueva al viejo); al salir del aura no se le saca.
+   Cuando se le vence, si sigue adentro, vuelve el del tótem.
+3. **Le sacan el Silencio del tótem estando adentro** (Purificar, «Limpiar», a mano): vuelve a entrarle al segundo, mientras siga adentro.
+¿Está bien así? **Recomendación de Claude:** sí; lo único discutible es el 3 (si una limpieza debería protegerlo un rato del aura).

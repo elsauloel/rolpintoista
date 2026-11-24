@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261124suela"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261124c80"></script>
+<script src="combatiente.js?v=20261124c85"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -9143,6 +9143,42 @@ prueba('⏳ Desequilibrado «hasta el fin del turno de…» (dueño, 2026-11-20:
     'hasta el fin del turno de Rocardo', true, false, '∞', true,
     -2, 1]);   // y no cambia cuándo se va: su propio fin de turno no lo saca
 });
+prueba('🤐 El Silencio del Tótem (dueño, 2026-11-24): el estado de siempre, sin turnos, «mientras esté en el aura del tótem»; avisa como el estado y lo frena la Inmunidad mental', () => {
+  const T = 'mientras esté en el aura del tótem', spec = {nombre: 'Silencio', permanente: true, hasta: T, turnos: 0};
+  const ep = FichaAcciones.estadoDeSpec(spec, estadosPresetFicha());
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, spec); const ec = sc.estados[0];
+  const g = EstadoCorto.globo(ep, {});
+  const rayo = {nombre: 'Rayo', costo: '3'};
+  igual([!!ep.silencio, ep.permanente, Combatiente.hastaTxt(ep), JSON.stringify(Combatiente.hastaPub(ep)), g.dura, !!ec.silencio, Combatiente.hastaTxt(ec),
+    /^Estás en Silencio/.test(Combatiente.preguntaSilencio([ep], rayo, '', 'x')),
+    Combatiente.inmunidad([{nombre: 'Inmunidad mental', inmunidadMental: true}], ep), Combatiente.inmunidad([{nombre: 'Inmunidad a CC', inmunidadCC: true}], ep), Combatiente.inmunidad([], ep),
+    Combatiente.hastaTxt({permanente: true, hasta: 'que empiece su próximo turno'}), Combatiente.pasarTurnoEstados([ep]).quedan ? Combatiente.pasarTurnoEstados([ep]).quedan.length : 1],
+    [true, true, T, JSON.stringify({hasta: T}), T, true, T, true, 'Inmunidad mental', 'Inmunidad a CC', false, 'hasta que empiece su próximo turno', 1]);
+});
+prueba('🤐 El Silencio del Tótem en el mapa (vtt-hexgrid/js/134): cuál es el del tótem, quién lo cubre, la inmunidad con lo público y una sola pantalla por token', async () => {
+  const src = await (await fetch('../vtt-hexgrid/js/134-totem-silencio.js', {cache: 'no-store'})).text();
+  const toks = new Map([
+    ['tot', {tipo: 'creep', fichaId: 'ctot', col: 5, fila: 5, info: {radio: 3, silencio: true}}],
+    ['est', {tipo: 'creep', fichaId: 'cest', col: 5, fila: 5, info: {radio: 3, silencio: false}}],
+    ['j1', {tipo: 'pj', fichaId: 'f1', col: 6, fila: 5}],
+    ['j2', {tipo: 'pj', fichaId: 'f2', col: 15, fila: 5}],
+    ['inv', {tipo: 'pj', fichaId: 'f1~i1', col: 7, fila: 6}],
+    ['cr', {tipo: 'creep', fichaId: 'c1', col: 6, fila: 6}],
+  ]);
+  const pubEst = {f1: [{nombre: 'Inmunidad mental'}], f2: []};
+  const dist = (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(a.fila - b.fila));
+  const M = new Function('tokens', 'estandarteInfo', 'estandarteEnPie', 'distanciaHex', 'vinculo', 'esInerte', 'confusionEstadosDe', 'fbUsuario', 'soyGM', 'bnManejo', 'SEP_INVOCACION', 'num', 'setInterval',
+    src + '\nreturn {totemSilEsDelTotem, totemSilEsSilencio, totemSilQueCubre, totemSilPuedeEntrar, totemSilManejo, TOTEM_HASTA};')(
+    toks, t => t.info || null, () => true, dist, t => ({nombre: t.fichaId === 'ctot' ? 'Tótem de silencio' : t.fichaId}), t => !!t.info,
+    t => pubEst[t.fichaId] || [], {uid: 'u1'}, false, f => f === 'f1', '~', Number, () => 0);
+  const T = M.TOTEM_HASTA;
+  igual([M.totemSilEsDelTotem({nombre: 'Silencio', permanente: true, hasta: T}), M.totemSilEsDelTotem({nombre: 'Silencio', silencio: true, totemSilencio: true}),
+    M.totemSilEsDelTotem({nombre: 'Silencio', turnos: 1}), M.totemSilEsSilencio({nombre: 'Silencio', turnos: 1}), M.totemSilEsDelTotem({nombre: 'Silencio', hasta: T, activo: false}),
+    M.totemSilQueCubre(toks.get('j1')), M.totemSilQueCubre(toks.get('j2')), M.totemSilQueCubre(toks.get('inv')), M.totemSilQueCubre(toks.get('cr')), M.totemSilQueCubre(toks.get('tot')),
+    M.totemSilPuedeEntrar(toks.get('j1')), M.totemSilPuedeEntrar(toks.get('j2')),
+    M.totemSilManejo(toks.get('j1')), M.totemSilManejo(toks.get('inv')), M.totemSilManejo(toks.get('j2')), M.totemSilManejo(toks.get('cr'))],
+    [true, true, false, true, false, 'Tótem de silencio', '', 'Tótem de silencio', '', '', false, true, true, true, false, false]);
+});
 prueba('⚔ Al empezar un combate la cuenta de ataques arranca en cero (dueño, 2026-11-20: «le aparecía como que ya había atacado una vez, que le costaba 10 nitros»): personaje, invocación y creep; No2, vida, estados y cooldowns no se tocan', () => {
   let arma = {id: 'a10', nombre: 'Cachiporra', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, equipado: true};
   const S = fichaDePrueba({inventario: [arma]});
@@ -9435,7 +9471,7 @@ prueba('🚩 Estandartes (2026-11-05): las áreas se ven como estados según dó
   const txt = w.estandarteTexto('est', tk.get('est'));
   igual([nom('c1'), nom('c2'), nom('pj'), nom('pj2'), nom('c3'), nom('c4'), nom('est'), nom('tot'), w.estadosDeAreaRef('c1').length, w.estadosDeAreaRef('nadie').length,
     /\+1 a la Probabilidad de Golpe y \+2 al daño/.test(det), txt.titulo, txt.lineas[1], /Vida: 60 %/.test(txt.lineas[3]), w.estandarteTexto('c1', tk.get('c1'))],
-    ['Bajo el estandarte/buff/true', '', 'Silenciado (tótem)/debuff/true', '', '', 'En el aura sanadora/buff/true', '', '', 1, 0,
+    ['Bajo el estandarte/buff/true', '', '', '', '', 'En el aura sanadora/buff/true', '', '', 1, 0,   // 🤐 (2026-11-24) el tótem ya no es un estado de área: pone el Silencio de verdad (js/134)
      true, 'Estandarte de guerra', 'Aura: 2 casillas alrededor (diámetro 5).', true, null]);
   // Al salir del aura, el estado se va solo (sale de la posición, no se guardó en ningún lado).
   tk.get('c1').col = 4;

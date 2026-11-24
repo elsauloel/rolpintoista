@@ -12,6 +12,9 @@
 // ningún skill que cueste SP; aliados no, solo a rivales; 10 por nivel del caster»): el mismo token, con `estandarte.silencio` (lo público:
 // `estandarteSilencio`). No da bonus: a los rivales de su bando dentro del aura, `silencioDeLugar` (la usa Combatiente.preguntaSilencio) les avisa
 // que no pueden usar habilidades que cuestan SP (y los deja seguir si la mesa lo decide, como el estado Silencio).
+// 🤐 Desde el 2026-11-24 (dueño: «mientras estás en el efecto, te tiene que aparecer el estado de silencio… cuando te vas, se te va»): el aura le pone
+// el estado Silencio de verdad a sus rivales mientras están adentro (js/134). `silencioDeLugar` queda solo de respaldo: avisa si todavía no le llegó
+// el estado (ninguna pantalla lo puso aún) y nunca a quien es inmune al Silencio (Inmunidad mental, Inmunidad a CC, Invulnerable).
 
 const TOTEM_VIOLETA = '#5B4B8A', TOTEM_GRIS = '#B9B2CC';
 
@@ -59,6 +62,7 @@ function silencioDeLugar(ref){
   if(!ref) return '';
   const quien = [...tokens.values()].find(t => t.fichaId === ref);
   if(!quien || quien.bajoTierra) return '';
+  if(typeof totemSilPuedeEntrar === 'function' && !totemSilPuedeEntrar(quien)) return '';   // 🤐 inmune al Silencio: el tótem no le hace nada (js/134)
   let nom = '';
   tokens.forEach((t, id) => {
     if(nom || t === quien) return;

@@ -1054,6 +1054,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Lo que no se guarda (quién puso un Veneno): P314 (dueño: no hace falta). **Ajuste** (2026-11-23): «Nombre: N»; el corto nunca pierde el número (la
   vida por turno, los stacks y los números que publican ahora la ficha, GM Tools y `modificarCreep`, con `EstadoCorto.pub`); el Sobrepeso «−X a Evasión,
   salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −X a Iniciativa»; al pie de los dos globos, `hoverDetallePie()` (dónde ver el detalle: ◎ o E).
+- **🤐 El Tótem de silencio pone el estado Silencio de verdad** (2026-11-24, dueño: «mientras estás en el efecto, te tiene que aparecer el estado de
+  silencio. Y cuando te vas, se te va»; `js/134-totem-silencio.js`): a los rivales de quien lo clavó que están adentro del aura de un tótem en pie, el
+  estado «Silencio» de siempre con `totemSilencio`, `permanente` y `hasta` = «mientras esté en el aura del tótem» (sin turnos; el globo lo dice así,
+  `Combatiente.hastaTxt`). Se va al salir, al romperse/borrarse el tótem o si quien lo clavó clava otro lejos. Un reloj de 1 s (`totemSilRevisar`);
+  lo escribe UNA pantalla por token (`totemSilManejo`: un creep el GM; un personaje o invocación, `bnManejo`) con `modificarCreep` /
+  `editarPersonajeMapa`, mirando adentro antes de poner (no duplica). Lo frena `Combatiente.inmunidad` (cartel «INMUNE A SILENCIO» y línea en la
+  Mesa, una vez por entrada). Un Silencio de otro origen no se toca ni se pisa (P319). El aviso al usar SP es el del estado (preguntaSilencio);
+  `silencioDeLugar` (js/73) queda de respaldo y no avisa a quien es inmune (`totemSilPuedeEntrar`). js/103 ya no arma «Silenciado (tótem)».
 - **▶ Iniciar combate** (2026-11-20, dueño: «al apretar Ordenar al GM le aparezca un botón… que diga Iniciar combate, y ahí se inicia con el primer
   turno del primero de la lista»; js/04): el orden de turnos lleva `porIniciar` (lo pone Ordenar, js/86, con `OrdenTurnos.marcasAlOrdenar(iniciativa,
   modoMapa)`) e `iniciado` (true / false / sin marca = un orden de antes del botón); `guardarIniciativa` las conserva. Con `OrdenTurnos.porIniciar`

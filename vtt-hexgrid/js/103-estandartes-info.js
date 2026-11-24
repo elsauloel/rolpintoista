@@ -5,7 +5,7 @@
 //     (aura, efecto, vida). (2) Un inerte no lleva la ficha lite; su carnet 🪪 va en el primer anillo del HUD (js/10). (3) «Todo efecto de área que
 //     afecta a los tokens se ve como estado mientras el token está adentro»: `estadosDeArea(t)` arma esos estados a partir de la posición (no se
 //     guardan): los muestran los circulitos (js/88), el globo de estados del HUD (js/10) y la ficha lite (js/15). Son informativos: el bono del
-//     estandarte lo sigue sumando el duelo (`estandarteBonus`), el silencio lo sigue preguntando `silencioDeLugar` y el aura sanadora la sigue curando
+//     estandarte lo sigue sumando el duelo (`estandarteBonus`), el Tótem de silencio pone el estado Silencio de verdad (js/134, 2026-11-24) y el aura sanadora la sigue curando
 //     js/70; esto no suma nada dos veces. (2026-11-05, cola 17) También «🛡 Muro de escudos (+N Def)» (js/26 `muroDe`) y «⬡ En la zona: <nombre>»
 //     mientras está adentro de una zona persistente que le aplica, con qué le va a pasar y cuándo (`zonaEstadoDetalle`).
 
@@ -39,18 +39,16 @@ function estadosDeArea(t){
   if(typeof estandarteInfo === 'function' && estandarteInfo(t)) return [];   // el estandarte mismo no
   const yo = {col: t.col, fila: t.fila}, out = [];
   const nombre = x => (vinculo(x) || {}).nombre || x.nombre || '';
-  let est = null, sil = null;
+  let est = null;
   if(typeof estandarteInfo === 'function') tokens.forEach((x, id) => {
     if(x === t || (x.oculto && !soyGM)) return;
     const e = estandarteInfo(x);
     if(!e || !estandarteEnPie(id, x) || distanciaHex({col: x.col, fila: x.fila}, yo) > e.radio) return;
-    if(e.silencio){ if(x.tipo !== t.tipo && !sil) sil = {nom: nombre(x) || 'un tótem de silencio'}; }
-    else if(x.tipo === t.tipo && t.tipo === 'creep' && (!est || e.pdg + e.dano > est.pdg + est.dano)) est = {...e, nom: nombre(x) || 'un estandarte'};
+    if(!e.silencio && x.tipo === t.tipo && t.tipo === 'creep' && (!est || e.pdg + e.dano > est.pdg + est.dano)) est = {...e, nom: nombre(x) || 'un estandarte'};
   });
   if(est) out.push({nombre: 'Bajo el estandarte', polaridad: 'buff', derivado: true, area: true,
     detalle: `Dentro del aura de ${est.nom}: +${est.pdg} a la Probabilidad de Golpe y +${est.dano} al daño. Se va al salir del aura.`});
-  if(sil) out.push({nombre: 'Silenciado (tótem)', polaridad: 'debuff', derivado: true, area: true,
-    detalle: `Dentro del aura de ${sil.nom}: no puede usar habilidades que cuestan SP. Se va al salir del aura.`});
+  // 🤐 (2026-11-24) El tótem ya no se muestra como un estado de área: le pone el estado Silencio de verdad mientras está adentro (js/134).
   // ✚ El Aura sanadora de un creep (js/70): sus aliados creeps a AURA_CURA_RADIO o menos.
   if(t.tipo === 'creep' && typeof auraCuraEnEstados === 'function' && typeof AURA_CURA_RADIO !== 'undefined'){
     let cura = null;

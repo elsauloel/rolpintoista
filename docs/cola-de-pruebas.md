@@ -2082,7 +2082,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Probabilidad de golpe.» (el texto está pensado para cuando dice «PdG»). La varita de niebla no se probó (la entrada pedía una de las dos).
   El estandarte y la nube se borraron y el creep quedó como estaba.
 
-- **⬜ en cola (decidido por el dueño el 2026-11-24, a programar) — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
+- **✅ hecho (2026-11-24) — 📖 Revisar en contexto: «Silencio» en el nombre del tótem y el glosario** (dueño, 2026-11-22: «la observación de que marcaba
   silencio como un estado la pondría para revisar al final, porque técnicamente el silencio es un estado, pero lo revisamos en contexto más
   tarde»). Hoy, en «Ver detalle», las filas de nombres («De quién es», «Con qué se puso») no se marcan, así que «Tótem de silencio» no muestra
   el globo del estado Silencio. Mostrarle el caso y decidir juntos.
@@ -2104,6 +2104,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   el tótem); con eso «Inmune a controles mentales» lo frena como al estado.
   **Y (dueño, 2026-11-24):** el título no se marca con el glosario, y la descripción del tótem queda igual («a fines prácticos sucede
   lo mismo, solo que mecánicamente aparece el estado o no»). Opción (a) para el texto.
+  *Resultado (2026-11-24):* el aura del tótem le pone el estado Silencio de siempre a los rivales que están adentro («mientras esté en el aura del
+  tótem», sin turnos) y se lo saca al salir, al romperse o al borrarse el tótem (`vtt-hexgrid/js/134-totem-silencio.js`). Lo pone una sola pantalla:
+  la del jugador (o quien tiene 🎮 el control) para un personaje o invocación, la del GM para un creep. Lo frena lo que frena al estado (Inmunidad
+  mental, Inmunidad a CC, Invulnerable): no le entra, cartel «INMUNE» y línea en la Mesa. Al querer usar una habilidad de SP sale el aviso de
+  siempre del estado, una sola vez. Un Silencio que ya tenía por otra cosa no se toca (P319). Título y descripción del tótem, igual; ya no sale el
+  «Silenciado (tótem)» de área (sería doble). Probado con clics en «Claude · pruebas 2» (GM y Jugador 1): entrar (iconito, globo, ficha), el aviso
+  al usar Remolino, salir, Inmunidad mental, romper el tótem, borrarlo y con un Silencio previo.
 - **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
   (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
 - **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
@@ -2450,6 +2457,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 📖 El globo de «Probabilidad de Golpe» repite el nombre** (dueño, 2026-11-24, de la prueba del glosario): hoy el globo arranca
   con «Probabilidad de golpe.» (el texto está pensado para cuando la tarjeta dice «PdG»). Que quede algo como «Probabilidad de Golpe (PdG): …».
   Revisar si otras entradas del glosario (`comun/glosario.js`) tienen el mismo problema.
+
+- **⬜ en cola — Probar: 🤐 el Silencio del Tótem en una invocación y con 🎮 el control** (2026-11-24): con clics se probó solo con el personaje del
+  Jugador 1. Falta: una invocación que entra al aura (lo pone la pantalla de su dueño), un personaje que el GM maneja con 🎮 el control (lo pone la
+  pantalla del GM, no la del jugador) y el Jugador 1 con el mapa abierto en dos pestañas (que no quede doble).
 
 ## En cola
 

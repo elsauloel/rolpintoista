@@ -2754,6 +2754,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   del turno libre; «▶ Empieza tu turno» (`inicioTurnoPendiente`) y el Provocado van marcados. El anillo dorado ya respetaba lo que ve cada pantalla.
   Para el GM, un personaje escondido ya no deja «▶ Aplicar por él» (salvo con 👁): se aplica solo al pasar el turno. Probado con clics en «Claude ·
   pruebas 2» (GM, J1, J2): Blanco J2 en sigilo y envenenado, y un creep en sigilo y envenenado. Dudas: P290.
+  **(2026-11-24, probado con clics las cuatro tarjetas y el fin de turno)** Lo que se va al terminar el turno (Tropezado, Acelerado) ahora deja su
+  línea («se terminó»), así el fin de turno de un escondido tiene su tarjeta aparte. Al GM sin 👁 tampoco se le nombra al escondido en el botón
+  «↩ Volver a…» (solo si está en su lista), en el cartel de «Es el turno de…» (`iniciativaDarTurno`) ni en el de ⏭ Pasar de ronda (cuenta solo a los
+  que ve); la línea «se saltearon los turnos de…» nombra solo a los que se ven (ya no dice «alguien más»). Duda: P325.
 
 - **💀 Caer, el mismo corte en todos lados** (2026-11-23, P270): `modificarCreep` (js/09) usa `Combatiente.caerSiCayo` (el mismo que GM Tools, que desde hoy
   también limpia al creep que cae ahí: gm-toolset/CLAUDE.md). Un personaje que cae desde la Botonera nueva (`bnRevisarVida`) o en su pase de turno

@@ -556,7 +556,8 @@ const Combatiente = (() => {
     // Turnos completos (2026-10-24, dueño, Ojo certero: «que el afectado inicie y termine N turnos completos con ese efecto»): el turno en que se lo
     // pusieron no cuenta nunca — tampoco si fue el propio —, así el próximo inicio no descuenta. Vale para los efectos activos (efectoActivo).
     (estados || []).forEach(e => { if(e && e.recien && !efectoActivo(e)) delete e.recien; });
-    return {hp: 0, quedan: estados || [], terminados, eventos: []};
+    // 🙈 (2026-11-24) Lo que se va al terminar el turno se cuenta («Tropezado: se terminó»): antes se iba en silencio y el fin de turno no tenía nada que decir.
+    return {hp: 0, quedan: estados || [], terminados, eventos: terminados.map(e => ({tipo: 'fin', nombre: e.nombre}))};
   }
   // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
   function pasarTurnoEstados(estados, campos){

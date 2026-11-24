@@ -584,8 +584,9 @@ async function iniciativaSiguiente(o){
   }
   if(o.pasarRonda){
     const nomP = id => { const tk = tokens.get(id), fila = orden.find(x => x.id === id); return tk && publico(fila, tk) ? nombreDe(tk) : ''; };
-    const vivos = saltaRonda.filter(id => !iniciativaFueraDeJuego(id)), nombres = vivos.map(nomP).filter(Boolean), otros = vivos.length - nombres.length;
-    const quien = [...nombres, ...(otros ? [otros === 1 ? 'alguien más' : `${otros} más`] : [])].join(', ');
+    // 🙈 (2026-11-24) Solo los que se ven: «alguien más» le contaba a los rivales que había un escondido en el orden.
+    const vivos = saltaRonda.filter(id => !iniciativaFueraDeJuego(id)), nombres = vivos.map(nomP).filter(Boolean);
+    const quien = nombres.join(', ');
     const txt = `⏭ El GM pasó de ronda${quien ? `: se saltearon los turnos de ${quien}` : ''}`;
     grupos.unshift(suelta([txt + '.']));
     try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
@@ -735,7 +736,8 @@ const iniciativaPendientesRonda = () => OrdenTurnos.pendientesRonda(iniciativa, 
 async function iniciativaPasarRonda(){
   if(!soyGM || pasandoRonda || !iniciativa.orden.length) return;
   if(iniciandoCombate){ toast('⏳ El combate se está iniciando: esperá unos segundos'); return; }
-  const pend = iniciativaPendientesRonda();
+  // 🙈 (2026-11-24) El GM no se entera de un escondido (sin 👁): no se lo nombra ni se lo cuenta (igual pasa su turno sin jugar).
+  const pend = iniciativaPendientesRonda().filter(x => { const e = escondidoDe(x.id, x); return !e || escondidoLoVeo(e.tipo, tokens.get(x.id)); });
   if(pend.length){
     const nombres = pend.map(x => { const t = tokens.get(x.id); return t ? nombreDe(t) : '?'; });
     const ok = await Confirmar.preguntar(`${pend.length === 1 ? 'Queda 1 turno' : `Quedan ${pend.length} turnos`} sin jugar en la ronda ${fmt(iniciativa.ronda)} (${nombres.join(', ')}). Pasan su turno sin jugar, se pasa el Mantenimiento de la ronda y empieza el primero del orden.`,
@@ -758,9 +760,11 @@ async function iniciativaDarTurno(id){
   if(j < 0) return;
   const t = tokens.get(id), nombre = t ? nombreDe(t) : 'ese token';
   if(j === iniciativa.turno && !iniciativa.libre){ toast(`Ya es el turno de ${nombre}`); return; }
-  const actual = iniciativa.orden[iniciativa.turno], tAct = actual && tokens.get(actual.id);
+  // 🙈 (2026-11-24) Al que juega (o al que vuelve) se lo nombra solo si esta pantalla lo ve: el GM sin 👁 no se entera de un escondido.
+  const loVeo = id => { const e = escondidoDe(id); return !e || escondidoLoVeo(e.tipo, tokens.get(id)); };
+  const actual = iniciativa.orden[iniciativa.turno], tAct0 = actual && tokens.get(actual.id), tAct = tAct0 && loVeo(actual.id) ? tAct0 : null;
   const vuelve = iniciativa.libre ? iniciativa.libre.vuelve : actual && actual.id;
-  const tVuelve = tokens.get(vuelve), nomVuelve = tVuelve ? nombreDe(tVuelve) : 'quien lo tenía';
+  const tVuelve = tokens.get(vuelve), nomVuelve = tVuelve && loVeo(vuelve) ? nombreDe(tVuelve) : 'quien lo tenía';
   const modo = await Confirmar.elegir(`¿Cómo le das el turno a ${nombre}?`, {titulo: `Es el turno de ${nombre}`, icono: '▶', no: 'Cancelar', opciones: [
     {valor: 'normal', texto: '▶ Turno normal', detalle: `Cuenta como su turno de la ronda: ${tAct ? `termina el de ${nombreDe(tAct)}` : 'termina el turno en curso'}, ${nombre} recarga y bajan sus cooldowns y estados. El orden sigue desde ${nombre}.`},
     {valor: 'libre', texto: '⚡ Turno libre', detalle: `Juega ahora sin que pase el turno: no recarga ni baja cooldowns ni estados. Con ▶ Siguiente, el turno vuelve a ${nomVuelve}.`},
@@ -1312,7 +1316,7 @@ function renderIniciativa(){
     ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +
       '<button type="button" class="btn" id="ini-tirar" title="Con un solo botón tirás la iniciativa de TODOS los creeps de la lista y se carga junto a cada nombre (los jugadores tiran la de sus personajes con su propio botón)">🎲 Tirar iniciativa de los creeps</button>' +
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
-      (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`
+      (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) && visibles.some(x => x.o.id === iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`   /* 🙈 (2026-11-24) a quien no ve al que vuelve (un escondido), sin su nombre */
         : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +
       (iniciativa.orden.length && !OrdenTurnos.porIniciar(iniciativa) ? `<button type="button" class="btn" id="ini-pasar-ronda"${pasandoRonda ? ' disabled aria-busy="true"' : ''} title="Saltea los turnos que faltan en esta ronda (pasan sin jugar), pasa el Mantenimiento de la ronda y vuelve al primero del orden">${pasandoRonda ? '⏳ Pasando de ronda…' : '⏭ Pasar de ronda'}</button>` : '') +
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>' +

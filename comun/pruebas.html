@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261124suela"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261124agu"></script>
+<script src="combatiente.js?v=20261124finT"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261122prisa5"></script>
@@ -85,7 +85,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261124c80"></script>
 <script src="orden-turnos.js?v=20261123c69"></script>
-<script src="ficha-mantenimiento.js?v=20261123esc"></script>
+<script src="ficha-mantenimiento.js?v=20261124finT"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -9510,6 +9510,18 @@ prueba('📺 El televisor también en los teletransportes, y el Town portal solo
   const t19 = await fuente('19-trampa-paso-a-paso.js', 'async function trampaPortalMover', '// Le chupa el SP');
   const t84 = await fuente('84-town-portal.js', 'async function townPortalRevisar', 'deshacerRegistrar');
   igual([antes(t02, 't.col = c.col'), antes(t02, '.update({col'), antes(t19, '.update({col'), antes(t84, '.delete()'), /blinkTvPublicar\([^)]*null\)/.test(t84)], [true, true, true, true, true]);
+});
+prueba('🙈 El fin del turno cuenta lo que se va al terminarlo (2026-11-24): «Tropezado: se terminó», en un personaje, una invocación y un creep', () => {
+  const pre = n => estadosPresetFicha().find(p => p.nombre === n);
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.efectos.push({...structuredClone(pre('Tropezado')), id: 't1', activo: true});
+  const r = FichaMantenimiento.finTurno(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)}, 'k1', '', [], 5);
+  const a = [{...structuredClone(pre('Acelerado')), id: 'a1', activo: true}, {nombre: 'Veneno', turnos: 2, activo: true}];
+  const k = Combatiente.terminarTurnoEstados(a);
+  const sc = CreepCalculo.normalizar({nombre: 'Rata', hp: 10, hpMax: 10, estados: [{...structuredClone(pre('Tropezado')), id: 't2', activo: true}]});
+  const rc = CreepAcciones.finTurno(sc, 'k1', 5);
+  igual([r.rep, S.efectos.some(e => e.nombre === 'Tropezado'), Combatiente.reporteTurno(k.eventos), a.map(e => e.nombre), rc.rep],
+    [['Tropezado: se terminó'], false, ['Acelerado: se terminó'], ['Veneno'], ['Tropezado: se terminó']]);
 });
 prueba('🙈 La tele, cada lado solo si esta pantalla vería al token ahí (2026-11-24, vtt-hexgrid/js/111)', async () => {
   const src = await (await fetch('../vtt-hexgrid/js/111-parpadeo-tv.js', {cache: 'no-store'})).text();

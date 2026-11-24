@@ -2240,10 +2240,27 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   nada, «▶ Aplicar por él» lo aplicó (veneno 2 → 1, vida 49 → 48), el GM vio la línea en la Mesa y al Jugador 1 su ventana le pasó a «✔ Ya se aplicó
   (lo aplicó el GM)». Los jugadores no vieron nada nuevo, salvo la línea de siempre «El GM está revelando lo oculto». Como dice P322 (2), la línea
   de la Mesa del turno anterior (llegada con el ojo apagado) no apareció al prenderlo. Sin arreglos. Duda aparte: P324 («Cómo quedó el grupo»).
-- **⬜ en cola — Probar: 🙈 escondido y ▶ Iniciar combate / ⏬ Demorar / ⟳ Pasar de ronda / ↩ fin del turno libre** (2026-11-23): las cuatro
+- **✅ hecho (2026-11-24) — Probar: 🙈 escondido y ▶ Iniciar combate / ⏬ Demorar / ⟳ Pasar de ronda / ↩ fin del turno libre** (2026-11-23): las cuatro
   tarjetas usan la misma regla (a los que lo ven, con su nombre; a los rivales, la de siempre sin él); solo se probó con ▶ Siguiente.
-- **⬜ en cola — Probar: 🙈 el fin de turno de un escondido con algo que contar** (2026-11-23): si al terminar su turno le pasa algo (un estado
+  Probado con clics en «Claude · pruebas 2» (GM de pruebas sin 👁, Jugador 1 y Jugador 2), Blanco J1 en Sigilo con un veneno de prueba.
+  (a) **▶ Iniciar combate** con J1 primero: el GM vio «Ronda 1 · Empieza el combate · Sigue el orden de turnos» sin nombre; J1, su «▶ Empieza tu
+  turno»; J2, «Empieza el combate: turno de Blanco J1». (b) **⟳ Pasar de ronda** en el turno de J2: el GM, «Ronda 2 · Pasa el turno»; J1 y J2, «Ronda 2 ·
+  Empieza el turno de Blanco J1». Con J1 todavía sin jugar (se saltea), el GM vio solo «⏭ El GM pasó de ronda» y J1/J2 la tarjeta aparte de J1.
+  **Arreglado**: el cartel de confirmar le nombraba al GM a J1 («Queda 1 turno sin jugar… (Blanco J1)») y la línea decía «se saltearon los turnos de
+  alguien más» (le contaba a todos que había un escondido): ahora el cartel cuenta solo a los que el GM ve y la línea nombra solo a los que se ven.
+  (c) **↩ fin del turno libre** (turno libre a J2 en el turno de J1): el GM vio «Termina el turno libre: sigue el orden de turnos»; J1 y J2, «Vuelve el
+  turno de Blanco J1». **Arreglado**: el botón del GM decía «↩ Volver a Blanco J1» y el cartel de «Es el turno de…» decía «termina el de Blanco J1» /
+  «vuelve a Blanco J1»; ahora, sin el nombre del escondido («↩ Volver», «el turno en curso», «quien lo tenía»). (d) **⏬ Demorar** con J1 escondido
+  como el siguiente: el GM vio «⏬ Pasa el turno · Blanco J2 demora su turno: juega justo después» y la Mesa «le toca al siguiente»; J1 y J2, «Empieza el
+  turno de Blanco J1». Ojo: el GM sin 👁 no puede apretar ▼ en el que juega cuando el de abajo es el escondido (no ve su fila: el ▼ queda apagado); se
+  probó llamando a lo mismo que hace ▼. Duda: P325. Capturas fuera del repo.
+- **✅ hecho (2026-11-24) — Probar: 🙈 el fin de turno de un escondido con algo que contar** (2026-11-23): si al terminar su turno le pasa algo (un estado
   que vence), va en su propia tarjeta, solo para los que lo ven; en la prueba no hubo líneas de fin de turno.
+  Probado con clics con Blanco J1 en Sigilo y «Tropezado» (se va al terminar el turno). **Arreglado**: un estado que se va al terminar el turno
+  (Tropezado, Acelerado) se iba en silencio, así que nunca había nada que contar; ahora deja «Tropezado: se terminó» (personaje, invocación y creep;
+  `Combatiente.terminarTurnoEstados`, `FichaMantenimiento.finTurno`, prueba nueva; `comun/pruebas.html` 1112 en verde). Con ▶ Siguiente: J1 y J2 vieron
+  la tarjeta aparte «Turno de Blanco J1 · Terminó el turno de Blanco J1: Tropezado: se terminó» y la línea de la Mesa; el GM no vio nada de J1 (solo
+  «Empieza el turno de Blanco J2»).
 - **⬜ en cola — Probar: 🙈 una zona de «al empezar su turno» (Muro de fuego) bajo un escondido, y el cartel flotante de inmunidad** (2026-11-23):
   no se tocaron (la zona la resuelve quien lo maneja; el cartel flotante ya no sale en una pantalla que no ve el token, P263); no se probaron
   con un escondido al empezar su turno.

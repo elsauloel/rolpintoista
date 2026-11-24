@@ -306,9 +306,9 @@ const FichaMantenimiento = (() => {
       (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
       return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
     }
-    Combatiente.terminarTurnoEstados(S.efectos);   // P177: los turnos ya no bajan acá (bajan al empezar el próximo); lo recién puesto deja de serlo
+    const k = Combatiente.terminarTurnoEstados(S.efectos);   // P177: los turnos ya no bajan acá (bajan al empezar el próximo); lo recién puesto deja de serlo
     if(num(S.aguanteListo) > 0) S.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante (como los creeps)
-    const rep = [];
+    const rep = Combatiente.reporteTurno(k.eventos);   // lo que se fue al terminar (Tropezado, Acelerado: «se terminó»)
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
     // Calma (anillo, 2026-10-06): si no atacó en su turno, al terminarlo recupera No2 (sin pasar del máximo).
     const calma = num(c.final.calma);

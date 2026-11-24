@@ -2647,3 +2647,11 @@ Probando el inicio de turno de un escondido (cola de pruebas, 2026-11-24): al pa
 para ajustar los turnos de los estados (como GM Tools, que también tiene las fichas), pero en el mapa todo lo demás de ese escondido se le tapa.
 1. ¿Se deja así (es la ficha del grupo, no el mapa) o el escondido sale solo con el 👁 prendido? **Recomendación:** dejarlo así: es para que el GM
    acomode los estados de todos al empezar, y no dice dónde está.
+
+### P325 — 🙈 El GM sin 👁 no puede demorar al que juega por debajo de un escondido (2026-11-24, Claude)
+Probando ⏬ Demorar con un escondido (cola de pruebas): con Blanco J2 jugando y Blanco J1 (en Sigilo) justo abajo, el GM con el 👁 apagado no ve la
+fila de J1, así que el ▼ de J2 queda apagado: no puede demorarlo. Con el 👁 prendido sí puede (y ahí ve todo). Si lo hace, las tarjetas salen bien
+(el GM ve «Pasa el turno» sin nombre). Es lo mismo que pasa con cualquier cosa del orden que el GM no ve.
+1. ¿Queda así (para demorar a alguien por debajo de un escondido, el GM prende el 👁 un momento)? **Recomendación:** dejarlo así: es raro y el 👁
+   es justo para eso.
+2. ¿O el ▼ del que juega se deja apretar igual, y se demora por debajo del siguiente aunque el GM no lo vea (el GM no se entera a quién le toca)?

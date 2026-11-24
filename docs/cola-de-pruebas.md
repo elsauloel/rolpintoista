@@ -2586,6 +2586,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Dueño (2026-11-24):** «se tendrían que minimizar los menús, enfocar en los tokens durante la animación, y después volver a abrir el menú». Y
   el mínimo 11 del Portal (Rara) contra la Res.CC de un nivel 1: «es una trampa rara, y entiendo que cara, así que está bien».
 
+- **⬜ en cola — 🌀 Ajustes del Portal cósmico** (dueño, 2026-11-24, después de probarlo él en «Claude · pruebas»):
+  1. **La dificultad es una tirada, no un número fijo:** hoy la Res.CC de la víctima va contra el Ef.Esp de quien puso la trampa como valor fijo
+     (el Mago del rayo, 20). Quien la puso también tira su Ef.Esp, y si saca menos que el mínimo de la calidad (Rara 11), vale el mínimo.
+     (Revisar si las otras trampas mágicas compradas con «contra el Ef.Esp de quien la puso», P218, tienen que ir igual: preguntarle.)
+  2. **Al elegir el destino, mostrar el área de casillas disponibles** (las que están a la distancia permitida y libres).
+  3. **La tele no se ve por los menús** (lo vio él): durante la animación, minimizar los menús y enfocar los tokens, y después volver a abrirlos
+     (ver también la entrada «📺 El cartel de la trampa tapa la tele del Portal cósmico»).
+  4. **Rango: máximo 5 casillas desde el punto de origen** (hoy 8). Actualizar el texto de la trampa en el catálogo.
+  El escenario de prueba sigue puesto en «Claude · pruebas» (mapa «Prueba · Tormenta y Meteoro»): sacarlo cuando el dueño diga, o usarlo para probar esto.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

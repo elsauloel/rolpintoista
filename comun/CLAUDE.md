@@ -2317,7 +2317,7 @@ versión parecida en más de una, es candidato a juntar.
   no lo abre en la pantalla del GM que lo crea si no lo ve. Quien maneja al escondido hace también lo del atacante (`porOcultoAtq`: «Tirar a mano»
   y los efectos). Todas las líneas de la Mesa de ese duelo van marcadas: `conOculta(id, r)` / `anunciarMesa(texto, id)` / el resumen →
   `desde = 'oculta-<pj|creep>:<desde>'` y `ficha` = el escondido (`mesa.js` lo deja pasar en `mesaPublicar`; sin `mesaFiltrar`, la ficha suelta y
-  GM Tools lo muestran solo a su bando, `mesaOcultaSinMapa`). **No frena a nadie:** `revisarOcultos` (cada 5 s, en la pantalla del GM) resuelve lo
+  GM Tools lo muestran solo a su bando, `mesaOcultaSinMapa`). **Si el golpe lo delata** (2026-11-24), el mapa lo deja en `dano.delatado` (js/13 `dueloAplicarDano`) y lo que sigue de ese duelo (la cuenta del daño, el resumen) va sin marca: a la vista también en la ficha suelta y GM Tools (`delatadoEn`, `ocultaMesa`). **No frena a nadie:** `revisarOcultos` (cada 5 s, en la pantalla del GM) resuelve lo
   que quedó quieto `OCULTO_MS` (40 s): la resistencia con `cfg.valorOculto(d, lado, stat)` (`tiroDeValor`), el empate, el dodge roll (no se mueve),
   acepta el daño y tira/pide los efectos. Dudas: P287.
 - **💀 `Combatiente.caerSiCayo(quien, campo, hpAntes)`** (2026-11-23, P270): el corte común de «un creep cayó»: si tenía vida (`hpAntes > 0`) y ahora

@@ -10855,7 +10855,7 @@ grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comu
     const src = await traer('duelo.js');
     cierto(/\.\.\.\(g\.oculto \? \{oculto: true\} : \{\}\)/.test(src));
     cierto(/listaDuelos = todosDuelos\.filter\(veoOculto\)/.test(src));
-    cierto(/todosDuelos\.forEach\(publicarResumenSiCorresponde\)/.test(src) && /esOculto\(datos\) \? ocultaMesa\(datos\.id, 'reporte', datos\)/.test(src));
+    cierto(/todosDuelos\.forEach\(publicarResumenSiCorresponde\)/.test(src) && /\(esOculto\(datos\) && ocultaMesa\(datos\.id, 'reporte', datos\)\) \|\| \{desde: 'reporte'\}/.test(src));
     cierto(/const OCULTO_MS = 40 \* 1000/.test(src) && /setInterval\(revisarOcultos, 5000\)/.test(src));
     cierto(/const puedeAtq = esMio\(d\.atacante\) \|\| soyGM\(\) \|\| porOcultoAtq\(d\)/.test(src));
     cierto(!/anunciarMesa\(anuncio\);/.test(src) && !/mesaPublicar\(publicar\.origen, publicar\.r\)/.test(src));   // todas las líneas pasan por la marca
@@ -10927,11 +10927,29 @@ grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hex
     cierto(/window\.mesaLineaMarca\(desde \|\| 'recordatorio'\)/.test(mesa) && /window\.mesaLineaMarca\(r\.desde === 'gm' \? 'gm' : 'mapa'\)/.test(mesa));
     cierto(/areaOcultaCalla\(\)\) return;/.test(m01) && /momentoMarcaOculta\(m\.datos\)/.test(m16) && /d\.datos\.paraUids\.includes\(fbUsuario\.uid\)\)\)\{ momentosFeed/.test(m16));
     const iDel = m13.indexOf('const sali = await'), iTal = m13.indexOf("if(typeof talEspejito === 'function' && !res.r.invulnerable)");
-    cierto(iDel > 0 && iTal > iDel && /return areaOcultaCon\(d, \(\) => dueloAplicarDanoBase\(d, o\)\)/.test(m13));
+    cierto(iDel > 0 && iTal > iDel && /const info = await areaOcultaCon\(d, async \(\) => \{ const r = await dueloAplicarDanoBase\(d, o\)/.test(m13));
     cierto(/areaOcultaCon\(d, \(\) => dueloAplicarEfecto\(d, ef\)\)/.test(m14) && /areaOcultaCon\(d, \(\) => talContrahechizo\(d\)\)/.test(m14) && /areaOcultaCon\(m, \(\) => talSalvajeAnunciar/.test(m14));
     cierto(/sinPorque/.test(m53) && /nombre: 'un Espejito'/.test(m53) && /Una Cruz de plata le rebota/.test(m53) && /'su objetivo'/.test(m53));
     cierto(/todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'atacante'/.test(duelo) && /todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'defensor'/.test(duelo));
     cierto(/conOculta\(d\.id, \{\.\.\.r, quien: d\.atacante\.nombre/.test(duelo));
+  });
+  prueba('si el golpe lo delata, el duelo queda «delatado» y lo que sigue (la cuenta del daño, el resumen) va sin marca: también en la ficha suelta y GM Tools (cola, 2026-11-24)', async () => {
+    const [src130, m13, duelo] = await Promise.all(['../vtt-hexgrid/js/130-area-oculta.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js', 'duelo.js'].map(traer));
+    const envol = m13.slice(m13.indexOf('async function dueloAplicarDano(d, o){'), m13.indexOf('async function dueloAplicarDanoBase(d, o){'));
+    const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'u1', escondido: true}], ['rata', {tipo: 'creep', fichaId: 'c1', duenoUid: 'gm'}]]);
+    let delata = false;
+    const base = async () => { if(delata) areaOcultaDelatadoRef(); return {quien: 'Blanco J1', recibido: 9}; };
+    let areaOcultaDelatadoRef = null;
+    const w = new Function('tokens', 'fbUsuario', 'soyGM', 'ojoRevelando', 'loVeoAhora', 'areaDanoCompartible', 'creepPrivadoDe', 'CreepCalculo', 'fichasPub', 'SEP_INVOCACION', 'num', 'dueloAplicarDanoBase',
+      src130 + '\n' + envol + '\nreturn {dueloAplicarDano, areaOcultaDelatado};')(
+      tokens, {uid: 'gm'}, true, false, t => !t.escondido, () => true, () => null, {statValor: () => 0}, new Map(), '~', Number, (...a) => base(...a));
+    areaOcultaDelatadoRef = w.areaOcultaDelatado;
+    const no = await w.dueloAplicarDano(DO);
+    delata = true;
+    const si = await w.dueloAplicarDano(DO), visto = await w.dueloAplicarDano(DV);
+    igual([no, si, visto], [{quien: 'Blanco J1', recibido: 9}, {quien: 'Blanco J1', recibido: 9, delatado: true}, {quien: 'Blanco J1', recibido: 9}]);
+    cierto(/const delatadoEn = d => !!\(d && d\.dano && d\.dano\.delatado\)/.test(duelo) && /if\(!info \|\| info\.delatado \|\| delatadoEn\(d\)\) return null;/.test(duelo));
+    cierto(/delatado = delatadoEn\(m\);/.test(duelo) && /anunciarMesa\(anuncio, delatado \? null : id\);/.test(duelo) && /delatado: delatadoEn\(d\)\}\); \}\);/.test(duelo));
   });
   prueba('el diablito de la Botella: contra un escondido, el cartel dice solo la quemadura', async () => {
     const m53 = await traer('../vtt-hexgrid/js/53-talismanes.js');

@@ -1915,7 +1915,7 @@ const Duelo = (() => {
         await fbDb.collection(fbRutaCampana('tiradas')).add({
           uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: `⚔ Resumen del duelo · ${datos.atacante.nombre} → ${datos.defensor.nombre}`,
           formula: lineasResumen(datos).join('\n').slice(0, 900), texto: fraseResumen(datos), rolls: [], mod: 0, total: 0,
-          ...(esOculto(datos) ? ocultaMesa(datos.id, 'reporte', datos) : {desde: 'reporte'}),   // 🙈 un duelo oculto: solo lo ve el bando del escondido
+          ...((esOculto(datos) && ocultaMesa(datos.id, 'reporte', datos)) || {desde: 'reporte'}),   // 🙈 un duelo oculto: solo lo ve el bando del escondido
           cuando: firebase.firestore.FieldValue.serverTimestamp(),
         });
       }
@@ -1987,7 +1987,7 @@ const Duelo = (() => {
   }
   async function guardarAplicacion(id, info){
     const ref = col().doc(id);
-    let anuncio = '';
+    let anuncio = '', delatado = false;
     await fbDb.runTransaction(async tx => {
       anuncio = '';
       const doc = await tx.get(ref);
@@ -1995,6 +1995,7 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.fase !== 'dano' || !m.dano || m.dano.aplicado) return;
       m.dano = {...m.dano, ...info, aplicado: true};
+      delatado = delatadoEn(m);
       // ¿El golpe hizo daño? Los efectos que lo necesitan no entran si la armadura lo absorbió todo.
       const dn0 = m.dano;
       // 🛡/❤ (P227, dueño, 2026-10-27): lo que se lleva la Vida extra es daño (es vida); lo que se come un escudo, no (es el escudo).
@@ -2017,7 +2018,7 @@ const Duelo = (() => {
       if(magJunto(dn) && !dn.manual && !dn.invulnerable && !dn.aMano) anuncio += ` · ${magIcono(dn.magico.tipo)} + ${dn.magico.recibido} de ${String(dn.magico.tipo).toLowerCase()} directo = ${_fmt(entroDn(dn) + entroDn(dn.magico))} en total (vida ${vidaCambioDn(dn)})`;   // 🔥 el elemental del arma en la misma cuenta (2026-11-04)
       if(_num(dn.mitiMiti) > 0 && !dn.manual && !tieneCuenta(dn)) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (${dn.mitiMitiTxt || 'Miti-Miti'})`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
     });
-    anunciarMesa(anuncio, id);
+    anunciarMesa(anuncio, delatado ? null : id);   // 🕶 si el golpe lo delató, la cuenta del daño ya va a la vista
   }
 
   // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un d6 y gana el que acierta.
@@ -2259,6 +2260,8 @@ const Duelo = (() => {
      Quien maneja al escondido hace también lo que le tocaría al atacante (los efectos), y si nadie lo resuelve en OCULTO_MS, la pantalla del GM lo
      resuelve sola (revisarOcultos). */
   const esOculto = d => !!(d && d.grupo && d.grupo.oculto);
+  // 🕶 El escondido de un duelo oculto se delató con el golpe (el mapa lo deja en `dano.delatado`, vtt-hexgrid/js/13): lo que sigue va sin marca.
+  const delatadoEn = d => !!(d && d.dano && d.dano.delatado);
   function veoOcultoAhora(d){
     if(esMio(d.defensor)) return true;
     if(cfgEscuchar.veOculto){ try{ return !!cfgEscuchar.veOculto(d); }catch(err){ return false; } }
@@ -2286,7 +2289,7 @@ const Duelo = (() => {
   // La marca de la Mesa de un duelo oculto: `oculta-<pj|creep>:<desde de siempre>` y la ficha del escondido (vtt-hexgrid/js/29 la filtra).
   function ocultaMesa(id, desde, d){
     const info = ocultosInfo.get(id) || (d && esOculto(d) ? {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || '')} : null);
-    if(!info) return null;
+    if(!info || info.delatado || delatadoEn(d)) return null;   // 🕶 se delató con el golpe: desde ahí, a la vista de todos (cola, 2026-11-24)
     return {desde: `oculta-${info.tipo}:${desde || 'mapa'}`.slice(0, 40), ficha: info.ficha.slice(0, 80)};
   }
   function conOculta(id, r){
@@ -4244,7 +4247,7 @@ const Duelo = (() => {
       if(snap.metadata.fromCache && !servidorVisto) return;
       servidorVisto = true;
       todosDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-      todosDuelos.forEach(d => { if(esOculto(d)) ocultosInfo.set(d.id, {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || '')}); });
+      todosDuelos.forEach(d => { if(esOculto(d)) ocultosInfo.set(d.id, {tipo: d.defensor && d.defensor.tipo === 'creep' ? 'creep' : 'pj', ficha: String((d.defensor && (d.defensor.ref || d.defensor.fichaId)) || ''), delatado: delatadoEn(d)}); });
       listaDuelos = todosDuelos.filter(veoOculto);   // 🙈 lo que esta pantalla no tiene que ver, ni se abre ni se cuenta (P263)
       const ahora = Date.now();
       // Un duelo nuevo se abre solo para todos los conectados; si ya hay otro abierto y sin resolver, queda el botón.

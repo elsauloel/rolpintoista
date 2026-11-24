@@ -2150,7 +2150,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   aviso arriba) y lo resolvió a mano (✍ la Evasión de J1, otro valor de daño menor al Sigilo, la Quemadura): J1 siguió escondido. Los jugadores
   no vieron nada nuevo (solo el aviso de siempre del ojo). Quedó una pregunta: P322 (con el ojo prendido, un área alcanza al escondido como
   duelo normal y se lo puede elegir de objetivo). Capturas: cola89. Lo que no se probó con clics, al final de la cola.
-- **⬜ en cola — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263): solo con pruebas automáticas.
+- **✅ hecho (2026-11-24) — Probar: 🙈 la Mesa de la ficha suelta y de GM Tools con un duelo escondido** (2026-11-22, P263). Probado con clics en
+  «Claude · pruebas 2»: el mapa abierto para los tres y, al lado, GM Tools (GM de pruebas, sin «👁 Revelar lo oculto») y la ficha suelta de Blanco J1
+  (Jugador 1) y de Blanco J2 (Jugador 2). **Sin delatarse** (Blanco J1 en Sigilo, el Grito espeluznante de un creep con la Botella, 3 de daño): en
+  GM Tools el GM vio solo el anuncio del Grito y, después, «el diablito quemó a Control mental 4» (sin decir a quién le pegó); ninguna línea con el
+  nombre de Blanco J1 ni su duelo. Jugador 1 y Jugador 2 (su bando) vieron en la ficha todo el duelo: las dos tiradas, el +2 de la Botella, los 3 de
+  daño, el Pánico y el resumen con «Ver detalle del duelo». **Se delata** (la Nova arcana con 9): las tres Mesas muestran «se delató», el Maldito y,
+  **con un arreglo**, también la cuenta del daño y el resumen del duelo. Antes, en GM Tools esas dos líneas seguían escondidas (iban marcadas como del
+  duelo oculto aunque ya se había delatado; el mapa del GM sí las mostraba). Ahora, si el golpe lo delata, el duelo queda anotado y lo que sigue va a
+  la vista de todos (`comun/duelo.js`, `vtt-hexgrid/js/13`; prueba automática nueva, 1102 en verde). Las tiradas de antes de delatarse siguen siendo
+  solo de su bando (igual que en el mapa). Capturas: cola90.
 - **⬜ en cola — Probar: 🙈 el vencimiento de 40 s con un personaje escondido, con el código nuevo en la pantalla del GM** (2026-11-22, P263): se
   probó con la pantalla del GM todavía con el código de antes (tiró la Evasión de J2, aceptó el daño y aplicó el Empujón solo); con el código
   nuevo solo se probó con el creep.

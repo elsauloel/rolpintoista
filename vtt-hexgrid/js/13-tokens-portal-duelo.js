@@ -2137,7 +2137,11 @@ function sueltoHooksDuelo(lado){
 // delata. La vista previa no escribe nada: va directo.
 async function dueloAplicarDano(d, o){
   if((o && o.simular) || typeof areaOcultaCon !== 'function') return dueloAplicarDanoBase(d, o);
-  return areaOcultaCon(d, () => dueloAplicarDanoBase(d, o));
+  // 🕶 Si el golpe lo delató, el duelo lo anota (`dano.delatado`): lo que sigue de ese duelo (la cuenta del daño, el resumen) va a la vista de todos,
+  // también en la ficha suelta y GM Tools, que no tienen mapa para mirar si se lo ve (cola, 2026-11-24).
+  let delatado = false;
+  const info = await areaOcultaCon(d, async () => { const r = await dueloAplicarDanoBase(d, o); delatado = !!(areaOcultaCtx && areaOcultaCtx.delatado); return r; });
+  return delatado && info && typeof info === 'object' ? {...info, delatado: true} : info;
 }
 async function dueloAplicarDanoBase(d, o){
   const simular = !!(o && o.simular);

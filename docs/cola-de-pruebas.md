@@ -2489,6 +2489,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   salió a la vista para todos, después del «se delató». Capturas en la carpeta de la prueba (cola87). Lo que no se probó con clics: Espejito,
   Relicario, Orbe salvaje, anillos, Cruz de plata (solo pruebas automáticas y lectura de código).
 
+- **⬜ en cola (revisar más tarde) — 😈 El aviso del diablito de la Botella contra un escondido, con una mini explicación y al final del turno**
+  (dueño, 2026-11-24, sobre P320): «si aparece ese mensaje así sin nadie, va a ser confuso, porque va a parecer que es un error. Entonces, que
+  aparezca una mini explicación: había alguien oculto, te hizo esta tirada a escondidas, sacaste uno y el diablito te hace daño. Pero que lo
+  diga de última, al final del turno». Revisar también los otros talismanes que quedaron con texto «sin nombre» (Espejito, Relicario, Cruz de
+  plata, Orbe salvaje) por si conviene lo mismo.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

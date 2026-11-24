@@ -2588,3 +2588,15 @@ mientras tanto (lo conservador: nunca le saca un Silencio que no puso el tótem)
    Cuando se le vence, si sigue adentro, vuelve el del tótem.
 3. **Le sacan el Silencio del tótem estando adentro** (Purificar, «Limpiar», a mano): vuelve a entrarle al segundo, mientras siga adentro.
 ¿Está bien así? **Recomendación de Claude:** sí; lo único discutible es el 3 (si una limpieza debería protegerlo un rato del aura).
+
+### P320 — 🙈 Un área le pega a alguien escondido: ¿los talismanes de quien la lanzó le avisan? (2026-11-24, Claude)
+Probado con clics en «Claude · pruebas 2»: el Grito espeluznante de un creep le pegó 1 de daño a Blanco J1 escondido (no alcanzó para delatarlo,
+bien) y el GM no vio el duelo. Pero el creep lleva la **Botella con un diablito**: al aplicar el daño sumó +2 y, como en los dados salió un 1, a la
+pantalla del GM le llegó el cartel «😈 El diablito se ríe: 2 de fuego para Control mental 4» y la línea en la Mesa. O sea: el GM se enteró de que el
+grito le pegó a alguien. Con la Nova arcana de otro creep que lleva la **Cabeza reducida**, la Mesa de todos dijo «Blanco J1 queda Maldito», con el
+nombre, antes de que se delatara. Lo mismo pasaría con otros talismanes y anillos que actúan al pegar.
+1. **Los efectos sobre quien lanzó el área** (la quemadura del diablito, el Orbe salvaje que le devuelve el daño, curarse con Luz sanadora o al drenar):
+   ¿pasan igual, aunque eso le avise que le pegó a algo? ¿O se guardan sin anunciar, y el diablito le quema sin decir por qué?
+   **Recomendación:** que pasen (es su equipo y lo siente), pero sin nombrar a nadie: «el diablito se ríe» sin decir a quién le pegó.
+2. **Lo que le pasa al escondido por esos talismanes** (Maldito de la Cabeza reducida, el +2 de la Botella): que vaya marcado como el resto del duelo
+   oculto (lo ve solo su bando, o quien lo vea). **Recomendación:** sí.

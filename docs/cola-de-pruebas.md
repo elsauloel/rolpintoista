@@ -2111,8 +2111,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   siempre del estado, una sola vez. Un Silencio que ya tenía por otra cosa no se toca (P319). Título y descripción del tótem, igual; ya no sale el
   «Silenciado (tótem)» de área (sería doble). Probado con clics en «Claude · pruebas 2» (GM y Jugador 1): entrar (iconito, globo, ficha), el aviso
   al usar Remolino, salir, Inmunidad mental, romper el tótem, borrarlo y con un Silencio previo.
-- **⬜ en cola — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
+- **✅ hecho (2026-11-24) — Probar: 🙈 golpe a un personaje escondido que NO lo delata, visto desde el GM** (2026-11-22, P263): un área de un creep sin daño
   (o con daño menor que su Sigilo) contra un personaje en sigilo; que el GM no vea nada aunque le pegue. En la prueba, la Nova arcana siempre lo delató.
+  Probado con clics en «Claude · pruebas 2» (GM de pruebas y Jugador 1, cada uno en su pantalla). Blanco J1 (Sigilo 6) escondido al lado de los creeps.
+  (1) **Grito espeluznante** de Control mental 4 (onda de 3, 1d6 de daño: nunca pasa de 6, así que con Sigilo 6 nunca lo delata): al GM solo le
+  salió «Grito espeluznante ejecutada» y la línea de siempre de la habilidad; nada de J1 (ni cuadro, ni Crónica, ni Mesa). J1 tuvo su duelo aparte
+  (Res.Mt), perdió a propósito, le entraron 3 (1 + 2 de la Botella del creep: 50 → 47), se le puso Pánico y **siguió en Sigilo**; el GM siguió sin verlo.
+  (2) **Nova arcana** de Arcano 3 con 5 de daño: J1 la esquivó; el GM no vio nada. (3) **Control**: Nova arcana con 9 de daño, J1 no la esquivó → «🕶
+  Blanco J1 se delató y salió del sigilo», el GM lo ve y ve la línea del golpe. **❌ Lo que lo delata igual** (a la cola, abajo, y P320): los talismanes
+  de quien lanza el área publican en la Mesa para todos. En (1), al GM le salió «😈 La Botella de Control mental 4: … el diablito se ríe» y el cartel
+  «El diablito se ríe» (o sea: le pegó a alguien); en (3), «🔮 Cabeza reducida de jíbaro de Arcano 3: Blanco J1 queda Maldito», con el nombre, antes
+  de que se delatara. Capturas en la carpeta de la prueba (cola86).
 - **⬜ en cola — Probar: 🙈 área contra un escondido con línea, cono, área con centro y con dodge roll** (2026-11-22, P263): solo se probaron ondas
   (Shockwave, Nova arcana). Mirar la Lanza arcana (chispas solo sobre los que se ven), un cono y un área con dodge roll (el escondido se mueve solo
   en su pantalla).
@@ -2461,6 +2470,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🤐 el Silencio del Tótem en una invocación y con 🎮 el control** (2026-11-24): con clics se probó solo con el personaje del
   Jugador 1. Falta: una invocación que entra al aura (lo pone la pantalla de su dueño), un personaje que el GM maneja con 🎮 el control (lo pone la
   pantalla del GM, no la del jugador) y el Jugador 1 con el mapa abierto en dos pestañas (que no quede doble).
+
+- **⬜ en cola — 🙈 Los talismanes de quien lanza un área delatan al escondido** (2026-11-24, de la prueba del golpe que no lo delata; P320):
+  cuando un área le pega a alguien que el bando que la lanzó no ve, lo que hacen los talismanes de quien la lanzó al aplicar el daño
+  (`vtt-hexgrid/js/53-talismanes.js`, llamado desde `dueloAplicarDano`, js/13) va a la Mesa sin la marca del duelo oculto: la Botella con un
+  diablito («+2… el diablito se ríe», y su cartel para aplicar la quemadura a quien la lleva), la Cabeza reducida / el Muñeco vudú («Fulano queda
+  Maldito», **con el nombre del escondido**), y seguramente el Espejito, el Relicario, el Orbe salvaje y los anillos elementales (no probados).
+  Visto con clics: el GM se enteró de que el Grito le pegó a alguien por la Botella, y del nombre por la Cabeza reducida. Arreglarlo depende de P320.
 
 ## En cola
 

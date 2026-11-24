@@ -2694,7 +2694,12 @@ mareada: no actúa. Recién actúa en la ronda 3 (o en la 2 si J1 la deja jugar 
 3. Refuerzos: si el creep que lo llamó no está en el orden (lo raro: un creep copiado a mano no es un refuerzo), el refuerzo queda con el mareo de
    antes (solo su primer turno), porque el GM no tiene turno propio. ¿Está bien?
 
-### P328 — ➕➖ Sumar o sacar a mano del orden de turnos: lo que quedó elegido (2026-11-24, Claude)
+### ✅ P328 — ➕➖ Sumar o sacar a mano del orden de turnos: lo que quedó elegido (2026-11-24, Claude)
+
+**Decidido (dueño, 2026-11-24): todo como lo recomendado** (1 sí; 2 sí, cuando se haga P301 b; 3 sí; 4 lo sacado queda afuera hasta que el GM
+lo vuelva a sumar; 5 la ✕ de la tabla hace lo mismo que sacar del orden cuando saca al que tiene el turno). Y además: **no tiene que existir el
+«➖ Sacar del orden» en el token** («hay muchos botones alrededor del token. Para quitar un token de la tabla, lo hace el GM desde la tabla
+misma»); el «➕ Sumar al orden de turnos» sí queda.
 
 Desde hoy el GM tiene en el «⋯» de cualquier token «➕ Sumar al orden de turnos» (o «➖ Sacar del orden» si ya está). Quedaron elegidas estas cosas,
 todas cambiables:

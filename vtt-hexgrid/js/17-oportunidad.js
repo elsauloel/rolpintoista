@@ -150,6 +150,28 @@ async function oportunidadResolver(){
     datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide, ...(p.cruza ? {cruza: true} : {}), ...(p.vigilancia ? {vigilancia: true} : {})}});   // 🕊 cruza: el que vuela pasa por encima
   if(!e.momentoId && oporEspera === e){ oporEspera = null; renderOporEspera(); oporContinuar(e); }   // sin reglas publicadas: sigue como antes
 }
+/* 💍 P266 (dueño, 2026-11-23: «el aviso del anillo sale primero»): quien se frena en el primer paso (se aleja de un rival pegado) con Puntería
+   certera, el Foco de un anillo o una Apuntada activos ve antes «Si te movés, lo perdés. [Moverme igual] [Cancelar]» (`quietoAvisoAntes`, js/126).
+   Cancelar: no se mueve, no hay oportunidad (el par no se marca como usado) y no pierde nada. Moverme igual: el bono se da por perdido ya
+   (`quietoMarcar`: aunque el rival lo ataque y no termine de moverse) y recién ahí se le ofrece la oportunidad; al seguir el camino no se vuelve
+   a preguntar. Sin bono activo (o en un dodge roll), como siempre. Si el camino se frena más adelante (no en el primer paso), el aviso ya sale
+   antes, en confirmarRuta (js/08), porque ahí se mueve antes de ofrecer la oportunidad. */
+async function oportunidadTrasAvisoQuieto(id){
+  const p = oportunidadPendiente;
+  if(!p || typeof quietoAvisoAntes !== 'function') return oportunidadResolver();
+  const o = {};
+  let si = true;
+  try{ si = await quietoAvisoAntes(id, o); }catch(err){ console.error('💍 P266: el aviso antes de la oportunidad', err); si = true; }
+  if(!si){
+    if(oportunidadPendiente === p) oportunidadPendiente = null;
+    if(typeof dodgeFrenado !== 'undefined') dodgeFrenado.delete(id);
+    pedirDibujo();
+    return;
+  }
+  if(o.pregunto && typeof quietoMarcar === 'function') quietoMarcar(id);
+  oportunidadPendiente = p;
+  return oportunidadResolver();
+}
 /* Retirada limpia (2026-10-04, dueño, mecánica de las piernas): quien se aleja tiene una chance de no darle el ataque de oportunidad al
    rival. Antes de preguntarle nada al rival, a quien se aleja se le abre un cartel paso a paso (la estética del duelo, como las trampas):
    qué chance tiene y con qué número sale, y el botón «🎲 Tirar 1d6» — no se tira solo ni en silencio (dueño: «el anuncio y la tirada no

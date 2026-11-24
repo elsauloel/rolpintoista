@@ -2617,6 +2617,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   deduce); la primera mirada solo toma nota (al entrar no salta). **El aviso**: `quietoAvisoAntes(id)` desde `confirmarRuta` (js/08), con
   `AvisoCombate.preguntar` → «Moverme igual» / «Cancelar» (Cancelar = `cancelarRuta`); al GM que mueve a otro, en tercera persona. Lo elegido
   «mientras tanto»: P258. Probado con clics en «El origen · CLON de pruebas» (Jugador 1 y GM, con y sin 🎮 el control).
+  **Antes del ataque de oportunidad** (P266, 2026-11-24): si el arrastre se frena en el primer paso (se aleja de un rival pegado), `rutaSoltada`
+  (js/06) llama a `oportunidadTrasAvisoQuieto` (js/17) en vez de `oportunidadResolver`: primero `quietoAvisoAntes` (que deja `o.pregunto`); Cancelar
+  = sin moverse ni oportunidad (el par no queda usado); «Moverme igual» = `quietoMarcar` (lo pierde ya) y recién ahí la oportunidad. Si se frena más
+  adelante, el aviso ya salía antes, en `confirmarRuta`.
 - **⚔ Maestrías por familia de arma** (2026-11-20; la cuenta está en `comun/combatiente.js`, ver comun/CLAUDE.md): del lado del mapa, solo dos cosas.
   `espaldaBono(atq, def, ataque)` (js/13) suma `ataque.espaldaMas` (el +1 PdG por la espalda de la Maestría en armas punzantes, que trae el ataque);
   y los lugares que arman un ataque (js/11 `bnAtacar`, js/12, js/17 oportunidad, js/58 vigilancia, js/78) le pasan a `Combatiente.ataqueDeArma` /

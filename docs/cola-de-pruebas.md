@@ -2335,8 +2335,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     Traer tokens trajo a todos menos a J2; ➕ a J2 → volvió a entrar. Pruebas automáticas: 1116 en verde. Captura:
     `cola102/1-GM-la-X-saca-a-J2-en-su-turno-y-empieza-el-del-creep.png`. Partida como estaba.
 
-- **⬜ en cola — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
+- **✅ hecho (2026-11-24) — 💍 El aviso del anillo antes del ataque de oportunidad (P266)** (dueño, 2026-11-23): al alejarse con Puntería certera o Foco
   activo, primero sale «Si te movés, lo perdés. [Moverme igual] [Cancelar]» y recién si confirma se le ofrece al rival el ataque de oportunidad.
+  **Cómo era:** pegado a un rival, el primer paso ya lo alejaba, así que se le ofrecía la oportunidad al rival enseguida y el aviso del anillo salía
+  recién al seguir el camino (Cancelar dejaba el token quieto, pero la oportunidad ya se había jugado). Si el camino se frenaba más adelante (no en
+  el primer paso), el orden ya era el bueno. **Cómo quedó** (`oportunidadTrasAvisoQuieto`, vtt-hexgrid/js/17, desde el arrastre de js/06): primero el
+  aviso; con Cancelar no se mueve, no hay oportunidad (no queda «usada») y no pierde nada; con «Moverme igual» el bono se da por perdido en ese momento
+  (aunque el rival lo ataque) y recién ahí se le pregunta al rival; al terminar de moverse no se vuelve a preguntar. Vale igual para el GM moviendo un
+  creep, para las Apuntadas y para la vigilancia; sin bono activo, como siempre. **Probado con clics** en «Claude · pruebas 2» (Jugador 1 pegado a
+  Blanco creep, ronda 3 y 5, con el GM en su pantalla): con Puntería certera y con el Anillo de Foco Arcano, arrastrando el token → sale primero el
+  aviso y al GM no le aparece nada; Cancelar → quieto, con el bono, sin línea en la Mesa; «Moverme igual» → pierde el bono y recién ahí al GM
+  «¿Ataque de oportunidad?»; «No, dejarlo pasar» → J1 terminó su camino sin otro aviso. Pruebas automáticas: 1117 en verde. Capturas:
+  `cola103/1-J1-primero-el-aviso-del-anillo.png`, `cola103/2-GM-recien-despues-le-ofrecen-la-oportunidad.png`. Partida como estaba.
 
 - **⬜ en cola — Probar: 💀 un personaje que cae desde la Botonera del mapa o en su pase de turno** (2026-11-23, P270): ahora deja la línea «💀 X cayó:
   se le fueron N estados (…)» (`caidaContarPj`, vtt-hexgrid/js/11); antes los sacaba sin contarlo. Probarlo con J1 envenenado y poca vida (⏭ Pasar
@@ -2745,6 +2755,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: ➕ Sumar al orden a mano una invocación y un personaje con «🎲 Tirar su Iniciativa», y un token oculto** (2026-11-24, P291):
   con clics se probaron el tótem y el Cofre con el número escrito y Blanco creep tirando. Falta: una invocación (sin Mareo) y un personaje con
   sobrepeso (la fila lleva el «⚖−N»), y sumar o sacar un token oculto o un creep que los jugadores no vieron (sin línea en la Mesa, solo el aviso al GM).
+- **⬜ en cola — Probar: 💍 el aviso del anillo antes de la oportunidad con un creep, con «Sí, atacar» y con la vigilancia** (2026-11-24, P266): con
+  clics se probó solo el Jugador 1 arrastrando su token y el GM contestando «No». Falta: el GM moviendo un creep con una Apuntada o un anillo (el
+  aviso en tercera persona), el rival que contesta «Sí, atacar» (el bono tiene que quedar perdido aunque no termine de moverse) y alejarse en la mira
+  de alguien en vigilancia.
 
 ## En cola
 

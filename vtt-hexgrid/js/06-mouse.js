@@ -652,7 +652,9 @@ function rutaSoltada(a, t){
       const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
       a.x = pc.x; a.y = pc.y;
       indice = -1;
-      if(a.ruta.length === 1){ visibles.delete(a.id); oportunidadResolver(); }   // se aleja en el primer paso: no hay nada que mover todavía
+      // Se aleja en el primer paso: no hay nada que mover todavía. 💍 P266 (dueño, 2026-11-23): con Puntería certera / Foco / una Apuntada activa,
+      // primero el aviso «si te movés, lo perdés» y recién si confirma se le ofrece al rival la oportunidad (js/17).
+      if(a.ruta.length === 1){ visibles.delete(a.id); oportunidadTrasAvisoQuieto(a.id); }
     }
     if(indice >= 0){
       a.ruta = a.ruta.slice(0, indice + 1);

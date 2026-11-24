@@ -1890,7 +1890,7 @@ como un arma común: Tipo ÷ 2 y después el Tipo). No se tocó nada.
 
 ### P266 — 💍 Puntería certera y Foco: el ataque de oportunidad se pregunta antes que el aviso «si te movés, lo perdés» (2026-11-21, Claude)
 
-> ✅ **Respondida (dueño, 2026-11-23):** el aviso del anillo sale **primero**, antes de ofrecerle al rival el ataque de oportunidad («está bien como lo planteás vos»). En la cola.
+> ✅ **Respondida (dueño, 2026-11-23):** el aviso del anillo sale **primero**, antes de ofrecerle al rival el ataque de oportunidad («está bien como lo planteás vos»). **Aplicada el 2026-11-24** (`oportunidadTrasAvisoQuieto`, vtt-hexgrid/js/17): Cancelar = sin moverse, sin oportunidad y sin perder nada; «Moverme igual» = lo pierde y recién ahí la oportunidad.
 Visto con clics (Blanco J1 con el Anillo de Foco Arcano, pegado a un creep): al arrastrar el token, primero sale «⚔ Te alejás de … esperando a
 ver si aprovecha el ataque de oportunidad» y el GM decide; recién después le aparece al jugador «Tenés Foco activo (+2 a PdG.Esp). Si te
 movés, lo perdés. [Moverme igual] [Cancelar]». Si el GM ya atacó y el jugador elige Cancelar, el token se queda donde estaba pero el ataque

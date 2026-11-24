@@ -10180,6 +10180,45 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     igual([await movido.quietoAvisoAntes('biz'), await r1.quietoAvisoAntes('biz'), await narr.quietoAvisoAntes('biz'), await dodge.quietoAvisoAntes('biz')], [true, true, true, true]);
     igual([movido.preguntas.length, r1.preguntas.length, narr.preguntas.length, dodge.preguntas.length], [0, 0, 0, 0]);
   });
+  prueba('⚔ P266 (js/17): al alejarse de un rival pegado con el anillo activo, primero «si te movés, lo perdés» y recién si confirma la oportunidad', async () => {
+    const src17 = await (await fetch('../vtt-hexgrid/js/17-oportunidad.js', {cache: 'no-store'})).text();
+    const ini = src17.indexOf('async function oportunidadTrasAvisoQuieto'), fin = src17.indexOf('/* Retirada limpia', ini);
+    cierto(ini > 0 && fin > ini);
+    const cuerpo = src17.slice(ini, fin).replace(/\/\*[\s\S]*?\*\//g, '');
+    // Un tablero chico: el orden en que pasan las cosas (aviso, marca de «se movió», oportunidad).
+    const armar = (o) => {
+      const pasos = [], frenados = new Set(['biz']);
+      const st = {opor: {tokenId: 'biz', rivalId: 'rata', resto: [{col: 1, fila: 1}, {col: 2, fila: 1}]}};
+      const f = new Function('st', 'quietoAvisoAntes', 'quietoMarcar', 'dodgeFrenado', 'pedirDibujo', 'oportunidadResolverFn',
+        'let oportunidadPendiente = st.opor; const oportunidadResolver = () => { oportunidadResolverFn(oportunidadPendiente); oportunidadPendiente = null; };\n' + cuerpo +
+        '\nreturn {correr: id => oportunidadTrasAvisoQuieto(id), pendiente: () => oportunidadPendiente};');
+      const api = f(st,
+        o.sinQuieto ? undefined : async (id, op) => { if(o.bono){ op.pregunto = true; pasos.push('aviso'); return !!o.responde; } return true; },
+        id => pasos.push('marca ' + id), frenados, () => pasos.push('dibujo'), p => pasos.push(p ? 'oportunidad ' + p.rivalId : 'oportunidad nada'));
+      return {...api, pasos, frenados};
+    };
+    const cancela = armar({bono: true, responde: false});
+    await cancela.correr('biz');
+    igual([cancela.pasos, cancela.pendiente(), cancela.frenados.has('biz')], [['aviso', 'dibujo'], null, false]);   // Cancelar: ni oportunidad ni pierde nada
+    const sigue = armar({bono: true, responde: true});
+    await sigue.correr('biz');
+    igual(sigue.pasos, ['aviso', 'marca biz', 'oportunidad rata']);   // Moverme igual: lo pierde y RECIÉN AHÍ la oportunidad
+    const sinBono = armar({bono: false});
+    await sinBono.correr('biz');
+    igual(sinBono.pasos, ['oportunidad rata']);   // sin anillo activo: como siempre, sin aviso ni marca
+    const viejo = armar({sinQuieto: true});
+    await viejo.correr('biz');
+    igual(viejo.pasos, ['oportunidad rata']);
+    // El arrastre que se aleja en el primer paso pasa por acá (js/06), no directo a la oportunidad.
+    const src06 = await (await fetch('../vtt-hexgrid/js/06-mouse.js', {cache: 'no-store'})).text();
+    cierto(/if\(a\.ruta\.length === 1\)\{ visibles\.delete\(a\.id\); oportunidadTrasAvisoQuieto\(a\.id\); \}/.test(src06));
+    // Y el aviso de js/126 avisa que preguntó (para dar el bono por perdido).
+    const tokens = new Map([['biz', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Bizzante', foco: 2}], ['rata', {tipo: 'creep', fichaId: 'c1', nombre: 'Rata'}]]);
+    const m = await mundo({ini: {orden: [{id: 'biz'}, {id: 'rata'}], ronda: 3, movidos: {}}, tokens, responde: true});
+    const o1 = {}, o2 = {};
+    igual([await m.quietoAvisoAntes('biz', o1), o1.pregunto, await m.quietoAvisoAntes('rata', o2), o2.pregunto], [true, true, true, undefined]);
+    igual(m.preguntas[0][0], 'Tenés Foco activo (+2 a PdG.Esp). Si te movés, lo perdés.');
+  });
   prueba('🎯 en el mapa (js/126): la Apuntada tiene su cartel dorado al pasar a la ronda 2 y su aviso antes de moverse; con el anillo, un solo aviso (P271)', async () => {
     const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'yo', nombre: 'Blanco J1', apuntada: 2}], ['j2', {tipo: 'pj', fichaId: 'f2', duenoUid: 'yo', nombre: 'Blanco J2', apuntada: 2, pulso: 2}]]);
     const ini = {orden: [{id: 'j1'}, {id: 'j2'}], ronda: 1, movidos: {j2: [1]}};

@@ -189,6 +189,7 @@ async function quietoAvisoHab(id, h, nombre){
 function quietoTokenDeFicha(fichaId){ for(const [id, t] of tokens) if(t.tipo !== 'creep' && String(t.fichaId || '') === String(fichaId || '')) return id; return ''; }
 
 // Antes de mover un token caminando (confirmarRuta, js/08): si tiene el bono activo, en combate, se pregunta. → true = se mueve.
+// También antes de ofrecerle al rival el ataque de oportunidad (P266, `oportunidadTrasAvisoQuieto`, js/17): `o.pregunto` queda en true si salió el aviso.
 async function quietoAvisoAntes(id, o){
   try{
     if((o && o.dodge) || (typeof enDodge === 'function' && enDodge(id)) || typeof modoMapa === 'undefined' || modoMapa !== 'combate' || !quietoHayOrden()) return true;
@@ -197,6 +198,7 @@ async function quietoAvisoAntes(id, o){
     const bonos = quietoBonosActivos(id, t);
     if(!bonos.length || typeof AvisoCombate === 'undefined') return true;
     const propio = t.tipo !== 'creep' && !!fbUsuario && t.duenoUid === fbUsuario.uid && !String(t.fichaId || '').includes(SEP_INVOCACION);
+    if(o) o.pregunto = true;   // ⚔ P266: la oportunidad (js/17) necesita saber si se preguntó, para dar por perdido el bono al confirmar
     return !!(await AvisoCombate.preguntar(Quieto.aviso(bonos, nombreDe(t), propio),
       {icono: bonos[0].icono, titulo: bonos.map(b => b.nombre).join(' y '), si: 'Moverme igual', no: 'Cancelar'}));
   }catch(err){ console.error('💍 Quieto: el aviso antes de moverse', err); return true; }

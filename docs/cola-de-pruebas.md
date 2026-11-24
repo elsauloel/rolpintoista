@@ -2283,6 +2283,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (2026-11-23): por código, la invocación nueva y el refuerzo pasan por la misma regla (`iniciativaOcupaLugar`) y Pasar de ronda no le hace pasar el
   turno a un tótem o estandarte; no se probaron en el mapa (hoy ninguna invocación ni refuerzo es un objeto inerte: es solo la red de seguridad).
 
+  **Dueño (2026-11-24):** la parte del tótem en un orden viejo se descarta («si queda algún estandarte o tótem directamente se puede borrar a mano…
+  a partir de ahora no deberían ni entrar a la lista de turnos»). Y se define: **una invocación o un refuerzo, el turno en que entra, tira su
+  iniciativa automáticamente y se ubica en el orden; tiene Mareo de invocación hasta el inicio del próximo turno de quien lo invocó**. Armarlo
+  junto con la prueba.
 - **⬜ en cola — ➕ Sumar un token al orden de turnos a mano (P291)** (dueño, 2026-11-23: «sí, quiero que lo hagas»): en el menú del token, para el
   GM, «➕ Sumar al orden de turnos» (y «➖ Sacar del orden» si ya está), aunque la regla diga que no ocupa lugar (un tótem, un token suelto…).
 

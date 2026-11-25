@@ -2806,3 +2806,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   de ese Mantenimiento, así que en el primer duelo el dueño tira de nuevo con su botón y vale para todos; quien entra usa la última. Los 40 s:
   comun/duelo.js `venceSolo` (un duelo con `hab.zonaId` y `hab.mant`) entra a `revisarOcultos` como el duelo oculto (también tira la fórmula de quien
   la creó). `Duelo.limpiarHab` conserva `mant` (solo con `zonaId`). Probado con clics en «Prueba · General» (cola 2026-11-25). Dudas: P334, P335.
+- **☠ Las Nubes tóxicas y 🔥 el piso de la Mina napalm, al empezar el turno** (P295, dueño, 2026-11-25). Las dos Nubes llevan `alEmpezar` en su
+  `zonaEstado` y `zonaAltura: 'ambos'` (comun/skills-clase.js, comun/skills-creep-base.js; los creeps guardados, `Combatiente.migrarLuzSanadora` con
+  `NUBE_TOXICA_CREEP`; las copias de los personajes, `FichaGuardado.migrarHabsDeClase`). La de la clase lleva además `tiraSuya`: `zonaDueloHab` (js/112)
+  le pone `tira: {stat}` (el Especial de verdad de quien la tiró, con su botón) y `areaCrearSiguienteSubDuelo` (js/13) no usa la tirada guardada
+  (`zonaDueloTiraSuya`): una tirada nueva en cada tanda. **El que ya tiene el estado** (`zonaSoloSuma`, js/08): al empezar su turno va como renglón de
+  «▶ Empieza tu turno» («☠ Sumar 1 stack», `zonaInicioRenglon`/`zonaInicioResolver`; `zonaSumarStack` devuelve false si se resolvió a mano) y, sin
+  ventana (un creep), `zonaInicioOfrecer` le suma el stack (no un duelo). **La Mina napalm**: `trampaDatos.zonaModo` = {altura: 'piso', alEmpezar,
+  porPaso} (comun/catalogo.js; `Plantillas.TRAMPA` y `TokensAuto.estadoJson` lo guardan como `zm` en `trampaEstado`); al dispararse, la conversión a
+  zona (js/08) lo pasa al JSON de la zona (las reglas no dejan sumar `zonaAltura` ahí: `alturaDe` lee `altura` del JSON en la zona de una trampa);
+  `zonaLeFalta` ya no la cuenta «una vez por ronda» si pega al empezar o por paso; `zonaIconoDe` le deja el 🔥 (`zonaDeTrampaDeFuego`); el cartel de la
+  trampa («Queda en el piso», js/19) lo dice con `zonaComo`. Las minas de antes se ponen al día (`ITEMS_AL_DIA`). Probado con clics en «Prueba ·
+  General» (cola 2026-11-25). Dudas: P336, P337.

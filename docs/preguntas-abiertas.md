@@ -2777,3 +2777,17 @@ medio de la ronda sigue como antes: su duelo al entrar, contra **la última tira
 sin tirar de nuevo (lo más conservador). Opciones: (a) así; (b) que cada vez que alguien entra, el dueño tire de nuevo. Además, cuando alguien no
 contesta en 40 s, la pantalla del GM hace por él todo lo que le falta del duelo (su Res.Esp con su número, aceptar el daño, el 1d20), igual que en
 el duelo de un escondido; si el dueño de la nube no tira su Ef.Esp en 40 s, también se la tira la pantalla del GM. ¿Está bien?
+
+### P336 — ☠ La Nube tóxica de la clase: al aparecer, ¿una tirada del Especial para todos o una por cada uno? (2026-11-25, Claude)
+
+Desde hoy (P295) quien tira la Nube tóxica de la clase tira **su Especial de verdad, con su botón, cada vez que la nube afecta a alguien**: al empezar
+el turno de cada rival que está adentro, una tirada nueva para ese. Pero cuando la nube **aparece** y agarra a varios a la vez (o entran varios
+juntos), tira **una sola vez para todos los de esa tanda** (como los Pedos y la Nube de los creeps), y cada uno resiste con su Res.Esp. Lo dejé así
+por ser lo más conservador. ¿Está bien, o al aparecer tiene que tirar una vez por cada rival?
+
+### P337 — 🔥 La Mina napalm: quien la pisa, ¿recibe también el 1d6 del piso por ese paso? (2026-11-25, Claude)
+
+Desde hoy el piso ardiendo de la Mina napalm pega por cada paso que se da adentro y al empezar el turno adentro (P295). Quien **pisa la mina** recibe
+el golpe de 2d6 (la explosión) y el movimiento se corta ahí; ese paso **no** suma además el 1d6 del piso (el piso empieza a pegar desde el paso
+siguiente o al empezar su turno). Lo dejé así (lo más conservador: «el golpe de 2d6 al dispararse queda igual»). ¿Está bien, o ese primer paso tiene
+que pegar también el 1d6 del piso?

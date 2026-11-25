@@ -386,7 +386,9 @@ function zonaLeFalta(el, t){
   const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
   if(sup && sup.superficie && !sup.nombre) return false;
   if(sup && sup.tiraPaso) return true;
-  if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
+  // 🔥 (P295, 2026-11-25) La de una trampa que pega al empezar el turno y por cada paso (la Mina napalm) cuenta como cualquier zona con daño: no una
+  // vez por ronda.
+  if(el.trampa && !(zonaSpecDe(el).alEmpezar || zonaSpecDe(el).porPaso)) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   // `unaVez` (adentro del JSON de zonaEstado; 2026-10-26, la Nube tóxica: «una vez envenenado, la nube ya no le vuelve a tirar»): con el estado
   // ya puesto, tampoco el daño.
   // Con `sumaUno` (o el `resetea` de antes): si ya no tiene el estado (se lo curó, se le terminó), le vuelve a tirar.
@@ -434,6 +436,9 @@ function zonaMostrarSiguiente(){
 function alturaDe(el){
   if(!el) return 'aire';
   if(['piso', 'aire', 'ambos'].includes(el.zonaAltura)) return el.zonaAltura;
+  // 🔥 La zona que deja una trampa puede tener su propia altura, adentro de su zonaEstado (P295, 2026-11-25: el piso ardiendo de la Mina napalm es solo
+  // de piso, aunque la explosión sea de piso y aire). Las reglas no dejan sumarle `zonaAltura` al convertirla.
+  if(el.zona && el.trampa){ const a = zonaSpecDe(el).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }
   try{ const a = (JSON.parse(el.trampaEstado || '{}') || {}).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }catch(err){}
   if(el.fuego) return 'piso';
   // 🧊 Una superficie (hielo, agua) es del piso aunque no lo diga (2026-10-26: el suelo congelado salía «del aire» y Levitar no lo salvaba).
@@ -489,7 +494,8 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
     // de ronda (o vuelve a entrar), sin tirada ni daño, le suma 1 stack. `sumaUno` en el JSON de zonaEstado; las zonas de antes traen `resetea`
     // (del 2026-10-26: volvía a sus stacks) y desde hoy hacen lo mismo. Vale igual para personajes, invocaciones y creeps.
     const e = zonaSpecDe(el);
-    if((e.sumaUno || e.resetea) && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)){
+    if(zonaSoloSuma(el, t)){
+      if(zonaJuntar){ zonaJuntar.push(el.id); return; }   // ▶ (P295, 2026-11-25) al empezar su turno: un renglón de «Empieza tu turno», no otro cartel encima
       if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, stacks: 1}, el, 'sumaUno');
       return;
     }
@@ -510,6 +516,8 @@ function zonaRenuevaTxt(t, spec){
   return zonaTieneEstado(t, spec.nombre) ? `${spec.nombre}: ya la tenía, vuelve a ${tt} turno${s}` : `${spec.nombre} (${tt} turno${s})`;
 }
 const zonaSpecDe = el => { try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };
+// ☠ ¿A este token la zona solo le suma 1 stack? (la Nube tóxica: ya tiene el estado que deja; sin tirada ni daño)
+function zonaSoloSuma(el, t){ const e = zonaSpecDe(el); return !!((e.sumaUno || e.resetea) && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)); }
 const zonaTieneEstado = (t, nombre) => (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(x => x && x.activo !== false && x.nombre === nombre);
 // Al soltar un movimiento: para la mayoría de las zonas alcanza con mirar dónde terminó. Las de zonaCadaPaso
 // (púas: se disparan aunque solo se las cruce, sin quedarse) además cuentan cualquier casillero cruzado que sea
@@ -654,7 +662,7 @@ async function zonaSumarStack(t, spec, el, nombre){
   try{
     // ☠ Con el Veneno, primero el cartel con «Aplicar» / «Resolver a mano» (2026-10-31); la Mesa y la Crónica las pone zonaVenenoContar.
     const r = zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, false) : null;
-    if(r && !r.aplicar){ await zonaVenenoContar(t, el, spec, r); return; }
+    if(r && !r.aplicar){ await zonaVenenoContar(t, el, spec, r); return false; }
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
     if(r){ await zonaVenenoContar(t, el, spec, r); return; }
@@ -810,7 +818,9 @@ function danoDirectoCuentaYAviso(t, monto, res, o){
 }
 /* Lo que dice el cartel de una zona ANTES de resolverla (qué se resiste y con qué, o qué le entra y quién tira el daño) → {icono, titulo, texto, boton}.
    Lo usan el cartel de siempre (renderZonaBanner) y el renglón de la zona dentro de «▶ Empieza tu turno» (zonaInicioRenglon, 2026-11-22). */
-function zonaIconoDe(el){ return typeof esHielo === 'function' && esHielo(el) ? '🧊' : el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫'; }   // 🔥 solo para el fuego (o una zona vieja de puro daño)
+function zonaIconoDe(el){ return typeof esHielo === 'function' && esHielo(el) ? '🧊' : el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) || zonaDeTrampaDeFuego(el) ? '🔥' : '🌫'; }
+// 🔥 (2026-11-25) La zona que deja una trampa de fuego (la Mina napalm, que ahora lleva su zonaEstado con cómo pega): sigue con su 🔥.
+function zonaDeTrampaDeFuego(el){ if(!el || !el.trampa || !el.zona) return false; try{ return (JSON.parse(el.trampaEstado || '{}') || {}).elemento === 'fuego'; }catch(err){ return false; } }   // 🔥 solo para el fuego (o una zona vieja de puro daño)
 function zonaCartelAntes(el, t, pasos){
   const icono = zonaIconoDe(el), nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
   const stat = el.zonaResistStat ? (ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat) : '';
@@ -892,7 +902,9 @@ const zonaInicioEspera = new Map();       // tokenId → {elIds, timer}: esperan
 function zonaInicioOfrecer(tokenId, elIds){
   const t = tokens.get(tokenId);
   const conVentana = t && t.tipo !== 'creep' && typeof inicioTurnoTarjetaSobra === 'function' && inicioTurnoTarjetaSobra(tokenId) && typeof inicioZonasSumar === 'function';
-  const encolar = ids => ids.forEach(id => { const el = elementos.get(id), tk = tokens.get(tokenId); if(el && tk) zonaEncolar(el, tk); });
+  const encolar = ids => ids.forEach(id => { const el = elementos.get(id), tk = tokens.get(tokenId); if(!el || !tk) return;
+    if(zonaSoloSuma(el, tk)) zonaRenovarEstado(tk, {nombre: zonaSpecDe(el).nombre, stacks: 1}, el, 'sumaUno');   // ☠ ya envenenado: +1 stack (no un duelo)
+    else zonaEncolar(el, tk); });
   if(!conVentana || (typeof inicioYaCerrado === 'function' && inicioYaCerrado(tokenId))){ encolar(elIds); return; }
   if(inicioZonasSumar(tokenId, elIds)) return;   // la ventana ya estaba abierta
   const ya = zonaInicioEspera.get(tokenId);
@@ -911,6 +923,9 @@ function zonaInicioTomar(tokenId){
 function zonaInicioRenglon(elId, tokenId){
   const el = elementos.get(elId), t = tokens.get(tokenId);
   if(!el || !el.zona || !t) return null;
+  // ☠ (P295, 2026-11-25) Ya tiene el estado de la nube: sin tirada, le suma 1 stack (el cartel de «Aplicar / Resolver a mano» sale al tocar el botón).
+  if(zonaSoloSuma(el, t)){ const nom = zonaSpecDe(el).nombre;
+    return {elId, tokenId, icono: zonaIconoDe(el), nombre: el.zonaNombre || 'Zona', texto: `Ya tiene ${nom}: la nube no le tira ni le hace daño, le suma 1 stack de ${nom}.`, boton: `☠ Sumar 1 stack de ${nom}`, estado: 'pend', suma: true}; }
   const a = zonaCartelAntes(el, t, 0);
   return {elId, tokenId, icono: a.icono, nombre: el.zonaNombre || 'Zona', texto: a.texto, boton: el.zonaResistStat ? a.boton : (a.botonInicio || a.boton), estado: 'pend', momentoP: zonaMomentoAbrir(el, t)};
 }
@@ -919,6 +934,8 @@ function zonaInicioResolver(z){
   return new Promise(ok => {
     const el = elementos.get(z.elId), t = tokens.get(z.tokenId);
     if(!el || !el.zona || !t){ ok({resultado: 'La zona (o el token) ya no está: no pasa nada.'}); return; }
+    if(z.suma || zonaSoloSuma(el, t)){ const nom = zonaSpecDe(el).nombre;   // ☠ +1 stack (con su cartel de «Aplicar / Resolver a mano»)
+      zonaSumarStack(t, {nombre: nom, stacks: 1}, el, el.zonaNombre || 'la zona').then(r => ok({resultado: r === false ? `${nom}: se resuelve a mano.` : `${nom}: +1 stack (ya lo tenía; sin tirada).`})); return; }
     if(zonaBanner){ toast('Esperá: se está resolviendo otra zona'); ok(null); return; }
     if(typeof zonaEsDuelo === 'function' && zonaEsDuelo(el)){ zonaDueloPedir(el, t); ok({resultado: 'Se resuelve en el cuadro del duelo.'}); return; }
     zonaBanner = {elId: z.elId, tokenId: z.tokenId, el, t, resultado: null, pasos: 0, pisa: null, momentoP: z.momentoP, enInicio: ok};
@@ -1199,7 +1216,8 @@ async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT, desde){
     // 🪢 El Cordón oculto (2026-10-27): quien lo pisó y no se aguanta cae una casilla más allá, en la dirección en que venía.
     const adelante = x === t && spec && spec.adelante ? trampaCasillaAdelante(celdaPisada || {col: t.col, fila: t.fila}, desde) : null;
     await trampaMomentoNuevo({...comun, ...(adelante ? {adelante} : {}), x, tokenId: x === t && idT ? idT : zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
-      muroLargo: muro ? muro.largo : 0, zona: x === t && el.trampaDejaZona ? (Math.max(1, Math.round(num(el.zonaTurnos)) || 3)) : 0});
+      muroLargo: muro ? muro.largo : 0, zona: x === t && el.trampaDejaZona ? (Math.max(1, Math.round(num(el.zonaTurnos)) || 3)) : 0,
+      ...(x === t && el.trampaDejaZona && spec && spec.zm && (spec.zm.alEmpezar || spec.zm.porPaso) ? {zonaComo: `${spec.zm.porPaso ? 'p' : ''}${spec.zm.alEmpezar ? 't' : ''}`} : {})});   // 🔥 cómo pega lo que queda (la Mina napalm, P295)
   }
 }
 
@@ -1314,7 +1332,13 @@ async function trampaResolver(){
       let ej = {}; try{ ej = JSON.parse(p.el.trampaEstado || '{}') || {}; }catch(err){}
       const danoZ = trampaDanoValido(ej.danoZona) ? ej.danoZona : p.el.trampaDano;   // la Mina napalm: el piso quema menos que la explosión
       if(trampaDanoValido(danoZ)){ cambios.zonaDano = danoZ; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
-      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; delete e.de; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
+      let zj = null;
+      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; delete e.de; delete e.zm; if(e.nombre) zj = e; }catch(err){} }   // sin la salvación (es del disparo)
+      // 🔥 Cómo pega la zona (P295, dueño, 2026-11-25, la Mina napalm: «al empezar el turno de quien está adentro, por cada paso que da adentro, y la
+      // frena la Suela gruesa»): `zm` = {altura, alEmpezar, porPaso} de la trampa (trampaDatos.zonaModo, comun/tokens-auto.js) va al JSON de la zona.
+      const zm = ej.zm && typeof ej.zm === 'object' ? ej.zm : null;
+      if(zm) zj = {...(zj || {}), ...(['piso', 'aire', 'ambos'].includes(zm.altura) ? {altura: zm.altura} : {}), ...(zm.alEmpezar ? {alEmpezar: true} : {}), ...(zm.porPaso ? {porPaso: true} : {})};
+      if(zj && Object.keys(zj).length) cambios.zonaEstado = JSON.stringify(zj).slice(0, 300);
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
       // La nube ocupa la superficie del efecto (2026-10-04, dueño): si es una flor, la flor alrededor del centro (aunque se dispare en menos casillas).
       const ef = trampaEfectoDe(p.el), forma = {};

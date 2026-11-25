@@ -90,7 +90,11 @@ const ItemCorto = (() => {
     if(t.portal && t.portal.colocador) f.push(['Teletransporta', 'a un destino fijo: al colocarla elegís la casilla del glifo y adónde manda, las dos dentro de tu Rango; de uso único']);
     else if(t.portal && num(t.portal.rango) > 0) f.push(['Teletransporta', `quien la pone elige adónde lo manda, hasta ${num(t.portal.rango)} casillas`]);
     if(t.cadena && num(t.cadena.rango) > 0) f.push(['Salta', `al enemigo más cercano a ${num(t.cadena.rango)} casillas o menos, con la mitad del daño (hacia abajo: con 1 ya no salta); una vez por enemigo`]);
-    if(t.danoZona) f.push(['Después', `el piso sigue haciendo ${t.danoZona} de daño en cada Mantenimiento`]);
+    // 🔥 (P295, 2026-11-25) La Mina napalm: el piso ardiendo pega al entrar, por cada paso adentro y al empezar el turno adentro (`zonaModo`).
+    const zmo = t.zonaModo && typeof t.zonaModo === 'object' ? t.zonaModo : null;
+    if(t.danoZona) f.push(['Después', zmo && (zmo.porPaso || zmo.alEmpezar)
+      ? `el piso sigue haciendo ${t.danoZona} de daño a quien entra${zmo.porPaso ? ', por cada paso que da adentro' : ''}${zmo.alEmpezar ? ' y al empezar su turno adentro' : ''}`
+      : `el piso sigue haciendo ${t.danoZona} de daño en cada Mantenimiento`]);
     if(num(t.lento) > 0) f.push(['Terreno', `una vez disparada, cada paso que sale de ella cuesta ${num(t.lento)} No2`]);
     const so = t.soltar && t.soltar.stat ? t.soltar : null;   // salir antes de que venza (el botón 🔓 Soltarse)
     if(so) f.push(['Para salir', `🔓 Soltarse: ${so.etq || so.stat} contra ${num(so.dif)} · ${num(so.no2)} No2${num(so.hunde) ? ` · si falla, se hunde más: +${num(so.hunde)} turno${num(so.hunde) === 1 ? '' : 's'}` : ''}`]);

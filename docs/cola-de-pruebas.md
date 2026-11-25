@@ -2507,11 +2507,37 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tirada). Probado con clics: Blanco J1 los tiró con Blanco J2, el Liviano · Sangrador y el Debuffer adentro (la primera tanda con su 7); al pasar
   de ronda, una sola tanda con los tres, J1 tiró de nuevo (5) y esa misma valió para los tres; J2 no contestó y a los 40 s se tiró sola («solo: no
   contestó») y le entró el daño. Al final, la vuelta del mapa: «quedó igual». Pruebas automáticas: dos nuevas (1121 en verde). Duda: P335.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-25) — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
   **Decidido (dueño, 2026-11-25, «va así»):** (1) las **dos Nubes tóxicas** (clase y creep; piso y aire) pasan a pegar **al empezar el turno de quien
   está adentro**, como la miasma, con el resto igual; en la de la clase, **el dueño tira su Especial cada vez** (no más el valor fijo de cuando la
   lanzó). (2) La **Mina napalm** (solo piso) pasa a pegar **al empezar el turno de quien está adentro, por cada paso que da adentro, y la frena la
   Suela gruesa**, como el Chorro de lava; el golpe de 2d6 al dispararse queda igual.
+  **✅ hecho (2026-11-25), la Nube tóxica de la clase:** piso y aire; pega al aparecer, al entrar y **al empezar el turno de quien está adentro** (ya
+  no en el Mantenimiento; sin orden de turnos, al pasar de ronda), en el cuadro del duelo; **quien la tiró tira su Especial de verdad, con su botón,
+  en cada tanda** (`tiraSuya`: ni el valor de cuando la lanzó ni la tirada de antes; al aparecer, una tirada para todos los que agarra). Lo demás
+  igual. Texto nuevo: «…A cada rival que está adentro cuando aparece, que entra o que empieza su turno adentro: tirás tu Especial contra su Res.Esp
+  (una tirada nueva cada vez, con tu botón); quien pierde queda con 3 stacks de Veneno. Una vez envenenado, no se le vuelve a tirar: cada vez que la
+  nube lo afecta (al entrar o al empezar su turno adentro) le suma 1 stack de Veneno. No afecta a tus aliados. ⚙ Automatizado: todo…». Las copias de
+  los personajes se ponen al día solas.
+  **✅ hecho (2026-11-25), la Nube tóxica de los creeps:** piso y aire; al empezar el turno de quien está adentro (`alEmpezar`), el resto igual (2d4
+  tóxico directo + Veneno 3; el envenenado suma 1 stack sin daño; quien resistió vuelve a tirar). Los creeps ya guardados con ella se ponen al día
+  solos (`Combatiente.migrarLuzSanadora`, con los textos nuevos). **De paso:** al empezar el turno, al que ya está envenenado ya no le salta el
+  cartel del Veneno encima de «▶ Empieza tu turno»: es un renglón más («☠ Sumar 1 stack de Veneno») y el cartel de «Aplicar / Resolver a mano» sale
+  al tocarlo (un creep, el cartel de siempre del GM).
+  **✅ hecho (2026-11-25), la Mina napalm:** la explosión (2d6, piso y aire) queda igual; el piso ardiendo es **solo de piso** y pega **al entrar, por
+  cada paso que se da adentro y al empezar el turno de quien está adentro** (como el Chorro de lava; entrar es el primer paso, P333); lo frenan la
+  Defensa especial, la resistencia al fuego y la Suela gruesa; alcanza también a los aliados. Va en `trampaDatos.zonaModo` (comun/catalogo.js) → `zm`
+  en la trampa puesta → el JSON de la zona al dispararse (js/08); las minas de las mochilas y los creeps se ponen al día solas. Texto nuevo: «El piso
+  queda ardiendo 3 turnos: 1d6 de fuego a quien entra, por cada paso que da adentro y al empezar su turno adentro. Lo frenan la Defensa especial,
+  la resistencia al fuego y la Suela gruesa.» El cartel de la trampa («Queda en el piso») lo dice igual.
+  *Probado con clics* en «Claude · pruebas 2», mapa «Prueba · General» (GM de pruebas, Jugador 1 y Jugador 2), armado por datos: el Debuffer ·
+  Maldito con la Nube tóxica **vieja** (se puso al día sola al leerla) la tiró sobre Blanco J1 y Blanco J2 (los dos con Veneno 3); al empezar el turno
+  de cada uno, su renglón («☠ Sumar 1 stack»: 3 → 4); al pasar de ronda, ningún cartel de la nube; sin Veneno, al empezar su turno J1 tuvo su duelo
+  (Res.Esp, 2d4, Veneno 3). Blanco J1 con la Nube de la clase sobre el Warrior y el Tanque: al aparecer tiró su Especial (8) para los dos; al
+  empezar el turno del Warrior (envenenado) +1 stack; al del Tanque (había resistido) **J1 volvió a tirar su Especial** (3). Mina napalm: el Rango ·
+  Tirador la puso, J1 la pisó (2d6 = 10, sin Suela); caminó 2 pasos por el piso ardiendo (2 golpes: 1 − Suela 2 = 0 y 2 − 2 = 0); al pasar de ronda
+  nada; al empezar su turno, su renglón (6 − Suela 2 = 4). Tiró el daño el GM (dueño de la zona). Al final, la vuelta del mapa: «quedó igual».
+  Pruebas automáticas: una nueva (1122 en verde). Dudas: P336, P337.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): el terreno incendiado y las zonas hechas a mano con el asistente** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Gas adormecedor y Gas somnífero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube de veneno y Aceite resbaladizo** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -2938,6 +2964,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   halcón (sin duplicar si ya la tienen); ajustar las etiquetas de Vista de halcón (Shooter y Mago; distancia y mágico) y el texto si hace falta.
   **Y cambiarle el nombre** (dueño, 2026-11-25): **Vista de halcón pasa a llamarse «Rango amplificado»** («vista de halcón es muy referencia a algo de
   puntería»). Que los que ya la tienen guardada vean el nombre nuevo (mismo id o con su puesta al día).
+- **⬜ en cola — Probar: ☠🔥 las Nubes tóxicas y la Mina napalm sin orden de turnos y sobre una invocación** (2026-11-25): sin orden (narrativo)
+  tienen que pegar al pasar de ronda; la Nube de la clase sobre una invocación o con un escondido adentro (P326); la Nube de un creep sobre una
+  invocación (renglón de «Empieza el turno de…»). Con clics se probó todo con orden de turnos, sobre personajes y creeps.
 
 ## En cola
 

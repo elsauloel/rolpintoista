@@ -63,7 +63,10 @@ const TokensAuto = (() => {
     const al = extra && ['piso', 'aire', 'ambos'].includes(extra.altura) ? extra.altura : '';   // dónde está su efecto (2026-10-07: Levitar y las Suelas)   // la Brea (2026-10-04, dueño): cada paso sobre ella le renueva el estado a quien ya lo tiene   // el Dardo (2026-10-04, dueño): lo que deja solo entra si el daño pasó la Defensa
     const po = extra && extra.portal && Number(extra.portal.rango) >= 1 ? {rango: Math.min(20, Math.round(Number(extra.portal.rango))),
       ...(/^-?\d+,-?\d+$/.test(String(extra.portal.destino || '')) ? {destino: String(extra.portal.destino)} : {})} : null;   // destino fijo: Varita del portal (2026-10-05)   // el Portal cósmico: su dueño elige adónde lo manda
-    const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
+    // 🔥 Cómo pega la zona que deja (P295, 2026-11-25, la Mina napalm): {altura, alEmpezar, porPaso} → `zm` (lo pasa al JSON de la zona el mapa, js/08).
+    const zmA = extra && extra.zonaModo && typeof extra.zonaModo === 'object' ? extra.zonaModo : null;
+    const zm = zmA ? {...(['piso', 'aire', 'ambos'].includes(zmA.altura) ? {altura: zmA.altura} : {}), ...(zmA.alEmpezar ? {alEmpezar: true} : {}), ...(zmA.porPaso ? {porPaso: true} : {})} : null;
+    const o = {...(zm && Object.keys(zm).length ? {zm} : {}), ...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
       ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {}), ...(rp ? {renuevaPaso: true} : {}), ...(al ? {altura: al} : {}), ...(ex ? {explota: true} : {}), ...(mg ? {magica: true} : {}), ...(pf ? {pf} : {}), ...(ad ? {adelante: true} : {}), ...(vi ? {visual: vi} : {}), ...(dc ? {dc: true} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';
     if(j.length > 300) return '';
@@ -165,7 +168,7 @@ const TokensAuto = (() => {
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {}), ...(t.soltar ? {soltar: t.soltar} : {})} : null,
         salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '', lento: t.lento || 0,
-        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || '', explota: !!t.explota, perfora: t.perfora || 0, adelante: !!t.adelante, visual: t.visual || '', disparo: t.disparo || '', magica: t.detectarStat === 'dmgesp', de: o.fichaId ? `${o.fichaId}|${o.tipoToken === 'pj' ? 'pj' : 'creep'}` : ''},
+        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || '', explota: !!t.explota, perfora: t.perfora || 0, adelante: !!t.adelante, visual: t.visual || '', disparo: t.disparo || '', magica: t.detectarStat === 'dmgesp', zonaModo: t.zonaModo || null, de: o.fichaId ? `${o.fichaId}|${o.tipoToken === 'pj' ? 'pj' : 'creep'}` : ''},
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();

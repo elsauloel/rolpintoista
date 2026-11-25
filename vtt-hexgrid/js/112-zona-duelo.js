@@ -136,6 +136,9 @@ async function zonaDueloTiradaGuardada(zonaId, mant){
   }catch(err){ console.error('Zona: no se pudo leer la tirada guardada', err); return null; }
 }
 
+// 🎲 (P295, 2026-11-25) ¿Quien creó esta zona tira de nuevo en cada tanda? (la Nube tóxica de la clase: `tiraSuya` en su JSON)
+const zonaDueloTiraSuya = zonaId => { const el = zonaId ? elementos.get(zonaId) : null; return !!(el && el.zona && zonaSpecDe(el).tiraSuya); };
+
 /* ---------- las tandas de duelos ---------- */
 function zonaDueloCasteador(el){
   const ref = String(el.zonaCasteadorRef || ''), creep = el.zonaCasteadorTipo === 'creep';
@@ -153,7 +156,7 @@ function zonaDueloHab(el){
   const dano = el.zonaDanoDif ? {formula: '', diferencia: true, tipo, ignoraDef: !!el.zonaIgnoraDef, ...(el.zonaDirecto ? {directo: true} : {})}
     : el.zonaDano ? {formula: el.zonaDano, tipo, ignoraDef: !!el.zonaIgnoraDef, ...(el.zonaDirecto ? {directo: true} : {})} : null;
   const efectos = [];
-  if(e.nombre){ const {duelo, porTirada, ...spec} = e; efectos.push({nombre: e.nombre, caras: 1, exitos: 1, spec}); }
+  if(e.nombre){ const {duelo, porTirada, alEmpezar, tiraSuya, altura, ...spec} = e; efectos.push({nombre: e.nombre, caras: 1, exitos: 1, spec}); }
   const tabla = Combatiente.porTiradaNorm(e.porTirada), m = String(el.zonaTiraExtra || '').match(/d(\d+)/i);
   if(tabla.length && m && dano){
     const caras = Math.max(2, Math.min(100, num(m[1]))), desde = Math.min(...tabla.map(x => x.desde));
@@ -161,8 +164,10 @@ function zonaDueloHab(el){
       detalle: Combatiente.porTiradaTxt(tabla)});
   }
   const detalle = `${el.zonaNombre || 'La zona'}: ${etqTira} de quien la tiró contra tu ${etqRes}. Si no resistís, ${dano ? (dano.diferencia ? `la diferencia como daño ${el.zonaDanoTipo ? String(el.zonaDanoTipo).toLowerCase() : ''}${dano.ignoraDef && !dano.directo ? ' (menos la Defensa especial)' : ''}` : `${dano.formula} de daño`) : 'lo que deja'}${efectos.some(x => x.porTirada) ? ` y ${el.zonaTiraExtra}: ${Combatiente.porTiradaTxt(tabla)}` : ''}.`;
+  // 🎲 `tiraSuya` (P295, dueño, 2026-11-25, la Nube tóxica de la clase: «el dueño tira su Especial cada vez»): quien la creó tira su stat de verdad (el de
+  // ahora, con su botón), en cada tanda; no el valor de cuando la tiró ni la tirada de una tanda anterior (zonaDueloTiraSuya, js/13).
   return {nombre: el.zonaNombre || 'Zona', objetivo: 'area', radio: 2,
-    tira: f ? {formula: f.formula, etq: etqTira} : {stat: tiraStat, etq: etqTira},
+    tira: f && !e.tiraSuya ? {formula: f.formula, etq: etqTira} : {stat: tiraStat, etq: etqTira},
     contra: [{modo: resStat, stat: resStat, etq: etqRes}], dano, efectos, sinDodge: true, zonaId: el.id, detalle: detalle.slice(0, 600)};
 }
 // Ordena los tokens en sentido horario alrededor del centro, empezando por el más cercano.

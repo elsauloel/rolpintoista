@@ -97,7 +97,8 @@ const Plantillas = (() => {
     'explota',   // 💥 (2026-10-17, dueño): al pisarla, el mapa se queda quieto 1,5 s con una explosión y recién después el Anuncio
     'elemento',   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
     'perfora', 'adelante', 'visual',
-    'disparo'];   // 🎯 qué la dispara (2026-11-10, prueba del dueño): 'centro' = solo la casilla del medio; sin esto, cualquier casilla   // 2026-10-27: Perfora N (la Aguja), cae una casilla más allá (el Cordón oculto) y cómo se dibuja ('cordon')
+    'disparo',
+    'zonaModo'];   // 🔥 cómo pega la zona que deja (P295, 2026-11-25, la Mina napalm): {altura, alEmpezar, porPaso}   // 🎯 qué la dispara (2026-11-10, prueba del dueño): 'centro' = solo la casilla del medio; sin esto, cualquier casilla   // 2026-10-27: Perfora N (la Aguja), cae una casilla más allá (el Cordón oculto) y cómo se dibuja ('cordon')
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;
     const n = v => Number(v) || 0;

@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125lava"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261125miasma"></script>
+<script src="combatiente.js?v=20261125nube"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
@@ -125,10 +125,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261120hasta"></script>
 <script src="pasivas.js?v=20261124tags2"></script>
-<script src="skills-clase.js?v=20261125miasma"></script>
+<script src="skills-clase.js?v=20261125nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
-<script src="skills-creep-base.js?v=20261124mareo"></script>
+<script src="skills-creep-base.js?v=20261125nube"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
 <script src="biblioteca.js?v=20261124tags"></script>
 <script src="editar-item.js"></script>
@@ -10506,6 +10506,52 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     // Los 40 s: como el duelo oculto, la pantalla del GM tira por quien no contesta (también la fórmula de quien la creó).
     ok(/const venceSolo = d => esOculto\(d\) \|\| !!\(d && d\.grupo && d\.hab && d\.hab\.zonaId && _num\(d\.hab\.mant\) > 0\);/.test(tDu) && /if\(!venceSolo\(d\) \|\| d\.estado === 'resuelto'/.test(tDu));
     ok(/else if\(!d\.pdg && d\.hab && d\.hab\.tira && d\.hab\.tira\.formula && typeof tirarDados === 'function'\)/.test(tDu));
+  });
+  prueba('☠🔥 la Nube tóxica (clase y creep) y el piso de la Mina napalm pegan al empezar el turno de quien está adentro (P295, dueño, 2026-11-25)', async () => {
+    // La de la clase: al empezar el turno, piso y aire, y quien la tiró tira su Especial de verdad en cada tanda (`tiraSuya`).
+    const pj = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'debuffer-nube-toxica');
+    igual([pj.duelo.zonaAltura, pj.duelo.zonaEstado], ['ambos', {nombre: 'Veneno', turnos: 3, stacks: 3, unaVez: true, sumaUno: true, alEmpezar: true, tiraSuya: true}]);
+    ok(/que entra o que empieza su turno adentro: tirás tu Especial contra su Res\.Esp \(una tirada nueva cada vez, con tu botón\)/.test(pj.detalle) && /⚙ Automatizado/.test(pj.detalle) && !/Mantenimiento|de cuando la lanzaste/.test(pj.detalle));
+    const zp = Combatiente.zonaDeHab(pj, structuredClone(pj.duelo), {fichaId: 'f1', tipo: 'pj', tiraValor: 6});
+    ok(zp.zonaEstado.alEmpezar && zp.zonaEstado.tiraSuya && zp.zonaAltura === 'ambos' && zp.tiraStat === 'esp' && zp.tiraValor === 6);
+    // La de los creeps: igual (sin `tiraSuya`), y los textos de la migración son los mismos que los de la habilidad.
+    const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);
+    igual([h.duelo.zonaAltura, h.duelo.zonaEstado], ['ambos', {nombre: 'Veneno', stacks: 3, unaVez: true, sumaUno: true, alEmpezar: true}]);
+    const N = Combatiente.NUBE_TOXICA_CREEP;
+    ok(e.datos.sp.detalle === N.detalle && e.datos.sp.ataqueTxt === N.ataqueTxt && h.detalle.startsWith(N.detalle) && h.detalle.includes(N.ataqueTxt) && !/pasar de ronda/.test(h.detalle));
+    // La copia guardada en un creep (el texto de la habilidad + «⚙ Automatizado: cuesta…» con su resumen) se pone al día (una vez).
+    const vieja = {nombre: 'Nube tóxica', detalle: h.detalle.replace(N.detalle, N.detalleViejo).replace(N.ataqueTxt, N.ataqueViejo),
+      duelo: {objetivo: 'zona', radio: 1, tira: 'dmgesp', contra: ['resmg'], zonaDuelo: true, zonaEstado: {nombre: 'Veneno', stacks: 3, unaVez: true, sumaUno: true}}};
+    ok(/al pasar de ronda/.test(vieja.detalle) && Combatiente.migrarLuzSanadora([vieja]) && vieja.duelo.zonaEstado.alEmpezar && vieja.duelo.zonaAltura === 'ambos' && vieja.detalle === h.detalle);
+    ok(!Combatiente.migrarLuzSanadora([vieja]));
+    // La Mina napalm: su piso ardiendo es solo de piso, pega al empezar el turno y por cada paso; la explosión sigue igual (2d6, piso y aire).
+    const mina = CATALOGO_BASE.find(x => x.id === 'trampa-mina-napalm'), td = mina.trampaDatos;
+    igual([td.dano, td.altura, td.danoZona, td.zonaModo], ['2d6', 'ambos', '1d6', {altura: 'piso', alEmpezar: true, porPaso: true}]);
+    ok(/1d6 de fuego a quien entra, por cada paso que da adentro y al empezar su turno adentro\. Lo frenan la Defensa especial, la resistencia al fuego y la Suela gruesa\./.test(mina.detalle) && !/Mantenimiento/.test(mina.detalle) && !/Mantenimiento/.test(td.detalle));
+    igual(ItemCorto.trampaFilas(td).find(f => f[0] === 'Después')[1], 'el piso sigue haciendo 1d6 de daño a quien entra, por cada paso que da adentro y al empezar su turno adentro');
+    // Lo que se guarda en la trampa puesta (trampaEstado) lleva cómo pega la zona (`zm`); Plantillas no lo pierde al subirla.
+    const j = JSON.parse(TokensAuto.estadoJson(null, null, null, td.efecto, td.elemento, 0, {danoZona: td.danoZona, altura: td.altura, zonaModo: td.zonaModo, de: 'abc|pj'}));
+    igual([j.zm, j.altura, j.danoZona], [{altura: 'piso', alEmpezar: true, porPaso: true}, 'ambos', '1d6']);
+    igual(Plantillas.limpiar('trampas', structuredClone(td)).zonaModo, td.zonaModo);
+    // Las minas de antes (mochilas y creeps) se ponen al día solas; la nueva no se toca.
+    const mv = structuredClone(mina); delete mv.trampaDatos.zonaModo; mv.detalle = 'viejo';
+    ok(Combatiente.ponerAlDiaItemsFabrica([mv]) && mv.trampaDatos.zonaModo.porPaso && mv.detalle === mina.detalle);
+    ok(!Combatiente.ponerAlDiaItemsFabrica([structuredClone(mina)]));
+    // «Ver detalle»: la zona que deja dice cuándo pega y la Suela gruesa la frena.
+    const elM = {zona: true, trampa: true, zonaNombre: 'Mina napalm', zonaDano: '1d6', zonaIgnoraDef: true, zonaCasteadorRef: '', zonaCasteadorTipo: 'pj', zonaAmiga: true, zonaEstado: JSON.stringify({altura: 'piso', alEmpezar: true, porPaso: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(elM, {}), 'se dispara al entrar, en cada paso que dan adentro y al empezar su turno adentro');
+    igual(ZonaDetalle.frenoDe(elM, {elemento: 'fuego', altura: 'piso'}).suela, true);
+    // El mapa: la altura de la zona de una trampa sale de su JSON; ya no pega «una vez por ronda»; la conversión copia `zm`; la tirada nueva de la clase.
+    const [t08, t112, t13] = await Promise.all(['../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', '../vtt-hexgrid/js/112-zona-duelo.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+    ok(/if\(el\.zona && el\.trampa\)\{ const a = zonaSpecDe\(el\)\.altura;/.test(t08) && /if\(el\.trampa && !\(zonaSpecDe\(el\)\.alEmpezar \|\| zonaSpecDe\(el\)\.porPaso\)\)/.test(t08));
+    ok(/const zm = ej\.zm && typeof ej\.zm === 'object' \? ej\.zm : null;/.test(t08) && /delete e\.zm;/.test(t08));
+    ok(/tira: f && !e\.tiraSuya \? \{formula: f\.formula, etq: etqTira\} : \{stat: tiraStat, etq: etqTira\}/.test(t112) && /const zonaDueloTiraSuya = zonaId =>/.test(t112));
+    ok(/!\(typeof zonaDueloTiraSuya === 'function' && zonaDueloTiraSuya\(a\.hab\.zonaId\)\) \? await zonaDueloTiradaGuardada/.test(t13));
+    // ☠ Al empezar el turno, el que ya está envenenado: un renglón de «Empieza tu turno» que suma el stack (no otro cartel encima, ni un duelo).
+    ok(/if\(zonaJuntar\)\{ zonaJuntar\.push\(el\.id\); return; \}   \/\/ ▶ \(P295/.test(t08) && /if\(zonaSoloSuma\(el, tk\)\) zonaRenovarEstado/.test(t08) && /boton: `☠ Sumar 1 stack de \$\{nom\}`/.test(t08));
+    // 🔥 El piso de la Mina sigue con su 🔥, y el cartel de la trampa dice cómo pega lo que queda.
+    const t19 = await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'}).then(r => r.text());
+    ok(/function zonaDeTrampaDeFuego\(el\)/.test(t08) && /zonaComo: `\$\{spec\.zm\.porPaso \? 'p' : ''\}/.test(t08) && /if\(dt\.fase === 'zona' && dt\.zonaComo\)/.test(t19));
   });
   prueba('🔥 el número de la resistencia, solo para su bando (P297, dueño, 2026-11-23): el rival lee «es resistente» sin cuánto', async () => {
     igual([Combatiente.verResDe(true, 'pj'), Combatiente.verResDe(true, 'creep'), Combatiente.verResDe(false, 'pj'), Combatiente.verResDe(false, 'creep')], [false, true, true, false]);

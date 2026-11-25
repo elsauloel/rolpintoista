@@ -1421,7 +1421,8 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
     // 💨 (P295, dueño, 2026-11-25) Los Pedos en el Mantenimiento: una tirada NUEVA de quien la creó, una sola vez para todos los de ese Mantenimiento
     // (`hab.mant`): solo vale la de una tanda del mismo Mantenimiento; si no hay, la tira en este duelo con su botón.
-    const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId, a.hab.mant) : null;
+    // 🎲 (P295, 2026-11-25) La Nube tóxica de la clase (`tiraSuya`): quien la creó tira de nuevo en cada tanda (no se usa la de antes).
+    const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' && !(typeof zonaDueloTiraSuya === 'function' && zonaDueloTiraSuya(a.hab.zonaId)) ? await zonaDueloTiradaGuardada(a.hab.zonaId, a.hab.mant) : null;
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total)), ...(a.hab && a.hab.oculta ? {oculto: true} : {})}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       // 💍 El Foco también en un área, una línea y los misiles (2026-11-21, visto en el mapa: la Varita de misiles no lo sumaba). Solo cuando el
       // casteador tira acá (con la tirada compartida ya viene sumado desde el primer objetivo). quietoDe solo lo da si la habilidad tira PdG.Esp.

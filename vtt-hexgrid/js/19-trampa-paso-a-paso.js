@@ -69,6 +69,8 @@ const TRAMPA_INFO = ['estado', 'mano', 'muro', 'zona'];   // los pasos sin tirad
 function trampaTextoInfo(dt){
   if(dt.fase === 'mano') return {titulo: 'Lo que va a mano', texto: dt.aMano};
   if(dt.fase === 'muro') return {titulo: 'El muro', texto: `Se levanta ${num(dt.muroLargo) === 1 ? 'un pilar' : `un muro de ${num(dt.muroLargo) || 3} casillas`} justo delante, por ${dt.muro} turnos: hay que rodearlo.`};
+  // 🔥 (P295, 2026-11-25) La Mina napalm: el piso pega al entrar, por cada paso adentro y al empezar el turno adentro (`zonaComo`: 'p' por paso, 't' al empezar el turno).
+  if(dt.fase === 'zona' && dt.zonaComo) return {titulo: 'Queda en el piso', texto: `El efecto dura ${dt.zona} turnos: lo sufre quien entra${/p/.test(dt.zonaComo) ? ', por cada paso que da adentro' : ''}${/t/.test(dt.zonaComo) ? ' y al empezar su turno adentro' : ''}.`};
   if(dt.fase === 'zona') return {titulo: 'Queda en el piso', texto: `El efecto dura ${dt.zona} turnos: en cada Mantenimiento, a quien siga encima se le renueva (con su tirada para resistirlo), y quien entre también lo sufre.`};
   return null;
 }
@@ -143,7 +145,7 @@ async function trampaMomentoNuevo(p){
     cadena: p.cadena && p.pisador ? {rango: num(p.cadena.rango) || 3, golpeados: [p.tokenId || '']} : null,
     celdas: Array.isArray(p.celdas) ? p.celdas.slice(0, 120) : [],
     portal: p.portal ? {rango: num(p.portal.rango) || 8, ...(p.portal.destino ? {destino: String(p.portal.destino)} : {})} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, ...(num(p.perfora) > 0 ? {perfora: num(p.perfora)} : {}), ...(p.adelante ? {adelante: p.adelante} : {}), spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
-    fase: '', tirando: false, evita: '', pasos: [],
+    fase: '', tirando: false, evita: '', pasos: [], ...(p.zonaComo ? {zonaComo: String(p.zonaComo).slice(0, 4)} : {}),
     ...(p.explota ? {explota: p.explota} : {}),   // 💥 (2026-10-17)
   };
   // Los pies de la víctima (2026-10-04, js/21): Inamovible (para el portal). Reflejos de mangosta ya se jugó antes del disparo (js/23).
@@ -238,7 +240,7 @@ async function trampaSaltar(dt){
   const [hid, h] = cand[0], quien = nombreDe(h);
   const nd = {tokenId: hid, creep: h.tipo === 'creep', fichaId: String(h.fichaId || ''), quien, nombreT: dt.nombreT, pisador: false, salva: dt.salva || null,
     dano: '', danoFijo: n, ignoraDef: true, elemento: dt.elemento || '', pierdeSp: '', spec: dt.spec || '', muro: 0, muroLargo: 0, zona: 0, aMano: '',
-    fase: '', tirando: false, evita: '', pasos: [], cadena: {rango: num(c.rango) || 4, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
+    fase: '', tirando: false, evita: '', pasos: [], ...(p.zonaComo ? {zonaComo: String(p.zonaComo).slice(0, 4)} : {}), cadena: {rango: num(c.rango) || 4, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
   nd.fase = trampaFaseInicial(nd);
   nd.lineas = trampaLineas(nd);
   await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});

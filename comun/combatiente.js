@@ -3286,6 +3286,10 @@ Sigue: Evasión −${s} al tirarla (o 1 No2), Iniciativa −${s} (tu lugar se re
       vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar)); }},
     {id: 'esp-buena-varita-del-chorro-de-lava', nombre: 'Varita del chorro de lava', claves: ['especial', 'detalle'],
       vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar && d.zonaEstado.porPaso)); }},
+    // ☠ (P295, dueño, 2026-11-25): la Varita de miasma pega al empezar el turno de quien está adentro (no al pasar de ronda) y dura 2 turnos (antes 1);
+    // es una nube: de piso y aire.
+    {id: 'esp-varita-de-miasma', nombre: 'Varita de miasma', claves: ['especial', 'detalle'],
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar)); }},
   ];
   function ponerAlDiaItemsFabrica(lista){
     if(!Array.isArray(lista) || typeof CATALOGO_BASE === 'undefined') return false;

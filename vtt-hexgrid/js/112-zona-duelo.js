@@ -114,17 +114,24 @@ function zonaDueloBocanadas(color, gris, i){
 }
 
 /* ---------- la tirada de quien la creó, una para todos ---------- */
-const zonaDueloTiradas = new Map();   // zonaId → la tirada (en la pantalla del GM, que arma las tandas)
-function zonaDueloTiradaAnotar(zonaId, pdg){ if(zonaId && pdg) zonaDueloTiradas.set(zonaId, pdg); }
-// → la tirada que ya hizo quien creó la zona (en una tanda anterior), o null si todavía no tiró.
-async function zonaDueloTiradaGuardada(zonaId){
+const zonaDueloTiradas = new Map();   // zonaId (la última) y `zonaId@mant` (la de ese Mantenimiento) → la tirada (en la pantalla del GM, que arma las tandas)
+function zonaDueloTiradaAnotar(zonaId, pdg, mant){
+  if(!zonaId || !pdg) return;
+  zonaDueloTiradas.set(zonaId, pdg);
+  if(num(mant) > 0) zonaDueloTiradas.set(`${zonaId}@${Math.round(num(mant))}`, pdg);
+}
+/* → la tirada que ya hizo quien creó la zona (en una tanda anterior), o null si todavía no tiró. Con `mant` (P295, dueño, 2026-11-25, los Pedos en el
+   Mantenimiento: «el dueño de la nube tira una vez»), solo la de una tanda de ESE Mantenimiento: en cada uno se tira de nuevo. Sin `mant` (alguien que
+   entra), la última que tiró (la del Mantenimiento de antes, o la de cuando la tiró). */
+async function zonaDueloTiradaGuardada(zonaId, mant){
   if(!zonaId) return null;
-  if(zonaDueloTiradas.has(zonaId)) return zonaDueloTiradas.get(zonaId);
+  const m = num(mant) > 0 ? Math.round(num(mant)) : 0, clave = m ? `${zonaId}@${m}` : zonaId;
+  if(zonaDueloTiradas.has(clave)) return zonaDueloTiradas.get(clave);
   try{
     const q = await coleccionAreas().where('hab.zonaId', '==', zonaId).get();
     let mejor = null, cuando = -1;
-    q.forEach(doc => { const a = doc.data(); const ms = a.creado && a.creado.toMillis ? a.creado.toMillis() : 0; if(a.pdgCompartido && ms > cuando){ mejor = a.pdgCompartido; cuando = ms; } });
-    if(mejor) zonaDueloTiradas.set(zonaId, mejor);
+    q.forEach(doc => { const a = doc.data(); if(m && Math.round(num(a.hab && a.hab.mant)) !== m) return; const ms = a.creado && a.creado.toMillis ? a.creado.toMillis() : 0; if(a.pdgCompartido && ms > cuando){ mejor = a.pdgCompartido; cuando = ms; } });
+    if(mejor) zonaDueloTiradas.set(clave, mejor);
     return mejor;
   }catch(err){ console.error('Zona: no se pudo leer la tirada guardada', err); return null; }
 }
@@ -179,18 +186,62 @@ function zonaDueloAfectados(el){
   });
   return ids;
 }
-async function zonaDueloLanzar(el, ids){
+// `o.mant` (P295): la tanda del Mantenimiento N (una tirada nueva de quien la creó); `o.unica`: con un id fijo por nube y Mantenimiento, así dos
+// pantallas del GM no arman dos tandas.
+async function zonaDueloLanzar(el, ids, o){
+  o = o || {};
   ids = zonaDueloOrdenar(el, ids.filter(id => tokens.has(id)));
   if(!ids.length) return;
   const c = zonaDueloCasteador(el);
   const casteador = {ref: String(el.zonaCasteadorRef || ''), tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj', nombre: String(c ? nombreDe(c.t) : (el.zonaNombre || 'La zona')).slice(0, 40),
     uid: (c && c.t.duenoUid) || fbUsuario.uid, tokenId: c ? c.id : ''};
+  const mant = num(o.mant) > 0 ? Math.round(num(o.mant)) : 0;
+  const doc = {
+    casteador, hab: Duelo.limpiarHab({...zonaDueloHab(el), ...(mant ? {mant} : {})}), centro: {col: el.origen.col, fila: el.origen.fila, mapa: mapaMostrado}, radio: 2, objetivos: ids, duelos: [], indice: 0,
+    estado: AREA_EN_CURSO, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  };
   try{
-    await coleccionAreas().add({
-      casteador, hab: Duelo.limpiarHab(zonaDueloHab(el)), centro: {col: el.origen.col, fila: el.origen.fila, mapa: mapaMostrado}, radio: 2, objetivos: ids, duelos: [], indice: 0,
-      estado: AREA_EN_CURSO, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    if(mant && o.unica){
+      const ref = coleccionAreas().doc(zonaDueloMantId(el, mant));
+      await fbDb.runTransaction(async tx => { const ya = await tx.get(ref); if(!ya.exists) tx.set(ref, doc); });
+    }else await coleccionAreas().add(doc);
   }catch(err){ console.error('Zona con duelo: no se pudo armar la tanda', err); toast(`${el.zonaNombre || 'La zona'}: no se pudieron armar los duelos (${String((err && err.message) || err).slice(0, 80)})`); }
+}
+
+/* ---------- 💨 Los Pedos Tóxicos en el Mantenimiento: todos juntos, una sola tirada (P295, dueño, 2026-11-25) ----------
+   «Como excepción, siguen en el Mantenimiento, para que se haga todo junto una sola vez, porque son varias tiradas»: en cada Mantenimiento, la
+   pantalla del GM arma UNA tanda por nube con todos los que siguen adentro (antes, cada pantalla pedía la suya con sus tokens y se usaba la tirada
+   de cuando se tiró la nube, para siempre). En el primer duelo el dueño de la nube tira su Ef.Esp con su botón (una tirada nueva, que vale para todos
+   los de ese Mantenimiento: `hab.mant`); cada afectado resiste en su pantalla, de a uno, y si no contesta en 40 s lo hace la pantalla del GM por él
+   (comun/duelo.js, `venceSolo`). Si la pantalla del GM no la arma (está mirando otro mapa), a los 5 s cada pantalla pide la suya, con la misma marca.
+   Quien entra a la nube sigue como antes (su duelo al entrar, con la última tirada). */
+const zonaDueloJunta = el => !!(el && el.zona && zonaSpecDe(el).duelo && /^pedos t[oó]xicos$/i.test(String(el.zonaNombre || '').trim()));
+const ZONA_MANT_RESPALDO_MS = 5000;
+const zonaDueloMantId = (el, mant) => `zmant-${el.id}-${Math.round(num(mant))}`.slice(0, 140);
+let zonaDueloEnMant = 0;   // mientras zonaRevisarMantenimiento (js/08) revisa: el número de ese Mantenimiento
+// Desde zonaDueloPedir: ¿lo de este token en esta nube lo lleva la tanda del Mantenimiento? (true = no pedir una tanda propia ahora)
+function zonaDueloMantPedido(el, t){
+  if(!zonaDueloEnMant || !zonaDueloJunta(el)) return false;
+  if(soyGM) return true;   // la arma zonaDueloMantenimiento
+  const mant = zonaDueloEnMant, tokId = zonaIdDe(t);
+  setTimeout(async () => {
+    const e2 = elementos.get(el.id), t2 = tokens.get(tokId);
+    if(!e2 || !t2) return;
+    try{ const ya = await coleccionAreas().doc(zonaDueloMantId(e2, mant)).get(); if(ya.exists) return; }catch(err){ return; }
+    if(zonaDueloPendiente(e2.id, tokId)) return;
+    zonaDueloLanzar(e2, [tokId], {mant});
+  }, ZONA_MANT_RESPALDO_MS);
+  return true;
+}
+// La pantalla del GM, al pasar el Mantenimiento (js/08 zonaRevisarMantenimiento).
+function zonaDueloMantenimiento(numero){
+  const mant = Math.round(num(numero));
+  if(!soyGM || !(mant > 0)) return;
+  elementos.forEach(el => {
+    if(!zonaDueloJunta(el)) return;
+    const ids = zonaDueloAfectados(el).filter(id => { const t = tokens.get(id); return t && !(typeof etereoDe === 'function' && etereoDe(t)) && zonaLeFalta(el, t); });
+    if(ids.length) zonaDueloLanzar(el, ids, {mant, unica: true});
+  });
 }
 // La pantalla que la creó (js/13 crearElementoZona → alCrear): la primera tanda, cuando terminó de expandirse.
 function zonaDueloAlCrear(id){
@@ -223,6 +274,7 @@ function zonaDueloResuelvoYo(t){
 function zonaDueloPedir(el, t){
   const tokId = zonaIdDe(t);
   if(!tokId || !zonaDueloResuelvoYo(t) || zonaDueloPendiente(el.id, tokId)) return;
+  if(zonaDueloMantPedido(el, t)) return;   // 💨 (P295) en el Mantenimiento, los Pedos van todos juntos
   const t0 = zonaDueloInicio.get(el.id);
   if(t0 && zonaSpecDe(el).duelo && performance.now() - t0 < ZONA_DUELO_EXPANDE_MS + 2000) return;   // recién tirada: la primera tanda ya lo incluye (solo las de `duelo`, que la arma quien la creó)
   const p = zonaDueloPedidos.get(el.id) || {ids: new Set(), timer: null};

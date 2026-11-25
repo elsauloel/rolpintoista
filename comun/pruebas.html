@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125lava"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261125lava"></script>
+<script src="combatiente.js?v=20261125miasma"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
@@ -112,7 +112,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261124c91"></script>
+<script src="duelo.js?v=20261125miasma"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261124c80"></script>
@@ -125,7 +125,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261120hasta"></script>
 <script src="pasivas.js?v=20261124tags2"></script>
-<script src="skills-clase.js?v=20261114sang"></script>
+<script src="skills-clase.js?v=20261125miasma"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
 <script src="skills-creep-base.js?v=20261124mareo"></script>
@@ -10469,6 +10469,43 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     ok(/dt\.altura === 'aire' \|\| dt\.altura === 'ambos' \? 0/.test(t19) && /else if\(spec\.porPaso\) cuando = /.test(t103));
     // El renglón de «Empieza tu turno» y el Mantenimiento: como el Muro (zonaAlEmpezar lee el mismo JSON).
     ok(/const zonaAlEmpezar = el => !!zonaSpecDe\(el\)\.alEmpezar;/.test(t08));
+  });
+  prueba('☠ la Varita de miasma pega al empezar el turno de quien está adentro y dura 2 turnos (P295, dueño, 2026-11-25)', async () => {
+    const it = CATALOGO_BASE.find(x => x.id === 'esp-varita-de-miasma'), d = it.especial.duelo;
+    igual([d.zonaTurnos, d.zonaAltura, d.zonaEstado, d.tira, d.contra, d.danoDirecto, it.especial.dano], [2, 'ambos', {nombre: 'Veneno', pct: 50, alEmpezar: true}, 'dmgesp', ['resmg'], true, '1d4']);
+    ok(/queda 2 turnos \(los tuyos\), en el piso y en el aire/.test(it.detalle) && /al entrar y al empezar su turno adentro: tu Ef\.Esp contra su Res\.Esp/.test(it.detalle));
+    ok(/1d4 de daño tóxico directo \(no lo frenan la Defensa ni la Defensa especial; sí la resistencia a lo tóxico\) y tiene 50 % de quedar envenenado\. ⚙ Automatizado: todo\./.test(it.detalle) && !/Mantenimiento|Suela|cada paso/.test(it.detalle));
+    // El mensaje al mapa: alEmpezar adentro del JSON (crearElementoZona lo guarda), 2 turnos, la tirada de la zona, piso y aire.
+    const z = Combatiente.zonaDeHab({nombre: it.nombre, tiradaExtra: '1d4'}, structuredClone(d), {fichaId: 'c1', tipo: 'creep', tiraValor: 6});
+    ok(z.zonaEstado.alEmpezar && z.zonaEstado.nombre === 'Veneno' && z.zonaEstado.pct === 50 && z.zonaTurnos === 2 && z.zonaAltura === 'ambos' && z.zonaDirecto === true && z.resistStat === 'resmg');
+    // Las copias de antes se ponen al día solas; la nueva no se toca.
+    const vieja = {id: it.id, nombre: it.nombre, especial: {sp: 3, dano: '1d4', duelo: {objetivo: 'zona', tira: 'dmgesp', contra: ['resmg'], dano: true, tipoDano: 'toxico', radio: 1, zonaTurnos: 1, zonaEstado: {nombre: 'Veneno', pct: 50}, danoDirecto: true}}, detalle: 'viejo'};
+    ok(Combatiente.ponerAlDiaItemsFabrica([vieja]) && vieja.especial.duelo.zonaEstado.alEmpezar && vieja.especial.duelo.zonaTurnos === 2 && vieja.detalle === it.detalle);
+    ok(!Combatiente.ponerAlDiaItemsFabrica([structuredClone(it)]));
+    // «Ver detalle»: cuándo pega; y la Suela gruesa no la frena (piso y aire).
+    const el = {zona: true, zonaNombre: it.nombre, zonaDano: '1d4', zonaDanoTipo: 'tóxico', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep', zonaAltura: 'ambos', zonaTiraStat: 'dmgesp', zonaTiraValor: 6, zonaResistStat: 'resmg', zonaEstado: JSON.stringify({nombre: 'Veneno', pct: 50, alEmpezar: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(el, {}), 'se dispara al entrar y al empezar su turno adentro');
+    ok(ZonaDetalle.frenoDe(el, {elemento: 'toxico', altura: 'ambos'}).suela === false);
+  });
+  prueba('💨 los Pedos Tóxicos en el Mantenimiento: todos juntos, una tirada nueva del dueño de la nube y cada uno resiste (P295, dueño, 2026-11-25)', async () => {
+    const pedos = SKILLS_CUSTOM.find(x => x.id === 'custom-pedos-toxicos');
+    ok(/En cada Mantenimiento, los que siguen adentro van todos juntos: tirás tu Ef\.Esp una sola vez para todos y cada uno resiste en su pantalla, de a uno \(si no contesta en 40 s, se tira solo\)\./.test(pedos.detalle));
+    ok(/Con quien entra después, lo mismo \(con tu última tirada\)\./.test(pedos.detalle) && !/sigue adentro cuando pasa la ronda/.test(pedos.detalle));
+    // El duelo guarda de qué Mantenimiento es (solo en una zona); sin zona, no.
+    const base = {nombre: 'Pedos Tóxicos', objetivo: 'area', tira: {formula: '1d8+1', etq: 'Ef.Esp'}, contra: [{modo: 'resmg', stat: 'resmg', etq: 'Res.Esp'}], dano: {formula: '', diferencia: true, tipo: 'toxico', ignoraDef: true}, sinDodge: true};
+    igual([Duelo.limpiarHab({...base, zonaId: 'z1', mant: 7}).mant, Duelo.limpiarHab({...base, zonaId: 'z1'}).mant, Duelo.limpiarHab({...base, mant: 7}).mant, Duelo.limpiarHab({...base, zonaId: 'z1', mant: 'x'}).mant], [7, undefined, undefined, undefined]);
+    const [t08, t112, t13, tDu] = await Promise.all(['../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', '../vtt-hexgrid/js/112-zona-duelo.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js', 'duelo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+    // El Mantenimiento: cada pantalla no pide la suya (el GM la arma con todos, con un id por nube y Mantenimiento); si el GM no la arma, a los 5 s.
+    ok(/zonaDueloEnMant = Math\.round\(num\(mantenimientoNumero\)\)/.test(t08) && /if\(typeof zonaDueloMantenimiento === 'function'\) zonaDueloMantenimiento\(mantenimientoNumero\);/.test(t08));
+    ok(/if\(zonaDueloMantPedido\(el, t\)\) return;/.test(t112) && /if\(soyGM\) return true;/.test(t112) && /zonaDueloLanzar\(el, ids, \{mant, unica: true\}\)/.test(t112));
+    ok(/const zonaDueloMantId = \(el, mant\) => `zmant-\$\{el\.id\}-/.test(t112) && /if\(!ya\.exists\) tx\.set\(ref, doc\)/.test(t112) && /ZONA_MANT_RESPALDO_MS = 5000/.test(t112));
+    ok(/const zonaDueloJunta = el => !!\(el && el\.zona && zonaSpecDe\(el\)\.duelo && \/\^pedos t\[oó\]xicos\$\/i/.test(t112));
+    // La tirada: en una tanda del Mantenimiento solo vale la de ese Mantenimiento (si no hay, la tira el dueño con su botón).
+    ok(/zonaDueloTiradaGuardada\(a\.hab\.zonaId, a\.hab\.mant\)/.test(t13) && /zonaDueloTiradaAnotar\(a\.hab\.zonaId, a\.pdgCompartido \|\| d\.pdg, a\.hab\.mant\)/.test(t13));
+    ok(/if\(m && Math\.round\(num\(a\.hab && a\.hab\.mant\)\) !== m\) return;/.test(t112));
+    // Los 40 s: como el duelo oculto, la pantalla del GM tira por quien no contesta (también la fórmula de quien la creó).
+    ok(/const venceSolo = d => esOculto\(d\) \|\| !!\(d && d\.grupo && d\.hab && d\.hab\.zonaId && _num\(d\.hab\.mant\) > 0\);/.test(tDu) && /if\(!venceSolo\(d\) \|\| d\.estado === 'resuelto'/.test(tDu));
+    ok(/else if\(!d\.pdg && d\.hab && d\.hab\.tira && d\.hab\.tira\.formula && typeof tirarDados === 'function'\)/.test(tDu));
   });
   prueba('🔥 el número de la resistencia, solo para su bando (P297, dueño, 2026-11-23): el rival lee «es resistente» sin cuánto', async () => {
     igual([Combatiente.verResDe(true, 'pj'), Combatiente.verResDe(true, 'creep'), Combatiente.verResDe(false, 'pj'), Combatiente.verResDe(false, 'creep')], [false, true, true, false]);

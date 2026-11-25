@@ -2759,3 +2759,17 @@ como uno de esos pasos (entrar desde afuera y dar 2 pasos más adentro = 3 golpe
 entrar» y «el de cada paso» no se suman en la misma casilla (sería entrar = 2 golpes). Lo elegí así por ser lo más conservador. ¿Está bien, o al
 entrar tiene que pegar dos veces (una por entrar y otra por el paso)?
 Además: si alguien sigue caminando mientras se está tirando el daño de sus pasos anteriores, los pasos nuevos salen en otro cartel después.
+
+### P334 — ☠ La Varita de miasma: ¿también les pega a los aliados? (2026-11-25, Claude)
+
+El texto de antes decía «a quien está adentro o entra (aliados incluidos)», pero la nube nunca les pegó a los aliados de quien la tira (no tiene
+la marca de «fuego amigo», como sí la tienen los Pedos y el Chorro de lava). Al reescribir el texto (P295) puse lo que hace de verdad: **«A cada
+rival…»**, sin tocar cómo funciona (lo más conservador). ¿Queda así, solo a los rivales, o le pongo el fuego amigo (aliados incluidos, como decía)?
+
+### P335 — 💨 Los Pedos Tóxicos: quien ENTRA a la nube, ¿con qué tirada? (2026-11-25, Claude)
+
+Desde hoy, en cada Mantenimiento el dueño de la nube tira su Ef.Esp una vez para todos los de adentro (P295). Pero quien **entra caminando** en el
+medio de la ronda sigue como antes: su duelo al entrar, contra **la última tirada** del dueño (la del último Mantenimiento, o la de cuando la tiró),
+sin tirar de nuevo (lo más conservador). Opciones: (a) así; (b) que cada vez que alguien entra, el dueño tire de nuevo. Además, cuando alguien no
+contesta en 40 s, la pantalla del GM hace por él todo lo que le falta del duelo (su Res.Esp con su número, aceptar el daño, el 1d20), igual que en
+el duelo de un escondido; si el dueño de la nube no tira su Ef.Esp en 40 s, también se la tira la pantalla del GM. ¿Está bien?

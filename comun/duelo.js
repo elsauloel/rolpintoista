@@ -1056,6 +1056,7 @@ const Duelo = (() => {
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
       ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}), ...(h.empateGana ? {empateGana: true} : {}),   // empate: gana quien la usa (Tolerar un efecto: hay que superarlo, 2026-11-10)   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
       ...(h.tiraCadaUno ? {tiraCadaUno: true} : {}), ...(h.zonaId ? {zonaId: txtCorto(h.zonaId, 40)} : {}),   // 💨 una zona con duelo por token (js/112): quien la creó tira de nuevo contra cada uno
+      ...(h.zonaId && Number.isFinite(Number(h.mant)) && Number(h.mant) > 0 ? {mant: Math.round(Number(h.mant))} : {}),   // 💨 (P295, 2026-11-25) la tanda del Mantenimiento N (los Pedos): una tirada nueva de quien la creó, para todos
       ...(h.dadosEstilo && /^[a-z_]{1,20}$/.test(String(h.dadosEstilo)) ? {dadosEstilo: String(h.dadosEstilo)} : {}),   // 🔥 los dados 3D de esta tirada con un estilo fijo (el fuego del Meteoro: 'fire', 2026-11-18)
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       // 🌩 La ronda de a uno (2026-11-13, dueño; vtt-hexgrid/js/118): `soloTirada` = una tirada de quien la usa que no es daño (los proyectiles de la
@@ -2260,6 +2261,9 @@ const Duelo = (() => {
      Quien maneja al escondido hace también lo que le tocaría al atacante (los efectos), y si nadie lo resuelve en OCULTO_MS, la pantalla del GM lo
      resuelve sola (revisarOcultos). */
   const esOculto = d => !!(d && d.grupo && d.grupo.oculto);
+  /* ⏳ El duelo de la tanda del Mantenimiento de una zona (los Pedos Tóxicos; P295, dueño, 2026-11-25: «cada afectado resiste en su momento»): cada uno
+     resiste en su pantalla, y si no contesta en OCULTO_MS (40 s) lo hace la pantalla del GM por él, como en el duelo oculto (revisarOcultos). */
+  const venceSolo = d => esOculto(d) || !!(d && d.grupo && d.hab && d.hab.zonaId && _num(d.hab.mant) > 0);
   // 🕶 El escondido de un duelo oculto se delató con el golpe (el mapa lo deja en `dano.delatado`, vtt-hexgrid/js/13): lo que sigue va sin marca.
   const delatadoEn = d => !!(d && d.dano && d.dano.delatado);
   function veoOcultoAhora(d){
@@ -4484,7 +4488,7 @@ const Duelo = (() => {
   async function revisarOcultos(){
     const ahora = Date.now();
     for(const d of todosDuelos){
-      if(!esOculto(d) || d.estado === 'resuelto' || d.estado === 'cancelado'){ ocultoVisto.delete(d.id); continue; }
+      if(!venceSolo(d) || d.estado === 'resuelto' || d.estado === 'cancelado'){ ocultoVisto.delete(d.id); continue; }
       const f = firmaOculto(d);
       const v = ocultoReloj(ocultoVisto.get(d.id), f, ahora);
       ocultoVisto.set(d.id, v);
@@ -4506,6 +4510,8 @@ const Duelo = (() => {
     if(d.estado === 'empate'){ await elegirParidad(d.id, 'defensor', Math.random() < 0.5 ? 'par' : 'impar'); return; }
     if(d.fase === 'contacto'){
       if(!d.pdg && d.hab && d.hab.tira && d.hab.tira.stat){ const r = tiroDeValor(valor('atacante', d.hab.tira.stat) + _num(d.hab.tira.bono)); if(r) await guardarTiro(d.id, 'pdg', r, null, null); }
+      // (la tirada de quien creó la zona, con su fórmula: la de los Pedos en el Mantenimiento, si no la tiró en 40 s)
+      else if(!d.pdg && d.hab && d.hab.tira && d.hab.tira.formula && typeof tirarDados === 'function'){ const r = tirarDados(d.hab.tira.formula); if(r) await guardarTiro(d.id, 'pdg', {...r, formula: `${r.formula || d.hab.tira.formula} (solo: no contestó)`.slice(0, 60)}, null, null); }
       if(!d.eva){
         const c = d.hab && (d.hab.contra || [])[0];
         const r = c && c.formula && typeof tirarDados === 'function' ? tirarDados(c.formula) : tiroDeValor((c ? valor('defensor', c.stat || c.modo) : valor('defensor', 'eva')) + _num(c && c.bono));

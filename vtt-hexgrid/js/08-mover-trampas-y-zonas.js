@@ -667,7 +667,13 @@ async function zonaSumarStack(t, spec, el, nombre){
     }catch(err){}
   }catch(err){ console.error('No se pudo sumar el stack de la zona:', err); }
 }
-function zonaRevisarMantenimiento(){ tokens.forEach(t => { if(zonaResuelvoYo(t)) zonaRevisarToken(t, true); }); }
+function zonaRevisarMantenimiento(){
+  // 💨 (P295, 2026-11-25) Los Pedos Tóxicos: en el Mantenimiento, una sola tanda por nube con todos los de adentro (js/112, zonaDueloMantenimiento).
+  if(typeof zonaDueloEnMant !== 'undefined') zonaDueloEnMant = Math.round(num(mantenimientoNumero));
+  try{ tokens.forEach(t => { if(zonaResuelvoYo(t)) zonaRevisarToken(t, true); }); }
+  finally{ if(typeof zonaDueloEnMant !== 'undefined') zonaDueloEnMant = 0; }
+  if(typeof zonaDueloMantenimiento === 'function') zonaDueloMantenimiento(mantenimientoNumero);
+}
 // Una zona recién puesta que «aparece bajo los pies» (2026-10-08, campo de estática, arena movediza Buena, luz flotante): cada pantalla revisa sus
 // tokens que ya están adentro, como si acabaran de entrar.
 function zonaInmediataRevisar(elId){

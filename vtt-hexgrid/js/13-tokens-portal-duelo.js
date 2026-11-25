@@ -1419,7 +1419,9 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // 💨 Una zona con duelo (js/112; dueño, 2026-11-09: «la tirada debe ser la misma para todos. Tira Ef.Esp una sola vez»): no se tira sola —
     // la primera vez quien la creó (su jugador, o el GM por un creep) tira con su botón (si no está, el GM con «🎲 Tirar a mano») y vale para todos;
     // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
-    const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId) : null;
+    // 💨 (P295, dueño, 2026-11-25) Los Pedos en el Mantenimiento: una tirada NUEVA de quien la creó, una sola vez para todos los de ese Mantenimiento
+    // (`hab.mant`): solo vale la de una tanda del mismo Mantenimiento; si no hay, la tira en este duelo con su botón.
+    const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId, a.hab.mant) : null;
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: areaHabConDano(tormentaHabDe(a.hab, tokenId), a), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total)), ...(a.hab && a.hab.oculta ? {oculto: true} : {})}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       // 💍 El Foco también en un área, una línea y los misiles (2026-11-21, visto en el mapa: la Varita de misiles no lo sumaba). Solo cuando el
       // casteador tira acá (con la tirada compartida ya viene sumado desde el primer objetivo). quietoDe solo lo da si la habilidad tira PdG.Esp.
@@ -1482,7 +1484,7 @@ function dueloGrupoResuelto(d){
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
     const cambios = siguiente >= total ? (quedan > 0 ? {estado: AREA_ELIGIENDO, indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
-    if(a.hab && a.hab.zonaId && d.pdg && typeof zonaDueloTiradaAnotar === 'function') zonaDueloTiradaAnotar(a.hab.zonaId, a.pdgCompartido || d.pdg);   // 💨 la de la zona, para las tandas de después
+    if(a.hab && a.hab.zonaId && d.pdg && typeof zonaDueloTiradaAnotar === 'function') zonaDueloTiradaAnotar(a.hab.zonaId, a.pdgCompartido || d.pdg, a.hab.mant);   // 💨 la de la zona, para las tandas de después
     if(!a.pdgCompartido && d.pdg && !reparte && !(a.hab && a.hab.tiraCadaUno)) cambios.pdgCompartido = d.pdg;
     // 💥 El daño, una sola tirada para todos (dueño, 2026-11-18, «sí» a pasar todas las áreas a una tirada como el Meteoro): lo que tiró quien la
     // lanzó contra el primero al que le pegó queda en el área (sin lo de ese objetivo: la Presa, el miedo…), y los siguientes lo reciben ya tirado.

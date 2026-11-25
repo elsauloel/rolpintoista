@@ -2488,10 +2488,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pasos por la lava → un cartel con 2 golpes (4 − 2 = 2, 3 − 2 = 1); pasar de ronda → ninguna zona pegó en el Mantenimiento; en su turno siguiente,
   solo el renglón de la lava (salió de la fogata); volviendo, 1 paso de lava → 1 golpe, y entrar a la fogata → su golpe al entrar. Tiró el daño el GM
   (dueño de la zona). Al final, la vuelta del mapa: «quedó igual». Pruebas automáticas: una nueva y tres puestas al día (1119 en verde). Duda: P333.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de miasma y Pedos Tóxicos** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-25) — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de miasma y Pedos Tóxicos** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
   **Decidido (dueño, 2026-11-25):** (1) la **Varita de miasma** pasa a pegar **al empezar el turno de quien está adentro** y **dura 2 turnos** (en vez
   de 1). (2) Los **Pedos Tóxicos**, como excepción, **siguen en el Mantenimiento**, «para que se haga todo junto una sola vez, porque son varias
   tiradas»: en ese momento **el dueño de la nube tira una vez** (su Ef.Esp) y **cada afectado resiste en su momento** (su Res.Esp, en su pantalla).
+  **✅ hecho (2026-11-25), la miasma:** pega al entrar y **al empezar el turno de quien está adentro** (el renglón de «▶ Empieza tu turno», con su
+  duelo Ef.Esp contra Res.Esp, el 1d4 tóxico directo y el 50 % de Veneno), ya no al pasar de ronda; dura **2 turnos** (los de quien la tiró) y es de
+  piso y aire. Texto nuevo: «Una nube tóxica en flor que queda 2 turnos (los tuyos), en el piso y en el aire. A cada rival, al entrar y al empezar su
+  turno adentro: tu Ef.Esp contra su Res.Esp; el que no resiste recibe 1d4 de daño tóxico directo (no lo frenan la Defensa ni la Defensa especial;
+  sí la resistencia a lo tóxico) y tiene 50 % de quedar envenenado. ⚙ Automatizado: todo.» Las copias guardadas se ponen al día solas. Probado con
+  clics en «Prueba · General» (GM de pruebas, Jugador 1, Jugador 2): el Debuffer · Maldito la tiró sobre Blanco J1 y Blanco J2; al empezar el turno
+  de cada uno, su renglón (J1 no resistió: 3 de daño, sin nombrar la resistencia en 0, y salió el Veneno; J2 resistió); al pasar de ronda, ningún
+  cartel; volvió a pegar en sus turnos de las rondas 2 y 3 y en la 4 ya no estaba. Duda: P334 (los aliados).
+  **✅ hecho (2026-11-25), los Pedos:** siguen en el Mantenimiento, pero ahora **todos juntos**: la pantalla del GM arma una sola tanda por nube con
+  todos los que siguen adentro; en el primer duelo **el dueño de la nube tira su Ef.Esp con su botón** (una tirada nueva en cada Mantenimiento; antes
+  se usaba para siempre la de cuando la tiró) y vale para todos; **cada afectado resiste en su pantalla**, de a uno, y si no contesta en 40 s lo
+  tira la pantalla del GM por él. Lo demás igual (la diferencia como daño tóxico, el 1d20, el jefe). Quien entra a la nube, como antes (con la última
+  tirada). Probado con clics: Blanco J1 los tiró con Blanco J2, el Liviano · Sangrador y el Debuffer adentro (la primera tanda con su 7); al pasar
+  de ronda, una sola tanda con los tres, J1 tiró de nuevo (5) y esa misma valió para los tres; J2 no contestó y a los 40 s se tiró sola («solo: no
+  contestó») y le entró el daño. Al final, la vuelta del mapa: «quedó igual». Pruebas automáticas: dos nuevas (1121 en verde). Duda: P335.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): el terreno incendiado y las zonas hechas a mano con el asistente** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Gas adormecedor y Gas somnífero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -2904,6 +2919,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🔥 Recargar en el medio del turno vuelve a ofrecer una zona ya tirada** (visto el 2026-11-25): si «▶ Empieza tu turno» tardó (otro
   cartel de zona abierto más de 15 s) la zona sale en su cartel aparte; si después se recarga la página antes de cerrar la ventana, la zona vuelve a
   aparecer como renglón y se puede tirar dos veces. Pasa con cualquier zona de «al empezar el turno» (también el Muro).
+- **⬜ en cola — Probar: 💨 los Pedos en el Mantenimiento con el GM mirando otro mapa** (2026-11-25): la tanda la arma la pantalla del GM; si está
+  en otro mapa, a los 5 s cada pantalla pide la suya (con la misma tirada de ese Mantenimiento). No se probó con clics; tampoco con un escondido
+  adentro (P326) ni con una invocación.
+- **⬜ en cola — Probar: ☠ la Varita de miasma sin orden de turnos y sobre un creep** (2026-11-25): sin orden (narrativo) tiene que pegar al pasar de
+  ronda; sobre un creep (la tira un jugador), el cartel de siempre del GM. Con clics se probó solo un creep tirándola sobre dos personajes.
 
 ## En cola
 

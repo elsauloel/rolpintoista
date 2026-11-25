@@ -2796,3 +2796,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `zonaEncolar`: si el cartel de esa zona y ese token ya muestra el resultado, lo nuevo va a la fila (antes se perdía). «Ver detalle» y el globo de
   estados (js/103) dicen «al entrar, en cada paso que dan adentro y al empezar su turno adentro». Las zonas ya puestas terminan como estaban; las
   copias de las varitas se ponen al día solas (`ITEMS_AL_DIA`). Probado con clics en «Prueba · General» (cola 2026-11-25). Duda: P333.
+- **☠ La Varita de miasma, al empezar el turno; 💨 los Pedos, todos juntos en el Mantenimiento** (P295, dueño, 2026-11-25). La miasma: `alEmpezar`
+  en su `zonaEstado`, 2 turnos y `zonaAltura: 'ambos'` (comun/catalogo.js; las copias, `ITEMS_AL_DIA`); va por el cartel de siempre (tiene chance de
+  Veneno: no es `zonaDueloCompatible`), como renglón de «▶ Empieza tu turno». Los Pedos (`zonaDueloJunta`, js/112: zona con `duelo` y ese nombre):
+  `zonaRevisarMantenimiento` (js/08) marca `zonaDueloEnMant` mientras revisa y `zonaDueloPedir` no pide la tanda de cada pantalla
+  (`zonaDueloMantPedido`); la pantalla del GM arma UNA tanda por nube con todos los de adentro (`zonaDueloMantenimiento`, id fijo
+  `zmant-<zona>-<Mantenimiento>` con transacción: dos pantallas del GM no la duplican) con `hab.mant`. Si no aparece en 5 s (el GM mira otro mapa),
+  cada pantalla pide la suya con la misma marca. La tirada: `zonaDueloTiradaGuardada(zonaId, mant)` (js/13 `areaCrearSiguienteSubDuelo`) solo toma la
+  de ese Mantenimiento, así que en el primer duelo el dueño tira de nuevo con su botón y vale para todos; quien entra usa la última. Los 40 s:
+  comun/duelo.js `venceSolo` (un duelo con `hab.zonaId` y `hab.mant`) entra a `revisarOcultos` como el duelo oculto (también tira la fórmula de quien
+  la creó). `Duelo.limpiarHab` conserva `mant` (solo con `zonaId`). Probado con clics en «Prueba · General» (cola 2026-11-25). Dudas: P334, P335.

@@ -2932,6 +2932,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (investigar) — 🔁 La línea «Empieza su turno» sale repetida en la Mesa a veces** (visto el 2026-11-25 probando la miasma, con J1 y J2;
   dueño: «anotalo para investigarlo»). Buscar de dónde sale la repetida (¿dos pantallas que la publican?, ¿una recarga?) y arreglarlo.
 
+- **⬜ en cola — 🔭 Una sola pasiva de +1 Rango: se saca «Largo alcance arcano»** (dueño, 2026-11-25: «resolver que exista solamente una de más
+  rango y punto… sirve para todo lo que es rango: hechizos, armas de rango, etcétera»). Queda **Vista de halcón** (+1 Rango, para todo); sacar
+  Largo alcance arcano de las pasivas de fábrica (`comun/pasivas.js`); los personajes, invocaciones y creeps que la tengan, pasarlos a Vista de
+  halcón (sin duplicar si ya la tienen); ajustar las etiquetas de Vista de halcón (Shooter y Mago; distancia y mágico) y el texto si hace falta.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

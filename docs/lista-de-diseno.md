@@ -15,7 +15,7 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 
 > **Orden (dueño, 2026-11-24):** de menos complejo / largo a más, para ir trabajando de menos a más. Lo nuevo se ubica según eso.
 
-- [ ] **🔭 Diseñar «Largo alcance arcano»** (dueño, 2026-11-24): hoy da lo mismo que Vista de halcón (+1 Rango); Vista de
+- [x] (✅ decidido 2026-11-25: queda una sola pasiva de +1 Rango, Vista de halcón, para todo lo de rango; Largo alcance arcano se saca → cola) **🔭 Diseñar «Largo alcance arcano»** (dueño, 2026-11-24): hoy da lo mismo que Vista de halcón (+1 Rango); Vista de
   halcón queda. Propuesta de partida: algo propio del Mago, p. ej. +1 al alcance solo de habilidades y varitas.
 - [ ] **👢 Más piezas que den Suela gruesa** (dueño, 2026-11-24). Hoy la da una sola: «Suelas de cuero de dragón del pantano» (pies, Buena
   Calidad, Suela gruesa 2). Cada punto resta 1 al daño de lo que se pisa (zonas y trampas del piso).

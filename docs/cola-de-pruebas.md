@@ -2936,6 +2936,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   rango y punto… sirve para todo lo que es rango: hechizos, armas de rango, etcétera»). Queda **Vista de halcón** (+1 Rango, para todo); sacar
   Largo alcance arcano de las pasivas de fábrica (`comun/pasivas.js`); los personajes, invocaciones y creeps que la tengan, pasarlos a Vista de
   halcón (sin duplicar si ya la tienen); ajustar las etiquetas de Vista de halcón (Shooter y Mago; distancia y mágico) y el texto si hace falta.
+  **Y cambiarle el nombre** (dueño, 2026-11-25): **Vista de halcón pasa a llamarse «Rango amplificado»** («vista de halcón es muy referencia a algo de
+  puntería»). Que los que ya la tienen guardada vean el nombre nuevo (mismo id o con su puesta al día).
 
 ## En cola
 

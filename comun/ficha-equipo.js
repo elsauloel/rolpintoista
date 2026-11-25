@@ -568,8 +568,21 @@ const FichaEquipo = (() => {
     .sil-slot.lleno{background:#2f4a3a;border:1.5px solid #6fbf8a;color:#eafff0}
     .sil-slot.vacio{background:rgba(29,23,29,.85);border:1.5px dashed #6a5a63;color:var(--muted, #a8998f)}
     .sil-slot.vacio i{font-style:normal;opacity:.75}
-    .sil-slot.casi{border-color:#e0a040;box-shadow:0 0 0 1px #e0a04055}
+    .sil-slot.basico{background:rgba(70,62,68,.6);border:1px solid #9a8f96;color:#ddd3d8}
+    .sil-slot.basico .sil-nom{font-weight:500}
+    .sil-slot.casi{border-color:#e0a040;background:#4a3a22;box-shadow:0 0 0 1px #e0a04055}
     .sil-slot.roto{border-color:#e06060;background:#4a2a2a;box-shadow:0 0 0 1px #e0606055}
+    .sil-grietas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;border-radius:inherit}
+    .sil-slot>b,.sil-it>summary,.sil-slot>.sil-nom,.sil-slot>.sil-insignia{position:relative}
+    .sil-slot.casi .sil-nom,.sil-slot.casi>b{text-shadow:0 0 3px #4a3a22,0 0 6px #4a3a22}
+    .sil-slot.roto .sil-nom,.sil-slot.roto>b,.sil-slot.roto .sil-insignia{text-shadow:0 0 2px #4a2a2a,0 0 4px #4a2a2a,0 0 7px #4a2a2a}
+    .sil-ico{position:absolute;right:3px;top:2px;font-size:12px;line-height:1;cursor:help;padding:1px;border-radius:4px}
+    .sil-ico:hover,.sil-ico:focus{background:rgba(255,255,255,.12);outline:none}
+    .sil-ico>.sil-tip{left:0;right:auto}
+    .sil-der .sil-ico>.sil-tip{left:auto;right:0}
+    .sil-ico:hover>.sil-tip,.sil-ico:focus>.sil-tip{display:block}
+    .sil-arriba .sil-ico>.sil-tip{top:auto;bottom:calc(100% + 6px)}
+    .sil-ico-fila+.sil-ico-fila{margin-top:6px;padding-top:6px;border-top:1px solid #4a3b33}
     .sil-slot.mano{width:96px;min-height:118px;display:flex;flex-direction:column;justify-content:center}
     .sil-slot.dos{background:repeating-linear-gradient(135deg,#2f4a3a 0 8px,#284034 8px 16px)}
     .sil-slot.sil-acepta{outline:2px dashed #e0a45a;outline-offset:2px}
@@ -639,11 +652,51 @@ const FichaEquipo = (() => {
         <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button><button type="button" class="mini" data-toggle="${it.id}" title="Pasarlo a la mochila">Sacar</button>
       </div></details>${silTipHtml(it, lugar)}</div>`;
   }
-  // El color del lugar según lo que tiene puesto: rojo si algo está roto, ámbar si está gastado o con Armadura rota.
-  function silEstadoCls(items){
-    if(items.some(i => FichaCalculo.durableItem(i) && FichaCalculo.itemRoto(i))) return ' roto';
-    if(items.some(i => FichaCalculo.durableItem(i) && (FichaCalculo.durActual(i) <= 1 || FichaCalculo.armRotaDe(i) > 0))) return ' casi';
+  // El estado del lugar según lo que tiene puesto: 'roto' si algo está roto, 'casi' (gastado) si le queda 1 punto o tiene Armadura rota.
+  const silRoto = i => FichaCalculo.durableItem(i) && FichaCalculo.itemRoto(i);
+  const silGastado = i => FichaCalculo.durableItem(i) && !FichaCalculo.itemRoto(i) && (FichaCalculo.durActual(i) <= 1 || FichaCalculo.armRotaDe(i) > 0);
+  function silEstado(items){
+    if(items.some(silRoto)) return 'roto';
+    if(items.some(silGastado)) return 'casi';
     return '';
+  }
+  const silEstadoCls = items => { const e = silEstado(items); return e ? ' ' + e : ''; };
+  /* 🩹 Las grietas (2026-11-25, dueño; boceto aprobado en charla): en SVG encima del recuadro, estiradas a su tamaño (viewBox 150×118 sin guardar
+     proporción y el trazo que no se estira), sin imágenes. Gastado: finitas, entran solo desde los bordes y las esquinas (amarillo claro al 75 %).
+     Roto: cruzan de lado a lado, con ramificaciones (rojo claro al 80 %). Pasan por detrás de las letras (el texto lleva un halo del color del
+     fondo). Cada lugar elige una variante y la da vuelta según su nombre, para que no se vean todas iguales. */
+  const GRIETAS = {
+    casi: [
+      ['M0 22 L9 25 L14 21 L22 27', 'M9 25 L12 33', 'M150 70 L141 73 L137 80 L128 82', 'M137 80 L139 88', 'M40 118 L43 109 L50 105', 'M118 0 L115 8 L120 14'],
+      ['M0 0 L8 7 L11 14 L19 17', 'M8 7 L15 6', 'M150 40 L142 44 L139 51', 'M95 118 L97 110 L104 106 L108 109', 'M150 118 L143 111 L136 112'],
+      ['M60 0 L63 8 L58 15', 'M63 8 L70 11', 'M0 84 L8 82 L13 88 L21 87', 'M150 14 L143 19 L140 27', 'M150 104 L141 101 L135 106']],
+    roto: [
+      ['M0 30 L18 36 L31 29 L47 44 L62 40 L74 58 L92 55 L104 72 L122 70 L135 86 L150 90', 'M74 58 L70 76 L78 92 L73 118', 'M47 44 L44 22 L53 0',
+        'M104 72 L116 52 L130 46 L150 38', 'M18 36 L14 52 L22 66', 'M92 55 L98 30 L94 14'],
+      ['M0 92 L16 84 L27 90 L44 72 L58 76 L71 58 L88 62 L101 44 L119 47 L133 28 L150 24', 'M71 58 L66 38 L74 20 L70 0', 'M44 72 L48 94 L41 118',
+        'M101 44 L112 64 L128 70 L150 78', 'M16 84 L20 102 L12 118', 'M119 47 L124 26'],
+      ['M30 0 L36 16 L29 30 L44 46 L40 62 L58 74 L54 92 L70 104 L68 118', 'M0 58 L20 54 L40 62', 'M58 74 L82 68 L98 80 L120 74 L134 88 L150 86',
+        'M98 80 L102 100 L96 118', 'M36 16 L56 20 L66 8', 'M120 74 L126 54 L150 48']]};
+  const silSemilla = t => { let h = 7; for(const c of String(t || '')) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  function grietasSvg(estado, clave){
+    const lista = GRIETAS[estado]; if(!lista) return '';
+    const h = silSemilla(clave), trazos = lista[h % lista.length];
+    const vx = (h >> 3) & 1, vy = (h >> 4) & 1;
+    const tr = vx || vy ? ` transform="matrix(${vx ? -1 : 1} 0 0 ${vy ? -1 : 1} ${vx ? 150 : 0} ${vy ? 118 : 0})"` : '';
+    const col = estado === 'roto' ? 'stroke="#ff9a90" stroke-opacity=".8" stroke-width="1.6"' : 'stroke="#f3c27a" stroke-opacity=".75" stroke-width="1.4"';
+    return `<svg class="sil-grietas sil-grietas-${estado}" viewBox="0 0 150 118" preserveAspectRatio="none" aria-hidden="true" fill="none" ${col} stroke-linecap="round" stroke-linejoin="round"><g${tr}>`
+      + trazos.map(d => `<path d="${d}" vector-effect="non-scaling-stroke"/>`).join('') + '</g></svg>';
+  }
+  /* 💔 / ⚠ El iconito del estado (2026-11-25): adentro del recuadro, arriba a la derecha; con el mouse encima, lo que ya calcula el juego para cada
+     pieza (estadoPieza: la durabilidad, si está rota y no da efectos, la Defensa que pierde por la Armadura rota, si le queda 1 punto). */
+  function silIconoHtml(estado, items){
+    const piezas = items.filter(estado === 'roto' ? silRoto : silGastado);
+    if(!piezas.length) return '';
+    const ico = estado === 'roto' ? '💔' : '⚠';
+    const filas = piezas.map(it => { const e = estadoPieza(it);
+      return `<div class="sil-ico-fila"><div class="sil-tip-n">${e.roto ? '💔' : '⚠'} ${esc(it.nombre)}</div>${e.lin.map(l => `<div>${l}</div>`).join('')}</div>`; }).join('');
+    const pie = estado === 'roto' ? 'Se repara fuera de combate: el herrero de una tienda o el talento de reparar.' : 'Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.';
+    return `<span class="sil-ico sil-ico-${estado}" tabindex="0" aria-label="${estado === 'roto' ? 'Roto' : 'Gastado'}: ver el detalle">${ico}<span class="sil-tip sil-ico-tip">${filas}<div class="hint" style="margin-top:4px">${pie}</div></span></span>`;
   }
   // Un lugar de la silueta. o = {slot (id de SLOT_DEFS, para arrastrar), cats, titulo, items, lugar, pos: {left, top, w}, cls, vacio, insignia(it)}.
   function silSlotHtml(o){
@@ -651,8 +704,12 @@ const FichaEquipo = (() => {
     const st = `left:${o.pos.left}px;top:${o.pos.top}px${o.pos.w ? `;width:${o.pos.w}px` : ''}`;
     const datos = o.cats ? ` data-sil-slot="${esc(o.slot)}" data-sil-cats="${esc(o.cats.join(','))}"` : '';
     const cuerpo = items.length ? items.map(it => silItemHtml(it, o.lugar, o.insignia ? o.insignia(it) : '')).join('') : (o.contenido || `<i>${esc(o.vacio || 'vacío')}</i>`);
-    const lleno = items.length || o.contenido;
-    return `<div class="sil-slot ${lleno ? 'lleno' : 'vacio'}${lleno ? silEstadoCls(items) : ''}${o.cls ? ' ' + o.cls : ''}" style="${st}"${datos}${!items.length && o.titleVacio ? ` title="${esc(o.titleVacio)}"` : ''}><b>${esc(o.titulo)}</b>${cuerpo}</div>`;
+    // Lo básico (2026-11-25): la mochila, el cinturón y el carcaj que vienen de base; ni vacío (punteado) ni un ítem (verde).
+    const clase = items.length ? 'lleno' : o.contenido ? (o.basico ? 'basico' : 'lleno') : 'vacio';
+    const estado = items.length ? silEstado(items) : '';
+    const titulo = !items.length && (o.basico ? o.titleBasico || o.titleVacio : o.titleVacio);
+    return `<div class="sil-slot ${clase}${estado ? ' ' + estado : ''}${o.cls ? ' ' + o.cls : ''}" style="${st}"${datos}${titulo ? ` title="${esc(titulo)}"` : ''}><b>${esc(o.titulo)}</b>`
+      + `${estado ? grietasSvg(estado, o.titulo + '|' + items.map(i => i.id || i.nombre).join(',')) : ''}${cuerpo}${estado ? silIconoHtml(estado, items) : ''}</div>`;
   }
   function siluetaHtml(S, equipados){
     const de = id => { const sd = SLOT_DEFS.find(x => x.id === id); return {sd, items: equipados.filter(i => sd.cats.includes(i.tipoItem))}; };
@@ -673,23 +730,39 @@ const FichaEquipo = (() => {
     const anillosHtml = silSlotHtml({slot: 'anillos', cats: anillos.sd.cats, titulo: `Anillos ${fmt(anillos.items.length)}/${fmt(anillos.sd.max)}`, items: anillos.items, lugar: 'Anillos',
       pos: {left: 360, top: 340, w: 96}, cls: 'sil-der', titleVacio: arr});
     // La espalda: la mochila equipada y el carcaj (el de verdad, o el «Carcaj básico» que viene con el arco: no es un ítem, no tiene menú).
-    const carcaj = de('carcaj'), inc = !carcaj.items.length && carcajDe(S) && carcajDe(S).incluido;
+    const carcaj = de('carcaj'), cInc = !carcaj.items.length ? carcajDe(S) : null, inc = cInc && cInc.incluido ? cInc : null;
+    const lugaresInc = inc ? capCarcaj(inc, S) : 0;
     const carcajSlot = silSlotHtml({slot: 'carcaj', cats: carcaj.sd.cats, titulo: 'Espalda · Carcaj', items: carcaj.items, lugar: 'Carcaj', pos: {left: 430, top: 44, w: 110}, cls: 'sil-der', titleVacio: arr,
-      contenido: inc ? `<span class="sil-nom" title="Viene con tu arco o tu ballesta (5 lugares, no pesa ni ocupa lugar): sus proyectiles, abajo, en 🏹 Carcaj">${esc(CARCAJ_BASICO_NOMBRE)}</span><span class="sil-insignia">viene con tu arco</span>` : ''});
+      basico: !!inc, titleBasico: `Viene de base con tu arco o tu ballesta (${fmt(lugaresInc)} lugares, no pesa ni ocupa lugar). Para llevar más, arrastrá acá un carcaj de la mochila.`,
+      contenido: inc ? `<span class="sil-nom">${esc(CARCAJ_BASICO_NOMBRE)}</span><span class="sil-insignia">${fmt(lugaresInc)} lugares · viene con tu arma</span>` : ''});
+    // La mochila y el cinturón: el equipado con sus ranuras; sin nada, lo que viene de base («Mochila básica · 20 ranuras», «Cinturón básico · 5 ranuras»,
+    // con los números que usa el juego: S.caps y los bonos de lo puesto).
+    const mochila = de('mochila'), cinturon = de('cinturon'), rMochila = capMochila(S), rCinturon = capCinturon(S);
+    const ran = n => `${fmt(n)} ${n === 1 ? 'ranura' : 'ranuras'}`;
+    const basico = (nombre, n) => `<span class="sil-nom">${esc(nombre)}</span><span class="sil-insignia">${ran(n)}</span>`;
+    const mochilaSlot = silSlotHtml({slot: 'mochila', cats: mochila.sd.cats, titulo: 'Espalda · Mochila', items: mochila.items, lugar: 'Mochila (espalda)', pos: {left: 20, top: 44, w: 110},
+      insignia: () => ran(rMochila), basico: true, contenido: basico('Mochila básica', rMochila),
+      titleBasico: `La mochila que viene de base: ${ran(rMochila)}. Para llevar más, arrastrá acá una mochila de la mochila.`});
+    const cinturonSlot = silSlotHtml({slot: 'cinturon', cats: cinturon.sd.cats, titulo: 'Cinturón', items: cinturon.items, lugar: lugar('cinturon'), pos: {left: 226, top: 298, w: 108},
+      insignia: () => ran(rCinturon), basico: true, contenido: basico('Cinturón básico', rCinturon),
+      titleBasico: `El cinturón que viene de base: ${ran(rCinturon)} para consumibles. Para llevar más, arrastrá acá un cinturón de la mochila.`});
     const ley = `<div class="sil-ley"><span><i style="background:#2f4a3a;border:1.5px solid #6fbf8a"></i>ocupado</span><span><i style="border:1.5px dashed #6a5a63"></i>vacío</span>
+      <span><i style="background:rgba(70,62,68,.6);border:1px solid #9a8f96"></i>básico (viene de base)</span>
+      <span title="Le queda 1 punto de durabilidad o tiene Armadura rota: pasá el mouse por el ⚠"><i style="background:#4a3a22;border:1.5px solid #e0a040"></i>gastado ⚠</span>
+      <span title="Durabilidad en 0: no da ningún efecto hasta repararlo. Pasá el mouse por el 💔"><i style="background:#4a2a2a;border:1.5px solid #e06060"></i>roto 💔</span>
       <span>🖱 pasá el mouse: qué tiene · clic: Ver / Editar / Sacar</span>
       <span title="La ranura «Manos (armas, escudos y otros)»: 2 lugares; lo de dos manos ocupa los dos">✋ <b>Mano 1 / Mano 2</b>: armas, escudos y otros (lo que sostiene)</span>
       <span title="La ranura «Manos (guantes / defensa)»">🧤 <b>Guantes</b>: manos (guantes / defensa)</span></div>`;
     return `<div class="sil-cuerpo">${SIL_SVG}
       <div class="sil-zona" style="left:24px;top:168px">✋ En las manos</div>
       <div class="sil-zona" style="left:214px;top:14px">Equipado al cuerpo</div>
-      ${silSlotHtml({slot: 'mochila', cats: de('mochila').sd.cats, titulo: 'Espalda · Mochila', items: de('mochila').items, lugar: 'Mochila (espalda)', pos: {left: 20, top: 44, w: 110}, titleVacio: arr})}
+      ${mochilaSlot}
       ${carcajSlot}
       ${simple('cabeza', 'Cabeza', {left: 232, top: 66, w: 96})}
       ${mano1}${mano2}${antebrazo}
       ${simple('torso_blanda', 'Armadura blanda', {left: 222, top: 160, w: 116})}
       ${simple('torso_rigida', 'Armadura rígida', {left: 222, top: 224, w: 116})}
-      ${simple('cinturon', 'Cinturón', {left: 226, top: 298, w: 108})}
+      ${cinturonSlot}
       ${simple('manos', 'Guantes', {left: 112, top: 340, w: 92})}
       ${anillosHtml}
       ${simple('piernas', 'Piernas', {left: 222, top: 440, w: 116})}
@@ -846,20 +919,25 @@ const FichaEquipo = (() => {
   /* 🛠 El estado del equipo (2026-10-29, dueño: «abajo del primer set de información del equipo, si parte del equipo está roto, que aclare bien
      cómo está la condición de durabilidad, con detalles»): cada pieza puesta que esté gastada, dañada o rota, con su durabilidad, la Defensa que da
      ahora y qué significa. */
+  /* El estado de una pieza durable, en renglones (lo usan «🛠 Estado del equipo» y el iconito 💔 / ⚠ de la silueta): la durabilidad, si está
+     ROTA (no da ningún efecto), la Defensa que le baja la Armadura rota / lo abollado y el aviso de que le queda 1 punto. */
+  function estadoPieza(it){
+    const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.armRotaDe(it), roto = act <= 0, esEsc = FichaCalculo.esEscudoItem(it);
+    const d0 = (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0), menos = FichaCalculo.pierdeDefPorRotura(it) ? Math.min(ar, Math.max(0, d0)) : 0;
+    const lin = [`Durabilidad <b>${fmt(act)} de ${fmt(max)}</b>`];
+    if(roto) lin.push('<b>ROTO</b>: sigue ocupando su lugar, pero <b>no da ningún efecto</b> (ni Defensa ni bonos) hasta repararlo');
+    else{
+      if(menos > 0) lin.push(`${esEsc ? 'abollado' : 'Armadura rota'} ×${fmt(ar)}: da <b>Defensa ${fmt(d0 - menos)}</b> en vez de ${fmt(d0)} (−${fmt(menos)}) hasta que lo reparen`);
+      if(act === 1) lin.push('⚠ le queda 1 punto: el próximo lo rompe y se anulan todos sus efectos');
+    }
+    return {max, act, ar, roto, esEsc, menos, lin};
+  }
   function estadoEquipoHtml(S, equipados){
     const dur = (equipados || []).filter(FichaCalculo.durableItem);
-    const defDe = it => (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
     const mal = dur.filter(it => FichaCalculo.durActual(it) < FichaCalculo.durMax(it) || FichaCalculo.armRotaDe(it) > 0);
     if(!mal.length) return dur.length ? '<div class="equipo-estado ok">✔ <b>Estado del equipo:</b> todo lo que tenés puesto está entero.</div>' : '';
     const filas = mal.map(it => {
-      const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.armRotaDe(it), roto = act <= 0, esEsc = FichaCalculo.esEscudoItem(it);
-      const d0 = defDe(it), menos = FichaCalculo.pierdeDefPorRotura(it) ? Math.min(ar, Math.max(0, d0)) : 0;
-      const lin = [`Durabilidad <b>${fmt(act)} de ${fmt(max)}</b>`];
-      if(roto) lin.push('<b>ROTO</b>: sigue ocupando su lugar, pero <b>no da ningún efecto</b> (ni Defensa ni bonos) hasta repararlo');
-      else{
-        if(menos > 0) lin.push(`${esEsc ? 'abollado' : 'Armadura rota'} ×${fmt(ar)}: da <b>Defensa ${fmt(d0 - menos)}</b> en vez de ${fmt(d0)} (−${fmt(menos)}) hasta que lo reparen`);
-        if(act === 1) lin.push('⚠ le queda 1 punto: el próximo lo rompe y se anulan todos sus efectos');
-      }
+      const {act, roto, menos, esEsc, lin} = estadoPieza(it);
       return `<div class="equipo-estado-fila${roto ? ' roto' : act <= 1 ? ' casi' : ''}"><div class="equipo-estado-nombre">${roto ? '💥' : menos > 0 ? (esEsc ? '🛡' : '🔨') : '🔧'} ${esc(it.nombre)}</div><div>${lin.join(' · ')}</div></div>`;
     }).join('');
     return `<div class="equipo-estado"><div class="equipo-estado-tit">🛠 Estado del equipo</div>${filas}

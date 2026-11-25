@@ -1126,6 +1126,12 @@ versión parecida en más de una, es candidato a juntar.
   `window.__silEscuchas`, con `composedPath`) y al soltar donde entra aprietan el «Equipar» de la fila; donde no, `toast`. Los títulos: `SLOT_DEFS`
   `manos` = «Manos (guantes / defensa)», `manos_arma` = «Manos (armas, escudos y otros)» (también `CATEGORIAS`, `FichaCalculo.SLOT_LABEL`, el
   asistente de ítems, `FichaLupa`, `CreepCalculo`, la ficha lite y el Ver de un creep). Dudas: P340.
+  **🩹 Grietas y lo básico** (2026-11-25, dueño): el estado de un lugar es `silEstado(items)` ('roto' | 'casi' | ''): sobre el recuadro va
+  `grietasSvg(estado, clave)` (SVG estirado, `GRIETAS` con tres dibujos por estado; la `clave` = el lugar y lo puesto elige el dibujo y lo da vuelta)
+  y `silIconoHtml` (💔 / ⚠ arriba a la derecha, con `.sil-tip` = `estadoPieza(it).lin`, los mismos renglones de «🛠 Estado del equipo»). El texto
+  queda arriba de las grietas con `position:relative` y un halo. La Mochila, el Cinturón y el Carcaj sin nada equipado muestran lo básico
+  (`silSlotHtml({basico: true, contenido, titleBasico})`, clase `.basico`): «Mochila básica · N ranuras» (`capMochila(S)`), «Cinturón básico · N
+  ranuras» (`capCinturon(S)`) y el «Carcaj básico» (con arco o ballesta, `carcajDe(S).incluido`); lo equipado lleva sus ranuras de insignia.
 - **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
   `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
   dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y

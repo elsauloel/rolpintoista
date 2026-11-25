@@ -3040,16 +3040,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🧍 la silueta del Equipo con lo que no se probó con clics** (2026-11-25): un escudo atado al antebrazo (el lugar «💪
   Antebrazo»), una mochila y un carcaj de verdad equipados en la espalda, el «Carcaj básico» con un arco, una pieza rota (en rojo) y con Armadura
   rota (en ámbar), y arrastrar en combate (que cobre los No2 de equipar). Con clics se probó lo demás (ver la entrada de la silueta).
-- **⬜ en cola — 🧍 Grietas y un iconito de «roto» en la silueta del Equipo** (dueño, 2026-11-25, con boceto aprobado en charla:
+- **✅ hecho (2026-11-25) — 🧍 Grietas y un iconito de «roto» en la silueta del Equipo** (dueño, 2026-11-25, con boceto aprobado en charla:
   el boceto mostraba tres recuadros sano / gastado / roto): una pieza **gastada (naranja)** lleva unas grietas finitas que
   entran solo desde los bordes y las esquinas; una **rota (roja)**, grietas que cruzan todo el recuadro de lado a lado. Dibujadas encima del recuadro,
   sin imágenes, y que se adapten al tamaño de cada lugar. Sugerencia de Claude (a confirmar con el dueño al mostrarlo): que en el roto pasen por detrás
   de las letras para que el nombre se lea. Además, **dentro del recuadro de una pieza rota, un iconito** que con el mouse encima diga el detalle: la
   durabilidad, si baja la Defensa, etc.
-- **⬜ en cola — 🧍 La Espalda y el Cinturón muestran lo básico cuando no hay nada especial** (dueño, 2026-11-25): al equiparse un arco o una
+- **✅ hecho (2026-11-25) — 🧍 La Espalda y el Cinturón muestran lo básico cuando no hay nada especial** (dueño, 2026-11-25): al equiparse un arco o una
   ballesta se ocupa solo el **«Carcaj básico»** (así se llama hoy), y si después se pone un carcaj de verdad, va ese. Lo mismo con la mochila y el
   cinturón: sin nada especial equipado, la silueta dice **«Mochila básica · 20 ranuras»** y **«Cinturón básico · 5 ranuras»** (números dichos por el
   dueño; si las reglas o el código dicen otra cosa, preguntar antes de cambiar).
+  **✅ hecho (2026-11-25), las grietas:** gastado (ámbar: le queda 1 punto o tiene Armadura rota) = grietas finitas desde los bordes y las esquinas
+  y un **⚠**; roto (rojo) = grietas de lado a lado con ramas y un **💔**. Dibujadas en SVG, se estiran a cada lugar, tres dibujos por estado dados
+  vuelta según el lugar (no se ven todas iguales) y pasan por detrás de las letras (el nombre lleva un halo del color del fondo). Con el mouse
+  sobre el ⚠ / 💔: la durabilidad (x de y), si está ROTO (no da ningún efecto hasta repararlo), la Defensa que le baja la Armadura rota y con qué
+  se repara (lo mismo que ya dice «🛠 Estado del equipo»). Probado con clics con el Jugador 1 (botas gastadas, cuchillo roto) y vuelto a como estaba.
+  **✅ hecho (2026-11-25), lo básico:** el manual y el código dicen **20** ranuras de mochila y **5** de cinturón: sin nada equipado, la silueta
+  dice «Mochila básica · 20 ranuras» y «Cinturón básico · 5 ranuras» (con los números que usa el juego, así que si cambian, cambian solos); con
+  una mochila o un cinturón equipados, ese con sus ranuras totales. El «Carcaj básico» aparece con un arco **y con una ballesta** (dice sus
+  lugares, «viene con tu arma»); con un carcaj de verdad, va ese. Los básicos van con borde fino sólido y fondo gris suave (ni punteado ni verde),
+  con su explicación al pasar el mouse. Probado con clics con el Jugador 1 (arco y ballesta arrastrados a la Mano 1).
 
 ## En cola
 

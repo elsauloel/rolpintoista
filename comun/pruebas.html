@@ -61,7 +61,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261125sil"></script>
+<script src="dar-jugador.js?v=20261125gri"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -93,7 +93,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
 <script src="selector-estados.js?v=20261101jefe"></script>
-<script src="ficha-equipo.js?v=20261125sil"></script>
+<script src="ficha-equipo.js?v=20261125gri"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
@@ -2858,7 +2858,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -3314,6 +3314,45 @@ prueba('🧍 la silueta sin dos manos: la mano preferida manda, el hover trae el
   igual([M.m1.map(i => i.id), M.m2.map(i => i.id), /sil-tip[^]*?Rodela[^]*?Def \+1/.test(h), /sil-slot lleno roto[^>]*><b>Armadura rígida/.test(h), /sil-slot lleno casi[^>]*><b>Piernas/.test(h),
       /<b>Mano 2<\/b>[^]*?Espada/.test(h)],
     [['b'], ['a'], true, true, true, true]);
+});
+prueba('🩹 la silueta con grietas (2026-11-25): gastado = grietas de los bordes y ⚠, roto = grietas de lado a lado y 💔, con el detalle que ya calcula el juego al pasar el mouse', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: [
+    {id: 'p', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 3}], dur: 0, durV: Combatiente.DUR_VERSION},
+    {id: 'q', nombre: 'Polainas', tipoItem: 'piernas', equipado: true, peso: 1, mods: [{stat: 'def', val: 2}], armRota: 1},
+    {id: 'y', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}]}]}).S);
+  const h = FichaEquipo.html(S, {});
+  const slot = t => (h.match(new RegExp(`<div class="sil-slot [^"]*"[^>]*><b>${t}</b>[^]*?(?=<div class="sil-slot |<div class="sil-zona|</div><div class="sil-ley)`)) || [''])[0];
+  const roto = slot('Armadura rígida'), gas = slot('Piernas'), sano = slot('Cabeza');
+  igual([/sil-grietas-roto/.test(roto), /stroke="#ff9a90" stroke-opacity=".8"/.test(roto), /class="sil-ico sil-ico-roto"[^>]*>💔/.test(roto), /Durabilidad <b>0 de \d+<\/b>/.test(roto), /ROTO<\/b>: sigue ocupando su lugar, pero <b>no da ningún efecto/.test(roto),
+      /sil-grietas-casi/.test(gas), /stroke="#f3c27a" stroke-opacity=".75"/.test(gas), /sil-ico-casi[^>]*>⚠/.test(gas), /Armadura rota ×1: da <b>Defensa 1<\/b> en vez de 2/.test(gas),
+      /sil-grietas|sil-ico/.test(sano), /vector-effect="non-scaling-stroke"/.test(roto)],
+    [true, true, true, true, true, true, true, true, true, false, true]);
+});
+prueba('🩹 las grietas cambian según el lugar (no todas iguales) y el estado de la pieza, no el rojo de «no entra» en la Mano 2', () => {
+  const fz = inv => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: inv}).S);
+  const a = FichaEquipo.siluetaHtml(fz([]), [{id: 'p', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, dur: 0, durV: Combatiente.DUR_VERSION},
+    {id: 'q', nombre: 'Grebas', tipoItem: 'piernas', equipado: true, peso: 2, dur: 0, durV: Combatiente.DUR_VERSION}, {id: 'c', nombre: 'Casco', tipoItem: 'cabeza', equipado: true, peso: 2, dur: 0, durV: Combatiente.DUR_VERSION}]);
+  const trazos = (a.match(/<svg class="sil-grietas[^]*?<\/svg>/g) || []);
+  const S2 = fz([{id: 'g', nombre: 'Gran hacha', tipoItem: 'arma_2m', equipado: true, peso: 3}, {id: 'd', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1}]);
+  const b = FichaEquipo.siluetaHtml(S2, S2.inventario);
+  igual([trazos.length, new Set(trazos).size > 1, /sil-grietas/.test(b), /mano sil-der roto/.test(b)], [3, true, false, true]);
+});
+prueba('🎒 lo básico en la espalda y el cinturón (2026-11-25): «Mochila básica · 20 ranuras», «Cinturón básico · 5 ranuras» y el «Carcaj básico» con arco o ballesta; lo equipado, con sus ranuras', () => {
+  const ficha = inv => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: inv}).S);
+  const cat = id => Object.assign({}, CATALOGO_BASE.find(i => i.id === id), {equipado: true});
+  const nada = FichaEquipo.html(ficha([]), {});
+  const arco = FichaEquipo.html(ficha([cat('new-arco-corto')]), {});
+  const ball = FichaEquipo.html(ficha([cat('bal-de-mano')]), {});
+  const real = FichaEquipo.html(ficha([cat('new-arco-corto'), {id: 'k', nombre: 'Carcaj de cuero', tipoItem: 'carcaj', capFlechas: 10, equipado: true},
+    {id: 'm', nombre: 'Mochila grande', tipoItem: 'mochila', equipado: true, mods: [{stat: 'capmochila', val: 10}]},
+    {id: 'z', nombre: 'Cinturón de cuero', tipoItem: 'cinturon', equipado: true, mods: [{stat: 'capcinturon', val: 3}]}]), {});
+  igual([/sil-slot basico[^>]*><b>Espalda · Mochila<\/b><span class="sil-nom">Mochila básica<\/span><span class="sil-insignia">20 ranuras/.test(nada),
+      /sil-slot basico[^>]*><b>Cinturón<\/b><span class="sil-nom">Cinturón básico<\/span><span class="sil-insignia">5 ranuras/.test(nada),
+      /sil-slot vacio[^>]*><b>Espalda · Carcaj<\/b><i>vacío/.test(nada),
+      /sil-slot basico[^>]*><b>Espalda · Carcaj<\/b><span class="sil-nom">Carcaj básico/.test(arco), /sil-slot basico[^>]*><b>Espalda · Carcaj<\/b><span class="sil-nom">Carcaj básico/.test(ball),
+      /<b>Espalda · Carcaj<\/b>[^]*?sil-nom">Carcaj de cuero/.test(real), /<b>Espalda · Carcaj<\/b>[^]*?Carcaj básico/.test(real.split('sil-ley')[0]),
+      /<b>Espalda · Mochila<\/b>[^]*?Mochila grande<\/span><span class="sil-insignia">30 ranuras/.test(real), /<b>Cinturón<\/b>[^]*?Cinturón de cuero<\/span><span class="sil-insignia">8 ranuras/.test(real)],
+    [true, true, true, true, true, true, false, true, true]);
 });
 prueba('✋ los títulos de las dos ranuras de manos (2026-11-25): «Manos (guantes / defensa)» y «Manos (armas, escudos y otros)», en el Equipo, las categorías y el asistente', () => {
   igual([FichaEquipo.SLOT_DEFS.find(s => s.id === 'manos').label, FichaEquipo.SLOT_DEFS.find(s => s.id === 'manos_arma').label, FichaEquipo.CATEGORIA_LABEL.manos, FichaCalculo.SLOT_LABEL.manos],
@@ -10221,7 +10260,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10345,7 +10384,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

@@ -3278,7 +3278,14 @@ Sigue: Evasión −${s} al tirarla (o 1 No2), Iniciativa −${s} (tu lugar se re
     // 🔥 (P272, dueño, 2026-11-22: «sí»): la Varita del muro de fuego, como el Muro de fuego: quema al cruzarlo y al empezar el turno adentro (no al pasar de ronda).
     // 🔥 (P296, dueño, 2026-11-23: «debería ser daño directo»): y su daño es directo (no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego).
     {id: 'esp-buena-varita-del-muro-de-fuego', nombre: 'Varita del muro de fuego', claves: ['especial', 'detalle'],
-      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && (!(d.zonaEstado && d.zonaEstado.alEmpezar) || !d.danoDirecto)); }},
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && (!(d.zonaEstado && d.zonaEstado.alEmpezar) || !d.danoDirecto
+        || (typeof it.detalle === 'string' && /y la Suela gruesa\)/.test(it.detalle)))); }},   // 👟 (2026-11-25) la Suela gruesa ya no lo frena: es de piso y aire
+    // 🔥 (P295, dueño, 2026-11-25): la Varita de la fogata pega al empezar el turno de quien está adentro (no al pasar de ronda); la del chorro de
+    // lava, igual, y además por cada paso que se da adentro (`porPaso`).
+    {id: 'esp-varita-de-la-fogata', nombre: 'Varita de la fogata', claves: ['especial', 'detalle'],
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar)); }},
+    {id: 'esp-buena-varita-del-chorro-de-lava', nombre: 'Varita del chorro de lava', claves: ['especial', 'detalle'],
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'zona' && !(d.zonaEstado && d.zonaEstado.alEmpezar && d.zonaEstado.porPaso)); }},
   ];
   function ponerAlDiaItemsFabrica(lista){
     if(!Array.isArray(lista) || typeof CATALOGO_BASE === 'undefined') return false;

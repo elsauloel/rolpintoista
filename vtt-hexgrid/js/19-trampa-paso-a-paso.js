@@ -810,7 +810,7 @@ async function trampaDanoCalcular(dt, x, simular){
       if(dt.elemento && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(x, dt.elemento, rr.res, null);   // 🛡 «INMUNE AL FUEGO…» flotando sobre el token (js/121, 2026-11-20)
       const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // la Defensa especial (también lo tóxico, 2026-10-07)
       freno = [...(arm ? [`Defensa especial ${arm}`] : []), ...(rr.res ? [Combatiente.resElementalTxt(dt.elemento, rr.res)] : [])].join(' − ');
-      const suela = dt.altura === 'aire' ? 0 : Math.max(0, statPiesDe(x, 'suelagruesa'));   // solo lo que toca el piso (2026-10-07)   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
+      const suela = dt.altura === 'aire' || dt.altura === 'ambos' ? 0 : Math.max(0, statPiesDe(x, 'suelagruesa'));   // solo lo que es solo del piso (2026-11-25; antes también «piso y aire»)   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
       const resTxt = [...(dt.elemento && rr.res ? [Combatiente.ELEMENTOS[dt.elemento] ? Combatiente.ELEMENTOS[dt.elemento].etq : 'Resistencia al elemento'] : []), ...(suela ? ['Suela gruesa'] : [])].join(' + ');   // (el renglón de la cuenta)
       if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);

@@ -2464,10 +2464,30 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   caja, se pasó a combate con un orden de turnos, se le bajó la vida a Blanco J2 (31 + Veneno), a la Abeja (12) y al Warrior (9 + Stun); la vuelta
   dejó todo como en la foto («quedó igual», 82 documentos) y se vio así en el mapa, en la ficha de Blanco J2 (50/50, sin estados) y en GM Tools
   (Warrior 35, sin estados). `docs/memoria-claude.md` («Dónde se prueba») lo dice para todas las pruebas que siguen.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de la fogata y Varita del chorro de lava** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-25) — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de la fogata y Varita del chorro de lava** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
   **Decidido (dueño, 2026-11-25):** las dos pasan a pegar **al empezar el turno de quien está adentro** (como el Muro de fuego), manteniendo el daño
   al entrar y el golpe inmediato de la lava. Y la diferencia por la altura: la **Fogata es de piso y aire**; el **Chorro de lava es solo de piso**,
   así que **además le pega por cada paso que dé dentro del área**, y **lo frena la Suela gruesa** (solo en lo que es solo de piso).
+  *Resultado:* **Fogata** (piso y aire): su zona lleva `alEmpezar` (como el Muro de fuego): pega al entrar y al empezar el turno de quien está adentro
+  (con orden de turnos; sin orden, al pasar de ronda), ya no en cada Mantenimiento. Texto nuevo: «Una flor de fuego que queda ardiendo 2 turnos (los
+  tuyos), en el piso y en el aire: 1d4 de fuego directo a cada rival (no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego), al
+  entrar y al empezar su turno adentro. ⚙ Automatizado: todo.» **Chorro de lava** (solo piso): `alEmpezar` y una marca nueva, `porPaso` (adentro del
+  JSON de la zona, sin reglas nuevas): sigue el golpe al lanzarla; cada casilla del camino que pisa adentro (entrando o caminando por ella) es un
+  golpe, el cartel lo dice («Dio 2 pasos sobre Varita del chorro de lava: le pega una vez por paso (2 veces)») y el daño se tira una vez por paso
+  (cada uno con su cuenta; si cae, no le sigue pegando); y al empezar su turno adentro. Texto nuevo: «…y arde 2 turnos (los tuyos) en el piso: 1d4 a
+  quien entra, por cada paso que da adentro y al empezar su turno adentro. Lo frenan la Defensa especial, la resistencia al fuego y la Suela gruesa.
+  ⚙ Automatizado: todo.» **Suela gruesa**: el mapa ahora la resta solo en lo que es SOLO del piso (`suelaFrena`, js/08; también las trampas de «piso y
+  aire», js/19, y «Ver detalle», `ZonaDetalle.frenoDe`); así queda resuelto de paso lo pendiente de «👟 Repasar la Suela gruesa» (el Muro de fuego ya
+  no la resta, y el texto de la Varita del muro de fuego ya no la nombra). Las copias de las tres varitas en mochilas y creeps se ponen al día solas
+  (`ITEMS_AL_DIA`). **Las zonas ya puestas** con el modo viejo terminan como estaban (duran 2 turnos). De paso: si el cartel de una zona ya mostraba
+  su resultado, un golpe nuevo de la misma zona al mismo token se perdía (lo vi: la lava no volvía a pegar al empezar el turno si seguía abierto el
+  cartel del golpe al lanzarla); ahora va a la fila. Probado con clics en «Claude · pruebas 2», mapa «Prueba · General» (GM y Jugador 1), armado por
+  datos (el Mago · Piromante con las dos varitas, al lado de Blanco J1 con las Suelas de cuero de dragón del pantano, Suela gruesa 2): desde las
+  Acciones del creep, la fogata centrada en J1 y el chorro de lava empezando en su casilla; el golpe inmediato de la lava (1 − Suela 2 = 0); al empezar
+  el turno de J1, dos renglones: lava «lo frenan su Defensa especial y su Suela gruesa 2» (4 − 2 = 2) y fogata sin Suela (4, directo); J1 camina 2
+  pasos por la lava → un cartel con 2 golpes (4 − 2 = 2, 3 − 2 = 1); pasar de ronda → ninguna zona pegó en el Mantenimiento; en su turno siguiente,
+  solo el renglón de la lava (salió de la fogata); volviendo, 1 paso de lava → 1 golpe, y entrar a la fogata → su golpe al entrar. Tiró el daño el GM
+  (dueño de la zona). Al final, la vuelta del mapa: «quedó igual». Pruebas automáticas: una nueva y tres puestas al día (1119 en verde). Duda: P333.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de miasma y Pedos Tóxicos** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube tóxica (de clase y de creep) y Mina napalm (el piso ardiendo)** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): el terreno incendiado y las zonas hechas a mano con el asistente** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -2873,6 +2893,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   resistencia 0, el renglón igual dice «lo frena su resistencia al fuego» porque no lee su número; que lo lea, y con 0 no la nombre (como P300).
 - **⬜ en cola — 😵 El Mareo de invocación se ve como estado (P332 decidida)** (dueño, 2026-11-24): que la invocación recién llegada muestre el
   iconito 😵 alrededor del token y que «Mareo de invocación» aparezca entre sus estados (ventana ◎, ficha). Sin vincularlo a las zonas.
+- **⬜ en cola — Probar: 🌋 el Chorro de lava sobre un escondido, sobre un creep y sobre quien vuela** (2026-11-25): con clics se probó solo un
+  personaje a la vista. El escondido va por el camino de siempre (P326, en cola aparte); el creep y quien vuela (no lo toca: es del piso), solo con
+  la prueba automática.
+- **⬜ en cola — Probar: 🔥 la Fogata y la lava sin orden de turnos** (2026-11-25): sin orden (narrativo) tienen que pegar al pasar de ronda, como el
+  Muro; no se probó con clics.
+- **⬜ en cola — 🔥 Recargar en el medio del turno vuelve a ofrecer una zona ya tirada** (visto el 2026-11-25): si «▶ Empieza tu turno» tardó (otro
+  cartel de zona abierto más de 15 s) la zona sale en su cartel aparte; si después se recarga la página antes de cerrar la ventana, la zona vuelve a
+  aparecer como renglón y se puede tirar dos veces. Pasa con cualquier zona de «al empezar el turno» (también el Muro).
 
 ## En cola
 

@@ -2750,3 +2750,10 @@ En su primer turno (mareada), la ventana «▶ Empieza el turno de Abeja de prue
 Que no actúa recién se ve al intentar algo («😵 Abeja de prueba recién llega: está mareada — No actúa en su primer turno»). ¿Sumamos un renglón en la
 ventana («😵 Está mareada: en este turno no actúa; la zona igual le pega»), o alcanza con el cartel al intentar actuar?
 
+### P333 — 🌋 El Chorro de lava «por cada paso»: ¿entrar cuenta como el primer paso? (2026-11-25, Claude)
+
+Desde hoy el Chorro de lava le pega a quien camina por adentro **una vez por cada casilla de lava que pisa**, y la casilla por la que entra cuenta
+como uno de esos pasos (entrar desde afuera y dar 2 pasos más adentro = 3 golpes; arrancar adentro y dar 2 pasos = 2 golpes). O sea, «el daño al
+entrar» y «el de cada paso» no se suman en la misma casilla (sería entrar = 2 golpes). Lo elegí así por ser lo más conservador. ¿Está bien, o al
+entrar tiene que pegar dos veces (una por entrar y otra por el paso)?
+Además: si alguien sigue caminando mientras se está tirando el daño de sus pasos anteriores, los pasos nuevos salen en otro cartel después.

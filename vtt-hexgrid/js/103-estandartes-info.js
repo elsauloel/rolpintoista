@@ -92,6 +92,7 @@ function zonaEstadoDetalle(el, t){
   // Cuándo.
   let cuando;
   if((sup && sup.tiraPaso) || spec.tiraPaso) cuando = 'En cada paso que dé adentro';
+  else if(spec.porPaso) cuando = `Al entrar, en cada paso que dé adentro${el.zonaEnMantenimiento !== false ? (spec.alEmpezar ? ' y al empezar su turno adentro' : ' y en cada Mantenimiento mientras siga adentro') : ''}`;   // 🌋 el Chorro de lava (2026-11-25)
   else {
     const partes = [el.trampa ? 'al detonar y al entrar' : el.zonaCadaPaso ? 'al entrar (aunque solo la cruce)' : 'al entrar'];
     if(el.zonaEnMantenimiento !== false && spec.alEmpezar) partes.push('al empezar su turno adentro');   // 🔥 el Muro de fuego (P259, 2026-11-21)

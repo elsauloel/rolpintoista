@@ -22,7 +22,7 @@ const ZonaDetalle = (() => {
   /* 🔥 Qué frena el daño de una zona (2026-11-23, dueño: «en el Muro de fuego, si bien no se resiste, el daño sí lo frena la resistencia al fuego»).
      La MISMA cuenta que hace el mapa al aplicarlo (vtt-hexgrid/js/08 `zonaResolverBanner` → el cuadro del duelo, js/13 `dueloAplicarDano`): sin
      «ignora la Defensa», la Defensa; si la ignora, la Defensa especial (salvo el daño directo, y las zonas del GM sin elemento, que van directo);
-     siempre la resistencia a su elemento; y la Suela gruesa si es del piso (`altura` 'piso' o 'ambos'). → {defensa: 'Defensa' | 'Defensa especial' | '',
+     siempre la resistencia a su elemento; y la Suela gruesa si es SOLO del piso (`altura` 'piso'; desde el 2026-11-25, «piso y aire» no). → {defensa: 'Defensa' | 'Defensa especial' | '',
      directo, elemento, res (el nombre: «resistencia al fuego»), suela}. */
   const RES_NOMBRE = {fuego: 'al fuego', hielo: 'al hielo', rayo: 'eléctrica', toxico: 'a lo tóxico', acido: 'al ácido', luz: 'a la luz', siniestro: 'a lo siniestro'};
   const resNombre = elem => elem ? `resistencia ${RES_NOMBRE[elem] || 'a ' + elem}` : '';
@@ -30,7 +30,7 @@ const ZonaDetalle = (() => {
     o = o || {};
     const elem = o.elemento || '';
     const defensa = !el.zonaIgnoraDef ? 'Defensa' : (!el.zonaDirecto && (el.zonaCasteadorRef || elem)) ? 'Defensa especial' : '';
-    return {defensa, directo: !!el.zonaIgnoraDef && !defensa, elemento: elem, res: resNombre(elem), suela: o.altura === 'piso' || o.altura === 'ambos'};
+    return {defensa, directo: !!el.zonaIgnoraDef && !defensa, elemento: elem, res: resNombre(elem), suela: o.altura === 'piso'};
   }
   /* Lo corto, para el cartel y el renglón de «Empieza tu turno»: «lo frena su resistencia al fuego» / «lo frenan su Defensa especial y su resistencia
      al hielo». o = {elemento, res (la de quien lo recibe, si se puede mostrar: un personaje), suela (la Suela gruesa de quien lo recibe, si la tiene),
@@ -72,6 +72,13 @@ const ZonaDetalle = (() => {
   // Cuándo se dispara una zona, corto (para la frase de arriba) y largo (para la fila).
   function cuandoZona(el, sp, ctx){
     const paso = !!(sp.tiraPaso);
+    // 🌋 Una vez por paso (2026-11-25, el Chorro de lava): al entrar, por cada paso adentro y al empezar su turno adentro.
+    if(!paso && sp.porPaso){
+      const mant = el.zonaEnMantenimiento !== false, turno = !!sp.alEmpezar && mant;
+      return {corto: `al entrar, en cada paso que dan adentro${turno ? ' y al empezar su turno adentro' : mant ? ' y, mientras sigan adentro, cada vez que se pasa de ronda' : ''}`,
+        largo: [el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '', 'En cada paso que se da adentro (entrando o caminando por ella): una vez por paso',
+          turno ? 'Al empezar su turno adentro (con orden de turnos; sin orden de turnos, cada vez que se pasa de ronda)' : mant ? 'Mientras se siga adentro, cada vez que se pasa de ronda (el Mantenimiento)' : 'Quedarse quieto adentro NO la vuelve a disparar'].filter(Boolean).join('. ') + '.'};
+    }
     if(paso) return {corto: 'en cada paso que dan adentro', largo: 'En cada paso que se da adentro (entrando o caminando por ella). Quedarse quieto no la dispara.'};
     const entra = el.zonaCadaPaso || el.trampa ? 'al entrar o cruzarla' : 'al entrar';
     const mant = el.zonaEnMantenimiento !== false;
@@ -202,7 +209,7 @@ const ZonaDetalle = (() => {
     if(sp.porTirada && el.zonaTiraExtra) filas.push({k: 'Tirada extra', v: `Si el daño entra, quien la puso tira ${el.zonaTiraExtra} y lo que sale decide un efecto más${ctx.porTiradaTxt ? `: ${ctx.porTiradaTxt}` : ''}.`});
     // Qué frena el daño.
     if(dano){
-      // 🔥 (2026-11-23) la misma cuenta que el mapa al aplicarlo (frenoDe): la resistencia a su elemento siempre, la Suela gruesa también en «piso y aire».
+      // 🔥 (2026-11-23) la misma cuenta que el mapa al aplicarlo (frenoDe): la resistencia a su elemento siempre; la Suela gruesa, solo en lo que es solo del piso (2026-11-25).
       const fr = [], f = frenoDe(el, {elemento: elem, altura: ctx.altura});
       if(f.defensa === 'Defensa') fr.push('Le resta la Defensa.');
       else if(f.defensa) fr.push('La Defensa común no; la Defensa especial sí.');

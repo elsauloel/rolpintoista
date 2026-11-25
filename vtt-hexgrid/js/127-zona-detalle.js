@@ -86,7 +86,7 @@ function zonaTurnosQuedan(el, a){
 function zonaDetalleCtx(elId, el){
   const a = zonaDetalleAutor(el), ctx = {autor: a.autor};
   ctx.statLabel = id => (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[id]) || '';
-  ctx.estadoTexto = sp => { try{ const {duelo, porTirada, pct, unaVez, sumaUno, resetea, renuevaPaso, superficie, tiraPaso, salva, efecto, magica, elemento, alEmpezar, ...limpio} = sp; return EstadosAplicar.texto(limpio); }catch(e){ return sp.nombre; } };
+  ctx.estadoTexto = sp => { try{ const {duelo, porTirada, pct, unaVez, sumaUno, resetea, renuevaPaso, superficie, tiraPaso, salva, efecto, magica, elemento, alEmpezar, porPaso, ...limpio} = sp; return EstadosAplicar.texto(limpio); }catch(e){ return sp.nombre; } };
   // Cuánto le queda: la misma cuenta que el ⏳ del lienzo (js/05) y el cartel de la casilla (js/104).
   const q = zonaTurnosQuedan(el, a);
   if(q){ ctx.quedan = q.quedan; if(q.porTurnos) ctx.quedanDe = `son turnos de ${a.nombre || 'quien la puso'}: baja uno cada vez que empieza su turno`; }

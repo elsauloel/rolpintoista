@@ -409,8 +409,10 @@ function zonaEncolar(el, t, pasos, pisa){
   const id = zonaIdDe(t), n = Math.max(0, Math.round(num(pasos)));
   const ya = zonaCola.find(x => x.elId === el.id && x.tokenId === id);
   if(ya){ if(n){ ya.pasos = (ya.pasos || 0) + n; ya.pisa = [...(ya.pisa || []), ...(pisa || [])]; } return; }
-  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === id && !(n && zonaBanner.resultado)){
-    if(n && !zonaBanner.tirando){ zonaBanner.pasos = (zonaBanner.pasos || 0) + n; zonaBanner.pisa = [...(zonaBanner.pisa || []), ...(pisa || [])]; renderZonaBanner(); }
+  // (2026-11-25) Si el cartel de esa zona ya muestra su resultado, lo nuevo va a la fila (antes se perdía: el Chorro de lava, que pega al aparecer, no
+  // volvía a pegar al empezar el turno si el cartel del golpe seguía abierto). Si se está tirando, los pasos nuevos también van aparte.
+  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === id && !zonaBanner.resultado && !(n && zonaBanner.tirando)){
+    if(n){ zonaBanner.pasos = (zonaBanner.pasos || 0) + n; zonaBanner.pisa = [...(zonaBanner.pisa || []), ...(pisa || [])]; renderZonaBanner(); }
     return;
   }
   zonaCola.push({elId: el.id, tokenId: id, pasos: n, pisa: pisa || null});
@@ -439,6 +441,9 @@ function alturaDe(el){
   return el.trampa && !el.zona ? 'piso' : 'aire';
 }
 const tocaElPiso = el => alturaDe(el) !== 'aire';
+/* 👟 La Suela gruesa frena solo lo que es SOLO del piso (dueño, 2026-11-24: «el muro de fuego es suelo y aire, así que técnicamente la suela gruesa no
+   debería frenarlo»; 2026-11-25: el Chorro de lava, que es solo de piso, sí). Antes la restaba también en «piso y aire». */
+const suelaFrena = el => alturaDe(el) === 'piso';
 // `desdeMantenimiento`: las zonas con zonaEnMantenimiento === false (las púas: "no mientras estás parado") no se
 // chequean acá — solo al caminar (ver zonaRevisarEntrada). `flotando`: terminó el movimiento levitando (las del piso, todavía no);
 // `soloPiso`: al aterrizar, solo las del piso (las del aire ya las vio al moverse).
@@ -537,6 +542,19 @@ function zonaRevisarEntrada(id, celdas, levita){
       }
     });
   }
+  /* 🌋 Una vez por paso (P295, dueño, 2026-11-25, el Chorro de lava: «le pega por cada paso que dé dentro del área»): `porPaso` adentro del JSON de
+     zonaEstado. Cada casilla del camino que pisa adentro (entrando o caminando por ella; levitando o volando, si es del piso, no) es un golpe: el cartel
+     junta los pasos y el daño se tira una vez por paso (zonaResolverBanner). La revisión del final del movimiento (zonaRevisarToken) se suma a esta
+     misma fila, no agrega otro golpe. */
+  if(celdas && celdas.length > 1) elementos.forEach(el => {
+    if(!el.zona || !zonaSpecDe(el).porPaso || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    { const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null; if(sup && sup.tiraPaso) return; }   // (el hielo, arriba)
+    if(alturaDe(el) === 'piso' && typeof vuelaToken === 'function' && vuelaToken(t)) return;   // 🕊 quien vuela no toca lo del piso
+    const cs = celdasDeElemento(el), enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
+    let n = 0;
+    for(let i = 1; i < celdas.length; i++) if(enCelda(celdas[i]) && !alAire(el, i)) n++;
+    if(n) zonaEncolar(el, t, n);
+  });
   // La Brea (2026-10-04, dueño): a quien ya tiene el estado de la zona, cada paso sobre ella se lo vuelve a poner en sus turnos, sin tirar de
   // nuevo (la tirada para resistir es solo al entrar).
   if(celdas && celdas.length > 1) elementos.forEach(el => {
@@ -819,12 +837,15 @@ function zonaCartelAntes(el, t, pasos){
     }
     else if(elZ && !String(t.fichaId || '').includes(SEP_INVOCACION)){ const f = fichasPub.get(t.fichaId); if(f && f.resumen) resZ = num(f.resumen['res' + elZ]); }
   }catch(err){}
-  const suelaZ = tocaElPiso(el) && verNum ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+  const suelaZ = suelaFrena(el) && verNum ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
   const texto = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.sinTiradaTexto ? ZonaDetalle.sinTiradaTexto(el, {estadoTexto: sp => EstadosAplicar.texto(sp), quienTira: t.oculto ? null : quienTira,
       elemento: elZ, res: t.oculto ? null : resZ, suela: t.oculto ? 0 : suelaZ, sinNumero: !verNum})
     : 'No hay nada que tirar: se aplica lo que deja la zona.';
   const conDados = !!el.zonaDano && /d/i.test(String(el.zonaDano)) && !t.oculto;
-  return {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto, boton: 'Aplicar', botonInicio: conDados ? `${icono} Tirar el daño (${el.zonaDano})` : `${icono} Aplicar`};
+  // 🌋 (2026-11-25) Una vez por paso: cuántos pasos dio adentro = cuántas veces le pega.
+  const pasosN = Math.round(num(pasos));
+  const porPasoTxt = zonaSpecDe(el).porPaso && pasosN > 1 ? ` Dio ${pasosN} pasos sobre ${nombreZ}: le pega una vez por paso (${pasosN} veces).` : '';
+  return {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: texto + porPasoTxt, boton: 'Aplicar', botonInicio: conDados ? `${icono} Tirar el daño (${el.zonaDano})` : `${icono} Aplicar`};
 }
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
@@ -967,7 +988,11 @@ async function zonaResolverBanner(){
   // El daño (2026-10-02, regla del dueño): quien resiste no recibe nada — ni el daño ni el estado. Con «la diferencia», el daño es
   // la tirada de quien la creó menos la de quien resiste (en un empate, 0: ni daño ni tirada extra).
   let danoHecho = 0;
-  if(!resistio && (el.zonaDano || el.zonaDanoDif)){
+  // 🌋 Una vez por paso (2026-11-25, el Chorro de lava): un golpe por cada paso que dio adentro (cada uno con su tirada y lo que lo frena).
+  const golpes = specZ && specZ.porPaso && !specZ.tiraPaso ? Math.max(1, Math.round(num(zonaBanner.pasos)) || 1) : 1;
+  if(!resistio && (el.zonaDano || el.zonaDanoDif)) for(let golpe = 1; golpe <= golpes; golpe++){
+    if(golpe > 1 && iniciativaFueraDeJuego(tokenId)) break;   // 💀 cayó en el paso anterior: no le sigue pegando
+    const n0 = partes.length;
     let monto = null;
     // 🎲 Con dados para tirar (y quien entra a la vista: a uno oculto el cuadro lo delataría), el daño va al cuadro del duelo (zonaDanoQuien).
     const formulaD = el.zonaDano ? (el.zonaDanoDif ? (num(diferencia) > 0 ? `${el.zonaDano}+${Math.round(num(diferencia))}` : '') : String(el.zonaDano)) : '';
@@ -982,7 +1007,7 @@ async function zonaResolverBanner(){
     let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     if(porDuelo){
-      const q = zonaDanoQuien(el), suela = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+      const q = zonaDanoQuien(el), suela = suelaFrena(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
       // La Defensa especial, como acá abajo: solo la de una zona de habilidad o con elemento (las del GM y de trampas sin elemento, no: «directo»).
       const directo = !!el.zonaIgnoraDef && (!!el.zonaDirecto || !(el.zonaCasteadorRef || elZ));
       const sinId = !!(specZ && ['Marcado', 'Herida sombría'].includes(String(specZ.nombre || '')));   // (si la zona ya deja ese estado, no dos veces)
@@ -996,14 +1021,14 @@ async function zonaResolverBanner(){
       }catch(err){ console.error('El daño de la zona en el cuadro del duelo:', err); rd = {falla: true}; }
       const dn = rd && rd.d && rd.d.dano;
       if(dn && dn.crudo !== undefined){
-        danoHecho = num(dn.recibido);
-        partes.push(`${fmt(num(dn.crudo))} de daño${tipoTxt} (lo tiró ${q.yo.nombre}; entraron ${fmt(danoHecho)})`);
-        if(danoHecho > 0 && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, danoHecho, el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03)
+        danoHecho += num(dn.recibido);
+        partes.push(`${fmt(num(dn.crudo))} de daño${tipoTxt} (lo tiró ${q.yo.nombre}; entraron ${fmt(num(dn.recibido))})`);
+        if(num(dn.recibido) > 0 && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, num(dn.recibido), el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03)
       }else partes.push(`${formulaD} de daño${tipoTxt}: ${rd && rd.aMano ? 'se resolvió a mano' : 'no se tiró'} (en el cuadro del duelo)`);
     }
     const rz = porDuelo ? {res: 0, armadmg: 0} : await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
-    const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
+    const resEl = (elZ ? rz.res : 0) + (suelaFrena(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo que es solo del piso (2026-11-25)
     const idZ = elZ ? Combatiente.identidadElemento(elZ, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 la luz ×1,5 a lo oscuro; lo siniestro, nada (2026-10-26)
     if(elZ && !porDuelo && monto > 0 && typeof inmuneCartelElemento === 'function') inmuneCartelElemento(t, elZ, rz.res, idZ);   // 🛡 «INMUNE A LO TÓXICO…» flotando sobre el token (js/121, 2026-11-20)
     if(idZ && idZ.mult !== 1 && monto > 0){ monto = Math.ceil(monto * idZ.mult); partes.push(idZ.txt); }
@@ -1016,12 +1041,12 @@ async function zonaResolverBanner(){
         const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef)), ...(frenaEspZ ? {frenaEsp: true} : {})};   // el Orbe de absorción (js/26)
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
-        const suelaZ = tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
+        const suelaZ = suelaFrena(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
         const cz = res && res.r ? zonaDanoCuenta(monto, res.r, {ignoraDef: !!el.zonaIgnoraDef, armadmg, resElem: resEl - suelaZ, suela: suelaZ, elZ}) : null;
         if(cz) partes.push(`${monto} de daño${tipoTxt} (${cz.cuenta}): entraron ${fmt(cz.entro)}`);
         else{ const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
           partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`); }
-        danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
+        danoHecho += res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
         if(cz) await zonaDanoAvisar(t, el, monto, cz, tipoTxt).catch(err => console.error('El aviso del daño de la zona:', err));   // 📣 (P245)
         if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03, 2026-11-01)
         // (si la zona ya deja ese mismo estado —Destello revelador, antes Luz para los suyos: Marcado—, no se pone dos veces; 2026-10-26, visto en el mapa)
@@ -1032,8 +1057,9 @@ async function zonaResolverBanner(){
             partes.push(idZ.estado.nombre === 'Marcado' ? 'Marcado (la luz)' : 'Herida sombría (no se cura)');
           }catch(err){ console.error('La identidad del elemento:', err); partes.push(`${idZ.estado.nombre} (aplicalo a mano)`); }
         }
-      }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
+      }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho += monto; }
     }else if(monto === 0) partes.push('sin daño');
+    if(golpes > 1 && partes.length > n0) partes[n0] = `paso ${golpe}: ${partes[n0]}`;
   }
   // Si el daño entró: la tirada extra (ej. 1d20) con el texto de qué significa cada resultado, en la Mesa y en el cartelito. Aplicar lo que
   // salga queda a mano.

@@ -2787,3 +2787,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   también limpia al creep que cae ahí: gm-toolset/CLAUDE.md). Un personaje que cae desde la Botonera nueva (`bnRevisarVida`) o en su pase de turno
   (`mantFijarHp`) ya perdía los estados en `FichaAcciones.revisarMuerte`; ahora además deja la línea «💀 X cayó: se le fueron N estados (…)»
   (`caidaContarPj`, js/11), como `vidaCeroRevisar` (js/98).
+- **🌋 La Fogata y el Chorro de lava, al empezar el turno; la lava, por paso** (P295, dueño, 2026-11-25; js/08): las dos varitas llevan `alEmpezar` en
+  `especial.duelo.zonaEstado` (como el Muro de fuego: renglón de «▶ Empieza tu turno», no en el Mantenimiento si está en el orden). La lava suma
+  `porPaso` (adentro del mismo JSON, sin reglas nuevas): `zonaRevisarEntrada` cuenta las casillas del camino que pisa adentro (no levitando ni
+  volando) y las encola con `zonaEncolar(el, t, n)`; `zonaResolverBanner` tira el daño `golpes` veces (cada golpe con su cuenta, «paso k:» en el
+  resultado; corta si cae) y `zonaCartelAntes` dice «Dio N pasos…: le pega una vez por paso». **👟 La Suela gruesa solo en lo que es SOLO del piso**
+  (`suelaFrena(el)` = `alturaDe(el) === 'piso'`, en vez de `tocaElPiso`; también js/19 para las trampas de «piso y aire» y `ZonaDetalle.frenoDe`).
+  `zonaEncolar`: si el cartel de esa zona y ese token ya muestra el resultado, lo nuevo va a la fila (antes se perdía). «Ver detalle» y el globo de
+  estados (js/103) dicen «al entrar, en cada paso que dan adentro y al empezar su turno adentro». Las zonas ya puestas terminan como estaban; las
+  copias de las varitas se ponen al día solas (`ITEMS_AL_DIA`). Probado con clics en «Prueba · General» (cola 2026-11-25). Duda: P333.

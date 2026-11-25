@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261124suela"></script>
+<script src="zona-detalle.js?v=20261125lava"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261124finT"></script>
+<script src="combatiente.js?v=20261125lava"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
@@ -10393,7 +10393,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     // La Varita (de habilidad, sin «directo»): la Defensa especial también, como lo resta el mapa (js/08: `directo` = sin elemento ni casteador, o zonaDirecto).
     const varita = {zona: true, zonaNombre: 'Varita del muro de fuego', zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({alEmpezar: true})};
     igual(ZonaDetalle.sinTiradaTexto(varita, {quienTira: 'Blanco', elemento: 'fuego', res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frenan su Defensa especial y su resistencia al fuego 2). El daño lo tira Blanco.');
-    igual(ZonaDetalle.frenoDe(varita, {elemento: 'fuego', altura: 'ambos'}), {defensa: 'Defensa especial', directo: false, elemento: 'fuego', res: 'resistencia al fuego', suela: true});
+    igual(ZonaDetalle.frenoDe(varita, {elemento: 'fuego', altura: 'ambos'}), {defensa: 'Defensa especial', directo: false, elemento: 'fuego', res: 'resistencia al fuego', suela: false});   // 👟 (2026-11-25) piso y aire: la Suela no
     igual(ZonaDetalle.frenoDe(muro, {elemento: 'fuego', altura: 'aire'}), {defensa: '', directo: true, elemento: 'fuego', res: 'resistencia al fuego', suela: false});
     igual(ZonaDetalle.frenoCorto({zona: true, zonaDano: '2d6', zonaDanoTipo: 'eléctrico', zonaIgnoraDef: true, zonaCasteadorRef: 'c'}, {elemento: 'rayo', res: 99}), 'es inmune a lo eléctrico: su resistencia eléctrica es 99');
     igual(ZonaDetalle.frenoCorto({zona: true, zonaDano: '4', zonaIgnoraDef: true}, {}), '');   // (una zona del GM sin elemento: va directo)
@@ -10414,12 +10414,12 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
   prueba('🔥 la Varita del muro de fuego es daño directo (P296, dueño, 2026-11-23): no la frenan la Defensa ni la Defensa especial; sí la resistencia al fuego', async () => {
     const it = CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-muro-de-fuego');
     ok(it && it.especial.duelo.danoDirecto === true && it.especial.dano === '1d4');
-    ok(/1d4 de fuego directo a cada rival \(no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego y la Suela gruesa\)/.test(it.detalle));
+    ok(/1d4 de fuego directo a cada rival \(no lo frenan la Defensa ni la Defensa especial; sí la resistencia al fuego\)/.test(it.detalle) && !/Suela gruesa/.test(it.detalle));
     // El mensaje de la zona (el mismo para personajes y creeps): zonaDirecto.
     const z = Combatiente.zonaDeHab({nombre: it.nombre, tiradaExtra: '1d4'}, structuredClone(it.especial.duelo), {fichaId: 'f1', tipo: 'pj'});
     ok(z.zonaDirecto === true && z.zonaIgnoraDef === true && z.zonaDano === '1d4');
     const el = {zona: true, zonaNombre: it.nombre, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaEstado: JSON.stringify({alEmpezar: true})};
-    igual(ZonaDetalle.frenoDe(el, {elemento: 'fuego', altura: 'ambos'}), {defensa: '', directo: true, elemento: 'fuego', res: 'resistencia al fuego', suela: true});
+    igual(ZonaDetalle.frenoDe(el, {elemento: 'fuego', altura: 'ambos'}), {defensa: '', directo: true, elemento: 'fuego', res: 'resistencia al fuego', suela: false});
     igual(ZonaDetalle.sinTiradaTexto(el, {quienTira: 'Blanco', elemento: 'fuego', res: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frena su resistencia al fuego 2). El daño lo tira Blanco.');
     const m = ZonaDetalle.armar(el, {statLabel: lbl, elemento: 'fuego', elementoRes: 'al fuego', quedan: 3, autor: {nombre: 'Blanco'}, habilidad: it.nombre, altura: 'ambos', rivalesTxt: 'los creeps'});
     ok(/^No lo frenan la Defensa ni la Defensa especial \(va directo\)\. Sí le resta la resistencia al fuego/.test(fila(m, 'Qué frena el daño')));
@@ -10430,6 +10430,45 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     ok(vieja1.especial.duelo.danoDirecto === true && vieja2.especial.duelo.danoDirecto === true && vieja1.detalle === it.detalle);
     const nueva = structuredClone(it);
     ok(!Combatiente.ponerAlDiaItemsFabrica([nueva]));
+    // 👟 (2026-11-25) la copia con el texto de antes («…y la Suela gruesa)») también se pone al día.
+    const vieja3 = {...structuredClone(it), detalle: it.detalle.replace('sí la resistencia al fuego)', 'sí la resistencia al fuego y la Suela gruesa)')};
+    ok(Combatiente.ponerAlDiaItemsFabrica([vieja3]) && vieja3.detalle === it.detalle);
+  });
+  prueba('🔥🌋 la Varita de la fogata y la del chorro de lava pegan al empezar el turno; la lava, además, por cada paso (P295, dueño, 2026-11-25)', async () => {
+    const fog = CATALOGO_BASE.find(x => x.id === 'esp-varita-de-la-fogata'), lav = CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-chorro-de-lava');
+    igual(fog.especial.duelo.zonaEstado, {alEmpezar: true});
+    igual(lav.especial.duelo.zonaEstado, {alEmpezar: true, porPaso: true});
+    ok(lav.especial.duelo.zonaInmediata === true && lav.especial.duelo.zonaAltura === 'piso' && fog.especial.duelo.zonaAltura === 'ambos');
+    ok(/al entrar y al empezar su turno adentro\. ⚙ Automatizado/.test(fog.detalle) && !/Mantenimiento/.test(fog.detalle));
+    ok(/1d4 a quien entra, por cada paso que da adentro y al empezar su turno adentro\. Lo frenan la Defensa especial, la resistencia al fuego y la Suela gruesa\./.test(lav.detalle) && !/Mantenimiento/.test(lav.detalle));
+    // El mensaje al mapa lleva las marcas (y crearElementoZona guarda el JSON porque trae `alEmpezar`).
+    const zf = Combatiente.zonaDeHab({nombre: fog.nombre, tiradaExtra: '1d4'}, structuredClone(fog.especial.duelo), {fichaId: 'f1', tipo: 'pj'});
+    const zl = Combatiente.zonaDeHab({nombre: lav.nombre, tiradaExtra: '1d4'}, structuredClone(lav.especial.duelo), {fichaId: 'c1', tipo: 'creep'});
+    ok(zf.zonaEstado.alEmpezar && zl.zonaEstado.alEmpezar && zl.zonaEstado.porPaso && zl.zonaInmediata === true && !zl.zonaCadaPaso);
+    // Las copias de antes (en mochilas y creeps) se ponen al día solas; la nueva no se toca.
+    const vf = {id: fog.id, nombre: fog.nombre, especial: {sp: 3, dano: '1d4', duelo: {objetivo: 'zona', dano: true, tipoDano: 'fuego', radio: 1, zonaTurnos: 2, zonaAltura: 'ambos', danoDirecto: true}}, detalle: 'viejo'};
+    const vl = {id: lav.id, nombre: lav.nombre, especial: {sp: 3, dano: '1d4', duelo: {objetivo: 'zona', dano: true, tipoDano: 'fuego', zonaForma: 'camino', zonaInmediata: true, zonaAltura: 'piso'}}, detalle: 'viejo'};
+    ok(Combatiente.ponerAlDiaItemsFabrica([vf, vl]) && vf.especial.duelo.zonaEstado.alEmpezar && vl.especial.duelo.zonaEstado.porPaso && vf.detalle === fog.detalle && vl.detalle === lav.detalle);
+    ok(!Combatiente.ponerAlDiaItemsFabrica([structuredClone(fog), structuredClone(lav)]));
+    // «Ver detalle» y el cartel de arriba: cuándo pega.
+    const elL = {zona: true, zonaNombre: lav.nombre, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaCasteadorRef: 'c1', zonaCasteadorTipo: 'creep', zonaInmediata: true, zonaAltura: 'piso', zonaEstado: JSON.stringify({alEmpezar: true, porPaso: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(elL, {}), 'se dispara al entrar, en cada paso que dan adentro y al empezar su turno adentro');
+    const elF = {zona: true, zonaNombre: fog.nombre, zonaDano: '1d4', zonaDanoTipo: 'de fuego', zonaIgnoraDef: true, zonaDirecto: true, zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj', zonaAltura: 'ambos', zonaEstado: JSON.stringify({alEmpezar: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(elF, {}), 'se dispara al entrar y al empezar su turno adentro');
+    // 👟 La Suela gruesa: la lava (solo de piso) sí; la fogata (piso y aire) no.
+    igual([ZonaDetalle.frenoDe(elL, {elemento: 'fuego', altura: 'piso'}).suela, ZonaDetalle.frenoDe(elF, {elemento: 'fuego', altura: 'ambos'}).suela], [true, false]);
+    igual(ZonaDetalle.sinTiradaTexto(elL, {quienTira: 'Mago', elemento: 'fuego', res: 0, suela: 2}), 'No hay tirada para esquivarla: le entra 1d4 de daño de fuego (lo frenan su Defensa especial y su Suela gruesa 2). El daño lo tira Mago.');
+    // El mapa (js/08): la Suela solo en lo que es solo del piso; un golpe por paso; el cartel lo dice. Las trampas de «piso y aire» (js/19), tampoco.
+    const [t08, t19, t103] = await Promise.all(['../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', '../vtt-hexgrid/js/19-trampa-paso-a-paso.js', '../vtt-hexgrid/js/103-estandartes-info.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+    ok(/const suelaFrena = el => alturaDe\(el\) === 'piso';/.test(t08) && !/tocaElPiso\(el\)[^\n]*suelagruesa/.test(t08));
+    ok(/if\(!el\.zona \|\| !zonaSpecDe\(el\)\.porPaso \|\| !zonaAplicaA\(el, t\) \|\| !zonaLeFalta\(el, t\)\) return;/.test(t08) && /if\(n\) zonaEncolar\(el, t, n\);/.test(t08));
+    ok(/const golpes = specZ && specZ\.porPaso && !specZ\.tiraPaso \?/.test(t08) && /for\(let golpe = 1; golpe <= golpes; golpe\+\+\)/.test(t08) && /partes\[n0\] = `paso \$\{golpe\}: /.test(t08));
+    ok(/le pega una vez por paso \(\$\{pasosN\} veces\)/.test(t08));
+    // Cada paso dice lo que entró en ese golpe (no la suma), y un golpe nuevo de la misma zona no se pierde si el cartel ya mostraba el resultado.
+    ok(/entraron \$\{fmt\(num\(dn\.recibido\)\)\}/.test(t08) && /zonaBanner\.tokenId === id && !zonaBanner\.resultado && !\(n && zonaBanner\.tirando\)\)/.test(t08));
+    ok(/dt\.altura === 'aire' \|\| dt\.altura === 'ambos' \? 0/.test(t19) && /else if\(spec\.porPaso\) cuando = /.test(t103));
+    // El renglón de «Empieza tu turno» y el Mantenimiento: como el Muro (zonaAlEmpezar lee el mismo JSON).
+    ok(/const zonaAlEmpezar = el => !!zonaSpecDe\(el\)\.alEmpezar;/.test(t08));
   });
   prueba('🔥 el número de la resistencia, solo para su bando (P297, dueño, 2026-11-23): el rival lee «es resistente» sin cuánto', async () => {
     igual([Combatiente.verResDe(true, 'pj'), Combatiente.verResDe(true, 'creep'), Combatiente.verResDe(false, 'pj'), Combatiente.verResDe(false, 'creep')], [false, true, true, false]);

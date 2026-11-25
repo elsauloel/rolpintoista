@@ -3008,6 +3008,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   lo que tenga daño en su Ejecución) y que la comparación **aclare de qué tipo es cada daño** (físico, especial, directo; y el elemento / Tipo si lo
   tiene): p. ej. «Daño prom. 5.5 (físico, Tipo 4, área)» contra «5.5 (físico, Tipo 8)». Ojo: la Varita de granizo es físico Tipo 4 según su texto.
 
+- **⬜ en cola — ✋ Los títulos de las dos ranuras de manos en el Equipo** (dueño, 2026-11-25, con captura de la ficha): hoy dicen «MANOS» y «MANOS
+  (ARMAS Y ESCUDOS)», y se confunden. Que digan algo como **«MANOS (guantes / defensa)»** y **«MANOS (armas, escudos y otros)»**, en todos lados
+  donde aparezcan (ficha, ventana de Equipo del mapa, ficha lite, GM Tools, el asistente de ítems).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

@@ -22,6 +22,11 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 - [ ] **🧪 ¿Quién puede subir consumibles al catálogo?** (P317, dueño, 2026-11-24: «no sé bien si quiero que cualquiera pueda subir
   consumibles»). Ya decidido: los consumibles propios «a mano» (narrativos, de la partida) no van nunca al catálogo. Queda por pensar el resto
   (consumibles con efectos que sube el grupo, y si se ven en el catálogo sin el 👁).
+- [ ] **🧍 El Equipo en una silueta del cuerpo** (dueño, 2026-11-25, con un boceto suyo; «a grandes rasgos me parece un buen comienzo»): cada lugar
+  del equipo sobre la silueta (ocupado en verde con el nombre / vacío punteado), «Mano 1» y «Mano 2» a los costados, la espalda (mochila, carcaj)
+  arriba, el detalle con el mouse, y la mochila al costado. Boceto de Claude en el scratchpad (`silueta/`). **Falta la silueta**: el dueño va a pasar
+  una imagen y Claude solo le ajusta los colores. Después, a la cola para programar (reemplaza la lista de «Equipado»; junto con los títulos de
+  las manos y la división Mano 1 / Mano 2 / Equipado al cuerpo, ya en la cola).
 - [ ] **🪤 Revisar la creación de trampas** (dueño, 2026-11-24): que el creador de trampas del programa (⚙ Terreno y Formas → 🪤 Trampas, y donde
   más se armen) ofrezca **funciones simples**: daño, aplicar algún estado y alguna otra básica; las trampas de **mecánicas más complejas o efectos
   específicos se resuelven a mano** («✋ A mano»). Revisar qué ofrece hoy el paso a paso y simplificarlo.

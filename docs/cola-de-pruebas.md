@@ -3089,6 +3089,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   lugares, «viene con tu arma»); con un carcaj de verdad, va ese. Los básicos van con borde fino sólido y fondo gris suave (ni punteado ni verde),
   con su explicación al pasar el mouse. Probado con clics con el Jugador 1 (arco y ballesta arrastrados a la Mano 1).
 
+- **⬜ en cola — Revisar P343: 🪤 al detonar una trampa, una invocación resiste con los números de su dueño** (dueño, 2026-11-25: «ponela al
+  final de la cola para revisarla»). Ver P343 en `preguntas-abiertas.md`: la Abeja de prueba resistió el Gas adormecedor con la Res.Mt de Blanco J1 al
+  dispararse la trampa (al empezar su turno, con la suya). Y el 🔍 de una nube que alcanza a todos dice «a favor de los aliados de quien la puso»
+  (se entiende al revés; propuesta: «también a los aliados de quien la puso»).
+- **⬜ en cola — 🙈 Revisar el «?» que ve el GM dentro de una nube con un jugador escondido** (dueño, 2026-11-25): en la captura del GM probando el
+  Gas adormecedor (J2 escondido con Sigilo adentro de la nube), al GM le aparecía un hexágono con «?» dentro de la nube. Investigar qué es (¿la última
+  posición conocida? ¿una marca del escondido?) y, si delata **dónde** está el escondido, sacarlo: el GM sabe que existe y quién es, no dónde.
+  En la misma captura, la tabla de turnos del GM no mostraba a Blanco J2 mientras estaba escondido (eso ya está en la cola: «El GM siempre ve a los
+  jugadores en la tabla de turnos»).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

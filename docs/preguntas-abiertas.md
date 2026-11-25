@@ -2822,7 +2822,7 @@ En la silueta del Equipo, arrastrar un arma de una mano a la Mano 1 o a la Mano 
 diga la regla de siempre (la «mano preferida» del ítem, si tiene; si no, la primera libre). Opciones: (a) dejarlo así; (b) que soltarla en la
 Mano 2 le marque la mano preferida 2 (y en la 1, la 1). Mientras tanto, (a).
 
-### P341 — 💤 El Gas adormecedor: ¿le vuelve a tocar al empezar su turno si ya lo sufrió en esa misma ronda? (2026-11-25, Claude)
+### ✅ P341 — 💤 El Gas adormecedor: ¿le vuelve a tocar al empezar su turno si ya lo sufrió en esa misma ronda? (2026-11-25, Claude)
 
 Desde hoy la nube del Gas adormecedor y del Gas somnífero pega al entrar y al empezar el turno de quien está adentro (P295). Un caso: la trampa se
 dispara en el turno de Blanco J1 y alcanza también a Blanco J2, que juega **después en la misma ronda**. Hasta hoy, la nube de una trampa le tocaba a
@@ -2830,6 +2830,8 @@ cada uno **una sola vez por ronda**, así que al empezar su turno J2 no habría 
 turno (la Fogata, la miasma, el Muro de fuego): **al empezar su turno le vuelve a tocar** (otra tirada; si falla, el estado vuelve a contar 2 turnos),
 aunque lo haya sufrido un rato antes. Lo que no cambia: moverse adentro no lo repite, y al entrar le toca una vez por ronda. ¿Queda así, o al empezar su
 turno solo le toca si en esa ronda todavía no la sufrió?
+
+> ✅ **Respondida (dueño, 2026-11-25):** «está bien como está» (al empezar su turno le vuelve a tocar).
 
 ### P342 — 🙈 La tirada de un escondido en una zona: la Mesa dice qué jugador tiró (2026-11-25, Claude)
 
@@ -2846,3 +2848,5 @@ estado de prueba de J1: «Afectada por Prueba: Res.Mt −20»). Al empezar el tu
 del paso a paso de la trampa (no de la nube), de antes de este cambio, y no lo toqué. ¿Lo arreglo (que la invocación tire con sus propios números al
 detonar una trampa)? De paso: el 🔍 de la casilla de una nube que alcanza a todos dice «a favor de los aliados de quien la puso», que se entiende al
 revés (quiere decir que también les pega a ellos); ¿lo cambio por «también a los aliados de quien la puso»?
+
+> **Dueño, 2026-11-25:** «ponela al final de la cola para revisarla» (en la cola).

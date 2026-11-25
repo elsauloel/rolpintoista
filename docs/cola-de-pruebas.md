@@ -2561,7 +2561,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
      mochilas.
   3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
      frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
-- **⬜ en cola (2026-11-24: explicado; más piezas → lista de diseño; «Ver detalle» ya no la nombra; QUEDA lo de abajo) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
+- **✅ hecho (2026-11-25: con las varitas de P295, la Suela gruesa ya se resta solo en lo que es solo de piso; el Muro de fuego ya no la resta) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
   rival se le nombra en el cartel del daño de una zona.
 
   **Pendiente (dueño, 2026-11-24):** «en la prueba del muro de fuego decía que la suela lo frenaba, y el muro de fuego es suelo y aire, así que

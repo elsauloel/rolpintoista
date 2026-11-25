@@ -2815,7 +2815,9 @@ todavía «deja terreno incendiado (a mano, con Terreno y Formas → Fuego)» (R
 así (para un fuego nuevo, el asistente de zonas: «de piso y aire», con daño); (b) volver a poner un botón «🔥 Terreno incendiado» (con su daño fijo)
 en Terreno y Formas; (c) que esas habilidades lo pongan solas. Mientras tanto, nada cambió.
 
-### P340 — 🧍 Arrastrar a la «Mano 2»: ¿elige la mano? (2026-11-25, Claude)
+### ✅ P340 — 🧍 Arrastrar a la «Mano 2»: ¿elige la mano? (2026-11-25, Claude)
+**Desestimada (dueño, 2026-11-25):** «hoy en día es irrelevante en qué mano se ocupa qué equipo… no importa cómo se resuelva, va a estar bien». Queda como está (a).
+
 En la silueta del Equipo, arrastrar un arma de una mano a la Mano 1 o a la Mano 2 la equipa igual (aprieta su «Equipar»): queda en la mano que
 diga la regla de siempre (la «mano preferida» del ítem, si tiene; si no, la primera libre). Opciones: (a) dejarlo así; (b) que soltarla en la
 Mano 2 le marque la mano preferida 2 (y en la 1, la 1). Mientras tanto, (a).

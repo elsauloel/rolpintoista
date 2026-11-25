@@ -2842,6 +2842,11 @@ aplica la pantalla de quien lo recibe. Opciones: (a) dejarlo así; (b) que esa l
 vea solo su bando, como las de un duelo oculto (P263), y el GM solo la Crónica sin nombre. Mientras tanto, (a).
 
 > ✅ **Decidida (dueño, 2026-11-25): (c)** «que solamente lo vean los aliados del personaje escondido. Cosa que el GM ni siquiera vea que el jugador esté dentro de la nube. El GM siempre va a saber cuando un jugador está escondido o no. Lo que no debería saber es dónde, y ya la nube le da esa pista.»
+>
+> **Aplicada (2026-11-25)** (`vtt-hexgrid/js/130` `zonaOcultaCon`, `js/08`): lo que resuelve la pantalla del escondido en una zona (su tirada para
+> resistir, la tirada de la zona, la chance, el daño fijo, el estado, el +1 stack, la Crónica «… está en …» y sus avisos) va marcado como las líneas
+> del duelo oculto: lo ven él, sus aliados y el GM solo con 👁. Como lo ven los suyos, la línea lo nombra («Blanco J2 · Res.Mt»). Probado con clics.
+> El daño con dados que tira el dueño de la zona (P326) quedó como estaba: ver P345.
 
 
 ### P343 — 🪤 Al detonar una trampa, una invocación resiste con los números de su dueño (2026-11-25, Claude)
@@ -2864,3 +2869,15 @@ Opciones: (a) dejarlo así (se borran a mano las copias muertas); (b) que una mu
 el mismo nombre; recomendado); (c) que al morir una copia se borre sola de la ficha (la original queda). Mientras tanto, (a). No toqué nada.
 
 > ✅ **Decidida (dueño, 2026-11-25):** (b), y además sin estados: «se reúsa, vuelve con la vida y los No2 [llenos] y además vuelve sin ningún estado alterado… como si recién la invocaran de cero». En la cola.
+
+### P345 — 🙈 La zona de un creep le pega con dados a un jugador escondido: ¿choca con la P342 (c)? (2026-11-25, Claude)
+
+Con la P342 (c), el GM ya no ve nada de lo que le pasa a un jugador escondido dentro de una zona: ni su tirada, ni la Crónica, ni los avisos. Pero la
+P326 (decidida el 24/11, en la cola: «🙈 La zona de un creep que le pega a un jugador escondido…») dice lo contrario para el daño con dados de la zona
+de un creep: lo tira el dueño de la zona (el GM) y el GM ve «el muro le hizo N de daño a un personaje oculto». Hoy ese daño se abre en el cuadro del
+duelo del GM (no lo toqué), así que con el Muro de fuego de un creep el GM sigue enterándose de que hay alguien escondido **ahí**.
+1. ¿Gana la P342 (el GM no ve nada; el daño lo tira la pantalla del escondido, como el daño fijo) o la P326 (lo tira el GM y ve «a un personaje
+   oculto»)? **Recomendación:** la P342, que es la más nueva y sigue tu regla («lo que no debería saber es dónde»): el daño lo tira la pantalla del
+   escondido, con el dado a la vista para él y sus aliados.
+2. Elegido mientras tanto en la P342: como esas líneas las ven solo los suyos, nombran al escondido («Blanco J2 · Res.Mt», «Blanco J2 está en Gas
+   adormecedor…») en vez de «Un personaje oculto». ¿Está bien?

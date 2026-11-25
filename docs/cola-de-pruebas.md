@@ -3054,6 +3054,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   para revisar al final de la cola»): probando la habilidad que invoca, la copia de la abeja de Blanco J1 se llamó «Abeja de prueba 2», el mismo nombre
   que la abeja de Blanco J2, y en la tabla de turnos quedaron dos «Abeja de prueba 2» que no se distinguen. Propuesta: que una copia nunca repita el
   nombre de otro token del mapa.
+- **✅ hecho (2026-11-25) — 🙈 P342 (c): un jugador escondido dentro de una zona, solo lo ven él y sus aliados** (dueño: «el GM ni siquiera
+  vea que el jugador esté dentro de la nube»). Lo que resuelve la pantalla del escondido (la tirada para resistir la nube, la tirada de la zona, la
+  chance, el daño fijo, el estado, el +1 stack del Veneno, la Crónica «… está en …» y los avisos) va marcado como las líneas del duelo oculto (P263):
+  lo ven él, sus aliados y el GM solo con 👁; las líneas lo nombran. Mismo mecanismo (`vtt-hexgrid/js/130`, `zonaOcultaCon`); en `js/08`, el cartel de
+  la zona, la Crónica, el Veneno, el stack y la renovación (estas tres escribían en la Mesa sin marca y con el nombre). El daño con dados de una zona
+  de creep (P326) quedó igual: posible choque, P345. Pruebas: 6 nuevas (1137 en verde). Probado con clics en «Claude · pruebas 2» (Prueba · General):
+  Blanco J2 en Sigilo dentro del Gas adormecedor al empezar su turno → J2 y J1 ven «Blanco J2 · Res.Mt» y la Crónica; el GM, nada (ni Mesa ni Crónica).
+- **⬜ en cola — Probar: 🙈 P342 con el daño fijo de una zona (terreno incendiado), el +1 stack de la Nube tóxica y el GM con 👁** (2026-11-25): van por
+  el mismo contexto (prueba automática), sin clics.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

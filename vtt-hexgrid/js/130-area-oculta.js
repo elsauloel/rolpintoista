@@ -144,8 +144,8 @@ async function areaOcultaEsperar(cond, ms){
   const t0 = Date.now();
   while(!cond() && Date.now() - t0 < ms) await new Promise(r => setTimeout(r, 120));
 }
-async function areaOcultaCon(d, fn){
-  const c = areaOcultaDe(d);
+async function areaOcultaCon(d, fn){ return areaOcultaConCtx(areaOcultaDe(d), fn); }
+async function areaOcultaConCtx(c, fn){
   if(!c){
     if(areaOcultaCtx) await areaOcultaEsperar(() => !areaOcultaCtx, 8000);
     areaOcultaEnCurso++;
@@ -158,6 +158,35 @@ async function areaOcultaCon(d, fn){
   try{ return await fn(); }
   finally{ areaOcultaCtx = antes; }
 }
+/* ---------- 🙈 Un personaje escondido dentro de una zona (2026-11-25, P342, dueño, opción c: «que solamente lo vean los aliados del personaje
+   escondido. Cosa que el GM ni siquiera vea que el jugador esté dentro de la nube… lo que no debería saber es dónde, y ya la nube le da esa pista») ----------
+   Lo que resuelve la pantalla de quien lo maneja (su tirada para resistir la nube, el daño fijo, el estado que se le aplica solo, la Crónica de la
+   zona y sus avisos) va con el mismo contexto que el duelo oculto (P263, P320): la Mesa marcada `oculta-pj:<desde>` con su ficha y los momentos con
+   `datos.escondido` (los ven su bando, el GM con 👁 y quien lo vea ahora; js/29). Solo personajes e invocaciones (un creep escondido, como antes) y
+   no un token oculto por el GM (ese ya no deja nada). El daño con dados que tira el dueño de la zona en el cuadro del duelo (P326) va aparte
+   (`areaOcultaAfuera` en js/08): esa parte sigue en la cola. */
+function zonaOcultaDe(t){
+  if(!t || t.oculto || t.tipo === 'creep' || typeof escondidoDe !== 'function' || typeof zonaIdDe !== 'function') return null;
+  const id = zonaIdDe(t);
+  if(!id || !escondidoDe(id)) return null;
+  return {tipo: 'pj', ficha: String(t.fichaId || '').slice(0, 80), tokenId: id, veo: typeof loVeoAhora === 'function' ? !!loVeoAhora(t) : true, delatado: false};
+}
+// Corre `fn` (async) con lo de `t` marcado si está escondido; si no, igual que siempre (sin esperar nada).
+function zonaOcultaCon(t, fn){
+  if(t && areaOcultaCtx && typeof zonaIdDe === 'function' && areaOcultaCtx.tokenId === zonaIdDe(t)) return fn();   // (ya adentro: el cartel de la zona que llama al del Veneno)
+  const c = zonaOcultaDe(t);
+  return c ? areaOcultaConCtx(c, fn) : fn();
+}
+// Lo mismo para algo que publica en el momento (un momentoAbrir: la marca se pone antes de su primer await). Si ya hay un contexto, no lo toca.
+function zonaOcultaSinc(t, fn){
+  const c = areaOcultaCtx ? null : zonaOcultaDe(t);
+  if(!c) return fn();
+  areaOcultaCtx = c;
+  try{ return fn(); }
+  finally{ areaOcultaCtx = null; }
+}
+// ¿Lo que se publica ahora va marcado para este token? (así la línea, que la ven solo los suyos, lo nombra)
+function zonaOcultaMarcando(t){ return !!(t && areaOcultaActiva() && typeof zonaIdDe === 'function' && areaOcultaCtx.tokenId === zonaIdDe(t)); }
 // Lo que va a la vista aunque se esté aplicando un duelo oculto: lo de quien lanzó (con texto neutro) y el «se delató».
 async function areaOcultaAfuera(fn){
   const c = areaOcultaCtx;

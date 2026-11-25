@@ -11474,6 +11474,76 @@ grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hex
   });
 })();
 
+grupo('🙈 Un personaje escondido dentro de una zona: lo ve solo su bando (P342 c, vtt-hexgrid/js/130 y js/08)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  // js/130 con su pantalla: Blanco J2 escondido (en Sigilo), Blanco J1 a la vista, una invocación escondida, la rata (creep) escondida y un token oculto por el GM.
+  async function mundo342(){
+    const src = await traer('../vtt-hexgrid/js/130-area-oculta.js');
+    const tokens = new Map([['j1', {tipo: 'pj', fichaId: 'f1', duenoUid: 'u1'}], ['j2', {tipo: 'pj', fichaId: 'f2', duenoUid: 'u2', escondido: true}],
+      ['abeja', {tipo: 'pj', fichaId: 'f2~inv1', duenoUid: 'u2', escondido: true}], ['rata', {tipo: 'creep', fichaId: 'c1', duenoUid: 'gm', escondido: true}],
+      ['npc', {tipo: 'pj', fichaId: 'f3', duenoUid: 'u3', oculto: true, escondido: true}]]);
+    const zonaIdDe = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };
+    const escondidoDe = id => { const t = tokens.get(id); return t && t.escondido ? {tipo: t.tipo === 'creep' ? 'creep' : 'pj', tokenId: id} : null; };
+    const w = new Function('tokens', 'fbUsuario', 'soyGM', 'ojoRevelando', 'loVeoAhora', 'areaDanoCompartible', 'creepPrivadoDe', 'CreepCalculo', 'fichasPub', 'SEP_INVOCACION', 'num', 'zonaIdDe', 'escondidoDe',
+      src + '\nreturn {zonaOcultaDe, zonaOcultaCon, zonaOcultaSinc, zonaOcultaMarcando, areaOcultaAfuera, areaOcultaDelatado, mesaLineaMarca, momentoMarcaOculta, areaOcultaCalla, ctx: () => areaOcultaCtx};')(
+      tokens, {uid: 'u2'}, false, false, () => true, () => true, () => null, {statValor: () => 0}, new Map(), '~', Number, zonaIdDe, escondidoDe);
+    return {w, tk: id => tokens.get(id)};
+  }
+  prueba('a quién marca: un personaje o una invocación escondidos sí; a la vista, un creep o uno oculto por el GM, no', async () => {
+    const {w, tk} = await mundo342();
+    igual([w.zonaOcultaDe(tk('j2')), w.zonaOcultaDe(tk('abeja')), w.zonaOcultaDe(tk('j1')), w.zonaOcultaDe(tk('rata')), w.zonaOcultaDe(tk('npc')), w.zonaOcultaDe(null)],
+      [{tipo: 'pj', ficha: 'f2', tokenId: 'j2', veo: true, delatado: false}, {tipo: 'pj', ficha: 'f2~inv1', tokenId: 'abeja', veo: true, delatado: false}, null, null, null, null]);
+  });
+  prueba('mientras resuelve su zona: la Mesa marcada con su ficha, la Crónica para los que lo ven y la línea lo nombra; afuera, todo como siempre', async () => {
+    const {w, tk} = await mundo342();
+    let dentro = null, j1 = null;
+    await w.zonaOcultaCon(tk('j2'), async () => { dentro = [w.mesaLineaMarca('mapa'), w.momentoMarcaOculta({centro: true}), w.zonaOcultaMarcando(tk('j2')), w.zonaOcultaMarcando(tk('j1')), w.areaOcultaCalla()]; });
+    await w.zonaOcultaCon(tk('j1'), async () => { j1 = [w.mesaLineaMarca('mapa'), w.zonaOcultaMarcando(tk('j1'))]; });
+    igual(dentro, [{desde: 'oculta-pj:mapa', ficha: 'f2'}, {centro: true, escondido: {tipo: 'pj', tokenId: 'j2'}}, true, false, false]);
+    igual([j1, w.mesaLineaMarca('mapa'), w.ctx()], [[null, false], null, null]);
+  });
+  prueba('el momento «… está en la zona» (zonaOcultaSinc) va marcado aunque se publique después del primer paso; y no pisa un contexto que ya está', async () => {
+    const {w, tk} = await mundo342();
+    const a = w.zonaOcultaSinc(tk('j2'), () => w.momentoMarcaOculta({centro: true}));
+    const b = w.zonaOcultaSinc(tk('j1'), () => w.momentoMarcaOculta({centro: true}));
+    let c = null;
+    await w.zonaOcultaCon(tk('j2'), async () => { c = w.zonaOcultaSinc(tk('j2'), () => w.mesaLineaMarca('recordatorio')); });
+    igual([a, b, c, w.ctx()], [{centro: true, escondido: {tipo: 'pj', tokenId: 'j2'}}, {centro: true}, {desde: 'oculta-pj:recordatorio', ficha: 'f2'}, null]);
+  });
+  prueba('adentro, el cartel del Veneno (otra vuelta por el mismo token) no espera; el daño con dados de P326 (afuera) y lo que sigue a delatarse, sin marca', async () => {
+    const {w, tk} = await mundo342();
+    const r = [], t0 = Date.now();
+    await w.zonaOcultaCon(tk('j2'), async () => {
+      await w.zonaOcultaCon(tk('j2'), async () => { r.push(!!w.mesaLineaMarca('recordatorio')); });
+      await w.areaOcultaAfuera(async () => { r.push(w.mesaLineaMarca('recordatorio')); });
+      w.areaOcultaDelatado();
+      r.push(w.mesaLineaMarca('recordatorio'), w.zonaOcultaMarcando(tk('j2')));
+    });
+    igual([r, Date.now() - t0 < 2000], [[true, null, null, false], true]);
+  });
+  prueba('las piezas enganchadas en js/08: el cartel de la zona, la Crónica, el Veneno, el stack, la renovación, P326 afuera y el «se delató»', async () => {
+    const m08 = await traer('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js');
+    cierto(/function zonaResolverBanner\(\)\{\n[^\n]*\n\s+return typeof zonaOcultaCon === 'function' \? zonaOcultaCon\(t, zonaResolverBannerBase\)/.test(m08));
+    cierto(/const zonaMomentoAbrir = [\s\S]{0,400}zonaOcultaSinc\(t, f\)/.test(m08));
+    cierto(['zonaVenenoContarBase', 'zonaRenovarEstadoBase', 'zonaSumarStackBase'].every(n => new RegExp(`zonaOcultaCon\\(t, \\(\\) => ${n}\\(`).test(m08)));
+    cierto(!/fbDb\.collection\(fbRutaCampana\('tiradas'\)\)\.add/.test(m08));   // (todas las líneas de las zonas por mesaLinea: así van marcadas)
+    cierto(/rd = await \(typeof areaOcultaAfuera === 'function' \? areaOcultaAfuera\(pedir\) : pedir\(\)\)/.test(m08));
+    cierto(/areaOcultaAfuera\(delatar\)[\s\S]{0,200}areaOcultaDelatado\(\)/.test(m08));
+  });
+  prueba('el nombre: marcado lo nombra (lo ven los suyos); sin marca, «Un personaje oculto»; uno oculto por el GM, «Alguien»', async () => {
+    const m08 = await traer('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js');
+    const trozo = m08.slice(m08.indexOf('function zonaQuienPublico('), m08.indexOf('// 🙈 (P342 c) la Crónica'));
+    let marca = false;
+    const f = new Function('escondidoDe', 'zonaIdDe', 'nombreDe', 'zonaOcultaMarcando', trozo + '\nreturn zonaQuienPublico;')(
+      id => id === 'j2' ? {tipo: 'pj', tokenId: 'j2'} : null, t => t.id, t => t.nombre, () => marca);
+    const J2 = {id: 'j2', tipo: 'pj', nombre: 'Blanco J2'}, J1 = {id: 'j1', tipo: 'pj', nombre: 'Blanco J1'};
+    const a = [f(J2, true), f(J1, true), f({...J2, oculto: true}, true)];
+    marca = true;
+    igual([a, f(J2, true)], [['Un personaje oculto', 'Blanco J1', 'Alguien'], 'Blanco J2']);
+  });
+})();
+
 grupo('🥷 Aviso al escondido cuando el daño no alcanza para delatarlo (2026-11-24, vtt-hexgrid/js/03 y js/16)');
 (function(){
   const traer = async u => (await fetch(u, {cache: 'no-store'})).text();

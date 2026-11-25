@@ -2842,3 +2842,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   quien ya lo tiene vuelve a tirar; el cartel de la trampa (js/19), «lo sufre quien entra y quien empieza su turno adentro». De paso se arregló
   `trampaSaltar` (js/19: usaba `p.zonaComo` sin `p`, y cortaba el salto de la Descarga eléctrica). Probado con clics en «Prueba · General». Dudas:
   P341–P343.
+- **🙈 Un personaje escondido dentro de una zona: solo su bando** (2026-11-25, dueño, P342 c: «que solamente lo vean los aliados del personaje
+  escondido… el GM ni siquiera vea que el jugador esté dentro de la nube»): js/130 `zonaOcultaCon(t, fn)` / `zonaOcultaSinc(t, fn)` arman, para un
+  personaje o una invocación escondidos (`escondidoDe`; no un creep ni un token oculto por el GM), el mismo contexto que el duelo oculto
+  (`areaOcultaConCtx`): las líneas de la Mesa van `oculta-pj:<desde>` con su ficha y los momentos con `datos.escondido` (js/29: él, sus aliados y el GM
+  con 👁). Lo usan en js/08 `zonaResolverBanner` (envuelve a `zonaResolverBannerBase`), `zonaMomentoAbrir`, `zonaVenenoContar`, `zonaRenovarEstado` y
+  `zonaSumarStack` (estas tres ahora escriben con `mesaLinea`). Marcado, `zonaQuienPublico` lo nombra (`zonaOcultaMarcando`). El daño con dados que va al
+  cuadro del duelo (P326) corre fuera de la marca (`areaOcultaAfuera`), y si el daño lo delata, desde ahí todo a la vista (`areaOcultaDelatado`). Dudas: P345.

@@ -589,7 +589,8 @@ function zonaVenenoJugador(t){
   return (f && f.duenoUid) || t.duenoUid || '';
 }
 // La Mesa y la Crónica de lo que pasó con el Veneno; al jugador del personaje (si no lo resolvió él), su Aviso al centro.
-async function zonaVenenoContar(t, el, spec, r){
+function zonaVenenoContar(t, el, spec, r){ return typeof zonaOcultaCon === 'function' ? zonaOcultaCon(t, () => zonaVenenoContarBase(t, el, spec, r)) : zonaVenenoContarBase(t, el, spec, r); }   // 🙈 (P342 c, js/130)
+async function zonaVenenoContarBase(t, el, spec, r){
   const nombreZ = el.zonaNombre || 'la zona', cambio = r.antes ? `${spec.nombre} ${r.antes} → ${r.despues}` : `${spec.nombre} ${r.despues}`;
   if(t.oculto){ toast(`${nombreZ}: ${r.aplicar ? cambio : `${spec.nombre}, se resuelve a mano`}`); return; }
   const quien = nombreDe(t), resultado = r.aplicar ? cambio : `${cambio}: se resuelve a mano`;
@@ -597,12 +598,10 @@ async function zonaVenenoContar(t, el, spec, r){
   const aviso = r.aplicar && uid && uid !== fbUsuario.uid;
   momentoAbrir({tipo: 'zona-veneno', icono: '☠', titulo: `${quien} · ${nombreZ}`, resultado, estado: 'listo',
     datos: aviso ? {paraUids: [uid], aviso: true, tituloAviso: nombreZ, textoAviso: r.antes ? `Tu ${spec.nombre} sube: ${r.antes} → ${r.despues}.` : `Quedás con ${spec.nombre} ${r.despues}.`} : {}});
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombreZ}: ${quien} — ${resultado}`,
-      formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-  }catch(err){}
+  await mesaLinea(`☠ ${nombreZ}: ${quien} — ${resultado}`, 'recordatorio');   // (mesaLinea: uno escondido, marcada; P342)
 }
-async function zonaRenovarEstado(t, spec, el, como){
+function zonaRenovarEstado(t, spec, el, como){ return typeof zonaOcultaCon === 'function' ? zonaOcultaCon(t, () => zonaRenovarEstadoBase(t, spec, el, como)) : zonaRenovarEstadoBase(t, spec, el, como); }   // 🙈 (P342 c, js/130)
+async function zonaRenovarEstadoBase(t, spec, el, como){
   const nombre = el.zonaNombre || 'la zona';
   if(como === 'sumaUno') return zonaSumarStack(t, spec, el, nombre);
   try{
@@ -614,16 +613,14 @@ async function zonaRenovarEstado(t, spec, el, como){
     if(t.oculto){ toast(`${nombre}: ${spec.nombre} vuelve a ${turnos}`); return; }
     const quien = nombreDe(t);
     momentoAbrir({tipo: 'zona-renueva', icono: '🟫', titulo: `${quien} sigue pegado en ${nombre}`, resultado: `Cada paso sobre la zona le renueva el ${spec.nombre}: vuelve a ${turnos}.`, estado: 'listo', datos: {}});
-    try{
-      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `🟫 ${nombre}: ${quien} dio un paso sobre la zona — ${spec.nombre} vuelve a ${turnos}`,
-        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-    }catch(err){}
+    await mesaLinea(`🟫 ${nombre}: ${quien} dio un paso sobre la zona — ${spec.nombre} vuelve a ${turnos}`, 'recordatorio');   // (uno escondido, marcada; P342)
   }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
 }
 // ☠ +1 stack del estado de la zona a quien ya lo tiene (la Nube tóxica, 2026-10-31): sin tirada ni daño; Crónica y Mesa (un oculto, solo esta
 // pantalla). Se aplica como cualquier estado que llega (Veneno suma sus stacks: Combatiente.acumularVeneno), un personaje o invocación por su
 // ficha (encolarPj, `fichaId~invId` para una invocación) y un creep directo.
-async function zonaSumarStack(t, spec, el, nombre){
+function zonaSumarStack(t, spec, el, nombre){ return typeof zonaOcultaCon === 'function' ? zonaOcultaCon(t, () => zonaSumarStackBase(t, spec, el, nombre)) : zonaSumarStackBase(t, spec, el, nombre); }   // 🙈 (P342 c, js/130)
+async function zonaSumarStackBase(t, spec, el, nombre){
   try{
     // ☠ Con el Veneno, primero el cartel con «Aplicar» / «Resolver a mano» (2026-10-31); la Mesa y la Crónica las pone zonaVenenoContar.
     const r = zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, false) : null;
@@ -634,10 +631,7 @@ async function zonaSumarStack(t, spec, el, nombre){
     if(t.oculto){ toast(`${nombre}: +1 stack de ${spec.nombre}`); return; }
     const quien = nombreDe(t);
     momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Ya tenía ${spec.nombre}: la zona le suma 1 stack (sin tirada).`, estado: 'listo', datos: {}});
-    try{
-      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombre}: ${quien} sigue adentro — +1 stack de ${spec.nombre}`,
-        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-    }catch(err){}
+    await mesaLinea(`☠ ${nombre}: ${quien} sigue adentro — +1 stack de ${spec.nombre}`, 'recordatorio');   // (uno escondido, marcada; P342)
   }catch(err){ console.error('No se pudo sumar el stack de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){
@@ -862,10 +856,13 @@ function zonaQuienPublico(t, mayuscula){
   if(!t) return '';
   if(t.oculto) return 'Alguien';
   const esc = t.tipo !== 'creep' && typeof escondidoDe === 'function' ? escondidoDe(zonaIdDe(t)) : null;   // (un personaje o una invocación; un creep escondido, como antes)
-  if(esc) return `${mayuscula ? 'Un' : 'un'} personaje oculto`;
+  // 🙈 (P342 c, 2026-11-25) lo que su pantalla publica de él en una zona va marcado (js/130): lo ven solo los suyos, así que lo nombra.
+  if(esc) return typeof zonaOcultaMarcando === 'function' && zonaOcultaMarcando(t) ? nombreDe(t) : `${mayuscula ? 'Un' : 'un'} personaje oculto`;
   return nombreDe(t);
 }
-const zonaMomentoAbrir = (el, t) => momentoAbrir({tipo: 'zona', icono: zonaIconoDe(el), titulo: `${zonaQuienPublico(t, true)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
+// 🙈 (P342 c) la Crónica «… está en <zona>» de uno escondido, solo para su bando (js/130, zonaOcultaSinc).
+const zonaMomentoAbrir = (el, t) => { const f = () => momentoAbrir({tipo: 'zona', icono: zonaIconoDe(el), titulo: `${zonaQuienPublico(t, true)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
+  return typeof zonaOcultaSinc === 'function' ? zonaOcultaSinc(t, f) : f(); };
 /* ▶🔥 La zona como un renglón más de «▶ Empieza tu turno» (dueño, 2026-11-22, opción A: «esta superposición de menús no me gusta»). Antes, al empezar
    el turno de alguien parado en el Muro de fuego, salían dos carteles a la vez y encimados: «Empieza tu turno» y «Muro de fuego: le toca a…». Ahora,
    si a ese token le sale la ventana «Empieza tu turno» en esta pantalla (un personaje o una invocación, a quien lo maneja), las zonas de «al empezar su
@@ -920,7 +917,13 @@ function zonaInicioResolver(z){
     });
   });
 }
-async function zonaResolverBanner(){
+/* 🙈 (P342 c, 2026-11-25) Uno escondido (en Sigilo, en la niebla…): todo lo que esta pantalla publica mientras resuelve su zona (la tirada para resistir,
+   la de la zona, la chance, el daño fijo, el estado, el aviso y la Crónica) lo ven solo su bando y el GM con 👁 (js/130, zonaOcultaCon). */
+function zonaResolverBanner(){
+  const t = zonaBanner ? tokens.get(zonaBanner.tokenId) : null;
+  return typeof zonaOcultaCon === 'function' ? zonaOcultaCon(t, zonaResolverBannerBase) : zonaResolverBannerBase();
+}
+async function zonaResolverBannerBase(){
   if(!zonaBanner) return;
   const {elId, tokenId} = zonaBanner;
   const el = elementos.get(elId), t = tokens.get(tokenId);
@@ -1013,9 +1016,11 @@ async function zonaResolverBanner(){
       if(zonaBanner && zonaBanner.momentoP) zonaBanner.momentoP.then(mid => mid && momentoActualizar(mid, {resultado: `🎲 El daño (${formulaD}) lo tira ${q.yo.nombre}…`})).catch(() => {});
       let rd = null;
       try{
-        rd = await danoDuelo({yo: q.yo, deTokenId: q.deTokenId, aTokenId: tokenId, nombre: `${el.zonaNombre || 'Zona'}: el daño`, formula: formulaD,
+        // 🙈 (P342) el daño con dados de una zona contra uno escondido (P326) sigue como estaba: fuera de la marca (la parte del dueño de la zona, en la cola).
+        const pedir = () => danoDuelo({yo: q.yo, deTokenId: q.deTokenId, aTokenId: tokenId, nombre: `${el.zonaNombre || 'Zona'}: el daño`, formula: formulaD,
           tipo: elZ || (el.zonaIgnoraDef ? 'arcano' : 'físico'), fisico: !el.zonaIgnoraDef, directo, esperar: true,
           danoExtra: {...(suela ? {suela} : {}), ...(sinId ? {sinIdentidad: true} : {})}});
+        rd = await (typeof areaOcultaAfuera === 'function' ? areaOcultaAfuera(pedir) : pedir());
       }catch(err){ console.error('El daño de la zona en el cuadro del duelo:', err); rd = {falla: true}; }
       const dn = rd && rd.d && rd.d.dano;
       if(dn && dn.crudo !== undefined){
@@ -1046,7 +1051,12 @@ async function zonaResolverBanner(){
           partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`); }
         danoHecho += res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
         if(cz) await zonaDanoAvisar(t, el, monto, cz, tipoTxt).catch(err => console.error('El aviso del daño de la zona:', err));   // 📣 (P245)
-        if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), el.zonaNombre || 'Zona').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03, 2026-11-01)
+        if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function'){   // 🕶 (js/03, 2026-11-01)
+          // 🙈 (P342) si se delata, el «salió del sigilo» va a la vista y lo que sigue también (como el duelo oculto, js/13).
+          const delatar = () => sigiloDelatarPorDano(tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), el.zonaNombre || 'Zona');
+          const sali = await (typeof areaOcultaAfuera === 'function' ? areaOcultaAfuera(delatar) : delatar()).catch(err => { console.error('El sigilo que se delata:', err); return false; });
+          if(sali && typeof areaOcultaDelatado === 'function') areaOcultaDelatado();
+        }
         // (si la zona ya deja ese mismo estado —Destello revelador, antes Luz para los suyos: Marcado—, no se pone dos veces; 2026-10-26, visto en el mapa)
         if(idZ && idZ.estado && danoHecho > 0 && !(res && res.r && res.r.invulnerable) && !(specZ && String(specZ.nombre || '') === idZ.estado.nombre)){   // ☀ Marcado · 🌑 Herida sombría
           try{

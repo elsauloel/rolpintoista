@@ -2596,10 +2596,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la ronda 2, nada en el Mantenimiento; al empezar el turno de J1 (ya Cansado: 2 → 1), su renglón y volvió a fallar: «Cansado: ya lo tenía, vuelve a
   2 turnos» (quedó en 2). «Ver detalle», el cartel de arriba y el 🔍, con el texto nuevo. Al final, la vuelta del mapa: «quedó igual». Pruebas
   automáticas: una nueva (1131 en verde). Dudas: P341, P342, P343.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Resina de árbol negro y Arena movediza (con las trampas de arena de varita)** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita del aceite y Varita del farol** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de arena movediza (y la mayor) y Varita de la luz flotante** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **✅ hecho (2026-11-23) — 🔥 El Muro de fuego lo frena la resistencia al fuego.** Dueño: «En el Muro de fuego, si bien no se resiste, el daño sí
   lo frena la resistencia al fuego. Ajustá esta tarea con lo de la resistencia al fuego, que ya esté resuelto eso.» (El renglón de «Empieza tu turno»
   y el cartel decían «No hay tirada para resistirla: le entra 1d4 de daño de fuego…», como si nada lo frenara.)
@@ -2616,18 +2612,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   muro de fuego, al cruzar con 99 (cartel «INMUNE AL FUEGO» en la pantalla del GM) y con 2 (4 − 2 = 2, «Daño especial»); las tiradas con «✍ Elegir
   manualmente». Al final, todo como estaba (sin muros, sin la resistencia ni la habilidad/varita de prueba, vida y No2 de antes, narrativo, sin orden).
   Las pruebas del cartel puestas al día y una nueva (1045). Dudas: P296 (¿la varita también la frena la Defensa especial?) y P297 (el número en el cartel).
-- **⬜ en cola — Probar: 🔥 la Suela gruesa en el texto y la cuenta del Muro de fuego** (2026-11-23): nadie de la partida tiene Suela gruesa; el
-  texto la nombra y el mapa la resta (prueba automática), sin clics.
-- **⬜ en cola — Probar: 🔥 el Muro de fuego sobre un creep y sobre una invocación con resistencia al fuego** (2026-11-23): con clics, solo un
-  personaje; el creep (el número solo en la pantalla del GM) y la invocación (sin número en el cartel) van por la misma función.
-- **⬜ en cola — Probar: 🔥 resistencia al fuego negativa (vulnerable) en el Muro de fuego** (2026-11-23): el texto «−2, vulnerable» solo con la
-  prueba automática.
-- **⬜ en cola — Probar: 🔥 el Muro de la habilidad al cruzarlo (sin terminar adentro) y la Varita al empezar el turno, con resistencia** (2026-11-23):
-  van por el mismo cartel y la misma cuenta que los otros caminos probados; con clics no se hizo esa combinación.
 
-- **⬜ en cola — 🔥 El cartel verde del daño de una zona dice «no hay nada que resistir»** (visto en las capturas del 23/11): en el cuadro del duelo del
-  daño del Muro de fuego, el cartel grande de abajo sigue diciendo «no hay nada que resistir: se aplica», aunque la cuenta resta la resistencia al
-  fuego. Que diga algo coherente con lo nuevo (por ejemplo «no se puede esquivar: se aplica»).
 - **✅ hecho (2026-11-23) — 🔥 Varita del muro de fuego directa y la resistencia sin número para el rival (P296, P297).** Dueño: (P296) «probablemente
   sea un daño bajo (1d4) y debería ser daño directo»; (P297) «me gustaría que el equipo rival no vea el número, pero que sí diga resistente al fuego,
   resistente a lo tóxico, pero que no diga cuánto».
@@ -2649,29 +2634,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   el número, J1 y J2 sin él; se reveló «Blanco creep es resistente al fuego» (sin número). Tiradas con «✍ Elegir manualmente». Al final, todo como
   estaba (sin muros; el creep sin la varita, sin la resistencia ni lo descubierto, vida 60 y No2 5, en su casilla; J1 y J2 con su mochila, vida,
   No2 y estados de antes, en su casilla; narrativo, sin orden de turnos). Dos pruebas nuevas (1047).
-- **⬜ en cola — Probar: 🔥 el cartel de la zona visto por el bando rival** (2026-11-23): el cartel lo ve solo la pantalla que lo resuelve (la del
-  dueño del personaje, o la del GM para un creep), o sea siempre su bando; el texto sin número («es resistente») sale cuando el GM resuelve por un
-  personaje (🎮 el control). Solo con la prueba automática.
-- **⬜ en cola — Probar: 🔥 la Varita del muro de fuego al empezar el turno adentro, con resistencia** (2026-11-23): el renglón de «Empieza tu turno»
-  usa el mismo texto que el cartel (probado al cruzarla); esa combinación no se hizo con clics.
-- **⬜ en cola — Probar: 🔥 inmune y vulnerable sin número, a la vista del rival** (2026-11-23): «es inmune al fuego» y «(es vulnerable: le entra de
-  más)» y la fila «+ Resistencia… (vulnerable)» del cuadro, solo con la prueba automática.
 
-- **⬜ en cola — 🔥 Ajustes de la Varita del muro de fuego y del texto de la resistencia** (dueño, 2026-11-23):
-  1. **El GM ve el número de la resistencia de los jugadores** (cartel, renglón de «Empieza tu turno», cuenta del daño): «el GM está bien que lo
-     vea; el tema son los jugadores a los creeps». Los jugadores siguen sin ver el número de los creeps.
-  2. **La varita pasa a 2d4** de daño de fuego directo («un d4 sin quemadura ni nada me parece muy poco»): catálogo, textos y las varitas ya en
-     mochilas.
-  3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
-     frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
 - **✅ hecho (2026-11-25: con las varitas de P295, la Suela gruesa ya se resta solo en lo que es solo de piso; el Muro de fuego ya no la resta) — 👟 Repasar la Suela gruesa** (dueño, 2026-11-23: «no me acuerdo bien qué es»; P298 punto 4): contarle qué es y qué hace hoy, y si al
   rival se le nombra en el cartel del daño de una zona.
 
   **Pendiente (dueño, 2026-11-24):** «en la prueba del muro de fuego decía que la suela lo frenaba, y el muro de fuego es suelo y aire, así que
   técnicamente la suela gruesa no debería frenarlo». Hoy el mapa resta la Suela gruesa también en las zonas de «piso y aire» (`frenoDe`, y el
   cartel «su Suela gruesa N»): que solo la reste en lo que es solo del piso.
-- **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
-  23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
 
 - **✅ hecho (2026-11-23) — 🐝 «Empieza tu turno» de una invocación dice su nombre** (P299, dueño 2026-11-23: «sí»): «▶ Empieza el turno de Abeja de prueba»
   (y que se entienda que no es el turno del personaje).
@@ -2684,10 +2653,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   número (una invocación, o un creep que los jugadores no descubrieron) sigue «lo frena su resistencia al fuego»: los jugadores no se enteran de nada
   nuevo de un creep. Probado con clics: Blanco J1 (resistencia 0) leyó «le entra 3d4 de daño de fuego y Quemadura (3 turnos)»; la abeja, como antes.
   (El «en parte» de los textos es otra tarea de la cola, todavía sin hacer.)
-- **⬜ en cola — Probar: 🔥 la resistencia 0 de un creep en la pantalla del GM** (2026-11-23, P300): el cartel de una zona sobre un creep sin resistencia,
-  visto por el GM, tampoco la nombra; solo con la prueba automática (con clics se vio un personaje).
-- **⬜ en cola — Probar: 🔥 el renglón «le llegó fuera de su turno» con el texto final** (2026-11-23): con clics se vio con la primera redacción («se lo
-  pusieron fuera de su turno… ya pegó al ponérselo»); la final («le llegó… ya pegó al llegar») solo con la prueba automática.
 - **⬜ en cola — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
   la abeja con «🎭 Ponerlo en el mapa» (el mismo camino: aparece el token) y se fue con «Turnos agotados → Borrar»; falta invocarla con una habilidad que
   invoca y que salga del orden al caer con la vida en 0.
@@ -2946,12 +2911,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (revisar en detalle con el dueño) — Responder P325: demorar cuando el que sigue es un escondido** (dueño, 2026-11-24: «ponela para
   revisar en la cola bien en detalle porque no la termino de entender»). Explicarla con un ejemplo paso a paso (quién juega, qué botón, qué pasa).
   Ver primero la entrada de arriba (el GM ve a los escondidos en la tabla), que quizás la resuelve sola.
-- **⬜ en cola — 🙈 La zona de un creep que le pega a un jugador escondido no tiene que delatarlo ante el GM (P326)** (prueba con clics,
-  2026-11-24): hoy, con Blanco J1 en Sigilo sobre el Muro de fuego de un creep, el daño (3d4) va al cuadro del duelo y lo tira el GM; y el GM ve en
-  la Crónica «Blanco J1 está en Muro de fuego…» y en la Mesa el daño con el nombre. El GM sabe que J1 está escondido (está bien), pero así sabe
-  **dónde**. Lo mismo vale para cualquier zona con daño de dados del GM (y probablemente al entrar caminando, no solo al empezar el turno). Dónde:
-  `vtt-hexgrid/js/08` (`zonaResolverBanner`: `porDuelo` mira solo `t.oculto`; `zonaMomentoAbrir` no marca `datos.escondido`; `danoDirectoAvisar`,
-  la línea de la Mesa), `zonaCartelAntes` («El daño lo tira Blanco creep»). Esperar la respuesta de P326; no tocar lo de la tabla de turnos.
 
 - **⬜ en cola (investigar) — 👂 «Pasos a tu espalda» le salió al GM cuando el escondido se delató sin moverse** (visto el 2026-11-24, con el Muro
   de fuego: «Protector 4 oye pasos…»; dueño: «no lo entiendo bien, ponelo al final de la cola para investigarlo en su momento»). De paso, mirar
@@ -2992,23 +2951,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🐝 El cuadro del duelo dice «personaje» debajo de una invocación** (visto el 2026-11-24, probando la Abeja sobre el muro de la
   varita): en «Objetivo», debajo de «Abeja de prueba», dice «personaje». Que diga «invocación» (o «invocación de Blanco J1»).
 
-- **⬜ en cola — 🔥 El renglón de una zona lee la resistencia de una invocación (P331 decidida)** (dueño, 2026-11-24): hoy, con una invocación en
-  resistencia 0, el renglón igual dice «lo frena su resistencia al fuego» porque no lee su número; que lo lea, y con 0 no la nombre (como P300).
 - **⬜ en cola — 😵 El Mareo de invocación se ve como estado (P332 decidida)** (dueño, 2026-11-24): que la invocación recién llegada muestre el
   iconito 😵 alrededor del token y que «Mareo de invocación» aparezca entre sus estados (ventana ◎, ficha). Sin vincularlo a las zonas.
-- **⬜ en cola — Probar: 🌋 el Chorro de lava sobre un escondido, sobre un creep y sobre quien vuela** (2026-11-25): con clics se probó solo un
-  personaje a la vista. El escondido va por el camino de siempre (P326, en cola aparte); el creep y quien vuela (no lo toca: es del piso), solo con
-  la prueba automática.
-- **⬜ en cola — Probar: 🔥 la Fogata y la lava sin orden de turnos** (2026-11-25): sin orden (narrativo) tienen que pegar al pasar de ronda, como el
-  Muro; no se probó con clics.
-- **⬜ en cola — 🔥 Recargar en el medio del turno vuelve a ofrecer una zona ya tirada** (visto el 2026-11-25): si «▶ Empieza tu turno» tardó (otro
-  cartel de zona abierto más de 15 s) la zona sale en su cartel aparte; si después se recarga la página antes de cerrar la ventana, la zona vuelve a
-  aparecer como renglón y se puede tirar dos veces. Pasa con cualquier zona de «al empezar el turno» (también el Muro).
-- **⬜ en cola — Probar: 💨 los Pedos en el Mantenimiento con el GM mirando otro mapa** (2026-11-25): la tanda la arma la pantalla del GM; si está
-  en otro mapa, a los 5 s cada pantalla pide la suya (con la misma tirada de ese Mantenimiento). No se probó con clics; tampoco con un escondido
-  adentro (P326) ni con una invocación.
-- **⬜ en cola — Probar: ☠ la Varita de miasma sin orden de turnos y sobre un creep** (2026-11-25): sin orden (narrativo) tiene que pegar al pasar de
-  ronda; sobre un creep (la tira un jugador), el cartel de siempre del GM. Con clics se probó solo un creep tirándola sobre dos personajes.
 
 - **⬜ en cola (investigar) — 🔁 La línea «Empieza su turno» sale repetida en la Mesa a veces** (visto el 2026-11-25 probando la miasma, con J1 y J2;
   dueño: «anotalo para investigarlo»). Buscar de dónde sale la repetida (¿dos pantallas que la publican?, ¿una recarga?) y arreglarlo.
@@ -3019,16 +2963,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   halcón (sin duplicar si ya la tienen); ajustar las etiquetas de Vista de halcón (Shooter y Mago; distancia y mágico) y el texto si hace falta.
   **Y cambiarle el nombre** (dueño, 2026-11-25): **Vista de halcón pasa a llamarse «Rango amplificado»** («vista de halcón es muy referencia a algo de
   puntería»). Que los que ya la tienen guardada vean el nombre nuevo (mismo id o con su puesta al día).
-- **⬜ en cola — Probar: ☠🔥 las Nubes tóxicas y la Mina napalm sin orden de turnos y sobre una invocación** (2026-11-25): sin orden (narrativo)
-  tienen que pegar al pasar de ronda; la Nube de la clase sobre una invocación o con un escondido adentro (P326); la Nube de un creep sobre una
-  invocación (renglón de «Empieza el turno de…»). Con clics se probó todo con orden de turnos, sobre personajes y creeps.
-- **⬜ en cola — Probar: 🔥 el terreno incendiado y las zonas del asistente sin orden de turnos, y una zona del asistente con estado** (2026-11-25):
-  sin orden (narrativo) tienen que pegar al pasar de ronda; una zona del asistente solo de piso con un estado y resistencia (una tirada al entrar
-  aunque dé varios pasos; el daño, una vez por paso); una que «solo importa moverse» (sin el golpe al empezar el turno); que quien levita cruce las
-  Brasas sin que le peguen. Con clics se probó todo con orden de turnos y daño sin estado.
 
-- **⬜ en cola — 🔥 Al terreno incendiado lo frena la resistencia al fuego (P338 decidida)** (dueño, 2026-11-25): hoy su daño fijo va directo a la
-  vida sin restar la resistencia al fuego; que la reste, como las demás zonas de fuego (y que el renglón / «Ver detalle» lo digan, P300/P331).
 
 - **⬜ en cola — ⚖ «Comparar» (tienda) no toma el daño de una varita** (dueño, 2026-11-25, con captura: Varita de granizo equipada contra Hacha de
   mano): en la fila «Daño prom.» la varita sale «—» aunque su texto dice que hace daño (1d4 + 3 a cada uno). Que cuente el daño de las varitas (y de
@@ -3102,6 +3037,81 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   resiste con Agilidad contra 7 pero el charco que queda con Res.CC contra 7** (error probable: recomendado Agilidad en los dos). Dudas abiertas:
   1) Nube de veneno, si ya está envenenado y vuelve a fallar: (a) +3 stacks, (b) +1 stack como la Nube tóxica (recomendado), (c) vuelve a 3.
   2) Aceite (solo piso): ¿también en cada paso adentro (recomendado) y sin que lo frene la Suela gruesa (recomendado: la Suela es para daño del piso)?
+- **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
+  de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
+- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+  Lo que ya se le contó (2026-11-25): la **Cola, al dispararse, se resiste con Fuerza contra 9 pero lo que queda en el piso con Res.CC contra 9**
+  (error probable; recomendado Fuerza en los dos). Propuesto: al entrar y al empezar el turno; la Brea sigue renovando el Rengo por paso a quien ya
+  está pegado; la Cola sin «cada paso»; la Suela gruesa no frena ninguna; quien ya tiene el estado y vuelve a fallar, se le renueva. Sin respuesta.
+- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Resina de árbol negro y Arena movediza (con las trampas de arena de varita)** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita del aceite y Varita del farol** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita de arena movediza (y la mayor) y Varita de la luz flotante** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **⬜ en cola — Probar: 🔥 la Suela gruesa en el texto y la cuenta del Muro de fuego** (2026-11-23): nadie de la partida tiene Suela gruesa; el
+  texto la nombra y el mapa la resta (prueba automática), sin clics.
+- **⬜ en cola — Probar: 🔥 el Muro de fuego sobre un creep y sobre una invocación con resistencia al fuego** (2026-11-23): con clics, solo un
+  personaje; el creep (el número solo en la pantalla del GM) y la invocación (sin número en el cartel) van por la misma función.
+- **⬜ en cola — Probar: 🔥 resistencia al fuego negativa (vulnerable) en el Muro de fuego** (2026-11-23): el texto «−2, vulnerable» solo con la
+  prueba automática.
+- **⬜ en cola — Probar: 🔥 el Muro de la habilidad al cruzarlo (sin terminar adentro) y la Varita al empezar el turno, con resistencia** (2026-11-23):
+  van por el mismo cartel y la misma cuenta que los otros caminos probados; con clics no se hizo esa combinación.
+- **⬜ en cola — 🔥 El cartel verde del daño de una zona dice «no hay nada que resistir»** (visto en las capturas del 23/11): en el cuadro del duelo del
+  daño del Muro de fuego, el cartel grande de abajo sigue diciendo «no hay nada que resistir: se aplica», aunque la cuenta resta la resistencia al
+  fuego. Que diga algo coherente con lo nuevo (por ejemplo «no se puede esquivar: se aplica»).
+- **⬜ en cola — Probar: 🔥 el cartel de la zona visto por el bando rival** (2026-11-23): el cartel lo ve solo la pantalla que lo resuelve (la del
+  dueño del personaje, o la del GM para un creep), o sea siempre su bando; el texto sin número («es resistente») sale cuando el GM resuelve por un
+  personaje (🎮 el control). Solo con la prueba automática.
+- **⬜ en cola — Probar: 🔥 la Varita del muro de fuego al empezar el turno adentro, con resistencia** (2026-11-23): el renglón de «Empieza tu turno»
+  usa el mismo texto que el cartel (probado al cruzarla); esa combinación no se hizo con clics.
+- **⬜ en cola — Probar: 🔥 inmune y vulnerable sin número, a la vista del rival** (2026-11-23): «es inmune al fuego» y «(es vulnerable: le entra de
+  más)» y la fila «+ Resistencia… (vulnerable)» del cuadro, solo con la prueba automática.
+- **⬜ en cola — 🔥 Ajustes de la Varita del muro de fuego y del texto de la resistencia** (dueño, 2026-11-23):
+  1. **El GM ve el número de la resistencia de los jugadores** (cartel, renglón de «Empieza tu turno», cuenta del daño): «el GM está bien que lo
+     vea; el tema son los jugadores a los creeps». Los jugadores siguen sin ver el número de los creeps.
+  2. **La varita pasa a 2d4** de daño de fuego directo («un d4 sin quemadura ni nada me parece muy poco»): catálogo, textos y las varitas ya en
+     mochilas.
+  3. **«Lo frena en parte su resistencia al fuego»** en vez de «lo frena su resistencia al fuego», en todos los textos donde aparezca («si dice "lo
+     frena" se puede interpretar como que lo frena completamente»). El caso inmune sigue diciendo «es inmune».
+- **⬜ en cola — 🪟 La tarjeta de la Crónica «X está en <zona>…» queda «tirando» para siempre después de recargar** (visto en la prueba del
+  23/11): al recargar con una zona pendiente, la tarjeta de la Crónica no se cierra nunca. Que se cierre o se ponga al día sola.
+- **⬜ en cola — Probar: 🔥 la resistencia 0 de un creep en la pantalla del GM** (2026-11-23, P300): el cartel de una zona sobre un creep sin resistencia,
+  visto por el GM, tampoco la nombra; solo con la prueba automática (con clics se vio un personaje).
+- **⬜ en cola — Probar: 🔥 el renglón «le llegó fuera de su turno» con el texto final** (2026-11-23): con clics se vio con la primera redacción («se lo
+  pusieron fuera de su turno… ya pegó al ponérselo»); la final («le llegó… ya pegó al llegar») solo con la prueba automática.
+- **⬜ en cola — 🙈 La zona de un creep que le pega a un jugador escondido no tiene que delatarlo ante el GM (P326)** (prueba con clics,
+  2026-11-24): hoy, con Blanco J1 en Sigilo sobre el Muro de fuego de un creep, el daño (3d4) va al cuadro del duelo y lo tira el GM; y el GM ve en
+  la Crónica «Blanco J1 está en Muro de fuego…» y en la Mesa el daño con el nombre. El GM sabe que J1 está escondido (está bien), pero así sabe
+  **dónde**. Lo mismo vale para cualquier zona con daño de dados del GM (y probablemente al entrar caminando, no solo al empezar el turno). Dónde:
+  `vtt-hexgrid/js/08` (`zonaResolverBanner`: `porDuelo` mira solo `t.oculto`; `zonaMomentoAbrir` no marca `datos.escondido`; `danoDirectoAvisar`,
+  la línea de la Mesa), `zonaCartelAntes` («El daño lo tira Blanco creep»). Esperar la respuesta de P326; no tocar lo de la tabla de turnos.
+- **⬜ en cola — 🔥 El renglón de una zona lee la resistencia de una invocación (P331 decidida)** (dueño, 2026-11-24): hoy, con una invocación en
+  resistencia 0, el renglón igual dice «lo frena su resistencia al fuego» porque no lee su número; que lo lea, y con 0 no la nombre (como P300).
+- **⬜ en cola — Probar: 🌋 el Chorro de lava sobre un escondido, sobre un creep y sobre quien vuela** (2026-11-25): con clics se probó solo un
+  personaje a la vista. El escondido va por el camino de siempre (P326, en cola aparte); el creep y quien vuela (no lo toca: es del piso), solo con
+  la prueba automática.
+- **⬜ en cola — Probar: 🔥 la Fogata y la lava sin orden de turnos** (2026-11-25): sin orden (narrativo) tienen que pegar al pasar de ronda, como el
+  Muro; no se probó con clics.
+- **⬜ en cola — 🔥 Recargar en el medio del turno vuelve a ofrecer una zona ya tirada** (visto el 2026-11-25): si «▶ Empieza tu turno» tardó (otro
+  cartel de zona abierto más de 15 s) la zona sale en su cartel aparte; si después se recarga la página antes de cerrar la ventana, la zona vuelve a
+  aparecer como renglón y se puede tirar dos veces. Pasa con cualquier zona de «al empezar el turno» (también el Muro).
+- **⬜ en cola — Probar: 💨 los Pedos en el Mantenimiento con el GM mirando otro mapa** (2026-11-25): la tanda la arma la pantalla del GM; si está
+  en otro mapa, a los 5 s cada pantalla pide la suya (con la misma tirada de ese Mantenimiento). No se probó con clics; tampoco con un escondido
+  adentro (P326) ni con una invocación.
+- **⬜ en cola — Probar: ☠ la Varita de miasma sin orden de turnos y sobre un creep** (2026-11-25): sin orden (narrativo) tiene que pegar al pasar de
+  ronda; sobre un creep (la tira un jugador), el cartel de siempre del GM. Con clics se probó solo un creep tirándola sobre dos personajes.
+- **⬜ en cola — Probar: ☠🔥 las Nubes tóxicas y la Mina napalm sin orden de turnos y sobre una invocación** (2026-11-25): sin orden (narrativo)
+  tienen que pegar al pasar de ronda; la Nube de la clase sobre una invocación o con un escondido adentro (P326); la Nube de un creep sobre una
+  invocación (renglón de «Empieza el turno de…»). Con clics se probó todo con orden de turnos, sobre personajes y creeps.
+- **⬜ en cola — Probar: 🔥 el terreno incendiado y las zonas del asistente sin orden de turnos, y una zona del asistente con estado** (2026-11-25):
+  sin orden (narrativo) tienen que pegar al pasar de ronda; una zona del asistente solo de piso con un estado y resistencia (una tirada al entrar
+  aunque dé varios pasos; el daño, una vez por paso); una que «solo importa moverse» (sin el golpe al empezar el turno); que quien levita cruce las
+  Brasas sin que le peguen. Con clics se probó todo con orden de turnos y daño sin estado.
+- **⬜ en cola — 🔥 Al terreno incendiado lo frena la resistencia al fuego (P338 decidida)** (dueño, 2026-11-25): hoy su daño fijo va directo a la
+  vida sin restar la resistencia al fuego; que la reste, como las demás zonas de fuego (y que el renglón / «Ver detalle» lo digan, P300/P331).
+- **⬜ en cola — Probar: 💤 el Gas adormecedor y el Gas somnífero con lo que no se probó con clics** (2026-11-25): sin orden de turnos (narrativo:
+  tienen que pegar al pasar de ronda), el **Gas somnífero** (Exhausto, Res.CC contra 9, se dispara solo en el centro), un **creep** adentro (el
+  cartel de siempre en la pantalla del GM, no un renglón), alguien que **entra** a la nube ya puesta y se mueve adentro (una sola vez por ronda), y
+  la puesta al día de una copia vieja en una **mochila** y en el **cinturón** de un personaje o de un creep. Con clics se probó el Gas adormecedor
+  con orden de turnos sobre dos personajes, una invocación que vuela y un escondido.
 
 ## En cola
 
@@ -3300,9 +3310,4 @@ Cada línea nueva que se termine de diseñar se suma al final.
   token: «el muro le hizo N de daño a un personaje oculto». El escondido sigue escondido y se puede seguir moviendo. Lo mismo con el inmune
   (la Crónica y la Mesa sin nombre; «esto es fácil de resolver, supongo»).
 
-- **⬜ en cola — Probar: 💤 el Gas adormecedor y el Gas somnífero con lo que no se probó con clics** (2026-11-25): sin orden de turnos (narrativo:
-  tienen que pegar al pasar de ronda), el **Gas somnífero** (Exhausto, Res.CC contra 9, se dispara solo en el centro), un **creep** adentro (el
-  cartel de siempre en la pantalla del GM, no un renglón), alguien que **entra** a la nube ya puesta y se mueve adentro (una sola vez por ronda), y
-  la puesta al día de una copia vieja en una **mochila** y en el **cinturón** de un personaje o de un creep. Con clics se probó el Gas adormecedor
-  con orden de turnos sobre dos personajes, una invocación que vuela y un escondido.
 

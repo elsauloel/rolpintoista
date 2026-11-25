@@ -2596,7 +2596,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   la ronda 2, nada en el Mantenimiento; al empezar el turno de J1 (ya Cansado: 2 → 1), su renglón y volvió a fallar: «Cansado: ya lo tenía, vuelve a
   2 turnos» (quedó en 2). «Ver detalle», el cartel de arriba y el 🔍, con el texto nuevo. Al final, la vuelta del mapa: «quedó igual». Pruebas
   automáticas: una nueva (1131 en verde). Dudas: P341, P342, P343.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube de veneno y Aceite resbaladizo** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Resina de árbol negro y Arena movediza (con las trampas de arena de varita)** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Varita del aceite y Varita del farol** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -3098,6 +3097,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   posición conocida? ¿una marca del escondido?) y, si delata **dónde** está el escondido, sacarlo: el GM sabe que existe y quién es, no dónde.
   En la misma captura, la tabla de turnos del GM no mostraba a Blanco J2 mientras estaba escondido (eso ya está en la cola: «El GM siempre ve a los
   jugadores en la tabla de turnos»).
+- **⬜ en cola (vuelta al final, dueño 2026-11-25: «volvé a pasar esta tarea así como está al final de la cola») — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube de veneno y Aceite resbaladizo** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+  Lo que ya se le contó (2026-11-25): la Nube de veneno es de aire, Veneno ×3, Res.Esp contra 9; el Aceite es de piso, Sentado, **al dispararse se
+  resiste con Agilidad contra 7 pero el charco que queda con Res.CC contra 7** (error probable: recomendado Agilidad en los dos). Dudas abiertas:
+  1) Nube de veneno, si ya está envenenado y vuelve a fallar: (a) +3 stacks, (b) +1 stack como la Nube tóxica (recomendado), (c) vuelve a 3.
+  2) Aceite (solo piso): ¿también en cada paso adentro (recomendado) y sin que lo frene la Suela gruesa (recomendado: la Suela es para daño del piso)?
 
 ## En cola
 

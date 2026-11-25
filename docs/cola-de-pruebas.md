@@ -3000,6 +3000,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   aunque dé varios pasos; el daño, una vez por paso); una que «solo importa moverse» (sin el golpe al empezar el turno); que quien levita cruce las
   Brasas sin que le peguen. Con clics se probó todo con orden de turnos y daño sin estado.
 
+- **⬜ en cola — 🔥 Al terreno incendiado lo frena la resistencia al fuego (P338 decidida)** (dueño, 2026-11-25): hoy su daño fijo va directo a la
+  vida sin restar la resistencia al fuego; que la reste, como las demás zonas de fuego (y que el renglón / «Ver detalle» lo digan, P300/P331).
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

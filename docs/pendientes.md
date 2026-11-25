@@ -838,6 +838,9 @@
   cartel de la zona (y sus dados salen solos o con un «Aplicar»), porque el duelo todavía no las maneja: el **hielo** (una tirada por paso), las
   zonas de **cura** y de **luz**, un **estado con chance** (la Varita de miasma), las que dejan **«soltarse»**, la **tirada extra sin tabla**, las de
   **trampas** y las de **número fijo** (también su daño). Ver juntos: ¿pasan al cuadro del duelo o queda un cartel de zonas estandarizado?
+- [ ] **🌫 Revisar el asistente de zonas** (dueño, 2026-11-25, de P339: «vamos a esperar al momento de rediseñar el asistente de zonas»). Mirarlo
+  en la compu y decidir cómo rediseñarlo; ahí se decide también si vuelve el botón «🔥 Terreno incendiado» a ⚙ Terreno y Formas (hoy solo lo arma
+  el asistente o se copia uno puesto). Ver también, en la lista de diseño, «Revisar la creación de trampas» (funciones simples; lo complejo, a mano).
 - [ ] **Auditoría de tiradas (`docs/auditoria-tiradas.md`), las preguntas abiertas** (2026-11-10, dueño: «cuando esté en la compu… las vamos a
   revisar una por una»). Los bloques 1, 2 y 3 (resistencias, daños y chances) se pasan al cuadro del duelo como ruta de trabajo, por tandas;
   quedan para revisar juntos:

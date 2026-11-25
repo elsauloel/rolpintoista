@@ -709,7 +709,9 @@ function hudHpHtml(t, d){
       <button type="button" class="hud-mini${danio ? ' activo' : ''}" data-hud-hpmodo="danio">1 · Recibe daño</button>
       <button type="button" class="hud-mini${danio ? '' : ' activo'}" data-hud-hpmodo="directo">2 · HP directo</button>
     </div>
-    <div class="hud-hp-expl">${danio
+    <div class="hud-hp-expl">${danio && TokensAuto.sueltoVida(t)
+      ? 'Es un objeto: <b>no tiene Defensa</b>. Escribí el <b>daño del golpe</b> y entra entero a su vida.<br>Con un <b>+</b> adelante (<b>+10</b>) <b>suma vida</b>, sin pasar del máximo.'
+      : danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.<br>Con un <b>+</b> adelante (<b>+10</b>) <b>suma vida</b>.`)
@@ -739,7 +741,7 @@ function hudHpPrevia(t, d, texto){
   if(/^\+/.test(crudo)){   // ➕ sumar vida, en los dos modos (2026-11-05)
     const suma = leerValorVital(crudo, 0);
     if(suma === null || suma <= 0) return 'Escribí +N (por ejemplo +10)';
-    const max = num(d.hpMax), nuevo = max > 0 ? Math.min(max, hp + suma) : hp + suma, sobra = max > 0 ? hp + suma - max : 0;
+    const max = num(d.hpMax), nuevo = max > 0 ? Math.min(max, hp + suma) : hp + suma, sobra = max > 0 && !TokensAuto.esSuelto(t) ? hp + suma - max : 0;   // 📦 un objeto: sin Vida extra
     return `HP ${fmt(hp)} → ${fmt(nuevo)}${sobra > 0 ? ` · sobran ${fmt(sobra)} (te pregunta si van como Vida extra)` : ''}`;
   }
   if(hpModo === 'directo'){
@@ -751,6 +753,7 @@ function hudHpPrevia(t, d, texto){
   if(/^[\-−]/.test(crudo)) return 'Para bajarla sin Defensa, usá 2 · HP directo';
   const golpe = leerGolpe(crudo);
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
+  if(TokensAuto.sueltoVida(t)) return `${fmt(Math.round(golpe))} entra entero (es un objeto, sin Defensa) → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - Math.round(golpe)))}`;   // 📦 (2026-11-25)
   if(d.def === null || d.def === undefined) return '—';
   const est = estoicoDe(estadosPrevia(t, d), estoicoRivales(t).length);   // 🗿 Estoicismo (js/85): lo que suman los enemigos pegados
   const trinP = typeof trincheraAhora === 'function' ? trincheraAhora(t) : null;   // 🛡 Aguante de trinchera (js/65)
@@ -869,7 +872,7 @@ async function rayoCadenaAplicar(cadena, o){
 async function hudSumarVida(t, crudo){
   const d = hpDatos(t), hp = num(d.hp), max = num(d.hpMax), suma = leerValorVital(crudo, 0);
   if(suma === null || suma <= 0){ toast('Escribí +N (por ejemplo +10)'); return; }
-  const sobra = max > 0 && hp > 0 ? Math.round(hp + suma - max) : 0;
+  const sobra = max > 0 && hp > 0 && !TokensAuto.esSuelto(t) ? Math.round(hp + suma - max) : 0;   // 📦 un objeto no tiene Vida extra: no pasa del máximo
   let extra = 0;
   if(sobra > 0){
     const quien = t.tipo === 'creep' ? `de ${nombreDe(t)} ` : '';
@@ -901,6 +904,8 @@ async function hudHpAplicar(t, texto){
       return;
     }
     if(/^[\-−]/.test(String(texto).trim())){ toast('Para bajarla sin Defensa, usá 2 · HP directo'); return; }
+    // 📦 Un token suelto con vida (2026-11-25): no tiene ficha ni Defensa; el golpe entra entero (como al atacarlo, P306). Antes buscaba una ficha y fallaba.
+    if(TokensAuto.sueltoVida(t)){ const g = leerGolpe(texto); if(g === null) throw new Error(ERROR_TIPEO); hudGlobo = ''; await hudAplicar('hp', '-' + Math.round(g)); return; }
     const idTok = seleccion, antes = vitalActual(t, 'hp');
     const golpe = leerGolpe(texto);
     const resH = t.tipo === 'creep' ? await danioCreep(t, texto, false) : esTokenInv(t) ? await danioInv(t, texto, false, 0, 0, {reparte: true}) : await danioPj(t, texto, false, 0, 0, {reparte: true});   // reparte: Miti-Miti

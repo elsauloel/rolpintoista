@@ -42,6 +42,8 @@ historia.
   quien lo puso) ofrece «🪨 Evasión 1 (es un objeto)» sin tirar, resistencia a crítico 0, sin Parry; `dueloAplicarDano` → `dueloDanoSuelto`: el golpe
   entra entero (sin Defensa ni nada), `hp` no baja de 0, «✍ Otro valor» tal cual (P306, P307). Reglas nuevas (`tokenValido` y la rama del GM):
   sin pegarlas, `crearToken` y el Guardar ponen el token sin esos campos y avisan.
+  **El menú de la vida de un suelto** (2026-11-25): «1 · Recibe daño» le baja el golpe entero (sin Defensa, como al atacarlo) y «+N» no pasa del máximo
+  ni ofrece Vida extra (`hudHpHtml`, `hudHpPrevia`, `hudHpAplicar`, `hudSumarVida`, js/10); antes buscaba una ficha y fallaba.
 
 **Desde el 2026-10-02 está partido en archivos** (paso 5 nivel A, como la ficha y GM Tools): `mapa.html` es solo la pantalla
 (~260 líneas) y carga `mapa.css` (los estilos) y los 14 tramos de su código en `js/`, en este orden:

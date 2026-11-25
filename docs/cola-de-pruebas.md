@@ -2666,10 +2666,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en ~1,5 s. Segunda vez, invocada fuera de turno (sacó 1, entró después del Sanador, que tenía el turno) y muerta **en su propio turno**: salió del orden
   y el turno pasó a Blanco J3. Visto de paso: cada vez que se invoca se crea otra copia («… 3») porque la copia muerta no se vuelve a usar → P344.
   No se probó la pantalla de J3 al recibir el turno (no estaba conectado). Capturas fuera del repo (cola116). La vuelta: «quedó igual».
-- **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
+- **✅ hecho (2026-11-25) — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
   iniciativa y ver que «Traer tokens» / «Tirar iniciativa» no lo meten; otro con «Sí», que entra. Uno con vida: el círculo rojo en el token, cambiarla a
   mano («12», «-3», Ctrl+Z) desde quien lo puso y desde el GM; en la tarjeta 🪪 y al pasar el mouse, la de un jugador con números y la del GM sin números
   para los jugadores. Editarlo: bajar el máximo (la vida no pasa del nuevo) y sacarle la vida.
+  *Resultado:* probado con clics en «Claude · pruebas 2», mapa «Prueba · General» (GM, Jugador 1 y Jugador 2). Los pasos arrancan en «No» y «No» (P305).
+  **Iniciativa:** con cuatro sueltos puestos (un cofre del GM con «No», un guardia del GM con «Sí», una caja del Jugador 1 con vida 20 y «No», una puerta
+  del GM con vida 30 y «No»), «Traer tokens» trajo a los 12 de siempre más el guardia, y ninguno de los «No»; «🎲 Tirar iniciativa de los creeps» tampoco
+  los metió (el guardia, sin nada que tirar, sale en «Sin datos de: Guardia…», como quedó en P291: el número se escribe a mano). **Vida:** el círculo rojo
+  «20/20» al seleccionar la caja; con «2 · HP directo», «12» → 12, «-3» → 9, Ctrl+Z → 12 → 20 («Deshecho: HP vuelve a…»), igual desde el Jugador 1 y
+  desde el GM (en la caja del jugador y en su propia puerta). **Tarjeta 🪪 y globo del mouse:** la caja del Jugador 1, vista por el Jugador 2, el GM y él
+  mismo: «❤ Vida 20 de 20 · se lo puede atacar» y el círculo con números (al Jugador 2, sin poder cambiarlo); la puerta del GM, vista por los dos jugadores:
+  «❤ Tiene vida · se lo puede atacar», sin números y sin círculo (P308); el GM la ve con números. El cofre sin vida: solo «🪨 No ocupa lugar en la iniciativa».
+  **Editar:** la caja en 15/20 → máximo 10 → quedó 10/10; la puerta en 25/30 → máximo 12 → 12/12; «— No: no tiene vida» → sin círculo ni renglón de vida.
+  **Error encontrado y arreglado:** el menú de la vida arranca en «1 · Recibe daño», y en un suelto escribir «12» ahí fallaba con un mensaje técnico
+  («No se pudo aplicar: Invalid document reference…», buscaba una ficha que no tiene) y decía «No conozco su Defensa todavía». Ahora dice «Es un objeto:
+  no tiene Defensa… entra entero», la vista previa «7 entra entero → HP 20 → 13», aplica el golpe entero (con Ctrl+Z) y «+50» suma sin pasar del máximo
+  y sin preguntar por Vida extra (`vtt-hexgrid/js/10`: `hudHpHtml`, `hudHpPrevia`, `hudHpAplicar`, `hudSumarVida`). Probado otra vez con el Jugador 1 y el
+  GM. No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola118). La vuelta: «quedó igual».
 - **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
   uno del Jugador 2 (cada uno contesta «🪨 Evasión 1» desde su pantalla; si no está, el GM a mano), el crítico, el daño que entra entero, «✍ Otro valor»,
   la línea de la Mesa, llegar a 0 («💥 Roto») y una habilidad dirigida contra el objeto.

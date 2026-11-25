@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-11-23T21:32:01Z",
+ "actualizado": "2026-11-25T10:36:26Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1168,7 +1168,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "El **fuego** trabaja en **área** y deja el terreno **incendiado**: en el mapa, en *Terreno y Formas*, se marca la forma como **🔥 Terreno incendiado** (una flor para una bola de fuego, una forma libre para una llamarada). Tiene un **daño de fuego** (valor inicial **5**, se puede cambiar al crearla y después desde el ⚙).\n\n\n\n- **Al entrar** en el terreno incendiado (viniendo de afuera) recibís el daño. Si el recorrido cruza el fuego más de una vez, cuenta cada entrada.\n\n- **En cada ⟳ Mantenimiento**, todo el que **siga adentro** lo recibe de nuevo.\n\n- El daño es **directo a la vida** (el fuego es daño mágico elemental: no hay defensa mágica).\n\n- Con **\"Turnos que dura\"** el fuego se apaga solo.\n\n\n\nLo aplica solo el que maneja al token (cada jugador a sus personajes, el GM a los creeps); las invocaciones se avisan en la Mesa para aplicarlas a mano. [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora)."
+   "cuerpo": "El **fuego** trabaja en **área** y deja el terreno **incendiado**: en el mapa, en *Terreno y Formas*, se marca la forma como **🔥 Terreno incendiado** (una flor para una bola de fuego, una forma libre para una llamarada). Tiene un **daño de fuego** (valor inicial **5**, se puede cambiar al crearla y después desde el ⚙).\n\n\n\n- **Al entrar** en el terreno incendiado recibís el daño (también si solo lo cruzás de paso).\n\n- **Al empezar tu turno** adentro lo recibís de nuevo (con orden de turnos; sin orden, cada vez que se pasa de ronda).\n\n- Es **de piso y aire**: también quema a quien **vuela o levita**, y la Suela gruesa no lo frena.\n\n- El daño es **directo a la vida** (no lo frenan la Defensa ni la Defensa especial).\n\n- Con **\"Turnos que dura\"** el fuego se apaga solo.\n\n\n\nLo aplica solo el que maneja al token (cada jugador a sus personajes y sus invocaciones, el GM a los creeps). [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora)."
   },
   {
    "id": "lisiado",

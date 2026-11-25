@@ -516,7 +516,7 @@ async function crearElementoZona(centro, cfg){
   };
   if(cfg.amiga) datos.zonaAmiga = true;
   if(cfg.dano){ datos.zonaDano = String(cfg.dano).slice(0, 12); if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
-  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada || cfg.estado.cura || cfg.estado.duelo || cfg.estado.alEmpezar)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22; o solo «al empezar su turno»: la Varita del muro de fuego, P272, 2026-11-23)
+  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada || cfg.estado.cura || cfg.estado.duelo || cfg.estado.alEmpezar || cfg.estado.porPaso)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22; o solo «al empezar su turno»: la Varita del muro de fuego, P272, 2026-11-23)
   if(cfg.resistStat && Number.isFinite(cfg.resistValor)){ datos.zonaResistStat = String(cfg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(cfg.resistValor)); }
   // La tirada de la zona (2026-10-02, P143): el stat de quien la creó y su valor al crearla; se tira cada vez que afecta a alguien.
   else if(cfg.resistStat && cfg.tiraStat && Number.isFinite(cfg.tiraValor)){
@@ -851,6 +851,11 @@ function invocacionDeHabilidad(msg){
 // 🌫 Zonas con efectos persistentes: el asistente paso a paso (comun/asistente-zona.js, 2026-09-28, pedido del
 // dueño). Cualquier miembro lo puede usar (mismo criterio que Formas libres y Trampas); el casteador queda como
 // "el bando de quien la coloca" (el GM = rival de los PJ; un jugador = rival de los creeps), no un token puntual.
+// El zonaEstado de una zona del asistente: su estado (si deja uno) + cómo pega (P295, 2026-11-25). → null si no hay nada que guardar.
+function zonaModoAsistente(r){
+  const e = {...(r && r.estado ? r.estado : {}), ...(r && r.enMantenimiento !== false ? {alEmpezar: true} : {}), ...(r && r.altura === 'piso' ? {porPaso: true} : {})};
+  return Object.keys(e).length ? e : null;
+}
 function abrirAsistenteZonaNueva(){
   if(borradorElemento) consolidarBorradorElemento();
   desactivarHerramienta();
@@ -861,7 +866,12 @@ function abrirAsistenteZonaNueva(){
       elegirDestino(h => crearElementoZona(h, {
         radio, turnos: r.turnos, nombre: r.nombre, color: r.color, alfa: r.alfa, amiga: r.amiga, dano: r.dano, ignoraDef: r.ignoraDef,
         danoTipo: r.dano ? ({toxico: 'tóxico', rayo: 'eléctrico', fisico: 'físico'})[r.tipoDano] || r.tipoDano || '' : '',   // 🔥 el elemento elegido en el asistente (2026-11-21, visto en el mapa: no se guardaba, y una zona «de fuego» hecha a mano no tenía elemento: ni resistencia, ni «INMUNE AL FUEGO»)
-        estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso, altura: r.altura,
+        // 🔥 (P295, dueño, 2026-11-25) Pega al entrar y AL EMPEZAR EL TURNO de quien está adentro (`alEmpezar`; sin orden de turnos, al pasar de ronda),
+        // ya no en cada Mantenimiento; solo de piso, además una vez por cada paso que da adentro (`porPaso`, entrar es el primero: P333) y la frena la
+        // Suela gruesa (`suelaFrena`, js/08). Piso y aire (o del aire), sin eso. Va adentro del JSON de zonaEstado (sin reglas nuevas). Las ya puestas,
+        // como estaban.
+        estado: zonaModoAsistente(r), resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento,
+        cadaPaso: r.altura === 'piso' ? false : r.cadaPaso, altura: r.altura,
         casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
       }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
       if(typeof areaPrevia === 'function') areaPrevia(radio, r.color);

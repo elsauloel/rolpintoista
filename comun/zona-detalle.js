@@ -269,17 +269,18 @@ const ZonaDetalle = (() => {
       }
       return t;
     }
-    if(el.zona) return armarZona(el, ctx);
     const filas = [];
-    if(el.fuego){
+    // 🔥 El terreno incendiado primero: el mapa le suma los campos de una zona (P295, 2026-11-25), pero se cuenta como lo que es.
+    if(el.fuego && !el.trampa){
       const d = Math.round(Number(el.fuegoDano)) || 5;
       filas.push({k: 'Fuego amigo', v: 'SÍ. Quema a cualquiera que lo pise: personajes, invocaciones y creeps.'});
       filaAutor(el, ctx, filas); filaQueda(el, ctx, filas);
-      filas.push({k: 'Cuándo se dispara', v: 'Al entrar (cada vez que se entra viniendo de afuera) y, mientras se siga adentro, cada vez que se pasa de ronda (el Mantenimiento).'});
+      filas.push({k: 'Cuándo se dispara', v: 'Al entrar (también si solo lo cruza) y al empezar su turno adentro. Sin orden de turnos, cada vez que se pasa de ronda (el Mantenimiento).'});
       filas.push({k: 'Tirada para evitarla', v: 'No tiene: entra directo.'});
-      filas.push({k: 'Qué frena el daño', v: 'La Defensa no (va directo a la vida). Es del piso: a quien vuela o levita no lo toca.'});
-      return {icono: '🔥', titulo: 'Terreno en llamas', esencial: `${d} de daño de fuego a cualquiera: al entrar y, mientras siga adentro, cada vez que se pasa de ronda.`, filas, descripcion: '', descripcionNo: ''};
+      filas.push({k: 'Qué frena el daño', v: 'Nada: va directo a la vida (ni la Defensa ni la Defensa especial). Es del piso y del aire: también quema a quien vuela o levita, y la Suela gruesa no lo frena.'});
+      return {icono: '🔥', titulo: 'Terreno en llamas', esencial: `${d} de daño de fuego a cualquiera: al entrar y al empezar su turno adentro.`, filas, descripcion: '', descripcionNo: ''};
     }
+    if(el.zona) return armarZona(el, ctx);
     if(el.niebla){
       filas.push({k: 'Fuego amigo', v: 'No aplica: no le pega a nadie. Tapa la vista para todos por igual.'});
       filaAutor(el, ctx, filas); filaQueda(el, ctx, filas);

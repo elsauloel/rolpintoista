@@ -84,8 +84,9 @@ const AsistenteZona = (() => {
       if(est.seResiste) f.push(`Se resiste con ${STATS.find(s => s[0] === est.resistStat)[1].split(' (')[0]} contra ${est.resistValor}: quien pierde recibe lo de arriba`);
       else if(f.length) f.push('Se aplica directo, sin nada que resistir');
       if(!f.length) f.push('Todavía no hace nada: volvé a los pasos de Daño o Estado');
-      f.push(est.enMantenimiento ? 'Sigue afectando en cada Mantenimiento a quien se quede adentro' : 'Solo afecta al entrar — quedarse quieto adentro no hace nada');
-      f.push(est.cadaPaso ? 'Cada paso que se camina adentro cuenta (como pisar una a una varias púas)' : 'Alcanza con entrar una vez');
+      f.push(est.enMantenimiento ? 'Afecta al entrar y al empezar su turno a quien se quede adentro (sin orden de turnos, cada vez que se pasa de ronda)' : 'Solo afecta al entrar — quedarse quieto adentro no hace nada');
+      if(est.altura === 'piso') f.push('Es del piso: le pega una vez por cada paso que da adentro (entrar es el primero), lo frena la Suela gruesa y no toca a quien vuela o levita');
+      else f.push(est.cadaPaso ? 'Cruzarla de largo también cuenta (no hace falta terminar el movimiento adentro)' : 'Alcanza con entrar una vez');
       f.push(est.amiga ? 'Afecta también a los aliados de quien la puso' : 'Solo afecta a los rivales');
       return f;
     }
@@ -147,18 +148,19 @@ const AsistenteZona = (() => {
       if(id === 'disparo'){
         return `<div class="az-preg">¿Sigue afectando a quien se queda adentro?</div>
           <p class="az-ayuda">Una nube de veneno sí: quien se queda parado la sigue respirando. Un piso de púas no: si no caminás, no te pinchás.</p>
-          <button type="button" class="az-op${est.enMantenimiento ? ' on' : ''}" data-mant="1"><span class="ico">☁️</span><span><b>Sí, en cada Mantenimiento</b><small>Mientras alguien siga adentro cuando el GM pasa el turno, se lo vuelve a chequear.</small></span></button>
+          <button type="button" class="az-op${est.enMantenimiento ? ' on' : ''}" data-mant="1"><span class="ico">☁️</span><span><b>Sí, al empezar su turno</b><small>A quien siga adentro le vuelve a pegar al empezar su turno (sin orden de turnos, cada vez que se pasa de ronda).</small></span></button>
           <button type="button" class="az-op${!est.enMantenimiento ? ' on' : ''}" data-mant="0"><span class="ico">🚶</span><span><b>No, solo importa moverse</b><small>Quedarse quieto adentro no hace nada — hace falta volver a caminar.</small></span></button>
-          <div class="az-preg" style="margin-top:14px">¿Se dispara con cada paso, o alcanza con entrar?</div>
-          <p class="az-ayuda">Con "cada paso", cruzarla de largo también cuenta, no solo terminar el movimiento adentro (las púas: cada casillero que pisás, aunque sigas de largo).</p>
-          <button type="button" class="az-op${!est.cadaPaso ? ' on' : ''}" data-paso="0"><span class="ico">📍</span><span><b>Alcanza con entrar</b><small>Se chequea cuando termina de moverse adentro (nube de veneno, gas).</small></span></button>
-          <button type="button" class="az-op${est.cadaPaso ? ' on' : ''}" data-paso="1"><span class="ico">🦶</span><span><b>Cada paso caminado adentro</b><small>Se chequea aunque solo la esté cruzando, sin quedarse (púas, brasas).</small></span></button>
           <div class="az-preg" style="margin-top:14px">¿Dónde está?</div>
-          <p class="az-ayuda">Levitar salva de lo que está en el piso (mientras levita; al terminar su turno toca el suelo). Las Suelas restan al daño de lo que toca el piso.</p>
+          <p class="az-ayuda">Levitar salva de lo que está en el piso (mientras levita; al terminar su turno toca el suelo). Lo que es solo del piso pega en cada paso que se da adentro y lo frena la Suela gruesa.</p>
           <select id="az-altura" style="max-width:100%">
             <option value="aire"${est.altura === 'aire' ? ' selected' : ''}>☁️ Del aire: ocupa el espacio (gas, nube, humo, explosión) — alcanza aunque levites</option>
-            <option value="piso"${est.altura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — levitando se cruza sin tocarla</option>
-            <option value="ambos"${est.altura === 'ambos' ? ' selected' : ''}>🔥 Ambos (fuego, escarcha): alcanza aunque levites; las Suelas le restan</option></select>
+            <option value="piso"${est.altura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — pega en cada paso; levitando se cruza sin tocarla</option>
+            <option value="ambos"${est.altura === 'ambos' ? ' selected' : ''}>🔥 Piso y aire (fuego, escarcha): alcanza aunque levites; la Suela gruesa no la frena</option></select>
+          ${est.altura === 'piso' ? `<div class="az-preg" style="margin-top:14px">¿Y al caminar adentro?</div>
+          <p class="az-ayuda">Como es del piso, le pega <b>una vez por cada paso</b> que da adentro (entrar es el primero) y le resta la Suela gruesa.</p>` : `<div class="az-preg" style="margin-top:14px">¿Cruzarla de largo también cuenta, o alcanza con entrar?</div>
+          <p class="az-ayuda">Con "cruzarla", también le pega a quien solo pasa por adentro sin quedarse (una vez por movimiento). Lo de «una vez por cada paso» es solo para lo que es del piso.</p>
+          <button type="button" class="az-op${!est.cadaPaso ? ' on' : ''}" data-paso="0"><span class="ico">📍</span><span><b>Alcanza con entrar</b><small>Se chequea cuando termina de moverse adentro (nube de veneno, gas).</small></span></button>
+          <button type="button" class="az-op${est.cadaPaso ? ' on' : ''}" data-paso="1"><span class="ico">🦶</span><span><b>También al cruzarla</b><small>Se chequea aunque solo la esté cruzando, sin quedarse (una vez por movimiento).</small></span></button>`}
           <div class="az-preg" style="margin-top:14px">¿Afecta también a los aliados?</div>
           <label class="az-sin"><input type="checkbox" id="az-amiga"${est.amiga ? ' checked' : ''}> Sí, a cualquiera que corresponda, no solo a los rivales</label>`;
       }
@@ -238,7 +240,7 @@ const AsistenteZona = (() => {
       else if(t.id === 'az-seresiste'){ est.seResiste = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'az-resiststat') est.resistStat = t.value;
       else if(t.id === 'az-amiga') est.amiga = t.checked;
-      else if(t.id === 'az-altura') est.altura = t.value;
+      else if(t.id === 'az-altura'){ est.altura = t.value; dibujar(); }   // (lo del «cada paso» depende de la altura)
     };
     const inicial = JSON.stringify(est);
     api = PasoAPaso.abrir({

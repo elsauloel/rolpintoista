@@ -274,67 +274,22 @@ function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros
   return null;
 }
 /* ---------- Terreno incendiado (2026-09-25, pedido del dueño) ----------
-   Una forma con `fuego: true` y `fuegoDano` (valor inicial 5, editable). Hace daño (DIRECTO a la vida: el fuego es daño mágico elemental y no hay
-   defensa mágica) (1) cada vez que un token ENTRA en el fuego viniendo de afuera (lo aplica quien mueve el token: su dueño o el GM en los creeps) y
-   (2) en cada ⟳ Mantenimiento a todos los que sigan adentro (cada cliente aplica lo suyo: el GM a los creeps, cada jugador a sus personajes).
-   Las invocaciones y los personajes sin dueño conectado se avisan en la Mesa para aplicarlo a mano. Con "Turnos que dura" se apaga solo. */
-function fuegoCeldas(){
-  const m = new Map();   // "col,fila" → daño (el mayor si se superponen)
-  elementos.forEach(el => {
-    if(!el.fuego) return;
-    const d = Math.max(1, num(el.fuegoDano) || 5);
-    celdasDeElemento(el).forEach(c => { const k = nbPack(c.col, c.fila); if(!m.has(k) || m.get(k) < d) m.set(k, d); });
+   Una forma con `fuego: true` y `fuegoDano` (valor inicial 5, editable desde el ⚙). Ya no se crea desde Terreno y Formas (lo reemplazó el asistente de
+   zonas), pero lo ya puesto (o copiado con Ctrl+C / Ctrl+V) sigue andando.
+   🔥 Desde el 2026-11-25 (P295, dueño: «vamos a asumir que hay fuego») es de PISO Y AIRE y va por el motor de las zonas, como el Muro de fuego: pega al
+   entrar (también si solo lo cruza) y AL EMPEZAR EL TURNO de quien está adentro (un renglón de «▶ Empieza tu turno»); sin orden de turnos (o a quien no
+   está en el orden), al pasar de ronda. Sin «cada paso» ni Suela gruesa; alcanza también a quien vuela o levita y a las invocaciones (antes se avisaban
+   a mano). El daño, el de siempre: fijo, directo a la vida (no lo frenan la Defensa ni la Defensa especial; tampoco la resistencia al fuego, como
+   antes: P338). Le pega a cualquiera (fuego amigo). El fuego que se apaga justo en ese Mantenimiento no cuenta (como antes).
+   No se escribe nada nuevo en Firestore: al leer el elemento (js/07) se le suman, solo en esta pantalla, los campos de una zona (`fuegoComoZona`). */
+function fuegoComoZona(el){
+  if(!el || !el.fuego || el.zona || el.trampa) return el;
+  const dueno = typeof miembros !== 'undefined' ? miembros.get(el.duenoUid) : null;
+  return Object.assign(el, {
+    zona: true, terrenoFuego: true, zonaNombre: 'Terreno incendiado', zonaDano: String(Math.max(1, Math.round(num(el.fuegoDano)) || 5)),
+    zonaIgnoraDef: true, zonaDirecto: true, zonaDanoTipo: 'de fuego', zonaAmiga: true, zonaAltura: 'ambos', zonaCadaPaso: true, zonaEnMantenimiento: true,
+    zonaEstado: '', zonaCasteadorRef: '', zonaCasteadorTipo: dueno && !dueno.gm ? 'pj' : 'creep',
   });
-  return m;
-}
-async function fuegoAplicarA(t, dano, cuando){
-  let hecho = false, res = null;
-  try{
-    if(t.tipo === 'creep' && t.fichaId && soyGM){ res = await danioCreep(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
-    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ res = await danioPj(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
-  }catch(err){ console.error('No se pudo aplicar el daño de fuego:', err); }
-  // 📣 El aviso a quien lo recibe, con la cuenta (P246): la línea en la Mesa, el Aviso al centro y la Crónica.
-  if(hecho && res && res.r) danoDirectoCuentaYAviso(t, dano, res, {nombre: 'el Terreno incendiado', titulo: 'Terreno incendiado', icono: '🔥', tipoTxt: ' de fuego', estilo: 'alerta-roja', detalle: cuando || ''});
-  return hecho;
-}
-// Al soltar un movimiento: cada casilla del recorrido que es fuego y viene de una que no lo es cuenta como una entrada.
-async function fuegoEntrada(id, celdas){
-  const t = tokens.get(id);
-  if(!t || !celdas || celdas.length < 2) return;
-  const fuego = fuegoCeldas();
-  if(!fuego.size) return;
-  let total = 0, entradas = 0;
-  for(let i = 1; i < celdas.length; i++){
-    const k = nbPack(celdas[i].col, celdas[i].fila), previa = nbPack(celdas[i - 1].col, celdas[i - 1].fila);
-    if(fuego.has(k) && !fuego.has(previa)){ total += fuego.get(k); entradas++; }
-  }
-  if(!total) return;
-  const hecho = await fuegoAplicarA(t, total, entradas > 1 ? `entró ${entradas} veces` : 'al entrar');
-  if(!hecho || t.oculto) alertaRojaAnonima(`🔥 Terreno incendiado`, `${t.oculto ? 'Alguien' : nombreDe(t)} entró en el fuego${entradas > 1 ? ` (${entradas} veces)` : ''}: ${total} de daño de fuego (directo a la vida) — ${hecho ? 'aplicado solo' : 'aplicalo a mano'}`);
-}
-// Al pasar el turno (⟳ Mantenimiento): todo el que siga en el fuego lo recibe de nuevo. Los fuegos que se apagan justo ahora no cuentan.
-async function fuegoMantenimiento(numero){
-  const fuego = new Map();
-  elementos.forEach(el => {
-    if(!el.fuego || (el.venceMant !== null && el.venceMant !== undefined && el.venceMant <= numero)) return;
-    const d = Math.max(1, num(el.fuegoDano) || 5);
-    celdasDeElemento(el).forEach(c => { const k = nbPack(c.col, c.fila); if(!fuego.has(k) || fuego.get(k) < d) fuego.set(k, d); });
-  });
-  if(!fuego.size) return;
-  const propios = [], ajenos = [];
-  tokens.forEach(t => {
-    const d = fuego.get(nbPack(t.col, t.fila));
-    if(!d || !t.fichaId) return;
-    const mio = (t.tipo === 'creep' && soyGM) || (t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t));
-    (mio ? propios : ajenos).push({t, d});
-  });
-  const hechos = [];
-  for(const {t, d} of propios){ if(await fuegoAplicarA(t, d, 'Mantenimiento: sigue adentro') && t.oculto) hechos.push(`Alguien: ${d}`); }   // (cada uno, con su aviso; el oculto, anónimo)
-  if(hechos.length) alertaRojaAnonima('🔥 Terreno incendiado (Mantenimiento)', `${hechos.join(' · ')} de daño de fuego, directo a la vida (aplicado solo)`);
-  if(soyGM){   // el GM avisa lo que no se pudo aplicar solo (invocaciones o personajes que no están conectados no se detectan: revisar el mapa)
-    const manual = ajenos.filter(({t}) => t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION));
-    if(manual.length) alertaRojaAnonima('🔥 Terreno incendiado (a mano)', `${manual.map(({t, d}) => `${nombreDe(t)}: ${d}`).join(' · ')} de daño de fuego: aplicalo a mano`);
-  }
 }
 
 /* ---------- Zona con efecto persistente: el motor (2026-09-28, pedido del dueño) ----------
@@ -432,7 +387,7 @@ function zonaMostrarSiguiente(){
 /* Del piso, del aire o ambos (2026-10-07, dueño): dónde está el efecto de una zona o una trampa. Levitar salva solo de lo del piso (mientras levita:
    los primeros casilleros de su turno; al terminarlo toca el piso, `levitarAterrizar`); las Suelas restan solo a lo que toca el piso (piso o ambos).
    `zonaAltura` en la zona (asistente de zonas, Ejecución); en una trampa, `altura` adentro del JSON de trampaEstado. Sin marca: una zona es del
-   aire (como siempre), el daño directo de una trampa es del piso (se pisa), el terreno incendiado es del piso. */
+   aire (como siempre), el daño directo de una trampa es del piso (se pisa), el terreno incendiado es de piso y aire (desde el 2026-11-25). */
 function alturaDe(el){
   if(!el) return 'aire';
   if(['piso', 'aire', 'ambos'].includes(el.zonaAltura)) return el.zonaAltura;
@@ -440,7 +395,7 @@ function alturaDe(el){
   // de piso, aunque la explosión sea de piso y aire). Las reglas no dejan sumarle `zonaAltura` al convertirla.
   if(el.zona && el.trampa){ const a = zonaSpecDe(el).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }
   try{ const a = (JSON.parse(el.trampaEstado || '{}') || {}).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }catch(err){}
-  if(el.fuego) return 'piso';
+  if(el.fuego) return 'ambos';   // 🔥 el terreno incendiado: de piso y aire (P295, 2026-11-25; antes, del piso)
   // 🧊 Una superficie (hielo, agua) es del piso aunque no lo diga (2026-10-26: el suelo congelado salía «del aire» y Levitar no lo salvaba).
   { const sup = el.zona && typeof superficieSpec === 'function' ? superficieSpec(el) : null; if(sup && sup.superficie) return 'piso'; }
   return el.trampa && !el.zona ? 'piso' : 'aire';
@@ -485,6 +440,7 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
     if(sup && sup.tiraPaso) return;   // el hielo: al aparecer y por cada paso (zonaRevisarEntrada), no por estar parado
     if(soloAlEmpezar ? !zonaAlEmpezar(el) : (desdeMantenimiento && porTurno && zonaAlEmpezar(el))) return;   // 🔥 la de «al empezar su turno», en su turno
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
+    if(desdeMantenimiento && el.terrenoFuego && Number.isFinite(el.venceMant) && el.venceMant <= Math.round(num(mantenimientoNumero))) return;   // 🔥 el que se apaga justo ahora no cuenta (como siempre)
     if((flotando || (typeof vuelaToken === 'function' && vuelaToken(t))) && alturaDe(el) === 'piso') return;   // 🕊 quien vuela (Levitando, Vuela) no toca lo del piso, tampoco parado (2026-10-26)
     if(soloPiso && alturaDe(el) !== 'piso') return;
     const cs = celdasDeElemento(el), enZona = c => cs.some(x => x.col === c.col && x.fila === c.fila);
@@ -515,7 +471,7 @@ function zonaRenuevaTxt(t, spec){
   const s = tt === 1 ? '' : 's';
   return zonaTieneEstado(t, spec.nombre) ? `${spec.nombre}: ya la tenía, vuelve a ${tt} turno${s}` : `${spec.nombre} (${tt} turno${s})`;
 }
-const zonaSpecDe = el => { try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };
+const zonaSpecDe = el => { if(el && el.terrenoFuego) return {alEmpezar: true}; try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };   // (🔥 el terreno incendiado: al empezar el turno, P295)
 // ☠ ¿A este token la zona solo le suma 1 stack? (la Nube tóxica: ya tiene el estado que deja; sin tirada ni daño)
 function zonaSoloSuma(el, t){ const e = zonaSpecDe(el); return !!((e.sumaUno || e.resetea) && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)); }
 const zonaTieneEstado = (t, nombre) => (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(x => x && x.activo !== false && x.nombre === nombre);
@@ -792,7 +748,7 @@ function zonaDanoCuenta(monto, r, o){
    de la zona); la línea en la Mesa (no si está oculto) y la Crónica. */
 async function danoDirectoAvisar(t, o){
   if(!t || !o || !o.cz || !fbUsuario) return;
-  const cz = o.cz, nombreZ = o.nombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t), icono = o.icono || '💔';
+  const cz = o.cz, nombreZ = o.nombre || 'la zona', quien = zonaQuienPublico(t, true), icono = o.icono || '💔';   // (🙈 P326: uno escondido, «Un personaje oculto»)
   const cuantos = `${cz.entro === 1 ? 'entró 1' : `entraron ${fmt(cz.entro)}`} de daño${o.tipoTxt || ''}`;
   const texto = `${t.tipo === 'creep' ? `A ${quien} le` : 'Te'} ${cuantos} por ${nombreZ} (${cz.cuenta}).`;   // (un creep: el GM lo lee en tercera persona)
   const veredicto = {tono: cz.entro > 0 ? 'malo' : 'neutro', grande: cz.entro > 0 ? `💔 −${fmt(cz.entro)}` : '🛡 0', chico: texto};
@@ -838,7 +794,7 @@ function zonaCartelAntes(el, t, pasos){
   try{ const q = zonaDanoQuien(el), tq = q.deTokenId ? tokens.get(q.deTokenId) : null; quienTira = tq && tq.oculto && !soyGM ? '' : q.yo.nombre; }catch(err){}
   // 🔥 Lo que frena el daño (2026-11-23, dueño: «si bien no se resiste, el daño sí lo frena la resistencia al fuego»): la resistencia a su elemento
   // de quien lo recibe (un personaje: su resumen; un creep, solo en la pantalla del GM), la Defensa o la Defensa especial y la Suela gruesa.
-  let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+  let elZ = el.terrenoFuego ? '' : Combatiente.elementoDe(el.zonaDanoTipo || '');   // (🔥 el terreno incendiado: directo a la vida — P338)
   if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // (como zonaResolverBanner)
   // 🔥 El número, solo para su bando (P297, dueño, 2026-11-23: «que el equipo rival no vea el número, pero que sí diga resistente al fuego»): el GM
   // ve el de los creeps; un jugador, el de los personajes. El rival lee «(es resistente)» / «es inmune» sin cuánto; de un creep, solo lo que los
@@ -890,7 +846,17 @@ function renderZonaBanner(){
     AvisoCombate.cartel('zona', {icono, titulo: a.titulo, texto: a.texto, botones: [{texto: a.boton, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }
 }
-const zonaMomentoAbrir = (el, t) => momentoAbrir({tipo: 'zona', icono: zonaIconoDe(el), titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
+/* 🙈 Quién recibe, como lo ven todos (la Crónica y la Mesa): uno oculto, «Alguien»; uno escondido (en Sigilo, en la niebla…) para el bando rival, «un
+   personaje oculto» sin nombre (P326, dueño, 2026-11-24: «que se revele que hay alguien ahí pero no se descubra»; 2026-11-25, para lo que el mapa
+   aplica solo —el terreno incendiado, el daño fijo de una zona—; el daño con dados en el cuadro del duelo sigue en la cola). */
+function zonaQuienPublico(t, mayuscula){
+  if(!t) return '';
+  if(t.oculto) return 'Alguien';
+  const esc = t.tipo !== 'creep' && typeof escondidoDe === 'function' ? escondidoDe(zonaIdDe(t)) : null;   // (un personaje o una invocación; un creep escondido, como antes)
+  if(esc) return `${mayuscula ? 'Un' : 'un'} personaje oculto`;
+  return nombreDe(t);
+}
+const zonaMomentoAbrir = (el, t) => momentoAbrir({tipo: 'zona', icono: zonaIconoDe(el), titulo: `${zonaQuienPublico(t, true)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
 /* ▶🔥 La zona como un renglón más de «▶ Empieza tu turno» (dueño, 2026-11-22, opción A: «esta superposición de menús no me gusta»). Antes, al empezar
    el turno de alguien parado en el Muro de fuego, salían dos carteles a la vez y encimados: «Empieza tu turno» y «Muro de fuego: le toca a…». Ahora,
    si a ese token le sale la ventana «Empieza tu turno» en esta pantalla (un personaje o una invocación, a quien lo maneja), las zonas de «al empezar su
@@ -1027,7 +993,7 @@ async function zonaResolverBanner(){
     // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Defensa especial de quien lo recibe, como en el
     // duelo (dueloAplicarDano). Lo confirmó el dueño para el tóxico (P142, 2026-10-02). Las zonas del GM y de trampas, no.
     // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Defensa especial.
-    let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+    let elZ = el.terrenoFuego ? '' : Combatiente.elementoDe(el.zonaDanoTipo || '');   // (🔥 el terreno incendiado: directo a la vida, como siempre — P338)
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     if(porDuelo){
       const q = zonaDanoQuien(el), suela = suelaFrena(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
@@ -1061,7 +1027,7 @@ async function zonaResolverBanner(){
       try{
         let res = null;
         const frenaEspZ = !!(el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ));   // 🛡 Aguante de trinchera: va a la Defensa especial cuando es lo que frena (js/10; 2026-11-21)
-        const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef)), ...(frenaEspZ ? {frenaEsp: true} : {})};   // el Orbe de absorción (js/26)
+        const oZ = {magico: !!(elZ || el.terrenoFuego || (el.zonaIgnoraDef && el.zonaCasteadorRef)), ...(frenaEspZ ? {frenaEsp: true} : {})};   // el Orbe de absorción (js/26)
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         const suelaZ = suelaFrena(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0;
@@ -1123,7 +1089,7 @@ async function zonaResolverBanner(){
       }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }
     }
   }
-  const finTurno = el.venceMant === Math.round(num(mantenimientoNumero));   // su último Mantenimiento: anota que ya lo resolvió (js/07, zonaEsperaSuFin)
+  const finTurno = !el.terrenoFuego && el.venceMant === Math.round(num(mantenimientoNumero));   // (🔥 el terreno incendiado no se guarda como zona: no anota nada)   // su último Mantenimiento: anota que ya lo resolvió (js/07, zonaEsperaSuFin)
   if((el.zonaEstado && !resistio) || el.trampa || finTurno){   // la de una trampa: resista o no, ya le tocó en esta ronda
     const claves = [...((el.zonaEstado && !resistio) || el.trampa ? [zonaClave(el, t)] : []), ...(finTurno ? [zonaIdDe(t) + '@fin'] : [])];
     try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(...claves)}); }

@@ -151,7 +151,7 @@ const FichaCalculo = (() => {
     // Torso rígido de Buena calidad (2026-10-06, dueño).
     // Pies de Buena calidad (2026-10-06, dueño).
     {id:'levantarse', label:'Levantarse rápido', full:'Levantarse de Sentado cuesta esta cantidad de No2 menos (nunca menos de 0)'},
-    {id:'levitar', label:'Levitar', full:'Los primeros N casilleros que te movés en cada turno no tocan el piso: no te frena el terreno lento, no pisás ni detectás trampas y no te quema el terreno incendiado (las zonas sí te alcanzan: pueden ser nubes); al terminar el turno tocás el piso'},
+    {id:'levitar', label:'Levitar', full:'Los primeros N casilleros que te movés en cada turno no tocan el piso: no te frena el terreno lento, no pisás ni detectás trampas y no te toca lo que es solo del piso (el terreno incendiado y las zonas del aire sí te alcanzan: pueden ser fuego o nubes); al terminar el turno tocás el piso'},
     {id:'suelagruesa', label:'Suela gruesa', full:'Lo que pisás (zonas y trampas) te hace esta cantidad menos de daño'},
     {id:'meditar', label:'Meditar', full:'Si no te moviste en tu turno anterior, al empezar el tuyo recuperás esta cantidad de SP'},
     // Piernas de Buena calidad (2026-10-06, dueño).

@@ -262,17 +262,19 @@ El **fuego** trabaja en **área** y deja el terreno **incendiado**: en el mapa, 
 
 
 
-- **Al entrar** en el terreno incendiado (viniendo de afuera) recibís el daño. Si el recorrido cruza el fuego más de una vez, cuenta cada entrada.
+- **Al entrar** en el terreno incendiado recibís el daño (también si solo lo cruzás de paso).
 
-- **En cada ⟳ Mantenimiento**, todo el que **siga adentro** lo recibe de nuevo.
+- **Al empezar tu turno** adentro lo recibís de nuevo (con orden de turnos; sin orden, cada vez que se pasa de ronda).
 
-- El daño es **directo a la vida** (el fuego es daño mágico elemental: no hay defensa mágica).
+- Es **de piso y aire**: también quema a quien **vuela o levita**, y la Suela gruesa no lo frena.
+
+- El daño es **directo a la vida** (no lo frenan la Defensa ni la Defensa especial).
 
 - Con **"Turnos que dura"** el fuego se apaga solo.
 
 
 
-Lo aplica solo el que maneja al token (cada jugador a sus personajes, el GM a los creeps); las invocaciones se avisan en la Mesa para aplicarlas a mano. [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora).
+Lo aplica solo el que maneja al token (cada jugador a sus personajes y sus invocaciones, el GM a los creeps). [[Escarcha y Parálisis|Fuego y hielo se cancelan entre sí]] (a mano, por ahora).
 
 
 

@@ -2538,11 +2538,35 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Tirador la puso, J1 la pisó (2d6 = 10, sin Suela); caminó 2 pasos por el piso ardiendo (2 golpes: 1 − Suela 2 = 0 y 2 − 2 = 0); al pasar de ronda
   nada; al empezar su turno, su renglón (6 − Suela 2 = 4). Tiró el daño el GM (dueño de la zona). Al final, la vuelta del mapa: «quedó igual».
   Pruebas automáticas: una nueva (1122 en verde). Dudas: P336, P337.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): el terreno incendiado y las zonas hechas a mano con el asistente** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-25) — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): el terreno incendiado y las zonas hechas a mano con el asistente** (con daño). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
   **Decidido (dueño, 2026-11-25):** (1) el **Terreno incendiado** pasa a ser **de piso y aire** («vamos a asumir que hay fuego») y pega **al empezar
   el turno de quien está adentro** (y al entrar), sin «cada paso» ni Suela gruesa; ahora también alcanza a quien vuela o levita (actualizar el texto
   de Levitar, que dice que no lo quema); las invocaciones, con su renglón como los demás. El daño fijo queda igual. (2) Las **zonas hechas a mano**:
   al empezar el turno de quien está adentro; si son **solo de piso**, además por cada paso y con Suela gruesa; si son **de piso y aire**, sin eso.
+  **✅ hecho (2026-11-25), el terreno incendiado:** va por el mismo motor que las demás zonas (el mapa le suma, solo en pantalla, los datos de una
+  zona: no se escribe nada nuevo en la nube). Es de piso y aire: pega **al entrar** (también si solo lo cruza) y **al empezar el turno de quien está
+  adentro** (un renglón de «▶ Empieza tu turno», como el Muro de fuego); sin orden de turnos, al pasar de ronda. Ya no en el Mantenimiento si está en el
+  orden; sin «cada paso» ni Suela gruesa; **alcanza a quien vuela o levita** y **a las invocaciones** (con su renglón; antes el GM las aplicaba a mano).
+  El daño, el de siempre: fijo (5 por defecto), directo a la vida, a cualquiera (fuego amigo); como antes, no lo frena la resistencia al fuego (P338).
+  Como es un número fijo, **no hay tirada**: lo aplica la pantalla de quien lo recibe (como toda zona de número fijo, P245), no el GM. Si quien lo recibe
+  está escondido, la Mesa y la Crónica dicen «**Un personaje oculto** · Terreno incendiado» sin nombre (P326; sirve para todo daño fijo de una zona).
+  Textos al día: Levitar (`comun/ficha-calculo.js`), las Zapatillas de pluma y de levitación (las copias se ponen al día solas), «Ver detalle», el cartel
+  de arriba, el 🔍 de la casilla y el manual. Ojo: el terreno incendiado **ya no se puede crear desde Terreno y Formas** (desde el 2026-09-28 lo
+  reemplaza el asistente de zonas); sigue andando el que ya está puesto o se copia con Ctrl+C / Ctrl+V (P339).
+  **✅ hecho (2026-11-25), las zonas del asistente:** si «siguen afectando a quien se queda adentro», ahora pegan **al entrar y al empezar su turno
+  adentro** (sin orden de turnos, al pasar de ronda), ya no en cada Mantenimiento. **Solo de piso**: además **una vez por cada paso** que da adentro
+  (entrar es el primero, P333), las frena la Suela gruesa y no tocan a quien vuela o levita (la pregunta de «cruzarla» ya no se hace). **Piso y aire**
+  (o del aire): sin eso (se sigue pudiendo elegir si cruzarla cuenta). Los textos del asistente lo dicen así. **Las zonas ya puestas terminan como
+  estaban** (en cada Mantenimiento; duran pocos turnos), como con las varitas.
+  *Probado con clics* en «Claude · pruebas 2», mapa «Prueba · General» (GM de pruebas, Jugador 1, Jugador 2): el GM puso terreno incendiado (por datos)
+  debajo de Blanco J1 y de la Abeja de prueba (la que vuela); con orden de turnos, al empezar el turno de J1, su renglón (5, directo: 50 → 45); al empezar
+  el de la abeja, su renglón (ahora sí la quema volando: 30 → 25); al pasar a la ronda 2, ningún golpe en el Mantenimiento (vida igual) y otra vez el
+  renglón al empezar el turno de J1; J1 salió y volvió a entrar → su golpe al entrar. El GM armó con el asistente (con clics) «Brasas» solo de piso y
+  «Llamarada» de piso y aire (1d4 de fuego): al empezar el turno de la abeja y de J1 en la Llamarada, su renglón (sin Suela); al empezar el de Blanco J2
+  (con las Suelas de cuero de dragón del pantano, Suela gruesa 2) en las Brasas, su renglón (4 − Suela 2 = 2); J2 caminó 2 pasos adentro → un cartel
+  «Dio 2 pasos…: le pega una vez por paso (2 veces)» y 2 golpes (3 − 2 = 1, 1 − 2 = 0); al pasar de ronda, nada. Tiró el daño con dados el GM (dueño de
+  la zona). J1 en Sigilo entró al terreno: el GM leyó «Un personaje oculto · Terreno incendiado» en la Mesa y la Crónica. Al final, la vuelta del mapa:
+  «quedó igual». Pruebas automáticas: dos nuevas y una puesta al día (1124 en verde). Dudas: P338, P339.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Gas adormecedor y Gas somnífero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube de veneno y Aceite resbaladizo** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -2971,6 +2995,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: ☠🔥 las Nubes tóxicas y la Mina napalm sin orden de turnos y sobre una invocación** (2026-11-25): sin orden (narrativo)
   tienen que pegar al pasar de ronda; la Nube de la clase sobre una invocación o con un escondido adentro (P326); la Nube de un creep sobre una
   invocación (renglón de «Empieza el turno de…»). Con clics se probó todo con orden de turnos, sobre personajes y creeps.
+- **⬜ en cola — Probar: 🔥 el terreno incendiado y las zonas del asistente sin orden de turnos, y una zona del asistente con estado** (2026-11-25):
+  sin orden (narrativo) tienen que pegar al pasar de ronda; una zona del asistente solo de piso con un estado y resistencia (una tirada al entrar
+  aunque dé varios pasos; el daño, una vez por paso); una que «solo importa moverse» (sin el golpe al empezar el turno); que quien levita cruce las
+  Brasas sin que le peguen. Con clics se probó todo con orden de turnos y daño sin estado.
 
 ## En cola
 

@@ -1176,6 +1176,8 @@ function elementoQueEs(e){
     const [ref, tipo] = String(e.armaDe || '').split('|'), t = [...tokens.values()].find(x => x.fichaId === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo);
     return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
   }
+  // 🔥 El terreno incendiado (el mapa lo lee como zona desde el 2026-11-25, P295): primero, como lo que es.
+  if(e.fuego && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien empieza su turno adentro (también volando)</span>`;
   if(e.zona){
     const q = num(e.turnos) > 0 && typeof zonaTurnosQuedan === 'function' ? zonaTurnosQuedan(e) : null;   // la misma cuenta que «Ver detalle» (js/127)
     const t = q ? q.quedan : (num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0);
@@ -1187,7 +1189,6 @@ function elementoQueEs(e){
     // (P259 (3), 2026-11-22: la nube guarda quién la puso; si esta pantalla no lo ve, tampoco se dice desde qué cuenta se puso — js/127)
     let quien = de; try{ if(typeof zonaDetalleAutor === 'function' && e.zonaCasteadorRef){ const a = zonaDetalleAutor(e).autor || {}; quien = a.escondido ? '(alguien)' : a.nombre ? esc(`(${a.nombre})`) : de; } }catch(err){}
     return `<b>☁ NUBE${e.zonaNombre && quien !== '(alguien)' ? ' · ' + esc(e.zonaNombre) : ''}</b> <span>${quien}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''} · <span class="es-libre">tapa la vista: quien está adentro no se ve desde afuera</span>`; }
-  if(e.fuego && !e.zona && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien sigue adentro al pasar de ronda</span>`;
   if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
   if(e.trampa){
     // Quién la dispara y a quién alcanza (dueño, 2026-10-19: «al seleccionar una trampa, arriba a la derecha, también se debe aclarar esto»).

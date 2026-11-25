@@ -46,16 +46,16 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-elemental.js?v=20261106escudo"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
-<script src="hex-info.js?v=20261105hex"></script>
-<script src="zona-detalle.js?v=20261125lava"></script>
+<script src="hex-info.js?v=20261125incend"></script>
+<script src="zona-detalle.js?v=20261125incend"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261125nube"></script>
+<script src="combatiente.js?v=20261125incend"></script>
 <script src="creep-calculo.js?v=20261122cola47"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js?v=20261123c68"></script>
+<script src="ficha-calculo.js?v=20261125incend"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261124mareo3"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
@@ -5823,6 +5823,23 @@ prueba('asistente de zonas en la ventana común: sin nombre no llega al resumen;
   igual([tabs, aviso, res && res.nombre, res && res.radio, v.mia.isConnected],
     [['Tamaño', 'Daño', 'Estado', 'Resistencia', 'Cuándo afecta', 'Nombre', 'Resumen'], 'Ponele un nombre a la zona.', 'Nube', 1, false]);
 });
+prueba('🔥 asistente de zonas (P295, 2026-11-25): «al empezar su turno»; solo de piso = una vez por paso y la Suela gruesa (sin la pregunta de cruzarla)', async () => {
+  let res = null;
+  AsistenteZona.abrir({alTerminar: r => { res = r; }});
+  const v = papUltima();
+  v.ir('Cuándo afecta');
+  const antes = v.q('.az-c').textContent;
+  const sel = v.q('#az-altura'); sel.value = 'piso'; sel.dispatchEvent(new Event('change', {bubbles: true}));
+  const piso = v.q('.az-c').textContent;
+  v.ir('Nombre'); v.escribir('#az-nombre', 'Brasas');
+  v.ir('Resumen');
+  const resumen = v.q('.az-resumen').textContent;
+  v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  cierto(/Sí, al empezar su turno/.test(antes) && !/en cada Mantenimiento/.test(antes) && /Cruzarla de largo/.test(antes), antes);
+  cierto(/una vez por cada paso/.test(piso) && /Suela gruesa/.test(piso) && !/Cruzarla de largo/.test(piso), piso);
+  cierto(/al empezar su turno/.test(resumen) && /una vez por cada paso que da adentro \(entrar es el primero\)/.test(resumen) && !/Mantenimiento a quien/.test(resumen), resumen);
+  igual([res && res.altura, res && res.enMantenimiento, v.mia.isConnected], ['piso', true, false]);
+});
 prueba('cantidades de un estado en la ventana común: una pregunta por paso, valida el número, «Sin límite» y Cancelar = null', async () => {
   const p1 = EstadoPreguntas.pedir({nombre: 'Escudo', escudoMagico: 5, turnos: 2}, {});
   const v = papUltima();
@@ -10369,7 +10386,7 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const c1 = Combatiente.ponerAlDiaItemsFabrica(lista), c2 = Combatiente.ponerAlDiaItemsFabrica(lista);
     igual([c1, c2, vieja.especial.duelo.zonaEstado, vieja.especial.duelo.zonaCadaPaso, vieja.detalle === v.detalle, vieja.equipado], [true, false, {alEmpezar: true}, true, true, true]);
     const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text();
-    ok(/cfg\.estado\.duelo \|\| cfg\.estado\.alEmpezar\)\) datos\.zonaEstado/.test(t13));   // (una zona sin estado guarda igual la marca)
+    ok(/cfg\.estado\.duelo \|\| cfg\.estado\.alEmpezar \|\| cfg\.estado\.porPaso\)\) datos\.zonaEstado/.test(t13));   // (una zona sin estado guarda igual la marca)
   });
   prueba('🔥 el cartel de una zona sin tirada dice qué le entra y quién tira el daño (2026-11-21: decía «No hay nada que tirar» y se tiraba el 3d4 del Muro)', async () => {
     const nuevo = {...muro, zonaEstado: JSON.stringify({nombre: 'Quemadura', alEmpezar: true})};
@@ -10552,6 +10569,49 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     // 🔥 El piso de la Mina sigue con su 🔥, y el cartel de la trampa dice cómo pega lo que queda.
     const t19 = await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'}).then(r => r.text());
     ok(/function zonaDeTrampaDeFuego\(el\)/.test(t08) && /zonaComo: `\$\{spec\.zm\.porPaso \? 'p' : ''\}/.test(t08) && /if\(dt\.fase === 'zona' && dt\.zonaComo\)/.test(t19));
+  });
+  prueba('🔥 El terreno incendiado y las zonas hechas a mano, al empezar el turno (P295, dueño, 2026-11-25)', async () => {
+    const filaDe = (m, k) => ((m.filas || []).find(x => x.k === k) || {}).v || '';
+    // El terreno incendiado: piso y aire, al entrar y al empezar el turno, directo, sin Suela; el mapa lo lee como zona y igual se cuenta como lo que es.
+    const elF = {fuego: true, fuegoDano: 6, zona: true, terrenoFuego: true, zonaNombre: 'Terreno incendiado', zonaDano: '6', zonaAltura: 'ambos', zonaDanoTipo: 'de fuego'};
+    const f = ZonaDetalle.armar(elF, {autor: {nombre: 'El GM'}});
+    igual([f.titulo, f.esencial], ['Terreno en llamas', '6 de daño de fuego a cualquiera: al entrar y al empezar su turno adentro.']);
+    ok(/vuela o levita/.test(filaDe(f, 'Qué frena el daño')) && /Suela gruesa no lo frena/.test(filaDe(f, 'Qué frena el daño')) && /al empezar su turno adentro/.test(filaDe(f, 'Cuándo se dispara')));
+    const hx = HexInfo.describir(elF);
+    igual([hx.length, hx[0].icono], [1, '🔥']); ok(/empieza su turno adentro/.test(hx[0].detalle), hx[0].detalle);
+    // Levitar (y las zapatillas) ya no dicen que no te quema; las copias viejas de las zapatillas se ponen al día.
+    const lev = FichaCalculo.EXTRA.find(x => x.id === 'levitar');
+    ok(!/no te quema el terreno incendiado/.test(lev.full) && /el terreno incendiado y las zonas del aire sí te alcanzan/.test(lev.full), lev.full);
+    ['pies-zapatillas-de-pluma', 'pies-buena-zapatillas-de-levitacion'].forEach(id => {
+      const z = CATALOGO_BASE.find(x => x.id === id);
+      ok(!/no te quema el terreno incendiado/.test(z.detalle) && /el terreno incendiado y las zonas, como una nube, te alcanzan igual/.test(z.detalle), z.detalle);
+      const vieja = {...structuredClone(z), detalle: z.detalle.replace('no pisás ni detectás trampas; el terreno incendiado y las zonas', 'no pisás ni detectás trampas, no te quema el terreno incendiado; las zonas')};
+      ok(Combatiente.ponerAlDiaItemsFabrica([vieja]) && vieja.detalle === z.detalle && !Combatiente.ponerAlDiaItemsFabrica([vieja]));
+    });
+    // El mapa: el terreno va por el motor de las zonas (al empezar el turno, piso y aire, cruzarlo cuenta, a cualquiera) y ya no por su camino viejo.
+    const [t04, t07, t08, t13] = await Promise.all(['04-mantenimiento-e-iniciativa.js', '07-tokens-y-elementos.js', '08-mover-trampas-y-zonas.js', '13-tokens-portal-duelo.js']
+      .map(f => fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'}).then(r => r.text())));
+    ok(!/fuegoMantenimiento\(|fuegoEntrada\(/.test(t04 + t07 + t08), 'el camino viejo ya no está');
+    ok(/fuegoComoZona\(elementos\.get\(ch\.doc\.id\)\)/.test(t07) && /el\.terrenoFuego \|\| el\.zonaEnMantenimiento === false/.test(t07));
+    const fcz = new Function('num', 'miembros', t08.match(/function fuegoComoZona\(el\)\{[\s\S]*?\n\}\n/)[0] + 'return fuegoComoZona;')(v => Number(v) || 0, new Map([['g', {gm: true}]]));
+    const z = fcz({fuego: true, fuegoDano: 7, duenoUid: 'g'});
+    igual([z.zona, z.terrenoFuego, z.zonaDano, z.zonaAltura, z.zonaCadaPaso, z.zonaAmiga, z.zonaIgnoraDef, z.zonaDirecto, z.zonaEstado, z.zonaCasteadorTipo],
+      [true, true, '7', 'ambos', true, true, true, true, '', 'creep']);
+    igual(fcz({fuego: true, trampa: true}).zona, undefined);   // (una trampa con fuego no se toca)
+    ok(/if\(el && el\.terrenoFuego\) return \{alEmpezar: true\};/.test(t08) && /if\(el\.fuego\) return 'ambos';/.test(t08) && /el\.terrenoFuego \? '' : Combatiente\.elementoDe/.test(t08));
+    ok(/desdeMantenimiento && el\.terrenoFuego && Number\.isFinite\(el\.venceMant\)/.test(t08) && /const finTurno = !el\.terrenoFuego &&/.test(t08));
+    // 🙈 (P326) lo que el mapa aplica solo a uno escondido: la Mesa y la Crónica dicen «Un personaje oculto».
+    ok(/function zonaQuienPublico\(t, mayuscula\)/.test(t08) && /quien = zonaQuienPublico\(t, true\)/.test(t08) && /titulo: `\$\{zonaQuienPublico\(t, true\)\} está en/.test(t08));
+    // Las zonas del asistente: al empezar el turno (si siguen afectando a quien se queda) y, solo de piso, una vez por paso (sin «cruzarla»).
+    const zma = new Function(t13.match(/function zonaModoAsistente\(r\)\{[\s\S]*?\n\}\n/)[0] + 'return zonaModoAsistente;')();
+    igual([zma({enMantenimiento: true, altura: 'piso'}), zma({enMantenimiento: true, altura: 'ambos', estado: {nombre: 'Veneno', stacks: 2}}), zma({enMantenimiento: false, altura: 'aire'}), zma({enMantenimiento: false, altura: 'piso'})],
+      [{alEmpezar: true, porPaso: true}, {nombre: 'Veneno', stacks: 2, alEmpezar: true}, null, {porPaso: true}]);
+    ok(/estado: zonaModoAsistente\(r\)/.test(t13) && /cadaPaso: r\.altura === 'piso' \? false : r\.cadaPaso/.test(t13));
+    // «Ver detalle» de una del asistente solo de piso: al entrar, por paso y al empezar el turno; la Suela la frena.
+    const elP = {zona: true, zonaNombre: 'Brasas', zonaDano: '1d4', zonaCasteadorTipo: 'creep', zonaAltura: 'piso', zonaEstado: JSON.stringify({alEmpezar: true, porPaso: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(elP, {}), 'se dispara al entrar, en cada paso que dan adentro y al empezar su turno adentro');
+    igual(ZonaDetalle.frenoDe(elP, {altura: 'piso'}).suela, true);
+    igual(ZonaDetalle.frenoDe({...elP, zonaAltura: 'ambos'}, {altura: 'ambos'}).suela, false);
   });
   prueba('🔥 el número de la resistencia, solo para su bando (P297, dueño, 2026-11-23): el rival lee «es resistente» sin cuánto', async () => {
     igual([Combatiente.verResDe(true, 'pj'), Combatiente.verResDe(true, 'creep'), Combatiente.verResDe(false, 'pj'), Combatiente.verResDe(false, 'creep')], [false, true, true, false]);

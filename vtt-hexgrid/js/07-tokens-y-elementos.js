@@ -390,6 +390,8 @@ function escucharElementos(){
         trampaItem: typeof d.trampaItem === 'string' ? d.trampaItem : '',   // el consumible que la colocó (js/28: desarmarla la devuelve tal cual; 2026-10-24, no se copiaba)
         zonaTurnos: Math.max(1, Math.round(num(d.zonaTurnos)) || 3),
       });
+      // 🔥 El terreno incendiado va por el motor de las zonas (P295, 2026-11-25; js/08): se le suman, solo en esta pantalla, los campos de una zona.
+      if(d.fuego === true && d.zona !== true && d.trampa !== true && typeof fuegoComoZona === 'function') fuegoComoZona(elementos.get(ch.doc.id));
       // ☁ Una nube a la que el viento le sacó casillas: las que se fueron se disipan (js/91, 2026-11-03).
       if(ch.type === 'modified' && previoElem && typeof nubeSeFue === 'function') try{ nubeSeFue(previoElem, elementos.get(ch.doc.id)); }catch(err){}
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
@@ -441,7 +443,7 @@ function trampasDisparadasBarrer(){
    borra; como mucho espera ZONA_FIN_MS, por si alguien no está conectado. */
 const ZONA_FIN_MS = 120000, zonasFinDesde = new Map();
 function zonaEsperaSuFin(el, id){
-  if(!el.zona || el.zonaEnMantenimiento === false || mantenimientoNumero !== el.venceMant) return false;
+  if(!el.zona || el.terrenoFuego || el.zonaEnMantenimiento === false || mantenimientoNumero !== el.venceMant) return false;   // (🔥 el terreno incendiado que se apaga no pega: como siempre)
   if(!zonasFinDesde.has(id)){ zonasFinDesde.set(id, Date.now()); setTimeout(elementosVencidosBarrer, ZONA_FIN_MS + 500); }
   if(Date.now() - zonasFinDesde.get(id) > ZONA_FIN_MS) return false;
   const celdas = celdasDeElemento(el);
@@ -1246,8 +1248,7 @@ async function moverToken(id, col, fila, celdas, levita){
     if(rot === num(t.rotacion || 0)) rot = undefined; else t.rotacion = rot;
   }
   const conRot = rot === undefined ? {} : {rotacion: rot};
-  // Levitar (2026-10-06): los primeros casilleros no tocan el piso — el fuego del terreno solo mira desde ahí (las zonas, no: pueden ser nubes).
-  const pisadas = celdas && num(levita) > 0 ? celdas.slice(Math.min(num(levita), celdas.length - 1)) : celdas;
+  // (🔥 el terreno incendiado va por las zonas desde el 2026-11-25, P295: es de piso y aire, así que también quema levitando — zonaRevisarEntrada)
   renderPanel();
   pedirDibujo();
   const doc = coleccionTokens().doc(id);
@@ -1258,7 +1259,6 @@ async function moverToken(id, col, fila, celdas, levita){
     sigiloPublicarAvisos(id);
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
-    fuegoEntrada(id, pisadas);
     zonaRevisarEntrada(id, celdas, num(levita));   // las zonas del piso no tocan lo levitado; las del aire, sí (2026-10-07)
     if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas);   // ⏩ (js/40)
     if(typeof townPortalRevisar === 'function') townPortalRevisar(id, celdas);   // 🌀 (js/84)
@@ -1268,7 +1268,7 @@ async function moverToken(id, col, fila, celdas, levita){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && (ruta.length > 2 || conTunel)){   // (🕳 la estela de un jugador bajo tierra: hasta pegar las reglas del 2026-10-28)
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); if(typeof townPortalRevisar === 'function') townPortalRevisar(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); if(typeof townPortalRevisar === 'function') townPortalRevisar(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);

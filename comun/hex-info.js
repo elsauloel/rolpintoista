@@ -30,8 +30,8 @@ const HexInfo = (() => {
       if(el.disparada) out.push(item('trampa', '💥', `Trampa detonada · ${el.trampaNombre || 'sin nombre'}`, 'Ya se disparó.'));
       else out.push(item('trampa', '⚠', `Trampa armada · ${el.trampaNombre || 'sin nombre'}`, corto(el.trampaDetalle) || 'Se dispara al pisarla.'));
     }
-    if(el.fuego) out.push(item('peligro', '🔥', 'Terreno en llamas', `Quema a quien lo pisa o se queda: ${Math.round(Number(el.fuegoDano)) || 5} de daño de fuego.`));
-    if(el.zona){
+    if(el.fuego) out.push(item('peligro', '🔥', 'Terreno en llamas', `Quema a quien entra y a quien empieza su turno adentro (también volando): ${Math.round(Number(el.fuegoDano)) || 5} de daño de fuego.`));
+    if(el.zona && !(el.fuego && !el.trampa)){   // (🔥 el terreno incendiado, que el mapa lee como zona: ya está arriba)
       if(sup === 'hielo') out.push(item('superficie', '🧊', 'Hielo', 'Cada paso encima pide una tirada de Agilidad: quien falla queda Sentado. Al irse, deja un charco.'));
       else if(sup === 'agua') out.push(item('superficie', '💧', 'Charco de agua', 'Quien está parado acá recibe el rayo ×1,5 y la Parálisis le entra con el doble de chance (salvo que vuele o levite). El fuego lo seca.'));
       else if(el.zonaLuz && !sp.nombre) out.push(item('luz', '💡', el.zonaNombre || 'Luz', 'Ilumina: deja ver lo que hay acá (también trampas y lo escondido).'));

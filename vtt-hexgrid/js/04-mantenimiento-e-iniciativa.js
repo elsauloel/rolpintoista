@@ -20,7 +20,7 @@ function escucharMantenimiento(){
     pedirDibujo();   // las marcas del sigilo duran por turnos
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
-    fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
+    // (🔥 el terreno incendiado va por las zonas desde el 2026-11-25, P295: zonaRevisarMantenimiento, js/08)
     trampasDisparadasBarrer();   // las trampas ya detonadas (rojas) desaparecen
     zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
     // Los creeps (solo el GM): desde el 2026-10-02 (A2b) el pase de turno lo hace el mapa (js/12, mantenimientoCreeps), sin cargar GM
@@ -1693,7 +1693,7 @@ function statPiesDe(t, st){
   return num(f && f.resumen && f.resumen[st]);
 }
 /* Levitar (pies, 2026-10-06, dueño: «no tocás el suelo»): los primeros N casilleros que se mueve en cada turno no tocan el piso — el terreno
-   lento no lo frena, no pisa ni detecta trampas y no lo quema el terreno incendiado (las zonas sí: pueden ser nubes) —; al terminar su turno toca el piso (si quedó parado sobre una
+   lento no lo frena y no pisa ni detecta trampas (el terreno incendiado, desde el 2026-11-25 de piso y aire, y las zonas del aire sí lo alcanzan) —; al terminar su turno toca el piso (si quedó parado sobre una
    trampa, se dispara: `levitarAterrizar`, desde el fin del turno). Los usados se anotan en esta pantalla, como los Pasos gratis. */
 const levitarUsados = new Map();
 const levitarRestante = t => Math.max(0, Math.round(statPiesDe(t, 'levitar')) - num(levitarUsados.get(pasosGratisClave(idDeToken(t)))));

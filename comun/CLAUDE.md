@@ -2333,3 +2333,9 @@ versión parecida en más de una, es candidato a juntar.
   está caído (`estaCaido`, con vida máxima), `caerLimpio` → los sacados; si no, []. Lo usan `modificarCreep` del mapa (js/09) y GM Tools
   (`gmCaidasRevisar`, js/11). La ficha suelta ahora cuenta la caída de un personaje (toast y Mesa con `caidaTxt`, solo la pantalla que puede guardarlo;
   ficha js/02) y el mapa también en la Botonera nueva y en el pase de turno (`caidaContarPj`, vtt-hexgrid/js/11).
+- **🔥 `asistente-zona.js` y `zona-detalle.js`, al empezar el turno** (P295, dueño, 2026-11-25): el paso «Cuándo afecta» del asistente de zonas dice
+  «Sí, al empezar su turno» (ya no «en cada Mantenimiento»); «¿Dónde está?» va antes y, si es **solo del piso**, en lugar de la pregunta de cruzarla dice
+  que pega una vez por cada paso y la frena la Suela gruesa (el resumen igual). Lo arma el mapa (`zonaModoAsistente`, vtt-hexgrid/js/13).
+  `ZonaDetalle.armar` y `HexInfo.describir` cuentan el terreno incendiado (`fuego`, aunque el mapa le sume los campos de una zona) primero: «al entrar y
+  al empezar su turno adentro», de piso y aire, sin Suela. Levitar (`ficha-calculo.js`) y las dos zapatillas (`catalogo.js`, `ITEMS_AL_DIA`) ya no dicen
+  que no te quema.

@@ -2795,3 +2795,18 @@ Desde hoy el piso ardiendo de la Mina napalm pega por cada paso que se da adentr
 el golpe de 2d6 (la explosión) y el movimiento se corta ahí; ese paso **no** suma además el 1d6 del piso (el piso empieza a pegar desde el paso
 siguiente o al empezar su turno). Lo dejé así (lo más conservador: «el golpe de 2d6 al dispararse queda igual»). ¿Está bien, o ese primer paso tiene
 que pegar también el 1d6 del piso?
+
+### P338 — 🔥 El terreno incendiado: ¿lo frena la resistencia al fuego? (2026-11-25, Claude)
+
+Desde hoy el terreno incendiado pega como las demás zonas (al entrar y al empezar el turno de quien está adentro; de piso y aire, P295). Su daño
+sigue siendo **directo a la vida y sin nada que lo frene**, como siempre: tampoco la **resistencia al fuego** (un creep inmune al fuego se quema igual).
+Las otras zonas de fuego directo (la Fogata, el Muro de fuego, la Varita del muro de fuego) sí restan la resistencia al fuego de quien lo recibe. Lo
+dejé como estaba (lo más conservador). ¿Queda así, o le resta la resistencia al fuego como a las demás (con «INMUNE AL FUEGO» si es 99)?
+
+### P339 — 🔥 El terreno incendiado ya no se puede crear desde el menú: ¿vuelve? (2026-11-25, Claude)
+
+El botón «🔥 Terreno incendiado» de Terreno y Formas se sacó el 2026-09-28 (lo reemplazó el asistente de zonas: una zona con solo daño). Hoy solo anda
+el que ya estaba puesto o el que se copia con Ctrl+C / Ctrl+V de uno puesto; para probarlo lo puse por datos. Algunas habilidades de creep dicen
+todavía «deja terreno incendiado (a mano, con Terreno y Formas → Fuego)» (Rastro de llamas, Bola de fuego de los elementales). Opciones: (a) dejarlo
+así (para un fuego nuevo, el asistente de zonas: «de piso y aire», con daño); (b) volver a poner un botón «🔥 Terreno incendiado» (con su daño fijo)
+en Terreno y Formas; (c) que esas habilidades lo pongan solas. Mientras tanto, nada cambió.

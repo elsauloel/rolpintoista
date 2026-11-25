@@ -2830,3 +2830,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   de piso; `zonaCadaPaso` en false); `crearElementoZona` guarda el JSON también con solo `porPaso`. Las ya puestas, como estaban. **🙈 P326 en lo fijo**:
   `zonaQuienPublico(t)` — la Crónica de la zona y `danoDirectoAvisar` (Mesa y Crónica) dicen «Un personaje oculto» si quien lo recibe está escondido
   (`escondidoDe`); el daño con dados en el cuadro del duelo sigue en la cola. Probado con clics (cola 2026-11-25). Dudas: P338, P339.
+- **💤 El Gas adormecedor y el Gas somnífero, al empezar el turno** (P295, dueño, 2026-11-25): las dos trampas llevan `trampaDatos.zonaModo =
+  {altura: 'aire', alEmpezar: true}` (comun/catalogo.js; el mismo camino que la Mina napalm: `zm` en la trampa puesta → el JSON de la nube al
+  dispararse). La nube pega al detonar, al entrar y al empezar el turno de quien está adentro (renglón de «▶ Empieza tu turno»; sin orden, en el
+  Mantenimiento). **Al empezar su turno le vuelve a tocar aunque ya la haya sufrido en esa ronda** (P341): `zonaRevisarToken` con `soloAlEmpezar`
+  marca la nube de estado de una trampa (sin daño) en `zonaInicioToca` (`elId|tokenId`), `zonaLeFalta` la deja pasar y `zonaResolverBanner` la borra
+  al resolverla (la clave por ronda de `zonaClave` no cambia: moverse adentro no lo repite). El estado repetido se renueva (`agregarEstado`: el mismo
+  nombre reemplaza al de antes) y `zonaRenuevaTxt` lo dice también para un estado de una zona `alEmpezar` que no se apila: «Cansado: ya lo tenía,
+  vuelve a 2 turnos». La tirada de resistencia de un escondido sale en la Mesa con `zonaQuienPublico` («Un personaje oculto · Res.Mt», P326; vale para
+  cualquier zona). `HexInfo` (🔍 de la casilla) dice «a quien entra y a quien empieza su turno adentro» para toda zona `alEmpezar`; `ZonaDetalle`, que
+  quien ya lo tiene vuelve a tirar; el cartel de la trampa (js/19), «lo sufre quien entra y quien empieza su turno adentro». De paso se arregló
+  `trampaSaltar` (js/19: usaba `p.zonaComo` sin `p`, y cortaba el salto de la Descarga eléctrica). Probado con clics en «Prueba · General». Dudas:
+  P341–P343.

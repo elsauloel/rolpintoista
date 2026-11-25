@@ -315,7 +315,7 @@ function renderAll(){
   if(typeof Combatiente !== 'undefined' && Combatiente.pasivasAlDia){ Combatiente.pasivasAlDia(S.pasivas); (S.invocaciones || []).forEach(i => i && Combatiente.pasivasAlDia(i.pasivas)); }
   { const alDia = FichaGuardado.migrarHabsDeClase(S);   // 🔄 P222: las de clase siguen a su clase (se guarda sola, como cualquier cambio)
     if(alDia.length && !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura)) toast(`🔄 Se pusieron al día con su clase: ${alDia.join(', ')}`); }
-  if(typeof Combatiente !== 'undefined' && Combatiente.ponerAlDiaItemsFabrica && Combatiente.ponerAlDiaItemsFabrica(S.inventario)
+  if(typeof Combatiente !== 'undefined' && Combatiente.ponerAlDiaItemsFabrica && (Combatiente.ponerAlDiaItemsFabrica(S.inventario) | Combatiente.ponerAlDiaItemsFabrica(S.cinturon))   // (💤 y el cinturón, P295)
      && !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura)) toast('🔄 Se pusieron al día ítems del catálogo que cambiaron');   // (2026-10-31)
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;

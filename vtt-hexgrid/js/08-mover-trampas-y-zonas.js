@@ -334,6 +334,9 @@ function zonaAplicaA(el, t){
 // tirar y aplicar (lo que ya tenía no se le saca). Se anota «token@Mantenimiento», así cada Mantenimiento cuenta aparte.
 // (2026-10-04, dueño) Se disparan al detonar la trampa, al ENTRAR (viniendo de afuera) y en el Mantenimiento: moverse adentro no la vuelve a
 // disparar. Cuenta una vez por ronda, también el daño (el piso ardiendo de la Mina napalm).
+// 💤 Las nubes de estado de una trampa que le tocan a alguien al empezar su turno (`elId|tokenId`; se borra al resolverse, zonaResolverBanner).
+const zonaInicioToca = new Set();
+const zonaInicioClave = (el, t) => `${el.id}|${zonaIdDe(t)}`;
 const zonaClave = (el, t) => el.trampa ? `${zonaIdDe(t)}@${Math.round(num(mantenimientoNumero))}` : zonaIdDe(t);
 function zonaLeFalta(el, t){
   if(typeof zonaCuraDe === 'function' && zonaCuraDe(el)) return false;   // 💚 la zona de curación cura por pulsos (js/70), no con el cartel de cada uno
@@ -344,6 +347,9 @@ function zonaLeFalta(el, t){
   // 🔥 (P295, 2026-11-25) La de una trampa que pega al empezar el turno y por cada paso (la Mina napalm) cuenta como cualquier zona con daño: no una
   // vez por ronda.
   if(el.trampa && !(zonaSpecDe(el).alEmpezar || zonaSpecDe(el).porPaso)) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
+  // 💤 (P295, 2026-11-25) Al empezar su turno adentro, la nube de una trampa (el Gas adormecedor y el somnífero) le vuelve a tocar aunque ya la haya
+  // sufrido en esta ronda (al detonar o al entrar): quien ya tiene el estado vuelve a tirar y, si falla, el estado vuelve a contar sus turnos (opción a).
+  if(el.zonaEstado && zonaInicioToca.has(zonaInicioClave(el, t))) return true;
   // `unaVez` (adentro del JSON de zonaEstado; 2026-10-26, la Nube tóxica: «una vez envenenado, la nube ya no le vuelve a tirar»): con el estado
   // ya puesto, tampoco el daño.
   // Con `sumaUno` (o el `resetea` de antes): si ya no tiene el estado (se lo curó, se le terminó), le vuelve a tirar.
@@ -455,6 +461,7 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
       if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, stacks: 1}, el, 'sumaUno');
       return;
     }
+    if(soloAlEmpezar && el.trampa && el.zonaEstado && !el.zonaDano && !el.zonaDanoDif) zonaInicioToca.add(zonaInicioClave(el, t));   // 💤 (P295)
     if(!zonaLeFalta(el, t)) return;
     zonaEncolar(el, t);
   });
@@ -465,11 +472,13 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
    «Quemadura: ya la tenía, vuelve a 3 turnos» / «Quemadura (3 turnos)». Solo para los estados que se renuevan contando de nuevo (la Quemadura). */
 function zonaRenuevaTxt(t, spec){
   const pre = spec && spec.nombre && EstadosAplicar.presetPorNombre ? EstadosAplicar.presetPorNombre(spec.nombre) : null;
-  if(!pre || !pre.esQuemadura) return '';
+  // 💤 (P295, 2026-11-25) También el estado de una nube que pega al empezar el turno (el Cansado del Gas adormecedor, el Exhausto del somnífero):
+  // quien ya lo tenía y vuelve a fallar, vuelve a contar sus turnos (se renueva, no se apila). El Veneno y el Sangrado se suman: no van acá.
+  if(!pre || !(pre.esQuemadura || (spec.alEmpezar && !pre.apila && !/^(Veneno|Sangrado)/.test(String(spec.nombre))))) return '';
   const tt = Math.round(num(spec.turnos) || num(pre.turnos));
   if(!(tt > 0)) return '';
   const s = tt === 1 ? '' : 's';
-  return zonaTieneEstado(t, spec.nombre) ? `${spec.nombre}: ya la tenía, vuelve a ${tt} turno${s}` : `${spec.nombre} (${tt} turno${s})`;
+  return zonaTieneEstado(t, spec.nombre) ? `${spec.nombre}: ya ${pre.esQuemadura ? 'la' : 'lo'} tenía, vuelve a ${tt} turno${s}` : `${spec.nombre} (${tt} turno${s})`;
 }
 const zonaSpecDe = el => { if(el && el.terrenoFuego) return {alEmpezar: true}; try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };   // (🔥 el terreno incendiado: al empezar el turno, P295)
 // ☠ ¿A este token la zona solo le suma 1 stack? (la Nube tóxica: ya tiene el estado que deja; sin tirada ni daño)
@@ -919,7 +928,7 @@ async function zonaResolverBanner(){
   if(!el || !t){ const fin = zonaBanner.enInicio; zonaBanner = null; if(fin) fin({resultado: 'La zona (o el token) ya no está: no pasa nada.'}); zonaMostrarSiguiente(); return; }
   let resistio = false, diferencia = null;
   const partes = [];
-  const quienTxt = t.oculto ? 'Alguien' : nombreDe(t);
+  const quienTxt = zonaQuienPublico(t, true);   // 🙈 (P326, P295 2026-11-25) uno escondido, «Un personaje oculto» en la Mesa (antes, su nombre)
   const specZ = (() => { try{ return el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){ return null; } })();
   const veces = specZ && specZ.tiraPaso ? Math.max(1, Math.round(num(zonaBanner.pasos)) || 1) : 1;   // 🧊 una tirada por paso
   zonaBanner.tirando = true;
@@ -1095,6 +1104,7 @@ async function zonaResolverBanner(){
     try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(...claves)}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
+  zonaInicioToca.delete(zonaInicioClave(el, t));   // 💤 (P295) ya le tocó al empezar su turno
   // 🔥 (P297) el número de su resistencia, solo para su bando: en el cartel de esta pantalla si es de su bando; en el momento (lo ven todos), nunca.
   const resultadoZ = partes.join(' · ') || 'sin efecto';
   zonaBanner = {...zonaBanner, el, t, resultado: Combatiente.verResDe(soyGM, t.tipo) ? resultadoZ : Combatiente.resSinNumero(resultadoZ)};

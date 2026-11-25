@@ -2821,3 +2821,28 @@ en Terreno y Formas; (c) que esas habilidades lo pongan solas. Mientras tanto, n
 En la silueta del Equipo, arrastrar un arma de una mano a la Mano 1 o a la Mano 2 la equipa igual (aprieta su «Equipar»): queda en la mano que
 diga la regla de siempre (la «mano preferida» del ítem, si tiene; si no, la primera libre). Opciones: (a) dejarlo así; (b) que soltarla en la
 Mano 2 le marque la mano preferida 2 (y en la 1, la 1). Mientras tanto, (a).
+
+### P341 — 💤 El Gas adormecedor: ¿le vuelve a tocar al empezar su turno si ya lo sufrió en esa misma ronda? (2026-11-25, Claude)
+
+Desde hoy la nube del Gas adormecedor y del Gas somnífero pega al entrar y al empezar el turno de quien está adentro (P295). Un caso: la trampa se
+dispara en el turno de Blanco J1 y alcanza también a Blanco J2, que juega **después en la misma ronda**. Hasta hoy, la nube de una trampa le tocaba a
+cada uno **una sola vez por ronda**, así que al empezar su turno J2 no habría tirado de nuevo. Lo dejé como las demás zonas que pegan al empezar el
+turno (la Fogata, la miasma, el Muro de fuego): **al empezar su turno le vuelve a tocar** (otra tirada; si falla, el estado vuelve a contar 2 turnos),
+aunque lo haya sufrido un rato antes. Lo que no cambia: moverse adentro no lo repite, y al entrar le toca una vez por ronda. ¿Queda así, o al empezar su
+turno solo le toca si en esa ronda todavía no la sufrió?
+
+### P342 — 🙈 La tirada de un escondido en una zona: la Mesa dice qué jugador tiró (2026-11-25, Claude)
+
+Cuando alguien escondido (en Sigilo) resiste una zona (el Gas adormecedor al empezar su turno), la tira su pantalla y la Mesa la muestra como «Un
+personaje oculto · Res.Mt» (P326), pero al lado sale, como en toda tirada, **el nombre de la cuenta del jugador que tiró**. Como cada jugador maneja
+un solo personaje, el GM sabe igual **quién** es (no dónde). Pasa lo mismo con el daño fijo de una zona (el terreno incendiado, P326), que también lo
+aplica la pantalla de quien lo recibe. Opciones: (a) dejarlo así; (b) que esa línea no diga qué jugador tiró (por ejemplo «—»); (c) que esa línea la
+vea solo su bando, como las de un duelo oculto (P263), y el GM solo la Crónica sin nombre. Mientras tanto, (a).
+
+### P343 — 🪤 Al detonar una trampa, una invocación resiste con los números de su dueño (2026-11-25, Claude)
+
+Visto probando el Gas adormecedor: la trampa alcanzó a la Abeja de prueba (la invocación de Blanco J1) y su Res.Mt salió **igual a la de J1** (con un
+estado de prueba de J1: «Afectada por Prueba: Res.Mt −20»). Al empezar el turno de la abeja, la nube sí usó la de ella (Res.Mt 1d2). Parece un error
+del paso a paso de la trampa (no de la nube), de antes de este cambio, y no lo toqué. ¿Lo arreglo (que la invocación tire con sus propios números al
+detonar una trampa)? De paso: el 🔍 de la casilla de una nube que alcanza a todos dice «a favor de los aliados de quien la puso», que se entiende al
+revés (quiere decir que también les pega a ellos); ¿lo cambio por «también a los aliados de quien la puso»?

@@ -2567,10 +2567,35 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «Dio 2 pasos…: le pega una vez por paso (2 veces)» y 2 golpes (3 − 2 = 1, 1 − 2 = 0); al pasar de ronda, nada. Tiró el daño con dados el GM (dueño de
   la zona). J1 en Sigilo entró al terreno: el GM leyó «Un personaje oculto · Terreno incendiado» en la Mesa y la Crónica. Al final, la vuelta del mapa:
   «quedó igual». Pruebas automáticas: dos nuevas y una puesta al día (1124 en verde). Dudas: P338, P339.
-- **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Gas adormecedor y Gas somnífero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
+- **✅ hecho (2026-11-25) — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Gas adormecedor y Gas somnífero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
   **Decidido (dueño, 2026-11-25):** las dos pasan a «al entrar y al empezar el turno de quien está adentro» (sin orden de turnos, al pasar de
   ronda), como la Fogata y la miasma; son de aire: sin pasos ni Suela gruesa, alcanzan a quien vuela. Quien ya tiene el estado y empieza otro turno
   adentro **vuelve a tirar** y, si falla, el estado vuelve a contar 2 turnos desde ahí (opción a). Las nubes ya puestas terminan como estaban.
+  **Cómo quedó:** las dos trampas llevan `trampaDatos.zonaModo = {altura: 'aire', alEmpezar: true}` (el mismo camino que la Mina napalm: va a la
+  trampa puesta como `zm` y, al dispararse, al JSON de la nube). La nube pega al detonar, **al entrar** (también si solo la cruza; moverse adentro no
+  lo repite) y **al empezar el turno de quien está adentro**, con un renglón en «▶ Empieza tu turno» y su tirada (Res.Mt contra 7 / Res.CC contra 9);
+  sin orden de turnos (o a quien no está en el orden), al pasar de ronda; con orden, ya no en el Mantenimiento. Es del aire: sin pasos ni Suela, y le
+  toca a quien vuela o levita. **Opción (a):** el código ya renovaba un estado repetido (el mismo nombre se reemplaza: no se apila); ahora, además,
+  al empezar su turno **le vuelve a tocar aunque ya la haya sufrido en esa misma ronda** (al detonar o al entrar; antes la nube de una trampa le
+  tocaba una sola vez por ronda), y el renglón lo dice: «no resistió (Res.Mt −12 contra 7) · Cansado: ya lo tenía, vuelve a 2 turnos» (P341). **Lo
+  oculto:** la tirada de quien está escondido sale en la Mesa como «Un personaje oculto · Res.Mt» y la Crónica «Un personaje oculto está en Gas
+  adormecedor…» (P326; vale para la tirada de resistencia de cualquier zona). Texto nuevo (las dos): «…La nube queda 3 turnos en las 7 casillas, en el
+  aire (alcanza también a quien vuela o levita): lo sufre quien entra y quien empieza su turno adentro (moverse adentro no lo repite). Quien ya lo
+  tiene vuelve a tirar: si falla, vuelve a 2 turnos.» Al día también: el cartel de la trampa al dispararse («lo sufre quien entra y quien empieza su
+  turno adentro»), el «Después» de la ficha corta de la trampa, «Ver detalle» (dice que quien ya lo tiene vuelve a tirar), el cartel de arriba y el
+  🔍 de la casilla (que antes decía «a quien sigue adentro en el Mantenimiento» para todas las zonas, también la Fogata o el Muro de fuego). El
+  manual no hablaba de esto. **Las copias guardadas** se ponen al día solas en la mochila (como las varitas) y, desde hoy, también en el **cinturón**
+  de los personajes y de los creeps (antes no: tampoco la Mina napalm del cinturón; ahora sí). Las nubes ya puestas y las trampas ya armadas en el
+  mapa siguen como estaban. **De paso:** el salto de la Descarga eléctrica (`trampaSaltar`, js/19) tenía un error desde el arreglo de la Mina napalm
+  (usaba una variable que no existía) y cortaba el salto: arreglado.
+  *Probado con clics* en «Claude · pruebas 2», mapa «Prueba · General» (GM, Jugador 1, Jugador 2), armado por datos (el Gas adormecedor de fábrica
+  puesto como del Debuffer · Maldito, y Blanco J1 con un estado de prueba que le baja la Res.Mt para que falle): con orden de turnos, J1 pisó el gas
+  y lo alcanzó a él, a Blanco J2 y a la Abeja de prueba (la que vuela); J1 y la abeja quedaron Cansados, J2 lo resistió; al empezar el turno de la
+  abeja, su renglón (no resistió: «Cansado: ya lo tenía, vuelve a 2 turnos»); J2 se escondió (Sigilo) y al empezar su turno, su renglón (no resistió:
+  Cansado 2 turnos) y el GM leyó «Un personaje oculto · Res.Mt» en la Mesa y «Un personaje oculto está en Gas adormecedor…» en la Crónica; al pasar a
+  la ronda 2, nada en el Mantenimiento; al empezar el turno de J1 (ya Cansado: 2 → 1), su renglón y volvió a fallar: «Cansado: ya lo tenía, vuelve a
+  2 turnos» (quedó en 2). «Ver detalle», el cartel de arriba y el 🔍, con el texto nuevo. Al final, la vuelta del mapa: «quedó igual». Pruebas
+  automáticas: una nueva (1131 en verde). Dudas: P341, P342, P343.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Nube de veneno y Aceite resbaladizo** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Resina de árbol negro y Arena movediza (con las trampas de arena de varita)** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.
@@ -3260,3 +3285,10 @@ Cada línea nueva que se termine de diseñar se suma al final.
   **Decidido (dueño, 2026-11-24, P326):** tira el daño el dueño de la zona; el GM sabe que le pegó «a un personaje oculto», sin nombre ni
   token: «el muro le hizo N de daño a un personaje oculto». El escondido sigue escondido y se puede seguir moviendo. Lo mismo con el inmune
   (la Crónica y la Mesa sin nombre; «esto es fácil de resolver, supongo»).
+
+- **⬜ en cola — Probar: 💤 el Gas adormecedor y el Gas somnífero con lo que no se probó con clics** (2026-11-25): sin orden de turnos (narrativo:
+  tienen que pegar al pasar de ronda), el **Gas somnífero** (Exhausto, Res.CC contra 9, se dispara solo en el centro), un **creep** adentro (el
+  cartel de siempre en la pantalla del GM, no un renglón), alguien que **entra** a la nube ya puesta y se mueve adentro (una sola vez por ronda), y
+  la puesta al día de una copia vieja en una **mochila** y en el **cinturón** de un personaje o de un creep. Con clics se probó el Gas adormecedor
+  con orden de turnos sobre dos personajes, una invocación que vuela y un escondido.
+

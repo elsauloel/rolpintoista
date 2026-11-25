@@ -46,12 +46,12 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-elemental.js?v=20261106escudo"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
-<script src="hex-info.js?v=20261125incend"></script>
-<script src="zona-detalle.js?v=20261125incend"></script>
+<script src="hex-info.js?v=20261125gas"></script>
+<script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261125incend"></script>
-<script src="creep-calculo.js?v=20261125sil"></script>
+<script src="combatiente.js?v=20261125gas"></script>
+<script src="creep-calculo.js?v=20261125gas"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
 <script src="creep-duelo.js"></script>
@@ -61,7 +61,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261125gri"></script>
+<script src="dar-jugador.js?v=20261125gas"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -120,7 +120,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="capas.js"></script>
 <script src="creep-lupa.js?v=20261125sil"></script>
 <script src="combate-fin.js"></script>
-<script src="grupo-botin.js?v=20261125sil"></script>
+<script src="grupo-botin.js?v=20261125gas"></script>
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
@@ -2858,7 +2858,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gas');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -10260,7 +10260,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gas', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10384,7 +10384,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gri', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125gas', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();
@@ -10644,6 +10644,44 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     // 🔥 El piso de la Mina sigue con su 🔥, y el cartel de la trampa dice cómo pega lo que queda.
     const t19 = await fetch('../vtt-hexgrid/js/19-trampa-paso-a-paso.js', {cache: 'no-store'}).then(r => r.text());
     ok(/function zonaDeTrampaDeFuego\(el\)/.test(t08) && /zonaComo: `\$\{spec\.zm\.porPaso \? 'p' : ''\}/.test(t08) && /if\(dt\.fase === 'zona' && dt\.zonaComo\)/.test(t19));
+  });
+  prueba('💤 el Gas adormecedor y el Gas somnífero: la nube pega al entrar y al empezar el turno de quien está adentro (P295, dueño, 2026-11-25)', async () => {
+    const MOD = {altura: 'aire', alEmpezar: true};
+    for(const [id, est] of [['trampa-gas-adormecedor', 'Cansado'], ['trampa-gas-somnifero', 'Exhausto']]){
+      const it = CATALOGO_BASE.find(x => x.id === id), td = it.trampaDatos;
+      igual([td.estado, td.estadoTurnos, td.altura, td.dejaZona, td.zonaTurnos, td.zonaModo], [est, 2, 'aire', true, 3, MOD]);
+      for(const txt of [td.detalle, it.detalle]) ok(/lo sufre quien entra y quien empieza su turno adentro \(moverse adentro no lo repite\)\. Quien ya lo tiene vuelve a tirar: si falla, vuelve a 2 turnos\./.test(txt) && /alcanza también a quien vuela o levita/.test(txt) && !/Mantenimiento/.test(txt));
+      igual(ItemCorto.trampaFilas(td).find(f => f[0] === 'Después')[1], 'queda como zona 3 turnos: le toca a quien entra y a quien empieza su turno adentro');
+      // Lo que se guarda en la trampa puesta lleva cómo pega la nube; las copias viejas (mochilas, cinturones, creeps) se ponen al día solas.
+      igual(JSON.parse(TokensAuto.estadoJson(null, null, null, td.efecto, '', 0, {altura: td.altura, zonaModo: td.zonaModo})).zm, MOD);
+      const v = structuredClone(it); delete v.trampaDatos.zonaModo; v.detalle = 'viejo';
+      ok(Combatiente.ponerAlDiaItemsFabrica([v]) && JSON.stringify(v.trampaDatos.zonaModo) === JSON.stringify(MOD) && v.detalle === it.detalle);
+      ok(!Combatiente.ponerAlDiaItemsFabrica([structuredClone(it)]));
+    }
+    // La Nube de veneno (otra tanda de la cola) no se tocó.
+    ok(!CATALOGO_BASE.find(x => x.id === 'trampa-nube-de-veneno').trampaDatos.zonaModo);
+    // «Ver detalle», el cartel de arriba y el 🔍 de la casilla.
+    const el = {zona: true, trampa: true, zonaNombre: 'Gas adormecedor', zonaCasteadorRef: '', zonaCasteadorTipo: 'pj', zonaAmiga: true, zonaResistStat: 'resm', zonaResistValor: 7,
+      zonaEstado: JSON.stringify({nombre: 'Cansado', turnos: 2, altura: 'aire', alEmpezar: true})};
+    igual(ZonaDetalle.cuandoEtiqueta(el, {}), 'se dispara al entrar o cruzarla y al empezar su turno adentro');
+    igual(HexInfo.describir({...el, disparada: true}).find(x => x.icono === '🌫').detalle, 'Aplica Cansado · a favor de los aliados de quien la puso; a quien entra y a quien empieza su turno adentro.');
+    // El cartel de la trampa al dispararse (js/19), el motor (js/08: le vuelve a tocar al empezar su turno aunque ya la haya sufrido en la ronda) y el
+    // renglón: «Cansado: ya lo tenía, vuelve a 2 turnos».
+    const [t08, t19] = await Promise.all(['../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', '../vtt-hexgrid/js/19-trampa-paso-a-paso.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+    ok(/' y quien empieza su turno adentro \(moverse adentro no lo repite\)'/.test(t19) && !/pasos: \[\], \.\.\.\(p\.zonaComo \? \{zonaComo: String\(p\.zonaComo\)\.slice\(0, 4\)\} : \{\}\), cadena:/.test(t19));
+    ok(/if\(soloAlEmpezar && el\.trampa && el\.zonaEstado && !el\.zonaDano && !el\.zonaDanoDif\) zonaInicioToca\.add\(zonaInicioClave\(el, t\)\);/.test(t08)
+      && /if\(el\.zonaEstado && zonaInicioToca\.has\(zonaInicioClave\(el, t\)\)\) return true;/.test(t08) && /zonaInicioToca\.delete\(zonaInicioClave\(el, t\)\);/.test(t08)
+      && /const quienTxt = zonaQuienPublico\(t, true\);/.test(t08));
+    const trozo = t08.slice(t08.indexOf('function zonaRenuevaTxt'), t08.indexOf('const zonaSpecDe'));
+    const f = tiene => new Function('EstadosAplicar', 'num', 'zonaTieneEstado', trozo + '\nreturn zonaRenuevaTxt;')(EstadosAplicar, x => Number(x) || 0, () => tiene);
+    igual([f(true)({}, {nombre: 'Cansado', turnos: 2, alEmpezar: true}), f(false)({}, {nombre: 'Exhausto', turnos: 2, alEmpezar: true}), f(true)({}, {nombre: 'Cansado', turnos: 2}),
+      f(true)({}, {nombre: 'Veneno', stacks: 3, alEmpezar: true})], ['Cansado: ya lo tenía, vuelve a 2 turnos', 'Exhausto (2 turnos)', '', '']);
+    // Quien ya está Cansado y vuelve a fallar: el estado se renueva a 2 turnos (no se apila).
+    const ests = [];
+    Combatiente.agregarEstado(ests, EstadosAplicar.componer({nombre: 'Cansado', turnos: 2}));
+    ests[0].turnos = 1;
+    const r = Combatiente.agregarEstado(ests, EstadosAplicar.componer({nombre: 'Cansado', turnos: 2}));
+    igual([r.que, ests.length, ests[0].turnos], ['renovado', 1, 2]);
   });
   prueba('🔥 El terreno incendiado y las zonas hechas a mano, al empezar el turno (P295, dueño, 2026-11-25)', async () => {
     const filaDe = (m, k) => ((m.filas || []).find(x => x.k === k) || {}).v || '';

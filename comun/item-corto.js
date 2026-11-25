@@ -102,7 +102,8 @@ const ItemCorto = (() => {
     const quien = t.detectarStat ? `${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : '';
     f.push(['Detectarla', quien && num(t.detectar) >= 1 ? `Percepción contra ${quien} (si la pone el GM: ${num(t.detectar)})` : quien ? `Percepción contra ${quien}` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
     if(t.detectarStat) f.push(['Es', t.detectarStat === 'dmgesp' ? 'mágica (se disipa con el Efecto especial)' : 'mecánica (se desarma con la Destreza)']);
-    if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
+    // 💤 (P295, 2026-11-25) La nube del Gas adormecedor y del somnífero (sin daño): al entrar y al empezar el turno de quien está adentro.
+    if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos${!t.danoZona && zmo && zmo.alEmpezar && !zmo.porPaso ? ': le toca a quien entra y a quien empieza su turno adentro' : ''}`]);
     if(t.amiga && !t.detectarStat) f.push(['Alcanza', 'también a los aliados del área']);   // (las del catálogo: el efecto alcanza a todos, siempre)
     return f;
   }

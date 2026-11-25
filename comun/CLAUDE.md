@@ -2354,3 +2354,6 @@ versión parecida en más de una, es candidato a juntar.
   `ZonaDetalle.armar` y `HexInfo.describir` cuentan el terreno incendiado (`fuego`, aunque el mapa le sume los campos de una zona) primero: «al entrar y
   al empezar su turno adentro», de piso y aire, sin Suela. Levitar (`ficha-calculo.js`) y las dos zapatillas (`catalogo.js`, `ITEMS_AL_DIA`) ya no dicen
   que no te quema.
+- **🔄 Los ítems de fábrica que cambian, también en el cinturón** (2026-11-25, P295: el Gas adormecedor y el somnífero): `Combatiente.ponerAlDiaItemsFabrica`
+  (la lista `ITEMS_AL_DIA`) ahora se aplica también al cinturón de un personaje (`FichaGuardado.completar` y la ficha, js/05) y al de un creep
+  (`CreepCalculo.normalizar`), no solo a la mochila y al equipo: los consumibles (las trampas) se llevan ahí.

@@ -40,7 +40,11 @@ const HexInfo = (() => {
         if(sp.nombre) partes.push(`aplica ${sp.nombre}`);
         if(el.zonaDano) partes.push(`${el.zonaDano} de daño${el.zonaDanoTipo ? ' de ' + el.zonaDanoTipo : ''}`);
         if(el.zonaAmiga) partes.push('a favor de los aliados de quien la puso');
-        const quien = el.zonaCadaPaso ? 'a quien la cruza, en cada paso' : 'a quien entra y a quien sigue adentro en el Mantenimiento';
+        // 💤🔥 (P295, 2026-11-25) Las que pegan al empezar el turno de quien está adentro (el Gas adormecedor, la Fogata, el Muro de fuego…) lo dicen así.
+        const alEmp = !!sp.alEmpezar && el.zonaEnMantenimiento !== false;
+        const quien = sp.porPaso && alEmp ? 'a quien entra, en cada paso que da adentro y al empezar su turno adentro'
+          : alEmp ? 'a quien entra y a quien empieza su turno adentro'
+          : el.zonaCadaPaso ? 'a quien la cruza, en cada paso' : 'a quien entra y a quien sigue adentro en el Mantenimiento';
         let det = partes.length ? `${partes.join(' · ')}; ${quien}.` : `Afecta ${quien}.`;
         det = det.charAt(0).toUpperCase() + det.slice(1);
         if(el.zonaNota) det += ' ' + corto(el.zonaNota, 140);

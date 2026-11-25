@@ -84,8 +84,10 @@ const ZonaDetalle = (() => {
     const mant = el.zonaEnMantenimiento !== false;
     // 🔥 «Al empezar su turno adentro» (P259, 2026-11-21: el Muro de fuego): con orden de turnos, en el turno de cada uno; sin orden, al pasar de ronda.
     if(sp.alEmpezar && mant) return {corto: `${entra} y al empezar su turno adentro`,
-      largo: [el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '', el.zonaCadaPaso || el.trampa ? 'Al entrar, aunque solo se la cruce de paso' : 'Al entrar (terminando el movimiento adentro)',
-        'Al empezar su turno adentro (con orden de turnos; sin orden de turnos, cada vez que se pasa de ronda)', 'Moverse por adentro no la vuelve a disparar'].filter(Boolean).join('. ') + '.'};
+      largo: [el.trampa ? 'Al detonar la trampa (a los que están adentro)' : '', el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '', el.zonaCadaPaso || el.trampa ? 'Al entrar, aunque solo se la cruce de paso' : 'Al entrar (terminando el movimiento adentro)',
+        'Al empezar su turno adentro (con orden de turnos; sin orden de turnos, cada vez que se pasa de ronda)', 'Moverse por adentro no la vuelve a disparar',
+        // 💤 (P295, 2026-11-25) La nube de estado de una trampa (el Gas adormecedor y el somnífero): quien ya lo tiene vuelve a tirar al empezar su turno.
+        el.trampa && sp.nombre && !el.zonaDano && !el.zonaDanoDif ? `Quien ya tiene ${sp.nombre} vuelve a tirar al empezar su turno adentro: si no resiste, ${sp.nombre} vuelve a contar sus turnos desde ahí (no se suma)` : ''].filter(Boolean).join('. ') + '.'};
     const largo = [el.trampa ? 'Al detonar la trampa (a los que están adentro)' : '', el.zonaInmediata ? 'Al aparecer (a los que ya estaban adentro)' : '',
       el.zonaCadaPaso || el.trampa ? 'Al entrar, aunque solo se la cruce de paso' : 'Al entrar (terminando el movimiento adentro)',
       mant ? 'Mientras se siga adentro, cada vez que se pasa de ronda (el Mantenimiento)' : 'Quedarse quieto adentro NO la vuelve a disparar',

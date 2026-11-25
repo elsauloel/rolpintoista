@@ -3310,6 +3310,12 @@ Sigue: Evasión −${s} al tirarla (o 1 No2), Iniciativa −${s} (tu lugar se re
     // en cada Mantenimiento), y es solo de piso (lo frena la Suela gruesa): `trampaDatos.zonaModo`.
     {id: 'trampa-mina-napalm', nombre: 'Mina napalm', claves: ['trampaDatos', 'detalle'],
       vieja: it => !!(it.trampaDatos && it.trampaDatos.dejaZona && !it.trampaDatos.zonaModo)},
+    // 💤 (P295, dueño, 2026-11-25): la nube del Gas adormecedor y del Gas somnífero pega al entrar y al empezar el turno de quien está adentro (sin orden
+    // de turnos, al pasar de ronda), es del aire y quien ya tiene el estado vuelve a tirar: `trampaDatos.zonaModo` y los textos nuevos.
+    {id: 'trampa-gas-adormecedor', nombre: 'Gas adormecedor', claves: ['trampaDatos', 'detalle'],
+      vieja: it => !!(it.trampaDatos && it.trampaDatos.dejaZona && !it.trampaDatos.zonaModo)},
+    {id: 'trampa-gas-somnifero', nombre: 'Gas somnífero', claves: ['trampaDatos', 'detalle'],
+      vieja: it => !!(it.trampaDatos && it.trampaDatos.dejaZona && !it.trampaDatos.zonaModo)},
     // 🔥 (P295, dueño, 2026-11-25): el terreno incendiado es de piso y aire: Levitar ya no salva de él (solo el texto).
     {id: 'pies-zapatillas-de-pluma', nombre: 'Zapatillas de pluma', claves: ['detalle'],
       vieja: it => typeof it.detalle === 'string' && /no te quema el terreno incendiado/.test(it.detalle)},

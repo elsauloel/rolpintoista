@@ -734,7 +734,8 @@ const CreepCalculo = (() => {
     Combatiente.migrarGritoEspeluznante(sc.habilidades);   // 😱 «Grito de pánico» → «Grito espeluznante», con Pánico (2026-11-01)
     Combatiente.migrarAdrenalina(sc.habilidades);   // 💉 la Adrenalina de fábrica vieja (Hypeado) → la del jugador (2026-11-01)   // 🎰 al azar (1 SP) o eligiendo (2 SP) (2026-11-01)
     Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite y Destello revelador: Luz sanadora; Lanza arcana y Destello revelador, los nombres nuevos (2026-10-31)
-    Combatiente.ponerAlDiaItemsFabrica(sc.equipo);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
+    Combatiente.ponerAlDiaItemsFabrica(sc.equipo);
+    if(Array.isArray(sc.cinturon)) Combatiente.ponerAlDiaItemsFabrica(sc.cinturon);   // 💤 los consumibles del cinturón (el Gas adormecedor, P295, 2026-11-25)   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
     migrarBarrido(sc);   // 🌀 el Barrido / Coletazo de antes (un área) → un ataque por rival (2026-11-08)
     migrarPielYMisiles(sc);   // 🛡 Piel de hierro +(3 + nivel) y ⏳ los misiles lentos, cooldown 4 (2026-11-03)
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)

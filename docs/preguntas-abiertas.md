@@ -2833,13 +2833,16 @@ turno solo le toca si en esa ronda todavía no la sufrió?
 
 > ✅ **Respondida (dueño, 2026-11-25):** «está bien como está» (al empezar su turno le vuelve a tocar).
 
-### P342 — 🙈 La tirada de un escondido en una zona: la Mesa dice qué jugador tiró (2026-11-25, Claude)
+### ✅ P342 — 🙈 La tirada de un escondido en una zona: la Mesa dice qué jugador tiró (2026-11-25, Claude)
 
 Cuando alguien escondido (en Sigilo) resiste una zona (el Gas adormecedor al empezar su turno), la tira su pantalla y la Mesa la muestra como «Un
 personaje oculto · Res.Mt» (P326), pero al lado sale, como en toda tirada, **el nombre de la cuenta del jugador que tiró**. Como cada jugador maneja
 un solo personaje, el GM sabe igual **quién** es (no dónde). Pasa lo mismo con el daño fijo de una zona (el terreno incendiado, P326), que también lo
 aplica la pantalla de quien lo recibe. Opciones: (a) dejarlo así; (b) que esa línea no diga qué jugador tiró (por ejemplo «—»); (c) que esa línea la
 vea solo su bando, como las de un duelo oculto (P263), y el GM solo la Crónica sin nombre. Mientras tanto, (a).
+
+> ✅ **Decidida (dueño, 2026-11-25): (c)** «que solamente lo vean los aliados del personaje escondido. Cosa que el GM ni siquiera vea que el jugador esté dentro de la nube. El GM siempre va a saber cuando un jugador está escondido o no. Lo que no debería saber es dónde, y ya la nube le da esa pista.»
+
 
 ### P343 — 🪤 Al detonar una trampa, una invocación resiste con los números de su dueño (2026-11-25, Claude)
 

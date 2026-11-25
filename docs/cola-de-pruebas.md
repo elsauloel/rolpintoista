@@ -2653,9 +2653,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   número (una invocación, o un creep que los jugadores no descubrieron) sigue «lo frena su resistencia al fuego»: los jugadores no se enteran de nada
   nuevo de un creep. Probado con clics: Blanco J1 (resistencia 0) leyó «le entra 3d4 de daño de fuego y Quemadura (3 turnos)»; la abeja, como antes.
   (El «en parte» de los textos es otra tarea de la cola, todavía sin hacer.)
-- **⬜ en cola — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
+- **✅ hecho (2026-11-25) — Probar: 🐝 una invocación de verdad (con su habilidad) entra al orden con su tirada y sale al morir** (2026-11-23, P275): con clics se puso
   la abeja con «🎭 Ponerlo en el mapa» (el mismo camino: aparece el token) y se fue con «Turnos agotados → Borrar»; falta invocarla con una habilidad que
   invoca y que salga del orden al caer con la vida en 0.
+  *Resultado:* probado con clics en «Claude · pruebas 2», mapa «Prueba · General» (GM y Jugador 1), con el orden armado, en Combate. A Blanco J1 se le dio
+  a mano una habilidad de prueba que invoca a su abeja («Llamar abeja (prueba)», 0 SP; la sacó la vuelta). Como su abeja ya estaba en juego, la habilidad
+  creó una copia («Abeja de prueba 2»): J1 eligió la casilla con un clic y la pantalla del GM tiró su Iniciativa (1d4 = 3, a la Mesa: «Iniciativa · Abeja
+  de prueba 2») y la puso **justo después de J1** (empate con él: después), con la Crónica «Sacó 3 de iniciativa: queda después de Blanco J1 · Recién
+  llega: no actúa en su primer turno». **Mareo**: al terminar J1, le tocó a la abeja («▶ Empieza el turno de Abeja de prueba 2»); al tocar Atacar salió
+  «Recién llega: está mareada — no actúa en su primer turno» (con «Hacerlo igual»); al terminar ese turno se fue el mareo («ya no está mareada: terminó
+  su primer turno»). **Al morir**: J1 le bajó la vida a 0 (HP directo) → el token desaparece («💀 Abeja de prueba 2 desaparece: murió») y **sale del orden**
+  en ~1,5 s. Segunda vez, invocada fuera de turno (sacó 1, entró después del Sanador, que tenía el turno) y muerta **en su propio turno**: salió del orden
+  y el turno pasó a Blanco J3. Visto de paso: cada vez que se invoca se crea otra copia («… 3») porque la copia muerta no se vuelve a usar → P344.
+  No se probó la pantalla de J3 al recibir el turno (no estaba conectado). Capturas fuera del repo (cola116). La vuelta: «quedó igual».
 - **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 el token suelto paso a paso guarda la iniciativa y la vida** (2026-11-23): crear uno con «No» en la
   iniciativa y ver que «Traer tokens» / «Tirar iniciativa» no lo meten; otro con «Sí», que entra. Uno con vida: el círculo rojo en el token, cambiarla a
   mano («12», «-3», Ctrl+Z) desde quien lo puso y desde el GM; en la tarjeta 🪪 y al pasar el mouse, la de un jugador con números y la del GM sin números

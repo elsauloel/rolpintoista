@@ -2814,3 +2814,8 @@ el que ya estaba puesto o el que se copia con Ctrl+C / Ctrl+V de uno puesto; par
 todavía «deja terreno incendiado (a mano, con Terreno y Formas → Fuego)» (Rastro de llamas, Bola de fuego de los elementales). Opciones: (a) dejarlo
 así (para un fuego nuevo, el asistente de zonas: «de piso y aire», con daño); (b) volver a poner un botón «🔥 Terreno incendiado» (con su daño fijo)
 en Terreno y Formas; (c) que esas habilidades lo pongan solas. Mientras tanto, nada cambió.
+
+### P340 — 🧍 Arrastrar a la «Mano 2»: ¿elige la mano? (2026-11-25, Claude)
+En la silueta del Equipo, arrastrar un arma de una mano a la Mano 1 o a la Mano 2 la equipa igual (aprieta su «Equipar»): queda en la mano que
+diga la regla de siempre (la «mano preferida» del ítem, si tiene; si no, la primera libre). Opciones: (a) dejarlo así; (b) que soltarla en la
+Mano 2 le marque la mano preferida 2 (y en la 1, la 1). Mientras tanto, (a).

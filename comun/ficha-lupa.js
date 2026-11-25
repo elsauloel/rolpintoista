@@ -303,7 +303,7 @@ const FichaLupa = (() => {
   // Las categorías de un ítem (las mismas del editor de la ficha).
   const CATEGORIA_LABEL = {'': '— elegir categoría —', arma_1m: 'Arma de una mano', arma_2m: 'Arma de dos manos',
     escudo_1m: 'Escudo de una mano', escudo_2m: 'Escudo de dos manos', armadura_blanda: 'Armadura blanda', armadura_rigida: 'Armadura rígida',
-    manos: 'Manos', piernas: 'Piernas', cabeza: 'Cabeza', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', anillos: 'Anillos',
+    manos: 'Manos (guantes / defensa)', piernas: 'Piernas', cabeza: 'Cabeza', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', anillos: 'Anillos',
     otros: 'Otros', consumibles: 'Consumibles'};
   const ES_ARMA = catId => catId === 'arma_1m' || catId === 'arma_2m';
   const sinAvisoTxt = s => String(s ?? '').replace(/^⚠️\s*/, '');

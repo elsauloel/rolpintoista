@@ -236,7 +236,7 @@ const CreepLupa = (() => {
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
       ${(sc.pasivas || []).length ? seccion('Pasivas', `<div class="vc-chips">${sc.pasivas.map(p => `<span class="vc-chip" title="${esc(p.detalle || '')}">${esc(p.nombre)}${K.pasivaComprasCreep(p) > 1 ? ' ×' + K.pasivaComprasCreep(p) : ''}</span>`).join('')}</div>`) : ''}
       ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
-      ${seccion('Manos', `<div class="vc-equipos">${armas}</div>`)}
+      ${seccion('Manos (armas, escudos y otros)', `<div class="vc-equipos">${armas}</div>`)}
       ${seccion('Equipo', equipo ? `<div class="vc-equipos">${equipo}</div>` : '<div class="hint">Sin equipo.</div>')}
       ${seccion('Cinturón', (sc.cinturon || []).length ? `<div class="vc-chips">${sc.cinturon.map(c => `<span class="vc-chip con-tip" data-tip="${esc(c.detalle || c.efectoDetalle || '')}">${esc(c.nombre || '(sin nombre)')}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}</span>`).join('')}</div>` : '<div class="hint">Sin consumibles.</div>')}
       ${seccion('Recompensas', recompensasVerHtml(sc))}

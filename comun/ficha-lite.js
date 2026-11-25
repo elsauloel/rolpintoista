@@ -14,7 +14,7 @@ const FichaLite = (() => {
   // Sin Tipo 12 (2026-11-05, segunda tanda de pruebas; dueño: «la resistencia tipo 12 no existe por ahora»): la ficha lite mostraba la columna T12.
   const TIPOS = ['T4', 'T6', 'T8', 'T10'];
   const TIPOS_LARGO = ['armas Tipo 4 (d4)', 'armas Tipo 6 (d6)', 'armas Tipo 8 (d8)', 'armas Tipo 10 (d10)'];
-  const SLOT_NOMBRE = {armadura: 'Armadura', cabeza: 'Cabeza', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón',
+  const SLOT_NOMBRE = {armadura: 'Armadura', cabeza: 'Cabeza', manos: 'Manos (guantes / defensa)', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón',
     mochila: 'Mochila', accesorio: 'Accesorio', anillo: 'Anillo', cuello: 'Cuello', escudo: 'Escudo', mano: 'Mano', otro: 'Equipo'};
 
   // Nombre corto de un stat ("Defensa", "PdG", "Tipo 4"), con lo que haya cargado.

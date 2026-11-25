@@ -3,7 +3,7 @@
 // La puerta: «🤝 Dar un ítem» en el menú «⋯» del token de un personaje (junto a Renovar / Quitar el Pacto), solo para el GM. La ventana, cómo
 // viaja y cómo lo recibe el jugador (directo a la mochila + cartel con «Aceptar») es la pieza común comun/dar-jugador.js: la misma de GM Tools.
 // Quien recibe lo aplica con lo de siempre (recibidosAplicar, js/11): por eso comun/dar-jugador.js se carga con la página, para todos.
-const DAR_PIEZAS = ['../comun/asistente-item.js?v=20261124c80'];
+const DAR_PIEZAS = ['../comun/asistente-item.js?v=20261125sil'];
 // ¿Va el botón en el menú de ese token? El GM, sobre el token de un personaje (no una invocación).
 function darJugadorPuede(t){
   return !!soyGM && !!t && t.tipo === 'pj' && !!t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && fichasPub.has(t.fichaId);

@@ -1117,6 +1117,15 @@ versión parecida en más de una, es candidato a juntar.
   `item: 'escudo'` = el escudo que tiene puesto (el Parry elegido a mano no dice con cuál paró). En 🛡 Equipo, debajo de las defensas,
   `FichaEquipo.estadoEquipoHtml(S, equipados)`: «✔ todo entero» o «🛠 Estado del equipo» pieza por pieza. Un disparo con Romper armadura parado con
   Parry de escudo va al escudo (`Combatiente.ataqueDeArma` → `ataque.rompeEscudo`; lo aplica el mapa, `dueloRompeEscudo` en `vtt-hexgrid/js/26`).
+- **🧍 `ficha-equipo.js`, el Equipo en una silueta** (2026-11-25, dueño; boceto en `../docs/bocetos/equipo-silueta.*`): en `html(S, o)`, «Equipado» es
+  `siluetaHtml(S, equipados)` (un contorno propio en SVG, `SIL_SVG`, y cada lugar encima; el CSS va adentro del HTML, `SIL_CSS`, así vale también en
+  el shadow DOM del mapa). `manosDeSilueta(equipados)` → `{m1, m2, dos, antebrazo, cats}` (como `FichaCombate.asignarManos`, sin los escudos atados al
+  antebrazo). Hover: `.sil-tip` (lo de la fila: `statTxt`, `modTags`, `durHtml`, el detalle en corto); clic: `<details class="sil-it">` con los
+  botones de siempre (`data-view`, `data-edit`, `data-toggle`), que atiende cada pantalla. Arrastrar: las filas de la mochila llevan `draggable`,
+  `data-sil-arrastra` y `data-sil-tipo`; cada lugar `data-sil-slot` y `data-sil-cats`; las escuchas van en el documento (una vez,
+  `window.__silEscuchas`, con `composedPath`) y al soltar donde entra aprietan el «Equipar» de la fila; donde no, `toast`. Los títulos: `SLOT_DEFS`
+  `manos` = «Manos (guantes / defensa)», `manos_arma` = «Manos (armas, escudos y otros)» (también `CATEGORIAS`, `FichaCalculo.SLOT_LABEL`, el
+  asistente de ítems, `FichaLupa`, `CreepCalculo`, la ficha lite y el Ver de un creep). Dudas: P340.
 - **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
   `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
   dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y

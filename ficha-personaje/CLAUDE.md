@@ -736,3 +736,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   efectos automáticos (`consumoAMano`, ver `comun/CLAUDE.md`); va a la mochila, «→ Cinturón» lo pasa al cinturón y se consume como cualquiera (la Mesa
   dice qué hace, ✋ a mano). Su «Editar» vuelve al asistente; los consumibles de fábrica siguen con el formulario completo. Una invocación no lleva
   consumibles (su «Ítem para…» no ofrece la categoría).
+
+- **🧍 El Equipo en una silueta** (2026-11-25, dueño): el 🛡 Equipo (`renderEquipo`, js/08) muestra lo equipado sobre una silueta del cuerpo
+  (`FichaEquipo.siluetaHtml`, `comun/ficha-equipo.js`): hover = el detalle, clic = Ver / Editar / Sacar (los mismos `data-view` / `data-edit` /
+  `data-toggle` que atiende js/06), arrastrar desde la mochila = su «Equipar». Lo mismo en la ventana de Equipo del mapa. Ver `comun/CLAUDE.md`.

@@ -66,7 +66,7 @@ const AsistenteItem = (() => {
     {id: 'armadura_blanda', label: 'Armadura blanda', grupo: 'defensa'},
     {id: 'armadura_rigida', label: 'Armadura rígida', grupo: 'defensa'},
     {id: 'cabeza', label: 'Cabeza', grupo: 'defensa'},
-    {id: 'manos', label: 'Manos', grupo: 'defensa'},
+    {id: 'manos', label: 'Manos (guantes / defensa)', grupo: 'defensa'},
     {id: 'piernas', label: 'Piernas', grupo: 'defensa'},
     {id: 'pies', label: 'Pies', grupo: 'defensa'},
     {id: 'cinturon', label: 'Cinturón', grupo: 'accesorio'},

@@ -3008,19 +3008,38 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   lo que tenga daño en su Ejecución) y que la comparación **aclare de qué tipo es cada daño** (físico, especial, directo; y el elemento / Tipo si lo
   tiene): p. ej. «Daño prom. 5.5 (físico, Tipo 4, área)» contra «5.5 (físico, Tipo 8)». Ojo: la Varita de granizo es físico Tipo 4 según su texto.
 
-- **⬜ en cola — ✋ Los títulos de las dos ranuras de manos en el Equipo** (dueño, 2026-11-25, con captura de la ficha): hoy dicen «MANOS» y «MANOS
+- **✅ hecho (2026-11-25) — ✋ Los títulos de las dos ranuras de manos en el Equipo** (dueño, 2026-11-25, con captura de la ficha): hoy dicen «MANOS» y «MANOS
   (ARMAS Y ESCUDOS)», y se confunden. Que digan algo como **«MANOS (guantes / defensa)»** y **«MANOS (armas, escudos y otros)»**, en todos lados
   donde aparezcan (ficha, ventana de Equipo del mapa, ficha lite, GM Tools, el asistente de ítems).
   **Y además (dueño, 2026-11-25, con captura del Equipo):** que esa parte tenga una **división clara**: **primero lo que sostiene en las manos**,
   dividido en **«Mano 1» y «Mano 2»** (arma, escudo, varita, talismán…), y **después una sección «Equipado al cuerpo»** (cabeza, armaduras, guantes,
   piernas, pies, anillos, cinturón…). Hacerlo junto con los títulos de arriba, en la ficha y en la ventana de Equipo del mapa (y donde se repita).
+  **Cómo quedó:** dicen «Manos (guantes / defensa)» y «Manos (armas, escudos y otros)» en el Equipo (la ficha y la ventana del mapa), la mochila,
+  el cartel «Slot equipado», las categorías del asistente de ítems, el «Ver», la ficha lite y el Ver de un creep en GM Tools (sus armas: «Manos (armas,
+  escudos y otros)»). La división quedó en la silueta (entrada de abajo): «✋ En las manos» con Mano 1 y Mano 2 a los costados, y «Equipado al cuerpo».
+  Probado con clics (ficha y mapa).
 
-- **⬜ en cola (aprobado por el dueño el 2026-11-25, «avancemos así») — 🧍 El Equipo en una silueta del cuerpo**: reemplazar la lista de
+- **✅ hecho (2026-11-25) (aprobado por el dueño el 2026-11-25, «avancemos así») — 🧍 El Equipo en una silueta del cuerpo**: reemplazar la lista de
   «Equipado» por una silueta simple (contorno propio, sin imágenes de terceros) con cada lugar del equipo encima: Cabeza; Armadura blanda y
   rígida en el torso; Cinturón; Piernas; Pies; Guantes y Anillos (1/2) junto a cada mano; **Mano 1 y Mano 2** como rectángulos a los costados;
   la Espalda arriba (Mochila equipada, Carcaj). Ocupado = verde con el nombre; vacío = punteado con «vacío». Con el mouse, el detalle del ítem;
   clic: Ver / Sacar. La Mochila al costado. Incluye los títulos de las manos y la división Mano 1 / Mano 2 / Equipado al cuerpo (entrada de
   arriba). Boceto aprobado: `docs/bocetos/equipo-silueta.html` y `.png`.
+  **Cómo quedó** (`comun/ficha-equipo.js`, `siluetaHtml`): en 🛡 Equipo de la ficha y en la ventana de Equipo del mapa (la misma pieza; el 🎒 de la
+  ficha lite abre esa), «Equipado» es la silueta, con la Mochila al costado como siempre y el peso equipado, el estado del equipo, Reparar y el
+  Carcaj arriba y abajo, como antes. **Hover**: el detalle de la fila de antes (números, bonos, durabilidad, Armadura rota) y lo que hace, en corto.
+  **Clic**: un menú con Ver / Editar / Sacar (los mismos botones de siempre). El lugar se pinta en rojo si lo puesto está roto y en ámbar si está
+  gastado o con Armadura rota. **Dos manos**: la Mano 1 y la Mano 2 rayadas, las dos con el nombre («de dos manos: ocupa las dos» / «la misma de la
+  Mano 1»). Un escudo atado al antebrazo va en un lugar propio, «💪 Antebrazo». La espalda: la mochila equipada y el carcaj (o el «Carcaj básico»
+  que viene con el arco). **Arrastrar** un ítem de la mochila a su lugar lo equipa (aprieta su «Equipar»: el mismo costo y el mismo «Reemplazar o
+  Comparar»); a un lugar donde no va, avisa y no hace nada. Invocaciones y creeps no usan este panel: quedan como hoy. Probado con clics en
+  «Claude · pruebas 2» («Prueba · General»): Jugador 1 en la ficha y en el mapa (Sacar desde el menú, un bastón de dos manos arrastrado a la Mano 1,
+  un anillo arrastrado, sacado y vuelto a poner, una capucha con «Equipar», un cuchillo arrastrado con el bastón puesto → «Slot equipado», unos
+  guantes a la Cabeza → no, a Guantes → sí) y el GM en el mapa (ve la silueta y el hover; «Sacar» le dice que solo puede mirar). La vuelta: «quedó igual».
+
+- **⬜ en cola — Probar: 🧍 la silueta del Equipo con lo que no se probó con clics** (2026-11-25): un escudo atado al antebrazo (el lugar «💪
+  Antebrazo»), una mochila y un carcaj de verdad equipados en la espalda, el «Carcaj básico» con un arco, una pieza rota (en rojo) y con Armadura
+  rota (en ámbar), y arrastrar en combate (que cobre los No2 de equipar). Con clics se probó lo demás (ver la entrada de la silueta).
 
 ## En cola
 

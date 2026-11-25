@@ -30,8 +30,8 @@ const FichaEquipo = (() => {
     {id:'cabeza', label:'Cabeza', cats:['cabeza'], max:1},
     {id:'torso_blanda', label:'Armadura blanda', cats:['armadura_blanda'], max:1},
     {id:'torso_rigida', label:'Armadura rígida', cats:['armadura_rigida'], max:1},
-    {id:'manos', label:'Manos', cats:['manos'], max:1},
-    {id:'manos_arma', label:'Manos (armas y escudos)', cats:['arma_1m','arma_2m','escudo_1m','escudo_2m'], max:2, peso:{arma_1m:1, arma_2m:2, escudo_1m:1, escudo_2m:2}},
+    {id:'manos', label:'Manos (guantes / defensa)', cats:['manos'], max:1},   // los títulos de las dos ranuras de manos (dueño, 2026-11-25: «se confunden»)
+    {id:'manos_arma', label:'Manos (armas, escudos y otros)', cats:['arma_1m','arma_2m','escudo_1m','escudo_2m'], max:2, peso:{arma_1m:1, arma_2m:2, escudo_1m:1, escudo_2m:2}},
     {id:'anillos', label:'Anillos', cats:['anillos'], max:2},
     {id:'pies', label:'Pies', cats:['pies'], max:1},
     {id:'piernas', label:'Piernas', cats:['piernas'], max:1},
@@ -51,7 +51,7 @@ const FichaEquipo = (() => {
     {id:'escudo_2m', label:'Escudo de dos manos', defensivo:true},
     {id:'armadura_blanda', label:'Armadura blanda', defensivo:true},
     {id:'armadura_rigida', label:'Armadura rígida', defensivo:true},
-    {id:'manos', label:'Manos', defensivo:true},
+    {id:'manos', label:'Manos (guantes / defensa)', defensivo:true},
     {id:'piernas', label:'Piernas', defensivo:true},
     {id:'cabeza', label:'Cabeza', defensivo:true},
     {id:'pies', label:'Pies', defensivo:true},
@@ -533,9 +533,9 @@ const FichaEquipo = (() => {
     const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
     return `<div class="hint equipo-dur"${color ? ` style="color:${color};font-weight:700"` : ''} title="Durabilidad: ${esc(Combatiente.durTexto(it) || String(max))}.${pierde ? ` Cada punto ${armadura ? 'de armadura rota' : 'abollado'} le baja 1 a la Defensa de esta pieza.` : ''} Se repara fuera de combate (herrero de una tienda).">🔧 ${fmt(act)}/${fmt(max)}${rota}${est}</div>`;
   }
-  function filaHtml(it, boton){
+  function filaHtml(it, boton, attrs){
     const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';   // el color del nombre delataba la calidad
-    return `<div class="equipo-fila">
+    return `<div class="equipo-fila"${attrs || ''}>
     ${thumb(it)}
     <div class="equipo-info">
       <div class="cat-nombre"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
@@ -546,6 +546,209 @@ const FichaEquipo = (() => {
     <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button>
     ${boton}
   </div>`;
+  }
+  /* ---------- 🧍 El Equipo en una silueta del cuerpo (2026-11-25, dueño: «avancemos así»; boceto en docs/bocetos/equipo-silueta.*) ----------
+     Un contorno propio (SVG, sin imágenes de terceros) con cada lugar encima: Cabeza; Armadura blanda y rígida en el torso; Cinturón; Piernas; Pies;
+     Guantes (la ranura «Manos (guantes / defensa)») y Anillos junto a cada mano; Mano 1 y Mano 2 a los costados (la ranura «Manos (armas, escudos y
+     otros)»: lo de dos manos ocupa las dos); la Espalda arriba (Mochila equipada, Carcaj). Ocupado = verde con el nombre; vacío = punteado.
+     Con el mouse, el detalle (lo de la fila de antes: números, bonos, durabilidad, Armadura rota); con clic, un menú con Ver / Editar / Sacar (los
+     mismos botones `data-view` / `data-edit` / `data-toggle`: cada pantalla los atiende como siempre). Arrastrar un ítem de la mochila a un lugar
+     aprieta su botón «Equipar» (silArrastrar, abajo): la misma regla, el mismo costo y el mismo «Reemplazar o Comparar». */
+  const SIL_SVG = `<svg class="sil-svg" width="560" height="640" viewBox="0 0 560 640" aria-hidden="true">
+    <g fill="var(--sil-cuerpo, #2a2228)" stroke="var(--sil-borde, #8a7465)" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+      <circle cx="280" cy="92" r="46"/>
+      <path d="M262 142 Q262 152 250 156 Q226 160 214 172 L150 300 Q140 322 158 330 Q176 336 186 318 L222 246 L222 560 Q222 584 244 584 Q266 584 266 560 L266 400 Q266 386 280 386 Q294 386 294 400 L294 560 Q294 584 316 584 Q338 584 338 560 L338 246 L374 318 Q384 336 402 330 Q420 322 410 300 L346 172 Q334 160 310 156 Q298 152 298 142 Z"/>
+    </g></svg>`;
+  const SIL_CSS = `
+    .sil-cuerpo{position:relative;width:560px;max-width:100%;height:650px;margin:0 0 8px;border:1px solid var(--line-soft, #3a2f38);border-radius:10px;background:var(--panel2, #1d171d)}
+    .sil-svg{position:absolute;left:0;top:0;pointer-events:none}
+    .sil-zona{position:absolute;font:600 10px "Space Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted, #a8998f)}
+    .sil-slot{position:absolute;box-sizing:border-box;border-radius:8px;padding:4px 6px;font-size:11.5px;line-height:1.2;text-align:center}
+    .sil-slot>b{display:block;font:600 9.5px "Space Mono",ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase;opacity:.85;margin-bottom:1px}
+    .sil-slot.lleno{background:#2f4a3a;border:1.5px solid #6fbf8a;color:#eafff0}
+    .sil-slot.vacio{background:rgba(29,23,29,.85);border:1.5px dashed #6a5a63;color:var(--muted, #a8998f)}
+    .sil-slot.vacio i{font-style:normal;opacity:.75}
+    .sil-slot.casi{border-color:#e0a040;box-shadow:0 0 0 1px #e0a04055}
+    .sil-slot.roto{border-color:#e06060;background:#4a2a2a;box-shadow:0 0 0 1px #e0606055}
+    .sil-slot.mano{width:96px;min-height:118px;display:flex;flex-direction:column;justify-content:center}
+    .sil-slot.dos{background:repeating-linear-gradient(135deg,#2f4a3a 0 8px,#284034 8px 16px)}
+    .sil-slot.sil-acepta{outline:2px dashed #e0a45a;outline-offset:2px}
+    .sil-slot.sil-sobre{outline:2px solid #e0a45a;background:#4a3f2a}
+    .sil-slot.sil-no{outline:2px solid #e06060;background:#4a2a2a}
+    .sil-item{margin-top:2px}
+    .sil-it{display:block}
+    .sil-it>summary{list-style:none;cursor:pointer;border-radius:5px;padding:1px 2px}
+    .sil-it>summary::-webkit-details-marker{display:none}
+    .sil-it>summary:hover{background:rgba(255,255,255,.08)}
+    .sil-nom{font-weight:600}
+    .sil-insignia{display:block;font-size:10px;opacity:.9;margin-top:1px}
+    .sil-tip,.sil-menu{position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:250px;box-sizing:border-box;text-align:left;
+      background:var(--sil-tip, #262027);border:1px solid var(--brass, #e0a45a);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.35;
+      color:var(--paper, #efe6dc);box-shadow:0 8px 24px #0009}
+    .sil-der .sil-tip,.sil-der .sil-menu{left:auto;right:0}
+    .sil-arriba .sil-tip,.sil-arriba .sil-menu{top:auto;bottom:calc(100% + 6px)}
+    .sil-tip{display:none;pointer-events:none}
+    .sil-item:hover>.sil-tip{display:block}
+    .sil-item:has(details[open])>.sil-tip{display:none}
+    .sil-tip-n{font-weight:700;font-size:13px;color:var(--brass, #e0a45a);margin-bottom:2px}
+    .sil-tip-d{margin-top:4px;opacity:.9}
+    .sil-tip .imeta{margin-top:3px}
+    .sil-menu{z-index:31;display:flex;flex-wrap:wrap;gap:5px;align-items:center;width:auto;min-width:200px}
+    .sil-menu-n{flex-basis:100%;font-weight:700;color:var(--brass, #e0a45a)}
+    .sil-ley{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;font-size:11.5px;color:var(--muted, #a8998f)}
+    .sil-ley span{display:inline-flex;gap:6px;align-items:center}
+    .sil-ley i{display:inline-block;width:18px;height:11px;border-radius:3px}
+    .sil-arr-hint{margin:0 0 8px}
+    .equipo-fila[draggable="true"]{cursor:grab}
+  `;
+  // Mano 1 y Mano 2: lo mismo que FichaCombate.asignarManos (lo de dos manos en la 1; la «mano preferida»), sin los escudos atados al antebrazo
+  // (no ocupan la mano: van aparte). Lo que sobre (más de lo que entra, de un dato raro) se muestra igual en la Mano 2, en rojo.
+  function manosDeSilueta(equipados){
+    const cats = SLOT_DEFS.find(sd => sd.id === 'manos_arma').cats;
+    const enMano = equipados.filter(i => cats.includes(i.tipoItem));
+    const antebrazo = enMano.filter(i => i.antebrazo && /^escudo_/.test(String(i.tipoItem || '')));
+    const resto = enMano.filter(i => !antebrazo.includes(i));
+    const dos = resto.find(i => i.tipoItem === 'arma_2m' || i.tipoItem === 'escudo_2m') || null;
+    let m1 = [], m2 = [];
+    if(dos){ m1 = [dos]; m2 = resto.filter(i => i !== dos); }
+    else{
+      const p1 = resto.find(a => String(a.manoPreferida) === '1');
+      const p2 = resto.find(a => String(a.manoPreferida) === '2' && a !== p1);
+      const libres = resto.filter(a => a !== p1 && a !== p2);
+      const a1 = p1 || libres.shift() || null, a2 = p2 || libres.shift() || null;
+      if(a1) m1 = [a1];
+      if(a2) m2 = [a2];
+      m2 = m2.concat(libres);
+    }
+    return {m1, m2, dos, antebrazo, cats};
+  }
+  const corto = (t, n) => { t = String(t || '').trim(); return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
+  // El detalle al pasar el mouse: lo mismo que la fila de antes (números, bonos, durabilidad y Armadura rota) y lo que hace, en corto.
+  function silTipHtml(it, lugar){
+    const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';
+    return `<div class="sil-tip"><div class="sil-tip-n"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
+      <div class="hint">${esc([lugar, statTxt(it)].filter(Boolean).join(' · '))}</div>
+      ${(it.mods || []).some(m => m.stat) ? `<div class="imeta">${modTags(it.mods)}</div>` : ''}${durHtml(it)}
+      ${it.detalle ? `<div class="sil-tip-d">${esc(corto(it.detalle, 240))}</div>` : ''}
+      <div class="hint" style="margin-top:4px">🖱 Clic: Ver / Editar / Sacar</div></div>`;
+  }
+  // Un ítem puesto: su nombre (clic = el menú) y su detalle (hover).
+  function silItemHtml(it, lugar, insignia){
+    return `<div class="sil-item"><details class="sil-it"><summary title=""><span class="sil-nom">${esc(it.nombre)}</span>${insignia ? `<span class="sil-insignia">${insignia}</span>` : ''}</summary>
+      <div class="sil-menu"><span class="sil-menu-n">${esc(it.nombre)}</span>
+        <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button><button type="button" class="mini" data-toggle="${it.id}" title="Pasarlo a la mochila">Sacar</button>
+      </div></details>${silTipHtml(it, lugar)}</div>`;
+  }
+  // El color del lugar según lo que tiene puesto: rojo si algo está roto, ámbar si está gastado o con Armadura rota.
+  function silEstadoCls(items){
+    if(items.some(i => FichaCalculo.durableItem(i) && FichaCalculo.itemRoto(i))) return ' roto';
+    if(items.some(i => FichaCalculo.durableItem(i) && (FichaCalculo.durActual(i) <= 1 || FichaCalculo.armRotaDe(i) > 0))) return ' casi';
+    return '';
+  }
+  // Un lugar de la silueta. o = {slot (id de SLOT_DEFS, para arrastrar), cats, titulo, items, lugar, pos: {left, top, w}, cls, vacio, insignia(it)}.
+  function silSlotHtml(o){
+    const items = o.items || [];
+    const st = `left:${o.pos.left}px;top:${o.pos.top}px${o.pos.w ? `;width:${o.pos.w}px` : ''}`;
+    const datos = o.cats ? ` data-sil-slot="${esc(o.slot)}" data-sil-cats="${esc(o.cats.join(','))}"` : '';
+    const cuerpo = items.length ? items.map(it => silItemHtml(it, o.lugar, o.insignia ? o.insignia(it) : '')).join('') : (o.contenido || `<i>${esc(o.vacio || 'vacío')}</i>`);
+    const lleno = items.length || o.contenido;
+    return `<div class="sil-slot ${lleno ? 'lleno' : 'vacio'}${lleno ? silEstadoCls(items) : ''}${o.cls ? ' ' + o.cls : ''}" style="${st}"${datos}${!items.length && o.titleVacio ? ` title="${esc(o.titleVacio)}"` : ''}><b>${esc(o.titulo)}</b>${cuerpo}</div>`;
+  }
+  function siluetaHtml(S, equipados){
+    const de = id => { const sd = SLOT_DEFS.find(x => x.id === id); return {sd, items: equipados.filter(i => sd.cats.includes(i.tipoItem))}; };
+    const lugar = id => SLOT_DEFS.find(x => x.id === id).label;
+    const arr = 'Arrastrá acá un ítem de la mochila para equiparlo';
+    const simple = (id, titulo, pos, cls) => { const d = de(id); return silSlotHtml({slot: id, cats: d.sd.cats, titulo, items: d.items, lugar: lugar(id), pos, cls, titleVacio: arr}); };
+    const M = manosDeSilueta(equipados);
+    const nDos = it => it.tipoItem === 'arma_2m' || it.tipoItem === 'escudo_2m';
+    const mano1 = silSlotHtml({slot: 'manos_arma', cats: M.cats, titulo: 'Mano 1', items: M.m1, lugar: 'Mano 1', pos: {left: 20, top: 186}, cls: 'mano' + (M.dos ? ' dos' : ''),
+      vacio: 'vacía', titleVacio: arr, insignia: it => nDos(it) ? '🤲 de dos manos: ocupa las dos' : ''});
+    // Con algo de dos manos, la Mano 2 queda ocupada por lo mismo (y se ve: rayada, «↔ … (de dos manos)»).
+    const mano2 = M.dos && !M.m2.length
+      ? silSlotHtml({titulo: 'Mano 2', pos: {left: 442, top: 186}, cls: 'mano dos sil-der', items: [M.dos], lugar: 'Mano 1 y Mano 2', insignia: () => '↔ la misma de la Mano 1 (de dos manos)'})
+      : silSlotHtml({slot: 'manos_arma', cats: M.cats, titulo: 'Mano 2', items: M.m2, lugar: 'Mano 2', pos: {left: 442, top: 186}, cls: 'mano sil-der' + (M.dos ? ' roto' : ''),
+          vacio: 'vacía', titleVacio: arr, insignia: it => M.dos ? '⚠ no entra: la Mano 1 tiene algo de dos manos' : ''});
+    const antebrazo = M.antebrazo.length ? silSlotHtml({titulo: '💪 Antebrazo', items: M.antebrazo, lugar: 'Atado al antebrazo (no ocupa la mano)', pos: {left: 20, top: 312, w: 90}}) : '';
+    const anillos = de('anillos');
+    const anillosHtml = silSlotHtml({slot: 'anillos', cats: anillos.sd.cats, titulo: `Anillos ${fmt(anillos.items.length)}/${fmt(anillos.sd.max)}`, items: anillos.items, lugar: 'Anillos',
+      pos: {left: 360, top: 340, w: 96}, cls: 'sil-der', titleVacio: arr});
+    // La espalda: la mochila equipada y el carcaj (el de verdad, o el «Carcaj básico» que viene con el arco: no es un ítem, no tiene menú).
+    const carcaj = de('carcaj'), inc = !carcaj.items.length && carcajDe(S) && carcajDe(S).incluido;
+    const carcajSlot = silSlotHtml({slot: 'carcaj', cats: carcaj.sd.cats, titulo: 'Espalda · Carcaj', items: carcaj.items, lugar: 'Carcaj', pos: {left: 430, top: 44, w: 110}, cls: 'sil-der', titleVacio: arr,
+      contenido: inc ? `<span class="sil-nom" title="Viene con tu arco o tu ballesta (5 lugares, no pesa ni ocupa lugar): sus proyectiles, abajo, en 🏹 Carcaj">${esc(CARCAJ_BASICO_NOMBRE)}</span><span class="sil-insignia">viene con tu arco</span>` : ''});
+    const ley = `<div class="sil-ley"><span><i style="background:#2f4a3a;border:1.5px solid #6fbf8a"></i>ocupado</span><span><i style="border:1.5px dashed #6a5a63"></i>vacío</span>
+      <span>🖱 pasá el mouse: qué tiene · clic: Ver / Editar / Sacar</span>
+      <span title="La ranura «Manos (armas, escudos y otros)»: 2 lugares; lo de dos manos ocupa los dos">✋ <b>Mano 1 / Mano 2</b>: armas, escudos y otros (lo que sostiene)</span>
+      <span title="La ranura «Manos (guantes / defensa)»">🧤 <b>Guantes</b>: manos (guantes / defensa)</span></div>`;
+    return `<div class="sil-cuerpo">${SIL_SVG}
+      <div class="sil-zona" style="left:24px;top:168px">✋ En las manos</div>
+      <div class="sil-zona" style="left:214px;top:14px">Equipado al cuerpo</div>
+      ${silSlotHtml({slot: 'mochila', cats: de('mochila').sd.cats, titulo: 'Espalda · Mochila', items: de('mochila').items, lugar: 'Mochila (espalda)', pos: {left: 20, top: 44, w: 110}, titleVacio: arr})}
+      ${carcajSlot}
+      ${simple('cabeza', 'Cabeza', {left: 232, top: 66, w: 96})}
+      ${mano1}${mano2}${antebrazo}
+      ${simple('torso_blanda', 'Armadura blanda', {left: 222, top: 160, w: 116})}
+      ${simple('torso_rigida', 'Armadura rígida', {left: 222, top: 224, w: 116})}
+      ${simple('cinturon', 'Cinturón', {left: 226, top: 298, w: 108})}
+      ${simple('manos', 'Guantes', {left: 112, top: 340, w: 92})}
+      ${anillosHtml}
+      ${simple('piernas', 'Piernas', {left: 222, top: 440, w: 116})}
+      ${simple('pies', 'Pies', {left: 206, top: 592, w: 148}, 'sil-arriba')}
+    </div>${ley}`;
+  }
+  /* 🖱 Arrastrar de la mochila a un lugar (escuchas en el documento: andan también adentro del recuadro del mapa, que es un shadow DOM, por
+     composedPath). Soltarlo en un lugar donde entra = apretar el «Equipar» de esa fila (la pantalla hace lo de siempre). Donde no entra, avisa. */
+  const silArrastre = {fila: null, tipo: '', raiz: null};
+  const silBuscar = (e, sel) => (e.composedPath ? e.composedPath() : []).find(el => el && el.matches && el.matches(sel)) || null;
+  const silAcepta = (slot, tipo) => !!slot && String(slot.dataset.silCats || '').split(',').includes(tipo);
+  function silLimpiar(){
+    if(silArrastre.raiz) silArrastre.raiz.querySelectorAll('.sil-acepta, .sil-sobre').forEach(el => el.classList.remove('sil-acepta', 'sil-sobre'));
+    silArrastre.fila = null; silArrastre.tipo = ''; silArrastre.raiz = null;
+  }
+  function silAvisar(t){ if(typeof toast === 'function') toast(t); }
+  if(typeof document !== 'undefined' && !window.__silEscuchas){
+    window.__silEscuchas = true;
+    document.addEventListener('dragstart', e => {
+      const fila = silBuscar(e, '[data-sil-arrastra]');
+      if(!fila) return;
+      silArrastre.fila = fila; silArrastre.tipo = fila.dataset.silTipo || ''; silArrastre.raiz = fila.getRootNode();
+      try{ e.dataTransfer.setData('text/plain', fila.dataset.silArrastra); e.dataTransfer.effectAllowed = 'move'; }catch(err){ /* sin dataTransfer */ }
+      silArrastre.raiz.querySelectorAll('[data-sil-slot]').forEach(sl => { if(silAcepta(sl, silArrastre.tipo)) sl.classList.add('sil-acepta'); });
+    });
+    document.addEventListener('dragover', e => {
+      if(!silArrastre.fila) return;
+      const slot = silBuscar(e, '[data-sil-slot]');
+      if(!slot) return;
+      e.preventDefault();
+      try{ e.dataTransfer.dropEffect = silAcepta(slot, silArrastre.tipo) ? 'move' : 'none'; }catch(err){ /* nada */ }
+      silArrastre.raiz.querySelectorAll('.sil-sobre').forEach(el => { if(el !== slot) el.classList.remove('sil-sobre'); });
+      if(silAcepta(slot, silArrastre.tipo)) slot.classList.add('sil-sobre');
+    });
+    document.addEventListener('drop', e => {
+      if(!silArrastre.fila) return;
+      const slot = silBuscar(e, '[data-sil-slot]');
+      if(!slot){ silLimpiar(); return; }
+      e.preventDefault();
+      const fila = silArrastre.fila, ok = silAcepta(slot, silArrastre.tipo);
+      silLimpiar();
+      if(!ok){
+        const nombre = (fila.querySelector('.cat-nombre') || {}).textContent || 'Ese ítem';
+        const titulo = (slot.querySelector('b') || {}).textContent || 'ese lugar';
+        slot.classList.add('sil-no'); setTimeout(() => slot.classList.remove('sil-no'), 700);
+        silAvisar(`${nombre.trim()} no va en ${titulo.trim()}`);
+        return;
+      }
+      const boton = fila.querySelector('button[data-toggle]');
+      if(boton) boton.click();
+    });
+    document.addEventListener('dragend', () => silLimpiar());
+    // Un solo menú abierto a la vez; un clic afuera lo cierra.
+    document.addEventListener('click', e => {
+      const ruta = e.composedPath ? e.composedPath() : [];
+      const raiz = ruta[0] && ruta[0].getRootNode ? ruta[0].getRootNode() : document;
+      if(!raiz || !raiz.querySelectorAll) return;
+      raiz.querySelectorAll('details.sil-it[open]').forEach(d => { if(!ruta.includes(d)) d.removeAttribute('open'); });
+    }, true);
   }
   function html(S, o){
     o = o || {};
@@ -567,7 +770,9 @@ const FichaEquipo = (() => {
       <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
       ${items.map(it => {
         const info = slotOcupado(S, it);
-        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it, o && o.fichaId) + Intercambio.botonDespojos(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+        // 🧍 Se puede arrastrar a un lugar de la silueta (2026-11-25): lo equipa con este mismo botón (silArrastrar).
+        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it, o && o.fichaId) + Intercambio.botonDespojos(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`,
+          ` draggable="true" data-sil-arrastra="${esc(it.id)}" data-sil-tipo="${esc(it.tipoItem)}"`);
       }).join('')}
     </div>`;
     }).join('');
@@ -607,9 +812,12 @@ const FichaEquipo = (() => {
       <div style="grid-column:-2 / -1;min-width:0">${Combatiente.resElementalesHtml(el => cEq.final['res' + el], el => lupa(`defensa:res${el}`))}</div>   <!-- debajo de la de crítico (la última columna) -->
     </div>
   </div>`;
-    return resumen + estadoEquipoHtml(S, equipados) + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
-    <div><h4 class="equipo-tit">Equipado</h4>${izq}${carcajHtml(S, o)}</div>
-    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻). En combate, solo a un aliado al lado (caído o no).">${esc(Intercambio.textoPasar ? Intercambio.textoPasar(o && o.fichaId) : '🤝 Pasar · ♻')}</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
+    // 🧍 Lo equipado, en una silueta del cuerpo (2026-11-25, boceto aprobado por el dueño: docs/bocetos/equipo-silueta.*). La lista de antes
+    // (`izq`, slot por slot) queda armada pero no se muestra: la silueta tiene lo mismo (hover = el detalle de la fila; clic = Ver / Editar / Sacar).
+    void izq;
+    return `<style>${SIL_CSS}</style>` + resumen + estadoEquipoHtml(S, equipados) + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
+    <div><h4 class="equipo-tit">Equipado</h4>${siluetaHtml(S, equipados)}${carcajHtml(S, o)}</div>
+    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻). En combate, solo a un aliado al lado (caído o no).">${esc(Intercambio.textoPasar ? Intercambio.textoPasar(o && o.fichaId) : '🤝 Pasar · ♻')}</button>` : ''}</h4>${der ? `<div class="hint sil-arr-hint">🖱 Arrastrá un ítem a su lugar en la silueta para equiparlo (si entra ahí).</div>${der}` : '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
   }
   /* 🔧 Reparar sin herrero (dueño, 2026-10-12; P99): el talento «Reparar equipo» y el Óleo reparador. Solo fuera de combate. Cada punto
@@ -781,5 +989,5 @@ const FichaEquipo = (() => {
   }
 
   return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, siRecibe, BASE_CINTURON, esFlecha, carcajDe, carcajReal, carcajHuerfano, acomodarCarcaj, costoCarcaj, CAP_CARCAJ_INCLUIDO, tieneArcoOBallesta, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, aManoApto, esEscudo, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
-    modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
+    modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml, manosDeSilueta, siluetaHtml};
 })();

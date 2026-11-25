@@ -51,21 +51,21 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261125incend"></script>
-<script src="creep-calculo.js?v=20261122cola47"></script>
+<script src="creep-calculo.js?v=20261125sil"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
 <script src="creep-duelo.js"></script>
-<script src="ficha-calculo.js?v=20261125incend"></script>
+<script src="ficha-calculo.js?v=20261125sil"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261124mareo3"></script>
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261124c79"></script>
+<script src="dar-jugador.js?v=20261125sil"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
-<script src="asistente-item.js"></script>
+<script src="asistente-item.js?v=20261125sil"></script>
 <script src="asistente-duelo-hab.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
@@ -93,7 +93,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
 <script src="selector-estados.js?v=20261101jefe"></script>
-<script src="ficha-equipo.js"></script>
+<script src="ficha-equipo.js?v=20261125sil"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
@@ -115,15 +115,15 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js?v=20261125miasma"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261124c80"></script>
+<script src="ficha-lupa.js?v=20261125sil"></script>
 <script src="ficha-editor.js"></script>
 <script src="capas.js"></script>
-<script src="creep-lupa.js?v=20261122prisa5"></script>
+<script src="creep-lupa.js?v=20261125sil"></script>
 <script src="combate-fin.js"></script>
-<script src="grupo-botin.js"></script>
+<script src="grupo-botin.js?v=20261125sil"></script>
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
-<script src="ficha-lite.js?v=20261120hasta"></script>
+<script src="ficha-lite.js?v=20261125sil"></script>
 <script src="pasivas.js?v=20261124tags2"></script>
 <script src="skills-clase.js?v=20261125nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
@@ -2858,7 +2858,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -3282,6 +3282,42 @@ prueba('equipar: slot lleno pide reemplazar, un consumible pasa al cinturón, un
   FichaEquipo.reemplazar(S, 'a1', 'a3', ui);
   igual([lleno, S.cinturon.some(i => i.nombre === 'Poción') && !S.inventario.some(i => i.id === 'p'), avisos.some(t => /trofeo/.test(t)), casco.equipado, S.inventario.find(i => i.id === 'a3').equipado, S.inventario.find(i => i.id === 'a1').equipado, S.nitros, avisos.includes('sin No2'), FichaEquipo.slotLlenoHtml(S, S.inventario.find(i => i.id === 'a1')).includes('data-reemplazar')],
     ['a3', true, true, true, true, false, 0, false, true]);   // casco −1 No2 (3 → 2), reemplazar −2 (2 → 0)
+});
+
+prueba('🧍 el Equipo en una silueta (2026-11-25): Mano 1 / Mano 2 con lo de dos manos en las dos, el escudo al antebrazo aparte, los anillos juntos, vacío punteado, y cada ítem con Ver / Editar / Sacar', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: [
+    {id: 'g', nombre: 'Gran hacha', tipoItem: 'arma_2m', equipado: true, peso: 3, tipoDado: 10},
+    {id: 'br', nombre: 'Brazal', tipoItem: 'escudo_1m', antebrazo: true, equipado: true, peso: 1},
+    {id: 'r1', nombre: 'Anillo de Foco', tipoItem: 'anillos', equipado: true}, {id: 'r2', nombre: 'Anillo de Plata', tipoItem: 'anillos', equipado: true},
+    {id: 'y', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, mods: [{stat: 'def', val: 2}]},
+    {id: 'd', nombre: 'Daga', tipoItem: 'arma_1m', equipado: false, peso: 1}]}).S);
+  const h = FichaEquipo.html(S, {});
+  const M = FichaEquipo.manosDeSilueta(S.inventario.filter(i => i.equipado));
+  const slot = t => (h.match(new RegExp(`<div class="sil-slot [^"]*"[^>]*><b>${t}</b>`)) || [''])[0];
+  igual([M.m1.map(i => i.id), M.m2.map(i => i.id), M.antebrazo.map(i => i.id), M.dos && M.dos.id,
+      /mano dos/.test(slot('Mano 1')), /mano dos/.test(slot('Mano 2')), (h.match(/sil-nom">Gran hacha/g) || []).length, /la misma de la Mano 1 \(de dos manos\)/.test(h),
+      /💪 Antebrazo<\/b>.*?Brazal/s.test(h), /Anillos 2\/2<\/b>.*?Anillo de Foco.*?Anillo de Plata/s.test(h),
+      /sil-slot vacio[^>]*><b>Pies<\/b><i>vacío<\/i>/.test(h), /sil-slot lleno[^>]*><b>Cabeza<\/b>/.test(h),
+      ['g', 'r1', 'y'].every(id => h.includes(`data-view="inventario:${id}"`) && h.includes(`data-edit="inventario:${id}"`) && h.includes(`data-toggle="${id}" title="Pasarlo a la mochila">Sacar`)),
+      /draggable="true" data-sil-arrastra="d" data-sil-tipo="arma_1m"/.test(h), /data-sil-slot="manos_arma" data-sil-cats="arma_1m,arma_2m,escudo_1m,escudo_2m"/.test(h),
+      /Peso equipado/.test(h), /equipo-tit">Mochila/.test(h)],
+    [['g'], [], ['br'], 'g', true, true, 2, true, true, true, true, true, true, true, true, true, true]);
+});
+prueba('🧍 la silueta sin dos manos: la mano preferida manda, el hover trae el detalle de la fila y la durabilidad pinta el lugar (roto en rojo, gastado en ámbar)', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: [
+    {id: 'a', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, peso: 1, tipoDado: 8},
+    {id: 'b', nombre: 'Rodela', tipoItem: 'escudo_1m', equipado: true, peso: 1, manoPreferida: '1', mods: [{stat: 'def', val: 1}]},
+    {id: 'p', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 3}], dur: 0, durV: Combatiente.DUR_VERSION},
+    {id: 'q', nombre: 'Polainas', tipoItem: 'piernas', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}], armRota: 1}]}).S);
+  const h = FichaEquipo.html(S, {});
+  const M = FichaEquipo.manosDeSilueta(S.inventario.filter(i => i.equipado));
+  igual([M.m1.map(i => i.id), M.m2.map(i => i.id), /sil-tip[^]*?Rodela[^]*?Def \+1/.test(h), /sil-slot lleno roto[^>]*><b>Armadura rígida/.test(h), /sil-slot lleno casi[^>]*><b>Piernas/.test(h),
+      /<b>Mano 2<\/b>[^]*?Espada/.test(h)],
+    [['b'], ['a'], true, true, true, true]);
+});
+prueba('✋ los títulos de las dos ranuras de manos (2026-11-25): «Manos (guantes / defensa)» y «Manos (armas, escudos y otros)», en el Equipo, las categorías y el asistente', () => {
+  igual([FichaEquipo.SLOT_DEFS.find(s => s.id === 'manos').label, FichaEquipo.SLOT_DEFS.find(s => s.id === 'manos_arma').label, FichaEquipo.CATEGORIA_LABEL.manos, FichaCalculo.SLOT_LABEL.manos],
+    ['Manos (guantes / defensa)', 'Manos (armas, escudos y otros)', 'Manos (guantes / defensa)', 'Manos (guantes / defensa)']);
 });
 
 prueba('el botín: se lista (sin lo tomado a la vieja) y la ventana muestra lo de cada jugador, la mochila y «Reclamar»', () => {
@@ -10185,7 +10221,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10309,7 +10345,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261125sil', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

@@ -792,7 +792,7 @@ const CreepCalculo = (() => {
     arma_1m:'Arma de 1 mano', arma_2m:'Arma de 2 manos',
     escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
     armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
-    manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
+    manos:'Manos (guantes / defensa)', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
   };
   // Etiquetas cortas de los stats de un ítem de creep (antes STAT_LABEL_GM de GM Tools).
   const STAT_LABEL = {

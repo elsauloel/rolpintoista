@@ -2760,13 +2760,17 @@ entrar» y «el de cada paso» no se suman en la misma casilla (sería entrar = 
 entrar tiene que pegar dos veces (una por entrar y otra por el paso)?
 Además: si alguien sigue caminando mientras se está tirando el daño de sus pasos anteriores, los pasos nuevos salen en otro cartel después.
 
-### P334 — ☠ La Varita de miasma: ¿también les pega a los aliados? (2026-11-25, Claude)
+### ✅ P334 — ☠ La Varita de miasma: ¿también les pega a los aliados? (2026-11-25, Claude)
+
+**Decidido (dueño, 2026-11-25): queda como está** — la miasma pega solo a los rivales (el texto nuevo dice «a cada rival»).
 
 El texto de antes decía «a quien está adentro o entra (aliados incluidos)», pero la nube nunca les pegó a los aliados de quien la tira (no tiene
 la marca de «fuego amigo», como sí la tienen los Pedos y el Chorro de lava). Al reescribir el texto (P295) puse lo que hace de verdad: **«A cada
 rival…»**, sin tocar cómo funciona (lo más conservador). ¿Queda así, solo a los rivales, o le pongo el fuego amigo (aliados incluidos, como decía)?
 
-### P335 — 💨 Los Pedos Tóxicos: quien ENTRA a la nube, ¿con qué tirada? (2026-11-25, Claude)
+### ✅ P335 — 💨 Los Pedos Tóxicos: quien ENTRA a la nube, ¿con qué tirada? (2026-11-25, Claude)
+
+**Decidido (dueño, 2026-11-25): queda como está** — quien entra usa la última tirada del dueño; a los 40 s, la pantalla del GM resuelve por quien no contesta.
 
 Desde hoy, en cada Mantenimiento el dueño de la nube tira su Ef.Esp una vez para todos los de adentro (P295). Pero quien **entra caminando** en el
 medio de la ronda sigue como antes: su duelo al entrar, contra **la última tirada** del dueño (la del último Mantenimiento, o la de cuando la tiró),

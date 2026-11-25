@@ -2925,6 +2925,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: ☠ la Varita de miasma sin orden de turnos y sobre un creep** (2026-11-25): sin orden (narrativo) tiene que pegar al pasar de
   ronda; sobre un creep (la tira un jugador), el cartel de siempre del GM. Con clics se probó solo un creep tirándola sobre dos personajes.
 
+- **⬜ en cola (investigar) — 🔁 La línea «Empieza su turno» sale repetida en la Mesa a veces** (visto el 2026-11-25 probando la miasma, con J1 y J2;
+  dueño: «anotalo para investigarlo»). Buscar de dónde sale la repetida (¿dos pantallas que la publican?, ¿una recarga?) y arreglarlo.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

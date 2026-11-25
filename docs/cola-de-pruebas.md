@@ -3015,6 +3015,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   dividido en **«Mano 1» y «Mano 2»** (arma, escudo, varita, talismán…), y **después una sección «Equipado al cuerpo»** (cabeza, armaduras, guantes,
   piernas, pies, anillos, cinturón…). Hacerlo junto con los títulos de arriba, en la ficha y en la ventana de Equipo del mapa (y donde se repita).
 
+- **⬜ en cola (aprobado por el dueño el 2026-11-25, «avancemos así») — 🧍 El Equipo en una silueta del cuerpo**: reemplazar la lista de
+  «Equipado» por una silueta simple (contorno propio, sin imágenes de terceros) con cada lugar del equipo encima: Cabeza; Armadura blanda y
+  rígida en el torso; Cinturón; Piernas; Pies; Guantes y Anillos (1/2) junto a cada mano; **Mano 1 y Mano 2** como rectángulos a los costados;
+  la Espalda arriba (Mochila equipada, Carcaj). Ocupado = verde con el nombre; vacío = punteado con «vacío». Con el mouse, el detalle del ítem;
+  clic: Ver / Sacar. La Mochila al costado. Incluye los títulos de las manos y la división Mano 1 / Mano 2 / Equipado al cuerpo (entrada de
+  arriba). Boceto aprobado: `docs/bocetos/equipo-silueta.html` y `.png`.
+
 ## En cola
 
 28. [x] (✅ ya estaba hecha: la prueba pasó el 2026-11-11, con las reglas del campo `pf` pegadas — ver `docs/pendientes.md`; esta línea había quedado sin tachar. Revisado el 2026-11-18: el código guarda `pf` en el token y no hay nada pendiente) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).

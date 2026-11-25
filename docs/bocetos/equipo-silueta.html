@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Equipo en silueta</title>
+<style>
+:root{--bg:#141016;--panel:#1d171d;--borde:#3a2f38;--txt:#efe6dc;--suave:#a8998f;--oro:#e0a45a;--lleno:#2f4a3a;--llenoB:#6fbf8a;--vacio:#5a4d55;--tip:#262027}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.35 system-ui,sans-serif;padding:22px}
+h2{margin:0 0 4px;font:600 13px ui-monospace,monospace;letter-spacing:.12em;color:var(--oro)}
+.sub{color:var(--suave);font-size:12px;margin-bottom:14px}
+.wrap{display:flex;gap:22px;align-items:flex-start}
+.cuerpo{position:relative;width:560px;height:650px;background:var(--panel);border:1px solid var(--borde);border-radius:10px}
+.cuerpo svg{position:absolute;left:0;top:0}
+.slot{position:absolute;border-radius:8px;padding:4px 7px;font-size:11.5px;line-height:1.2;min-width:74px;text-align:center;cursor:default}
+.slot b{display:block;font:600 9.5px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.lleno{background:var(--lleno);border:1.5px solid var(--llenoB);color:#eafff0}
+.vacio{background:transparent;border:1.5px dashed var(--vacio);color:var(--suave)}
+.vacio i{font-style:normal;opacity:.7}
+.mano{width:96px;height:118px;display:flex;flex-direction:column;justify-content:center}
+.lado{position:absolute;font:600 10px ui-monospace,monospace;color:var(--suave);letter-spacing:.1em}
+.tip{position:absolute;background:var(--tip);border:1px solid var(--oro);border-radius:8px;padding:8px 10px;width:210px;font-size:12px;box-shadow:0 8px 24px #0009;z-index:5}
+.tip h4{margin:0 0 3px;font-size:13px;color:var(--oro)}
+.tip .chips{margin-top:5px}.tip .chips span{display:inline-block;border:1px solid #6fbf8a;color:#9fe0b4;border-radius:10px;padding:0 6px;font:10px ui-monospace,monospace;margin:2px 2px 0 0}
+.mochila{width:300px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:14px}
+.mochila .barra{height:6px;border-radius:3px;background:#2c242b;margin:6px 0 12px}.mochila .barra div{height:100%;width:35%;background:var(--oro);border-radius:3px}
+.it{display:flex;justify-content:space-between;border:1px solid var(--borde);border-radius:7px;padding:7px 9px;margin-bottom:7px;font-size:12.5px}
+.it small{color:var(--suave)}
+.btn{font:11px ui-monospace,monospace;border:1px solid var(--borde);border-radius:5px;padding:2px 6px;color:var(--suave)}
+.ley{display:flex;gap:16px;margin-top:12px;font-size:11.5px;color:var(--suave)}
+.ley span{display:inline-flex;gap:6px;align-items:center}.ley i{display:inline-block;width:18px;height:11px;border-radius:3px}
+</style></head><body>
+<div class="wrap">
+<div>
+<h2>EQUIPO</h2><div class="sub">Peso equipado 4 / 6 · pasá el mouse por un lugar para ver qué tiene</div>
+<div class="cuerpo">
+<svg width="560" height="640" viewBox="0 0 560 640">
+ <g fill="#2a2228" stroke="#8a7465" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+  <circle cx="280" cy="92" r="46"/>
+  <path d="M262 142 Q262 152 250 156 Q226 160 214 172 L150 300 Q140 322 158 330 Q176 336 186 318 L222 246
+           L222 560 Q222 584 244 584 Q266 584 266 560 L266 400 Q266 386 280 386 Q294 386 294 400 L294 560
+           Q294 584 316 584 Q338 584 338 560 L338 246 L374 318 Q384 336 402 330 Q420 322 410 300 L346 172
+           Q334 160 310 156 Q298 152 298 142 Z"/>
+ </g>
+</svg>
+<!-- cabeza -->
+<div class="slot lleno" style="left:236px;top:70px;width:88px"><b>Cabeza</b>Yelmo de hierro</div>
+<!-- torso: dos capas -->
+<div class="slot lleno" style="left:226px;top:164px;width:108px"><b>Armadura blanda</b>Túnica de sanador</div>
+<div class="slot vacio" style="left:226px;top:226px;width:108px"><b>Armadura rígida</b><i>vacío</i></div>
+<!-- cinturón -->
+<div class="slot vacio" style="left:230px;top:300px;width:100px"><b>Cinturón</b><i>vacío</i></div>
+<!-- piernas -->
+<div class="slot lleno" style="left:226px;top:440px;width:108px"><b>Piernas</b>Polainas de ratero</div>
+<!-- pies -->
+<div class="slot lleno" style="left:212px;top:592px;width:136px"><b>Pies</b>Botas de estibador</div>
+<!-- guantes en las manos del cuerpo -->
+<div class="slot vacio" style="left:112px;top:340px;width:88px"><b>Guantes</b><i>vacío</i></div>
+<!-- anillos -->
+<div class="slot lleno" style="left:360px;top:340px;width:88px"><b>Anillos 1/2</b>Anillo de Foco</div>
+<!-- lo que sostiene -->
+<div class="lado" style="left:24px;top:168px">MANO 1</div>
+<div class="slot lleno mano" style="left:20px;top:186px"><b>Mano 1</b>Varita de granizo</div>
+<div class="lado" style="left:446px;top:168px">MANO 2</div>
+<div class="slot vacio mano" style="left:442px;top:186px"><b>Mano 2</b><i>vacía</i></div>
+<!-- espalda -->
+<div class="slot lleno" style="left:20px;top:44px;width:110px"><b>Espalda · Mochila</b>Mochila de cuero</div>
+<div class="slot vacio" style="left:430px;top:44px;width:110px"><b>Espalda · Carcaj</b><i>vacío</i></div>
+<!-- tooltip de ejemplo -->
+<div class="tip" style="left:122px;top:300px;display:none" id="t"></div>
+<div class="tip" style="left:120px;top:106px">
+ <h4>Varita de granizo</h4>Mano 1 · Peso 1 · 🔧 6/6<br>Flor de granizo físico (Tipo 4): 1d4 + 3 a cada uno, menos su Defensa; 25 % de Escarcha.
+ <div class="chips"><span>Tipo 4</span><span>Área</span></div>
+</div>
+</div>
+<div class="ley"><span><i style="background:#2f4a3a;border:1.5px solid #6fbf8a"></i>ocupado</span><span><i style="border:1.5px dashed #5a4d55"></i>vacío</span><span>🖱 pasá el mouse: qué tiene · clic: Ver / Sacar</span></div>
+</div>
+<div class="mochila">
+<h2>MOCHILA</h2><div class="sub" style="margin:0">Ranuras 7 / 20</div>
+<div class="barra"><div></div></div>
+<div class="it"><span>Hacha de mano<br><small>Tipo 8 · 1 dado · +1 daño</small></span><span class="btn">Equipar</span></div>
+<div class="it"><span>Poción de HP ×3<br><small>Recupera 25 HP</small></span><span class="btn">→ Cinturón</span></div>
+<div class="it"><span>Cuerda (10 m)<br><small>Peso 1</small></span><span class="btn">Ver</span></div>
+<div class="it"><span>Antorcha ×2<br><small>Luz 3 casillas</small></span><span class="btn">Ver</span></div>
+<div class="sub" style="margin-top:10px">Arrastrar un ítem de la mochila a un lugar del cuerpo lo equipa (si entra ahí).</div>
+</div>
+</div>
+</body></html>

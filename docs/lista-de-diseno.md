@@ -22,7 +22,7 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 - [ ] **🧪 ¿Quién puede subir consumibles al catálogo?** (P317, dueño, 2026-11-24: «no sé bien si quiero que cualquiera pueda subir
   consumibles»). Ya decidido: los consumibles propios «a mano» (narrativos, de la partida) no van nunca al catálogo. Queda por pensar el resto
   (consumibles con efectos que sube el grupo, y si se ven en el catálogo sin el 👁).
-- [ ] **🧍 El Equipo en una silueta del cuerpo** (dueño, 2026-11-25, con un boceto suyo; «a grandes rasgos me parece un buen comienzo»): cada lugar
+- [x] (✅ aprobado el boceto el 2026-11-25 → cola para programar) **🧍 El Equipo en una silueta del cuerpo** (dueño, 2026-11-25, con un boceto suyo; «a grandes rasgos me parece un buen comienzo»): cada lugar
   del equipo sobre la silueta (ocupado en verde con el nombre / vacío punteado), «Mano 1» y «Mano 2» a los costados, la espalda (mochila, carcaj)
   arriba, el detalle con el mouse, y la mochila al costado. Boceto de Claude en el scratchpad (`silueta/`). **Falta la silueta**: el dueño va a pasar
   una imagen y Claude solo le ajusta los colores. Después, a la cola para programar (reemplaza la lista de «Equipado»; junto con los títulos de

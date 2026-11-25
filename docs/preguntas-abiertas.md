@@ -2851,7 +2851,7 @@ revés (quiere decir que también les pega a ellos); ¿lo cambio por «también 
 
 > **Dueño, 2026-11-25:** «ponela al final de la cola para revisarla» (en la cola).
 
-### P344 — 🐝 Una invocación que murió: ¿la habilidad que invoca la vuelve a usar o crea otra copia? (2026-11-25, Claude)
+### ✅ P344 — 🐝 Una invocación que murió: ¿la habilidad que invoca la vuelve a usar o crea otra copia? (2026-11-25, Claude)
 
 Visto probando la habilidad que invoca (cola, P275): cuando la invocación ya está en juego, la habilidad crea una copia («Abeja de prueba 2») y, si hay
 una copia **dormida** (se le acabaron los turnos), la reusa. Pero una que **murió** no queda dormida: queda en la ficha con la vida en 0 y «activa».
@@ -2859,3 +2859,5 @@ Así, cada vez que se vuelve a invocar después de una muerte se crea **otra cop
 Invocaciones de la ficha. Pasa también con la original: si la Abeja de prueba muere y se la vuelve a llamar, sale «Abeja de prueba 2» en vez de ella.
 Opciones: (a) dejarlo así (se borran a mano las copias muertas); (b) que una muerta se reuse como una dormida (vuelve con la vida y los No2 llenos y
 el mismo nombre; recomendado); (c) que al morir una copia se borre sola de la ficha (la original queda). Mientras tanto, (a). No toqué nada.
+
+> ✅ **Decidida (dueño, 2026-11-25):** (b), y además sin estados: «se reúsa, vuelve con la vida y los No2 [llenos] y además vuelve sin ningún estado alterado… como si recién la invocaran de cero». En la cola.

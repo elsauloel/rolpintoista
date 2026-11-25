@@ -3047,6 +3047,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   resiste con Agilidad contra 7 pero el charco que queda con Res.CC contra 7** (error probable: recomendado Agilidad en los dos). Dudas abiertas:
   1) Nube de veneno, si ya está envenenado y vuelve a fallar: (a) +3 stacks, (b) +1 stack como la Nube tóxica (recomendado), (c) vuelve a 3.
   2) Aceite (solo piso): ¿también en cada paso adentro (recomendado) y sin que lo frene la Suela gruesa (recomendado: la Suela es para daño del piso)?
+- **⬜ en cola — 🐝 Una invocación muerta se reúsa al invocarla de nuevo (P344 decidida, b)** (dueño, 2026-11-25): al volver a invocar, una copia
+  muerta (vida 0) se reúsa como hoy se reúsa una dormida, y vuelve **como recién invocada de cero**: vida y No2 llenos y **sin ningún estado alterado**.
+  Así no se juntan copias muertas en la ficha («… 3», «… 4»). Vale también para la invocación original que murió.
+- **⬜ en cola (revisar) — 🐝 La copia de una invocación repite el nombre de otro token del mapa** (dueño, 2026-11-25: «me parece bien que lo pongas
+  para revisar al final de la cola»): probando la habilidad que invoca, la copia de la abeja de Blanco J1 se llamó «Abeja de prueba 2», el mismo nombre
+  que la abeja de Blanco J2, y en la tabla de turnos quedaron dos «Abeja de prueba 2» que no se distinguen. Propuesta: que una copia nunca repita el
+  nombre de otro token del mapa.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

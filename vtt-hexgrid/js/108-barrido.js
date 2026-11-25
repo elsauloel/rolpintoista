@@ -24,7 +24,7 @@ function barridoRivales(yo, centros){
   return [...tokens.entries()].map(([id, t]) => ({...t, id}))
     .filter(t => !propio(t) && (!t.oculto || soyGM) && !t.bajoTierra && !etereoDe(t) && !(typeof tapadoPorNiebla === 'function' && tapadoPorNiebla(t)))
     .filter(t => !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(t.id)))   // 💀 un caído no recibe el giro
-    .filter(t => dueloEsRival(yo, t))
+    .filter(t => dueloEsRival(yo, t) && !sueltoNoAtacable(t))   // 📦 un objeto sin vida, no (2026-11-25)
     .filter(t => centros.some(c => distanciaHex(c, t) === 1));
 }
 // El ángulo en pantalla (y hacia abajo): crece en el sentido de las agujas del reloj, como la hoja del giro.

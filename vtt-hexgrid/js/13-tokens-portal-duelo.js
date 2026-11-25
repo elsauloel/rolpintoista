@@ -1040,7 +1040,7 @@ function dueloElegirObjetivoMapa(msg){
   const caido = t => esCura && iniciativaFueraDeJuego(t.id || idDe(t));   // 💚 una curación: el caído ni brilla ni se puede elegir (dueño, 2026-10-23)
   // 💀 A alguien en 0 de vida no se lo ataca (dueño, 2026-11-14): ni brilla ni se puede elegir, salvo lo que es para un aliado (curas, revivir…).
   const atacaCaido = t => !esCura && objetivoTipo !== 'aliado' && typeof tokenFueraDeCombate === 'function' && tokenFueraDeCombate(t.id || idDe(t));
-  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t) && !caido(t) && !atacaCaido(t);
+  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t) && !caido(t) && !atacaCaido(t) && !sueltoNoAtacable(t);   // 📦 sin vida, no (2026-11-25)
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
@@ -1073,6 +1073,7 @@ function dueloElegirObjetivoMapa(msg){
       let t = cand[0];
       if(caido(t)){ toast(`💚 ${nombreDe(t)} está caído: una curación no lo levanta. Elegí otro.`); pedir(); return; }
       if(atacaCaido(t)){ toast(`💀 ${nombreDe(t)} está caído: no se lo puede atacar. Elegí otro.`); pedir(); return; }
+      if(sueltoNoAtacable(t)){ toast(`${TokensAuto.SIN_VIDA_TXT(nombreDe(t))}. Elegí otro.`); pedir(); return; }   // 📦 (2026-11-25)
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival.${typeof floripondioDe === 'function' && floripondioDe(todos.find(propio)) ? ' 🌺 Pero estás malviajando: lo ves como a un enemigo.' : ''} ¿Igual atacarlo?`;
         if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }
@@ -1850,6 +1851,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.anula) await anularEn(new Set(celdasFlor(hab.anulaDirigida ? 0 : Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), yo, hab, todos.filter(t => !propio(t) && dueloEsRival(yo, t)));   // 🚫 la Anulación: lo mágico del área
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
+      .filter(t => !sueltoNoAtacable(t))   // 📦 un token suelto sin vida: no lo alcanza (2026-11-25)
       .filter(t => !iniciativaFueraDeJuego(t.id))   // 💀 un caído es un cuerpo esperando que lo revivan: ningún área lo alcanza (P225, dueño, 2026-10-27)
       // Un área de aliados (2026-10-23, la Oleada sanadora): entran los suyos ocultos (el GM con sus creeps) y él mismo (en un área; la onda, no: los gritos
       // son «no él»); una curación no les llega a los caídos.
@@ -2145,6 +2147,40 @@ function sueltoHooksDuelo(lado){
       publicar(`${nombreDe(t)} · ${c ? c.etq : 'Evasión'}`, r1(modo === 'eva' || /evasi/i.test(c ? c.etq : '') ? 'eva' : 'otro'));
     },
   };
+}
+/* 📦 Un token suelto SIN vida no se puede atacar (2026-11-25, dueño: «no se debería poder atacar un token suelto»): ni brilla ni se lo puede elegir
+   como objetivo de un ataque o de una habilidad dirigida, no entra en un área y no da ataque de oportunidad. Excepción: el token viejo de un creep sin
+   vincular, que el GM vincula al atacarlo (dueloVincularSiFalta) si hay un creep con ese nombre. La última puerta es `Duelo.crear` (comun/duelo.js),
+   que lee el token completo con `window.dueloTokenDe`. */
+function sueltoNoAtacable(t){
+  if(!t || !TokensAuto.sueltoSinVida(t)) return false;
+  if(t.tipo === 'creep' && soyGM){
+    const nom = String(t.nombre || '').trim().toLowerCase();
+    if(nom && [...creepsPub.values()].some(c => String(c.nombre || '').trim().toLowerCase() === nom)) return false;
+  }
+  return true;
+}
+window.dueloTokenDe = tokDef => {
+  const t = tokDef && tokDef.id ? tokens.get(tokDef.id) : null;
+  return t ? {...t, id: tokDef.id, ...(tokDef.fichaId ? {fichaId: tokDef.fichaId} : {})} : tokDef;
+};
+/* 💥 Un objeto que llega a 0 de vida (P307 d, dueño 2026-11-23): a quien lo puso le aparece un aviso para que lo saque. No se borra solo. Lo dispara
+   `escucharTokens` (js/09) en la pantalla de quien lo puso, venga de donde venga el golpe (un duelo, la vida a mano, Ctrl+Z). */
+const sueltoRotoAvisados = new Set();
+async function sueltoRotoAviso(id){
+  const t = tokens.get(id);
+  if(!t || !fbUsuario || t.duenoUid !== fbUsuario.uid || sueltoRotoAvisados.has(id)) return;
+  sueltoRotoAvisados.add(id);
+  try{
+    const si = await AvisoCombate.preguntar(TokensAuto.SE_ROMPIO_TXT(nombreDe(t)), {icono: '💥', titulo: 'Se rompió', si: 'Sacarlo del mapa', no: 'Dejarlo'});
+    const t2 = tokens.get(id);
+    if(!si || !t2 || !puedoBorrar(t2)) return;
+    const v = TokensAuto.sueltoVida(t2);
+    if(v && v.hp > 0){ toast(`${nombreDe(t2)} ya no está en 0 de vida: no lo saco`); return; }
+    await coleccionTokens().doc(id).delete();
+    toast(`🗑 ${nombreDe(t2)} salió del mapa`);
+  }catch(err){ console.error('No se pudo sacar el objeto roto:', err); toast('No se pudo sacar el token'); }
+  finally{ sueltoRotoAvisados.delete(id); }
 }
 // 🙈 (P320, 2026-11-24) el daño de un duelo oculto se aplica con el contexto de js/130: lo que salta con el golpe (talismanes, anillos, drenaje…) no lo
 // delata. La vista previa no escribe nada: va directo.

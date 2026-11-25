@@ -171,6 +171,11 @@ function escucharTokens(){
         if(ruta.length > 2 && previo.rutaJson !== rutaJson){ const cs = []; for(let i = 0; i + 1 < ruta.length; i += 2) cs.push({col: ruta[i], fila: ruta[i + 1]}); setTimeout(() => aguaPasos(ch.doc.id, cs), 0); }
         else setTimeout(() => aguaPasos(ch.doc.id, [nueva]), 0);
       }
+      // 💥 Un objeto que llegó a 0 de vida: aviso a quien lo puso (P307 d, js/13). Antes de pisar `previo`.
+      if(ch.type === 'modified' && previo && escucharTokens.listo && fbUsuario && d.duenoUid === fbUsuario.uid && mapaDeEsteListener === mapaMostrado
+        && typeof sueltoRotoAviso === 'function' && TokensAuto.sueltoSeRompio(previo, {...d, fichaId: typeof d.fichaId === 'string' ? d.fichaId : ''})){
+        const idRoto = ch.doc.id; setTimeout(() => sueltoRotoAviso(idRoto), 0);
+      }
       tokens.set(ch.doc.id, {
         rutaJson,
         nombre: String(d.nombre || '?'),

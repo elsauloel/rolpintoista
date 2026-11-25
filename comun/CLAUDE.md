@@ -1003,6 +1003,9 @@ versión parecida en más de una, es candidato a juntar.
 - **`tokens-auto.js`, token suelto paso a paso** (2026-11-23): `sueltoNorm` devuelve además `{iniciativa, conVida, hpMax}`; `sueltoCampos(n, t0)` →
   `{poner, quitar}` (la vida llena al crear, conservada al editar), `sueltoVida(t)` → `{hp, max}` o null, `sueltoGolpe(t, monto)` (entra entero, no baja
   de 0), `sueltoVidaAMano(t, texto)` y `sueltoRasgos(t, {veVida})` (los renglones de la tarjeta). `VIDA_MAX` = 9999. Lo usa el mapa (vtt-hexgrid/CLAUDE.md).
+  (2026-11-25) `sueltoSinVida(t)` (no se lo puede atacar) con `SIN_VIDA_TXT(nombre)`, y `sueltoSeRompio(antes, ahora)` (de más de 0 a 0) con
+  `SE_ROMPIO_TXT(nombre)`. **`duelo.js`**: `crear` marca `defensor.objeto` y frena a un suelto sin vida (el mapa le da el token entero con
+  `window.dueloTokenDe`); contra un objeto no hay crítico (`entrarCritico`, `crit.objeto`) ni estados (`objetoSinEstados`).
 - **`orden-turnos.js`, ¿ocupa lugar en la iniciativa?** (2026-11-23): `OrdenTurnos.ocupaLugar(t, pub)` — el tótem y el estandarte no (`pub.estandarteRadio`),
   una trampa no, el campo `t.iniciativa` (true/false) manda; lo demás sí. La regla de todos los caminos que arman el orden de turnos (vtt-hexgrid/js/04, 86, 31).
 - **⚖ El sobrepeso con la mochila** (2026-11-23, dueño, P312 (a)): `FichaCalculo.calcular` suma a lo equipado **1 por cada ranura de más de la mochila**

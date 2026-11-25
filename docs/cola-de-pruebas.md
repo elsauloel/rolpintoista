@@ -2684,9 +2684,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no tiene Defensa… entra entero», la vista previa «7 entra entero → HP 20 → 13», aplica el golpe entero (con Ctrl+Z) y «+50» suma sin pasar del máximo
   y sin preguntar por Vida extra (`vtt-hexgrid/js/10`: `hudHpHtml`, `hudHpPrevia`, `hudHpAplicar`, `hudSumarVida`). Probado otra vez con el Jugador 1 y el
   GM. No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola118). La vuelta: «quedó igual».
-- **⬜ en cola — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
+- **✅ hecho (2026-11-25) — Probar (reglas ya pegadas por el dueño el 2026-11-23): 📦 atacar a un token suelto con vida** (2026-11-23): el Jugador 1 ataca con su arma a un objeto del GM y a
   uno del Jugador 2 (cada uno contesta «🪨 Evasión 1» desde su pantalla; si no está, el GM a mano), el crítico, el daño que entra entero, «✍ Otro valor»,
   la línea de la Mesa, llegar a 0 («💥 Roto») y una habilidad dirigida contra el objeto.
+  *Resultado (junto con las tres de abajo, una sola tarea):* probado con clics en «Claude · pruebas 2», mapa «Prueba · General» (GM, Jugador 1 y
+  Jugador 2). Se pusieron con «＋ Token suelto» un barril del GM (vida 12), una caja del Jugador 2 (vida 10) y un cofre del GM sin vida, al lado de
+  Blanco J1. **Arma contra el barril del GM:** el GM contestó «🪨 Evasión 1 (es un objeto)» desde su pantalla; PdG 6 a mano → «📦 SIN CRÍTICO: ES UN
+  OBJETO»; el daño (11) entró entero (12 → 1), con la cuenta «es un objeto, sin Defensa: entra entero» y en la Mesa «… · 📦 contra un objeto no hay
+  crítico». **Arma contra la caja del Jugador 2:** el mapa pregunta «es un aliado, ¿igual atacarlo?»; el Jugador 2 contestó «🪨 Evasión 1» desde su
+  pantalla; sin crítico; «✍ Otro valor» 10 desde su pantalla → 10/10 → 0/10, y le apareció el aviso nuevo «💥 … se rompió… ¿Lo sacás del mapa?»
+  («Dejarlo»: quedó roto en el mapa). La Mesa: «Blanco J1 atacó a Caja de J2… Le bajó 10 de vida. Caja de J2 se rompió 💥.». **Sin el Jugador 2:**
+  el GM escribió la Evasión a mano (1), sin crítico, y aplicó el daño «por la caja». **Habilidad dirigida:** Mala sombra contra el barril (el GM
+  contestó «🛡 Res.Mt»): funcionó, y su estado quedó «✘ No entra: 📦 es un objeto: no recibe estados». **Llegar a 0 a mano:** el GM le bajó la vida
+  al barril con el menú de la vida → aviso → «Sacarlo del mapa» → «🗑 Barril (prueba) salió del mapa». **Sin vida:** el cofre no brilla y tocarlo
+  dice «📦 Cofre sin vida (prueba) no tiene vida: no se lo puede atacar. Elegí otro.» (con el arma y con Mala sombra); el Remolino, con el cofre
+  pegado, no encontró a nadie. **Errores encontrados y arreglados:** a un objeto le quedaba pendiente el Sangrado del arma («Aplicar Sangrado sobre el
+  barril» → «no se pudo aplicar solo: hacelo a mano»); ahora los efectos que dejan un estado, curan o tocan los No2 quedan «no entra: es un
+  objeto» solos (`objetoSinEstados`, comun/duelo.js). El cuadro decía «creep» debajo del objeto del GM (ahora «📦 objeto»), «Se le resta la Defensa
+  del defensor» y «lo frena la Defensa» (ahora «es un objeto, sin Defensa: entra entero»), y la Mesa decía que la caja «cayó» (ahora «se rompió 💥»).
+  Dudas nuevas: P346 (¿un objeto tiene espalda? se sumó «+1 por la espalda» contra la caja) y P347 (el aviso si quien lo puso no estaba conectado).
+  No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola119). La vuelta: «quedó igual».
 - **⬜ en cola — Probar: 🤝 el cartel «El GM te dio algo» en el mapa y con el GM con 🎮 el control** (2026-11-23, de P278): con clics se vio el cartel en la
   ficha del Jugador 1; falta verlo con el jugador mirando el mapa, y que el GM con 🎮 el control de un personaje vea en el 🤝 Dar de la izquierda «🤝 Dar
   como GM» y «🤝 Pasar algo de la mochila de …» (los dos con 🤝, con textos distintos). El Ver de un ítem de GM Tools se abrió por función (el botón
@@ -2701,11 +2718,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   invocarse su tirada la ubica en un lugar que ya pasó en esta ronda, en esta ronda juega igual al final, y desde la próxima en su lugar.
   **Lo mismo para lo sumado a mano** con el ➕ del token (P328 2, dueño, 2026-11-24): hoy usa el mismo `OrdenTurnos.entrarConTirada`
   (`vtt-hexgrid/js/136`), así que alcanza con cambiarlo ahí; revisar que la línea de la Mesa del ➕ deje de decir «juega desde la próxima».
-- **⬜ en cola — 📦 Atacar a un objeto: sin crítico (P306 decidida, b)** (dueño, 2026-11-23): contra un token suelto con vida no hay crítico.
-- **⬜ en cola — 📦 Objeto en 0 de vida: aviso a quien lo puso para que lo saque (P307 decidida, d)** (dueño, 2026-11-23).
-- **⬜ en cola — 📦 Un token suelto sin vida no se puede atacar** (dueño, 2026-11-23: «no se debería poder atacar un token suelto»; sobre el
+- **✅ hecho (2026-11-25) — 📦 Atacar a un objeto: sin crítico (P306 decidida, b)** (dueño, 2026-11-23): contra un token suelto con vida no hay crítico.
+  *Resultado:* el duelo marca al objeto al crearse (`defensor.objeto`, `Duelo.crear`, que lee el token entero con `window.dueloTokenDe` del mapa) y, si
+  el golpe iba a ser crítico, entra como uno normal (`entrarCritico`, como el Blindado): el paso 4 dice «📦 SIN CRÍTICO: ES UN OBJETO» y «Contra un
+  objeto no hay crítico: … recibe el golpe con su daño normal (entero: no tiene Defensa)», y la Mesa suma «· 📦 contra un objeto no hay crítico».
+  Además, un objeto no recibe estados (lo decía la P306 y no se cumplía con los efectos del arma). Probado con clics (ver la entrada de arriba).
+- **✅ hecho (2026-11-25) — 📦 Objeto en 0 de vida: aviso a quien lo puso para que lo saque (P307 decidida, d)** (dueño, 2026-11-23).
+  *Resultado:* cuando la vida de un objeto pasa de más de 0 a 0 (por un duelo, por el menú de la vida o por Ctrl+Z), en la pantalla de quien lo puso
+  aparece «💥 X se rompió (llegó a 0 de vida). ¿Lo sacás del mapa?» con «Sacarlo del mapa» / «Dejarlo» (`sueltoRotoAviso`, js/13; lo dispara
+  `escucharTokens`, js/09). No se borra solo: con «Dejarlo» queda «💥 Roto» como antes. Probado con clics: el Jugador 2 (por un duelo) y el GM (a mano,
+  y lo sacó). Si quien lo puso no está conectado no le llega nada: P347.
+- **✅ hecho (2026-11-25) — 📦 Un token suelto sin vida no se puede atacar** (dueño, 2026-11-23: «no se debería poder atacar un token suelto»; sobre el
   hallazgo de que atacar uno sin vida abre un duelo donde el defensor no tiene opciones). Que no se lo pueda elegir como objetivo de un ataque
   (solo los que tienen vida, P305–P308).
+  *Resultado:* no brilla al elegir objetivo y tocarlo dice «📦 X no tiene vida: no se lo puede atacar. Elegí otro.» (ataques y habilidades dirigidas,
+  `sueltoNoAtacable`, js/13); no entra en un área, una onda, el Barrido, el Salto, la Carrera ni el Choque; no da ataque de oportunidad; en la lista de
+  la ficha suelta no aparece; y `Duelo.crear` lo frena como última puerta. Excepción: el token viejo de un creep sin vincular, que el GM vincula al
+  atacarlo si hay un creep con ese nombre. Probado con clics (arma, Mala sombra y Remolino).
 - **⬜ en cola — 🎁 Ver en detalle los dos 🎁 que no son ni «dar» ni botín (P309)** (dueño, 2026-11-23: «ponelo al final de la cola para ver en
   detalle»): la casilla «🎁 Permitir agregar gratis» del generador de tiendas y los efectos de arma de la Guía de diseño. Mostrárselos al dueño
   con captura y proponer.
@@ -3077,6 +3106,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Blanco J2 en Sigilo dentro del Gas adormecedor al empezar su turno → J2 y J1 ven «Blanco J2 · Res.Mt» y la Crónica; el GM, nada (ni Mesa ni Crónica).
 - **⬜ en cola — Probar: 🙈 P342 con el daño fijo de una zona (terreno incendiado), el +1 stack de la Nube tóxica y el GM con 👁** (2026-11-25): van por
   el mismo contexto (prueba automática), sin clics.
+- **⬜ en cola — Probar: 📦 un objeto sin vida tampoco lo alcanzan un área, una onda, el Salto, la Carrera ni el Choque** (2026-11-25): con clics se
+  probaron el ataque, Mala sombra y el Remolino; lo demás quedó con la misma regla (prueba automática), sin clics.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

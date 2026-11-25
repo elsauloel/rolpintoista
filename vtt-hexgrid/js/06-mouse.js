@@ -644,7 +644,7 @@ function rutaSoltada(a, t){
     let indice = corteTrampa ? corteTrampa.indice : (corteSigilo ? corteSigilo.indice : -1);
     // Ataque de oportunidad (2026-10-02, js/17): si antes de eso se aleja de un rival que puede aprovecharlo, se frena en el último
     // casillero al lado de ese rival y espera la decisión; el resto del camino queda guardado.
-    const opor = oportunidadCorte(t, a.id, a.ruta);
+    const opor = typeof sueltoNoAtacable === 'function' && sueltoNoAtacable(t) ? null : oportunidadCorte(t, a.id, a.ruta);   // 📦 un objeto sin vida no da oportunidad (2026-11-25)
     if(opor && (indice < 0 || opor.indice < indice)){
       oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice), ...(opor.cruza ? {cruza: true} : {}), ...(opor.vigilancia ? {vigilancia: true} : {})};
       { const dop = typeof dodgeOporDe === 'function' ? dodgeOporDe(a.id) : null; if(dop && !dop.todos) dodgeFrenado.add(a.id); }   // 🏃 un dodge roll frenado: no se revisa si salió hasta que siga (js/13)   // 🕊 cruza: pasa por encima (js/17)   // 👁 en la mira de quien vigila (js/58)

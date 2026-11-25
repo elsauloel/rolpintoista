@@ -439,5 +439,15 @@ const TokensAuto = (() => {
     out.push(t.iniciativa === false ? '🪨 No ocupa lugar en la iniciativa' : '🎲 Ocupa lugar en la iniciativa');
     return out;
   }
-  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
+  // 📦 (2026-11-25) Un token suelto SIN vida no se puede atacar (dueño, 2026-11-23: «no se debería poder atacar un token suelto»): ni con un ataque ni
+  // con una habilidad dirigida. `sueltoSinVida(t)` → true si es suelto y no tiene vida. El cartel corto, `SIN_VIDA_TXT(nombre)`.
+  const sueltoSinVida = t => esSuelto(t) && !sueltoVida(t);
+  const SIN_VIDA_TXT = nombre => `📦 ${nombre ? nombre + ' no tiene' : 'No tiene'} vida: no se lo puede atacar`;
+  // 📦 (2026-11-25, P307 d) ¿Este cambio lo rompió? (de más de 0 a 0 de vida): para el aviso a quien lo puso.
+  function sueltoSeRompio(antes, ahora){
+    const a = sueltoVida(antes), b = sueltoVida(ahora);
+    return !!(a && b && a.hp > 0 && b.hp <= 0);
+  }
+  const SE_ROMPIO_TXT = nombre => `💥 ${nombre || 'Tu objeto'} se rompió (llegó a 0 de vida). ¿Lo sacás del mapa?`;
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoSinVida, SIN_VIDA_TXT, sueltoSeRompio, SE_ROMPIO_TXT, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
 })();

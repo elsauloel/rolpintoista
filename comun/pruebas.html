@@ -11048,6 +11048,32 @@ grupo('Token suelto paso a paso: iniciativa y vida');
     cierto(/'descripcion', 'iniciativa', 'hp', 'hpMax'\]\)/.test(reglas) && /d\.hp <= d\.hpMax/.test(reglas) && /'townPortal', 'trampaDestino'\]\)/.test(reglas));
     igual((reglas.match(/hasOnly\(\['nombre', 'descripcion', 'imagen', 'color', 'iniciativa', 'hp', 'hpMax'\]\)/g) || []).length, 2);
   });
+  // 📦 (2026-11-25) Sin crítico contra un objeto (P306 b), sin vida no se ataca, y el aviso al romperse (P307 d).
+  prueba('📦 contra un objeto no hay crítico: el golpe que iba a ser crítico entra normal (y si no iba a serlo, nada cambia)', () => {
+    const m0 = objeto => ({ataque: {tipoDado: 6}, pdg: {total: 20}, eva: {total: 1}, critDatos: {resistencia: 0}, defensor: {nombre: 'Caja', ...(objeto ? {objeto: true} : {})}});
+    const comun = m0(false); Duelo.entrarCritico(comun);
+    const caja = m0(true); Duelo.entrarCritico(caja);
+    const flojo = {...m0(true), pdg: {total: 3}}; Duelo.entrarCritico(flojo);
+    igual([comun.crit.critico, comun.fase, caja.crit.critico, !!caja.crit.objeto, caja.fase !== 'critico', flojo.crit.critico, !!flojo.crit.objeto], [true, 'critico', false, true, true, false, false]);
+  });
+  prueba('📦 un token suelto sin vida no se ataca (con vida, sí); el aviso al romperse solo al pasar de más de 0 a 0', () => {
+    const caja = {nombre: 'Caja', fichaId: '', hp: 4, hpMax: 10}, cofre = {nombre: 'Cofre', fichaId: ''};
+    igual([TokensAuto.sueltoSinVida(cofre), TokensAuto.sueltoSinVida(caja), TokensAuto.sueltoSinVida({nombre: 'P', fichaId: 'f1'}), TokensAuto.sueltoSinVida({...cofre, trampa: true})], [true, false, false, false]);
+    igual([TokensAuto.sueltoSeRompio(caja, {...caja, hp: 0}), TokensAuto.sueltoSeRompio({...caja, hp: 0}, {...caja, hp: 0}), TokensAuto.sueltoSeRompio(caja, {...caja, hp: 1}), TokensAuto.sueltoSeRompio(cofre, cofre)], [true, false, false, false]);
+    cierto(/Cofre no tiene vida: no se lo puede atacar/.test(TokensAuto.SIN_VIDA_TXT('Cofre')) && /Caja se rompió.*¿Lo sacás del mapa\?/.test(TokensAuto.SE_ROMPIO_TXT('Caja')));
+  });
+  prueba('📦 el mapa y el duelo: el objetivo sin vida no brilla ni se elige, no entra en un área, Duelo.crear lo frena y marca al objeto; el aviso de roto', async () => {
+    const [t06, t09, t13, du] = await Promise.all(['../vtt-hexgrid/js/06-mouse.js', '../vtt-hexgrid/js/09-colocar-y-panel.js', '../vtt-hexgrid/js/13-tokens-portal-duelo.js', 'duelo.js']
+      .map(async u => (await fetch(u, {cache: 'no-store'})).text()));
+    cierto(/function sueltoNoAtacable\(t\)/.test(t13) && /!atacaCaido\(t\) && !sueltoNoAtacable\(t\)/.test(t13) && /if\(sueltoNoAtacable\(t\)\)\{ toast/.test(t13) && /\.filter\(t => !sueltoNoAtacable\(t\)\)/.test(t13));
+    cierto(/window\.dueloTokenDe = /.test(t13) && /async function sueltoRotoAviso\(id\)/.test(t13) && /TokensAuto\.sueltoSeRompio\(previo/.test(t09) && /sueltoNoAtacable\(t\) \? null : oportunidadCorte/.test(t06));
+    cierto(/TA\.sueltoSinVida\(tokObj\)/.test(du) && /esObjeto \? \{objeto: true\}/.test(du) && /m\.defensor && m\.defensor\.objeto\) e = \{\.\.\.e, critico: false, objeto: true\}/.test(du) && /Contra un objeto no hay crítico/.test(du));
+  });
+  prueba('📦 un objeto no recibe estados: los efectos del golpe o de la habilidad que dejan un estado quedan «no entra»; el objeto «se rompió» (no «cayó»)', async () => {
+    const du = await (await fetch('duelo.js', {cache: 'no-store'})).text();
+    cierto(/function objetoSinEstados\(m, efs\)/.test(du) && /const efs = objetoSinEstados\(m, efs0\)/.test(du) && /objetoSinEstados\(m, normalizarEfectos\(m\.hab \? m\.hab\.efectos : \[\]\)\)/.test(du));
+    cierto(/es un objeto: no recibe estados/.test(du) && /'se rompió 💥' : 'cayó'/.test(du) && /📦 objeto' : d\.defensor\.tipo === 'creep'/.test(du));
+  });
 })();
 
 /* ---------- ▶🔥 La zona como un renglón de «Empieza tu turno» (2026-11-22, dueño, opción A) ---------- */

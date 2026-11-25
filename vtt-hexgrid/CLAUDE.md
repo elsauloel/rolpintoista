@@ -44,6 +44,13 @@ historia.
   sin pegarlas, `crearToken` y el Guardar ponen el token sin esos campos y avisan.
   **El menú de la vida de un suelto** (2026-11-25): «1 · Recibe daño» le baja el golpe entero (sin Defensa, como al atacarlo) y «+N» no pasa del máximo
   ni ofrece Vida extra (`hudHpHtml`, `hudHpPrevia`, `hudHpAplicar`, `hudSumarVida`, js/10); antes buscaba una ficha y fallaba.
+  **Sin crítico, sin estados, sin vida no se ataca y el aviso de roto** (2026-11-25, P306 b, P307 d): `Duelo.crear` marca `defensor.objeto` (lee el
+  token entero con `window.dueloTokenDe`, js/13) y frena a un suelto sin vida (`TokensAuto.sueltoSinVida`); en el duelo, `entrarCritico` lo deja sin
+  crítico («📦 SIN CRÍTICO: ES UN OBJETO») y `objetoSinEstados` omite los efectos que dejan un estado, curan o tocan los No2. En el mapa,
+  `sueltoNoAtacable(t)` (js/13: un suelto sin vida, salvo el token viejo de un creep sin vincular que el GM puede vincular) no brilla ni se elige en
+  `dueloElegirObjetivoMapa`, no entra en un área (`dueloElegirAreaMapa`) ni en el Barrido (js/108), el Salto (js/105), la Carrera (js/55) o el Choque
+  (js/78), y no da oportunidad (js/06). Al pasar a 0, `escucharTokens` (js/09) llama a `sueltoRotoAviso(id)` en la pantalla de quien lo puso:
+  «💥 X se rompió… ¿Lo sacás del mapa?» (Sacarlo / Dejarlo). Dudas: P346 (¿espalda?), P347 (si no estaba conectado).
 
 **Desde el 2026-10-02 está partido en archivos** (paso 5 nivel A, como la ficha y GM Tools): `mapa.html` es solo la pantalla
 (~260 líneas) y carga `mapa.css` (los estilos) y los 14 tramos de su código en `js/`, en este orden:

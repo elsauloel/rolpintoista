@@ -26,7 +26,7 @@ function saltoCasillaDibujar(z){
 
 function saltoRivalesPegados(c, mioId, yo, fijo){
   return [...tokens.entries()].filter(([id, x]) => id !== mioId && !x.bajoTierra && distanciaHex(c, x) === 1
-      && (fijo ? id === fijo : dueloEsRival(yo, x)) && (soyGM || !x.oculto) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x)))
+      && (fijo ? id === fijo : dueloEsRival(yo, x) && !sueltoNoAtacable(x)) && (soyGM || !x.oculto) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(x)))
     .map(([id, x]) => ({...x, id}));
 }
 

@@ -563,10 +563,11 @@ const Duelo = (() => {
     let lista = [];
     try{ lista = await tokensDelMapa(); }catch(err){ console.error('Duelo: no se pudieron leer los tokens', err); }
     const propio = t => t.fichaId === cfg.yo.ref && t.tipo === cfg.yo.tipo;
-    const objetivos = lista.filter(t => !propio(t)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
+    const sinVida = t => typeof TokensAuto !== 'undefined' && TokensAuto.sueltoSinVida(t);   // 📦 un token suelto sin vida no se ataca (2026-11-25)
+    const objetivos = lista.filter(t => !propio(t) && !sinVida(t)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
     const cuerpo = f.querySelector('.duelo-cuerpo');
     cuerpo.innerHTML = `<div class="duelo-nota">${_esc(cfg.ataque.habNombre || NOMBRE_ATAQUE[cfg.ataque.tipo] || 'Ataque')}${cfg.ataque.armaNombre ? ' con ' + _esc(cfg.ataque.armaNombre) : ''}. Elegí el token al que va dirigido:</div>
-      <div class="duelo-lista">${objetivos.length ? objetivos.map(t => `<button type="button" data-tok="${_esc(t.id)}"><span>${_esc(t.nombre)}</span><span class="tag">${t.tipo === 'creep' ? 'creep' : 'personaje'}</span></button>`).join('') : '<div class="duelo-nota">No hay otros tokens en el mapa.</div>'}</div>
+      <div class="duelo-lista">${objetivos.length ? objetivos.map(t => `<button type="button" data-tok="${_esc(t.id)}"><span>${_esc(t.nombre)}</span><span class="tag">${typeof TokensAuto !== 'undefined' && TokensAuto.sueltoVida(t) ? '📦 objeto' : t.tipo === 'creep' ? 'creep' : 'personaje'}</span></button>`).join('') : '<div class="duelo-nota">No hay otros tokens en el mapa.</div>'}</div>
       <div class="duelo-pie">${cfg.suelto ? '<button type="button" class="sec" data-suelto>Sin objetivo · tirada suelta</button>' : ''}<button type="button" class="sec" data-cancelar>Cancelar</button></div>`;
     cuerpo.querySelector('[data-cancelar]').onclick = () => quitarFondo();
     const bs = cuerpo.querySelector('[data-suelto]');
@@ -744,12 +745,22 @@ const Duelo = (() => {
     _num(p.cd) >= 0 ? 'su cooldown' : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
+    // 📦 Un token suelto (un objeto, 2026-11-25): sin vida no se lo puede atacar (la última puerta: los caminos que eligen objetivo ya no lo ofrecen);
+    // con vida, el duelo lo lleva marcado (`defensor.objeto`): contra un objeto no hay crítico (P306 b). El mapa da el token completo
+    // (`window.dueloTokenDe`, vtt-hexgrid/js/13); fuera del mapa, `tokDef` ya es el documento entero (tokensDelMapa).
+    const TA = typeof TokensAuto !== 'undefined' ? TokensAuto : null;
+    let tokObj = tokDef;
+    try{ if(typeof window !== 'undefined' && typeof window.dueloTokenDe === 'function') tokObj = window.dueloTokenDe(tokDef) || tokDef; }catch(e){ tokObj = tokDef; }
+    const esObjeto = !!(TA && TA.sueltoVida(tokObj));
+    if(TA && tokObj && tokObj.id && TA.sueltoSinVida(tokObj) && (!cfg.ataque.hab || cfg.ataque.hab.objetivo !== 'uno mismo')){
+      const e = new Error(TA.SIN_VIDA_TXT(String(tokObj.nombre || tokDef.nombre || ''))); e.code = 'sin-vida'; throw e;
+    }
     const hab = limpiarHab(cfg.ataque.hab);
     const textoAtq = txtCorto((hab && hab.detalle) || cfg.ataque.habDetalle || cfg.ataque.armaDetalle || '', 600);   // 📜 el recuadro de la izquierda (2026-10-15)
     const inicial = {
       estado: 'esperando', fase: 'contacto',
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
-      defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
+      defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id, ...(esObjeto ? {objeto: true} : {})},
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true,
           ...(cfg.ataque.secundario ? {secundario: true} : {}),   // 🌵🪞 ni Espinas ni Espejo (un daño que no es un golpe: tanda 2 de docs/auditoria-tiradas.md)
           ...(cfg.ataque.danoSuelto ? {danoSuelto: true} : {})}   // 🎲 un daño suelto (la Varita inestable, el virote que estalla, la mordida; 2026-11-10): sin los bonos de quien lo «causa» (Botella, anillos, Orbe salvaje, Sed de sangre)
@@ -1133,8 +1144,9 @@ const Duelo = (() => {
       return;
     }
     if(m.hab && m.hab.dano){ entrarDano(m); return; }
-    const efs = normalizarEfectos(m.hab ? m.hab.efectos : []);
-    if(efs.length){ m.efectos = efs; m.fase = 'efectos'; m.estado = 'esperando'; }
+    const efs = objetoSinEstados(m, normalizarEfectos(m.hab ? m.hab.efectos : []));
+    if(efs.length && !efs.every(efectoResuelto)){ m.efectos = efs; m.fase = 'efectos'; m.estado = 'esperando'; }
+    else if(efs.length){ m.efectos = efs; m.fase = 'fin'; m.estado = 'resuelto'; }
     else{ m.fase = 'fin'; m.estado = 'resuelto'; }
   }
 
@@ -1222,13 +1234,15 @@ const Duelo = (() => {
     }
     // 🛡 Blindado (dueño, 2026-10-20: «la anulación del crítico debería estar automatizada»): un golpe que iba a ser crítico entra como uno normal.
     if(e && e.critico && dd.blindado) e = {...e, critico: false, blindado: true};
+    // 📦 Contra un objeto no hay crítico (P306 b, dueño 2026-11-23): el golpe entra con su daño normal (y entero: el objeto no tiene Defensa).
+    if(e && e.critico && m.defensor && m.defensor.objeto) e = {...e, critico: false, objeto: true};
     if(e && e.critico){
       const d20extra = Math.max(0, Math.round(_num(dd.d20)));   // el arma tira N d20 más en el crítico (2026-10-03)
       m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados + d20extra, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(d20extra ? {d20extra} : {})};
       m.fase = 'critico';
       m.estado = 'esperando';
     }else{
-      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(e.blindado ? {blindado: true} : {})} : null;
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(e.blindado ? {blindado: true} : {}), ...(e.objeto ? {objeto: true} : {})} : null;
       // 🎯 Headshot (Shooter, 2026-10-12): «falla si no es crítico» — pegó, pero sin crítico no hace nada.
       if(m.ataque && m.ataque.soloCritico){ m.crit = {...(m.crit || {}), critico: false, soloCritico: true}; m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
       entrarDano(m);
@@ -1539,7 +1553,18 @@ const Duelo = (() => {
      muestra el tablero (qué dado va con qué efecto, con qué número funciona, qué salió). */
   /* 💧 El agua y el rayo (2026-10-17, dueño): quien está parado en un charco (el mapa: `enAgua`, vtt-hexgrid/js/50) tiene el doble de chance
      de quedar Paralizado. Solo donde la pantalla sabe del mapa; en la ficha suelta o GM Tools queda igual. */
-  function aguaParalisis(m, efs){
+  // 📦 Un objeto (token suelto con vida) no recibe estados (P306, 2026-11-25): los efectos que dejan un estado o curan quedan omitidos, a la vista.
+  function objetoSinEstados(m, efs){
+    if(!(m && m.defensor && m.defensor.objeto)) return efs;
+    // Un estado (con su spec, o por el nombre de un estado de la lista), una cura o No2; no lo que mueve (empuja, trae, vuela, clava) ni lo que trae
+    // su propio daño (`dado`).
+    const esEstado = ef => !!(ef.spec || ef.cura || ef.no2 !== undefined
+      || (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.presetPorNombre && EstadosAplicar.presetPorNombre(ef.nombre)));
+    return (efs || []).map(ef => ef && !ef.omitido && !ef.dado && !ef.empuja && !ef.trae && !ef.vuela && !ef.clava && esEstado(ef)
+      ? {...ef, omitido: true, motivo: '📦 es un objeto: no recibe estados'} : ef);
+  }
+  function aguaParalisis(m, efs0){
+    const efs = objetoSinEstados(m, efs0);
     let t = null;
     try{ t = typeof enAgua === 'function' && typeof tokens !== 'undefined' && m.defensor ? tokens.get(m.defensor.tokenId) : null; }catch(err){ t = null; }
     if(!t || !enAgua(t)) return efs;
@@ -1809,6 +1834,7 @@ const Duelo = (() => {
     else if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defNom} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
     if(d.crit && d.crit.critico) L.push(`¡Crítico ×${d.crit.mult}!${d.crit.mult > 1 ? '' : ' (el d20 no alcanzó a multiplicar, pero ignora la Defensa)'} (d20: ${(d.crit.d20 || []).join(', ')})`);
+    else if(d.crit && d.crit.objeto) L.push('📦 Contra un objeto no hay crítico');   // (2026-11-25, P306 b)
     const dn = danoSinRes(d.dano);   // (la Mesa la ven todos: sin el número de la resistencia de quien lo recibe, P297)
     let juntoMag = false;   // 🔥 el elemental ya fue en la línea del daño
     if(dn && dn.aplicado){
@@ -1864,12 +1890,12 @@ const Duelo = (() => {
         const entro = _num(dn.recibido) + _num(dn.vidaAbs) + (dn.magico ? _num(dn.magico.recibido) : 0);
         const hpFin = magJunto(dn) ? dn.magico.hpDespues : dn.hpDespues;   // 🔥 con el elemental del arma, la vida al final de los dos (2026-11-04)
         if(dn.manual) partes.push(`Le hizo ${_fmt(_num(dn.golpe))} de daño (a mano).`);
-        else if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0 && entro > _num(dn.hpAntes)) partes.push(`Le hizo ${_fmt(entro)} de daño y ${D} cayó.`);   // más que la vida que tenía (dueño, 2026-11-03: decía «le bajó 18» con 6 de vida)
+        else if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0 && entro > _num(dn.hpAntes)) partes.push(`Le hizo ${_fmt(entro)} de daño y ${D} ${d.defensor && d.defensor.objeto ? 'se rompió' : 'cayó'}.`);   // más que la vida que tenía (dueño, 2026-11-03: decía «le bajó 18» con 6 de vida)
         else{
           // 🔥 (2026-11-23) lo que lo frenó, de la cuenta del daño («Resistencia al fuego»…): antes decía siempre «la armadura o el escudo».
           const frenos = [...new Set((Array.isArray(dn.cuenta) ? dn.cuenta : []).filter(x => x && x.s === '−' && x.txt).map(x => String(x.txt)))];
           partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : frenos.length ? `No le hizo daño (lo frenó: ${frenos.join(', ')}).` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
-          if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
+          if(_num(hpFin) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} ${d.defensor && d.defensor.objeto ? 'se rompió 💥' : 'cayó'}.`);   // 📦 un objeto se rompe (2026-11-25)
         }
       }
       if((d.efectos || []).some(ef => ef && _num(ef.trae) > 0 && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('Lo enganchó y lo arrastró hasta dejarlo pegado.');   // 🪝 Arrastrar (2026-11-04)
@@ -2016,6 +2042,7 @@ const Duelo = (() => {
         // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
         : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` − ${dn.freno}` : ''} = ${entroDn(dn)} de daño, directo a la vida (vida ${vidaCambioDn(dn)})`
         : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${entroDn(dn)} de daño (vida ${vidaCambioDn(dn)})`;
+      if(m.crit && m.crit.objeto) anuncio += ' · 📦 contra un objeto no hay crítico';   // (P306 b, 2026-11-25)
       if(magJunto(dn) && !dn.manual && !dn.invulnerable && !dn.aMano) anuncio += ` · ${magIcono(dn.magico.tipo)} + ${dn.magico.recibido} de ${String(dn.magico.tipo).toLowerCase()} directo = ${_fmt(entroDn(dn) + entroDn(dn.magico))} en total (vida ${vidaCambioDn(dn)})`;   // 🔥 el elemental del arma en la misma cuenta (2026-11-04)
       if(_num(dn.mitiMiti) > 0 && !dn.manual && !tieneCuenta(dn)) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (${dn.mitiMitiTxt || 'Miti-Miti'})`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
     });
@@ -3129,7 +3156,7 @@ const Duelo = (() => {
     let cuerpo;
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
-      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}${d.hab.dano.extra && d.hab.dano.extra.formula ? ` + ${_esc(d.hab.dano.extra.formula)} de ${_esc(d.hab.dano.extra.tipo || 'fuego')}` : ''}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}${d.hab.dano.extra && d.hab.dano.extra.formula ? ` + ${_esc(d.hab.dano.extra.formula)} de ${_esc(d.hab.dano.extra.tipo || 'fuego')}` : ''}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.defensor && d.defensor.objeto ? '📦 Es un objeto: no tiene Defensa, el golpe entra entero a su vida.' : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
       else if(puedoAMano(d.atacante, d)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
@@ -3172,14 +3199,16 @@ const Duelo = (() => {
         const suyo = esMio(d.defensor), tu = suyo ? 'tu' : 'su';
         // El resultado con el número grande, como después de aplicarlo (2026-10-24, dueño: «destacarlo un poco mejor»).
         const fuerte = crit || ignora, total = crit ? dn.crudo * mult : dn.crudo;
+        const objeto = !!(d.defensor && d.defensor.objeto);   // 📦 un objeto: no tiene Defensa (2026-11-25)
         const que = crit ? `Crítico ×${mult} (${_fmt(dn.crudo)} × ${mult}): no se resta ${tu} Defensa.`
+          : objeto ? 'de daño: es un objeto, sin Defensa: entra entero a su vida.'
           : ignora && d.hab.dano.trueDamage ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}: True Damage, no lo frena nada.`
           : ignora && d.hab.dano.directo ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}, directo: no lo frena ${tu} Defensa especial (sí ${tu}s resistencias a ese elemento, ${suyo ? 'si tenés' : 'si tiene'}).`   // (2026-10-24: Ráfaga arcana decía que la frenaba)
           : ignora ? `de daño ${_esc(d.hab.dano.tipo || 'especial')} (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
           : d.resultado === 'mitad' ? `Pasa la mitad: (${_fmt(dn.crudo)} − ${tu} Defensa) ÷ 2, redondeado para arriba.`
           : `de daño, menos ${tu} Defensa.`;
         // 🧮 (2026-10-28) Que se sepa que no es lo que entra: lo frenan la Defensa y lo demás, y al aplicarlo se ve la cuenta completa.
-        const frenan = ignora && d.hab.dano.trueDamage ? '' : `<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">Esto es lo que tiró: antes de llegar a la vida lo ${crit ? 'frenan solo' : ignora ? 'frenan la Defensa especial, las resistencias' : 'frena la Defensa'}${crit ? (suyo ? ' tus escudos o tu Vida extra, si tenés' : ' sus escudos o su Vida extra, si tiene') : (suyo ? ' (y tus escudos o tu Vida extra, si tenés)' : ' (y sus escudos o su Vida extra, si tiene)')}. Al aplicarlo se ve la cuenta, renglón por renglón.</div>`;
+        const frenan = (ignora && d.hab.dano.trueDamage) || objeto ? '' : `<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">Esto es lo que tiró: antes de llegar a la vida lo ${crit ? 'frenan solo' : ignora ? 'frenan la Defensa especial, las resistencias' : 'frena la Defensa'}${crit ? (suyo ? ' tus escudos o tu Vida extra, si tenés' : ' sus escudos o su Vida extra, si tiene') : (suyo ? ' (y tus escudos o tu Vida extra, si tenés)' : ' (y sus escudos o su Vida extra, si tiene)')}. Al aplicarlo se ve la cuenta, renglón por renglón.</div>`;
         // 🧮 La cuenta ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón aplicar el daño; al aplicar uno
         // ya debe saber cuánto va a ser»): la pide al mapa (cfgEscuchar.previa: la misma cuenta, sin escribir) la pantalla que puede aplicarlo.
         const pv = previaDe(d);
@@ -3370,8 +3399,9 @@ const Duelo = (() => {
     let cuerpo;
     const viz = criticoVizHtml(d);
     if(!c.critico){
-      cuerpo = titulo('no', c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
-        + explica([c.blindado ? `🛡 ${(d.defensor && d.defensor.nombre) || 'El defensor'} tiene Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
+      cuerpo = titulo('no', c.objeto ? '📦 SIN CRÍTICO: ES UN OBJETO' : c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
+        + explica([c.objeto ? `📦 Contra un objeto no hay crítico: ${(d.defensor && d.defensor.nombre) || 'el objeto'} recibe el golpe con su daño normal (entero: no tiene Defensa).`
+          : c.blindado ? `🛡 ${(d.defensor && d.defensor.nombre) || 'El defensor'} tiene Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
           : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}${_num(c.resistencia) > 0 ? `, que la Resistencia a crítico del defensor sube ${_fmt(c.resistencia)}` : _num(c.resistencia) < 0 ? `, que el 💢 Punto débil del defensor baja ${_fmt(-_num(c.resistencia))}` : ''}).`, ...lCuenta])
         + viz;
     }else if(!c.d20){
@@ -3533,7 +3563,7 @@ const Duelo = (() => {
           <div class="duelo-vs">
             <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') + (_num(d.ataque && d.ataque.carancho) > 0 ? ` · 🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)` : '') + (_num(d.ataque && d.ataque.quieto) > 0 ? ` · 💍 Foco: +${_fmt(d.ataque.quieto)} ${_esc((d.hab.tira && d.hab.tira.etq) || 'PdG.Esp')}` : '') + (trincheraDueloTxt(d) ? ' · ' + trincheraDueloTxt(d) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
             <div class="vs">VS</div>
-            <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
+            <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.objeto ? '📦 objeto' : d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
           </div></div>
         ${d.hab && d.hab.sinOposicion ? '' : `<div class="duelo-paso"><h4><span class="n">2</span>${d.hab ? '' : 'Contacto: '}${_esc(etqTira(d))} contra ${d.defensa || (d.hab && d.hab.contra.length === 1) ? _esc(etqContra(d)) : 'la defensa que elija'}</h4>
           <div class="duelo-tiros">${cajaHtml(d, 'pdg', 'eva', nuevoContacto)}${cajaHtml(d, 'eva', 'pdg', nuevoContacto)}</div>

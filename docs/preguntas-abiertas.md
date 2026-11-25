@@ -2883,3 +2883,19 @@ duelo del GM (no lo toqué), así que con el Muro de fuego de un creep el GM sig
    adormecedor…») en vez de «Un personaje oculto». ¿Está bien?
 
 > ✅ **Decidida (dueño, 2026-11-25):** 1) gana la P342: «vamos a resolver definitivamente esta con tu recomendación» — el GM no ve nada y el daño de la zona de un creep sobre un escondido lo tira la pantalla del escondido (reemplaza lo de la P326 de que el GM tire y vea «a un personaje oculto»). 2) «está bien como está por ahora»: las líneas que ven solo sus aliados lo nombran.
+
+### P346 — 📦 Un objeto, ¿tiene espalda? (2026-11-25, Claude, cola de programación)
+
+Probando el ataque a un objeto (la caja del Jugador 2), el Jugador 1 sumó **«🗡 por la espalda: +1 PdG»**: el objeto se pone en el mapa mirando
+hacia un lado (el paso de la casilla y hacia dónde mira) y el mapa lo trata como a cualquiera. Como un objeto se defiende siempre con Evasión 1 y ya no
+tiene crítico (P306), ese +1 casi nunca cambia nada, pero se ve en el cuadro y en la Mesa. Opciones: (a) dejarlo así (no molesta); (b) contra un
+objeto no hay «por la espalda» (ni el +1 ni lo que suman algunas armas por la espalda). **Recomendación:** (b), porque un barril no tiene frente ni
+espalda; es un cambio chico.
+
+### P347 — 📦 El aviso de «se rompió» si quien lo puso no estaba conectado (2026-11-25, Claude, cola de programación)
+
+El aviso «💥 X se rompió (llegó a 0 de vida). ¿Lo sacás del mapa?» (P307 d) le aparece a quien puso el objeto **en el momento** en que llega a 0, si
+tiene el mapa abierto. Probando, el GM aplicó por el Jugador 2 (que no estaba) el golpe que dejó su caja en 0: al Jugador 2 no le llegó nada (el objeto
+quedó «💥 Roto» en el mapa, como siempre, y lo puede sacar él o el GM). Opciones: (a) así: el aviso solo en el momento; (b) que al volver a abrir el
+mapa le aparezca una vez por cada objeto suyo que esté roto; (c) que si quien lo puso no está, el aviso le aparezca al GM. **Recomendación:** (a) por
+ahora: el objeto queda a la vista como roto y cualquiera de los dos lo saca.

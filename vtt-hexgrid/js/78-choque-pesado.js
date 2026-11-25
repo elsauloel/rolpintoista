@@ -103,7 +103,7 @@ function golpeQueSigueRivales(sc, fuera){
   if(!e) return null;
   const ta = e[1], yo = {ref: sc.id, tipo: 'creep', nombre: sc.nombre};
   return [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== fuera && distanciaHex(x, ta) === 1 && !x.oculto && !x.bajoTierra
-    && !etereoDe(x) && dueloEsRival(yo, x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id)));
+    && !etereoDe(x) && dueloEsRival(yo, x) && !sueltoNoAtacable(x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id)));
 }
 function golpeQueSigueRivalesPegados(sc){ const l = golpeQueSigueRivales(sc, null); return l ? l.length : null; }
 // ⚔ Dos al hilo, el segundo (dueño, 2026-11-10: «al terminar se minimiza y te tiene que dar a elegir el segundo objetivo, que tiene que ser el

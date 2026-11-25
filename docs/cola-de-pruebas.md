@@ -3011,6 +3011,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — ✋ Los títulos de las dos ranuras de manos en el Equipo** (dueño, 2026-11-25, con captura de la ficha): hoy dicen «MANOS» y «MANOS
   (ARMAS Y ESCUDOS)», y se confunden. Que digan algo como **«MANOS (guantes / defensa)»** y **«MANOS (armas, escudos y otros)»**, en todos lados
   donde aparezcan (ficha, ventana de Equipo del mapa, ficha lite, GM Tools, el asistente de ítems).
+  **Y además (dueño, 2026-11-25, con captura del Equipo):** que esa parte tenga una **división clara**: **primero lo que sostiene en las manos**,
+  dividido en **«Mano 1» y «Mano 2»** (arma, escudo, varita, talismán…), y **después una sección «Equipado al cuerpo»** (cabeza, armaduras, guantes,
+  piernas, pies, anillos, cinturón…). Hacerlo junto con los títulos de arriba, en la ficha y en la ventana de Equipo del mapa (y donde se repita).
 
 ## En cola
 

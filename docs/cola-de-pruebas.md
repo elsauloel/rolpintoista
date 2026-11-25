@@ -3104,6 +3104,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 🔥 el renglón «le llegó fuera de su turno» con el texto final** (2026-11-23): con clics se vio con la primera redacción («se lo
   pusieron fuera de su turno… ya pegó al ponérselo»); la final («le llegó… ya pegó al llegar») solo con la prueba automática.
 - **⬜ en cola — 🙈 La zona de un creep que le pega a un jugador escondido no tiene que delatarlo ante el GM (P326)** (prueba con clics,
+  **Actualizado por la P345 (dueño, 2026-11-25), reemplaza lo de abajo de la P326:** el GM **no ve nada** (ni la tirada, ni la Mesa, ni la Crónica,
+  ni el cuadro del duelo) y el daño de la zona del creep sobre el escondido lo **tira la pantalla del escondido**, visible solo para su bando (como la P342 c).
   2026-11-24): hoy, con Blanco J1 en Sigilo sobre el Muro de fuego de un creep, el daño (3d4) va al cuadro del duelo y lo tira el GM; y el GM ve en
   la Crónica «Blanco J1 está en Muro de fuego…» y en la Mesa el daño con el nombre. El GM sabe que J1 está escondido (está bien), pero así sabe
   **dónde**. Lo mismo vale para cualquier zona con daño de dados del GM (y probablemente al entrar caminando, no solo al empezar el turno). Dónde:

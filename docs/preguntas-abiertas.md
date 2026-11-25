@@ -2870,7 +2870,7 @@ el mismo nombre; recomendado); (c) que al morir una copia se borre sola de la fi
 
 > ✅ **Decidida (dueño, 2026-11-25):** (b), y además sin estados: «se reúsa, vuelve con la vida y los No2 [llenos] y además vuelve sin ningún estado alterado… como si recién la invocaran de cero». En la cola.
 
-### P345 — 🙈 La zona de un creep le pega con dados a un jugador escondido: ¿choca con la P342 (c)? (2026-11-25, Claude)
+### ✅ P345 — 🙈 La zona de un creep le pega con dados a un jugador escondido: ¿choca con la P342 (c)? (2026-11-25, Claude)
 
 Con la P342 (c), el GM ya no ve nada de lo que le pasa a un jugador escondido dentro de una zona: ni su tirada, ni la Crónica, ni los avisos. Pero la
 P326 (decidida el 24/11, en la cola: «🙈 La zona de un creep que le pega a un jugador escondido…») dice lo contrario para el daño con dados de la zona
@@ -2881,3 +2881,5 @@ duelo del GM (no lo toqué), así que con el Muro de fuego de un creep el GM sig
    escondido, con el dado a la vista para él y sus aliados.
 2. Elegido mientras tanto en la P342: como esas líneas las ven solo los suyos, nombran al escondido («Blanco J2 · Res.Mt», «Blanco J2 está en Gas
    adormecedor…») en vez de «Un personaje oculto». ¿Está bien?
+
+> ✅ **Decidida (dueño, 2026-11-25):** 1) gana la P342: «vamos a resolver definitivamente esta con tu recomendación» — el GM no ve nada y el daño de la zona de un creep sobre un escondido lo tira la pantalla del escondido (reemplaza lo de la P326 de que el GM tire y vea «a un personaje oculto»). 2) «está bien como está por ahora»: las líneas que ven solo sus aliados lo nombran.

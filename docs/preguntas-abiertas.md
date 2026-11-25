@@ -2750,7 +2750,9 @@ En su primer turno (mareada), la ventana «▶ Empieza el turno de Abeja de prue
 Que no actúa recién se ve al intentar algo («😵 Abeja de prueba recién llega: está mareada — No actúa en su primer turno»). ¿Sumamos un renglón en la
 ventana («😵 Está mareada: en este turno no actúa; la zona igual le pega»), o alcanza con el cartel al intentar actuar?
 
-### P333 — 🌋 El Chorro de lava «por cada paso»: ¿entrar cuenta como el primer paso? (2026-11-25, Claude)
+### ✅ P333 — 🌋 El Chorro de lava «por cada paso»: ¿entrar cuenta como el primer paso? (2026-11-25, Claude)
+
+**Decidido (dueño, 2026-11-25): como lo recomendado** — entrar a la lava cuenta como el primer paso (entrar y dar 2 pasos más = 3 golpes). Queda como está.
 
 Desde hoy el Chorro de lava le pega a quien camina por adentro **una vez por cada casilla de lava que pisa**, y la casilla por la que entra cuenta
 como uno de esos pasos (entrar desde afuera y dar 2 pasos más adentro = 3 golpes; arrancar adentro y dar 2 pasos = 2 golpes). O sea, «el daño al

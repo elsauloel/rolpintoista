@@ -3143,6 +3143,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: 📣 un refuerzo cuyo lugar ya pasó juega al final de esta ronda (P301 b)** (2026-11-26): con clics se probaron la invocación
   con su habilidad y el ➕ a mano; el refuerzo (un creep que llama refuerzos, js/31) usa el mismo camino (prueba automática), sin clics. Ver que entre al
   final con su mareo, lo pierda ahí y en la ronda siguiente juegue en su lugar.
+- **⬜ en cola — 😵 Revisar el Mareo de invocación y probarlo en el mapa** (dueño, 2026-11-26: «pone al final de la cola el revisar mareo de
+  invocación y testear en el mapa, etc.»). Revisar de punta a punta cómo funciona y probarlo con clics. Lo que dijo el dueño como ejemplo: «el Cura Plus
+  no cura el mareo de invocación» — confirmar con él si es una regla (que no se cure con consumibles) o algo que vio que hoy no anda, y revisar qué
+  hacen hoy el Cura Plus y los otros curadores con el mareo. Juntar con «😵 El Mareo de invocación se ve como estado (P332)» y «Probar: 😵 el Mareo de
+  invocación que se va sin que la invocación juegue», que ya están en la cola.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -2911,7 +2911,7 @@ tendría que salir al GM, que es quien lo aplica»), pero nunca se decidió qué
 cartelito corto «Le diste a Blanco J2…» y al jugador el cartel de siempre. **Recomendación:** (b): el cartel es el «enterado» del jugador, y el
 GM no necesita enterarse de lo que él mismo hizo. Mientras, quedó (a).
 
-### P349 — 🐝 Varios que entran con su lugar ya pasado en la misma ronda: ¿en qué orden juegan al final? (2026-11-26, Claude, cola de programación)
+### ✅ P349 — 🐝 Varios que entran con su lugar ya pasado en la misma ronda: ¿en qué orden juegan al final? (2026-11-26, Claude, cola de programación)
 
 Con P301 b, una invocación, un refuerzo o algo sumado a mano con el ➕ cuyo lugar ya pasó en esta ronda juega igual **al final** de la ronda. Si
 entran **varios** así en la misma ronda, hubo que elegir el orden entre ellos al final. **Elegí: por su tirada** (el que sacó más juega primero; con el
@@ -2921,3 +2921,5 @@ mismo número, el que entró antes), y los que entran en su lugar de siempre no 
 la ronda siguiente, cuando cada uno va a su lugar por su número.
 De paso: si el GM saca con la ✕ a alguien que **ya jugó** esta ronda y lo vuelve a sumar con el ➕ en un lugar que ya pasó, va al final igual, pero
 al llegarle el turno el mapa le pregunta al GM si vuelve a actuar (como con cualquiera que ya jugó y quedó más abajo). No se cambió nada de eso.
+
+> ✅ **Decidida (dueño, 2026-11-26):** por su tirada, como quedó («un poco da igual… porque tiene el mareo de invocación»).

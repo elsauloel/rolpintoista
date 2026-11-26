@@ -2993,10 +2993,12 @@ Además: una Vida extra que ya estaba guardada de antes de este cambio no sabe d
 
 > ✅ **Decidida (dueño, 2026-11-26):** cuando es de otro, «su máximo» (al final de la cola).
 
-### P354 — 🪱 ¿La Vida extra que trae la Sanguijuela tiene tope? (2026-11-26, Claude, al probar la Vida extra con Drenar vida y la Sanguijuela)
+### ✅ P354 — 🪱 ¿La Vida extra que trae la Sanguijuela tiene tope? (2026-11-26, Claude, al probar la Vida extra con Drenar vida y la Sanguijuela)
 
 **Drenar vida** dice: «lo que pase de tu vida máxima queda como Vida extra, **hasta un 50 % por encima del máximo**» (contando la que ya tenías). Se
 probó con clics: Blanco J1 (vida 50) llegó a +25 de Vida extra y un drenaje más ya no le sumó nada. **La Sanguijuela** dice: «toda cura que reciba […]
 te la llevás vos, hasta tu vida máxima, y **lo que sobra te queda como Vida extra**», sin tope. En la prueba, con +25 (el tope del Drenar vida) la cura
 que robó la Sanguijuela le sumó 5 más: quedó en +30 (más del 50 %).
 ¿La Vida extra de la Sanguijuela queda sin tope (como dice hoy), o tiene el mismo tope del 50 % que el Drenar vida y el Relicario de sangre?
+
+> ✅ **Decidida (dueño, 2026-11-26):** «que la vida extra siempre tenga el tope de 50%» — para toda fuente, no solo la Sanguijuela.

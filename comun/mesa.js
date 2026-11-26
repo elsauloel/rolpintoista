@@ -22,6 +22,7 @@
 const MESA_MAX = 30;
 
 let mesaIdsVistos = null;
+let mesaNuevasEst = MesaNuevas.nuevo();   // qué llegó después de abrir la pantalla (comun/mesa-nuevas.js): solo eso se anima y se avisa
 let mesaAnimadas = new Set();   // tiradas cuyo dado 3D ya se lanzó (la Mesa espera a que queden quietos antes de mostrar el resultado)
 let mesaRetenida = null;         // {snap, fin}: la última lista de tiradas, esperando a los dados
 // La tirada REAL (no una línea de sistema) más reciente del usuario actual, entre las que trae
@@ -250,11 +251,18 @@ function mesaDueloDetalle(origen, frase, lineas){
   document.body.appendChild(pop);
   const ok = pop.querySelector('.ok'); if(ok) ok.focus();
 }
+// ¿Esta línea llegó después de abrir la pantalla? (MesaNuevas, con lo que trajo Firebase antes del filtro de cada pantalla). Un mensaje
+// secreto (no viene de las tiradas) sigue con el criterio de siempre: no estaba en lo que ya se dibujó.
+function mesaEsNueva(d){
+  if(mesaIdsVistos !== null && mesaIdsVistos.has(d.id)) return false;
+  if(d._mensaje && !mesaNuevasEst.conocidos.has(d.id)) return mesaIdsVistos !== null;
+  return MesaNuevas.esNueva(mesaNuevasEst, d.id, Date.now());
+}
 function mesaRender(docs){
   mesaAlertaEstilos();
   const cuerpo = $('#mesa-cuerpo');
   const primeraVez = mesaIdsVistos === null;
-  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
+  const nuevasIds = new Set(docs.filter(mesaEsNueva).map(d => d.id));
   // La última tirada (no las líneas del sistema) va con fondo verde.
   const ultima = docs.find(d => !MESA_DESDE_SISTEMA.includes(d.data().desde));
   const ultimaId = ultima ? ultima.id : null;
@@ -278,7 +286,7 @@ function mesaRender(docs){
   cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
   docs.forEach(d => {
     const t = d.data({serverTimestamps: 'estimate'});
-    const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
+    const nueva = nuevasIds.has(d.id);
     if(nueva && fbUsuario && t.uid !== fbUsuario.uid) hayAjena = true;
     // 🕊️ Un mensaje secreto que ME llegó (comun/mensajes.js, 2026-11-22): solo en mi Mesa, con su color y su brillo; tocarlo abre la conversación.
     // Desde el 2026-11-24 (P285) también los que mandé yo (otro tono, sin brillo) y los 📣 a todo el grupo (los ven todos; vienen entre las tiradas).
@@ -385,6 +393,7 @@ function mesaRender(docs){
     cuerpo.appendChild(div);
   });
   mesaIdsVistos = new Set(docs.map(d => d.id));
+  docs.forEach(d => MesaNuevas.mostrada(mesaNuevasEst, d.id));
   // Aviso opcional a la herramienta de que llegaron tiradas nuevas (el mapa lo
   // usa para cerrar el "giro gratis" cuando alguien hace algo).
   if(!primeraVez && typeof mesaAlAccionNueva === 'function'){
@@ -430,6 +439,7 @@ function mesaOcultaSinMapa(d){
 }
 function mesaProcesar(snap){
   mesaUltimoSnap = snap;
+  MesaNuevas.pasar(mesaNuevasEst, MesaNuevas.docsDe(snap), !!(snap.metadata && snap.metadata.fromCache), Date.now());   // antes del filtro
   // 🎭 El mapa filtra lo que cada uno no tiene que ver (vtt-hexgrid/js/29: creeps sin revelar, acciones inciertas).
   if(typeof mesaFiltrar === 'function') snap = {docs: mesaFiltrar(snap.docs)};
   else snap = {docs: snap.docs.map(mesaOcultaSinMapa).filter(Boolean)};   // 🙈 la ficha suelta y GM Tools: lo de un duelo oculto, solo su bando
@@ -438,7 +448,7 @@ function mesaProcesar(snap){
   const docs = snap.docs;
   const primeraVez = mesaIdsVistos === null;
   const puedeEsperar = !primeraVez && typeof dadosAnimarTirada === 'function' && typeof dadosAnimara === 'function';
-  const nuevas = puedeEsperar ? docs.filter(d => !d._mensaje && !mesaIdsVistos.has(d.id) && !mesaAnimadas.has(d.id)) : [];
+  const nuevas = puedeEsperar ? docs.filter(d => !d._mensaje && mesaEsNueva(d) && !mesaAnimadas.has(d.id)) : [];
   const animables = nuevas.filter(d => { try{ return dadosAnimara(d.data()); }catch(e){ return false; } });
   if(!animables.length && !mesaRetenida){ mesaRender(docs); return; }
   const lanzar = () => animables.reverse().forEach(d => { mesaAnimadas.add(d.id); dadosAnimarTirada(d.data()); });
@@ -470,8 +480,10 @@ function mesaEscuchar(){
   $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
   fbDb.collection(fbRutaCampana('tiradas'))
     .orderBy('cuando', 'desc').limit(MESA_MAX)
-    .onSnapshot(snap => {
+    // Con los cambios de «metadata» para enterarse de cuándo deja de ser la copia local (fromCache): lo de antes no se anima.
+    .onSnapshot({includeMetadataChanges: true}, snap => {
       mesaEstado(`${fbPartida.nombre} · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
+      if(mesaNuevasEst.listo && !snap.docChanges().length){ mesaUltimoSnap = snap; return; }   // solo cambió la metadata
       mesaProcesar(snap);
     }, err => {
       console.error('Error escuchando la mesa:', err);

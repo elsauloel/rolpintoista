@@ -109,6 +109,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
+<script src="mesa-nuevas.js?v=20261126c128"></script>
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
@@ -11830,6 +11831,57 @@ grupo('👁 Revelar lo oculto del GM: qué ve y cómo lo marca (2026-11-24, vtt-
     cierto(/veOcultoPorOjo: d =>/.test(m14) && /const dueloOcultoPorOjo = d =>/.test(m130) && /ocultoPorOjo\(d\) \? `<div class="duelo-interpuesto duelo-por-ojo">/.test(duelo));
     cierto(/const porOjo = reveladoPorOjo\(t\)/.test(m05) && /if\(porOjo\) marcas\.push\('👁'\)/.test(m05) && /elementoReveladoPorOjo\(el\)\) ojoMarcaCeldas/.test(m05) && /areaOcultaPorOjo\(a\)/.test(m05));
     cierto(/reveladoPorOjo\(t\) \? '<span title="Lo ves porque estás revelando lo oculto">👁<\/span> '/.test(m04) && /porOjo: true/.test(m104));
+  });
+})();
+
+grupo('🎲 Al cargar (o con F5) solo se animan las tiradas que llegan después (2026-11-26, comun/mesa-nuevas.js, comun/mesa.js)');
+(() => {
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  const D = (id, ms, pendiente) => ({id, ms, pendiente: !!pendiente});
+  prueba('lo de la primera carga es viejo; lo que llega después, nuevo', () => {
+    const e = MesaNuevas.nuevo();
+    igual([...MesaNuevas.pasar(e, [D('c', 300), D('b', 200), D('a', 100)], false, 0)], []);
+    igual([...MesaNuevas.pasar(e, [D('d', 400), D('c', 300), D('b', 200), D('a', 100)], false, 10)], ['d']);
+    igual([MesaNuevas.esNueva(e, 'd', 20), MesaNuevas.esNueva(e, 'c', 20)], [true, false]);
+  });
+  prueba('una tirada vieja no se anima: la que el filtro escondió al cargar y aparece después sigue siendo vieja', () => {
+    const e = MesaNuevas.nuevo();
+    MesaNuevas.pasar(e, [D('b', 200), D('a', 100)], false, 0);   // llegaron todas, el mapa del jugador mostró la Mesa vacía
+    igual([...MesaNuevas.pasar(e, [D('b', 200), D('a', 100)], false, 5000)], []);   // mesaRefiltrar con los tokens: nada nuevo
+    igual([MesaNuevas.esNueva(e, 'a', 5000), MesaNuevas.esNueva(e, 'b', 5000)], [false, false]);
+  });
+  prueba('mientras Firebase solo leyó su copia local (fromCache), nada es nuevo; tampoco lo que trae el servidor después', () => {
+    const e = MesaNuevas.nuevo();
+    igual([...MesaNuevas.pasar(e, [D('p', 150)], true, 0)], []);
+    igual([...MesaNuevas.pasar(e, [D('c', 300), D('p', 150), D('a', 100)], false, 100)], []);
+    igual([...MesaNuevas.pasar(e, [D('n', 500), D('c', 300), D('p', 150), D('a', 100)], false, 200)], ['n']);
+  });
+  prueba('la que entra «por abajo» (se borró una de las 30) es vieja; la propia sin confirmar, nueva aunque el reloj atrase', () => {
+    const e = MesaNuevas.nuevo();
+    MesaNuevas.pasar(e, [D('c', 300), D('b', 200)], false, 0);
+    igual([...MesaNuevas.pasar(e, [D('c', 300), D('z', 50)], false, 10)], []);
+    igual([...MesaNuevas.pasar(e, [D('m', null, true), D('c', 300), D('z', 50)], false, 20)], ['m']);
+  });
+  prueba('la nueva que el filtro escondió un rato cuenta como nueva hasta mostrarse, y no para siempre', () => {
+    const e = MesaNuevas.nuevo();
+    MesaNuevas.pasar(e, [D('a', 100)], false, 0);
+    MesaNuevas.pasar(e, [D('b', 200), D('a', 100)], false, 1000);
+    igual(MesaNuevas.esNueva(e, 'b', 4000), true);
+    MesaNuevas.mostrada(e, 'b');
+    igual(MesaNuevas.esNueva(e, 'b', 4100), false);
+    MesaNuevas.pasar(e, [D('c', 300), D('b', 200), D('a', 100)], false, 5000);
+    igual(MesaNuevas.esNueva(e, 'c', 5000 + MesaNuevas.VIGENCIA_MS + 1), false);
+  });
+  prueba('docsDe lee la hora del servidor y si está sin confirmar', () => {
+    const doc = (id, ms, pend) => ({id, metadata: {hasPendingWrites: pend}, get: () => ms === null ? null : {toMillis: () => ms}});
+    igual(MesaNuevas.docsDe({docs: [doc('a', 100, false), doc('b', null, true)]}), [D('a', 100), D('b', null, true)]);
+  });
+  prueba('la Mesa decide con MesaNuevas antes del filtro y la cargan el mapa, la ficha y GM Tools (comun/mesa.js)', async () => {
+    const [mesa, mapa, ficha, gm] = await Promise.all(['mesa.js', '../vtt-hexgrid/mapa.html', '../ficha-personaje/ficha.html', '../gm-toolset/gm-tools.html'].map(traer));
+    cierto(/mesaUltimoSnap = snap;\n\s+MesaNuevas\.pasar\(mesaNuevasEst, MesaNuevas\.docsDe\(snap\)/.test(mesa));
+    cierto(/const nuevasIds = new Set\(docs\.filter\(mesaEsNueva\)/.test(mesa) && /d => !d\._mensaje && mesaEsNueva\(d\) && !mesaAnimadas\.has\(d\.id\)/.test(mesa));
+    cierto(/onSnapshot\(\{includeMetadataChanges: true\}/.test(mesa));
+    [mapa, ficha, gm].forEach(h => cierto(/mesa-nuevas\.js\?v=[^"]+"><\/script>\n<script src="\.\.\/comun\/mesa\.js/.test(h)));
   });
 })();
 

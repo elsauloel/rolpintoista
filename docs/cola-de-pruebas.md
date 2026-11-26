@@ -2843,10 +2843,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (`CreepCalculo.tarjetaPublica` → `botella`, `talismanDe` de js/53) y las dos pantallas dan la misma cuenta (probado con la Abeja: 3 + 2 = 5 en las dos).
 
 
-- **⬜ en cola — 🎲 Al cargar el mapa (o con F5) a veces se ven muchas tiradas de dados animadas juntas** (dueño, 2026-11-23: «a veces cuando
+- **✅ hecho (2026-11-26) — 🎲 Al cargar el mapa (o con F5) a veces se ven muchas tiradas de dados animadas juntas** (dueño, 2026-11-23: «a veces cuando
   aprieto F5 o cargo el mapa por primera vez aparece la animación de muchas tiradas de dados, juntas. Asumo que será la acumulación de tiradas
-  que se hacen durante los testeos en el mapa»). Revisar por qué se animan tiradas viejas al entrar (¿la Mesa trae las últimas y las anima como
-  nuevas?) y que al cargar solo se animen las que llegan después de abrir el mapa.
+  que se hacen durante los testeos en el mapa»). **Causa**: en el mapa de un **jugador** la Mesa espera a que lleguen los tokens para saber qué
+  puede ver (vtt-hexgrid/js/29 `mesaFiltrar` devuelve la lista vacía hasta entonces); la primera carga se dibujaba vacía y, un segundo después,
+  las 30 tiradas que ya estaban aparecían «nuevas» y se animaban todas juntas (también podían soltar el destello del ojo del GM de una línea vieja y
+  cerrar el giro libre). Al GM, a la ficha y a GM Tools no les pasaba (medido: 0 animaciones al cargar; el mapa del Jugador 1, 30 llamadas, 10 con
+  dados). **Arreglo**: pieza común nueva `comun/mesa-nuevas.js` (`MesaNuevas`): «nueva» se decide con lo que trae Firebase ANTES del filtro de cada
+  pantalla — lo de la primera carga (y lo que venga de la copia local, `fromCache`) es viejo; una que entra «por abajo» al borrarse otra, también;
+  lo nuevo que el filtro escondió un rato sigue siendo nuevo hasta mostrarse (15 s como mucho). La usa `comun/mesa.js` (mapa, ficha y GM Tools) para
+  animar, resaltar y avisar. Probado con clics en «Prueba · General» (GM y Jugador 1): antes, F5 del Jugador 1 = 30 animaciones; después, 0 al
+  cargar y con F5 (los dos); una tirada nueva de uno se anima en las dos pantallas (las dos direcciones) y el crítico de un duelo (los 3 d20) también.
+  7 pruebas automáticas nuevas («una tirada vieja no se anima»). Sin probar: la copia local de Firebase en una red lenta (no se pudo forzar).
 
 - **⬜ en cola — ❤ «Vida extra»: descripción corta y con el origen** (dueño, 2026-11-23, con captura de la ventana ◎ Estados alterados): «la
   explicación de vida extra está innecesariamente larga. Se entiende bastante solo con el nombre, aunque está bueno que diga algo como "vida por

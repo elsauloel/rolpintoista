@@ -113,6 +113,13 @@ versión parecida en más de una, es candidato a juntar.
   `armarDoc`, `armarPublico`, `ultimoQueMeEscribio`, `publicosNoLeidos`, `conversaciones`, `mezclarEnMesa`…) probado en `pruebas.html`. El mapa
   no esconde nombres en una línea `publico` (js/29). Colecciones y reglas: `docs/workflow-firebase.md`. Sin sonido (queda para la música). Dudas:
   P285 (aplicada), P318; varias conversaciones a la vez: en la cola.
+- **`mesa-nuevas.js`** (`MesaNuevas`, 2026-11-26) — **qué líneas de la Mesa llegaron después de abrir la pantalla**: solo esas se animan en 3D, se
+  resaltan y avisan (giro libre, el ojo). Se decide con lo que trae Firebase ANTES del filtro de cada pantalla (el mapa de un jugador muestra la Mesa
+  vacía hasta tener los tokens y, sin esto, al llegar animaba las 30 viejas juntas): la primera carga y la copia local (`fromCache`) son viejas; una
+  que entra «por abajo» (más vieja que la más vieja de antes) también; lo nuevo que el filtro escondió un rato sigue nuevo hasta mostrarse
+  (`VIGENCIA_MS`). Puras: `nuevo()`, `pasar(est, docs, desdeCache, ahora)`, `esNueva`, `mostrada`, `docsDe(snap)`; probadas en `pruebas.html`.
+  `mesa.js` la usa (`mesaNuevasEst`, `mesaEsNueva(d)`) y escucha con `includeMetadataChanges` (un cambio solo de metadata, ya cargada, no redibuja).
+  Se carga **antes** de `mesa.js` en el mapa, la ficha y GM Tools.
 - **`grilla-dados.js`** — la grilla de dados estilo Roll20 (D4…D100 × 1–6)
   que se abre al costado del botón "🎲 Dados"; cada clic es una tirada
   libre que se publica en la Mesa.

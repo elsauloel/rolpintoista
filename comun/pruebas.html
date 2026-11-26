@@ -3159,7 +3159,7 @@ prueba('😇 Renovar el Pacto (2026-11-19): la línea de la Mesa dice quién lo 
   igual([Combatiente.pactoRenovadoTxt('Bizzante', true), Combatiente.pactoRenovadoTxt('Bizzante', false), Combatiente.PACTO_AVISO, Combatiente.PACTO_A_MANO],
     ['😇 El GM le renovó el Pacto a Bizzante', '😇 Bizzante renovó su Pacto', 'Una entidad espiritual te brindó un nuevo Pacto.', 'El Pacto lo renueva el GM cuando la historia lo da. ¿Lo cambiás igual?']);
 });
-prueba('🕊 Quitar el Pacto (2026-11-19): la línea de la Mesa dice quién lo quitó y el aviso al jugador', () => {
+prueba('😇🚫 Quitar el Pacto (2026-11-19): la línea de la Mesa dice quién lo quitó y el aviso al jugador', () => {
   igual([Combatiente.pactoQuitadoTxt('Bizzante', true), Combatiente.pactoQuitadoTxt('Bizzante', false), Combatiente.pactoQuitadoAviso(true), Combatiente.pactoQuitadoAviso(false)],
     ['😇 El GM le quitó el Pacto a Bizzante', '😇 Bizzante dejó su Pacto', 'El GM te quitó el Pacto: si tu vida llega a 0, no revivís solo.', 'Ya no tenés el Pacto: si tu vida llega a 0, no revivís solo.']);
 });

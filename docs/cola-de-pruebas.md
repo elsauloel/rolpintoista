@@ -2721,10 +2721,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   ninguna pantalla. No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola120). La vuelta: «quedó igual» (las mochilas de
   Blanco J1 y Blanco J2 volvieron a como estaban).
 
-- **⬜ en cola — 🕊 Cambiar el ícono de «Quitar el Pacto» del anillo del token** (dueño, 2026-11-23, con captura: «el ícono de "quitar pacto" no
+- **✅ hecho (2026-11-26) — 🕊 Cambiar el ícono de «Quitar el Pacto» del anillo del token** (dueño, 2026-11-23, con captura: «el ícono de "quitar pacto" no
   me gusta, además la paloma quedó para mensajes. Quizás el mismo emoji del pacto, pero con el círculo rojo de "prohibido" encima»). Hoy es 🕊
   (`vtt-hexgrid/js/10-hud-y-vida.js`, `pacto-quitar`). Pasarlo al emoji del Pacto con un 🚫 / círculo rojo tachado encima; revisar si la 🕊 aparece
   en otros lugares del Pacto (js/83, Mesa, carteles) y cambiarla también ahí, para que la paloma quede solo para los mensajes secretos.
+  *Resultado:* en el anillo del token, «Quitar el Pacto» ahora es el 😇 (el mismo emoji del Pacto) con un círculo rojo tachado encima, dibujado en
+  SVG (`PACTO_QUITAR_ICONO`, js/83; `.hud-sin-pacto`, mapa.css). Donde solo va texto (el cartel de confirmar y su botón, el aviso «Quitando…», la
+  Crónica y el Aviso al jugador) dice 😇🚫. La 🕊 quedó solo para los mensajes secretos. Probado en «Prueba · General»: el GM le dio el Pacto a
+  Blanco J1 (😇), apareció el 😇🚫 en el ⋯, lo quitó; la Mesa dijo «El GM le quitó el Pacto a Blanco J1» y al Jugador 1 le saltó «😇🚫 Sin el Pacto».
+  1141 pruebas en verde. Capturas fuera del repo (cola121). La vuelta: «ya está igual a la foto».
 
 - **⬜ en cola — 🐝 Invocación cuyo lugar ya pasó: juega igual al final de esta ronda (P301 decidida, b)** (dueño, 2026-11-23): si al
   invocarse su tirada la ubica en un lugar que ya pasó en esta ronda, en esta ronda juega igual al final, y desde la próxima en su lugar.

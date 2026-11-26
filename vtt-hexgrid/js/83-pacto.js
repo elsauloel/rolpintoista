@@ -50,7 +50,13 @@ async function pactoRenovar(t){
   hudPonerNivel('vital');
 }
 
-/* 🕊 Quitar el Pacto desde el mapa (dueño, 2026-11-19, P244 ✅: «técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»): en
+/* 😇🚫 en el anillo del token (2026-11-26, dueño: «la paloma quedó para mensajes. Quizás el mismo emoji del pacto, pero con el círculo rojo de
+   "prohibido" encima»): el 😇 con un círculo rojo tachado dibujado en SVG encima (.hud-sin-pacto, mapa.css). Donde solo va texto (el cartel de
+   confirmar, los avisos, la Crónica), 😇🚫. La 🕊 queda solo para los mensajes secretos (comun/mensajes.js). */
+const PACTO_QUITAR_ICONO = '<span class="hud-sin-pacto">😇<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.2"/><line x1="4.2" y1="4.2" x2="15.8" y2="15.8"/></svg></span>';
+const PACTO_QUITAR_TXT = '😇🚫';
+
+/* 😇🚫 Quitar el Pacto desde el mapa (dueño, 2026-11-19, P244 ✅: «técnicamente también debería poderse quitar. Desde el mismo lugar no estaría mal»): en
    el mismo menú del token, con el Pacto activo, para los mismos que lo renuevan (el GM y el jugador dueño). Pide confirmar, apaga `S.meta.pacto`, deja la
    línea en la Mesa (Combatiente.pactoQuitadoTxt) y al jugador le llega el Aviso. */
 async function pactoQuitar(t){
@@ -59,9 +65,9 @@ async function pactoQuitar(t){
   const ok = await Confirmar.preguntar(porGM
     ? `¿Le quitás el Pacto a ${nombre}?\n\nSin el Pacto, si su vida llega a 0 no revive solo. Se le puede volver a dar con el 😇 del mismo menú.`
     : `¿Dejás el Pacto de ${nombre}?\n\nSin el Pacto, si tu vida llega a 0 no revivís solo. El Pacto lo da la historia: hablalo con el GM.`,
-    {titulo: 'Quitar el Pacto', icono: '🕊', si: porGM ? '🕊 Quitar el Pacto' : '🕊 Dejar el Pacto', no: 'Cancelar'});
+    {titulo: 'Quitar el Pacto', icono: PACTO_QUITAR_TXT, si: porGM ? `${PACTO_QUITAR_TXT} Quitar el Pacto` : `${PACTO_QUITAR_TXT} Dejar el Pacto`, no: 'Cancelar'});
   if(!ok) return;
-  toast(`🕊 Quitando el Pacto de ${nombre}…`);
+  toast(`${PACTO_QUITAR_TXT} Quitando el Pacto de ${nombre}…`);
   let hubo = null;
   try{ hubo = await editarPersonajeMapa(t.fichaId, S => { S.meta = S.meta || {}; if(!S.meta.pacto) return false; S.meta.pacto = false; return true; }); }
   catch(err){ console.error('Quitar el Pacto:', err); }
@@ -69,7 +75,7 @@ async function pactoQuitar(t){
   if(!hubo){ toast(`😇 No se pudo quitar el Pacto de ${nombre}: cambialo en su ficha (😇 Pacto: no)`); return; }
   const linea = Combatiente.pactoQuitadoTxt(nombre, porGM);
   try{ await mesaLinea(linea, 'recordatorio'); }catch(e){}
-  try{ momentoAbrir({tipo: 'pacto', icono: '🕊', titulo: linea.replace(/^😇 /, ''), resultado: 'Sin el Pacto: si su vida llega a 0, no revive solo.', estado: 'listo',
+  try{ momentoAbrir({tipo: 'pacto', icono: PACTO_QUITAR_TXT, titulo: linea.replace(/^😇 /, ''), resultado: 'Sin el Pacto: si su vida llega a 0, no revive solo.', estado: 'listo',
     datos: {...(f.duenoUid ? {paraUid: f.duenoUid} : {}), aviso: true, tituloAviso: 'Sin el Pacto', textoAviso: Combatiente.pactoQuitadoAviso(porGM)}}); }catch(e){}
   hudPonerNivel('vital');
 }

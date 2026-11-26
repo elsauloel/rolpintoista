@@ -109,8 +109,9 @@ function hudHtml(t){
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     // 😇 Renovar el Pacto (2026-11-19, dueño): el GM o el jugador dueño, con el Pacto gastado (js/83).
     (!pausaSoloMirar() && typeof pactoPuedeRenovar === 'function' && pactoPuedeRenovar(t) ? icono('pacto', '😇', 'Renovar el Pacto (se gastó): lo da la historia') : '') +
-    // 🕊 Quitar el Pacto (2026-11-19, dueño): los mismos, con el Pacto activo (js/83).
-    (!pausaSoloMirar() && typeof pactoPuedeQuitar === 'function' && pactoPuedeQuitar(t) ? icono('pacto-quitar', '🕊', 'Quitar el Pacto (está activo)') : '') +
+    // 😇🚫 Quitar el Pacto (2026-11-19, dueño): los mismos, con el Pacto activo (js/83). El ícono (2026-11-26, dueño: «la paloma quedó para mensajes.
+    // Quizás el mismo emoji del pacto, pero con el círculo rojo de "prohibido" encima»): el 😇 con un círculo rojo tachado en SVG (.hud-sin-pacto, mapa.css).
+    (!pausaSoloMirar() && typeof pactoPuedeQuitar === 'function' && pactoPuedeQuitar(t) ? icono('pacto-quitar', PACTO_QUITAR_ICONO, 'Quitar el Pacto (está activo)') : '') +
     // 🤝 Dar un ítem, DDE o despojos (2026-11-21, dueño; 🎁 → 🤝 el 2026-11-23, P278: el 🎁 queda solo para el botín): el GM, sobre el token de un personaje (js/128, comun/dar-jugador.js).
     (!pausaSoloMirar() && typeof darJugadorPuede === 'function' && darJugadorPuede(t) ? icono('dar', '🤝', 'Dar un ítem (o DDE, o despojos): le entra directo a la mochila y le salta un cartel') : '') +
     // ➕ Sumar a mano al orden de turnos (2026-11-24, dueño, P291): el GM, con el orden armado y si no está (js/136). Para sacarlo, la ✕ de la tabla
@@ -1398,7 +1399,7 @@ function hudConectar(t){
     if(clave === 'volver'){ if(typeof volverPreguntar === 'function') volverPreguntar(t.fichaId); return; }   // ☥ (js/98)
     if(clave === 'riesgo'){ if(typeof alternarVisionSigilo === 'function') alternarVisionSigilo(); return; }   // 🕵 (js/124)
     if(clave === 'pacto'){ if(typeof pactoRenovar === 'function') pactoRenovar(t); return; }   // 😇 (js/83)
-    if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 🕊 (js/83)
+    if(clave === 'pacto-quitar'){ if(typeof pactoQuitar === 'function') pactoQuitar(t); return; }   // 😇🚫 (js/83)
     if(clave === 'dar'){ if(typeof darJugadorAbrir === 'function') darJugadorAbrir(t); return; }   // 🤝 (js/128)
     if(clave === 'orden-sumar'){ if(typeof ordenSumarAMano === 'function') ordenSumarAMano(seleccion); return; }   // ➕ (js/136)
     if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)

@@ -577,6 +577,10 @@ aside{
 @media (prefers-reduced-motion: reduce){#hud .hud-lineas line{animation:none}}
 #hud .hud-circulo.icono{font-size:15px;border-color:rgba(237,227,210,.4);color:var(--paper)}
 #hud .hud-circulo.icono.abierto{border-color:var(--brass);color:var(--brass)}
+/* 😇🚫 Quitar el Pacto (2026-11-26, dueño): el 😇 con un círculo rojo de «prohibido» encima (js/83, PACTO_QUITAR_ICONO). */
+#hud .hud-sin-pacto{position:relative;display:inline-block;line-height:1}
+#hud .hud-sin-pacto svg{position:absolute;left:50%;top:50%;width:1.45em;height:1.45em;transform:translate(-50%,-50%);pointer-events:none;overflow:visible}
+#hud .hud-sin-pacto svg *{fill:none;stroke:#E8261C;stroke-width:2.4;stroke-linecap:round;filter:drop-shadow(0 0 1px rgba(0,0,0,.7))}
 #hud .hud-circulo.icono.libre-activo{background:#B3261E;border-color:#FF6A5F;color:#fff;box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 14px rgba(255,60,40,.6);animation:libre-pulso 1.4s ease-in-out infinite}
 @keyframes libre-pulso{50%{box-shadow:0 0 0 6px rgba(255,90,70,.15),0 0 18px rgba(255,60,40,.8)}}
 #hud .hud-circulo:disabled{cursor:default;opacity:.85}

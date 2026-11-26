@@ -3261,6 +3261,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de sangre) +20, pero el tope es +25…»; el sobrante al curarse ya en el tope: «el sobrante no se carga»; ◎ igual para los tres («Viene de Sanguijuela
   y Relicario de sangre (y una parte, cargada a mano)»). Sin probar con clics: Drenar vida (la regla es la misma, en las pruebas automáticas), una
   invocación, GM Tools suelto y el Anillo de la siesta. Preguntas nuevas: P355, P356, P357. Capturas `cola131/`.
+- **⬜ en cola — ❤ Tope de la Vida extra: recortar al bajar el máximo y el GM puede pasarlo a mano (P355 y P356 decididas)** (dueño, 2026-11-26,
+  «como sugerís»): (1) si baja la vida máxima, la Vida extra que quede por encima del tope nuevo (50 % del máximo) se recorta sola, con un aviso;
+  (2) el GM puede pasar el tope a mano (por ejemplo para un jefe), con un aviso que lo diga; los jugadores no. (P357: los escudos de los anillos
+  siguen fuera del tope, sin cambios.) Regla común en `comun/combatiente.js` (commit e1bd62dc).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

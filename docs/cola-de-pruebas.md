@@ -3226,6 +3226,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   que requieren que vayas ahí»). Pensar qué cosas (duelos esperando al GM, momentos pendientes, zonas por tirar…) y cómo avisarlas; conversarlo antes.
   Contado al dueño (2026-11-26): ejemplos de avisos (duelo esperando al GM, turno de un creep, zona o trampa por tirar, un jugador que pide algo, un
   creep caído) y formas (cartelito con «Ir al mapa», numerito rojo, sonido opcional); recomendado dejarlo para cuando juegue sesiones reales con GM Tools.
+- **⬜ en cola — ❤ Vida extra de otro: «por encima de su máximo» (P353 decidida)** (dueño, 2026-11-26): cuando se mira la Vida extra de otro
+  (otro jugador, un creep, una invocación ajena), la frase dice «su máximo»; la propia sigue «tu máximo» (ventana ◎, globo del iconito y del token).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

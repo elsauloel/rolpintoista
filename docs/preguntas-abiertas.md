@@ -2982,3 +2982,11 @@ equipo (salvo el Sobrepeso ⚖, que se sumó a pedido). En un creep sí es un es
 ¿Se deja así (es del equipo, se ve en ◎), o la Armadura rota de un personaje también lleva su iconito (🛡 roto, en «marcas y debilidades»), como el Sobrepeso?
 
 > ✅ **Decidida (dueño, 2026-11-26):** «sigamos tu recomendación»: la Armadura rota de un personaje (que viene del equipo) también tiene su iconito alrededor del token. En la cola.
+
+### P353 — ❤ «Vida extra»: ¿«tu máximo» o «su máximo» cuando es de otro? (2026-11-26, Claude, al acortar la descripción)
+
+La Vida extra ahora dice en corto «+25 de vida por encima de tu máximo» (la frase que propuso el dueño) en la ventana ◎ Estados alterados, en el globo
+del iconito y en el globo del token, y abajo de dónde viene: «Viene de Relicario de sangre.», «Cargado a mano.» o «Viene de Relicario de sangre (y una
+parte, cargada a mano).». La frase dice **«tu»** también cuando uno mira la Vida extra de otro (un jugador que mira el token de otro, el GM que mira a un
+personaje o a un creep). ¿Se deja «tu» siempre (es corto y se entiende), o cuando es de otro dice «su máximo»?
+Además: una Vida extra que ya estaba guardada de antes de este cambio no sabe de dónde vino, así que dice «Cargado a mano» aunque la haya dado un ítem.

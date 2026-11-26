@@ -10,6 +10,7 @@
    - `detalle(e, o)` → {descripcion, origen: [renglones]}: para la ventana ◎ Estados alterados del token. Solo lo que el estado trae guardado
      (quién lo protege, a quién marcó, de quién tiene miedo, quién lo provocó, quién le pegó la sanguijuela, de qué arma, de qué pasiva o pieza
      viene, la cuenta del sobrepeso). Lo que hoy no se guarda (quién puso un Veneno, con qué habilidad) no se inventa: ver P314.
+     La Vida extra (2026-11-26): en corto «+N de vida por encima de tu máximo» y, en el detalle, de dónde viene (o «Cargado a mano»).
    `e` = un estado como lo publica el resumen (de un personaje, una invocación o un creep). `o` = {sobre, sobreCuenta, nombreDe(id)}: el sobrepeso y
    su cuenta del resumen del personaje, y cómo nombrar un token o una ficha por su id (el Escudo elemental guarda el id de quien lo tiró).
    Funciones puras: sin pantalla ni Firebase (pruebas en comun/pruebas.html).
@@ -86,6 +87,16 @@ const EstadoCorto = (() => {
     return lista.find(p => p && (norm(p.nombre) === k || norm(p.nombre) === base)) || null;
   }
   const esSobrepeso = e => !!e && norm(e.nombre) === 'sobrepeso';
+  /* ❤ La Vida extra común (dueño, 2026-11-23: «la explicación de vida extra está innecesariamente larga. Se entiende bastante solo con el nombre, aunque
+     está bueno que diga algo como "vida por encima de tu máximo", y que diga el origen»): en corto, cuánta es y «vida por encima de tu máximo»; en la
+     ventana ◎, de dónde viene (Combatiente.vidaExtraOrigenTxt: el ítem o la habilidad, o «Cargado a mano»). Los escudos de los anillos (otro nombre) no. */
+  const esVidaExtra = e => !!e && (!!e.excedente || !!e.excedenteVida) && /^(vida extra|excedente de vida)$/.test(norm(e.nombre));
+  const VE_CORTO = 'Vida por encima de tu máximo';
+  function veOrigenTxt(e){
+    if(typeof Combatiente !== 'undefined' && Combatiente.vidaExtraOrigenTxt) return Combatiente.vidaExtraOrigenTxt(e);
+    const l = (Array.isArray(e && e.fuentes) ? e.fuentes : []).filter(Boolean);
+    return l.length ? `Viene de ${l.join(', ')}.` : 'Cargado a mano.';
+  }
   const esArmRota = e => !!e && (!!e.armaduraRota || norm(e.nombre) === 'armadura rota');
 
   // El número que va al lado del nombre: el sobrepeso, o los stacks si hay más de uno (Armadura rota, siempre).
@@ -128,6 +139,10 @@ const EstadoCorto = (() => {
       if(e.derivado) return menosDef > 0 ? `Defensa −${f(menosDef)}` : 'Piezas abolladas: menos Defensa';
       return `Defensa −${f(Math.max(1, n(e.stacks)))}`;
     }
+    if(esVidaExtra(e)){
+      const v = e.escudo !== undefined && e.escudo !== null ? e.escudo : e.escudoMagicoActual !== undefined ? e.escudoMagicoActual : e.excedenteVida ? e.escudoMagico : undefined;
+      return v !== undefined && v !== null ? `+${f(v)} de vida por encima de tu máximo${e.tope ? ' (tope ' + f(e.tope) + ')' : ''}` : VE_CORTO;
+    }
     const vt = vidaTurno(e), st = n(e.stacks);
     const escudo = e.escudo !== undefined && e.escudo !== null ? (e.excedente ? `Vida extra +${f(e.escudo)}${e.tope ? ' (tope ' + f(e.tope) + ')' : ''}` : `Escudo ${f(e.escudo)}${e.escudoMax !== undefined ? '/' + f(e.escudoMax) : ''}`) : '';
     const p = presetDe(e.nombre);
@@ -169,6 +184,12 @@ const EstadoCorto = (() => {
       origen.push('Se va solo cuando deja de cargar de más.');
       return {descripcion: '', origen};
     }
+    if(esVidaExtra(e)){
+      origen.push(veOrigenTxt(e));
+      const h0 = typeof Combatiente !== 'undefined' && Combatiente.hastaTxt ? Combatiente.hastaTxt(e) : '';
+      if(h0) origen.push(`Dura ${h0}.`);
+      return {descripcion: '', origen};
+    }
     const det0 = String((e && e.detalle) || '').trim();
     const viene = det0.match(/^Viene de ([^:.]*)[:.]\s*/);   // «Viene de tu pasiva "X": …» / «Viene de tu equipo: …»
     const det = viene ? det0.slice(viene[0].length) : det0;
@@ -202,7 +223,9 @@ const EstadoCorto = (() => {
     const st = Math.max(1, n(e.stacks) || 1), vt = n(e[campoHp || 'hpturno']) * st;
     const mods = (Array.isArray(e.mods) ? e.mods : []).filter(m => m && m.stat && n(m.val)).slice(0, 8).map(m => ({stat: String(m.stat).slice(0, 20), val: n(m.val)}));
     return {...(vt ? {vidaTurno: vt} : {}), ...(st > 1 ? {stacks: st} : {}), ...(e.curaDado ? {curaDado: String(e.curaDado).slice(0, 12)} : {}),
-      ...(mods.length ? {mods} : {}), ...(n(e.sobrepeso) > 0 ? {sobrepeso: n(e.sobrepeso)} : {})};
+      ...(mods.length ? {mods} : {}), ...(n(e.sobrepeso) > 0 ? {sobrepeso: n(e.sobrepeso)} : {}),
+      // ❤ De dónde viene la Vida extra (2026-11-26): el ítem o la habilidad, y si una parte se cargó a mano.
+      ...(Array.isArray(e.fuentes) && e.fuentes.length ? {fuentes: e.fuentes.slice(0, 4).map(x => String(x || '').slice(0, 40))} : {}), ...(e.aMano ? {aMano: true} : {})};
   }
 
   return {CORTO, pub, vidaTurno, limpiar, numero, dura, efecto, globo, texto, detalle};

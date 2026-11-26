@@ -148,7 +148,8 @@ const FichaAcciones = (() => {
     // queda como Vida extra (hasta +50 % del máximo, contando la que ya tiene); se va al «Finalizar combate». Una cura a alguien caído no entra.
     if(hpmax > 0 && antes > 0 && num(valor) > hpmax && Combatiente.relicarioEnEquipo(S.inventario)){
       const exc = Combatiente.excedenteConTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, Combatiente.RELICARIO_TOPE);
-      if(exc > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, exc, {finCombate: true, id: uid()});   // ❤ una sola Vida extra (2026-11-03)
+      const rel = (S.inventario || []).find(i => i && i.equipado && num(i.relicario) > 0);   // ❤ de dónde viene (2026-11-26)
+      if(exc > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, exc, {finCombate: true, id: uid(), fuente: (rel && rel.nombre) || 'Relicario de sangre'});   // ❤ una sola Vida extra (2026-11-03)
     }
     S.hp = Math.max(0, Math.min(tope, num(valor)));
     if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
@@ -1206,6 +1207,7 @@ const FichaAcciones = (() => {
     if(spec.chupaDe){ draft.chupaDe = spec.chupaDe; draft.chupaUid = spec.chupaUid || ''; draft.chupaNombre = spec.chupaNombre || ''; }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
+    if(spec.fuente) Combatiente.vidaExtraConFuente(draft, spec.fuente);   // ❤ de dónde viene la Vida extra (2026-11-26; sin esto, «cargado a mano»)
     if(spec.armaDe){ draft.armaDe = {...spec.armaDe}; draft.nombre = spec.nombre; }
     else if(preset && preset.armaElemental && spec.nombre && spec.nombre !== preset.nombre) draft.nombre = String(spec.nombre).slice(0, 40);   // «🔥 Arma ígnea» (sin arma)   // 🔥 el Arma elemental de un arma (2026-11-04)
     return draft;
@@ -1318,7 +1320,7 @@ const FichaAcciones = (() => {
       const quien = origen ? origen + ': ' : '';
       if(r.perdida){ ui.toast(`🪱 ${quien}estás caído: la cura que robó tu Sanguijuela (${fmt(m)}) se pierde`); return; }
       S.hp = antes + r.cura;
-      if(r.extra > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, r.extra, {id: uid()});   // ❤ una sola Vida extra (2026-11-03)
+      if(r.extra > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, r.extra, {id: uid(), fuente: 'Sanguijuela'});   // ❤ una sola Vida extra (2026-11-03); su origen (2026-11-26)
       ui.cambio(['vitals', 'efectos', 'refresh']);
       ui.toast(`🪱 ${quien}tu Sanguijuela te trajo ${fmt(m)} de vida${r.cura ? ` (${fmt(antes)} → ${fmt(S.hp)})` : ''}${r.extra ? ` · ${fmt(r.extra)} de Vida extra` : ''}`);
       return;
@@ -1413,7 +1415,7 @@ const FichaAcciones = (() => {
       ui.fijarHp(antes + num(spec.cura));
       return {nota: `+${fmt(num(spec.cura))} HP (${fmt(antes)} → ${fmt(num(S.hp))})`};
     }
-    aplicarEstadoRecibido(S, spec, `${d.atacante.nombre} · ${ef.nombre}`, ui, {propio: true});
+    aplicarEstadoRecibido(S, {...spec, ...(spec.fuente ? {} : {fuente: (d.hab && d.hab.nombre) || ef.nombre})}, `${d.atacante.nombre} · ${ef.nombre}`, ui, {propio: true});   // ❤ la Vida extra dice de qué habilidad viene (2026-11-26)
     return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
   }
   function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : FichaHabilidades.hpVariable(it) ? num(it._xHp) : 0; }

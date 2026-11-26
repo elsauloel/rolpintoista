@@ -50,17 +50,17 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261125gas"></script>
+<script src="combatiente.js?v=20261126ve"></script>
 <script src="creep-calculo.js?v=20261126bot"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
-<script src="creep-acciones.js?v=20261124vida0"></script>
+<script src="creep-acciones.js?v=20261126ve"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261125sil"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261124mareo3"></script>
-<script src="estados-aplicar.js?v=20261120hasta"></script>
-<script src="estado-corto.js?v=20261123c73"></script>
-<script src="recibidos.js?v=20261123cola65"></script>
+<script src="estados-aplicar.js?v=20261126ve"></script>
+<script src="estado-corto.js?v=20261126ve"></script>
+<script src="recibidos.js?v=20261126ve"></script>
 <script src="dar-jugador.js?v=20261126ico2"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
@@ -72,7 +72,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="generador-tiendas.js?v=20261120maestria"></script>
 <script src="items-subidos.js"></script>
-<script src="ficha-habilidades.js?v=20261110vaq"></script>
+<script src="ficha-habilidades.js?v=20261126ve"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js?v=20261123c73"></script>
@@ -83,9 +83,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261124c80"></script>
+<script src="ficha-acciones.js?v=20261126ve"></script>
 <script src="orden-turnos.js?v=20261126fin"></script>
-<script src="ficha-mantenimiento.js?v=20261124finT"></script>
+<script src="ficha-mantenimiento.js?v=20261126ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -2859,7 +2859,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -3037,7 +3037,7 @@ prueba('🔘 El globo de un iconito de estado: solo el nombre (con su número), 
     ['Regeneración (túnica) · Cura 2 de vida cada turno', 'Regeneración · Cura 5 de vida cada turno · quedan 2 turnos',
      'Veneno: 3 · −3 de vida al empezar el turno · quedan 3 turnos', 'Sangrado: 3 · −3 de vida cada turno',
      'Escarcha: 2 · −2 a sus No2 máximos · quedan 2 turnos', 'Llama propia · −4 de vida cada turno · quedan 2 turnos',
-     'Rengo · Moverse cuesta 2 No2 por casilla · queda 1 turno', 'Vida extra · Vida extra +49']);
+     'Rengo · Moverse cuesta 2 No2 por casilla · queda 1 turno', 'Vida extra · +49 de vida por encima de tu máximo']);
   igual(EstadoCorto.pub({nombre: 'Veneno', stacks: 3, hpturno: -1, mods: [{stat: 'def', val: -2}, {stat: 'x', val: 0}]}, 'hpturno'), {vidaTurno: -3, stacks: 3, mods: [{stat: 'def', val: -2}]});
   igual(EstadoCorto.pub({nombre: 'Sobrepeso', sobrepeso: 2, stacks: 1}, 'hpturno'), {sobrepeso: 2});
   igual(EstadoCorto.texto({nombre: 'Quemadura', stacks: 2, turnos: 2, detalle: 'Arde: pierde 2 HP por turno, 3 turnos. Si lo vuelven a quemar, vuelven a contar los turnos (no se suma). ⚙ Automatizado: su Res. fuego le resta a cada turno.'}),
@@ -3068,6 +3068,32 @@ prueba('🔘 El detalle de ◎ Estados alterados: la cuenta del sobrepeso, de d�
     {descripcion: 'Recupera 3 HP en cada Mantenimiento.', origen: ['Viene de tu pasiva "Sangre fría".']});
   igual(EstadoCorto.detalle({nombre: 'Provocado', permanente: true, provocaDe: 't2', provocaDeNombre: 'Bizzante', hasta: 'el fin del turno de Bizzante'}, o).origen,
     ['Lo provocó Bizzante.', 'Dura hasta el fin del turno de Bizzante.']);
+});
+prueba('❤ La Vida extra en corto y con su origen: el ítem o la habilidad, o «Cargado a mano» (2026-11-26)', () => {
+  // en corto: cuánta y «vida por encima de tu máximo» (sin la explicación larga); sin el número (un creep visto por un jugador), solo la frase
+  const ve = {nombre: 'Vida extra', excedente: true, escudo: 12, permanente: true, fuentes: ['Relicario de sangre'], detalle: 'Vida de más: se gasta antes que tu vida (lo que se lleva cuenta como daño)…'};
+  const g = EstadoCorto.globo(ve, {});
+  igual([g.titulo, g.efecto, EstadoCorto.globo({...ve, escudo: undefined}, {}).efecto], ['Vida extra', '+12 de vida por encima de tu máximo', 'Vida por encima de tu máximo']);
+  igual(EstadoCorto.detalle(ve, {}), {descripcion: '', origen: ['Viene de Relicario de sangre.']});
+  igual(EstadoCorto.detalle({nombre: 'Vida extra', excedenteVida: true, escudoMagico: 5, escudoMagicoActual: 5}, {}).origen, ['Cargado a mano.']);
+  // al juntarse, se juntan los orígenes (y lo cargado a mano)
+  let l = Combatiente.sumarVidaExtra([], 6, {fuente: 'Relicario de sangre'});
+  l = Combatiente.sumarVidaExtra(l, 4, {fuente: 'Drenar vida'});
+  igual(EstadoCorto.detalle(l[0], {}).origen, ['Viene de Relicario de sangre y Drenar vida.']);
+  const sc = {nombre: 'Rata', hp: 5, hpMax: 10, estados: [...l]};
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: 3});   // cargada desde la vida, sin origen
+  igual([sc.estados.length, sc.estados[0].escudoMagicoActual, EstadoCorto.detalle(sc.estados[0], {}).origen], [1, 13, ['Viene de Relicario de sangre y Drenar vida (y una parte, cargada a mano).']]);
+  // una habilidad o un consumible de creep, y una spec con `fuente` (la que manda el mapa a un personaje)
+  const sc2 = {nombre: 'Rata', hp: 5, hpMax: 10, estados: []};
+  EstadosAplicar.aplicarACreep(sc2, {nombre: 'Vida extra', escudoMagico: 3, fuente: 'Drenar vida'});
+  igual([sc2.estados[0].fuentes, EstadosAplicar.limpiarSpec({nombre: 'Vida extra', escudoMagico: 3, fuente: 'Drenar vida'}).fuente], [['Drenar vida'], 'Drenar vida']);
+  const S = {efectos: []};
+  FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Coraza de prueba', efectoNombre: 'Vida extra', efectoEscudo: 6}, presetsDePrueba);
+  igual(S.efectos[0].fuentes, ['Coraza de prueba']);
+  // lo que se publica: el origen viaja en el resumen (para que lo vean los demás)
+  igual(EstadoCorto.pub({nombre: 'Vida extra', excedenteVida: true, fuentes: ['Relicario de sangre'], aMano: true}, 'hpturno'), {fuentes: ['Relicario de sangre'], aMano: true});
+  // un escudo de anillo (otro nombre) sigue con su texto
+  cierto(!/por encima/.test(EstadoCorto.globo({nombre: 'Escudo de la mañana', excedente: true, escudo: 8}, {}).efecto), 'el escudo del anillo no cambia');
 });
 prueba('🔘 El mapa: el mouse sobre un iconito muestra solo ese estado; ◎ muestra el detalle (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
@@ -10363,7 +10389,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10487,7 +10513,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

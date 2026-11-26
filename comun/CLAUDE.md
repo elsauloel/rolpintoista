@@ -1030,6 +1030,10 @@ versión parecida en más de una, es candidato a juntar.
   elemental, arma). `o = {sobre, sobreCuenta, nombreDe(id), oculto(id)}`. `pub(e, campoHp)` (2026-11-23): los números de un estado para el resumen público (`vidaTurno` ya
   por los stacks, `stacks`, `curaDado`, `mods`, `sobrepeso`); lo usan `ficha-resumen.js`, GM Tools (`creepPublico`) y el mapa (`modificarCreep`), así que
   se carga también en la ficha, GM Tools y el simulador de encuentros. Lo usa el mapa (js/30 y js/10); lo que no se guarda (quién puso cada estado): P314.
+  ❤ **La Vida extra** (2026-11-26, dueño: «está innecesariamente larga… que diga el origen»): en corto «+N de vida por encima de tu máximo» y en `detalle`
+  solo su origen (`Combatiente.vidaExtraOrigenTxt`): el estado guarda `fuentes` (nombres del ítem o la habilidad) y `aMano`; sin `fuentes` = «Cargado a
+  mano». Cada fuente la pone al crearla (`sumarVidaExtra(…, {fuente})`, la spec `{fuente}` de `EstadosAplicar`/`encolarPj`, `vidaExtraConFuente`);
+  `fundirVidaExtra` junta los orígenes; `pub` los publica.
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
   yaPaso, finRonda, reubicar}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda,
   va al final de esta ronda (`finRonda`; varios así, por su tirada) y a `reubicar` (al pasar de ronda va a su lugar) (P301 b, 2026-11-26). Los que entran

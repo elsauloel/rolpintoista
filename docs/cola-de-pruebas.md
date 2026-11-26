@@ -2856,11 +2856,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cargar y con F5 (los dos); una tirada nueva de uno se anima en las dos pantallas (las dos direcciones) y el crítico de un duelo (los 3 d20) también.
   7 pruebas automáticas nuevas («una tirada vieja no se anima»). Sin probar: la copia local de Firebase en una red lenta (no se pudo forzar).
 
-- **⬜ en cola — ❤ «Vida extra»: descripción corta y con el origen** (dueño, 2026-11-23, con captura de la ventana ◎ Estados alterados): «la
+- **✅ hecho (2026-11-26) — ❤ «Vida extra»: descripción corta y con el origen** (dueño, 2026-11-23, con captura de la ventana ◎ Estados alterados): «la
   explicación de vida extra está innecesariamente larga. Se entiende bastante solo con el nombre, aunque está bueno que diga algo como "vida por
   encima de tu máximo", y que diga el origen (normalmente solo se va a permitir en casos particulares, lo dará algún ítem o algún skill, así que
   debería mencionar eso, o si se carga a mano, que diga "cargado a mano")». Acortar la descripción a algo como «Vida por encima de tu máximo» y
   mostrar de dónde viene (el ítem / la habilidad, o «cargado a mano»).
+  **Hecho:** en la ventana ◎, en el globo del iconito y en el globo del token dice solo «+25 de vida por encima de tu máximo» (sin la explicación
+  larga), y en ◎, abajo, de dónde viene: «Viene de Relicario de sangre.», «Cargado a mano.» (la que se carga desde la vida o con «+ Estado») o, si
+  se juntaron, «Viene de Relicario de sangre (y una parte, cargada a mano).». La Vida extra ahora guarda su origen en todas las fuentes que hay hoy:
+  el Relicario de sangre, el Anillo de la siesta, la Sanguijuela, Drenar vida y lo que drena, las habilidades y consumibles que la dan (de personajes,
+  invocaciones y creeps). Una que ya estaba guardada de antes dice «Cargado a mano». Probado en «Claude · pruebas 2», mapa «Prueba · General»: J1 con el
+  Relicario tomó una Poción de HP con la vida llena → «Vida extra +25 · Viene de Relicario de sangre» (lo ve él, J2 y el GM); J2 se cargó +10 desde
+  su vida → «Cargado a mano» (lo ve él, J1 y el GM); J1 sumó +5 a mano encima → «Viene de Relicario de sangre (y una parte, cargada a mano)».
+  1160 pruebas en verde; la vuelta dijo «quedó igual». Pregunta nueva: P353 («tu máximo» o «su máximo» cuando es de otro).
 - **⬜ en cola — 📜 Ventana ◎ Estados alterados: poder leer la descripción entera cuando no entra** (dueño, 2026-11-23: «en el caso de que una
   descripción de un estado no entre en el recuadro, debería haber alguna forma de poder leer el texto completo. En este caso no tengo cómo saber
   cómo termina ese texto»). Hoy se corta con «…» (p. ej. la de Vida extra). Que se pueda desplegar o ver completa.

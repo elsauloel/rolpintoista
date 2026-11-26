@@ -2056,6 +2056,7 @@ async function dueloDrenarBase(d, monto, opts){
   if(!ta) return {quien, monto, manual: true, motivo: 'el token de quien la usó ya no está en el mapa'};
   const pct = opts && opts.sinExtra ? 0 : Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // (☀ la Luz sanadora: nunca pasa el máximo) la Vida extra: solo las habilidades que lo dicen (un arma, no)
   // Toda la Vida extra que ya tiene (2026-10-07: se suman, cada una aparte); el drenaje le agrega solo lo que falta para el tope.
+  const drenaFuente = d.hab ? d.hab.nombre : ((d.ataque && d.ataque.armaNombre) || '');   // ❤ de dónde viene la Vida extra (2026-11-26)
   const excedenteDe = estados => (estados || []).filter(x => x && x.activo !== false && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida' || x.nombre === 'Vida extra'))
     .reduce((a, e) => a + num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico), 0);
   try{
@@ -2067,7 +2068,7 @@ async function dueloDrenarBase(d, monto, opts){
         sc.hp = Math.min(max, previo + Combatiente.curaQueEntra(previo, monto, sc.estados));   // 🌑 con una herida que no deja curarse, no se cura (2026-10-26)
         const sobra = monto - (sc.hp - previo), tope = Math.floor(max * pct / 100), antes = excedenteDe(sc.estados);
         const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) - antes : 0;
-        if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: exc});
+        if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: exc, fuente: drenaFuente});   // ❤ con su origen (2026-11-26)
         return {previo, nuevo: sc.hp, exc};
       });
       if(r.robo){ const c = curaRobadaMapa(r, quien); return {quien, monto, hpAntes: r.previo, hpDespues: r.previo, nota: c.robada}; }
@@ -2085,7 +2086,7 @@ async function dueloDrenarBase(d, monto, opts){
     const f = fichasPub.get(ta.fichaId), rs = (f && f.resumen) || {};
     const max = num(rs.hpMax) > 0 ? num(rs.hpMax) : num(r.nuevo), tope = Math.floor(max * pct / 100), antes = excedenteDe(rs.estados);
     const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) - antes : 0;
-    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: exc}, origen: `${quien} · ${d.hab ? d.hab.nombre : (d.ataque.armaNombre || 'su arma')}`});
+    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: exc, fuente: drenaFuente}, origen: `${quien} · ${d.hab ? d.hab.nombre : (d.ataque.armaNombre || 'su arma')}`});
     return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(exc ? {excedente: exc} : {})};
   }catch(err){
     console.error('No se pudo aplicar el drenaje:', err);
@@ -3057,7 +3058,7 @@ async function dueloCurar(t, n){
     const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const robo = Combatiente.curaRobada(previo, n, sc.estados); if(robo) return {previo, nuevo: previo, robo}; const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); const entra = Combatiente.curaQueEntra(previo, n, sc.estados); sc.hp = Math.min(tope, previo + entra);
       // 🩸 el Relicario de sangre (2026-10-27): lo que pasa del máximo, Vida extra hasta el fin del combate (+50 % como mucho)
       const exc = entra > 0 && num(sc.hpMax) > 0 && CreepCalculo.talisman(sc, 'relicario') > 0 ? Combatiente.excedenteConTope(sc.estados, previo + entra - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
-      if(exc > 0) sc.estados = Combatiente.sumarVidaExtra(sc.estados, exc, {finCombate: true});   // ❤ una sola Vida extra (2026-11-03)
+      if(exc > 0) sc.estados = Combatiente.sumarVidaExtra(sc.estados, exc, {finCombate: true, fuente: ((sc.equipo || []).find(i => i && num(i.relicario) > 0) || {}).nombre || 'Relicario de sangre'});   // ❤ una sola Vida extra (2026-11-03), con su origen (2026-11-26)
       return {previo, nuevo: sc.hp, sin, exc}; });
     if(res.robo) return curaRobadaMapa(res, nombreDe(t));
     return {previo: res.previo, nuevo: res.nuevo, ...(res.exc ? {excedente: res.exc} : {}), ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};
@@ -3083,7 +3084,7 @@ async function dueloCurar(t, n){
     return {previo, nuevo: datos.hp, ...(exc ? {excedente: exc} : {})};
   }).then(async r => {
     if(r && r.robo) return curaRobadaMapa(r, nombreDe(t));
-    if(r && r.excedente) try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: r.excedente, finCombate: true}, origen: 'Relicario de sangre'}); }catch(err){ console.error('Relicario de sangre:', err); }
+    if(r && r.excedente) try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: r.excedente, finCombate: true, fuente: 'Relicario de sangre'}, origen: 'Relicario de sangre'}); }catch(err){ console.error('Relicario de sangre:', err); }
     return r;
   });
 }
@@ -3317,6 +3318,7 @@ async function dueloAplicarEfectoBase(d, ef){
     const ta = tokens.get(d.atacante.tokenId);
     if(ta && ta.fichaId){ spec.chupaDe = `${ta.tipo === 'creep' ? 'creep' : 'pj'}:${ta.fichaId}`; spec.chupaUid = String(ta.duenoUid || ''); spec.chupaNombre = String(d.atacante.nombre || '').slice(0, 40); }
   }
+  if(/^(vida extra|excedente de vida)$/i.test(String(spec.nombre || '').trim()) && !spec.fuente) spec.fuente = String((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.armaNombre)) || ef.nombre || '').slice(0, 40);   // ❤ de qué habilidad viene (2026-11-26)
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   if((spec.nombre === 'Mordido' || spec.nombre === 'Agarrado') && d.atacante.tokenId && typeof mordidaEmpezar === 'function') await mordidaEmpezar(d, spec);   // 🦷 quién lo tiene agarrado, y la bestia queda Mordiendo (js/54)
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).

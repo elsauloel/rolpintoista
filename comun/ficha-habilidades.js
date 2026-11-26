@@ -100,6 +100,7 @@ const FichaHabilidades = (() => {
     const nuevo = {id: uid(), nombre, imagen: '', turnos, stacks, hpturno, stacksturno: 0, permanente, activo: true,
       popup: false, detalle, mods, ...categorias};
     if(n(nuevo.escudoMagico) > 0) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
+    if(nuevo.excedenteVida) Combatiente.vidaExtraConFuente(nuevo, (it && it.nombre) || src.nombre);   // ❤ la Vida extra dice de qué ítem o habilidad viene (2026-11-26)
     // 📜 Hasta el fin del combate (dueño, 2026-10-19, los pergaminos): no vence por turnos y se va solo con «Finalizar combate» (vtt-hexgrid/js/25).
     if(src.efectoFinCombate) nuevo.finCombate = true;
     if(src.efectoRecarga) nuevo.recarga = true;   // un escudo que se renueva cada turno

@@ -40,6 +40,7 @@ const EstadosAplicar = (() => {
     if(s.oro) out.oro = Math.max(0, Math.min(999, Math.round(Number(s.oro) || 0)));   // 🫳 el oro de un robo con el cinturón vacío (2026-11-03)
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     if(s.resetea) out.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
+    if(s.fuente) out.fuente = String(s.fuente).trim().slice(0, 40);   // ❤ de dónde viene la Vida extra: el ítem o la habilidad (2026-11-26; sin esto, «cargado a mano»)
     if(s.finCombate) out.finCombate = true;   // 🩸 se va al «Finalizar combate» (la Vida extra del Relicario de sangre, 2026-10-27)
     if(s.armaDe && (s.armaDe.id || s.armaDe.nombre)) out.armaDe = {id: String(s.armaDe.id || '').slice(0, 80), nombre: String(s.armaDe.nombre || '').slice(0, 60)};   // 🔥 el arma del Arma elemental (2026-11-04)
     // Vida extra (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
@@ -63,6 +64,7 @@ const EstadosAplicar = (() => {
   }
   const esPreset = nombre => !!presetPorNombre(nombre);
 
+  const conFuente = (s, e) => s.fuente && Combatiente.vidaExtraConFuente ? Combatiente.vidaExtraConFuente(e, s.fuente) : e;
   // Estado en la forma de un creep.
   function componer(spec){
     const s = limpiarSpec(spec);
@@ -78,7 +80,8 @@ const EstadosAplicar = (() => {
       if(base.escudoMagico) partes.push(`escudo de ${base.escudoMagico}`);
       base.detalle = partes.length ? partes.join(', ') + (base.turnos ? ` durante ${base.turnos} turno(s).` : '.') : '';
     }
-    return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {}),
+    // ❤ La Vida extra con su origen (2026-11-26): el ítem o la habilidad que trae la spec (`fuente`); sin él, queda «cargado a mano».
+    return conFuente(s, {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {}),
       ...(s.protege ? {protege: s.protege, protegeNombre: s.protegeNombre} : {}),
       ...(s.permanente ? {permanente: true, ...(s.hasta ? {hasta: s.hasta} : {})} : {}), ...(s.marcadoPor ? {marcadoPor: s.marcadoPor, marcadoToken: s.marcadoToken} : {}), ...(s.marca ? {marca: s.marca, marcaNombre: s.marcaNombre} : {}),
       ...(s.miedoDe ? {miedoDe: s.miedoDe, miedoDeNombre: s.miedoDeNombre} : {}),
@@ -87,7 +90,7 @@ const EstadosAplicar = (() => {
       ...(s.chupaDe ? {chupaDe: s.chupaDe, chupaUid: s.chupaUid, chupaNombre: s.chupaNombre} : {}),
       ...(s.escudoDe || s.escudoEsp ? {escudoDe: s.escudoDe, escudoEsp: s.escudoEsp} : {}),
       ...(s.resetea ? {resetea: true} : {}), ...(s.finCombate ? {finCombate: true} : {}),
-      ...(s.armaDe ? {armaDe: s.armaDe, nombre: s.nombre} : {})};   // 🔥 Arma elemental en un arma: su nombre con el arma («🔥 Arma ígnea: Lanza corta»)
+      ...(s.armaDe ? {armaDe: s.armaDe, nombre: s.nombre} : {})});   // 🔥 Arma elemental en un arma: su nombre con el arma («🔥 Arma ígnea: Lanza corta»)
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

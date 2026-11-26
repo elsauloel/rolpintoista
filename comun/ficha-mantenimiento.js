@@ -396,6 +396,7 @@ const FichaMantenimiento = (() => {
     }
     // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
     const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
+    const veAnillo = ((S.inventario || []).find(i => i && i.equipado && !FichaCalculo.itemRoto(i) && num(i.descansoVidaExtra) === veDescanso) || {}).nombre || 'Anillo de la siesta';   // ❤ su origen (2026-11-26)
     if(veDescanso > 0){
       // (P227 ✅, 2026-10-28: es Vida extra de verdad —`excedenteVida`—: lo que se lleva cuenta como daño. Al descansar la vida ya quedó llena, así que
       // «te curás N y lo que sobra es Vida extra» son N de Vida extra.)
@@ -403,10 +404,10 @@ const FichaMantenimiento = (() => {
       // de descanso en descanso): la Vida extra queda en lo que tenía o en la del anillo, lo que sea más.
       S.efectos = Combatiente.juntarVidaExtra([...(S.efectos || [])]);
       const iVe = S.efectos.findIndex(Combatiente.esVidaExtraComun);
-      if(iVe < 0) S.efectos.push({...Combatiente.estadoVidaExtra(veDescanso, {id: 'siesta' + Date.now().toString(36)}), sinRecarga: true, seGasta: true, descansoAnillo: true});
+      if(iVe < 0) S.efectos.push({...Combatiente.estadoVidaExtra(veDescanso, {id: 'siesta' + Date.now().toString(36), fuente: veAnillo}), sinRecarga: true, seGasta: true, descansoAnillo: true});
       else {
         const ve = {...S.efectos[iVe]}, actual = num(ve.escudoMagicoActual ?? ve.escudoMagico);
-        if(actual < veDescanso){ ve.escudoMagico = veDescanso; ve.escudoMagicoActual = veDescanso; }
+        if(actual < veDescanso){ ve.escudoMagico = veDescanso; ve.escudoMagicoActual = veDescanso; Combatiente.vidaExtraConFuente(ve, veAnillo); }
         ve.permanente = true; ve.turnos = 0; delete ve.finCombate; ve.descansoAnillo = true;
         S.efectos[iVe] = ve;
       }

@@ -115,7 +115,7 @@ function llamarRefuerzos(sc, h){
 }
 /* 📣 El refuerzo entra al orden de turnos (2026-11-24): como una invocación (js/04 invocacionAlOrden), tira su Iniciativa (la del creep, con lo fijo
    como la Prisa sumado al resultado), la tirada va a la Mesa («Iniciativa · <refuerzo>») y entra en su lugar con OrdenTurnos.entrarConTirada (antes del
-   primero que sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima: P301). Queda con Mareo de invocación: pierde solo su primer turno
+   primero que sacó menos; si su lugar ya pasó en esta ronda, juega igual al final de esta ronda y desde la próxima en su lugar: P301 b). Queda con Mareo de invocación: pierde solo su primer turno
    (se va al terminarlo o al empezar el turno del creep que lo llamó, lo que pase primero; js/135). `n` = lo que devolvió duplicarCreepDesdeMapa. */
 async function refuerzoAlOrden(idQuienLlama, idNuevo, n){
   if(!idNuevo || !soyGM || typeof iniciativa === 'undefined' || !iniciativa.orden.length) return;
@@ -130,7 +130,7 @@ async function refuerzoAlOrden(idQuienLlama, idNuevo, n){
   }catch(err){ console.error('No se pudo tirar la iniciativa del refuerzo:', err); }
   const e = OrdenTurnos.entrarConTirada(iniciativa, {id: idNuevo, valor: r ? num(r.total) : 0}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa), alFinal: !r});
   if(!e) return;
-  if(!(await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron}))) return;
+  if(!(await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron, finRonda: e.finRonda, reubicar: e.reubicar}))) return;
   const nombre = (n && n.nombre) || (tokens.has(idNuevo) ? nombreDe(tokens.get(idNuevo)) : 'Refuerzo');
   if(r) mesaPublicar(`Iniciativa · ${nombre}`, {...r, desde: 'gm'});
   else toast(`📣 ${nombre} entró al final del orden con 0: no se pudo leer su Iniciativa. Escribí el número a mano.`);

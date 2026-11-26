@@ -84,7 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
 <script src="ficha-acciones.js?v=20261124c80"></script>
-<script src="orden-turnos.js?v=20261124orden2"></script>
+<script src="orden-turnos.js?v=20261126fin"></script>
 <script src="ficha-mantenimiento.js?v=20261124finT"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -2920,7 +2920,7 @@ prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, �
   cierto(/iniciativa\.orden\.filter\(o => iniciativaOcupaLugar\(o\.id\)\)/.test(t86), 'Ordenar');
   cierto(/!iniciativaOcupaLugar\(idNuevo\)\) return;/.test(t31), 'refuerzos');
 });
-prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en su lugar, el turno sigue con quien lo tenía, si su lugar ya pasó juega desde la próxima', () => {
+prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en su lugar, el turno sigue con quien lo tenía, si su lugar ya pasó juega al final de esta ronda (P301 b)', () => {
   const E = OrdenTurnos.entrarConTirada, ids = r => r.orden.map(o => o.id).join('');
   const orden = [{id: 'a', valor: 15}, {id: 'b', valor: 10}, {id: 'c', valor: 5}];
   const r1 = E({orden, turno: 1, actuaron: ['a']}, {id: 'x', valor: 7}, {enCurso: true});     // después de b (que juega): esta ronda
@@ -2931,8 +2931,39 @@ prueba('🐝 Una invocación entra al orden con su tirada (2026-11-23, P275): en
   const r6 = E({orden, turno: 2, libre: {id: 'c', vuelve: 'a'}}, {id: 'x', valor: 12}, {enCurso: true});   // turno libre: cuenta desde quien lo tenía (a)
   igual([ids(r1), r1.turno, r1.yaPaso, r1.actuaron, ids(r2), r2.turno, r2.yaPaso, r2.actuaron, ids(r3), r3.lugar, ids(r4), r4.turno, r4.yaPaso,
     ids(r5), r5.orden[3].valor, r5.yaPaso, ids(r6), r6.turno, r6.yaPaso, E({orden}, {id: 'a', valor: 3}), E({orden}, null)],
-    ['abxc', 1, false, ['a'], 'axbc', 2, true, ['a', 'x'], 'abxc', 2, 'xabc', 1, false,
+    ['abxc', 1, false, ['a'], 'abcx', 1, true, ['a'], 'abxc', 2, 'xabc', 1, false,
      'abcx', 0, false, 'axbc', 3, false, null, null]);
+});
+prueba('🐝 Su lugar ya pasó: juega al final de esta ronda y desde la próxima en su lugar (2026-11-26, P301 b, P328 2); varios, por su tirada (P349)', () => {
+  const E = OrdenTurnos.entrarConTirada, ids = l => l.map(o => o.id).join('');
+  const ini = {orden: [{id: 'a', valor: 25}, {id: 'b', valor: 20}, {id: 'c', valor: 0}], turno: 2, actuaron: ['a', 'b'], reubicar: ['s']};   // le toca a c (el último)
+  const r1 = E(ini, {id: 'x', valor: 2}, {enCurso: true});                       // saca 2: su lugar (antes de c) ya pasó → al final
+  igual([ids(r1.orden), r1.turno, r1.yaPaso, r1.actuaron, r1.finRonda, r1.reubicar, r1.lugar], ['abcx', 2, true, ['a', 'b'], ['x'], ['s', 'x'], 3]);
+  const ini2 = {...ini, orden: r1.orden, finRonda: r1.finRonda, reubicar: r1.reubicar};
+  const r2 = E(ini2, {id: 'y', valor: 22}, {enCurso: true});                     // otro, con más: al final, antes de x (por su tirada)
+  const r3 = E(ini2, {id: 'y', valor: 1}, {enCurso: true});                      // otro, con menos: al final, después de x
+  const r4 = E(ini2, {id: 'y', valor: 2}, {enCurso: true});                      // empate con x: después del que entró antes
+  igual([ids(r2.orden), r2.finRonda, ids(r3.orden), ids(r4.orden), r4.reubicar], ['abcyx', ['x', 'y'], 'abcxy', 'abcxy', ['s', 'x', 'y']]);
+  // uno que todavía no pasó no se mete en la cola del final: va antes de los que entraron así
+  const ini3 = {orden: [{id: 'a', valor: 25}, {id: 'c', valor: 10}, {id: 'd', valor: 5}, {id: 'x', valor: 30}], turno: 1, actuaron: ['a'], finRonda: ['x']};
+  const r5 = E(ini3, {id: 'y', valor: 1}, {enCurso: true}), r6 = E(ini3, {id: 'y', valor: 99}, {enCurso: true, alFinal: true});
+  igual([ids(r5.orden), r5.yaPaso, r5.finRonda, ids(r6.orden), r6.yaPaso], ['acdyx', false, ['x'], 'acdxy', false]);
+  // le toca a uno de la cola del final (x) y entra otro con más: queda después de x (no antes de quien tiene el turno)
+  const r7 = E({...ini3, turno: 3, actuaron: ['a', 'c', 'd']}, {id: 'y', valor: 50}, {enCurso: true});
+  igual([ids(r7.orden), r7.turno, r7.yaPaso, r7.finRonda], ['acdxy', 3, true, ['x', 'y']]);
+  // sin combate empezado: entra en su lugar, sin la cola
+  igual(ids(E({...ini, turno: 0}, {id: 'x', valor: 30}, {enCurso: false}).orden), 'xabc');
+  // al empezar la ronda siguiente, cada uno va a su lugar por su número (lo mismo que el sobrepeso)
+  igual(ids(OrdenTurnos.reubicarAlEmpezar(r2.orden, r2.finRonda)), 'aybxc');
+});
+prueba('🐝 el mapa: la invocación, el refuerzo y el ➕ guardan la cola del final y lo dicen; la ronda nueva los acomoda (2026-11-26, P301 b)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
+  const [t04, t31, t136, t86] = await Promise.all(['js/04-mantenimiento-e-iniciativa.js', 'js/31-copiar-token.js', 'js/136-sumar-al-orden.js', 'js/86-prisa.js'].map(leer));
+  const guarda = /actuaron: e\.actuaron, finRonda: e\.finRonda, reubicar: e\.reubicar/;
+  cierto(guarda.test(t04) && guarda.test(t31) && guarda.test(t136), 'los tres caminos guardan finRonda y reubicar');
+  cierto(/finRonda: Array\.isArray\(d\.finRonda\)/.test(t04) && /\{finRonda: iniciativa\.finRonda\}/.test(t04), 'se lee y se conserva');
+  cierto(/nuevaRonda \? \{reubicar: \[\], finRonda: \[\]\}/.test(t04) && /reubicar: \[\], finRonda: \[\], sacados: \[\]/.test(t04) && /reubicar: \[\], finRonda: \[\]/.test(t86), 'se vacía al pasar de ronda, con Limpiar y con Ordenar');
+  cierto(/juega igual al final de esta ronda, y desde la próxima en su lugar/.test(t04) && /ordenLineaFinRonda\(\)/.test(t136) && !/juega desde la próxima/.test(t04 + t136 + t31), 'la Crónica y la Mesa dicen lo que pasa ahora');
 });
 prueba('➕➖ Sumar o sacar a mano del orden de turnos (2026-11-24, P291): la marca del token y el número escrito', () => {
   const O = OrdenTurnos;
@@ -2959,7 +2990,7 @@ prueba('➕✕ el mapa: el ➕ en el «⋯» del GM, entra con entrarConTirada; 
   cierto(/OrdenTurnos\.entrarConTirada\(iniciativa, \{id, valor\}/.test(t136) && /OrdenTurnos\.campoAlSumar\(t, vinculo\(t\)\) === true && !\(await ordenManoMarcar\(id, true\)\)/.test(t136), 'entra en su lugar, con la marca si la regla lo deja afuera');
   cierto(/await temporalFueraDelOrden\(id\);/.test(t136) && /OrdenTurnos\.campoAlSacar\(/.test(t136), 'sale como una invocación que se va (si era su turno, pasa al siguiente)');
   cierto(/\[data-ini-quitar\]'\)\.forEach\(b => b\.onclick = \(\) => ordenSacarDeTabla\(b\.dataset\.iniQuitar\)\)/.test(t04) && /iniciativa\.sacados = OrdenTurnos\.conSacado\(iniciativa, id\)/.test(t136), 'la ✕ de la tabla saca así y lo deja afuera (P328)');
-  cierto(/sacados: OrdenTurnos\.sinSacado\(iniciativa, id\)/.test(t136) && /reubicar: \[\], sacados: \[\],/.test(t04) && /sacados: Array\.isArray\(d\.sacados\)/.test(t04) && /\{sacados: iniciativa\.sacados\}/.test(t04), 'el ➕ lo vuelve a dejar entrar; Limpiar vacía la lista; se lee y se guarda');
+  cierto(/sacados: OrdenTurnos\.sinSacado\(iniciativa, id\)/.test(t136) && /reubicar: \[\], finRonda: \[\], sacados: \[\],/.test(t04) && /sacados: Array\.isArray\(d\.sacados\)/.test(t04) && /\{sacados: iniciativa\.sacados\}/.test(t04), 'el ➕ lo vuelve a dejar entrar; Limpiar vacía la lista; se lee y se guarda');
   cierto(/mesaLinea\(linea, 'recordatorio'\)/.test(t136) && /ordenManoPublico\(id\)/.test(t136), 'la línea de la Mesa, sin nombrar lo que no se ve');
 });
 prueba('⚖ El sobrepeso cambia en combate: el número se ajusta en el momento y el orden recién al pasar de ronda (2026-11-23, P312 y P313)', () => {

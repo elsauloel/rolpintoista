@@ -5,7 +5,7 @@
      se le escribe `iniciativa: true` (OrdenTurnos.campoAlSumar) para que Ordenar, Traer tokens y ▶ Siguiente lo respeten. Pide el número: si tiene
      datos (personaje, invocación o creep), «🎲 Tirar su Iniciativa» (como «🎲 Tirar iniciativa») o «✍ Escribir el número»; sin datos (un token suelto),
      directo el número. Entra en su lugar con OrdenTurnos.entrarConTirada (lo mismo que una invocación: antes del primero que sacó menos; si su lugar ya
-     pasó en esta ronda, juega desde la próxima, P301). Sin Mareo de invocación (no está entrando sola: la mete el GM). Una línea en la Mesa.
+     pasó en esta ronda, juega igual al final de esta ronda y desde la próxima en su lugar, P301 b y P328 2). Sin Mareo de invocación (no está entrando sola: la mete el GM). Una línea en la Mesa.
    · Sacar: con la ✕ de su fila en la tabla (P328: el ➖ del token se sacó, «hay muchos botones alrededor del token»): ordenSacarDeTabla, abajo.
    La línea no nombra a quien los jugadores no ven (oculto, en sigilo, un creep que todavía no vieron, su fila escondida): ahí solo el GM ve un aviso.
    ========================================================= */
@@ -83,10 +83,10 @@ async function ordenSumarAMano(id){
   const e = OrdenTurnos.entrarConTirada(iniciativa, {id, valor}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa)});
   if(!e) return;
   const orden = tiro && tiro.sobre ? e.orden.map(o => o.id === id ? {...o, sobre: tiro.sobre} : o) : e.orden;
-  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno: e.turno, actuaron: e.actuaron, sacados: OrdenTurnos.sinSacado(iniciativa, id)}))) return;   // (si lo había sacado con la ✕, ya no)
+  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno: e.turno, actuaron: e.actuaron, finRonda: e.finRonda, reubicar: e.reubicar, sacados: OrdenTurnos.sinSacado(iniciativa, id)}))) return;   // (si lo había sacado con la ✕, ya no)
   const publico = ordenManoPublico(id);
   if(tiro && publico) mesaPublicar(`Iniciativa · ${nombre}`, t.tipo === 'creep' ? {...tiro.r, desde: 'gm'} : {...tiro.r, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]});
-  const linea = `➕ ${nombre} entra al orden de turnos (lo sumó el GM) con ${fmt(valor)}: queda ${ordenDondeQueda(e)}.${e.yaPaso ? ' Su lugar ya pasó en esta ronda: juega desde la próxima.' : ''}`;
+  const linea = `➕ ${nombre} entra al orden de turnos (lo sumó el GM) con ${fmt(valor)}: queda ${ordenDondeQueda(e)}.${e.yaPaso ? ' ' + ordenLineaFinRonda() : ''}`;
   if(publico) mesaLinea(linea, 'recordatorio');
   else toast(`${linea} (Los jugadores no lo ven: no va a la Mesa.)`);
 }

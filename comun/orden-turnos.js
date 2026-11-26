@@ -126,8 +126,11 @@ const OrdenTurnos = (() => {
        previo; P303).
      · El turno sigue con quien lo tenía (por id; en un turno libre, también).
      · Si el combate está en curso y su lugar ya pasó en esta ronda (queda antes de quien tiene el turno —o de quien lo tenía, en un turno libre—),
-       en esta ronda no juega: queda anotado como que ya jugó y juega desde la próxima (lo más conservador: nadie juega fuera de su lugar; P301).
-     → {orden, turno, actuaron, lugar (índice donde quedó), yaPaso} o null si ya estaba. */
+       en esta ronda juega igual, AL FINAL, y desde la próxima en su lugar (2026-11-23, dueño, P301 b; lo mismo para el ➕ a mano, P328 2). Queda
+       anotado en `finRonda` (los que juegan al final de esta ronda) y en `reubicar` (al empezar la ronda siguiente va a su lugar por su número,
+       OrdenTurnos.reubicarAlEmpezar, como el sobrepeso). Si entran varios así en la misma ronda, al final juegan por su tirada (el más alto
+       primero; con el mismo número, el que entró antes; P349). Los demás que entran no se meten entre ellos: van antes de esa cola del final.
+     → {orden, turno, actuaron, lugar (índice donde quedó), yaPaso, finRonda, reubicar} o null si ya estaba. */
   function entrarConTirada(ini, fila, o){
     o = o || {};
     const orden0 = ini && Array.isArray(ini.orden) ? ini.orden : [];
@@ -136,14 +139,24 @@ const OrdenTurnos = (() => {
     const activo = orden0[turno0] ? orden0[turno0].id : null;
     const base = ini.libre && ini.libre.vuelve ? ini.libre.vuelve : activo;
     const kBase = orden0.findIndex(x => x && x.id === base);
-    let k = o.alFinal ? -1 : orden0.findIndex(x => x && num(x.valor) < v);
-    if(k < 0) k = orden0.length;
+    // La cola del final: el último tramo del orden con los que ya entraron así en esta ronda (`ini.finRonda`).
+    const fin0 = (Array.isArray(ini.finRonda) ? ini.finRonda : []).map(String).filter(id => orden0.some(x => x && x.id === id));
+    let cola = orden0.length;
+    while(cola > 0 && orden0[cola - 1] && fin0.includes(orden0[cola - 1].id)) cola--;
+    let k = o.alFinal ? orden0.length : orden0.slice(0, cola).findIndex(x => x && num(x.valor) < v);
+    if(k < 0) k = cola;
+    const yaPaso = !o.alFinal && !!o.enCurso && kBase >= 0 && k <= kBase;
+    if(yaPaso){   // P301 b: al final de esta ronda, entre los que entraron así por su tirada; nunca antes de quien tiene el turno
+      const j = orden0.slice(cola).findIndex(x => x && num(x.valor) < v);
+      k = Math.max(j < 0 ? orden0.length : cola + j, kBase + 1);
+    }
     const orden = orden0.slice();
     orden.splice(k, 0, {id: fila.id, valor: o.alFinal ? 0 : v});
     const turno = activo ? Math.max(0, orden.findIndex(x => x && x.id === activo)) : turno0;
-    const yaPaso = !!o.enCurso && kBase >= 0 && k <= kBase;
-    const actuaron = [...new Set([...(Array.isArray(ini.actuaron) ? ini.actuaron : []), ...(yaPaso ? [fila.id] : [])])];
-    return {orden, turno, actuaron, lugar: k, yaPaso};
+    const actuaron = [...new Set(Array.isArray(ini.actuaron) ? ini.actuaron : [])];
+    const finRonda = yaPaso ? [...fin0, fila.id] : fin0;
+    const reubicar = [...new Set([...(Array.isArray(ini.reubicar) ? ini.reubicar.map(String) : []), ...(yaPaso ? [fila.id] : [])])];
+    return {orden, turno, actuaron, lugar: k, yaPaso, finRonda, reubicar};
   }
   /* ⚖ Le cambió el número a alguien que ya está en el orden (2026-11-23, dueño, P312 y P313: el sobrepeso resta a la Iniciativa; «si en medio del
      combate cambia el número… el número se ajusta en el momento; el orden, en la ronda siguiente»). Función pura: cambia solo el número (y los campos

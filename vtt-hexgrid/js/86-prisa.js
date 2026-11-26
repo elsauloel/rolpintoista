@@ -15,7 +15,7 @@ function prisaUidDe(t){
 // Lo que no ocupa lugar (un tótem o un estandarte que quedó de un orden viejo: OrdenTurnos.ocupaLugar, 2026-11-23) sale de la lista.
 function iniciativaOrdenar(){
   const orden = ordenarIniciativa(iniciativa.orden.filter(o => iniciativaOcupaLugar(o.id)));
-  guardarIniciativa({orden, turno: 0, libre: null, reubicar: [], ...OrdenTurnos.marcasAlOrdenar(iniciativa, modoMapa)}).then(ok => { if(ok) iniciativaAvisarPuestos(orden); });
+  guardarIniciativa({orden, turno: 0, libre: null, reubicar: [], finRonda: [], ...OrdenTurnos.marcasAlOrdenar(iniciativa, modoMapa)}).then(ok => { if(ok) iniciativaAvisarPuestos(orden); });
 }
 
 /* 📣 «Terminó la ronda de iniciativa: quedaste en el puesto N» (dueño, 2026-11-03: «al tirar la iniciativa y apretar ordenar, le debe aparecer

@@ -2731,10 +2731,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Blanco J1 (😇), apareció el 😇🚫 en el ⋯, lo quitó; la Mesa dijo «El GM le quitó el Pacto a Blanco J1» y al Jugador 1 le saltó «😇🚫 Sin el Pacto».
   1141 pruebas en verde. Capturas fuera del repo (cola121). La vuelta: «ya está igual a la foto».
 
-- **⬜ en cola — 🐝 Invocación cuyo lugar ya pasó: juega igual al final de esta ronda (P301 decidida, b)** (dueño, 2026-11-23): si al
+- **✅ hecho (2026-11-26) — 🐝 Invocación cuyo lugar ya pasó: juega igual al final de esta ronda (P301 decidida, b)** (dueño, 2026-11-23): si al
   invocarse su tirada la ubica en un lugar que ya pasó en esta ronda, en esta ronda juega igual al final, y desde la próxima en su lugar.
   **Lo mismo para lo sumado a mano** con el ➕ del token (P328 2, dueño, 2026-11-24): hoy usa el mismo `OrdenTurnos.entrarConTirada`
   (`vtt-hexgrid/js/136`), así que alcanza con cambiarlo ahí; revisar que la línea de la Mesa del ➕ deje de decir «juega desde la próxima».
+  *Resultado:* `OrdenTurnos.entrarConTirada` ya no lo anota como que ya jugó: lo pone al final del orden, lo marca en `iniciativa.finRonda` (en la
+  tabla, un ⤵ al lado del nombre, con su globo) y en `reubicar`, y al pasar de ronda va a su lugar por su número (lo mismo que el sobrepeso). Vale para
+  las invocaciones, los refuerzos y el ➕. La Crónica y la Mesa dicen «Su lugar ya pasó en esta ronda: juega igual al final de esta ronda, y desde la
+  próxima en su lugar». Varios así en la misma ronda: al final, por su tirada (P349). **Con el Mareo** (P327) anda bien: si su primer turno es ese del
+  final, ahí no actúa y el mareo se va al terminarlo; en la ronda siguiente actúa en su lugar. 1143 pruebas en verde (dos nuevas).
+  Probado con clics en «Claude · pruebas 2», mapa «Prueba · General» (GM y Jugador 1), en Combate: Blanco J1 (0, el último) invocó a su abeja con una
+  habilidad de prueba en su turno; sacó 2 y entró **después de J1, al final** («⤵»), mareada. Al terminar J1 le tocó a la abeja (el cartel «Empieza el
+  turno de Abeja de prueba 2» al Jugador 1), al tocar Atacar salió «Recién llega: está mareada», y al terminar su turno se le fue el mareo («terminó su
+  primer turno») y empezó la ronda 2 con la abeja **en su lugar, antes de J1**; en la ronda 2 jugó ahí, sin mareo. **El ➕**: con el turno del Mago (20), el
+  GM sacó con la ✕ al Sanador y al Debuffer y los sumó con «✍ Escribir el número» (27 y 29): los dos al final, el Debuffer primero, con la línea nueva
+  en la Mesa; en la ronda 3, cada uno en su lugar. Capturas fuera del repo (cola122). La vuelta: «quedó igual».
 - **✅ hecho (2026-11-25) — 📦 Atacar a un objeto: sin crítico (P306 decidida, b)** (dueño, 2026-11-23): contra un token suelto con vida no hay crítico.
   *Resultado:* el duelo marca al objeto al crearse (`defensor.objeto`, `Duelo.crear`, que lee el token entero con `window.dueloTokenDe` del mapa) y, si
   el golpe iba a ser crítico, entra como uno normal (`entrarCritico`, como el Blindado): el paso 4 dice «📦 SIN CRÍTICO: ES UN OBJETO» y «Contra un
@@ -2993,6 +3004,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — Probar: ➕ Sumar al orden a mano una invocación y un personaje con «🎲 Tirar su Iniciativa», y un token oculto** (2026-11-24, P291):
   con clics se probaron el tótem y el Cofre con el número escrito y Blanco creep tirando. Falta: una invocación (sin Mareo) y un personaje con
   sobrepeso (la fila lleva el «⚖−N»), y sumar o sacar un token oculto o un creep que los jugadores no vieron (sin línea en la Mesa, solo el aviso al GM).
+  *Avance (2026-11-26, con la tarea de P301 b):* probado con clics **la invocación** (la Abeja de prueba 2 del Jugador 2, sacada con la ✕ y sumada con
+  «🎲 Tirar su Iniciativa»: 1d4 = 1 a la Mesa, entró en su lugar y **sin Mareo**) y **el token oculto** (Blanco J3 escondido con 🙈, sacado con la ✕ y
+  sumado con 21: ni la ✕ ni el ➕ dejaron línea en la Mesa —tampoco en la del Jugador 1—, solo el aviso al GM «(Los jugadores no lo ven: no va a la
+  Mesa.)», y su fila no aparece en la tabla del Jugador 1). **Falta:** un personaje con sobrepeso tirando (la fila con el «⚖−N»).
 - **⬜ en cola — Probar: 💍 el aviso del anillo antes de la oportunidad con un creep, con «Sí, atacar» y con la vigilancia** (2026-11-24, P266): con
   clics se probó solo el Jugador 1 arrastrando su token y el GM contestando «No». Falta: el GM moviendo un creep con una Apuntada o un anillo (el
   aviso en tercera persona), el rival que contesta «Sí, atacar» (el bono tiene que quedar perdido aunque no termine de moverse) y alejarse en la mira
@@ -3125,6 +3140,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   el mismo contexto (prueba automática), sin clics.
 - **⬜ en cola — Probar: 📦 un objeto sin vida tampoco lo alcanzan un área, una onda, el Salto, la Carrera ni el Choque** (2026-11-25): con clics se
   probaron el ataque, Mala sombra y el Remolino; lo demás quedó con la misma regla (prueba automática), sin clics.
+- **⬜ en cola — Probar: 📣 un refuerzo cuyo lugar ya pasó juega al final de esta ronda (P301 b)** (2026-11-26): con clics se probaron la invocación
+  con su habilidad y el ➕ a mano; el refuerzo (un creep que llama refuerzos, js/31) usa el mismo camino (prueba automática), sin clics. Ver que entre al
+  final con su mareo, lo pierda ahí y en la ronda siguiente juegue en su lugar.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -1024,8 +1024,9 @@ versión parecida en más de una, es candidato a juntar.
   por los stacks, `stacks`, `curaDado`, `mods`, `sobrepeso`); lo usan `ficha-resumen.js`, GM Tools (`creepPublico`) y el mapa (`modificarCreep`), así que
   se carga también en la ficha, GM Tools y el simulador de encuentros. Lo usa el mapa (js/30 y js/10); lo que no se guarda (quién puso cada estado): P314.
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
-  yaPaso}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda, queda en `actuaron` (P301).
-  La usa el mapa para las invocaciones (js/04 `invocacionAlOrden`).
+  yaPaso, finRonda, reubicar}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda,
+  va al final de esta ronda (`finRonda`; varios así, por su tirada) y a `reubicar` (al pasar de ronda va a su lugar) (P301 b, 2026-11-26). Los que entran
+  en su lugar no se meten en esa cola del final. La usa el mapa para las invocaciones (js/04 `invocacionAlOrden`), los refuerzos (js/31) y el ➕ (js/136).
 - **`orden-turnos.js`, el Mareo de invocación** (2026-11-24, P327: pierde solo su primer turno): `OrdenTurnos.mareoHasta()` (el `hasta` del estado:
   «que termine su primer turno»), `esMareoHasta(e)` (el mareo nuevo, por `mareoDe` o por ese `hasta`, que viaja en el resumen público) y
   `mareoSeVa({yo, invocador}, {empieza, termina, enOrden})` → 'termino' | 'empieza' | 'fuera' | ''. Lo usa el mapa (vtt-hexgrid/js/135).

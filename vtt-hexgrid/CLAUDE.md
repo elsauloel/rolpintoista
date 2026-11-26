@@ -1070,9 +1070,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
 - **🐝 Una invocación entra al orden con su tirada** (2026-11-23, dueño, P275): `invocacionAlOrden` (js/04, la pantalla del GM al aparecer el token de una
   invocación con el orden armado) tira su Iniciativa (`invocacionIniciativa`: `bnCargarPiezas` + `invDeToken` + `InvCalculo.statValor(x, 'ini')` +
   `Combatiente.conIniFijo`), la publica en la Mesa («Iniciativa · <invocación>», salvo oculta) y la ubica con `OrdenTurnos.entrarConTirada` (si su lugar ya
-  pasó en la ronda, a `actuaron`: juega desde la próxima); sin datos, al final con 0 y un aviso al GM. Mareo y Crónica como antes
+  pasó en la ronda, juega igual al final de esta ronda y desde la próxima en su lugar: P301 b, ver abajo); sin datos, al final con 0 y un aviso al GM. Mareo y Crónica como antes
   (`invocacionAlOrdenLineas`). Al borrarse el token de una invocación que está en el orden, la pantalla del GM la saca (`escucharTokens` js/09 →
   `temporalFueraDelOrden` js/54, que ahora va una sola vez por token: `fueraDelOrdenSacando`). Dudas: P301–P304. Probado con clics en «Claude · pruebas 2».
+- **🐝 Su lugar ya pasó: juega al final de esta ronda** (2026-11-26, dueño, P301 b; lo mismo para el ➕ a mano, P328 2): `OrdenTurnos.entrarConTirada`
+  lo pone al final del orden (después de todos) y devuelve `finRonda` y `reubicar`, que guardan los tres caminos (`invocacionAlOrden` js/04,
+  `refuerzoAlOrden` js/31, `ordenSumarAMano` js/136). `iniciativa.finRonda` (los que entraron así; la fila lleva un ⤵ con su globo) se vacía al pasar de
+  ronda, con Limpiar y con Ordenar; al pasar de ronda, `reubicar` los lleva a su lugar por su número (lo mismo que el sobrepeso, js/132). Varios en la
+  misma ronda: al final, por su tirada (P349). La Crónica y la Mesa: `ordenLineaFinRonda` (js/04). Con el Mareo, si su primer turno es ese del final,
+  lo pierde ahí y el mareo se va al terminarlo. Probado con clics en «Prueba · General».
 - **😵 El Mareo de invocación: pierde solo su primer turno** (2026-11-24, dueño: «una invocación o un refuerzo, el turno en que entra, tira su
   iniciativa automáticamente y se ubica en el orden»; P327: «la primera vez que le toque actuar a una invocación, no puede actuar»;
   `js/135-mareo-invocacion.js`). `invocacionAlOrden` (js/04) y `refuerzoAlOrden` (js/31, que ahora también tira su Iniciativa) le ponen

@@ -222,6 +222,7 @@ function escucharIniciativa(){
     iniciativa = {
       orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true, ...(o.sobre !== undefined ? {sobre: Math.max(0, num(o.sobre))} : {})})).filter(o => o.id),
       reubicar: Array.isArray(d.reubicar) ? d.reubicar.map(String) : [],   // ⚖ los que se acomodan al empezar la ronda (js/132, P312)
+      finRonda: Array.isArray(d.finRonda) ? d.finRonda.map(String) : [],   // 🐝 los que entraron con su lugar ya pasado: juegan al final de esta ronda (P301 b)
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
       paso: Math.max(0, Math.round(num(d.paso))),
@@ -274,6 +275,7 @@ async function guardarIniciativa(cambios){
     ordenPendientes: iniciativa.ordenPendientes || [], mufas: iniciativa.mufas || {}, ...(iniciativa.ordenUsados ? {ordenUsados: iniciativa.ordenUsados} : {}),   // (js/102)
     ...(iniciativa.porIniciar ? {porIniciar: true} : {}), ...(typeof iniciativa.iniciado === 'boolean' ? {iniciado: iniciativa.iniciado} : {}),   // ▶ Iniciar combate
     ...((iniciativa.reubicar || []).length ? {reubicar: iniciativa.reubicar} : {}),   // ⚖ js/132
+    ...((iniciativa.finRonda || []).length ? {finRonda: iniciativa.finRonda} : {}),   // 🐝 P301 b
     ...((iniciativa.sacados || []).length ? {sacados: iniciativa.sacados} : {}),   // ✕ js/136 (P328)
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
@@ -287,6 +289,7 @@ async function guardarIniciativa(cambios){
   if(!datos.termino) delete datos.termino;
   if(!datos.ordenUsados) delete datos.ordenUsados;
   if(!(Array.isArray(datos.reubicar) && datos.reubicar.length)) delete datos.reubicar;
+  if(!(Array.isArray(datos.finRonda) && datos.finRonda.length)) delete datos.finRonda;
   if(!(Array.isArray(datos.sacados) && datos.sacados.length)) delete datos.sacados;
   if(Array.isArray(datos.orden)) datos.orden = ordenSerial(datos.orden);   // (las filas en memoria traen `oculto: false`; ⚖ conserva `sobre`)   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
   try{
@@ -529,6 +532,7 @@ async function iniciativaSiguiente(o){
   }
   // ⚖ Al empezar la ronda (2026-11-23, P312 y P313): los que cambiaron de número por el sobrepeso en medio de la ronda (el orden no se tocó en el
   // momento) van al lugar que les toca por su número (js/132). Nadie jugó todavía: el primero que puede jugar es el que empieza.
+  // 🐝 También los que entraron con su lugar ya pasado y jugaron al final de la ronda (P301 b: OrdenTurnos.entrarConTirada los suma a `reubicar`).
   const reubicarIds = nuevaRonda ? (iniciativa.reubicar || []).filter(id => ordenFin.some(x => x.id === id)) : [];
   if(reubicarIds.length){
     ordenFin = OrdenTurnos.reubicarAlEmpezar(ordenFin, reubicarIds);
@@ -553,7 +557,7 @@ async function iniciativaSiguiente(o){
   const sigEmpezado = !nuevaRonda && !!orden[i] && empezados.includes(orden[i].id);
   const sinInicio = sigEmpezado || repite;   // su turno ya había empezado (o ya lo jugó): no se vuelve a contar el inicio
   const ok = await guardarIniciativa({...(o.orden || ordenFin !== orden ? {orden: ordenSerial(ordenFin)} : {}), turno: turnoFin, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {}), libre: null,
-    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null, ...(nuevaRonda ? {reubicar: []} : {}),
+    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null, ...(nuevaRonda ? {reubicar: [], finRonda: []} : {}),
     ...(ordenRonda ? {ordenPendientes: [], ordenUsados: {ronda, ids: ordenRonda.usados}, mufas: ordenRonda.mufas} : nuevaRonda ? {ordenPendientes: [], ordenUsados: null} : {})});
   if(!ok) return;
   if(notaDemora) mesaLinea(notaDemora, 'recordatorio');
@@ -1186,7 +1190,7 @@ const sobrepesoValorDeToken = t => {
    automáticamente al invocarse se ubique en el orden de turnos de acuerdo a su tirada»): antes entraba al final con 0. Ahora tira la Iniciativa
    de la invocación (la de sus datos, `InvCalculo.statValor(inv, 'ini')`, con lo fijo como la Prisa sumado al resultado), la tirada va a la Mesa
    como cualquier tirada de iniciativa («Iniciativa · <invocación>») y entra en su lugar (`OrdenTurnos.entrarConTirada`): antes del primero que
-   sacó menos; si su lugar ya pasó en esta ronda, juega desde la próxima (P301). Si no se pueden leer sus datos, entra al final con 0, como
+   sacó menos; si su lugar ya pasó en esta ronda, juega igual al final de esta ronda y desde la próxima en su lugar (P301 b). Si no se pueden leer sus datos, entra al final con 0, como
    antes, y se avisa al GM para que escriba el número a mano. La tira la pantalla del GM (P302). */
 async function invocacionIniciativa(t){
   try{
@@ -1209,7 +1213,7 @@ async function invocacionAlOrden(tokenId){
   const nombre = nombreDe(t);
   const e = OrdenTurnos.entrarConTirada(iniciativa, {id: tokenId, valor: r ? num(r.total) : 0}, {enCurso: OrdenTurnos.enCurso(iniciativa, modoMapa), alFinal: !r});
   if(!e) return;
-  const ok = await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron});
+  const ok = await guardarIniciativa({orden: ordenSerial(e.orden), turno: e.turno, actuaron: e.actuaron, finRonda: e.finRonda, reubicar: e.reubicar});
   if(!ok) return;
   if(r && !ocultoParaMesa(tokenId)) mesaPublicar(`Iniciativa · ${nombre}`, {...r, ficha: fichaId});
   if(!r) toast(`🐝 ${nombre} entró al final del orden con 0: no se pudo leer su Iniciativa. Escribí el número a mano.`);
@@ -1239,11 +1243,13 @@ function ordenDondeQueda(e){
   const nom = f => { const tt = f && tokens.get(f.id); return tt && !ocultoParaMesa(f.id) ? nombreDe(tt) : ''; };
   return e.lugar === 0 ? 'en el primer lugar' : nom(antes) ? `después de ${nom(antes)}` : nom(despues) ? `antes de ${nom(despues)}` : `en el ${e.lugar + 1}.º lugar`;
 }
+// 🐝 Su lugar ya pasó (P301 b): lo que dice la Crónica y la Mesa (la invocación, el refuerzo y el ➕ a mano, js/136).
+function ordenLineaFinRonda(){ return 'Su lugar ya pasó en esta ronda: juega igual al final de esta ronda, y desde la próxima en su lugar.'; }
 function invocacionAlOrdenLineas(e, r, sinMareo, invocador){
   const donde = ordenDondeQueda(e);
   return [
     r ? `🎲 Sacó ${fmt(num(r.total))} de iniciativa: queda ${donde}.` : 'Sin su Iniciativa a mano: entra al final del orden (el GM escribe el número).',
-    ...(e.yaPaso ? ['Su lugar ya pasó en esta ronda: juega desde la próxima.'] : []),
+    ...(e.yaPaso ? [ordenLineaFinRonda()] : []),
     typeof mareoLineaEntrada === 'function' ? mareoLineaEntrada(invocador, sinMareo) : sinMareo ? 'Sin mareo: actúa en su primer turno.' : 'Con Mareo de invocación: en su primer turno no actúa (reacciona igual).',
   ];
 }
@@ -1310,7 +1316,7 @@ function renderIniciativa(){
       const libre = !!libreArriba;
       return `<div class="ini-fila${(lib ? libre : i === iniciativa.turno) ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${ya && i > base ? ' — ya jugó esta ronda: si le vuelve a tocar, el GM decide si actúa de nuevo' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && typeof reveladoPorOjo === 'function' && reveladoPorOjo(t) ? '<span title="Lo ves porque estás revelando lo oculto">👁</span> ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
+        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${(iniciativa.finRonda || []).includes(o.id) ? '<span title="Entró con su lugar ya pasado: en esta ronda juega al final; desde la próxima, en su lugar">⤵ </span>' : ''}${t && typeof reveladoPorOjo === 'function' && reveladoPorOjo(t) ? '<span title="Lo ves porque estás revelando lo oculto">👁</span> ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
         // ⚖ El sobrepeso restado (2026-11-23, P312): «⚖−3» al lado del número, con la cuenta (tirada − sobrepeso) al pasar el mouse.
         (num(o.sobre) > 0 ? `<span class="ini-sobre" title="Tiró ${fmt(num(o.valor) + num(o.sobre))} − ${fmt(num(o.sobre))} de sobrepeso = ${fmt(num(o.valor))}${(iniciativa.reubicar || []).includes(o.id) ? ' · su lugar se reacomoda al pasar de ronda' : ''}" style="font-size:11px;color:#e0a040;white-space:nowrap;margin-right:2px">⚖−${fmt(num(o.sobre))}</span>` : '') +
         (puede
@@ -1441,7 +1447,7 @@ function conectarIniciativa(){
   const iniciar = $('#ini-iniciar');
   if(iniciar) iniciar.onclick = () => iniciativaIniciarCombate();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, reubicar: [], sacados: [], ...OrdenTurnos.SIN_INICIAR}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}, reubicar: [], finRonda: [], sacados: [], ...OrdenTurnos.SIN_INICIAR}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

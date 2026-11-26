@@ -2313,7 +2313,7 @@ En una invocación (que no tiene el número a mano) se seguiría diciendo como h
 
 ### ✅ P301 — 🐝 Una invocación que entra al orden en un lugar que ya pasó en esta ronda: ¿juega recién en la próxima? (2026-11-23, Claude, cola de programación)
 
-**Decidido (dueño, 2026-11-23): (b)** — si su lugar ya pasó, en esta ronda juega igual al final, y desde la próxima en su lugar. En la cola de programación.
+**Decidido (dueño, 2026-11-23): (b)** — si su lugar ya pasó, en esta ronda juega igual al final, y desde la próxima en su lugar. **Hecho (2026-11-26)**, también para los refuerzos y el ➕ a mano (P328 2); varios al final, por su tirada (P349).
 
 Desde hoy, al invocar con el orden de turnos armado, la invocación tira su iniciativa y entra en su lugar según la tirada (P275). Si ese lugar queda
 **antes** de quien tiene el turno (por ejemplo, el Jugador 1 tiene 0, invoca en su turno y la abeja saca 3), su lugar ya pasó en esta ronda.
@@ -2910,3 +2910,14 @@ tendría que salir al GM, que es quien lo aplica»), pero nunca se decidió qué
 (b) que al GM no le salga el cartel (ya sabe lo que dio) y al jugador le salga igual, aunque no tenga el control; (c) las dos cosas: al GM un
 cartelito corto «Le diste a Blanco J2…» y al jugador el cartel de siempre. **Recomendación:** (b): el cartel es el «enterado» del jugador, y el
 GM no necesita enterarse de lo que él mismo hizo. Mientras, quedó (a).
+
+### P349 — 🐝 Varios que entran con su lugar ya pasado en la misma ronda: ¿en qué orden juegan al final? (2026-11-26, Claude, cola de programación)
+
+Con P301 b, una invocación, un refuerzo o algo sumado a mano con el ➕ cuyo lugar ya pasó en esta ronda juega igual **al final** de la ronda. Si
+entran **varios** así en la misma ronda, hubo que elegir el orden entre ellos al final. **Elegí: por su tirada** (el que sacó más juega primero; con el
+mismo número, el que entró antes), y los que entran en su lugar de siempre no se meten entre ellos. Ejemplo probado con clics: le tocaba al Mago
+(20) y el GM sumó al Sanador con 27 y después al Debuffer con 29: al final jugaron Debuffer, Sanador (y después Blanco J3, sumado con 21). Opciones:
+(a) por su tirada, como quedó; (b) en el orden en que entraron (el primero que llegó, primero). **Recomendación:** (a), que es lo mismo que pasa en
+la ronda siguiente, cuando cada uno va a su lugar por su número.
+De paso: si el GM saca con la ✕ a alguien que **ya jugó** esta ronda y lo vuelve a sumar con el ➕ en un lugar que ya pasó, va al final igual, pero
+al llegarle el turno el mapa le pregunta al GM si vuelve a actuar (como con cualquiera que ya jugó y quedó más abajo). No se cambió nada de eso.

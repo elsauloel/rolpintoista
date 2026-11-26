@@ -625,6 +625,9 @@ aside{
 #hud .hud-estado-det .efecto{color:var(--paper)}
 #hud .hud-estado-det .dura{color:var(--brass)}
 #hud .hud-estado-det .desc{color:var(--muted);margin-top:2px}
+#hud .hud-estado-det .hud-ver-entera{background:none;border:0;padding:0;font:inherit;color:var(--brass);text-decoration:underline;cursor:pointer;white-space:nowrap}
+#hud .hud-estado-det .hud-ver-entera:hover{color:var(--paper)}
+#hud .hud-estado-det .hud-entera-no{font-style:italic}
 #hud .hud-estado-det .origen{color:#C9B9A6;margin-top:2px}
 #hud .hud-estado-det .origen::before{content:"↳ ";color:var(--muted)}
 #hud .hud-mini{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);font-size:11px;padding:1px 6px;cursor:pointer}

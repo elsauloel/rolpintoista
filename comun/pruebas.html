@@ -59,7 +59,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js?v=20261122cola47"></script>
 <script src="estados-presets.js?v=20261124mareo3"></script>
 <script src="estados-aplicar.js?v=20261126ve"></script>
-<script src="estado-corto.js?v=20261126ve"></script>
+<script src="estado-corto.js?v=20261126entera"></script>
 <script src="recibidos.js?v=20261126ve"></script>
 <script src="dar-jugador.js?v=20261126ico2"></script>
 <script src="tokens-auto.js"></script>
@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261126ve"></script>
+<script src="ficha-acciones.js?v=20261126ve2"></script>
 <script src="orden-turnos.js?v=20261126fin"></script>
 <script src="ficha-mantenimiento.js?v=20261126ve"></script>
 <script src="estado-preguntas.js"></script>
@@ -2859,7 +2859,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -3068,6 +3068,22 @@ prueba('🔘 El detalle de ◎ Estados alterados: la cuenta del sobrepeso, de d�
     {descripcion: 'Recupera 3 HP en cada Mantenimiento.', origen: ['Viene de tu pasiva "Sangre fría".']});
   igual(EstadoCorto.detalle({nombre: 'Provocado', permanente: true, provocaDe: 't2', provocaDeNombre: 'Bizzante', hasta: 'el fin del turno de Bizzante'}, o).origen,
     ['Lo provocó Bizzante.', 'Dura hasta el fin del turno de Bizzante.']);
+});
+prueba('📜 La descripción que llegó cortada en ◎: entera si es de la lista común; si no, «cortada» y la entera de lo guardado (2026-11-26)', () => {
+  // un estado de la lista común cuyo texto llegó cortado en 300 letras: va entero desde la lista (sin «…»)
+  const pre = ESTADOS_PRESET.find(p => p.nombre === 'Malviaje de floripondio'), largo = String(pre.detalle);
+  const dPre = EstadoCorto.detalle({nombre: 'Malviaje de floripondio', detalle: largo.slice(0, 300)}, {});
+  igual([dPre.cortada, dPre.descripcion.length > 300, dPre.descripcion.endsWith('…'), dPre.descripcion === largo.split(/\s*[⚙✋]/)[0].trim()], [undefined, true, false, true]);
+  // uno propio, cortado en 200: «cortada», con «…»; la entera sale de lo guardado (mismo nombre, empieza igual, más largo), sin la parte técnica
+  const entero = 'Una niebla espesa le tapa los ojos: ' + 'no ve nada más allá de una casilla y cada paso que da tiene que pensarlo dos veces, '.repeat(3) + 'hasta que se le pasa. ⚙ Automatizado: nada.';
+  const cort = {nombre: 'Niebla en los ojos', detalle: entero.slice(0, 200)};
+  const d = EstadoCorto.detalle(cort, {});
+  igual([d.cortada, d.descripcion.endsWith('…')], [true, true]);
+  igual(EstadoCorto.entera(cort, [{nombre: 'Otro', detalle: entero}, {nombre: 'Niebla en los ojos', detalle: entero}]), entero.split(' ⚙')[0]);
+  // nada más largo guardado (o de otro nombre): ''
+  igual([EstadoCorto.entera(cort, [{nombre: 'Niebla en los ojos', detalle: entero.slice(0, 200)}]), EstadoCorto.entera(cort, [{nombre: 'Otro', detalle: entero}]), EstadoCorto.entera(cort, null)], ['', '', '']);
+  // uno que no llegó cortado (termina en punto) no se marca
+  igual(EstadoCorto.detalle({nombre: 'Corto', detalle: 'Le pica la nariz.'}, {}).cortada, undefined);
 });
 prueba('❤ La Vida extra en corto y con su origen: el ítem o la habilidad, o «Cargado a mano» (2026-11-26)', () => {
   // en corto: cuánta y «vida por encima de tu máximo» (sin la explicación larga); sin el número (un creep visto por un jugador), solo la frase
@@ -10389,7 +10405,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10513,7 +10529,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

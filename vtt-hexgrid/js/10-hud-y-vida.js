@@ -955,6 +955,32 @@ function hudModsEstadoTxt(e, conTodo){
   const dura = Combatiente.hastaTxt(e) || (e.permanente ? 'no vence' : num(e.turnos) ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '');
   return partes.join(' · ') + (dura ? ` (${dura})` : '');
 }
+/* 📜 La descripción que llegó cortada, entera (2026-11-26, dueño: «en el caso de que una descripción de un estado no entre en el recuadro, debería haber
+   alguna forma de poder leer el texto completo»). Lo que se publica de un estado se corta en 200 o 300 letras: si es uno de la lista común, ya va entero
+   (EstadoCorto.detalle); si no, al final va «ver entera», que la busca guardada (`hudEstadoEntera`) y la deja abierta mientras dure la ventana. */
+const hudEnteras = new Map();   // «token|estado» → el texto entero ('' = no hay más guardado a la vista)
+const hudEnteraClave = e => `${seleccion}|${String((e && e.nombre) || '')}`;
+function hudEstadoDescHtml(desc, cortada, e, i){
+  const ent = cortada ? hudEnteras.get(hudEnteraClave(e)) : undefined;
+  if(ent) return `<div class="desc">${esc(ent)}</div>`;
+  return `<div class="desc">${esc(desc)}${!cortada ? '' : ent === undefined
+    ? ` <button type="button" class="hud-ver-entera" data-hud-ver-entera="${i}" title="Leer la descripción entera">ver entera</button>`
+    : ` <span class="hud-entera-no">(${esc(ent === '' && hudEnteras.get(hudEnteraClave(e) + '|gm') ? 'el texto entero solo lo ve el GM' : 'no quedó guardado el texto entero')})</span>`}</div>`;
+}
+// El texto entero de un estado: el de la ficha guardada (cualquier miembro la puede leer) o, para el GM, el del creep completo.
+async function hudEstadoEntera(t, e){
+  let guardados = [];
+  if(t.tipo === 'creep'){
+    if(!soyGM){ hudEnteras.set(hudEnteraClave(e) + '|gm', true); return ''; }
+    const c = creepsPriv.get(t.fichaId); guardados = (c && c.sc && c.sc.estados) || [];
+  }else if(t.fichaId){
+    const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+    const doc = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/${invId ? 'invocaciones' : 'efectos'}`)).get();
+    const datos = doc.exists ? JSON.parse(doc.data().json || '{}') : {};
+    guardados = invId ? ((((datos.invocaciones || []).find(x => x && x.id === invId)) || {}).estados || []) : (datos.efectos || []);
+  }
+  return EstadoCorto.entera(e, guardados);
+}
 function hudEstadosHtml(t, estados, puede){
   // El + abre el selector de estados de la ficha (o de gm-tools en creeps),
   // dentro del mapa, con sus presets y su mecánica.
@@ -973,7 +999,7 @@ function hudEstadosHtml(t, estados, puede){
     const g = EstadoCorto.globo(eV, o), dt = EstadoCorto.detalle(eV, o);
     const desc = dt.descripcion && dt.descripcion.replace(/[.\s]+$/, '') !== g.efecto ? dt.descripcion : '';
     const detHtml = '<div class="hud-estado-det">' + (g.efecto ? `<div class="efecto">${esc(g.efecto)}${g.dura ? ` · <span class="dura">${esc(g.dura)}</span>` : ''}</div>` : (g.dura ? `<div class="dura">${esc(g.dura)}</div>` : ''))
-      + (desc ? `<div class="desc">${esc(desc)}</div>` : '')
+      + (desc ? hudEstadoDescHtml(desc, dt.cortada, e, i) : '')
       + dt.origen.filter(x => !(hasta && /^Dura hasta/.test(x))).map(x => `<div class="origen">${esc(x)}</div>`).join('') + '</div>';
     return `<div class="hud-estado">
       <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
@@ -1467,6 +1493,15 @@ Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, {titulo: e.no
     const txt = acc === 'set' ? await Confirmar.texto(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: e.nombre, icono: '🛡', valor: fmt(num(e.escudo)), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'escudo', txt);
+  });
+  hud.querySelectorAll('[data-hud-ver-entera]').forEach(b => b.onclick = async () => {
+    const e = ((hudDatos(t) || {}).estados || [])[num(b.dataset.hudVerEntera)];
+    if(!e) return;
+    b.disabled = true; b.textContent = 'buscando…';
+    let txt = '';
+    try{ txt = await hudEstadoEntera(t, e); }catch(err){ console.warn('No se pudo leer la descripción entera:', err); }
+    hudEnteras.set(hudEnteraClave(e), txt);
+    $('#hud').dataset.firma = ''; hudUbicar();
   });
   hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
     const [i, delta] = b.dataset.hudTurnos.split(':');

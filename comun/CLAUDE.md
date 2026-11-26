@@ -1023,7 +1023,7 @@ versión parecida en más de una, es candidato a juntar.
   `FichaResumen.pantallaYo`, `window.FICHA_PANTALLA`; la ficha en un marco del mapa usa el del mapa). `Combatiente.sobrepesoAviso(antes, ahora, {yo, dueno,
   deOtro, nombre})` decide el cartel (subió / bajó / «Ya no tenés sobrepeso») y si le toca a esta pantalla (P313). `OrdenTurnos.cambiarValor` (en combate
   cambia solo el número; `cambiaLugar`) y `reubicarAlEmpezar` (al empezar la ronda siguiente, P313).
-- **`estado-corto.js`** (`EstadoCorto`, 2026-11-23, dueño: «que solamente diga… el efecto») — un estado en corto y en detalle, puro: `globo(e, o)` →
+- **`estado-corto.js`** (`EstadoCorto`, 2026-11-23, dueño: «que solamente diga… el efecto») — un estado en corto y en detalle, puro (📜 2026-11-26: `detalle` marca `cortada` la descripción que llegó cortada, salvo que la complete la lista común, y `entera(e, guardados)` la busca entera entre los estados guardados): `globo(e, o)` →
   {titulo «Sobrepeso 2», efecto, dura «quedan 3 turnos»}, `texto(e, o)` (en una línea), `efecto`, `numero`, `dura`, `limpiar` (la primera frase sin ⚙/✋/Ej./
   «Viene de») y `CORTO` (lo que hace cada estado de la lista en una línea; al sumar un estado largo a `estados-presets.js`, sumarlo acá), y `detalle(e, o)` →
   {descripcion, origen: [renglones]} (la cuenta del sobrepeso y lo que el estado guarda de quién: protege, marca, miedo, provocado, sanguijuela, escudo

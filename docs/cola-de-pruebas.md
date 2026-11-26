@@ -2869,9 +2869,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Relicario tomó una Poción de HP con la vida llena → «Vida extra +25 · Viene de Relicario de sangre» (lo ve él, J2 y el GM); J2 se cargó +10 desde
   su vida → «Cargado a mano» (lo ve él, J1 y el GM); J1 sumó +5 a mano encima → «Viene de Relicario de sangre (y una parte, cargada a mano)».
   1160 pruebas en verde; la vuelta dijo «quedó igual». Pregunta nueva: P353 («tu máximo» o «su máximo» cuando es de otro).
-- **⬜ en cola — 📜 Ventana ◎ Estados alterados: poder leer la descripción entera cuando no entra** (dueño, 2026-11-23: «en el caso de que una
+- **✅ hecho (2026-11-26) — 📜 Ventana ◎ Estados alterados: poder leer la descripción entera cuando no entra** (dueño, 2026-11-23: «en el caso de que una
   descripción de un estado no entre en el recuadro, debería haber alguna forma de poder leer el texto completo. En este caso no tengo cómo saber
   cómo termina ese texto»). Hoy se corta con «…» (p. ej. la de Vida extra). Que se pueda desplegar o ver completa.
+  **Hecho:** el texto se cortaba porque lo que se publica de cada estado llega hasta 300 letras. Ahora (1) si es un estado de la lista común (Miedo,
+  Malviaje de floripondio, Escudo eléctrico…), la ventana ◎ lo muestra entero desde la lista, sin «…» y sin tocar nada; (2) si es uno propio (de una
+  habilidad o cargado a mano), sigue con «…» y al lado **«ver entera»**: un clic y aparece el texto completo guardado en la ficha (la puede leer
+  cualquiera de la partida); queda abierto mientras dure la ventana. Los creeps no tienen el problema: los jugadores no ven su descripción y el GM la ve
+  entera. Es solo del mapa: la ficha y GM Tools muestran los estados en su propia lista, con el texto completo (globo y «Ver el detalle»).
+  `EstadoCorto.detalle` (`cortada`) y `EstadoCorto.entera` (comun/estado-corto.js), `hudEstadoDescHtml` / `hudEstadoEntera` (vtt-hexgrid/js/10).
+  Probado con clics en «Prueba · General» (J1, J2 y GM): un estado propio de 470 letras («ver entera» → completo) y el Malviaje de floripondio (entero
+  de entrada). Capturas `cola130/20-*` y `21-*`.
 
 - **⬜ en cola (más adelante) — 🧑 Que el personaje de un jugador diga qué clase / rol es** (dueño, 2026-11-24, de la pregunta 4 de las etiquetas):
   hoy no lo dice en ningún lado; hace falta para abrir «+ Pasiva» con su rol ya marcado (y quizás para otras cosas).
@@ -3235,6 +3243,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   al azar, que trabaje con los estados que tienen más sentido». Pasos: listar los estados de hoy (`comun/estados-presets.js` y los que suman ítems y
   skills), proponerle al dueño cuáles quedan en el «core» (con su motivo) y cuáles quedan fuera del menú (siguen existiendo y funcionando cuando un
   ítem o skill los pone); que la varita del estado al azar y lo que elija estados al azar use solo el core. Mostrárselo antes de programar.
+- **✅ hecho (2026-11-26) — Probar: ❤ la Vida extra con Drenar vida** (dueño, 2026-11-26: verla con la habilidad de Larry). En «Claude · pruebas 2»,
+  Blanco J1 (vida 50/50) con Drenar vida y Sanguijuela de prueba (se le sacaron al terminar), contra el Warrior · Hachero y el Support · Sanador,
+  en duelos de verdad desde su Botonera; el GM resolvió al creep desde su pantalla. Se vio: (1) con la vida llena, todo lo drenado queda como Vida extra
+  (+7, después +14); (2) **el tope del 50 %**: un tercer drenaje de 15 la dejó en +25 y no más (vida 50); (3) **la ventana ◎ dice «+25 de vida por encima
+  de tu máximo» y «↳ Viene de Drenar vida.»** igual para J1, J2 y el GM; los globos del iconito y del token dicen solo «+N de vida por encima de tu
+  máximo» (el origen, a propósito, va en ◎); (4) **la Sanguijuela**: pegada al Sanador, cuando se curó con «Sanar» la cura (+5) se la llevó J1 y, como
+  estaba lleno, quedó como Vida extra: ◎ dice «Viene de Drenar vida y Sanguijuela.» para los tres. **Arreglado:** al sumarse a una Vida extra que ya
+  había, el aviso decía «recibiste Vida extra (×undefined)»; ahora «recibiste Vida extra (+6: ahora +11)» (comun/ficha-acciones.js). **Pregunta nueva:**
+  P354 (la Vida extra de la Sanguijuela no tiene tope: llegó a +30). **Ya anotado de antes** (`docs/pendientes.md`, revisión de las skills de clase,
+  punto 5): Drenar vida dice «directo a la vida» pero le resta la Defensa especial del objetivo (se vio: 8 − 1 = 7). Capturas `cola130/01-*` a `17-*`.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

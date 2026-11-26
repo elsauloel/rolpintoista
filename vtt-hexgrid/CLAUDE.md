@@ -1122,6 +1122,10 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Lo que no se guarda (quién puso un Veneno): P314 (dueño: no hace falta). **Ajuste** (2026-11-23): «Nombre: N»; el corto nunca pierde el número (la
   vida por turno, los stacks y los números que publican ahora la ficha, GM Tools y `modificarCreep`, con `EstadoCorto.pub`); el Sobrepeso «−X a Evasión,
   salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −X a Iniciativa»; al pie de los dos globos, `hoverDetallePie()` (dónde ver el detalle: ◎ o E).
+  **📜 La descripción entera en ◎** (2026-11-26, dueño: «debería haber alguna forma de poder leer el texto completo»): lo publicado de un estado llega
+  cortado (300 letras). Uno de la lista común va entero desde `ESTADOS_PRESET` (`EstadoCorto.detalle`); uno propio sale con «…» y «ver entera»
+  (`hudEstadoDescHtml`), que lee la parte `efectos` (o `invocaciones`) de la ficha y busca el mismo estado más largo (`hudEstadoEntera` →
+  `EstadoCorto.entera`); queda abierto en `hudEnteras` mientras dure la página.
 - **🥷 «Seguís escondido»: el daño que no alcanza para delatarlo** (2026-11-24, dueño: «te hicieron tanto de daño, pero no alcanzó tu nivel de sigilo,
   por lo cual seguís escondido»): en `sigiloDelatarPorDano` (js/03, el chequeo de todo daño que puede delatar: áreas, zonas, trampas), si le sacó vida
   sin pasar su Sigilo, `sigiloAguantaAvisar` publica un momento `sigilo-aguanta` con `paraUids` = quien lo maneja (`sigiloManejaUids`: un personaje o

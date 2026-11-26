@@ -7,7 +7,7 @@
    - `globo(e, o)` → {titulo, efecto, dura}: lo que dice el globo de un iconito alrededor del token (y cada renglón del globo del token).
      «Sobrepeso: 2» · «−2 a Evasión, salvo que pague 1 No2 · Parry/escudo/dodge roll +1 No2 · −2 a Iniciativa» · sin duración.
    - `texto(e, o)` → la misma cosa en una línea: «Quemadura 2 · Arde: pierde 2 HP por turno · quedan 2 turnos».
-   - `detalle(e, o)` → {descripcion, origen: [renglones]}: para la ventana ◎ Estados alterados del token. Solo lo que el estado trae guardado
+   - `detalle(e, o)` → {descripcion, origen: [renglones], cortada?}: para la ventana ◎ Estados alterados del token. Solo lo que el estado trae guardado
      (quién lo protege, a quién marcó, de quién tiene miedo, quién lo provocó, quién le pegó la sanguijuela, de qué arma, de qué pasiva o pieza
      viene, la cuenta del sobrepeso). Lo que hoy no se guarda (quién puso un Veneno, con qué habilidad) no se inventa: ver P314.
      La Vida extra (2026-11-26): en corto «+N de vida por encima de tu máximo» y, en el detalle, de dónde viene (o «Cargado a mano»).
@@ -210,9 +210,28 @@ const EstadoCorto = (() => {
     const h = typeof Combatiente !== 'undefined' && Combatiente.hastaTxt ? Combatiente.hastaTxt(e || {}) : '';
     if(h) origen.push(`Dura ${h}.`);
     let desc = (det.split(/\s*[⚙✋]/)[0] || '').trim();
-    if(desc) desc = desc.charAt(0).toUpperCase() + desc.slice(1) + (det0.length >= 190 && !/[.!?…)]$/.test(desc) ? "…" : "");   // (lo que llega se corta en 200 o 300 letras)
+    const mayus = x => x.charAt(0).toUpperCase() + x.slice(1);
+    /* 📜 La descripción que llegó cortada (lo que se publica se corta en 200 o 300 letras; 2026-11-26, dueño: «debería haber alguna forma de poder leer
+       el texto completo»): si es la de un estado de la lista común, va entera desde ahí; si no, `cortada` (la ventana ◎ ofrece «ver entera», que la
+       busca guardada: `entera`). */
+    let cortada = !!desc && det0.length >= 190 && !/[.!?…)]$/.test(desc);
+    if(cortada){
+      const p = presetDe(e && e.nombre), pd = p ? (String(p.detalle || '').split(/\s*[⚙✋]/)[0] || '').trim() : '';
+      if(pd.length > desc.length && norm(pd).startsWith(norm(desc).slice(0, 40))){ desc = pd; cortada = false; }
+    }
+    if(desc) desc = mayus(desc) + (cortada ? '…' : '');
     if(!desc){ const p = presetDe(e && e.nombre); desc = p ? String(p.detalle || '').split(/\s*[⚙✋]/)[0].trim() : ''; }
-    return {descripcion: desc, origen};
+    return {descripcion: desc, origen, ...(cortada ? {cortada: true} : {})};
+  }
+  /* 📜 La descripción entera de un estado que llegó cortado: entre los estados guardados de verdad (`guardados`: los de la ficha o los del creep
+     completo), el del mismo nombre cuya descripción empieza igual y es más larga. → el texto (sin «⚙ Automatizado / ✋ A mano») o ''. */
+  function entera(e, guardados){
+    const det0 = String((e && e.detalle) || '').trim(), corta = norm((det0.split(/\s*[⚙✋]/)[0] || '').replace(/^Viene de [^:.]*[:.]\s*/i, '')).slice(0, 40);
+    const g = (Array.isArray(guardados) ? guardados : []).find(x => x && norm(x.nombre) === norm(e && e.nombre) && String(x.detalle || '').trim().length > det0.length
+      && norm(String(x.detalle).replace(/^Viene de [^:.]*[:.]\s*/i, '')).startsWith(corta));
+    if(!g) return '';
+    const d = (String(g.detalle).trim().replace(/^Viene de [^:.]*[:.]\s*/i, '').split(/\s*[⚙✋]/)[0] || '').trim();
+    return d ? d.charAt(0).toUpperCase() + d.slice(1) : '';
   }
 
   /* Los números de un estado para el resumen público (2026-11-23, dueño: «que diga cuánto cura cada turno… que el corto nunca pierda el número»): la vida
@@ -228,6 +247,6 @@ const EstadoCorto = (() => {
       ...(Array.isArray(e.fuentes) && e.fuentes.length ? {fuentes: e.fuentes.slice(0, 4).map(x => String(x || '').slice(0, 40))} : {}), ...(e.aMano ? {aMano: true} : {})};
   }
 
-  return {CORTO, pub, vidaTurno, limpiar, numero, dura, efecto, globo, texto, detalle};
+  return {CORTO, pub, vidaTurno, limpiar, numero, dura, efecto, globo, texto, detalle, entera};
 })();
 if(typeof window !== 'undefined') window.EstadoCorto = EstadoCorto;

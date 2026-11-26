@@ -1403,7 +1403,7 @@ const FichaAcciones = (() => {
     const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF, hpActual: S.hp, quien: (S.meta && S.meta.nombre) || ''});
     if(dis.hp){ try{ fijarHp(S, num(S.hp) + dis.hp); revisarAnkh(S); revisarMuerte(S); }catch(e){ S.hp = Math.max(0, num(S.hp) + dis.hp); } }
     ui.cambio(['efectos', 'refresh', ...(dis.hp ? ['vitals'] : [])]);
-    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
+    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.sumado ? ` (+${fmt(num(draft.escudoMagico))}: ahora +${fmt(num(r.estado.escudoMagicoActual ?? r.estado.escudoMagico))})` : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
   }
   // Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje (`fichaId`), sin esperar al GM.
   function dueloAplicarEfectoPropio(S, fichaId, d, ef, ui){

@@ -2959,7 +2959,7 @@ En cualquiera de las tres, con el mapa alejado conviene mostrar menos (2 o 3) en
 
 > **Programada (2026-11-26):** de cerca, hasta 6 uno por vértice y con más agrupados en 6 familias con numerito; de lejos (zoom menor a 0,7), los 3 más importantes y la pastilla. Las familias y lo que quedó por decidir: **P351**.
 
-### P351 — 🔘 Iconitos de estado agrupados: tres detalles que eligió Claude (2026-11-26, Claude, al programar la P350)
+### ✅ P351 — 🔘 Iconitos de estado agrupados: tres detalles que eligió Claude (2026-11-26, Claude, al programar la P350)
 
 Al programar la P350 quedaron tres cosas que el dueño no dijo y que Claude eligió para poder seguir (se cambian fácil, en `vtt-hexgrid/js/88-iconos-estados.js`):
 (a) **Lo que no es ni buff ni debuff en la pastilla de lejos**: el ✋ «Nada en la mano», Agarrando / Mordiendo, los Escudos elementales (ígneo, helado…),
@@ -2971,3 +2971,4 @@ B). La otra forma: juntar solo las familias necesarias para que entren en 6 (emp
 Silencio y Ceguera, entran Inmovilizado, Agarrado, Mordido, Tropezado, Sentado, Exhausto, **Desarmado, Lisiado, Rengo y Lento** y el Mareo de
 invocación. ¿Desarmado, Rengo, Lisiado y Lento van ahí o con las «marcas y debilidades»?
 
+> ✅ **Respondida (dueño, 2026-11-26):** «está bien como resolviste» (a, b y c quedan así).

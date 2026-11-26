@@ -579,7 +579,7 @@ const FichaEquipo = (() => {
     .sil-ico{position:absolute;right:-10px;top:-10px;z-index:6;width:22px;height:22px;box-sizing:border-box;border-radius:50%;display:flex;align-items:center;
       justify-content:center;font-size:12px;line-height:1;cursor:pointer;border:2px solid #1d171d;box-shadow:0 1px 5px rgba(0,0,0,.6);transition:transform .12s}
     .sil-ico-casi{background:#e0a45a;color:#2a1d12;font-weight:700}
-    .sil-ico-roto{background:#fbe3e1;border-color:#d9534f;font-size:11px}
+    .sil-ico-roto{background:#ffffff;border-color:#1d171d;font-size:12px}
     .sil-ico:hover,.sil-ico:focus{transform:scale(1.15);outline:none}
     .sil-ico>.sil-tip{left:0;right:auto}
     .sil-der .sil-ico>.sil-tip{left:auto;right:0}

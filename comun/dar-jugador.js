@@ -159,7 +159,7 @@ const DarJugador = (() => {
   async function piezasMochila(){
     if(typeof FichaCalculo === 'undefined' || typeof CATALOGO_BASE === 'undefined') throw new Error('faltan ficha-calculo.js / catalogo.js');
     if(typeof FichaGuardado === 'undefined') await cargarScript('ficha-guardado.js?v=20261125gas');
-    if(typeof FichaEquipo === 'undefined') await cargarScript('ficha-equipo.js?v=20261126ico');
+    if(typeof FichaEquipo === 'undefined') await cargarScript('ficha-equipo.js?v=20261126ico2');
     if(typeof FichaTienda === 'undefined') await cargarScript('ficha-tienda.js?v=20261120carcaj2');
   }
   // Lee el personaje (una vez por ventana). → S o null.

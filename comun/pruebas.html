@@ -61,7 +61,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261120hasta"></script>
 <script src="estado-corto.js?v=20261123c73"></script>
 <script src="recibidos.js?v=20261123cola65"></script>
-<script src="dar-jugador.js?v=20261126ico"></script>
+<script src="dar-jugador.js?v=20261126ico2"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -93,7 +93,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
 <script src="selector-estados.js?v=20261101jefe"></script>
-<script src="ficha-equipo.js?v=20261126ico"></script>
+<script src="ficha-equipo.js?v=20261126ico2"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
@@ -2858,7 +2858,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -10260,7 +10260,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10384,7 +10384,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

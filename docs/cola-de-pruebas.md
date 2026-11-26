@@ -2776,9 +2776,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (vtt-hexgrid/js/130 y js/29), con su otra cara para la Mesa (`sinoculta-…`, como `sinEscondido` de la Crónica). Probado con clics en
   «Prueba · General» (GM y Jugador 1): el tótem con el creep oculto, el estandarte con el creep en sigilo y el tótem con el creep a la vista.
   La pantalla del GM que lo clava no lo pone en su propia Crónica (como siempre: ya lo ve en el aviso y en la Mesa).
-- **⬜ en cola — ⚖ Probar: el sobrepeso al sacar del baúl y al comprar en la tienda** (2026-11-23, de la tarea del sobrepeso con la mochila, P312):
+- **✅ hecho (2026-11-26) — ⚖ Probar: el sobrepeso al sacar del baúl y al comprar en la tienda** (2026-11-23, de la tarea del sobrepeso con la mochila, P312):
   con la tienda abierta, sacar del 📦 baúl con la mochila llena (tiene que preguntar «Sacar igual» con la cuenta) y comprar algo que te deje con
   sobrepeso (cartel «⚖ Tenés sobrepeso» en el mapa y en la ficha). No se probó con clics: hacía falta abrir una tienda.
+  *Resultado:* probado con clics en «Prueba · General» de «Claude · pruebas 2» (GM con el generador de tiendas: publicó y abrió la tienda; Jugador 1
+  con el mapa y la ficha suelta abiertos a la vez). Blanco J1 (Fuerza 6, Carga máxima 6, equipo que pesa 1) con la mochila en 25 de 20. Todo anduvo
+  bien, sin errores: (1) guardó un Garfio en el baúl y al sacarlo (24 de 20) salió «🎒 Mochila llena» con la cuenta («tu mochila queda pasada (25 de
+  20)… tu equipo pesa 1 + 5 ranuras de más = 6; tu Carga máxima es 6») y «📦 Sacar igual» / «Volver»; con «Sacar igual» llegó a la mochila.
+  (2) Comprando en la tienda del mapa: «⚖ Blanco J1: tenés sobrepeso» (te pasás por 1, la cuenta y todo lo que implica, con la Iniciativa −1) solo
+  en el mapa; la ficha suelta mostró el estado Sobrepeso sin cartel; el ⚖ apareció alrededor del token, visto desde el Jugador 1 y desde el GM.
+  Comprando en la tienda de la ficha: «⚖ Tu sobrepeso subió (1 → 2)» solo en la ficha. (3) Vendiendo en la ficha: «⚖ Tu sobrepeso bajó (2 → 1)»
+  solo en la ficha; vendiendo en el mapa: «⚖ Blanco J1: ya no tenés sobrepeso» (antes, ahora y lo que recupera) solo en el mapa, y el ⚖ se fue
+  del token. El GM no recibió ningún cartel. Al terminar: tienda cerrada y retirada (y su stock borrado; el borrador del generador quedó igual),
+  baúl vacío y sin las dos líneas de su registro, la vuelta «quedó igual» (la plata y la mochila de Blanco J1, como estaban). Quedan en la Mesa
+  las líneas de la compra y del baúl.
 
 - **⬜ en cola — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
   más estados que los slots disponibles alrededor de un token para poner los iconitos»). Ver cuántos entran hoy, qué pasa con los que sobran

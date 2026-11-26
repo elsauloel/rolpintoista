@@ -3228,6 +3228,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   creep caído) y formas (cartelito con «Ir al mapa», numerito rojo, sonido opcional); recomendado dejarlo para cuando juegue sesiones reales con GM Tools.
 - **⬜ en cola — ❤ Vida extra de otro: «por encima de su máximo» (P353 decidida)** (dueño, 2026-11-26): cuando se mira la Vida extra de otro
   (otro jugador, un creep, una invocación ajena), la frase dice «su máximo»; la propia sigue «tu máximo» (ventana ◎, globo del iconito y del token).
+- **⬜ en cola — 📋 Achicar la lista de «+ Estado» a los estados del core del juego** (dueño, 2026-11-26): «revisar los estados alterados que
+  aparecen en el menú cuando uno pone más estado y filtrar los que son más redundantes, los que son un estado que se usa solamente por un ítem o un
+  skill específico, y dejar solamente en ese menú de estados los que son más relevantes o representativos del core del juego, para que no sea una
+  lista eterna. El resto de los estados que sigan existiendo, pero que no aparezcan en el core. Entonces, por ejemplo, la varita que te pone un estado
+  al azar, que trabaje con los estados que tienen más sentido». Pasos: listar los estados de hoy (`comun/estados-presets.js` y los que suman ítems y
+  skills), proponerle al dueño cuáles quedan en el «core» (con su motivo) y cuáles quedan fuera del menú (siguen existiendo y funcionando cuando un
+  ítem o skill los pone); que la varita del estado al azar y lo que elija estados al azar use solo el core. Mostrárselo antes de programar.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

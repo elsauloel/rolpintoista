@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-11-25T10:36:26Z",
+ "actualizado": "2026-11-26T22:48:04Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1403,7 +1403,7 @@
    ],
    "estado": "pendiente",
    "capitulo": "estados",
-   "cuerpo": "Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:\n\n\n\n| Resistencia | Sale de | Se usa contra |\n\n|---|---|---|\n\n| **Res. Especial** (Res.Esp; antes Res.Mg) | [[Constitución]] | Daño y efectos mágicos |\n\n| **Res. CC** | Constitución | Estados de [[Crowd Control]] |\n\n| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |\n\n\n\n> [!question] En pausa: están mezcladas\n\n> Las tres todavía están en **terreno ambiguo** entre sí (incluso si \"Res.M\" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora.\n\n\n\n## Excedente de vida\n\n\n\nEstado para una habilidad excepcional que deja tener **más vida que el máximo** (por ejemplo, drenar vida). Es un valor neto: **sin tope y sin recarga**; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan."
+   "cuerpo": "Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:\n\n\n\n| Resistencia | Sale de | Se usa contra |\n\n|---|---|---|\n\n| **Res. Especial** (Res.Esp; antes Res.Mg) | [[Constitución]] | Daño y efectos mágicos |\n\n| **Res. CC** | Constitución | Estados de [[Crowd Control]] |\n\n| **Res. Mental** (Res.Mt) | [[Especial]] | Control mental, maldiciones de mente |\n\n\n\n> [!question] En pausa: están mezcladas\n\n> Las tres todavía están en **terreno ambiguo** entre sí (incluso si \"Res.M\" de las cartas de clase se refiere a una, a otra o a ambas). **Se amplía cuando el dueño termine de definirlo**: no hace falta seguir preguntando por ahora.\n\n\n\n## Excedente de vida\n\n\n\nHoy se llama **Vida extra**: deja tener **más vida que el máximo**. La dan habilidades (Drenar vida, la Sanguijuela…), ítems (Relicario de sangre, Anillo de la siesta), consumibles, o se carga a mano (el sobrante al curarse, o desde «+ Estado»). Es una sola, venga de donde venga, y **tiene tope: el 50 % de la vida máxima** (para abajo: con 50 de vida, +25). Lo que llegue de más no entra, y la herramienta avisa («+6, pero el tope es +25 (50 % de tu máximo): quedó +25»); lo mismo si se escribe a mano un número más alto. No se recarga; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan. (Decidido por el dueño el 2026-11-26, P354; antes el tope lo tenían solo el Drenar vida y el Relicario.)"
   },
   {
    "id": "equipo-y-ranuras",

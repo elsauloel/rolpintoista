@@ -28,11 +28,9 @@ const EstadoPreguntas = (() => {
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }
     if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, inicial: num(p.escudoMagico), texto: '¿Cuántos HP de vida extra tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, inicial: num(p.escudoMagico), texto: '¿Cuántos HP tiene el escudo?'});
-    // La vida extra es un valor neto sin tope por defecto (2026-09-27, pedido del dueño): al activarlo se
-    // pregunta si esta vez tiene uno (ej. Drenar vida: "hasta 50% del máximo") — se guarda como recordatorio en
-    // `excedenteTope`, nada lo hace cumplir solo.
-    if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,
-      sinLimiteTexto: 'Sin tope (se puede acumular lo que sea)', texto: '¿Tiene un tope máximo de excedente?'});
+    // ❤ El tope de la Vida extra ya no se pregunta (P354, 2026-11-26: «que la vida extra siempre tenga el tope de 50%»): es siempre el 50 % de la vida
+    // máxima y lo hace cumplir Combatiente.agregarEstado. Antes (2026-09-27) se preguntaba uno, solo como recordatorio (`excedenteTope`, «Sin tope»).
+    if(num(p.escudoMagico) > 0 && p.excedenteVida) qs[qs.length - 1].texto = '¿Cuántos HP de vida extra tiene? (tope: el 50 % de su vida máxima)';
     // Sangrado no: sus stacks SON el daño (N de daño = N stacks de 1 HP), ya salen de la pregunta de HP.
     if(num(p.stacks) > 1 && !p.esSangrado && !p.esQuemadura) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, inicial: num(p.stacks), texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir

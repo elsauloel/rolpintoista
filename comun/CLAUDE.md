@@ -1034,6 +1034,13 @@ versión parecida en más de una, es candidato a juntar.
   solo su origen (`Combatiente.vidaExtraOrigenTxt`): el estado guarda `fuentes` (nombres del ítem o la habilidad) y `aMano`; sin `fuentes` = «Cargado a
   mano». Cada fuente la pone al crearla (`sumarVidaExtra(…, {fuente})`, la spec `{fuente}` de `EstadosAplicar`/`encolarPj`, `vidaExtraConFuente`);
   `fundirVidaExtra` junta los orígenes; `pub` los publica.
+  ❤ **El tope del 50 %** (2026-11-26, P354, dueño: «que la vida extra siempre tenga el tope de 50%»): toda Vida extra común, venga de donde venga, hasta el
+  50 % de la vida máxima (para abajo), contando la que ya tiene: `Combatiente.VIDA_EXTRA_TOPE`, `topeVidaExtra`, `vidaExtraEntra(estados, monto, máx)` →
+  {pedido, suma, antes, tope, queda, recortado, sinTope}, `vidaExtraTopeTxt(r, {su})` (el aviso), `sumarVidaExtraTope`, `vidaExtraAMano`/`vidaExtraAManoTxt`
+  (lo escrito a mano). `agregarEstado(…, {hpMax})` lo aplica y devuelve `tope` (un creep pasa `sc`); `sumarVidaExtra(…, {hpMax})` también;
+  `EstadosAplicar.aplicarACreep`, `FichaHabilidades.aplicarEfectoDeConsumo` y `SelectorEstados.textoAgregado` lo pasan o lo dicen;
+  `FichaAcciones.tomarAvisoTope()` (el del Relicario en `fijarHp`). **Una fuente nueva de Vida extra tiene que pasar el máximo.** Los escudos de los
+  anillos (`soloFisico`/`soloEspecial`) quedan fuera (P357); cuando baja el máximo no se recorta lo que ya tenía (P355).
 - **`orden-turnos.js`, entrar con una tirada** (2026-11-23, P275): `OrdenTurnos.entrarConTirada(ini, {id, valor}, {enCurso, alFinal})` → `{orden, turno, actuaron, lugar,
   yaPaso, finRonda, reubicar}`: antes del primero que sacó menos (empates: después), el turno sigue con quien lo tenía y, si su lugar ya pasó en la ronda,
   va al final de esta ronda (`finRonda`; varios así, por su tirada) y a `reubicar` (al pasar de ronda va a su lugar) (P301 b, 2026-11-26). Los que entran

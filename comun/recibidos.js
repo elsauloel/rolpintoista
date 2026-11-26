@@ -123,8 +123,13 @@ const Recibidos = (() => {
       const r = Combatiente.repartoCuraRobada(antes, num(inv.hpMax), m);
       if(r.perdida){ ui.toast(`🪱 ${inv.nombre} está caída: la cura que robó su Sanguijuela se pierde`); return {}; }
       inv.hp = antes + r.cura;
-      if(r.extra > 0) inv.estados = Combatiente.sumarVidaExtra(inv.estados, r.extra, {id: uid(), fuente: 'Sanguijuela'});   // ❤ una sola Vida extra (2026-11-03)
-      ui.toast(`🪱 ${origen ? origen + ' → ' : ''}${inv.nombre}: +${fmt(m)} de vida robada${r.extra ? ` (${fmt(r.extra)} de Vida extra)` : ''}`);
+      let veTxt = '';
+      if(r.extra > 0){
+        const ve = Combatiente.sumarVidaExtraTope(inv.estados, r.extra, num(inv.hpMax), {id: uid(), fuente: 'Sanguijuela'});   // ❤ una sola Vida extra (2026-11-03), con el tope (P354)
+        inv.estados = ve.estados;
+        veTxt = ve.tope.recortado ? ` (Vida extra ${Combatiente.vidaExtraTopeTxt(ve.tope, {su: true})})` : ` (${fmt(ve.tope.suma)} de Vida extra)`;
+      }
+      ui.toast(`🪱 ${origen ? origen + ' → ' : ''}${inv.nombre}: +${fmt(m)} de vida robada${veTxt}`);
       return {inv};
     }
     if(sp.nombre === 'Gana No2'){   // 🧉 el Matelisto (2026-10-18): aunque pase su máximo (dueño)

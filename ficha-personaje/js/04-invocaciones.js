@@ -915,7 +915,7 @@ function activarEfectoPresetInv(preset){
   const datos = {id: uid(), nombre, ...structuredClone(resto)};
   inv.estados = inv.estados || [];
   // La misma regla que el personaje y los creeps (antes la invocación no revisaba inmunidades: Invulnerable no frenaba un Stun).
-  const r = agregarEstadoConAviso(inv.estados, datos, inv.nombre, undefined, {resFuego: InvCalculo.statValor(inv, 'resfuego'),
+  const r = agregarEstadoConAviso(inv.estados, datos, inv.nombre, undefined, {resFuego: InvCalculo.statValor(inv, 'resfuego'), hpMax: num(inv.hpMax),
     alDisparar: hp => { inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + hp)); }});   // lo que se dispara pega ya (P161)
   if(r.ok && modsAfectanHpInv(r.estado.mods)) actualizarHpMaxPorConInv(inv);
   renderInvocaciones();

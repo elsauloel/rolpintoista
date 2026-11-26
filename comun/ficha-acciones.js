@@ -139,6 +139,9 @@ const FichaAcciones = (() => {
     Combatiente.avisarTormenta(((S.meta && S.meta.nombre) || '').trim(), r, motivo);
     return r;
   }
+  // ❤ El aviso del tope de la Vida extra que dejó la última cura con el Relicario (P354): lo toma quien muestra el resultado (consumir).
+  let topeAvisoPend = '';
+  const tomarAvisoTope = () => { const t = topeAvisoPend; topeAvisoPend = ''; return t; };
   function fijarHp(S, valor){
     const c = FichaCalculo.calcular(S);
     const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
@@ -147,9 +150,10 @@ const FichaAcciones = (() => {
     // 🩸 El Relicario de sangre (dueño, 2026-10-27: «toda curación cuenta como vida extra… hasta el final del combate»): lo que una cura pasa del máximo
     // queda como Vida extra (hasta +50 % del máximo, contando la que ya tiene); se va al «Finalizar combate». Una cura a alguien caído no entra.
     if(hpmax > 0 && antes > 0 && num(valor) > hpmax && Combatiente.relicarioEnEquipo(S.inventario)){
-      const exc = Combatiente.excedenteConTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, Combatiente.RELICARIO_TOPE);
       const rel = (S.inventario || []).find(i => i && i.equipado && num(i.relicario) > 0);   // ❤ de dónde viene (2026-11-26)
-      if(exc > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, exc, {finCombate: true, id: uid(), fuente: (rel && rel.nombre) || 'Relicario de sangre'});   // ❤ una sola Vida extra (2026-11-03)
+      const ve = Combatiente.sumarVidaExtraTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, {finCombate: true, id: uid(), fuente: (rel && rel.nombre) || 'Relicario de sangre'});   // ❤ una sola Vida extra (2026-11-03), con el tope (P354)
+      S.efectos = ve.estados;
+      if(ve.tope.recortado) topeAvisoPend = `Vida extra (${(rel && rel.nombre) || 'Relicario de sangre'}) ${Combatiente.vidaExtraTopeTxt(ve.tope)}`;
     }
     S.hp = Math.max(0, Math.min(tope, num(valor)));
     if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
@@ -325,6 +329,7 @@ const FichaAcciones = (() => {
     const r = FichaHabilidades.aplicarEfectoDeConsumo(S, it, presets);
     if(!r) return null;
     if(!r.ok){ toast(`Inmune ahora mismo${r.motivo === 'inmune' ? '' : ` (${r.motivo})`} — ${r.nombre} no hizo efecto`); return null; }
+    if(r.tope && r.tope.recortado) toast(`❤ Vida extra ${Combatiente.vidaExtraTopeTxt(r.tope)}`);   // ❤ el tope (P354)
     return r.estado;
   }
   // Las tiradas propias del ítem (su stat con su bono, y su fórmula), armadas sin publicar: [{origen, r} | {error}].
@@ -453,6 +458,7 @@ const FichaAcciones = (() => {
       if(num(it.curahp)){
         const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
         const robo = Combatiente.curaRobada(S.hp, num(it.curahp) + boticario, S.efectos);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+        tomarAvisoTope();
         if(entra) ui.fijarHp(num(S.hp) + entra);
         else if(robo) curaNo = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim()) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim()));
         else if(num(it.curahp) > 0) curaNo = num(S.hp) > 0 ? 'no se cura (Herida sombría)' : 'está caído: una cura no lo levanta';   // 🌑 Herida sombría
@@ -492,6 +498,7 @@ const FichaAcciones = (() => {
       if(armRotaTxt) partes.push(armRotaTxt);
       if(reviveTxt) partes.push(reviveTxt);
       if(curadosTxt) partes.push(curadosTxt);
+      { const t = tomarAvisoTope(); if(t) partes.push('❤ ' + t); }   // ❤ el Relicario topeado (P354)
       const aMano = Combatiente.consumoAMano(it) ? Combatiente.consumoAManoMesa(it, extra && extra.formula) : '';   // ✋ un consumible propio: lo resuelve la mesa (2026-11-22)
       if(aMano) partes.push(`✋ el efecto, a mano${Combatiente.consumoTirada(it) ? ` · 🎲 ${Combatiente.consumoTirada(it)}${extra && extra.formula ? ` = ${extra.formula.total}` : ''}` : ''}`);
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
@@ -1320,9 +1327,14 @@ const FichaAcciones = (() => {
       const quien = origen ? origen + ': ' : '';
       if(r.perdida){ ui.toast(`🪱 ${quien}estás caído: la cura que robó tu Sanguijuela (${fmt(m)}) se pierde`); return; }
       S.hp = antes + r.cura;
-      if(r.extra > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, r.extra, {id: uid(), fuente: 'Sanguijuela'});   // ❤ una sola Vida extra (2026-11-03); su origen (2026-11-26)
+      let veTxt = '';
+      if(r.extra > 0){
+        const ve = Combatiente.sumarVidaExtraTope(S.efectos, r.extra, max, {id: uid(), fuente: 'Sanguijuela'});   // ❤ una sola Vida extra (2026-11-03); su origen (2026-11-26); el tope (P354)
+        S.efectos = ve.estados;
+        veTxt = ve.tope.recortado ? ` · Vida extra ${Combatiente.vidaExtraTopeTxt(ve.tope)}` : ` · ${fmt(ve.tope.suma)} de Vida extra`;
+      }
       ui.cambio(['vitals', 'efectos', 'refresh']);
-      ui.toast(`🪱 ${quien}tu Sanguijuela te trajo ${fmt(m)} de vida${r.cura ? ` (${fmt(antes)} → ${fmt(S.hp)})` : ''}${r.extra ? ` · ${fmt(r.extra)} de Vida extra` : ''}`);
+      ui.toast(`🪱 ${quien}tu Sanguijuela te trajo ${fmt(m)} de vida${r.cura ? ` (${fmt(antes)} → ${fmt(S.hp)})` : ''}${veTxt}`);
       return;
     }
     // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.
@@ -1393,7 +1405,9 @@ const FichaAcciones = (() => {
     // 🔮 La Piedra bezoar: el Veneno entra con 1 stack menos (si no queda nada, no entra).
     if(!Combatiente.bezoar(draft, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)))){ ui.toast(`🔮 ${quien}la Piedra bezoar se tragó el Veneno`); return; }
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
-    const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? undefined : {vaquita: true, nombre: (S.meta && S.meta.nombre) || '', ref: String((o && o.ref) || '')});   // (`o.ref`: de qué ficha es, para el cartel flotante «INVULNERABLE» / «INMUNE A …» del mapa)
+    let hpMaxYo = 0;
+    try{ hpMaxYo = num(FichaCalculo.calcular(S).final.hpmax); }catch(e){}   // ❤ para el tope de la Vida extra (P354)
+    const r = Combatiente.agregarEstado(S.efectos, draft, o && o.propio ? {hpMax: hpMaxYo} : {vaquita: true, nombre: (S.meta && S.meta.nombre) || '', ref: String((o && o.ref) || ''), hpMax: hpMaxYo});   // (`o.ref`: de qué ficha es, para el cartel flotante «INVULNERABLE» / «INMUNE A …» del mapa)
     if(!r.ok && r.vaquita){ ui.toast(`🐞 ${quien}la vaquita de San Antonio espantó ${draft.nombre}`); ui.cambio(['efectos', 'refresh']); return; }
     if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); avisarNoEntro(S, draft.nombre, r.motivo, origen, ui); return; }
     if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
@@ -1403,7 +1417,7 @@ const FichaAcciones = (() => {
     const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF, hpActual: S.hp, quien: (S.meta && S.meta.nombre) || ''});
     if(dis.hp){ try{ fijarHp(S, num(S.hp) + dis.hp); revisarAnkh(S); revisarMuerte(S); }catch(e){ S.hp = Math.max(0, num(S.hp) + dis.hp); } }
     ui.cambio(['efectos', 'refresh', ...(dis.hp ? ['vitals'] : [])]);
-    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.sumado ? ` (+${fmt(num(draft.escudoMagico))}: ahora +${fmt(num(r.estado.escudoMagicoActual ?? r.estado.escudoMagico))})` : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
+    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.tope && r.tope.recortado ? ` (${Combatiente.vidaExtraTopeTxt(r.tope)})` : r.sumado ? ` (+${fmt(num(draft.escudoMagico))}: ahora +${fmt(num(r.estado.escudoMagicoActual ?? r.estado.escudoMagico))})` : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
   }
   // Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje (`fichaId`), sin esperar al GM.
   function dueloAplicarEfectoPropio(S, fichaId, d, ef, ui){
@@ -1716,7 +1730,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
+  return {tomarAvisoTope, gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, itemDeTrampa, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, noEntroTxt, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

@@ -3243,6 +3243,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   había, el aviso decía «recibiste Vida extra (×undefined)»; ahora «recibiste Vida extra (+6: ahora +11)» (comun/ficha-acciones.js). **Pregunta nueva:**
   P354 (la Vida extra de la Sanguijuela no tiene tope: llegó a +30). **Ya anotado de antes** (`docs/pendientes.md`, revisión de las skills de clase,
   punto 5): Drenar vida dice «directo a la vida» pero le resta la Defensa especial del objetivo (se vio: 8 − 1 = 7). Capturas `cola130/01-*` a `17-*`.
+- **✅ hecho (2026-11-26) — ❤ La Vida extra siempre con tope del 50 % (P354)** (dueño, 2026-11-26: «que la vida extra siempre tenga el tope de 50%»).
+  **Un solo tope, en un solo lugar** (`comun/combatiente.js`): `VIDA_EXTRA_TOPE` (50), `topeVidaExtra(máximo)` (para abajo: con 50, +25),
+  `vidaExtraEntra` (cuánto entra contando la que ya tiene), `vidaExtraTopeTxt` (el aviso «+6, pero el tope es +25 (50 % de tu máximo): quedó +25»),
+  `sumarVidaExtraTope` y `vidaExtraAMano`/`vidaExtraAManoTxt` (lo escrito a mano). `agregarEstado` lo aplica solo cuando recibe `hpMax` (un creep ya lo
+  pasa: es `sc`), así cubre el «+ Estado», las habilidades, los consumibles y lo recibido; `sumarVidaExtra(…, {hpMax})` también. Lo usan: el Relicario de
+  sangre (la ficha y el mapa), el Anillo de la siesta (al descansar), la Sanguijuela (personaje, invocación y creep), Drenar vida (personaje y creep:
+  `drenaTope` ya solo dice si da Vida extra; en el editor de la Ejecución pasó a una casilla), las habilidades y los consumibles, lo que llega por la
+  cola de estados, el sobrante al curarse (avisa si ya está en el tope) y el número del chip ❤ (mapa, ficha y GM Tools). **El aviso** sale en el toast
+  de cada camino y en la línea de la Mesa del creep. **Textos:** Drenar vida, la Sanguijuela (de clase, de creep y el estado), el Relicario, la Vida extra
+  de la lista de estados y el manual (`07-estados.md`, «Excedente de vida»: decía «sin tope»). El cartelito del «+ Estado» → Vida extra ya no pregunta
+  «¿Tiene un tope máximo?» (era solo un recordatorio, «Sin tope»): ahora dice el tope en la pregunta de cuánto. **Cuando baja el máximo:** hoy no se
+  toca lo que ya tenía (P355). **Arreglado de paso:** el «+ Estado» de la ficha (personaje e invocaciones) perdía las opciones (`agregarEstadoConAviso`
+  de `ficha-personaje/js/07`), así que un veneno o una regeneración no pegaban apenas se ponían (P161). **Probado con clics** en «Prueba · General»
+  (J1, J2 y GM): «+ Estado» Vida extra 40 → +25 con el aviso; el chip ❤ escrito a 60 → +25; la Sanguijuela pegada al Sanador con J1 en +22: la cura
+  robada (+5) lo dejó en +25 con el aviso; el Relicario de J1 con +20 y una Poción de HP (+25 con 45 de vida): +25 con el aviso «Vida extra (Relicario
+  de sangre) +20, pero el tope es +25…»; el sobrante al curarse ya en el tope: «el sobrante no se carga»; ◎ igual para los tres («Viene de Sanguijuela
+  y Relicario de sangre (y una parte, cargada a mano)»). Sin probar con clics: Drenar vida (la regla es la misma, en las pruebas automáticas), una
+  invocación, GM Tools suelto y el Anillo de la siesta. Preguntas nuevas: P355, P356, P357. Capturas `cola131/`.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

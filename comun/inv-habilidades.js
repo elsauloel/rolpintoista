@@ -77,8 +77,9 @@ const InvHabilidades = (() => {
   // `o.deAfuera` (2026-11-10): un estado que le pone otro (lo recibido) puede gastar la 🐞 Vaquita de San Antonio.
   function ponerEstado(inv, d, o){
     inv.estados = inv.estados || [];
-    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural, nombre: inv.nombre, ...(o && o.deAfuera ? {vaquita: true} : {}), ...(o && o.ref ? {ref: o.ref} : {})});
+    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural, nombre: inv.nombre, hpMax: num(inv.hpMax), ...(o && o.deAfuera ? {vaquita: true} : {}), ...(o && o.ref ? {ref: o.ref} : {})});   // ❤ hpMax: el tope de la Vida extra (P354)
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
+    if(r.tope && r.tope.recortado) return `Vida extra ${Combatiente.vidaExtraTopeTxt(r.tope, {su: true})}`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).

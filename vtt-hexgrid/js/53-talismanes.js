@@ -62,7 +62,7 @@ async function talRelicario(d, mato){
     const r = await dueloCurar(ta, n);
     if(r && r.robada) return {n};   // 🪱 se la llevó una Sanguijuela (ya quedó en la Mesa)
     const sube = Math.max(0, num(r.nuevo) - num(r.previo)), exc = num(r.excedente);
-    const txt = [sube ? `se cura ${sube}` : '', exc ? `Vida extra ${exc}` : '', !sube && !exc ? 'ya estaba con la vida y la Vida extra al tope' : ''].filter(Boolean).join(' y ');
+    const txt = [sube ? `se cura ${sube}` : '', r.veTope ? `Vida extra ${r.veTope}` : exc ? `Vida extra ${exc}` : '', !sube && !exc && !r.veTope ? 'ya estaba con la vida y la Vida extra al tope' : ''].filter(Boolean).join(' y ');   // ❤ el tope común (P354)
     try{ mesaLinea(`🩸 El Relicario de ${d.atacante.nombre} late por matar a ${d.defensor.nombre} con daño especial: ${txt}`, 'recordatorio'); }catch(err){}
     if(talNeutro()) try{ await talLineaAfuera(`🩸 El Relicario de ${d.atacante.nombre} late: ${txt}`); }catch(err){}   // 🙈 (P320) quien atacó lo siente, sin saber por qué
     return {n};

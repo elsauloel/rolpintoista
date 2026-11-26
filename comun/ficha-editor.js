@@ -198,8 +198,9 @@ const FichaEditor = (() => {
   // Ponerle un estado al personaje o a una invocación: inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y
   // renovación de uno igual son la regla común (comun/combatiente.js, agregarEstado). Devuelve el resultado.
   function agregarEstadoConAviso(lista, nuevo, quien, toast, o){
-    const r = Combatiente.agregarEstado(lista, nuevo);
+    const r = Combatiente.agregarEstado(lista, nuevo, o && Number(o.hpMax) > 0 ? {hpMax: o.hpMax} : undefined);   // ❤ `o.hpMax`: el tope de la Vida extra (P354)
     const q = quien ? quien + ': ' : '';
+    if(r.ok && r.tope && r.tope.recortado){ toast(`❤ ${q}Vida extra ${Combatiente.vidaExtraTopeTxt(r.tope, {su: !!quien})}`); return r; }
     if(!r.ok){ toast(`🛡 ${q}inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return r; }
     if(r.que === 'yaLoTiene'){ toast(`${q}${nuevo.nombre}: ya lo tiene, no se acumula`); return r; }
     const e = r.estado;
@@ -1008,7 +1009,7 @@ const FichaEditor = (() => {
       // Un estado nuevo desde el formulario completo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar).
       if(key === 'efectos' && !id){
         cerrar();
-        agregarEstadoConAviso(P.efectos, draft, '', toast, {resFuego: FichaCalculo.calcular(P).final.resfuego,
+        agregarEstadoConAviso(P.efectos, draft, '', toast, {resFuego: FichaCalculo.calcular(P).final.resfuego, hpMax: FichaCalculo.calcular(P).final.hpmax,
           alDisparar: hp => { FichaAcciones.fijarHp(P, num(P.hp) + hp); FichaAcciones.revisarAnkh(P); FichaAcciones.revisarMuerte(P); }});
         ctx.alCambiar(['efectos']);
         return;

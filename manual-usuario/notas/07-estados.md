@@ -629,5 +629,5 @@ Hay tres resistencias que se tiran **contra** hechizos, maldiciones y efectos:
 
 
 
-Estado para una habilidad excepcional que deja tener **más vida que el máximo** (por ejemplo, drenar vida). Es un valor neto: **sin tope y sin recarga**; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan.
+Hoy se llama **Vida extra**: deja tener **más vida que el máximo**. La dan habilidades (Drenar vida, la Sanguijuela…), ítems (Relicario de sangre, Anillo de la siesta), consumibles, o se carga a mano (el sobrante al curarse, o desde «+ Estado»). Es una sola, venga de donde venga, y **tiene tope: el 50 % de la vida máxima** (para abajo: con 50 de vida, +25). Lo que llegue de más no entra, y la herramienta avisa («+6, pero el tope es +25 (50 % de tu máximo): quedó +25»); lo mismo si se escribe a mano un número más alto. No se recarga; se sube o baja a mano desde el chip del estado o desde el token, y absorbe el daño antes que la vida (después de los escudos). No vence por turnos salvo que se le pongan. (Decidido por el dueño el 2026-11-26, P354; antes el tope lo tenían solo el Drenar vida y el Relicario.)
 

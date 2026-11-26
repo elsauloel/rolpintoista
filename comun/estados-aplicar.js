@@ -117,7 +117,7 @@ const EstadosAplicar = (() => {
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
     const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0, hpActual: sc.hp, quien: sc.nombre});
     if(d.hp){ const tope = parseFloat(sc.hpMax) > 0 ? parseFloat(sc.hpMax) : Infinity; sc.hp = Math.max(0, Math.min(tope, (parseFloat(sc.hp) || 0) + d.hp)); }
-    return {ok: true, estado: r.estado, que: r.que, disparo: d};
+    return {ok: true, estado: r.estado, que: r.que, disparo: d, ...(r.tope ? {tope: r.tope} : {})};   // ❤ `tope`: cómo entró una Vida extra (P354)
   }
 
   // Deja el aviso para que la ficha del dueño lo aplique (campanas/<id>/estados).

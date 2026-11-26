@@ -395,8 +395,11 @@ const FichaMantenimiento = (() => {
       }
     }
     // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
-    const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
-    const veAnillo = ((S.inventario || []).find(i => i && i.equipado && !FichaCalculo.itemRoto(i) && num(i.descansoVidaExtra) === veDescanso) || {}).nombre || 'Anillo de la siesta';   // ❤ su origen (2026-11-26)
+    const veAnilloVal = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
+    const veAnillo = ((S.inventario || []).find(i => i && i.equipado && !FichaCalculo.itemRoto(i) && num(i.descansoVidaExtra) === veAnilloVal) || {}).nombre || 'Anillo de la siesta';   // ❤ su origen (2026-11-26)
+    let veTope = 0;
+    try{ veTope = Combatiente.topeVidaExtra(FichaCalculo.calcular(S).final.hpmax); }catch(e){}
+    const veDescanso = veTope >= 1 ? Math.min(veAnilloVal, veTope) : veAnilloVal;   // ❤ con el tope del 50 % del máximo (P354)
     if(veDescanso > 0){
       // (P227 ✅, 2026-10-28: es Vida extra de verdad —`excedenteVida`—: lo que se lleva cuenta como daño. Al descansar la vida ya quedó llena, así que
       // «te curás N y lo que sobra es Vida extra» son N de Vida extra.)
@@ -411,7 +414,7 @@ const FichaMantenimiento = (() => {
         ve.permanente = true; ve.turnos = 0; delete ve.finCombate; ve.descansoAnillo = true;
         S.efectos[iVe] = ve;
       }
-      lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta)`);
+      lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta${veDescanso < veAnilloVal ? `: da ${veAnilloVal}, pero el tope es +${veTope}, el ${Combatiente.VIDA_EXTRA_TOPE} % de tu máximo` : ''})`);
     }
     // 💍 El Anillo del escudo de la mañana (2026-10-19, dueño): cada descanso, Vida extra solo contra el daño especial (`soloEspecial`: el mapa la
     // salta si el golpe no es mágico ni elemental, js/10 resolverGolpe). Como la de la siesta, no se recarga y reemplaza a la que quedó.

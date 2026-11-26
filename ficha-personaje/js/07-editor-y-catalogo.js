@@ -420,13 +420,13 @@ function activarEfectoPreset(preset){
   const {nombre, ...resto} = preset;
   const draft = Object.assign(FichaEditor.borrador(null), structuredClone(resto));
   draft.nombre = nombre;
-  agregarEstadoConAviso(S.efectos, draft, '', undefined, {resFuego: compute().final.resfuego, alDisparar: hp => fijarHp(num(S.hp) + hp)});   // lo que se dispara pega ya (P161)
+  agregarEstadoConAviso(S.efectos, draft, '', undefined, {resFuego: compute().final.resfuego, hpMax: compute().final.hpmax, alDisparar: hp => fijarHp(num(S.hp) + hp)});   // lo que se dispara pega ya (P161)
   renderList('efectos');
   refresh();
 }
 // Ponerle un estado al personaje o a una invocación: inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y
 // renovación de uno igual son la regla común (comun/combatiente.js, agregarEstado). Devuelve el resultado.
-function agregarEstadoConAviso(lista, nuevo, quien){ return FichaEditor.agregarEstadoConAviso(lista, nuevo, quien, toast); }   // comun/ficha-editor.js (A6b)
+function agregarEstadoConAviso(lista, nuevo, quien, _toast, o){ return FichaEditor.agregarEstadoConAviso(lista, nuevo, quien, toast, o); }   // comun/ficha-editor.js (A6b); `o` (alDisparar, hpMax) se pasa (2026-11-26: antes se perdía)
 
 // Menú paso a paso para crear un estado alterado de cero (comun/asistente-estado.js): reemplaza al botón "Estado personalizado"
 // que abría el formulario completo (el formulario sigue disponible desde el último paso). destino: 'directo' (el personaje) o 'inv'.

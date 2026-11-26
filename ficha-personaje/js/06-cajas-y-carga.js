@@ -340,9 +340,12 @@ document.addEventListener('click', async e => {
     const er = S.efectos.find(x => x.id === erId);
     if(er){
       const neto = !!er.excedenteVida, max = neto ? null : num(er.escudoMagico), actual = num(er.escudoMagicoActual ?? er.escudoMagico);
-      const txt = acc === 'set' ? await Confirmar.texto(neto ? `${er.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: er.nombre, icono: '🛡', valor: fmt(actual), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
+      const topeVe = neto && Combatiente.esVidaExtraComun(er) ? Combatiente.topeVidaExtra(compute().final.hpmax) : 0;   // ❤ el tope (P354)
+      const txt = acc === 'set' ? await Confirmar.texto(neto ? `${er.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N${topeVe > 0 ? ` (tope: +${fmt(topeVe)}, el ${Combatiente.VIDA_EXTRA_TOPE} % de tu máximo)` : ''}` : `${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: er.nombre, icono: '🛡', valor: fmt(actual), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
       const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
-      if(nuevo){ er.escudoMagico = neto ? nuevo.actual : nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); }
+      let topeTxt = '';
+      if(nuevo && neto){ const ta = Combatiente.vidaExtraAMano(S.efectos, er, nuevo.actual, compute().final.hpmax); if(ta.recortado){ nuevo.actual = ta.valor; topeTxt = Combatiente.vidaExtraAManoTxt(ta); } }   // ✋ a mano, con el tope (P354)
+      if(nuevo){ er.escudoMagico = neto ? nuevo.actual : nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); if(topeTxt) toast('❤ ' + topeTxt); }
       else if(txt !== null) toast(neto ? 'Escribí un número, +N o -N' : 'Escribí un número, +N, -N o "max N"');
     }
     return;

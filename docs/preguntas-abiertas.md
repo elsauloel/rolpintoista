@@ -3002,3 +3002,27 @@ que robó la Sanguijuela le sumó 5 más: quedó en +30 (más del 50 %).
 ¿La Vida extra de la Sanguijuela queda sin tope (como dice hoy), o tiene el mismo tope del 50 % que el Drenar vida y el Relicario de sangre?
 
 > ✅ **Decidida (dueño, 2026-11-26):** «que la vida extra siempre tenga el tope de 50%» — para toda fuente, no solo la Sanguijuela.
+> **Aplicada (2026-11-26):** un solo tope en `comun/combatiente.js` (`vidaExtraEntra`, `Combatiente.agregarEstado` con `hpMax`, `sumarVidaExtra(…, {hpMax})`,
+> `vidaExtraAMano` para lo que se escribe a mano). Si se pasa, entra hasta el tope y el aviso lo dice («+6, pero el tope es +25 (50 % de tu máximo):
+> quedó +25»). Ver la cola, «❤ La Vida extra siempre con tope del 50 % (P354)». Dudas que quedaron: P355–P357.
+
+### P355 — ❤ ¿Qué pasa con la Vida extra si baja la vida máxima? (2026-11-26, Claude, al aplicar la P354)
+
+Hoy la Vida extra es un estado con su número: **si baja la vida máxima (por ejemplo, se va un buff de Constitución o se saca un ítem que daba vida),
+la Vida extra que ya tenía no se toca**, aunque quede por encima del nuevo tope. Lo único que cambia es que ya no le entra más (cualquier fuente suma
+0 hasta que baje de ese tope) y que, si alguien la escribe a mano, se recorta al tope nuevo. Ejemplo: Blanco J1 con 50 de vida tiene +25; si su máximo
+baja a 40, el tope pasa a +20 pero se queda con +25.
+¿Se deja así (lo que ya tenía, lo conserva), o se recorta sola al tope nuevo apenas baja el máximo (con un aviso)?
+
+### P356 — ❤ ¿Hace falta una salida a mano para pasar el tope de la Vida extra? (2026-11-26, Claude, al aplicar la P354)
+
+Desde la P354, también lo que se carga a mano (el número del chip ❤, el «+ Estado» → Vida extra, el sobrante al curarse) se recorta al 50 % del máximo,
+y el aviso lo dice («Pusiste +40 de Vida extra, pero el tope es +25 (50 % de tu máximo): quedó +25»). No hay forma de pasarlo, ni para el GM.
+¿Hace falta una salida a mano («Dejarlo igual» / «Aplicar el tope»), por ejemplo para un jefe o algo narrativo, o así está bien?
+
+### P357 — ❤ Los escudos de los anillos y el tope de la Vida extra (2026-11-26, Claude, al aplicar la P354)
+
+El Escudo del sereno (solo contra lo físico) y el Escudo de la mañana (solo contra lo especial), de los anillos, por dentro son una Vida extra aparte
+(cuenta como daño lo que se llevan), pero se muestran como escudos con su nombre. Al aplicar la P354 **quedaron fuera del tope**: no cuentan para el
+50 % ni se recortan. ¿Está bien así, o tienen que contar dentro del mismo tope que la Vida extra?
+

@@ -874,24 +874,29 @@ async function hudSumarVida(t, crudo){
   const d = hpDatos(t), hp = num(d.hp), max = num(d.hpMax), suma = leerValorVital(crudo, 0);
   if(suma === null || suma <= 0){ toast('Escribí +N (por ejemplo +10)'); return; }
   const sobra = max > 0 && hp > 0 && !TokensAuto.esSuelto(t) ? Math.round(hp + suma - max) : 0;   // 📦 un objeto no tiene Vida extra: no pasa del máximo
-  let extra = 0;
+  let extra = 0, veR = null;
   if(sobra > 0){
     const quien = t.tipo === 'creep' ? `de ${nombreDe(t)} ` : '';
-    extra = (await Confirmar.preguntar(`El tope de vida ${quien}es ${fmt(max)}: con +${fmt(suma)} sobran ${fmt(sobra)}.\n\n¿Cargar el sobrante como Vida extra?`,
-      {titulo: '❤ Pasa del máximo', icono: '❤', si: 'Sí', no: 'No'})) ? sobra : 0;
+    // ❤ El tope de la Vida extra (P354): el 50 % del máximo, contando la que ya tiene. Si no entra nada, solo avisa.
+    let est = [];
+    try{ est = (hudDatos(t) || {}).estados || []; }catch(e){}
+    veR = Combatiente.vidaExtraEntra(est, sobra, max);
+    if(!veR.sinTope && veR.suma <= 0){ toast(`❤ ${nombreDe(t)} ya tiene la Vida extra en el tope (+${fmt(veR.tope)}, ${Combatiente.VIDA_EXTRA_TOPE} % del máximo): el sobrante no se carga`); }
+    else extra = (await Confirmar.preguntar(`El tope de vida ${quien}es ${fmt(max)}: con +${fmt(suma)} sobran ${fmt(sobra)}.${veR.recortado ? `\n\nLa Vida extra tiene tope: +${fmt(veR.tope)} (${Combatiente.VIDA_EXTRA_TOPE} % del máximo). Entran ${fmt(veR.suma)}.` : ''}\n\n¿Cargar el sobrante como Vida extra?`,
+      {titulo: '❤ Pasa del máximo', icono: '❤', si: 'Sí', no: 'No'})) ? veR.suma : 0;
   }
   await hudAplicar('hp', crudo);
   if(!extra) return;
   try{
-    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => { EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: extra}); });
+    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => { EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: extra}); });   // (el tope lo pone agregarEstado con sc.hpMax)
     else if(esTokenInv(t)){
       const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
       const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false;
-        inv.estados = Combatiente.sumarVidaExtra(Array.isArray(inv.estados) ? inv.estados : [], extra); return true; });
+        inv.estados = Combatiente.sumarVidaExtra(Array.isArray(inv.estados) ? inv.estados : [], extra, {hpMax: num(inv.hpMax)}); return true; });
       if(!ok) throw new Error('no se pudo escribir la ficha de su dueño');
     }
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: extra}, origen: 'Vida que pasó del máximo'});
-    toast(`❤ ${nombreDe(t)}: +${fmt(extra)} de Vida extra`);
+    toast(`❤ ${nombreDe(t)}: ${veR && veR.recortado ? 'Vida extra ' + Combatiente.vidaExtraTopeTxt({...veR, pedido: sobra}, {su: true}) : `+${fmt(extra)} de Vida extra`}`);
   }catch(err){ console.error('La Vida extra:', err); toast('No se pudo cargar la Vida extra: ' + (err.message || err)); }
 }
 
@@ -1490,7 +1495,8 @@ Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, {titulo: e.no
     const v = vinculo(t);
     const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
     if(!e) return;
-    const txt = acc === 'set' ? await Confirmar.texto(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: e.nombre, icono: '🛡', valor: fmt(num(e.escudo)), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
+    const topeVe = e.excedente ? Combatiente.topeVidaExtra(num((v && v.resumen && v.resumen.hpMax) || (hudDatos(t) || {}).hpMax)) : 0;   // ❤ el tope (P354)
+    const txt = acc === 'set' ? await Confirmar.texto(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N${topeVe > 0 ? ` (tope: +${fmt(topeVe)}, el ${Combatiente.VIDA_EXTRA_TOPE} % del máximo)` : ''}` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: e.nombre, icono: '🛡', valor: fmt(num(e.escudo)), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'escudo', txt);
   });
@@ -1774,7 +1780,7 @@ function abrirFichaDeToken(t){
    con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
    (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
    un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
-const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261009zl', '../comun/asistente-estado.js?v=20261018f', '../comun/buscar-estados.js?v=20261024sequia', '../comun/selector-estados.js?v=20261101jefe'];
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261126tope', '../comun/asistente-estado.js?v=20261018f', '../comun/buscar-estados.js?v=20261024sequia', '../comun/selector-estados.js?v=20261126tope'];
 const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
 // Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
 const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],
@@ -1828,7 +1834,9 @@ async function abrirEstadoNuevo(t){
     const lista = inv ? (inv.estados = inv.estados || []) : (S.efectos = S.efectos || []);
     const nuevo = inv ? SelectorEstados.estadoInvocacion(preset, idEstadoNuevo()) : SelectorEstados.estadoPersonaje(preset, idEstadoNuevo());
     const quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || '');
-    const r = Combatiente.agregarEstado(lista, nuevo, {nombre: quien, ref: invId ? fichaId + SEP_INVOCACION + invId : fichaId});   // (`ref`: para el cartel flotante de lo que frena una inmunidad, js/121)
+    let hpMaxDe = 0;
+    try{ hpMaxDe = inv ? num(inv.hpMax) : num(FichaCalculo.calcular(S).final.hpmax); }catch(e){}   // ❤ el tope de la Vida extra (P354)
+    const r = Combatiente.agregarEstado(lista, nuevo, {nombre: quien, ref: invId ? fichaId + SEP_INVOCACION + invId : fichaId, hpMax: hpMaxDe});   // (`ref`: para el cartel flotante de lo que frena una inmunidad, js/121)
     if(!r.ok){ toast(`🛡 ${quien}: inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return guardar; }
     if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
     if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
@@ -1894,7 +1902,8 @@ async function hudEstadoCambiar(t, indice, accion, delta){
   const lista = (v && v.resumen && v.resumen.estados) || [];
   const objetivo = lista[indice];
   if(!objetivo || !puedoCambiarEstados(t)) return;
-  const tocar = arr => {
+  let topeAviso = '';   // ❤ (P354) si lo que se escribió pasa del tope de la Vida extra
+  const tocar = (arr, hpMax) => {
     const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
     if(i < 0) throw new Error('Ese estado ya no está');
     if(accion === 'quitar') arr.splice(i, 1);
@@ -1909,6 +1918,10 @@ async function hudEstadoCambiar(t, indice, accion, delta){
       const e = arr[i], neto = !!e.excedenteVida, actual = num(e.escudoMagicoActual ?? e.escudoMagico);
       const n = escudoParsear(delta, actual, neto ? null : num(e.escudoMagico));
       if(!n) throw new Error(neto ? 'escribí un número, +N o -N' : 'escribí un número, +N, -N o "max N"');
+      if(neto){   // ✋ a mano también con el tope del 50 % (P354)
+        const ta = Combatiente.vidaExtraAMano(arr, e, n.actual, hpMax);
+        if(ta.recortado){ n.actual = ta.valor; topeAviso = Combatiente.vidaExtraAManoTxt(ta, {su: true}); }
+      }
       e.escudoMagico = neto ? n.actual : n.max; e.escudoMagicoActual = n.actual;
     }
     else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
@@ -1916,7 +1929,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
   };
   try{
     if(t.tipo === 'creep'){
-      await modificarCreep(t.fichaId, sc => { sc.estados = tocar(Array.isArray(sc.estados) ? sc.estados : []); });
+      await modificarCreep(t.fichaId, sc => { sc.estados = tocar(Array.isArray(sc.estados) ? sc.estados : [], num(sc.hpMax)); });
     }else{
       const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
       const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
@@ -1931,7 +1944,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           const r = ficha.data().resumen || {};
           const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
           if(!inv) throw new Error('La invocación ya no existe');
-          inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
+          inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : [], num(inv.hpMax));
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             ...(typeof EstadoCorto !== 'undefined' ? EstadoCorto.pub(e, e.hpturno !== undefined ? 'hpturno' : 'hpTurno') : {}),   // 🔘 los números y ❤ el origen de la Vida extra (2026-11-26)
@@ -1942,7 +1955,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           }));
           cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, estados: resumenEstados} : i);
         }else{
-          datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
+          datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : [], num((ficha.data().resumen || {}).hpMax));
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...Combatiente.hastaPub(e), ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             ...(typeof EstadoCorto !== 'undefined' ? EstadoCorto.pub(e, e.hpturno !== undefined ? 'hpturno' : 'hpTurno') : {}),   // 🔘 los números y ❤ el origen de la Vida extra (2026-11-26)
@@ -1956,6 +1969,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
         tx.update(base, cambios);
       });
     }
+    if(topeAviso) toast(`❤ ${nombreDe(t)}: ${topeAviso}`);
   }catch(err){
     console.error('No se pudo cambiar el estado:', err);
     toast(esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo cambiar el estado: ' + err.message);

@@ -476,7 +476,7 @@ const AsistenteDueloHab = (() => {
         if(cfg.costoVariable && fuente !== 'dif') h += `<div class="fila"><span>Por cada punto de X (${cfg.costoVariable === 'sp' ? 'SP' : 'No2'}): +</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño</span></div>`;
         if(!esZona){
           h += `<label class="op"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
-          if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>% · puede pasar su máximo hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (como Vida extra)</span></div>`;
+          if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>%</span></div><label class="op"><input type="checkbox" data-drenatope ${Number(st.drenaTope) > 0 ? 'checked' : ''}> Lo que pase de su máximo le queda como Vida extra (con el tope de siempre: el 50 % de su vida máxima)</label>`;   // ❤ un solo tope para todos (P354, 2026-11-26)
         }
         if(esZona) h += `<div class="fila"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>`;
         if(esZona && st.danoExtra) h += cuerpoPorTirada();
@@ -821,7 +821,7 @@ const AsistenteDueloHab = (() => {
       });
       q('[data-drena]', e => { st.drena = e.target.checked; dibujar(); });
       q('[data-ondadodge]', e => { st.ondaDodge = e.target.checked; dibujar(); });
-      q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
+      q('[data-drenatope]', e => { st.drenaTope = e.target.checked ? 50 : 0; });   // (el número ya no cuenta: el tope es el común, P354)
       q('[data-drenapct]', e => { st.drenaPct = Math.max(1, Math.min(100, Math.round(Number(e.target.value) || 100))); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       f.querySelectorAll('[data-danoextra]').forEach(el => el.onchange = () => dibujar());   // 🎲 al terminar de escribir la fórmula aparece la tabla

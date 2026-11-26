@@ -136,6 +136,8 @@ const SelectorEstados = (() => {
   // Lo que se le avisa al que pone un estado (misma frase en la ficha, las invocaciones y los creeps).
   function textoAgregado(r, campoHp){
     const e = r.estado;
+    if(r.tope && r.tope.recortado) return `Vida extra ${Combatiente.vidaExtraTopeTxt(r.tope, {su: true})}`;   // ❤ el tope del 50 % (P354)
+    if(r.sumado && e) return `Vida extra: se sumó, ahora +${fmt(num(e.escudoMagicoActual ?? e.escudoMagico))}`;
     if(r.que === 'acumulado'){
       if(e.esEscarcha) return `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)`;
       if(e.esSangrado) return `${e.nombre} +1 al daño por turno (${fmt(Math.abs(num(e[campoHp])) * num(e.stacks))} ahora)`;

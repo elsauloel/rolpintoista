@@ -50,17 +50,17 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261126ve"></script>
+<script src="combatiente.js?v=20261126tope"></script>
 <script src="creep-calculo.js?v=20261126bot"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261126ve"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261125sil"></script>
 <script src="ficha-combate.js?v=20261122cola47"></script>
-<script src="estados-presets.js?v=20261124mareo3"></script>
-<script src="estados-aplicar.js?v=20261126ve"></script>
+<script src="estados-presets.js?v=20261126tope"></script>
+<script src="estados-aplicar.js?v=20261126tope"></script>
 <script src="estado-corto.js?v=20261126entera"></script>
-<script src="recibidos.js?v=20261126ve"></script>
+<script src="recibidos.js?v=20261126tope"></script>
 <script src="dar-jugador.js?v=20261126ico2"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
@@ -72,7 +72,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="generador-tiendas.js?v=20261120maestria"></script>
 <script src="items-subidos.js"></script>
-<script src="ficha-habilidades.js?v=20261126ve"></script>
+<script src="ficha-habilidades.js?v=20261126tope"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js?v=20261123c73"></script>
@@ -83,16 +83,16 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261122prisa5"></script>
-<script src="ficha-acciones.js?v=20261126ve2"></script>
+<script src="ficha-acciones.js?v=20261126tope"></script>
 <script src="orden-turnos.js?v=20261126fin"></script>
-<script src="ficha-mantenimiento.js?v=20261126ve"></script>
+<script src="ficha-mantenimiento.js?v=20261126tope"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
 <script src="elegir-trampa.js"></script>
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
-<script src="selector-estados.js?v=20261101jefe"></script>
+<script src="selector-estados.js?v=20261126tope"></script>
 <script src="ficha-equipo.js?v=20261126ico2"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
@@ -126,10 +126,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
 <script src="pasivas.js?v=20261124tags2"></script>
-<script src="skills-clase.js?v=20261125nube"></script>
+<script src="skills-clase.js?v=20261126tope"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
-<script src="skills-creep-base.js?v=20261125nube"></script>
+<script src="skills-creep-base.js?v=20261126tope"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
 <script src="biblioteca.js?v=20261124tags"></script>
 <script src="editar-item.js"></script>
@@ -1081,8 +1081,9 @@ prueba('🛡/❤ P227 (2026-10-28): los anillos de la siesta, del sereno y del e
     {id: 'a3', nombre: 'Anillo del escudo de la mañana', tipoItem: 'anillos', equipado: true, descansoEscudoEsp: 8}]};
   FichaMantenimiento.descansar(S);
   const ve = S.efectos.filter(e => e.excedenteVida).map(e => [e.nombre, e.escudoMagico, !!e.soloFisico, !!e.soloEspecial]);
+  const tope = Combatiente.topeVidaExtra(FichaCalculo.calcular(S).final.hpmax);   // ❤ (P354) la del anillo, con el tope del 50 %
   igual([ve, /un escudo/.test(FichaCalculo.EXTRA ? (FichaCalculo.EXTRA.find(x => x.id === 'cascara') || {}).full : 'un escudo')],
-    [[['Vida extra', 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
+    [[['Vida extra', tope >= 1 ? Math.min(10, tope) : 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
 });
 prueba('❤ Una sola Vida extra (2026-11-03): venga de donde venga, suma al mismo estado; dura lo de la más larga; las viejas aparte se juntan; los escudos de los anillos van aparte', () => {
   // dos curas robadas de la Sanguijuela (25 y 5) → un solo «Vida extra 30»
@@ -1106,6 +1107,67 @@ prueba('❤ Una sola Vida extra (2026-11-03): venga de donde venga, suma al mism
     comunes(t.quedan).length, comunes(t.quedan)[0].escudoMagicoActual, t.quedan.filter(e => e.soloFisico).length, exc],
     [1, 30, 1, 10, true, false, 1, 30, 1, 0]);
   igual(enLaOriginal, [1, 30]);
+});
+prueba('❤ P354 (2026-11-26): la Vida extra, venga de donde venga, con tope del 50 % del máximo', () => {
+  const C = Combatiente;
+  // el cálculo: 50 de vida → tope 25; 35 → 17 (para abajo); sin máximo, sin tope
+  igual([C.VIDA_EXTRA_TOPE, C.topeVidaExtra(50), C.topeVidaExtra(35), C.vidaExtraEntra([], 30, 0).sinTope], [50, 25, 17, true]);
+  const r = C.vidaExtraEntra(C.sumarVidaExtra([], 19), 6, 50);
+  igual([r.pedido, r.suma, r.antes, r.tope, r.queda, r.recortado], [6, 6, 19, 25, 25, false]);
+  const r2 = C.vidaExtraEntra(C.sumarVidaExtra([], 22), 6, 50);
+  igual([r2.suma, r2.queda, r2.recortado, C.vidaExtraTopeTxt(r2)], [3, 25, true, '+6, pero el tope es +25 (50 % de tu máximo): quedó +25']);
+  igual(C.vidaExtraTopeTxt(r2, {su: true}), '+6, pero el tope es +25 (50 % de su máximo): quedó +25');
+  igual(C.vidaExtraTopeTxt(r), '');
+  // la Sanguijuela que llegó a +30 (sobre 50): ya no pasa de +25
+  const s1 = C.sumarVidaExtraTope(C.sumarVidaExtra([], 25, {fuente: 'Drenar vida'}), 5, 50, {fuente: 'Sanguijuela'});
+  igual([C.vidaExtraDe(s1.estados), s1.tope.suma, s1.tope.recortado], [25, 0, true]);
+  // sumarVidaExtra con o.hpMax también topea
+  igual(C.vidaExtraDe(C.sumarVidaExtra([], 40, {hpMax: 50})), 25);
+  // agregarEstado (el «+ Estado», una habilidad, un consumible, lo recibido): con o.hpMax topea y lo dice; un creep pasa `sc`
+  const sc = {hpMax: 40, estados: []};
+  const a = C.agregarEstado(sc.estados, {id: 'x', nombre: 'Vida extra', activo: true, excedenteVida: true, permanente: true, escudoMagico: 30}, sc);
+  igual([a.ok, C.vidaExtraDe(sc.estados), a.tope.recortado, a.tope.queda], [true, 20, true, 20]);
+  const b = C.agregarEstado(sc.estados, {id: 'y', nombre: 'Vida extra', activo: true, excedenteVida: true, permanente: true, escudoMagico: 5}, sc);
+  igual([b.ok, b.sumado, sc.estados.length, C.vidaExtraDe(sc.estados), b.tope.suma], [true, true, 1, 20, 0]);
+  // sin hpMax (como antes): sin tope
+  const sinMax = [];
+  C.agregarEstado(sinMax, {id: 'z', nombre: 'Vida extra', activo: true, excedenteVida: true, permanente: true, escudoMagico: 30});
+  igual(C.vidaExtraDe(sinMax), 30);
+  // los escudos de los anillos (soloFisico / soloEspecial) no cuentan ni se topean
+  const anillo = [{id: 'r', nombre: 'Escudo del sereno', activo: true, excedenteVida: true, soloFisico: true, escudoMagico: 8, escudoMagicoActual: 8}];
+  igual(C.vidaExtraEntra(anillo, 25, 50).suma, 25);
+  // dos fuentes de ítem/habilidad juntas: el Relicario después de la Sanguijuela
+  const rel = C.sumarVidaExtraTope(C.sumarVidaExtra([], 18, {fuente: 'Sanguijuela'}), 12, 50, {fuente: 'Relicario de sangre'});
+  igual([C.vidaExtraDe(rel.estados), C.vidaExtraOrigenTxt(rel.estados[0]), C.vidaExtraTopeTxt(rel.tope)], [25, 'Viene de Sanguijuela y Relicario de sangre.', '+12, pero el tope es +25 (50 % de tu máximo): quedó +25']);
+  // excedenteConTope (Relicario, por compatibilidad): el mismo tope, el pct ya no cuenta
+  igual([C.excedenteConTope([], 40, 50, 80), C.excedenteConTope([], 40, 50)], [25, 25]);
+  // a mano: escribir +40 sobre 50 de máximo queda en +25
+  const ve = C.sumarVidaExtra([], 10)[0];
+  const m = C.vidaExtraAMano([ve], ve, 40, 50);
+  igual([m.valor, m.recortado, C.vidaExtraAManoTxt(m)], [25, true, 'Pusiste +40 de Vida extra, pero el tope es +25 (50 % de tu máximo): quedó +25']);
+  igual(C.vidaExtraAMano([ve], ve, 12, 50), {valor: 12, pedido: 12, tope: 25, recortado: false});
+  igual(C.vidaExtraAMano(anillo, anillo[0], 40, 50).valor, 40);   // un escudo de anillo: no es la Vida extra común
+});
+prueba('❤ P354: a un personaje la Vida extra le llega con el tope (lo recibido, la Sanguijuela) y el aviso lo dice', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; S.attrs.con = 10; S.efectos = [];
+  const max = FichaCalculo.calcular(S).final.hpmax, tope = Combatiente.topeVidaExtra(max);
+  S.hp = max;
+  const avisos = [], ui = {cambio: () => {}, toast: t => avisos.push(t), presets: estadosPresetFicha()};
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Vida extra', escudoMagico: tope - 2, fuente: 'Drenar vida'}, 'X', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Vida extra', escudoMagico: 6, fuente: 'Relicario de sangre'}, 'X', ui);
+  const tras = Combatiente.vidaExtraDe(S.efectos);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Cura robada', vida: 9}, 'X', ui);
+  igual([tope > 4, tras, Combatiente.vidaExtraDe(S.efectos), S.efectos.filter(Combatiente.esVidaExtraComun).length,
+    avisos[1].includes(`+6, pero el tope es +${tope}`), avisos[2].includes(`+9, pero el tope es +${tope}`)], [true, tope, tope, 1, true, true]);
+  // el Relicario de sangre (una cura que pasa del máximo) sumado a lo que ya había: queda en el tope y deja el aviso
+  S.inventario = [{id: 'rel', nombre: 'Relicario de sangre', equipado: true, relicario: 10, tipoItem: 'escudo_1m'}];
+  S.efectos = Combatiente.sumarVidaExtra([], tope - 3, {fuente: 'Sanguijuela'}); S.hp = max;
+  FichaAcciones.tomarAvisoTope(); FichaAcciones.fijarHp(S, max + 8);
+  igual([S.hp, Combatiente.vidaExtraDe(S.efectos), FichaAcciones.tomarAvisoTope(), FichaAcciones.tomarAvisoTope()],
+    [max, tope, `Vida extra (Relicario de sangre) +8, pero el tope es +${tope} (50 % de tu máximo): quedó +${tope}`, '']);
+  // el «+ Estado» del selector: el texto del tope
+  igual(SelectorEstados.textoAgregado({ok: true, que: 'acumulado', sumado: true, estado: {nombre: 'Vida extra'}, tope: {pedido: 6, suma: 0, tope: 25, queda: 25, recortado: true}}, 'hpturno'),
+    'Vida extra +6, pero el tope es +25 (50 % de su máximo): quedó +25');
 });
 prueba('📋 Ver el grupo del botín (2026-11-03): los lugares vacíos y a quién le sirve cada pieza', () => {
   const S = {inventario: [{nombre: 'Espada', tipoItem: 'arma_1m', equipado: true}, {nombre: 'Chaleco', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'def', val: 2}]}]};
@@ -2859,7 +2921,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261126tope');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -3096,7 +3158,7 @@ prueba('❤ La Vida extra en corto y con su origen: el ítem o la habilidad, o �
   let l = Combatiente.sumarVidaExtra([], 6, {fuente: 'Relicario de sangre'});
   l = Combatiente.sumarVidaExtra(l, 4, {fuente: 'Drenar vida'});
   igual(EstadoCorto.detalle(l[0], {}).origen, ['Viene de Relicario de sangre y Drenar vida.']);
-  const sc = {nombre: 'Rata', hp: 5, hpMax: 10, estados: [...l]};
+  const sc = {nombre: 'Rata', hp: 5, hpMax: 40, estados: [...l]};   // (con 40 de máximo, el tope de la Vida extra es +20: P354)
   EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: 3});   // cargada desde la vida, sin origen
   igual([sc.estados.length, sc.estados[0].escudoMagicoActual, EstadoCorto.detalle(sc.estados[0], {}).origen], [1, 13, ['Viene de Relicario de sangre y Drenar vida (y una parte, cargada a mano).']]);
   // una habilidad o un consumible de creep, y una spec con `fuente` (la que manda el mapa a un personaje)
@@ -5661,12 +5723,12 @@ prueba('Ejecución ✨: «la diferencia» y «drena» se eligen en el paso Daño
   const ini = {objetivo: 'enemigo', tira: '', tiraFormula: 'X+1dX', tiraEtiqueta: 'Drenar', contra: ['resmg'], dano: true, tipoDano: 'arcano', ignoraDano: true, danoDiferencia: true, drena: true, drenaTope: 50, efectos: []};
   AsistenteDueloHab.abrir({nombre: 'Drenar Vida', inicial: ini, costoInicial: {sp: 'X', nitrosCosto: 2}, costoVariable: 'sp', alGuardar: x => { r = x; }});
   ejdPop('dano');
-  const ui = [!!ejd('input[name=fuentedano][value=dif]:checked'), !!ejd('[data-drena]:checked'), ejd('[data-drenatope]') && ejd('[data-drenatope]').value];
+  const ui = [!!ejd('input[name=fuentedano][value=dif]:checked'), !!ejd('[data-drena]:checked'), !!ejd('[data-drenatope]:checked')];   // ❤ (P354) ya no es un número: una casilla, con el tope común
   ejdGuardar(); await new Promise(res => setTimeout(res, 0));
   const c = r && r.duelo, h = Combatiente.habEjecucion({nombre: 'Drenar Vida', tiradaExtra: ''}, c, {X: 3});
   const limpia = Duelo.limpiarHab(h);
   igual([ui, c && [c.danoDiferencia, c.drena, c.drenaTope, c.danoFijoPorX], h && h.dano, limpia && limpia.dano, limpia && limpia.tira],
-    [[true, true, '50'], [true, true, 50, undefined], {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50},
+    [[true, true, true], [true, true, 50, undefined], {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50},
      {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50}, {formula: '3+1d3', etq: 'Drenar'}]);
 });
 prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño en área) — editor, regla común y duelo', async () => {
@@ -8150,7 +8212,8 @@ prueba('Anillo de la siesta (2026-10-19): cada descanso da Vida extra 10, sin ac
   const S = FichaGuardado.normalizar({}).S; S.inventario = [{id: 's', nombre: 'Anillo de la siesta', equipado: true, descansoVidaExtra: 10, tipoItem: 'anillos'}]; S.efectos = [];
   FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
   const ve = S.efectos.filter(e => e.descansoAnillo);
-  igual([ve.length, ve[0].escudoMagicoActual, !!ve[0].sinRecarga], [1, 10, true]);
+  const tope = Combatiente.topeVidaExtra(FichaCalculo.calcular(S).final.hpmax);   // ❤ (P354) con el tope del 50 % del máximo
+  igual([ve.length, ve[0].escudoMagicoActual, !!ve[0].sinRecarga], [1, tope >= 1 ? Math.min(10, tope) : 10, true]);
 });
 
 prueba('Anillos por día (2026-10-19): el herrero ambulante repara 1 cada pieza gastada y la mesa servida deja una Poción de HP', () => {
@@ -10405,7 +10468,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126tope', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10529,7 +10592,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ve2', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126tope', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

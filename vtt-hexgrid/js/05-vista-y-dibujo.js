@@ -1070,7 +1070,7 @@ function dibujarLienzo(){
     // (rad*sqrt3/2: el hexágono de lado arriba no llega a "rad" de alto.)
     const bordeV = rad * SQ3 / 2;
     let debajo = y + bordeV + 3 / z;
-    // 🫧😱💤 Los íconos de los estados en los vértices y los lados del token (js/88, 2026-11-01); si ocupan abajo, las barras bajan.
+    // 🫧😱💤 Los íconos de los estados en los vértices del token (js/88, 2026-11-01; agrupados o de lejos, P350): se anotan acá y se pintan después de todos los tokens; si ocupan abajo, las barras bajan.
     if(typeof iconosEstadosDibujar === 'function' && (est || (modoMapa === 'combate' && tokenSinArma(t)))){   // (✋ nada en la mano también va en la ronda)
       const ie = iconosEstadosDibujar(d.id, t, est || {estados: []}, x, y, rad, z);
       if(ie.animando) animando = true;
@@ -1129,6 +1129,8 @@ function dibujarLienzo(){
     ctx.globalAlpha = 1;
     if(d.tv) ctx.restore();
   });
+  // 🔘 Los iconitos de estado, encima de todos los tokens (P350, 2026-11-26): la barra de vida de un token de arriba ya no tapa los del de abajo (js/88).
+  if(typeof iconosPintarPendientes === 'function') iconosPintarPendientes();
   if(dibujarNieblaVarita(z)) animando = true;   // la niebla de una varita, encima de los tokens (2026-10-05)
   if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, true)) animando = true;   // ☁ la niebla que se va disipando (js/91)
 

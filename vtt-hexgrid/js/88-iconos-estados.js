@@ -4,8 +4,8 @@
 // con un borde verde para los estados beneficiosos y un borde rojo para los malos»).
 //
 // - Un circulito por estado (fondo oscuro, borde verde = buff, rojo = debuff, gris = ninguno), con su emoji (por familia); uno inventado, su inicial.
-// - Lugares: primero los 6 vértices del hexágono del token (empezando por los de arriba), después los 6 puntos medios de los lados: hasta 12; si hay
-//   más, el último lugar es «+N».
+// - Lugares: los 6 vértices del hexágono del token (empezando por los de arriba). Con más de 6 estados, se agrupan por familia (P350, 2026-11-26;
+//   antes había 12 lugares y un «+N»); con el mapa alejado, solo los 3 más importantes y una pastilla con los demás contados (ver iconosArmar).
 // - Orden de llegada: cada estado nuevo toma el siguiente lugar libre y lo conserva mientras dure (`iconosOrden`); los que ya estaban al cargar el
 //   mapa, en el orden en que vienen.
 // - Se dibuja en el recorrido de los tokens que se ven (js/05), así que un token oculto, en la niebla o en sigilo para el que mira no se delata.
@@ -102,10 +102,10 @@ const ICONOS_ESTADO = {
   'carga arcana': {ic: '🔮'},
 };
 const ICONOS_BORDE = {buff: '#4CB86A', debuff: '#E0434F', '': '#8A7D77'};
-const ICONOS_ANGULOS = [240, 300, 180, 0, 120, 60, 270, 210, 330, 150, 30, 90];   // 6 vértices (los de arriba primero) y después los 6 medios de los lados
+const ICONOS_ANGULOS = [240, 300, 180, 0, 120, 60, 270, 210, 330, 150, 30, 90];   // 6 vértices (los de arriba primero); desde P350 (2026-11-26) solo se usan estos 6 (los otros 6, los medios de los lados, quedaron sin uso)
 const iconosOrden = new Map();   // id del token → [nombres normalizados, en orden de llegada]
 // 🔘 Dónde quedó dibujado cada iconito (2026-11-23, dueño: «al poner el hover en el icono, que solamente diga… el efecto»): id del token →
-// [{px, py, r, e}] (en coordenadas del mapa), y el «+N» con los que no entraron (`resto`). Lo lee el globo al pasar el mouse (js/30, `iconoEn`).
+// [{px, py, r, e}] (en coordenadas del mapa), un grupo (`grupo`) y la pastilla de lejos con los que no se ven (`resto`, con w y h). Lo lee el globo al pasar el mouse (js/30, `iconoEn`).
 const iconosHit = new Map();
 
 const iconosNorm = s => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -160,12 +160,97 @@ function iconosLista(id, t, est){
 
 const iconosFuente = px => `${px}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
 
+// 🔘 Más estados que lugares (P350, dueño, 2026-11-26: «me gusta que la B, cuando se acerca, agruparlos por familia, pero la A, cuando está alejado,
+// que te muestre los 3 principales, pero que abajo haya un cosito con el número en rojo de los debuff y en verde de los buffs»).
+// - De cerca (zoom ≥ ICONOS_LEJOS): hasta 6 estados, uno por vértice, en orden de llegada (como antes). Con más de 6, los de la misma familia se juntan
+//   en un circulito con un numerito, con el ícono del más importante de la familia; nunca más de 6 circulitos (hay 6 familias).
+// - De lejos (zoom < ICONOS_LEJOS): solo los 3 más importantes y, abajo del token, una pastilla con los que no se ven: debuffs en rojo, buffs en verde
+//   (y los que no son ni una cosa ni la otra, en gris; P351). Sin escondidos, sin pastilla.
+// Las familias, de lo más importante a lo menos (dueño: lo que no deja actuar o controla, el daño por turno, las marcas / ✋ / 🕶, las defensas y los
+// buffs). Adentro de cada familia, el orden de la lista dice cuál es el más importante (su ícono es el del grupo).
+const ICONOS_LEJOS = 0.7;   // con el «−» del mapa: 1 → 0,8 sigue de cerca; 0,64 ya es de lejos
+const ICONOS_GRUPOS = [
+  {k: 'control', ic: '💫', nombre: 'Lo que no deja actuar o controla', claves: ['stun', 'pajaritos', 'sueno', 'paralisis', 'mareo de invocacion', 'panico',
+    'malviaje de floripondio', 'miedo', 'confusion', 'provocado', 'silencio', 'silenciado', 'ceguera', 'cegado', 'cegada', 'inmovilizado', 'agarrado', 'mordido',
+    'tropezado', 'sentado', 'exhausto', 'desarmado', 'lisiado', 'rengo', 'lento', 'agarrando', 'mordiendo']},
+  {k: 'dano', ic: '🩸', nombre: 'Daño por turno', claves: ['veneno severo', 'veneno', 'quemadura', 'sangrado', 'sanguijuela', 'atormentado', 'maldito', 'en la zona']},
+  {k: 'marcas', ic: '🎯', nombre: 'Marcas y debilidades', claves: ['marcado', 'presa senalada', 'presa', 'punto debil', 'expuesto', 'herida sombria', '__mano', 'sigilo',
+    'armadura rota', 'sobrepeso', 'escarcha', 'debilitado', 'cansado', 'extenuado', 'tendon cortado', 'desequilibrado', 'deslumbrado', 'escalofrio', 'mente abierta',
+    'coraza maldita', 'sequia', 'mufa', 'mala sombra']},
+  {k: 'defensa', ic: '🪨', nombre: 'Defensas', claves: ['invulnerable', 'titilando', 'etereo', 'inmunidad a cc', 'inmunidad mental', 'inmune a lo toxico', 'shield',
+    'escudo especial', 'barrera', 'armadura arcana', 'vida extra', 'llama de fenix', 'piel de hierro', 'blindado', 'endurecido', 'cuero duro', 'muro de escudos',
+    'al frente', 'interpuesto', 'estoicismo', 'inamovible', 'aguante', 'paso atras', 'espinas', 'espejo', 'sangre pura', 'coagulacion', 'escudo igneo',
+    'escudo helado', 'escudo electrico', 'escudo acido', 'escudo venenoso', 'escudo luminoso', 'escudo siniestro']},
+  {k: 'buff', ic: '💪', nombre: 'Buffs', claves: ['empower', 'hypeado', 'frenetico', 'enfurecido', 'bendecido', 'arrojo', 'desafiante', 'afortunado', 'vigilancia',
+    'enfocado', 'apuntando a la cabeza', 'golpe anunciado', 'carga arcana', 'ojo certero', 'critico frecuente', 'critico potente', 'armas perforantes', 'perforante',
+    'arma ignea', 'arma helada', 'arma electrica', 'arma acida', 'arma venenosa', 'arma luminosa', 'arma siniestra', 'arma bendecida', 'arma envenenada',
+    'oleo venenoso', 'oleo venenoso concentrado', 'acelerado', 'sprint', 'redoble', 'adrenalina', 'pila pila', 'repitiendo', 'regeneracion', 'vuela', 'levitando',
+    'bajo el estandarte', 'en el aura sanadora', 'vaquita de san antonio', 'toques de carga']},
+  {k: 'otro', ic: '◇', nombre: 'Otros', claves: []},
+];
+const iconosRango = new Map();   // clave → [familia, lugar adentro de la familia]
+ICONOS_GRUPOS.forEach((g, f) => g.claves.forEach((c, i) => { if(!iconosRango.has(c)) iconosRango.set(c, [f, i]); }));
+const iconosFam = k => ICONOS_GRUPOS.findIndex(g => g.k === k);
+// La polaridad de lo que se ve: la del estado; si no trae, la de su ícono (un inventado con palabra conocida); ✋ y los «otro», ninguna.
+function iconosPolaridad(clave, e){
+  if(e && (e.polaridad === 'buff' || e.polaridad === 'debuff')) return e.polaridad;
+  const def = clave === '__mano' ? null : iconoDeEstado(clave);
+  return (def && def.pol) || '';
+}
+// → [familia, lugar]. Se busca el nombre tal cual, sin lo de entre paréntesis («Regeneración (túnica)»), sin el emoji de adelante ni lo que va
+// después de «:» («En la zona: Nube tóxica»). Uno que no está: un control (esCC) va a los controles; uno que saca vida por turno, al daño; un debuff
+// cualquiera, a las debilidades; un buff, a los buffs; si no, a «Otros». Las zonas que ayudan van a los buffs.
+function iconosFamiliaDe(clave, e){
+  const base = clave.replace(/\s*\(.*\)\s*$/, '');
+  const sinEmoji = base.replace(/^[^a-zñ_]+/, '').replace(/:.*$/, '').trim();
+  const pol = iconosPolaridad(clave, e);
+  for(const c of [clave, base, sinEmoji]){
+    const r = iconosRango.get(c);
+    if(r && !(c === 'en la zona' && pol === 'buff')) return r;
+  }
+  if(sinEmoji === 'en la zona') return [iconosFam('buff'), 999];
+  if(e && e.esCC) return [iconosFam('control'), 999];
+  if(e && [e.hpTurno, e.vidaTurno, e.hpturno].some(v => (Number(v) || 0) < 0)) return [iconosFam('dano'), 999];
+  if(pol === 'debuff') return [iconosFam('marcas'), 999];
+  if(pol === 'buff') return [iconosFam(/escud|armadur|cuero|piel|coraza|blind|endurec|barrera|inmun/.test(clave) ? 'defensa' : 'buff'), 999];
+  return [iconosFam('otro'), 999];
+}
+// Qué circulitos van y qué queda en la pastilla. lista = [{clave, e}] en orden de llegada. →
+// {circulos: [{clave, e, pol, items: [{clave, e}], grupo: índice de la familia | null}], pastilla: null | {debuff, buff, otro, resto: [e]}}
+function iconosArmar(lista, lejos){
+  const conRango = lista.map((x, i) => ({...x, i, fam: iconosFamiliaDe(x.clave, x.e), pol: iconosPolaridad(x.clave, x.e)}));
+  const orden = [...conRango].sort((a, b) => a.fam[0] - b.fam[0] || a.fam[1] - b.fam[1] || a.i - b.i);
+  const solo = x => ({clave: x.clave, e: x.e, pol: x.pol, items: [{clave: x.clave, e: x.e}], grupo: null});
+  if(lejos){
+    const ver = orden.slice(0, 3), resto = orden.slice(3);
+    const cuenta = p => resto.filter(x => x.pol === p).length;
+    return {circulos: ver.map(solo), pastilla: resto.length ? {debuff: cuenta('debuff'), buff: cuenta('buff'), otro: cuenta(''), resto: resto.map(x => x.e)} : null};
+  }
+  if(conRango.length <= 6) return {circulos: conRango.map(solo), pastilla: null};
+  const grupos = new Map();
+  orden.forEach(x => { if(!grupos.has(x.fam[0])) grupos.set(x.fam[0], []); grupos.get(x.fam[0]).push(x); });
+  const circulos = [...grupos.entries()].map(([f, xs]) => {
+    if(xs.length === 1) return solo(xs[0]);
+    const pols = new Set(xs.map(x => x.pol));
+    return {clave: xs[0].clave, e: xs[0].e, pol: pols.size === 1 ? xs[0].pol : '', items: xs.map(x => ({clave: x.clave, e: x.e})), grupo: f};
+  });
+  return {circulos: circulos.slice(0, 6), pastilla: null};
+}
+
+// Los iconitos se dibujan después de todos los tokens (2026-11-26): así la barra de vida de un token de arriba no tapa los iconitos del de abajo.
+// iconosEstadosDibujar arma y anota; iconosPintarPendientes (js/05, al final del recorrido de los tokens) los pinta.
+let iconosPend = [];
+function iconosPintarPendientes(){
+  const lista = iconosPend; iconosPend = [];
+  lista.forEach(f => { try{ f(); }catch(err){ console.error('Íconos de estados:', err); } });
+}
+
 // En el recorrido de los tokens que se ven (js/05). → {animando, abajo}: si hay que seguir animando y cuánto ocupan por debajo del token (para
 // correr las barras).
 function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   const res = {animando: false, abajo: 0};
-  // ✋ Nada en la mano (dueño, 2026-11-01: «que la mano se ubique como el resto de los estados»): un circulito más, borde gris, al final de la ronda,
-  // solo en modo combate (como la marca de antes, js/05).
+  // ✋ Nada en la mano (dueño, 2026-11-01: «que la mano se ubique como el resto de los estados»): un circulito más, borde gris, solo en modo combate
+  // (como la marca de antes, js/05); ahora con su familia (las marcas).
   const mano = modoMapa === 'combate' && typeof tokenSinArma === 'function' && tokenSinArma(t);
   const deArea = typeof estadosDeArea === 'function' ? estadosDeArea(t) : [];
   if(deArea.length) est = {...(est || {}), estados: [...((est && est.estados) || []), ...deArea]};
@@ -174,67 +259,105 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   const lista = iconosLista(id, t, est || {estados: []});
   if(mano) lista.push({clave: '__mano', e: {nombre: 'Nada en la mano', mano: true}});
   if(!lista.length) return res;
+  const lejos = z < ICONOS_LEJOS;
+  const {circulos, pastilla} = iconosArmar(lista, lejos);
   const hit = [];
   iconosHit.set(id, hit);
-  const r = Math.max(6 / z, rad * 0.235);
-  const max = ICONOS_ANGULOS.length;
-  const ver = lista.length > max ? lista.slice(0, max - 1) : lista;
-  const ahora = performance.now();
-  const alfaPrevio = ctx.globalAlpha;
-  ctx.save();
-  ctx.globalAlpha = Math.max(alfaPrevio, 0.85);
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const r = lejos ? Math.max(5.5 / z, rad * 0.32) : Math.max(6 / z, rad * 0.29);
   const lugar = i => {
-    const a = ICONOS_ANGULOS[i] * Math.PI / 180, esVertice = i < 6;
-    const d = esVertice ? rad : rad * Math.sqrt(3) / 2;
-    return {px: x + d * Math.cos(a), py: y + d * Math.sin(a)};
+    const a = ICONOS_ANGULOS[i] * Math.PI / 180;
+    return {px: x + rad * Math.cos(a), py: y + rad * Math.sin(a)};
   };
-  const circulo = (px, py, borde, fondo) => {
-    ctx.beginPath(); ctx.arc(px, py, r, 0, 2 * Math.PI);
-    ctx.fillStyle = fondo || 'rgba(15,12,14,.92)'; ctx.fill();
-    ctx.lineWidth = Math.max(1.6 / z, r * 0.2); ctx.strokeStyle = borde; ctx.stroke();
-  };
-  ver.forEach(({clave, e}, i) => {
+  const bordeV = rad * Math.sqrt(3) / 2;
+  const pos = circulos.map((c, i) => {
     const {px, py} = lugar(i);
-    if(py + r > y + rad * 0.8) res.abajo = Math.max(res.abajo, py + r - (y + rad * Math.sqrt(3) / 2));
-    hit.push({px, py, r, e});
-    const def = iconoDeEstado(clave);
-    const pol = e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : (def && def.pol) || '';
-    circulo(px, py, ICONOS_BORDE[pol], def && def.fondo);
-    const semilla = (i * 97 + id.length * 13) % 1000;
-    if(def){
-      ctx.font = iconosFuente(r * 1.15);
-      ctx.fillStyle = def.color || '#fff';
-      if(def.anim === 'llama'){   // la llamita late
-        const s = 1 + 0.12 * Math.sin((ahora + semilla) / 140);
-        ctx.font = iconosFuente(r * 1.15 * s);
-        res.animando = true;
-      }
-      if(def.anim === 'chispa' && Math.floor((ahora + semilla) / 180) % 4 === 0) ctx.globalAlpha *= 0.45;   // el chispazo parpadea
-      ctx.fillText(def.ic, px, py + r * 0.08);
-      ctx.globalAlpha = Math.max(alfaPrevio, 0.85);
-      if(def.tachado){   // la armadura rota: una raya que la parte
-        ctx.beginPath(); ctx.moveTo(px - r * 0.6, py + r * 0.6); ctx.lineTo(px + r * 0.6, py - r * 0.6);
-        ctx.lineWidth = Math.max(1.5 / z, r * 0.18); ctx.strokeStyle = '#E0434F'; ctx.stroke();
-      }
-      if(def.anim && iconosAnimar(def, px, py, r, z, ahora + semilla)) res.animando = true;
-    }else{
-      ctx.font = `700 ${r * 1.05}px "Space Grotesk", system-ui, sans-serif`;
-      ctx.fillStyle = '#fff';
-      ctx.fillText((String(e.nombre).trim()[0] || '·').toUpperCase(), px, py + r * 0.06);
-    }
+    if(py + r > y + rad * 0.8) res.abajo = Math.max(res.abajo, py + r - (y + bordeV));
+    hit.push(c.grupo !== null ? {px, py, r, grupo: {fam: c.grupo, items: c.items.map(q => q.e)}} : {px, py, r, e: c.e});
+    const def = c.clave === '__mano' ? ICONOS_ESTADO.__mano : iconoDeEstado(c.clave);
+    if(def && def.anim) res.animando = true;
+    return {px, py, def};
   });
-  if(lista.length > max){
-    const {px, py} = lugar(max - 1);
-    hit.push({px, py, r, resto: lista.slice(max - 1).map(x => x.e)});
-    circulo(px, py, '#C9B9A6');
-    ctx.font = `700 ${r * 0.95}px "Space Grotesk", system-ui, sans-serif`;
-    ctx.fillStyle = '#fff';
-    ctx.fillText('+' + (lista.length - (max - 1)), px, py + r * 0.06);
-    if(py + r > y + rad * 0.8) res.abajo = Math.max(res.abajo, py + r - (y + rad * Math.sqrt(3) / 2));
+  // La pastilla de lejos: abajo del token, antes de las barras.
+  let pst = null;
+  if(pastilla){
+    const fs = Math.max(8 / z, rad * 0.3), h = fs * 1.35;
+    const partes = [];
+    if(pastilla.debuff) partes.push(['+' + pastilla.debuff, '#FF6B74']);
+    if(pastilla.buff) partes.push(['+' + pastilla.buff, '#6FDC8C']);
+    if(pastilla.otro) partes.push(['+' + pastilla.otro, '#C9B9A6']);
+    ctx.save(); ctx.font = `800 ${fs}px "Space Grotesk", system-ui, sans-serif`;
+    partes.forEach(q => { q[2] = ctx.measureText(q[0]).width; });
+    ctx.restore();
+    const hueco = fs * 0.3, w = partes.reduce((n, q) => n + q[2], 0) + (partes.length - 1) * hueco + fs * 0.8;
+    const py = y + bordeV + 2 / z + h / 2;
+    pst = {fs, h, w, py, partes, hueco};
+    hit.push({px: x, py, r: h / 2, w, h, resto: pastilla.resto, pastilla: true});
+    res.abajo = Math.max(res.abajo, h + 3 / z);
   }
-  ctx.restore();
-  ctx.globalAlpha = alfaPrevio;
+  const tf = ctx.getTransform(), alfaPrevio = ctx.globalAlpha;
+  iconosPend.push(() => {
+    const ahora = performance.now();
+    ctx.save();
+    ctx.setTransform(tf);
+    const alfa = Math.max(alfaPrevio, 0.85);
+    ctx.globalAlpha = alfa;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const circulo = (px, py, borde, fondo) => {
+      ctx.beginPath(); ctx.arc(px, py, r, 0, 2 * Math.PI);
+      ctx.fillStyle = fondo || 'rgba(15,12,14,.92)'; ctx.fill();
+      ctx.lineWidth = Math.max(1.6 / z, r * 0.2); ctx.strokeStyle = borde; ctx.stroke();
+    };
+    circulos.forEach((c, i) => {
+      const {px, py, def} = pos[i], e = c.e;
+      circulo(px, py, ICONOS_BORDE[c.pol], def && def.fondo);
+      const semilla = (i * 97 + id.length * 13) % 1000;
+      if(def){
+        ctx.font = iconosFuente(r * 1.15);
+        ctx.fillStyle = def.color || '#fff';
+        if(def.anim === 'llama'){   // la llamita late
+          const s = 1 + 0.12 * Math.sin((ahora + semilla) / 140);
+          ctx.font = iconosFuente(r * 1.15 * s);
+        }
+        if(def.anim === 'chispa' && Math.floor((ahora + semilla) / 180) % 4 === 0) ctx.globalAlpha *= 0.45;   // el chispazo parpadea
+        ctx.fillText(def.ic, px, py + r * 0.08);
+        ctx.globalAlpha = alfa;
+        if(def.tachado){   // la armadura rota: una raya que la parte
+          ctx.beginPath(); ctx.moveTo(px - r * 0.6, py + r * 0.6); ctx.lineTo(px + r * 0.6, py - r * 0.6);
+          ctx.lineWidth = Math.max(1.5 / z, r * 0.18); ctx.strokeStyle = '#E0434F'; ctx.stroke();
+        }
+        if(def.anim) iconosAnimar(def, px, py, r, z, ahora + semilla);
+      }else{
+        ctx.font = `700 ${r * 1.05}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.fillText((String(e.nombre).trim()[0] || '·').toUpperCase(), px, py + r * 0.06);
+      }
+      if(c.items.length > 1){   // el numerito del grupo, arriba a la derecha
+        const bx = px + r * 0.82, by = py - r * 0.82, br = Math.max(4.5 / z, r * 0.56);
+        ctx.beginPath(); ctx.arc(bx, by, br, 0, 2 * Math.PI);
+        ctx.fillStyle = '#F0D27A'; ctx.fill();
+        ctx.lineWidth = Math.max(1 / z, br * 0.18); ctx.strokeStyle = '#0F0C0E'; ctx.stroke();
+        ctx.font = `800 ${br * 1.35}px "Space Grotesk", system-ui, sans-serif`;
+        ctx.fillStyle = '#1A1418';
+        ctx.fillText(String(c.items.length), bx, by + br * 0.08);
+      }
+    });
+    if(pst){
+      const x0 = x - pst.w / 2, y0 = pst.py - pst.h / 2, rr = pst.h / 2;
+      ctx.beginPath();
+      ctx.moveTo(x0 + rr, y0); ctx.lineTo(x0 + pst.w - rr, y0); ctx.arc(x0 + pst.w - rr, pst.py, rr, -Math.PI / 2, Math.PI / 2);
+      ctx.lineTo(x0 + rr, y0 + pst.h); ctx.arc(x0 + rr, pst.py, rr, Math.PI / 2, Math.PI * 1.5); ctx.closePath();
+      ctx.fillStyle = 'rgba(15,12,14,.92)'; ctx.fill();
+      ctx.lineWidth = Math.max(1.2 / z, pst.h * 0.08); ctx.strokeStyle = '#C9B9A6'; ctx.stroke();
+      ctx.font = `800 ${pst.fs}px "Space Grotesk", system-ui, sans-serif`;
+      ctx.textAlign = 'left';
+      let cx = x0 + pst.fs * 0.4;
+      pst.partes.forEach(([tx, col, ancho]) => {
+        ctx.fillStyle = col; ctx.fillText(tx, cx, pst.py + pst.fs * 0.05);
+        cx += ancho + pst.hueco;
+      });
+    }
+    ctx.restore();
+  });
   return res;
 }
 
@@ -289,9 +412,9 @@ function iconosAnimar(def, px, py, r, z, ms){
 }
 
 // Los tokens que ya no están: fuera de la memoria del orden.
-function iconosLimpiar(){ iconosOrden.forEach((_, id) => { if(!tokens.has(id)) iconosOrden.delete(id); }); iconosHit.forEach((_, id) => { if(!tokens.has(id)) iconosHit.delete(id); }); }
+function iconosLimpiar(){ iconosPend = []; iconosOrden.forEach((_, id) => { if(!tokens.has(id)) iconosOrden.delete(id); }); iconosHit.forEach((_, id) => { if(!tokens.has(id)) iconosHit.delete(id); }); }
 
-// 🔘 El iconito bajo el mouse (x, y del mapa) → {id, e} o {id, resto}, o null. Solo de los tokens que esta pantalla ve ahora (`disposicion`, js/05):
+// 🔘 El iconito bajo el mouse (x, y del mapa) → {id, e}, {id, grupo: {fam, items}} (un grupo de cerca) o {id, resto} (la pastilla de lejos), o null. Solo de los tokens que esta pantalla ve ahora (`disposicion`, js/05):
 // un token oculto, en la niebla o en sigilo para el que mira no tiene iconitos a los que pasarles el mouse.
 function iconoEn(x, y){
   const vistos = new Set((typeof disposicion !== 'undefined' ? disposicion : []).map(d => d.id));
@@ -300,7 +423,8 @@ function iconoEn(x, y){
     if(!vistos.has(id)) return;
     lista.forEach(h => {
       const dist = Math.hypot(h.px - x, h.py - y);
-      if(dist <= h.r * 1.1 && (!mejor || dist < mejor.dist)) mejor = {dist, id, e: h.e, resto: h.resto};
+      const dentro = h.w ? Math.abs(h.px - x) <= h.w / 2 + 1 && Math.abs(h.py - y) <= h.h / 2 + 1 : dist <= h.r * 1.1;   // (la pastilla es un rectángulo)
+      if(dentro && (!mejor || dist < mejor.dist)) mejor = {dist, id, e: h.e, resto: h.resto, grupo: h.grupo};
     });
   });
   return mejor;

@@ -63,11 +63,17 @@ function estadoCortoFilaHtml(e, o, arriba){
     + `<b>${esc(g.titulo)}</b>${g.dura ? ` <span style="color:#B7A99F">· ${esc(g.dura)}</span>` : ''}`
     + (g.efecto ? `<div style="color:#D9CFC6;font-size:11.5px;margin-left:14px">${esc(g.efecto)}</div>` : '') + '</div>';
 }
-// 🔘 El globo de UN iconito alrededor del token: solo ese estado (o los que no entraron, si es el «+N»).
+// 🔘 El globo de UN iconito alrededor del token: solo ese estado, los de su grupo (de cerca) o los que no se ven (la pastilla de lejos).
 function hoverIconoHtml(t, ic){
   const o = estadoCortoOpc(t), veEscudo = soyGM || t.tipo !== 'creep';
   const limpio = e => veEscudo ? e : {...e, escudo: undefined, escudoMax: undefined};
-  if(ic.resto) return `<div style="font-weight:700;color:#F0D27A">${ic.resto.length} estados más</div>` + ic.resto.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('') + hoverDetallePie();
+  if(ic.resto) return `<div style="font-weight:700;color:#F0D27A">${ic.resto.length} estado${ic.resto.length === 1 ? '' : 's'} más</div>` + ic.resto.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('') + hoverDetallePie();
+  // 🔘 Un grupo de cerca (P350, 2026-11-26): «💫 Lo que no deja actuar o controla · 4» y un renglón por estado, como el globo de cada iconito.
+  if(ic.grupo){
+    const g = (typeof ICONOS_GRUPOS !== 'undefined' && ICONOS_GRUPOS[ic.grupo.fam]) || {ic: '', nombre: 'Estados'};
+    return `<div style="font-weight:700;color:#F0D27A">${esc(g.ic + ' ' + g.nombre)} · ${ic.grupo.items.length}</div>`
+      + ic.grupo.items.map(e => estadoCortoFilaHtml(limpio(e), o, 4)).join('') + (ic.grupo.items.every(e => e && e.mano) ? '' : hoverDetallePie());
+  }
   return estadoCortoFilaHtml(limpio(ic.e), o, 0) + (ic.e && ic.e.mano ? '' : hoverDetallePie());
 }
 function hoverEstadosMostrar(){
@@ -92,7 +98,7 @@ lienzo.addEventListener('pointermove', e => {
   // 🔘 Primero un iconito de estado (2026-11-23): su globo dice solo ese estado; si no, el token entero.
   const ic = typeof iconoEn === 'function' ? iconoEn(m.x, m.y) : null;
   const tok = ic ? ic.id : tokenEn(m.x, m.y);
-  const id = ic ? `ic:${ic.id}:${ic.resto ? '+' : (ic.e && ic.e.nombre)}` : tok;
+  const id = ic ? `ic:${ic.id}:${ic.resto ? '+' + ic.resto.length : ic.grupo ? 'g' + ic.grupo.fam + ':' + ic.grupo.items.length : (ic.e && ic.e.nombre)}` : tok;
   hoverEstados.x = e.clientX; hoverEstados.y = e.clientY;
   if(id !== hoverEstados.id){
     hoverEstadosOcultar();

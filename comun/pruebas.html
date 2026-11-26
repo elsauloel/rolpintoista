@@ -3071,11 +3071,82 @@ prueba('🔘 El detalle de ◎ Estados alterados: la cuenta del sobrepeso, de d�
 prueba('🔘 El mapa: el mouse sobre un iconito muestra solo ese estado; ◎ muestra el detalle (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
   const [t88, t30, t10, html] = await Promise.all(['js/88-iconos-estados.js', 'js/30-hover-estados.js', 'js/10-hud-y-vida.js', 'mapa.html'].map(leer));
-  cierto(/function iconoEn\(x, y\)/.test(t88) && /hit\.push\(\{px, py, r, e\}\)/.test(t88) && /vistos\.has\(id\)/.test(t88), 'dónde quedó cada iconito, solo de los tokens que se ven');
+  cierto(/function iconoEn\(x, y\)/.test(t88) && /\{px, py, r, e: c\.e\}/.test(t88) && /vistos\.has\(id\)/.test(t88), 'dónde quedó cada iconito, solo de los tokens que se ven');
   cierto(/iconoEn\(m\.x, m\.y\)/.test(t30) && /function hoverIconoHtml/.test(t30) && /EstadoCorto\.globo/.test(t30), 'el globo del iconito');
   cierto(/botón ◎ Estados alterados \(o la tecla E\)/.test(t30) && (t30.match(/hoverDetallePie\(\)/g) || []).length >= 3, 'al pie de los dos globos, dónde se ve el detalle');
   cierto(/EstadoCorto\.detalle\(eV, o\)/.test(t10) && /hud-estado-det/.test(t10), 'el detalle en ◎');
   cierto(/comun\/estado-corto\.js/.test(html));
+});
+// (las piezas puras del js/88, aisladas: armar los circulitos y las familias)
+async function iconos88(){
+  const t88 = await (await fetch('../vtt-hexgrid/js/88-iconos-estados.js', {cache: 'no-store'})).text();
+  return new Function(t88 + '; return {iconosArmar, iconosFamiliaDe, iconosPolaridad, ICONOS_GRUPOS, ICONOS_LEJOS, iconosNorm};')();
+}
+prueba('🔘 Iconitos de estado de cerca: hasta 6 uno por vértice; con más, agrupados por familia con numerito, nunca más de 6 (P350, 2026-11-26)', async () => {
+  const I = await iconos88();
+  const L = (...ns) => ns.map(n => typeof n === 'string' ? {clave: I.iconosNorm(n), e: {nombre: n}} : n);
+  const E = (nombre, polaridad, extra) => ({clave: I.iconosNorm(nombre), e: {nombre, polaridad, ...(extra || {})}});
+  // Con 6: como antes, en orden de llegada, sin agrupar.
+  const seis = I.iconosArmar([E('Veneno', 'debuff'), E('Empower', 'buff'), E('Stun', 'debuff'), E('Sangrado', 'debuff'), E('Marcado', 'debuff'), E('Endurecido', 'buff')], false);
+  igual([seis.circulos.map(c => c.e.nombre), seis.circulos.every(c => c.items.length === 1 && c.grupo === null), seis.pastilla],
+    [['Veneno', 'Empower', 'Stun', 'Sangrado', 'Marcado', 'Endurecido'], true, null]);
+  // El Warrior de la evaluación, con 16: seis familias como mucho; el ícono del grupo es el del más importante; el borde, el de todos o gris si se mezclan.
+  const w16 = [E('Veneno', 'debuff'), E('Sangrado', 'debuff'), E('Quemadura', 'debuff'), E('Stun', 'debuff'), E('Miedo', 'debuff'), E('Lento', 'debuff'),
+    E('Armadura rota', 'debuff'), E('Marcado', 'debuff'), E('Escarcha', 'debuff'), E('Provocado', 'debuff'), E('Ceguera', 'debuff'), E('Expuesto', 'debuff'),
+    E('Hypeado', 'buff'), E('Empower', 'buff'), E('Bendecido', 'buff'), E('Endurecido', 'buff')];
+  const g = I.iconosArmar(w16, false);
+  igual(g.circulos.map(c => [c.clave, c.items.length, c.pol, c.grupo === null ? null : I.ICONOS_GRUPOS[c.grupo].k]),
+    [['stun', 5, 'debuff', 'control'], ['veneno', 3, 'debuff', 'dano'], ['marcado', 4, 'debuff', 'marcas'], ['endurecido', 1, 'buff', null], ['empower', 3, 'buff', 'buff']]);
+  igual(g.circulos[0].items.map(x => x.e.nombre), ['Stun', 'Miedo', 'Provocado', 'Ceguera', 'Lento']);
+  igual(g.circulos.reduce((n, c) => n + c.items.length, 0), 16);   // no se esconde ninguno
+  // ✋ y 🕶 van con las marcas; un grupo con buffs y debuffs mezclados lleva borde gris.
+  const mez = I.iconosArmar([E('Stun', 'debuff'), E('Miedo', 'debuff'), E('Veneno', 'debuff'), E('Sigilo', 'buff'), {clave: '__mano', e: {nombre: 'Nada en la mano', mano: true}},
+    E('Marcado', 'debuff'), E('Empower', 'buff')], false);
+  igual(mez.circulos.map(c => [c.clave, c.items.length, c.pol]), [['stun', 2, 'debuff'], ['veneno', 1, 'debuff'], ['marcado', 3, ''], ['empower', 1, 'buff']]);
+  // Hasta 6 circulitos aunque estén las seis familias (con un estado inventado sin polaridad, en «Otros»).
+  const todas = I.iconosArmar([E('Stun', 'debuff'), E('Veneno', 'debuff'), E('Marcado', 'debuff'), E('Shield', 'buff'), E('Empower', 'buff'), E('Ritual raro', ''), E('Miedo', 'debuff')], false);
+  igual([todas.circulos.length, todas.circulos.map(c => I.ICONOS_GRUPOS[I.iconosFamiliaDe(c.clave, c.e)[0]].k)], [6, ['control', 'dano', 'marcas', 'defensa', 'buff', 'otro']]);
+});
+prueba('🔘 Las familias de los estados: los de la tabla, los de zona, el sobrepeso y uno inventado (P350, 2026-11-26)', async () => {
+  const I = await iconos88();
+  const fam = (n, e) => I.ICONOS_GRUPOS[I.iconosFamiliaDe(I.iconosNorm(n), {nombre: n, ...(e || {})})[0]].k;
+  igual(['Sueño', 'Mareo de invocación', 'Desarmado', 'Veneno severo', 'Maldito', 'Sobrepeso', 'Sigilo', 'Escarcha', 'Regeneración (túnica)', 'Shield', 'Escudo ígneo',
+    'Vuela', 'Muro de escudos (+2 Def)', 'Bajo el estandarte', 'Agarrando'].map(n => fam(n)),
+    ['control', 'control', 'control', 'dano', 'dano', 'marcas', 'marcas', 'marcas', 'buff', 'defensa', 'defensa', 'buff', 'defensa', 'buff', 'control']);
+  igual([fam('En la zona: Nube tóxica', {polaridad: 'debuff'}), fam('En la zona: Círculo sagrado', {polaridad: 'buff'}),
+    fam('Embrujo del pantano', {esCC: true, polaridad: 'debuff'}), fam('Brasas', {polaridad: 'debuff', vidaTurno: -2}), fam('Mal de ojo', {polaridad: 'debuff'}),
+    fam('Coraza de corteza', {polaridad: 'buff'}), fam('Canto de guerra', {polaridad: 'buff'}), fam('Cosa rara')],
+    ['dano', 'buff', 'control', 'dano', 'marcas', 'defensa', 'buff', 'otro']);
+  // Toda la tabla de íconos tiene familia propia (ninguno cae en «Otros» por no estar en la lista).
+  const t88 = await (await fetch('../vtt-hexgrid/js/88-iconos-estados.js', {cache: 'no-store'})).text();
+  const tabla = t88.slice(t88.indexOf('const ICONOS_ESTADO = {'), t88.indexOf('const ICONOS_BORDE'));
+  const claves = [...tabla.matchAll(/'([a-zñ_ ]+)': \{ic/g)].map(m => m[1]);
+  const sueltas = claves.filter(c => !I.ICONOS_GRUPOS.some(gr => gr.claves.includes(c)));
+  igual(sueltas, []);
+  cierto(claves.length > 100, 'leyó la tabla');
+});
+prueba('🔘 Iconitos de estado de lejos: los 3 más importantes y la pastilla con los debuffs en rojo y los buffs en verde (P350, 2026-11-26)', async () => {
+  const I = await iconos88();
+  const E = (nombre, polaridad) => ({clave: I.iconosNorm(nombre), e: {nombre, polaridad}});
+  igual(I.ICONOS_LEJOS, 0.7);
+  // Llegaron primero los buffs: igual se ven los más importantes (el control, el daño, las marcas).
+  const r = I.iconosArmar([E('Empower', 'buff'), E('Bendecido', 'buff'), E('Shield', 'buff'), E('Marcado', 'debuff'), E('Veneno', 'debuff'), E('Stun', 'debuff'),
+    E('Sangrado', 'debuff'), E('Lento', 'debuff'), {clave: '__mano', e: {nombre: 'Nada en la mano', mano: true}}], true);
+  igual([r.circulos.map(c => c.e.nombre), r.circulos.every(c => c.items.length === 1)], [['Stun', 'Lento', 'Veneno'], true]);
+  igual([r.pastilla.debuff, r.pastilla.buff, r.pastilla.otro, r.pastilla.resto.map(e => e.nombre)],
+    [2, 3, 1, ['Sangrado', 'Marcado', 'Nada en la mano', 'Shield', 'Empower', 'Bendecido']]);
+  // Con 3 o menos: sin pastilla.
+  igual(I.iconosArmar([E('Empower', 'buff'), E('Veneno', 'debuff'), E('Stun', 'debuff')], true), {circulos: I.iconosArmar([E('Stun', 'debuff'), E('Veneno', 'debuff'), E('Empower', 'buff')], true).circulos, pastilla: null});
+  igual(I.iconosArmar([E('Stun', 'debuff'), E('Veneno', 'debuff'), E('Empower', 'buff'), E('Bendecido', 'buff')], true).pastilla, {debuff: 0, buff: 1, otro: 0, resto: [{nombre: 'Bendecido', polaridad: 'buff'}]});
+});
+prueba('🔘 El mapa: los iconitos se pintan después de todos los tokens y el globo de un grupo lista sus estados (P350, 2026-11-26)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
+  const [t88, t30, t05] = await Promise.all(['js/88-iconos-estados.js', 'js/30-hover-estados.js', 'js/05-vista-y-dibujo.js'].map(leer));
+  const fin = t05.indexOf('iconosPintarPendientes()'), barras = t05.indexOf('if(barras.hp) barra(est.hp, HP_COLOR)');
+  cierto(fin > barras && barras > 0, 'se pintan después de las barras de todos');
+  cierto(/iconosPend\.push\(\(\) => \{/.test(t88) && /ctx\.setTransform\(tf\)/.test(t88) && /function iconosLimpiar\(\)\{ iconosPend = \[\];/.test(t88), 'se anotan y se pintan con la vista de su token');
+  cierto(/z < ICONOS_LEJOS/.test(t88) && /resto: pastilla\.resto, pastilla: true/.test(t88) && /grupo: h\.grupo/.test(t88), 'de lejos la pastilla, de cerca los grupos; los dos con globo');
+  cierto(/if\(ic\.grupo\)\{/.test(t30) && /ICONOS_GRUPOS\[ic\.grupo\.fam\]/.test(t30) && /estadoCortoFilaHtml\(limpio\(e\), o, 4\)/.test(t30), 'el globo de un grupo');
 });
 prueba('⚖ El mapa: la tirada de Iniciativa resta el sobrepeso, el GM ajusta el número y el orden espera a la ronda; los carteles (2026-11-23, P312 y P313)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();

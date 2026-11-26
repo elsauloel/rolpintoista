@@ -2791,7 +2791,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   baúl vacío y sin las dos líneas de su registro, la vuelta «quedó igual» (la plata y la mochila de Blanco J1, como estaban). Quedan en la Mesa
   las líneas de la compra y del baúl.
 
-- **⬜ en cola (evaluado 2026-11-26, falta que el dueño elija) — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
+- **✅ hecho (evaluado 2026-11-26; el dueño eligió B de cerca y A de lejos, programado el mismo día) — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
   más estados que los slots disponibles alrededor de un token para poner los iconitos»). Ver cuántos entran hoy, qué pasa con los que sobran
   (¿se pisan, se cortan, hay un «+N»?) y proponerle al dueño cómo mostrarlos, con capturas.
   *Evaluado (2026-11-26, sin tocar código; capturas en «Claude · pruebas 2», mapa «Prueba · General», y después la vuelta: «quedó igual»):* hoy entran
@@ -2801,7 +2801,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   los últimos que llegaron sin mirar cuáles importan (al Warrior con 16 le escondió sus 4 buffs) y el gris no dice si son buenos o malos; el ✋ va
   siempre al final, así que es lo primero que se esconde. Opciones (detalle y recomendación en **P350**): (a) prioridad y un «+N» con dos colores;
   (b) **agrupar por familia cuando no entran**, hasta 6 con un numerito (💫4) — la recomendada; (c) una segunda corona más chica. En las tres, con el
-  mapa alejado mostrar menos. Falta que el dueño elija; después se programa.
+  mapa alejado mostrar menos. *Elegida y programada (2026-11-26):* ver «🔘 Iconitos de estado: agrupar por familia…» más abajo.
 
 - **✅ hecho (2026-11-23) — 🔘 El globo de los iconitos de estado dice solo el efecto; el detalle, en la ventana de estados alterados** (dueño,
   2026-11-23: «al poner el hover en el icono, que solamente diga sobrepeso: número, y en qué consiste… solamente el efecto. Si después querés ver el
@@ -3174,13 +3174,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no cura el mareo de invocación» — confirmar con él si es una regla (que no se cure con consumibles) o algo que vio que hoy no anda, y revisar qué
   hacen hoy el Cura Plus y los otros curadores con el mareo. Juntar con «😵 El Mareo de invocación se ve como estado (P332)» y «Probar: 😵 el Mareo de
   invocación que se va sin que la invocación juegue», que ya están en la cola.
-- **⬜ en cola — 🔘 Iconitos de estado: agrupar por familia de cerca y los 3 principales de lejos (P350 decidida)** (dueño, 2026-11-26):
+- **✅ hecho (2026-11-26) — 🔘 Iconitos de estado: agrupar por familia de cerca y los 3 principales de lejos (P350 decidida)** (dueño, 2026-11-26):
   **de cerca (zoom normal o más):** opción B — hasta 6 estados, uno por vértice como hoy; con más, los de la misma familia se juntan en un circulito
   con numerito (💫4 = cuatro controles…), nunca más de 6 circulitos, y al pasar el mouse por un grupo se ve qué tiene; las familias se ordenan por
   importancia (lo que no deja actuar, el daño por turno, las marcas / ✋ / 🕶, las defensas y los buffs). **De lejos (mapa alejado):** opción A — solo
   los 3 más importantes y, abajo del token, una pastillita con el número de debuffs en rojo y el de buffs en verde (los que no se muestran). Bocetos:
   la evaluación del 2026-11-26 (entrada «Evaluar qué pasa cuando hay más estados que lugares…»). De paso: con tokens uno arriba del otro, la barra
   de vida queda encima de los iconitos del de abajo (visto en la evaluación).
+  *Resultado:* **de cerca** (zoom 0,7 o más), hasta 6 estados van uno por vértice, en orden de llegada, como antes (un poco más grandes); con más de 6
+  se juntan por familia en un circulito con el ícono del más importante y un numerito dorado (💫5). Seis familias, en este orden: lo que no deja actuar o
+  controla, el daño por turno, las marcas y debilidades (con el ✋, el 🕶 y el ⚖), las defensas, los buffs y «otros»: nunca más de 6 circulitos y no se
+  esconde ninguno. El globo de un grupo dice «💫 Lo que no deja actuar o controla · 5» y un renglón por estado con su efecto corto. **De lejos** (zoom
+  menor a 0,7: dos toques del «−»), solo los 3 más importantes y, abajo del token, la pastilla con los que no se ven (rojo debuffs, verde buffs, gris
+  los que no son ni una cosa ni la otra); su globo los lista. **De paso**: los iconitos se pintan después de todos los tokens, así que la barra de
+  vida del de arriba ya no los tapa. Probado con clics en «Claude · pruebas 2» (Prueba · General): Blanco J1 con 3, el Tanque con 6, la Abeja con 9,
+  el Warrior con 16 y el Debuffer escondido con 9, pegados; de cerca y de lejos, el globo de un grupo y el de la pastilla, desde el GM y desde el
+  Jugador 1 (el escondido no se ve ni tiene globo). Después, la vuelta: «quedó igual». Lo que eligió Claude: **P351**. Queda: de lejos, con tokens
+  pegados en diagonal, la pastilla de uno puede rozar un iconito del de al lado.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

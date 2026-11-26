@@ -375,7 +375,7 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   similares… mejor emojis»): `js/88-iconos-estados.js` (`iconosEstadosDibujar`, llamado desde el recorrido de tokens de js/05). Un circulito por estado
   (fondo oscuro, borde verde buff / rojo debuff / gris ninguno) con un emoji por familia (`ICONOS_ESTADO`, la tabla única: clave = nombre en minúsculas
   sin tildes; «Regeneración (túnica)» toma el de Regeneración; uno inventado lleva la inicial). Lugares: los 6 vértices (arriba primero) y después los 6
-  medios de los lados, hasta 12 (el último, «+N» si hay más); orden de llegada y lugar estable mientras dura (`iconosOrden`). Animaciones chicas
+  medios de los lados, hasta 12 (el último, «+N» si hay más; **desde el 2026-11-26, solo los 6 vértices, agrupados o de lejos: ver «Más estados que lugares»**); orden de llegada y lugar estable mientras dura (`iconosOrden`). Animaciones chicas
   (burbujas del Veneno, gotita del Sangrado, llamita, chispazo, Z del Sueño, estrellitas del Stun) mantienen `animando`. Si ocupan abajo, las
   barras bajan. No muestra los derivados ni los apagados; el Sigilo (🕶) solo si está de verdad en sigilo, y como se dibuja en el recorrido de
   tokens visibles, un rival no ve nada. Reemplazan a los circulitos con la inicial del seleccionado y a la insignia 🥷 (quedan 🙈 y ✋, más adentro).
@@ -1099,6 +1099,19 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   Probado con clics en «Claude · pruebas 2». Dudas: P313. (3) **El ⚖ alrededor del token** (2026-11-23, dueño: «que el sobrepeso además aparezca como
   un estado alrededor del token»): `iconosLista` (js/88) deja pasar el derivado «Sobrepeso» (ícono ⚖️ en `ICONOS_ESTADO`); el globo (js/30) dice
   «mientras cargue de más» y el detalle corto que publica la ficha (`FichaResumen.estadoSobrepeso`, en tercera persona, ≤ 160).
+- **🔘 Más estados que lugares: agrupados de cerca, los 3 principales de lejos** (2026-11-26, P350, dueño: «la B, cuando se acerca, agruparlos por
+  familia, pero la A, cuando está alejado, que te muestre los 3 principales, pero que abajo haya un cosito con el número en rojo de los debuff y en verde
+  de los buffs»). Reemplaza los 12 lugares y el «+N» de los íconos (más abajo). En js/88: `ICONOS_GRUPOS` (6 familias en orden de importancia: control,
+  daño por turno, marcas y debilidades —con ✋ `__mano`, 🕶 y ⚖—, defensas, buffs, otros; adentro, el orden de `claves` dice cuál manda),
+  `iconosFamiliaDe(clave, e)` (la tabla; si no está: `esCC` → control, vida por turno negativa → daño, debuff → marcas, buff → buffs o defensas,
+  si no «otros»; «En la zona: …» va al daño o a los buffs según su polaridad), `iconosPolaridad` y `iconosArmar(lista, lejos)` (puras, con pruebas).
+  **De cerca** (`vista.zoom ≥ ICONOS_LEJOS` = 0,7): hasta 6, uno por vértice en orden de llegada (`iconosOrden`); con más, un circulito por familia con
+  el ícono del primero y un numerito dorado (borde del color de todos, gris si se mezclan). **De lejos**: los 3 más importantes y una pastilla abajo
+  del token («+9 +4»: rojo debuffs, verde buffs, gris lo demás; sin escondidos, no hay), que corre las barras. `iconosHit` guarda `grupo: {fam, items}`
+  o la pastilla (`resto`, con `w`/`h`); `iconoEn` la toma como rectángulo; `hoverIconoHtml` (js/30) arma «💫 Lo que no deja actuar o controla · 5» y un
+  renglón por estado. **Se pintan después de todos los tokens**: `iconosEstadosDibujar` arma, anota el lugar y deja en `iconosPend` el dibujo (con la
+  vista y la transparencia de su token); js/05 llama a `iconosPintarPendientes()` al terminar el recorrido, así la barra del token de arriba no tapa
+  los iconitos del de abajo. Lo oculto no cambia: solo se arman en el recorrido de los tokens que se ven. Dudas: P351.
 - **🔘 El globo de cada iconito dice solo el efecto; el detalle, en ◎** (2026-11-23, dueño: «al poner el hover en el icono, que solamente diga
   sobrepeso: número, y en qué consiste… si querés ver el detalle… apretando el icono de estados alterados»): js/88 anota dónde quedó cada iconito
   (`iconosHit`, coordenadas del mapa; el «+N» con `resto`) e `iconoEn(x, y)` lo busca, solo en los tokens que esta pantalla ve (`disposicion`). js/30:

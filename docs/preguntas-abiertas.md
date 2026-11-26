@@ -2956,3 +2956,18 @@ que no se pisa con los tokens de al lado; no esconde nada (todo queda contado en
 En cualquiera de las tres, con el mapa alejado conviene mostrar menos (2 o 3) en lugar de achicar todo.
 
 > ✅ **Decidida (dueño, 2026-11-26): B de cerca y A de lejos.** «me gusta que la B, cuando se acerca, agruparlos por familia, pero la A, cuando está alejado, que te muestre los 3 principales, pero que abajo haya un cosito con el número en rojo de los debuff y en verde de los buffs». En la cola para programar.
+
+> **Programada (2026-11-26):** de cerca, hasta 6 uno por vértice y con más agrupados en 6 familias con numerito; de lejos (zoom menor a 0,7), los 3 más importantes y la pastilla. Las familias y lo que quedó por decidir: **P351**.
+
+### P351 — 🔘 Iconitos de estado agrupados: tres detalles que eligió Claude (2026-11-26, Claude, al programar la P350)
+
+Al programar la P350 quedaron tres cosas que el dueño no dijo y que Claude eligió para poder seguir (se cambian fácil, en `vtt-hexgrid/js/88-iconos-estados.js`):
+(a) **Lo que no es ni buff ni debuff en la pastilla de lejos**: el ✋ «Nada en la mano», Agarrando / Mordiendo, los Escudos elementales (ígneo, helado…),
+la Mala sombra y los Toques de carga no son ni rojos ni verdes. Hoy suman un **tercer número, en gris** («+9 +4 +1»), para que no quede nada sin contar.
+¿Va así, o se cuentan como debuffs (rojo) o no se cuentan?
+(b) **Con más de 6, se agrupa todo**: con 7 estados en 3 familias quedan 3 circulitos aunque sobraría lugar para ver alguno suelto (así estaba en el boceto
+B). La otra forma: juntar solo las familias necesarias para que entren en 6 (empezando por la que más estados tiene), y dejar sueltas las demás.
+(c) **Los «controles» incluyen todo lo que el juego marca como control (CC)**: además de Stun, Sueño, Parálisis, Miedo, Pánico, Confusión, Provocado,
+Silencio y Ceguera, entran Inmovilizado, Agarrado, Mordido, Tropezado, Sentado, Exhausto, **Desarmado, Lisiado, Rengo y Lento** y el Mareo de
+invocación. ¿Desarmado, Rengo, Lisiado y Lento van ahí o con las «marcas y debilidades»?
+

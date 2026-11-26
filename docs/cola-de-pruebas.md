@@ -2763,7 +2763,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `sueltoNoAtacable`, js/13); no entra en un área, una onda, el Barrido, el Salto, la Carrera ni el Choque; no da ataque de oportunidad; en la lista de
   la ficha suelta no aparece; y `Duelo.crear` lo frena como última puerta. Excepción: el token viejo de un creep sin vincular, que el GM vincula al
   atacarlo si hay un creep con ese nombre. Probado con clics (arma, Mala sombra y Remolino).
-- **⬜ en cola — 🎁 Ver en detalle los dos 🎁 que no son ni «dar» ni botín (P309)** (dueño, 2026-11-23: «ponelo al final de la cola para ver en
+- **✅ hecho (2026-11-26; dueño eligió (2)) — 🎁 Ver en detalle los dos 🎁 que no son ni «dar» ni botín (P309)** → «🆓 Permitir agregar gratis» y «💥 Efectos para un arma» (dueño, 2026-11-23: «ponelo al final de la cola para ver en
   detalle»): la casilla «🎁 Permitir agregar gratis» del generador de tiendas y los efectos de arma de la Guía de diseño. Mostrárselos al dueño
   con captura y proponer.
 

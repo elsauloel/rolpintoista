@@ -227,7 +227,7 @@ const GuiaDiseno = (() => {
       if(r.p === 'arma') return `<h2>Diseñar un arma</h2><p>Primero, <b>qué define a un arma</b>; después, de qué familia es y qué efectos suele tener.</p>${AVISO}
         <h3>1 · Qué define a un arma</h3><div class="gd-grid">${ARMA_BASE.map(b => `<div class="gd-card"><b>${esc(b.n)}</b><small>${esc(b.d)}</small></div>`).join('')}</div>
         <h3>2 · ¿De qué familia es?</h3><div class="gd-grid">${FAMILIAS.map(f => `<button class="gd-card" data-ir="familia:${f.id}"><span class="ico">${f.ico}</span><b>${esc(f.n)}</b><small>${esc(f.resumen)}</small><span><span class="gd-chip casa">🏠 ${esc(f.casa)}</span></span></button>`).join('')}</div>
-        <h3>3 · ¿Qué otros efectos puede tener?</h3><div class="gd-grid"><button class="gd-card" data-ir="efectosArma"><span class="ico">🎁</span><b>Ver todos los efectos</b><small>La grilla completa de efectos al golpear, con cuáles son de casa de cada familia.</small></button></div>`;
+        <h3>3 · ¿Qué otros efectos puede tener?</h3><div class="gd-grid"><button class="gd-card" data-ir="efectosArma"><span class="ico">💥</span><b>Ver todos los efectos</b><small>La grilla completa de efectos al golpear, con cuáles son de casa de cada familia.</small></button></div>`;
       if(r.p === 'familia'){
         const f = FAMILIAS.find(x => x.id === r.x);
         const casa = EFECTOS_ARMA.filter(e => e.casa.includes(f.id)), comp = EFECTOS_ARMA.filter(e => !e.casa.includes(f.id) && e.comp.includes(f.id)), otras = EFECTOS_ARMA.filter(e => !e.casa.includes(f.id) && !e.comp.includes(f.id));
@@ -238,7 +238,7 @@ const GuiaDiseno = (() => {
       }
       if(r.p === 'efectosArma'){
         const lista = filtroEfecto ? EFECTOS_ARMA.filter(e => e.casa.includes(filtroEfecto) || e.comp.includes(filtroEfecto)) : EFECTOS_ARMA;
-        return `<h2>🎁 Efectos para un arma</h2><p>Todo lo que un arma puede dejar en el golpeado. Filtrá por familia para ver cuáles son de casa (🏠) o están habilitados en ella (🤝). El <b>peso</b> mide cuánto pesa el efecto en combate: servirá para calcular la calidad y el precio de un arma (por ahora son valores provisorios).</p>${AVISO}
+        return `<h2>💥 Efectos para un arma</h2><p>Todo lo que un arma puede dejar en el golpeado. Filtrá por familia para ver cuáles son de casa (🏠) o están habilitados en ella (🤝). El <b>peso</b> mide cuánto pesa el efecto en combate: servirá para calcular la calidad y el precio de un arma (por ahora son valores provisorios).</p>${AVISO}
           <div class="gd-filtros"><button data-filtro="" class="${!filtroEfecto ? 'on' : ''}">Todos</button>${FAMILIAS.filter(f => EFECTOS_ARMA.some(e => e.casa.includes(f.id) || e.comp.includes(f.id))).map(f => `<button data-filtro="${f.id}" class="${filtroEfecto === f.id ? 'on' : ''}">${f.ico} ${esc(f.n)}</button>`).join('')}</div>
           <div class="gd-grid">${lista.map(carta(filtroEfecto)).join('')}</div>
           <div class="gd-leyenda">Los efectos de arma se <b>recuerdan y se tiran</b> en la Mesa; aplicarlos sobre el rival sigue siendo a mano, a propósito.</div>`;

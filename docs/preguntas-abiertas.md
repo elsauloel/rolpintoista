@@ -2392,7 +2392,7 @@ La vida del token suelto **de un jugador** la ve todo el mundo (en el círculo r
 un creep: los jugadores no ven los números, solo «❤ Tiene vida · se lo puede atacar» y, al llegar a 0, «💥 Roto». Opciones: (a) como quedó; (b) que la
 de todos los objetos se vea (una puerta no tiene secretos); (c) que lo elija el GM al crearlo.
 
-### P309 — 🎁 Dos 🎁 que no son ni «dar» ni botín: ¿se quedan? (2026-11-23, Claude, cola de programación, de P278)
+### ✅ P309 — 🎁 Dos 🎁 que no son ni «dar» ni botín: ¿se quedan? (2026-11-23, Claude, cola de programación, de P278)
 
 **Dueño (2026-11-23): «ponelo al final de la cola para ver en detalle».** En la cola de programación.
 
@@ -2400,6 +2400,9 @@ Al pasar el «dar» a 🤝 (P278: «que el regalo quede solo para el botín»), 
 (a) en el **Generador de tiendas**, la casilla «🎁 Permitir agregar gratis» (deja que los jugadores sumen ítems de la tienda sin pagar);
 (b) en la **📐 Guía de diseño**, la tarjeta «Ver todos los efectos» y el título «🎁 Efectos para un arma» (la lista de efectos al golpear).
 Opciones: (1) dejarlos así; (2) cambiarles el ícono para que el 🎁 sea de verdad solo el botín (por ejemplo, (a) 🆓 o 💸 y (b) 💥 o 🗡).
+
+> ✅ **Decidida (dueño, 2026-11-26): (2).** Hecho: la casilla del generador de tiendas pasó a «🆓 Permitir agregar gratis» y la Guía de diseño a «💥 Efectos para un arma» (y su tarjeta). El 🎁 queda solo para el botín.
+
 
 ### P310 — 🤝 Dos 🤝 en el menú de un token, con funciones distintas (2026-11-23, Claude, cola de programación, de P278)
 

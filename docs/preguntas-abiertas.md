@@ -2930,7 +2930,7 @@ al llegarle el turno el mapa le pregunta al GM si vuelve a actuar (como con cual
 
 > ✅ **Decidida (dueño, 2026-11-26):** por su tirada, como quedó («un poco da igual… porque tiene el mareo de invocación»).
 
-### P350 — 🔘 Cuando hay más estados que lugares alrededor del token, ¿cómo se muestran? (2026-11-26, Claude, cola de pruebas)
+### ✅ P350 — 🔘 Cuando hay más estados que lugares alrededor del token, ¿cómo se muestran? (2026-11-26, Claude, cola de pruebas)
 
 Evaluado con capturas en «Claude · pruebas 2» (Blanco J1 con 3 y con 12 estados, la Abeja con 9, un Tanque con 6 y el Warrior con 16, todos pegados,
 con el zoom normal, acercado y alejado). **Hoy** hay 12 lugares (los 6 vértices y después los 6 lados), en el orden en que llegaron; desde el 13 el último
@@ -2954,3 +2954,5 @@ afuera. Se ve todo, pero la corona de afuera se mete en las casillas vecinas y s
 **Recomendación:** (b), con el orden por importancia de (a) para elegir qué familia va primero: es la que mejor se lee con el zoom normal y la única
 que no se pisa con los tokens de al lado; no esconde nada (todo queda contado en algún circulito) y en el caso común (pocos estados) no cambia nada.
 En cualquiera de las tres, con el mapa alejado conviene mostrar menos (2 o 3) en lugar de achicar todo.
+
+> ✅ **Decidida (dueño, 2026-11-26): B de cerca y A de lejos.** «me gusta que la B, cuando se acerca, agruparlos por familia, pero la A, cuando está alejado, que te muestre los 3 principales, pero que abajo haya un cosito con el número en rojo de los debuff y en verde de los buffs». En la cola para programar.

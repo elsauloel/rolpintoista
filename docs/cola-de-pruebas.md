@@ -3174,6 +3174,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no cura el mareo de invocación» — confirmar con él si es una regla (que no se cure con consumibles) o algo que vio que hoy no anda, y revisar qué
   hacen hoy el Cura Plus y los otros curadores con el mareo. Juntar con «😵 El Mareo de invocación se ve como estado (P332)» y «Probar: 😵 el Mareo de
   invocación que se va sin que la invocación juegue», que ya están en la cola.
+- **⬜ en cola — 🔘 Iconitos de estado: agrupar por familia de cerca y los 3 principales de lejos (P350 decidida)** (dueño, 2026-11-26):
+  **de cerca (zoom normal o más):** opción B — hasta 6 estados, uno por vértice como hoy; con más, los de la misma familia se juntan en un circulito
+  con numerito (💫4 = cuatro controles…), nunca más de 6 circulitos, y al pasar el mouse por un grupo se ve qué tiene; las familias se ordenan por
+  importancia (lo que no deja actuar, el daño por turno, las marcas / ✋ / 🕶, las defensas y los buffs). **De lejos (mapa alejado):** opción A — solo
+  los 3 más importantes y, abajo del token, una pastillita con el número de debuffs en rojo y el de buffs en verde (los que no se muestran). Bocetos:
+  la evaluación del 2026-11-26 (entrada «Evaluar qué pasa cuando hay más estados que lugares…»). De paso: con tokens uno arriba del otro, la barra
+  de vida queda encima de los iconitos del de abajo (visto en la evaluación).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

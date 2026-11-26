@@ -2899,3 +2899,14 @@ tiene el mapa abierto. Probando, el GM aplicó por el Jugador 2 (que no estaba) 
 quedó «💥 Roto» en el mapa, como siempre, y lo puede sacar él o el GM). Opciones: (a) así: el aviso solo en el momento; (b) que al volver a abrir el
 mapa le aparezca una vez por cada objeto suyo que esté roto; (c) que si quien lo puso no está, el aviso le aparezca al GM. **Recomendación:** (a) por
 ahora: el objeto queda a la vista como roto y cualquiera de los dos lo saca.
+
+### P348 — 🤝 El GM le da algo a un personaje que él mismo tiene con 🎮 el control: ¿quién ve el cartel? (2026-11-26, Claude, cola de pruebas)
+
+Probando con clics: el GM tomó con 🎮 el control de Blanco J2 y le dio una Misericordia con «🤝 Dar como GM». El ítem entró bien, pero el cartel
+**«El GM te dio algo»** le salió **al GM** (en su propia pantalla: el que dio y el que recibe son la misma persona) y **al Jugador 2 no le salió
+nada** (solo ve la línea de la Mesa «El GM le dio a Blanco J2: Misericordia»). Pasa porque lo recibido lo aplica la pantalla que maneja al
+personaje, y mientras el GM tiene el control es la del GM; así estaba pensado (`docs/pruebas-en-el-mapa.md`, «Dar a un jugador»: «el cartel le
+tendría que salir al GM, que es quien lo aplica»), pero nunca se decidió qué ve el jugador. Opciones: (a) dejarlo así (el jugador está en solo lectura y la Mesa lo dice);
+(b) que al GM no le salga el cartel (ya sabe lo que dio) y al jugador le salga igual, aunque no tenga el control; (c) las dos cosas: al GM un
+cartelito corto «Le diste a Blanco J2…» y al jugador el cartel de siempre. **Recomendación:** (b): el cartel es el «enterado» del jugador, y el
+GM no necesita enterarse de lo que él mismo hizo. Mientras, quedó (a).

@@ -2704,10 +2704,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   del defensor» y «lo frena la Defensa» (ahora «es un objeto, sin Defensa: entra entero»), y la Mesa decía que la caja «cayó» (ahora «se rompió 💥»).
   Dudas nuevas: P346 (¿un objeto tiene espalda? se sumó «+1 por la espalda» contra la caja) y P347 (el aviso si quien lo puso no estaba conectado).
   No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola119). La vuelta: «quedó igual».
-- **⬜ en cola — Probar: 🤝 el cartel «El GM te dio algo» en el mapa y con el GM con 🎮 el control** (2026-11-23, de P278): con clics se vio el cartel en la
+- **✅ hecho (2026-11-26) — Probar: 🤝 el cartel «El GM te dio algo» en el mapa y con el GM con 🎮 el control** (2026-11-23, de P278): con clics se vio el cartel en la
   ficha del Jugador 1; falta verlo con el jugador mirando el mapa, y que el GM con 🎮 el control de un personaje vea en el 🤝 Dar de la izquierda «🤝 Dar
   como GM» y «🤝 Pasar algo de la mochila de …» (los dos con 🤝, con textos distintos). El Ver de un ítem de GM Tools se abrió por función (el botón
   «🤝 Dar a un jugador» sí se tocó con un clic).
+  **Cómo quedó (2026-11-26), todo con clics** («Claude · pruebas 2», mapa «Prueba · General», GM + Jugador 1 + Jugador 2): (1) **cartel en el
+  mapa**: el GM, con el 🤝 Dar de la izquierda (sin el control de nadie se abre directo «Dar a un jugador»), le dio una Misericordia a Blanco J1
+  mientras el Jugador 1 miraba el mapa: le salió el cartel «🤝 El GM te dio algo» («ya está en tu mochila», «✔ Aceptar» lo cierra), la línea en la
+  Mesa y el ítem en la mochila (el cartel tardó unos segundos más que la línea de la Mesa). (2) **El GM con 🎮 el control** de Blanco J2 (👓 →
+  «🎮 Tomar el control»): el 🤝 Dar abre «🤝 Dar» con las dos opciones, cada una con 🤝 y su texto: «🤝 Dar como GM» y «🤝 Pasar algo de la mochila
+  de Blanco J2». Con «Dar como GM» le dio una Misericordia a Blanco J2: entró bien y el cartel le salió **al GM** (como estaba pensado) y no al Jugador 2,
+  que solo ve la Mesa (duda nueva: **P348**). Con «Pasar algo de la mochila de Blanco J2» le ofreció esa Misericordia a Blanco J1: al Jugador 1 le llegó «Te ofrecen algo», tocó
+  «A la mochila», pasó de una mochila a la otra y la Mesa dijo «🤝 Blanco J2 le pasó Misericordia a Blanco J1». Después «↩ Devolver el control».
+  (3) **El Ver de un ítem de GM Tools, con clics**: ⚔ Catálogo → buscar «Yelmo de hierro» → «Ver» → «🤝 Dar a un jugador»: la ventana se abrió con
+  el yelmo ya en «Lo que vas a dar»; se marcó Blanco J1 y «🤝 Dar»: al Jugador 1, en el mapa, le salió el cartel y el yelmo entró. Sin errores en
+  ninguna pantalla. No se probó con el Jugador 3 (no hacía falta). Capturas fuera del repo (cola120). La vuelta: «quedó igual» (las mochilas de
+  Blanco J1 y Blanco J2 volvieron a como estaban).
 
 - **⬜ en cola — 🕊 Cambiar el ícono de «Quitar el Pacto» del anillo del token** (dueño, 2026-11-23, con captura: «el ícono de "quitar pacto" no
   me gusta, además la paloma quedó para mensajes. Quizás el mismo emoji del pacto, pero con el círculo rojo de "prohibido" encima»). Hoy es 🕊

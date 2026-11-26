@@ -2929,3 +2929,28 @@ De paso: si el GM saca con la ✕ a alguien que **ya jugó** esta ronda y lo vue
 al llegarle el turno el mapa le pregunta al GM si vuelve a actuar (como con cualquiera que ya jugó y quedó más abajo). No se cambió nada de eso.
 
 > ✅ **Decidida (dueño, 2026-11-26):** por su tirada, como quedó («un poco da igual… porque tiene el mareo de invocación»).
+
+### P350 — 🔘 Cuando hay más estados que lugares alrededor del token, ¿cómo se muestran? (2026-11-26, Claude, cola de pruebas)
+
+Evaluado con capturas en «Claude · pruebas 2» (Blanco J1 con 3 y con 12 estados, la Abeja con 9, un Tanque con 6 y el Warrior con 16, todos pegados,
+con el zoom normal, acercado y alejado). **Hoy** hay 12 lugares (los 6 vértices y después los 6 lados), en el orden en que llegaron; desde el 13 el último
+lugar es un «+N» gris y su globo lista los que no entraron. Lo que se vio: (1) con el zoom normal cada circulito mide unos 13 píxeles: los emojis se
+adivinan más de lo que se leen, y con 12 forman un anillo cerrado que tapa la cara del token; (2) con el mapa alejado (a la mitad o menos) no achican
+igual que el token: se pisan entre ellos y con los de al lado, y el token desaparece; (3) cuando los de abajo ocupan lugar, las barras de vida bajan y
+quedan encima de los iconitos del token de abajo; (4) el «+N» esconde **los últimos que llegaron**, sin mirar cuáles importan: en la prueba, los 4
+buffs del Warrior (Empower, Bendecido, Endurecido, Hypeado) quedaron todos adentro del «+5», y el gris no dice si lo escondido es bueno o malo; el ✋
+«Nada en la mano» va siempre al final, así que es lo primero que se esconde; (5) el «+N» se entiende al pasar el mouse («5 estados más» con la lista),
+pero el número es muy chico; (6) el globo del token entero con 16 estados ocupa casi toda la altura de la pantalla. Con 3 estados se ve bien.
+Opciones (bocetos con los mismos tokens):
+(a) **Prioridad y «+N» con colores**: los mismos 12 lugares, pero primero lo más importante (lo que no deja actuar, el daño por turno, las marcas y
+debilidades, ✋ y 🕶, después defensas y buffs); lo que sobra va en una pastilla debajo del token con dos números, «+1» en rojo y «+4» en verde. Con el
+mapa alejado, solo los 3 más importantes y la pastilla. Es el cambio más chico, pero con el zoom normal sigue siendo un anillo apretado.
+(b) **Agrupar por familia cuando no entran**: hasta 6 estados se ven como hoy, cada uno con su ícono, solo en los vértices. Si hay más de 6, los de la
+misma familia se juntan en un solo circulito con un numerito (💫4 = cuatro controles: Stun, Miedo, Provocado, Ceguera; 🤢3 = tres de daño por turno),
+con el ícono del más importante de la familia. Nunca más de 6, así que no tapa la cara del token y los circulitos pueden ser un poco más grandes.
+Con el mapa alejado, solo los 3 primeros. El globo de cada circulito agrupado lista los de esa familia.
+(c) **Segunda corona más chica**: los 6 más importantes en los vértices, del tamaño de hoy, y el resto en una segunda corona de circulitos chicos, más
+afuera. Se ve todo, pero la corona de afuera se mete en las casillas vecinas y se pisa con los tokens pegados.
+**Recomendación:** (b), con el orden por importancia de (a) para elegir qué familia va primero: es la que mejor se lee con el zoom normal y la única
+que no se pisa con los tokens de al lado; no esconde nada (todo queda contado en algún circulito) y en el caso común (pocos estados) no cambia nada.
+En cualquiera de las tres, con el mapa alejado conviene mostrar menos (2 o 3) en lugar de achicar todo.

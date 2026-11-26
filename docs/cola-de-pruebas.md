@@ -2791,9 +2791,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   baúl vacío y sin las dos líneas de su registro, la vuelta «quedó igual» (la plata y la mochila de Blanco J1, como estaban). Quedan en la Mesa
   las líneas de la compra y del baúl.
 
-- **⬜ en cola — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
+- **⬜ en cola (evaluado 2026-11-26, falta que el dueño elija) — 🔘 Evaluar qué pasa cuando hay más estados que lugares alrededor del token** (dueño, 2026-11-23: «evaluar qué pasa cuando hay
   más estados que los slots disponibles alrededor de un token para poner los iconitos»). Ver cuántos entran hoy, qué pasa con los que sobran
   (¿se pisan, se cortan, hay un «+N»?) y proponerle al dueño cómo mostrarlos, con capturas.
+  *Evaluado (2026-11-26, sin tocar código; capturas en «Claude · pruebas 2», mapa «Prueba · General», y después la vuelta: «quedó igual»):* hoy entran
+  **12** (6 vértices y 6 lados, en orden de llegada); desde el 13 el último lugar es un «+N» gris con la lista en su globo. Con 3 estados se ve bien.
+  Con 12, el anillo tapa la cara del token y, con el zoom normal, cada circulito mide unos 13 píxeles (se adivina más de lo que se lee); con el mapa
+  alejado se pisan entre ellos y con los tokens de al lado; las barras de vida bajan y quedan encima de los iconitos del token de abajo. El «+N» esconde
+  los últimos que llegaron sin mirar cuáles importan (al Warrior con 16 le escondió sus 4 buffs) y el gris no dice si son buenos o malos; el ✋ va
+  siempre al final, así que es lo primero que se esconde. Opciones (detalle y recomendación en **P350**): (a) prioridad y un «+N» con dos colores;
+  (b) **agrupar por familia cuando no entran**, hasta 6 con un numerito (💫4) — la recomendada; (c) una segunda corona más chica. En las tres, con el
+  mapa alejado mostrar menos. Falta que el dueño elija; después se programa.
 
 - **✅ hecho (2026-11-23) — 🔘 El globo de los iconitos de estado dice solo el efecto; el detalle, en la ventana de estados alterados** (dueño,
   2026-11-23: «al poner el hover en el icono, que solamente diga sobrepeso: número, y en qué consiste… solamente el efecto. Si después querés ver el

@@ -3205,6 +3205,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   el Warrior con 16 y el Debuffer escondido con 9, pegados; de cerca y de lejos, el globo de un grupo y el de la pastilla, desde el GM y desde el
   Jugador 1 (el escondido no se ve ni tiene globo). Después, la vuelta: «quedó igual». Lo que eligió Claude: **P351**. Queda: de lejos, con tokens
   pegados en diagonal, la pastilla de uno puede rozar un iconito del de al lado.
+- **⬜ en cola — 🔘 La Armadura rota de un personaje con su iconito alrededor del token (P352 decidida)** (dueño, 2026-11-26): hoy, en un
+  personaje, la Armadura rota viene del equipo roto y no sale entre los iconitos (ni de cerca ni en la pastilla de lejos; solo en la ventana ◎). Que
+  tenga su iconito, en la familia 🎯 marcas y debilidades, como el ⚖ del sobrepeso (que también viene del equipo).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

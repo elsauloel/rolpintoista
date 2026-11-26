@@ -2973,10 +2973,12 @@ invocación. ¿Desarmado, Rengo, Lisiado y Lento van ahí o con las «marcas y d
 
 > ✅ **Respondida (dueño, 2026-11-26):** «está bien como resolviste» (a, b y c quedan así).
 
-### P352 — 🔘 La «Armadura rota» de un personaje no tiene iconito alrededor del token (2026-11-26, Claude, al probar los estados puestos por creeps)
+### ✅ P352 — 🔘 La «Armadura rota» de un personaje no tiene iconito alrededor del token (2026-11-26, Claude, al probar los estados puestos por creeps)
 
 En la prueba, el Warrior · Hachero le hizo «Romper armadura» a Blanco J1 y le quedó «Armadura rota ×2» (se ve en la ventana ◎ Estados alterados), pero
 **no aparece entre los iconitos del token** (ni de cerca ni contada en la pastilla de lejos). Es a propósito del programa: en un personaje la Armadura
 rota no es un estado suelto sino que **viene de su equipo** (las piezas rotas, hasta que las reparen), y los iconitos no muestran lo que viene del
 equipo (salvo el Sobrepeso ⚖, que se sumó a pedido). En un creep sí es un estado común y sí se ve.
 ¿Se deja así (es del equipo, se ve en ◎), o la Armadura rota de un personaje también lleva su iconito (🛡 roto, en «marcas y debilidades»), como el Sobrepeso?
+
+> ✅ **Decidida (dueño, 2026-11-26):** «sigamos tu recomendación»: la Armadura rota de un personaje (que viene del equipo) también tiene su iconito alrededor del token. En la cola.

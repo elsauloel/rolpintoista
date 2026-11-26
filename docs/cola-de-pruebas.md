@@ -2883,16 +2883,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 - **⬜ en cola (más adelante) — 🧑 Que el personaje de un jugador diga qué clase / rol es** (dueño, 2026-11-24, de la pregunta 4 de las etiquetas):
   hoy no lo dice en ningún lado; hace falta para abrir «+ Pasiva» con su rol ya marcado (y quizás para otras cosas).
-- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 1 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
-  al dueño las pasivas 1–10 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
-- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 2 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
-  al dueño las pasivas 11–20 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
-- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 3 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
-  al dueño las pasivas 21–30 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
-- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 4 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
-  al dueño las pasivas 31–40 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
-- **⬜ en cola — 🏷 Revisar las etiquetas de las pasivas, tanda 5 de 5** (dueño, 2026-11-24: «dividida en grupos de a 10 por tanda»): mostrarle
-  al dueño las pasivas 41–47 de la tabla de `docs/etiquetas-pasivas.md` con sus etiquetas y aplicar lo que corrija.
 
 - **⬜ en cola — Probar: 🏷 «+ Pasiva» de una invocación y subir una pasiva con etiquetas de verdad** (2026-11-24, de las etiquetas de las pasivas):
   con clics se probó «+ Pasiva» en la ficha, en un creep de GM Tools (con su rol marcado) y en el asistente de personaje nuevo, y la ventana de

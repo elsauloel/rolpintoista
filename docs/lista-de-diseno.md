@@ -35,6 +35,9 @@ lo que salga para programar pasa a la cola de desarrollo. Las preguntas puntuale
 - [ ] **🧙 Más pasivas para Mago, Support y Debuffer** (dueño, 2026-11-24: «pendiente para meterle tiempo y
   dedicación de diseño»): hoy tienen 5–6 pasivas propias cada uno contra 23 del Warrior; tampoco hay ninguna de control.
 - [ ] **🏷 Pasivas** — [`etiquetas-pasivas.md`](etiquetas-pasivas.md) (etiquetas hechas; abajo, lo que quedó de diseño).
+  **Revisar las etiquetas de las 47 pasivas de fábrica, en 5 tandas de a 10** (pasó de la cola a esta lista, dueño 2026-11-26): mostrarle cada
+  tanda de la tabla de la sección 3 de `etiquetas-pasivas.md` y aplicar lo que corrija. Tanda 1 ya mostrada (2026-11-26), sin respuesta; sugerencias de
+  Claude: Voluntad de hierro +🌐; Temple mágico 🌐 🛡 (sin Mago); Vuela solo 🌐.
 - [ ] **🧑 Clases / roles de los personajes de los jugadores** — hoy el personaje no dice qué clase es (anotado en la cola como tarea de
   desarrollo para más adelante; el «qué es una clase» es de diseño).
 - [ ] **🧬 Razas** (y las marcas de las pasivas «racial / criatura / solo personajes», de abajo).

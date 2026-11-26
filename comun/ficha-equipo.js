@@ -576,8 +576,11 @@ const FichaEquipo = (() => {
     .sil-slot>b,.sil-it>summary,.sil-slot>.sil-nom,.sil-slot>.sil-insignia{position:relative}
     .sil-slot.casi .sil-nom,.sil-slot.casi>b{text-shadow:0 0 3px #4a3a22,0 0 6px #4a3a22}
     .sil-slot.roto .sil-nom,.sil-slot.roto>b,.sil-slot.roto .sil-insignia{text-shadow:0 0 2px #4a2a2a,0 0 4px #4a2a2a,0 0 7px #4a2a2a}
-    .sil-ico{position:absolute;right:3px;top:2px;font-size:12px;line-height:1;cursor:help;padding:1px;border-radius:4px}
-    .sil-ico:hover,.sil-ico:focus{background:rgba(255,255,255,.12);outline:none}
+    .sil-ico{position:absolute;right:-10px;top:-10px;z-index:6;width:22px;height:22px;box-sizing:border-box;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:12px;line-height:1;cursor:pointer;border:2px solid #1d171d;box-shadow:0 1px 5px rgba(0,0,0,.6);transition:transform .12s}
+    .sil-ico-casi{background:#e0a45a;color:#2a1d12;font-weight:700}
+    .sil-ico-roto{background:#fbe3e1;border-color:#d9534f;font-size:11px}
+    .sil-ico:hover,.sil-ico:focus{transform:scale(1.15);outline:none}
     .sil-ico>.sil-tip{left:0;right:auto}
     .sil-der .sil-ico>.sil-tip{left:auto;right:0}
     .sil-ico:hover>.sil-tip,.sil-ico:focus>.sil-tip{display:block}
@@ -693,7 +696,7 @@ const FichaEquipo = (() => {
   function silIconoHtml(estado, items){
     const piezas = items.filter(estado === 'roto' ? silRoto : silGastado);
     if(!piezas.length) return '';
-    const ico = estado === 'roto' ? '💔' : '⚠';
+    const ico = estado === 'roto' ? '💔' : '⚠\uFE0E';   // el ⚠ como letra (no emoji amarillo) sobre el círculo ámbar
     const filas = piezas.map(it => { const e = estadoPieza(it);
       return `<div class="sil-ico-fila"><div class="sil-tip-n">${e.roto ? '💔' : '⚠'} ${esc(it.nombre)}</div>${e.lin.map(l => `<div>${l}</div>`).join('')}</div>`; }).join('');
     const pie = estado === 'roto' ? 'Se repara fuera de combate: el herrero de una tienda o el talento de reparar.' : 'Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.';

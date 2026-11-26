@@ -528,7 +528,7 @@ const FichaEquipo = (() => {
     const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.armRotaDe(it), armadura = FichaCalculo.esArmaduraItem(it), pierde = FichaCalculo.pierdeDefPorRotura(it);
     // Las piezas de armadura y los escudos (abollados) pierden Defensa por la rotura, sin pasar de la que dan.
     const defPieza = (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0), menos = pierde ? Math.min(ar, Math.max(0, defPieza)) : 0;
-    const rota = !ar ? '' : ` · ${armadura ? 'Armadura rota' : 'abollado'} ×${fmt(ar)}${menos ? ` (−${fmt(menos)} Defensa)` : ''}`;
+    const rota = !ar ? '' : ` · <span style="white-space:nowrap">${armadura ? 'Armadura rota' : 'abollado'} ×${fmt(ar)}${menos ? ` (−${fmt(menos)} Defensa)` : ''}</span>`;
     const color = act <= 0 ? '#e06060' : act <= 1 ? '#e0a040' : '';
     const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
     return `<div class="hint equipo-dur"${color ? ` style="color:${color};font-weight:700"` : ''} title="Durabilidad: ${esc(Combatiente.durTexto(it) || String(max))}.${pierde ? ` Cada punto ${armadura ? 'de armadura rota' : 'abollado'} le baja 1 a la Defensa de esta pieza.` : ''} Se repara fuera de combate (herrero de una tienda).">🔧 ${fmt(act)}/${fmt(max)}${rota}${est}</div>`;
@@ -595,7 +595,7 @@ const FichaEquipo = (() => {
     .sil-it>summary:hover{background:rgba(255,255,255,.08)}
     .sil-nom{font-weight:600}
     .sil-insignia{display:block;font-size:10px;opacity:.9;margin-top:1px}
-    .sil-tip,.sil-menu{position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:250px;box-sizing:border-box;text-align:left;
+    .sil-tip,.sil-menu{position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:280px;box-sizing:border-box;text-align:left;
       background:var(--sil-tip, #262027);border:1px solid var(--brass, #e0a45a);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.35;
       color:var(--paper, #efe6dc);box-shadow:0 8px 24px #0009}
     .sil-der .sil-tip,.sil-der .sil-menu{left:auto;right:0}
@@ -605,7 +605,8 @@ const FichaEquipo = (() => {
     .sil-item:has(details[open])>.sil-tip{display:none}
     .sil-tip-n{font-weight:700;font-size:13px;color:var(--brass, #e0a45a);margin-bottom:2px}
     .sil-tip-d{margin-top:4px;opacity:.9}
-    .sil-tip .imeta{margin-top:3px}
+    .sil-tip .imeta{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+    .sil-tip .imeta .tag{white-space:nowrap;display:inline-block}
     .sil-menu{z-index:31;display:flex;flex-wrap:wrap;gap:5px;align-items:center;width:auto;min-width:200px}
     .sil-menu-n{flex-basis:100%;font-weight:700;color:var(--brass, #e0a45a)}
     .sil-ley{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 10px;font-size:11.5px;color:var(--muted, #a8998f)}
@@ -641,7 +642,7 @@ const FichaEquipo = (() => {
     const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';
     return `<div class="sil-tip"><div class="sil-tip-n"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
       <div class="hint">${esc([lugar, statTxt(it)].filter(Boolean).join(' · '))}</div>
-      ${(it.mods || []).some(m => m.stat) ? `<div class="imeta">${modTags(it.mods)}</div>` : ''}${durHtml(it)}
+      ${(it.mods || []).some(m => m.stat) ? `<div class="imeta">${modTags(it.mods)}</div>` : ''}${durHtml(it).replace(' · <span style="white-space:nowrap">', '<br><span style="white-space:nowrap">')}
       ${it.detalle ? `<div class="sil-tip-d">${esc(corto(it.detalle, 240))}</div>` : ''}
       <div class="hint" style="margin-top:4px">🖱 Clic: Ver / Editar / Sacar</div></div>`;
   }

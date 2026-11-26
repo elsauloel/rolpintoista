@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261125gas"></script>
-<script src="creep-calculo.js?v=20261125gas"></script>
+<script src="creep-calculo.js?v=20261126bot"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261124vida0"></script>
 <script src="creep-duelo.js"></script>
@@ -4490,7 +4490,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, masDanoElem: {}, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, estandarteDe: '', estandarteDeId: '', estandarteCon: '', meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
+    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, masDanoElem: {}, botella: 0, percepcionAumentada: false, auraMiedo: 0, auraEfEsp: 0, estandarteRadio: 0, estandartePdg: 0, estandarteDano: 0, estandarteSilencio: 0, estandarteDe: '', estandarteDeId: '', estandarteCon: '', meteoroCol: 0, meteoroFila: 0, meteoroRadio: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});

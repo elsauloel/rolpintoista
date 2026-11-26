@@ -2174,6 +2174,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🔮 Talismanes en el combate** (2026-10-18; `js/53-talismanes.js`): `talismanDe(t, campo)`, `talEspejito(d, entro)` y `talRelicario(d, mato)` (los llama
   `dueloAplicarDano`, js/13, después del Espejo) y `talismanUnaVez(d, ef)` (`dueloAplicarEfectoBase`: el efecto «🔮 …» de un talismán entra una vez por
   turno de quien usó la varita, `talismanUsados`).
+  **😈 La Botella de un creep en la pantalla del jugador** (2026-11-26, cola: «te va a entrar 6» y le entraban 8): el jugador no ve la ficha del
+  creep, así que `talismanDe(t, 'botella')` la lee de lo público (`creepsPub` → `botella`, que publica `CreepCalculo.tarjetaPublica`; GM Tools la
+  vuelve a publicar si no coincide). Así la cuenta del daño del duelo da lo mismo en las dos pantallas.
 
 - **🦷 Mordisco feroz** (2026-10-21, dueño; en `js/54-soltarse-al-empezar.js`): el efecto «Mordido» de la habilidad (un ataque con el arma) lleva en su
   `soltar` quién lo tiene agarrado (`de`, el token; lo pone `mordidaEmpezar`, llamado desde `dueloAplicarEfectoBase` de js/13) y el daño que se repite

@@ -23,7 +23,12 @@ const talNeutro = () => typeof areaOcultaNeutro === 'function' && areaOcultaNeut
 function talLineaAfuera(texto){ const f = () => mesaLinea(texto, 'recordatorio'); return typeof areaOcultaAfuera === 'function' ? areaOcultaAfuera(f) : f(); }
 function talismanDe(t, campo){
   if(!t || !t.fichaId) return 0;
-  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc && typeof CreepCalculo !== 'undefined' && CreepCalculo.talisman ? num(CreepCalculo.talisman(sc, campo)) : 0; }
+  if(t.tipo === 'creep'){
+    const sc = creepPrivadoDe(t.fichaId);
+    if(sc) return typeof CreepCalculo !== 'undefined' && CreepCalculo.talisman ? num(CreepCalculo.talisman(sc, campo)) : 0;
+    // 😈 un jugador no ve la ficha del creep: la Botella, de lo público (2026-11-26; antes su cuenta del duelo daba 2 menos que la del GM)
+    return campo === 'botella' && typeof creepsPub !== 'undefined' ? num((creepsPub.get(t.fichaId) || {}).botella) : 0;
+  }
   if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
   const f = fichasPub.get(t.fichaId);
   return num(f && f.resumen && f.resumen[campo]);

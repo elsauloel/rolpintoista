@@ -2824,9 +2824,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   pie de los dos globos: «Para ver el detalle de cada estado (de dónde viene, quién lo puso, la cuenta), tocá el token y su botón ◎ Estados alterados (o
   la tecla E)» (el ◎ está en el anillo de cualquier token que se ve, también un creep para un jugador). Probado con clics desde el GM, el Jugador 1 y el
   Jugador 2 (Regeneración de 2, Veneno ×3, Rengo y sobrepeso 1; la E del Jugador 2 sobre el token del Jugador 1); todo volvió a como estaba. 1070/1070.
-- **⬜ en cola — Probar: 🔘 los estados puestos de verdad por un creep, con su habilidad** (2026-11-23): en la prueba, la Quemadura y el Miedo se le
+- **✅ hecho (2026-11-26) — Probar: 🔘 los estados puestos de verdad por un creep, con su habilidad** (2026-11-23): en la prueba, la Quemadura y el Miedo se le
   mandaron a Blanco J1 por el mismo aviso que usan las habilidades de creep (sin pasar por el duelo). Falta verlo con un creep usando su habilidad en
   un duelo, el «+N» con más de 12 estados, un creep visto por un jugador (sin el escudo) y una invocación.
+  **Lo que se vio** (mapa «Prueba · General», GM con las Acciones del creep y J1 desde su pantalla; el «+N» ya no existe desde la P350, se miró el agrupado):
+  (1) En duelos de verdad le pusieron a Blanco J1: el Mago · Piromante la **Quemadura** (Lengua de fuego), el Debuffer · Maldito la **Coraza maldita**
+  y el **Punto débil** (con la Herida sombría del daño siniestro), el Tanque · Escudero el **Provocado** (y él quedó Desafiante), el Liviano · Sangrador
+  el **Sangrado** y el Warrior · Hachero la **Armadura rota**. Todos quedaron bien en la ficha y cada uno apareció en su vértice. El Punto débil se notó
+  en el duelo siguiente (bajó el rango del crítico). La Quemadura y el Sangrado sacan 2 de vida apenas entran: es la regla (`dispararAlAplicar`).
+  (2) Con 10 estados (6 por habilidades y 4 a mano: Miedo, Silencio, Parálisis, Ceguera): **de cerca**, 3 circulitos con numerito (⚡5 control, 🔥2
+  daño, 💢3 marcas) y su globo con los 5 de la familia; **de lejos**, Parálisis, Miedo y Provocado y la pastilla roja «+7», con su globo. Igual en la
+  pantalla del GM y en la de J1. La Armadura rota de un personaje no tiene iconito (viene de su equipo): pregunta **P352**.
+  (3) El Escudero (Desafiante y Piel de hierro por sus habilidades; Miedo, Veneno severo y Escudo especial a mano) visto por J1: los 5 iconitos y los
+  globos, sin los números del escudo (el GM ve «Escudo 5/5», J1 no) ni la vida del creep; la ventana ◎ tampoco los muestra.
+  (4) La Abeja de prueba recibió la Quemadura de la Lengua de fuego del Piromante (J1 se defendió desde su pantalla): quedó junto a su 🪶 Vuela.
+  **Error encontrado y arreglado**: con la Botella con un diablito del Piromante, la pantalla del jugador golpeado decía «te va a entrar 6» y le
+  entraban 8 (la del GM sí sumaba la Botella; el daño que se aplicaba era el bueno). Ahora la Botella va en lo público del creep
+  (`CreepCalculo.tarjetaPublica` → `botella`, `talismanDe` de js/53) y las dos pantallas dan la misma cuenta (probado con la Abeja: 3 + 2 = 5 en las dos).
 
 - **⬜ en cola (para evaluar más adelante) — 🗺 GM Tools avisa cuando en el mapa pasan cosas que requieren ir ahí** (dueño, 2026-11-23, sobre
   P283: «casi siempre todo esto va a suceder en el mapa. Quizás lo que debería pasar en GM Tools es que te avise que están pasando cosas en el mapa

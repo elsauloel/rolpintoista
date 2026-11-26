@@ -648,6 +648,9 @@ const CreepCalculo = (() => {
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,
       masDanoElem: masDanoElemTodos(sc),   // 💍 los anillos elementales (2026-11-10): el +N lo cuenta también la pantalla del jugador golpeado
+      // 😈 La Botella con un diablito (2026-11-26, cola: el jugador golpeado por una habilidad del creep veía «te va a entrar 14» y le entraban 16):
+      // el +N al daño especial, para que la cuenta del duelo en la pantalla del jugador dé lo mismo que en la del GM (talismanDe, vtt-hexgrid/js/53).
+      botella: talisman(sc, 'botella'),
       percepcionAumentada: (sc.pasivas || []).some(p => p && (p.percepcionAumentada || p.poolId === 'percepcion-aumentada' || String(p.nombre || '').trim() === 'Percepción aumentada')),   // 👁 sin punto ciego para el sigilo (js/02, 2026-11-09)   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
       // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
       // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).

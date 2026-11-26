@@ -179,7 +179,8 @@ function noVistoReintentar(){   // lo recién llegado que se escondió se vuelve
 function mesaOcultaVer(t){
   const o = typeof mesaOcultaParte === 'function' ? mesaOcultaParte(t) : null;
   if(!o) return null;
-  return escondidoLoVeo(o.tipo, tokenPorFicha(t.ficha, o.tipo)) ? o : false;
+  const ve = escondidoLoVeo(o.tipo, tokenPorFicha(t.ficha, o.tipo));
+  return (o.sin ? !ve : ve) ? o : false;   // `sinoculta-…` (P311): la versión para los que NO lo ven, como `datos.sinEscondido`
 }
 /* 🙈 Quién ve a quién (2026-11-23, dueño, sobre el inicio de turno de una rata escondida y envenenada: «a los rivales no les debería salir nada, a
    sus aliados sí»). UNA regla (NoVisto.loVeElEscondido) para todo lo que le pasa a alguien escondido: las líneas `oculta-…` de la Mesa (de arriba)

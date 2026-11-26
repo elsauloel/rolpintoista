@@ -69,7 +69,7 @@ async function mesaPublicar(origen, r){
   }
   mesaAntes(`${r.quien || ''} ${origen || ''}`);
   // 🙈 (P320) lo mismo que `mesaLinea`: una tirada que sale mientras el mapa aplica lo de un golpe a alguien escondido, marcada.
-  if(!/^oculta-/.test(String(r.desde || '')) && typeof window.mesaLineaMarca === 'function'){
+  if(!/^(sin)?oculta-/.test(String(r.desde || '')) && typeof window.mesaLineaMarca === 'function'){
     const marca = window.mesaLineaMarca(r.desde === 'gm' ? 'gm' : 'mapa');
     if(marca) r = {...r, desde: marca.desde, ficha: marca.ficha};
   }
@@ -89,7 +89,7 @@ async function mesaPublicar(origen, r){
     mod: num(r.mod),
     total: num(r.total),
     // r.desde = 'gm': la tirada de un creep que publica el mapa (Acciones nuevas, paso 4 etapa 4c): se pinta como las de GM Tools.
-    desde: r.desde === 'gm' ? 'gm' : /^oculta-(pj|creep):[a-z-]{1,20}$/.test(String(r.desde || '')) ? r.desde : MESA_DESDE,   // 🙈 (P263) una línea de un duelo oculto
+    desde: r.desde === 'gm' ? 'gm' : /^(sin)?oculta-(pj|creep):[a-z-]{1,20}$/.test(String(r.desde || '')) ? r.desde : MESA_DESDE,   // 🙈 (P263) una línea de un duelo oculto
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
   // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
@@ -411,9 +411,11 @@ let mesaUltimoSnap = null;
 /* 🙈 Las líneas de un duelo oculto (comun/duelo.js, P263, 2026-11-22): `desde = 'oculta-<pj|creep>:<desde de siempre>'` y `ficha` = el escondido.
    Las ve solo su bando (el mapa lo decide mejor: vtt-hexgrid/js/29 mesaFiltrar, mirando si esta pantalla lo ve); sin mapa, un personaje escondido
    solo lo ven los jugadores y un creep escondido solo el GM. `mesaOcultaParte(t)` → {tipo, desde} o null; `mesaOcultaDoc(d, desde)` = la línea con su desde. */
+/* 🙈 `sinoculta-<pj|creep>:<desde>` (P311, 2026-11-26) es la otra cara, como `datos.sinEscondido` de los momentos: la versión para los que NO lo
+   ven («Alguien clava un tótem…»); quien lo ve lee la marcada `oculta-…`, con el nombre. `mesaOcultaParte` → {tipo, desde, sin: true}. */
 function mesaOcultaParte(t){
-  const m = /^oculta-(pj|creep):(.+)$/.exec(String((t && t.desde) || ''));
-  return m ? {tipo: m[1], desde: m[2]} : null;
+  const m = /^(sin)?oculta-(pj|creep):(.+)$/.exec(String((t && t.desde) || ''));
+  return m ? (m[1] ? {tipo: m[2], desde: m[3], sin: true} : {tipo: m[2], desde: m[3]}) : null;
 }
 function mesaOcultaDoc(d, desde){
   const t = d.data({serverTimestamps: 'estimate'}), x = {...t, desde};
@@ -423,7 +425,8 @@ function mesaOcultaSinMapa(d){
   const o = mesaOcultaParte(d.data());
   if(!o) return d;
   const gm = typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm === true;
-  return (o.tipo === 'creep') === gm ? mesaOcultaDoc(d, o.desde) : null;
+  const suyo = (o.tipo === 'creep') === gm;
+  return (o.sin ? !suyo : suyo) ? mesaOcultaDoc(d, o.desde) : null;
 }
 function mesaProcesar(snap){
   mesaUltimoSnap = snap;

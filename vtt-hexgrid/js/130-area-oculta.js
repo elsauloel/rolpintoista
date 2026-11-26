@@ -201,13 +201,13 @@ function areaOcultaDelatado(){ if(areaOcultaCtx) areaOcultaCtx.delatado = true; 
 // La marca de una línea de la Mesa (comun/mesa.js la pide): `oculta-<pj|creep>:<desde>` y la ficha del escondido, o null.
 function mesaLineaMarca(desde){
   if(!areaOcultaActiva()) return null;
-  const base = /^[a-z-]{1,20}$/.test(String(desde || '')) && !/^oculta-/.test(String(desde)) ? String(desde) : 'recordatorio';
-  return {desde: `oculta-${areaOcultaCtx.tipo}:${base}`.slice(0, 40), ficha: areaOcultaCtx.ficha};
+  const base = /^[a-z-]{1,20}$/.test(String(desde || '')) && !/^(sin)?oculta-/.test(String(desde)) ? String(desde) : 'recordatorio';
+  return {desde: `${areaOcultaCtx.sin ? 'sin' : ''}oculta-${areaOcultaCtx.tipo}:${base}`.slice(0, 40), ficha: areaOcultaCtx.ficha};
 }
-// Un momento abierto mientras tanto: solo para los que lo ven (js/16 momentoEscondidoVer).
+// Un momento abierto mientras tanto: solo para los que lo ven (js/16 momentoEscondidoVer). Con `ctx.sin` (P311): solo para los que NO lo ven.
 function momentoMarcaOculta(datos){
   if(!areaOcultaActiva() || (datos && (datos.escondido || datos.sinEscondido))) return datos;
-  return {...(datos || {}), escondido: {tipo: areaOcultaCtx.tipo, tokenId: areaOcultaCtx.tokenId}};
+  return {...(datos || {}), [areaOcultaCtx.sin ? 'sinEscondido' : 'escondido']: {tipo: areaOcultaCtx.tipo, tokenId: areaOcultaCtx.tokenId}};
 }
 // ¿Esta pantalla se calla (los toasts)? Solo la que no ve al escondido.
 function areaOcultaCalla(){ return areaOcultaActiva() && !areaOcultaCtx.veo; }

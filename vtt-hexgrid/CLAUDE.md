@@ -1114,6 +1114,11 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   sin pasar su Sigilo, `sigiloAguantaAvisar` publica un momento `sigilo-aguanta` con `paraUids` = quien lo maneja (`sigiloManejaUids`: un personaje o
   su invocación, `resumen.control` o su dueño; un creep, los GM). js/16 no lo pone en la Crónica de nadie y lo abre al centro solo para ellos (espera
   a que se cierre otro aviso, como `zona-dano`). Los textos, `Combatiente.sigiloAguanta/sigiloAguantaTxt`. Probado con clics en «Claude · pruebas 2».
+- **🙈 «Alguien clava un tótem…»** (2026-11-26, dueño, P311 b; js/73 `estandarteOcultoCtx` / `estandarteAnunciar`): si quien clava el tótem o el
+  estandarte está escondido (`escondidoDe`), la línea de la Mesa y la tarjeta de la Crónica salen con el contexto del escondido de js/130
+  (`areaOcultaConCtx`: marcadas `oculta-creep` / `datos.escondido`, con el nombre, para el GM y quien lo vea) y otra vez con `sin: true` (marcadas
+  `sinoculta-creep` / `datos.sinEscondido`, con «Alguien», para los que no lo ven; `mesaOcultaVer` en js/29 y `mesaOcultaSinMapa` en comun/mesa.js
+  las reparten). El ⚡ de la habilidad (`acMesaHabilidad`, js/12) va marcado `oculta-creep:habilidad`. Probado con clics en «Prueba · General».
 - **🤐 El Tótem de silencio pone el estado Silencio de verdad** (2026-11-24, dueño: «mientras estás en el efecto, te tiene que aparecer el estado de
   silencio. Y cuando te vas, se te va»; `js/134-totem-silencio.js`): a los rivales de quien lo clavó que están adentro del aura de un tótem en pie, el
   estado «Silencio» de siempre con `totemSilencio`, `permanente` y `hasta` = «mientras esté en el aura del tótem» (sin turnos; el globo lo dice así,

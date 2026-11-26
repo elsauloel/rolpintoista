@@ -10291,7 +10291,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261125sil', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261126ico2', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -11440,6 +11440,74 @@ grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comu
       ['normal', 'nada', 'reporte', 'reporte', 'nada', 'mapa', 'mapa']);
     cierto(/const ocultosArea = typeof areaOcultosDe === 'function' \? areaOcultosDe\(hab, objetivos\) : \[\]/.test(m13) && /areaLanzarOcultos\(\{hab, casteador, h, radio, ocultos: ocultosArea, deArea: refArea\.id\}\)/.test(m13));
     cierto(/a\.hab && a\.hab\.oculta \? \{oculto: true\} : \{\}/.test(m13) && /veOculto: d =>/.test(m14) && /areaOcultaLaVeo\(a\)/.test(m05));
+  });
+})();
+
+grupo('🙈 «Alguien clava un tótem…» si el creep está escondido (P311 b, vtt-hexgrid/js/73, js/12, js/130, js/29, comun/mesa.js)');
+(function(){
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  prueba('la Mesa sin mapa: «sinoculta-…» es la otra cara (la ven los que NO son del bando del escondido)', async () => {
+    const src = await traer('mesa.js');
+    const trozo = src.slice(src.indexOf('function mesaOcultaParte'), src.indexOf('function mesaProcesar'));
+    const hacer = gm => new Function('fbMiembro', trozo + '\nreturn {mesaOcultaParte, mesaOcultaSinMapa};')({gm});
+    const doc = desde => ({id: 'x', data: () => ({desde, origen: 'algo'})});
+    const J = hacer(false), G = hacer(true);
+    const ver = (w, desde) => { const r = w.mesaOcultaSinMapa(doc(desde)); return r ? r.data().desde : null; };
+    igual([J.mesaOcultaParte({desde: 'sinoculta-creep:recordatorio'}), J.mesaOcultaParte({desde: 'oculta-creep:habilidad'}), ver(J, 'sinoculta-creep:recordatorio'), ver(G, 'sinoculta-creep:recordatorio'),
+      ver(J, 'sinoculta-pj:mapa'), ver(G, 'sinoculta-pj:mapa'), ver(G, 'oculta-creep:habilidad'), ver(J, 'oculta-creep:habilidad')],
+      [{tipo: 'creep', desde: 'recordatorio', sin: true}, {tipo: 'creep', desde: 'habilidad'}, 'recordatorio', null, null, 'mapa', 'habilidad', null]);
+    cierto(/\(sin\)\?oculta-\(pj\|creep\):\[a-z-\]\{1,20\}/.test(src));   // mesaPublicar deja pasar las dos marcas
+  });
+  prueba('el mapa (js/29): la marcada la ve quien ve al creep; la «sin», justo los que no', async () => {
+    const [m29, mesa] = await Promise.all([traer('../vtt-hexgrid/js/29-accion-incierta.js'), traer('mesa.js')]);
+    const trozo = m29.slice(m29.indexOf('function mesaOcultaVer'), m29.indexOf('function mesaFiltrar'));
+    const parte = new Function(mesa.slice(mesa.indexOf('function mesaOcultaParte'), mesa.indexOf('function mesaOcultaDoc')) + '\nreturn mesaOcultaParte;')();
+    const toks = {c1: {tipo: 'creep', fichaId: 'c1', ve: false}, c2: {tipo: 'creep', fichaId: 'c2', ve: true}};
+    const hacer = gm => new Function('soyGM', 'ojoRevelando', 'mesaOcultaParte', 'tokenPorFicha', 'loVeoAhora', 'ocultoPorSigiloParaMi', trozo + '\nreturn mesaOcultaVer;')(
+      gm, false, parte, f => toks[f] || null, t => t.ve, () => false);
+    const J = hacer(false), G = hacer(true);
+    const r = (w, desde, ficha) => { const o = w({desde, ficha}); return o === null ? 'normal' : o ? o.desde : 'nada'; };
+    igual([r(J, 'oculta-creep:recordatorio', 'c1'), r(J, 'sinoculta-creep:recordatorio', 'c1'), r(G, 'oculta-creep:recordatorio', 'c1'), r(G, 'sinoculta-creep:recordatorio', 'c1'),
+      r(J, 'sinoculta-creep:recordatorio', 'c2'), r(J, 'oculta-creep:habilidad', 'c1')],
+      ['nada', 'recordatorio', 'recordatorio', 'nada', 'nada', 'nada']);
+  });
+  prueba('js/130: con el contexto «sin», la línea va «sinoculta-…» y el momento «sinEscondido»', async () => {
+    const src = await traer('../vtt-hexgrid/js/130-area-oculta.js');
+    const trozo = src.slice(src.indexOf('function mesaLineaMarca'), src.indexOf('function areaOcultaCalla'));
+    const con = ctx => new Function('areaOcultaCtx', 'areaOcultaActiva', trozo + '\nreturn {mesaLineaMarca, momentoMarcaOculta};')(ctx, () => !!ctx);
+    const c = {tipo: 'creep', ficha: 'c1', tokenId: 't1'};
+    const a = con(c), b = con({...c, sin: true}), n = con(null);
+    igual([a.mesaLineaMarca('recordatorio'), b.mesaLineaMarca('recordatorio'), b.mesaLineaMarca('sinoculta-creep:x'), n.mesaLineaMarca('recordatorio'),
+      a.momentoMarcaOculta({centro: true}), b.momentoMarcaOculta({centro: true}), n.momentoMarcaOculta({centro: true})],
+      [{desde: 'oculta-creep:recordatorio', ficha: 'c1'}, {desde: 'sinoculta-creep:recordatorio', ficha: 'c1'}, {desde: 'sinoculta-creep:recordatorio', ficha: 'c1'}, null,
+        {centro: true, escondido: {tipo: 'creep', tokenId: 't1'}}, {centro: true, sinEscondido: {tipo: 'creep', tokenId: 't1'}}, {centro: true}]);
+  });
+  prueba('js/73: escondido → dos de cada (con el nombre, marcada; «Alguien», con «sin»); a la vista → una, con el nombre', async () => {
+    const src = await traer('../vtt-hexgrid/js/73-estandarte.js');
+    const trozo = src.slice(src.indexOf('function estandarteOcultoCtx'), src.indexOf('// Sacarlo del mapa y borrar su ficha'));
+    const correr = async esconde => {
+      const pub = [];
+      let ctx = null;
+      const tokens = new Map([['t1', {tipo: 'creep', fichaId: 'c1'}]]);
+      const w = new Function('tokens', 'escondidoDe', 'areaOcultaConCtx', 'mesaLinea', 'momentoAbrir', 'NoVisto', trozo + '\nreturn {estandarteOcultoCtx, estandarteAnunciar};')(
+        tokens, id => esconde ? {tipo: 'creep', tokenId: id} : null, async (c, fn) => { ctx = c; try{ return await fn(); } finally{ ctx = null; } },
+        async (t, desde) => { pub.push(['mesa', t, ctx ? (ctx.sin ? 'sin' : 'marcada') : '']); }, async m => { pub.push(['cronica', m.titulo, ctx ? (ctx.sin ? 'sin' : 'marcada') : '']); }, {ALGUIEN: 'Alguien'});
+      const sc = {id: 'c1', nombre: 'Blanco creep'};
+      const oc = w.estandarteOcultoCtx(sc);
+      await w.estandarteAnunciar(oc, sc, '🤐', q => `${q} clava un tótem de silencio`, q => `${q} clava un tótem de silencio`, 'r');
+      return {oc, pub};
+    };
+    const e = await correr(true), v = await correr(false);
+    igual(e.oc, {tipo: 'creep', ficha: 'c1', tokenId: 't1', veo: true, delatado: false});
+    igual(e.pub, [['mesa', '🤐 Blanco creep clava un tótem de silencio', 'marcada'], ['cronica', 'Blanco creep clava un tótem de silencio', 'marcada'],
+      ['mesa', '🤐 Alguien clava un tótem de silencio', 'sin'], ['cronica', 'Alguien clava un tótem de silencio', 'sin']]);
+    igual([v.oc, v.pub], [null, [['mesa', '🤐 Blanco creep clava un tótem de silencio', ''], ['cronica', 'Blanco creep clava un tótem de silencio', '']]]);
+    cierto(/const oculto = estandarteOcultoCtx\(sc\);/.test(src) && /await estandarteAnunciar\(oculto, sc, ic, txt, titulo, resultado\);/.test(src));
+  });
+  prueba('js/12: el ⚡ del tótem o el estandarte de un escondido va marcado (los que no lo ven no lo leen)', async () => {
+    const src = await traer('../vtt-hexgrid/js/12-acciones-nuevas.js');
+    cierto(/h && h\.estandarte && typeof estandarteOcultoCtx === 'function' \? estandarteOcultoCtx\(sc\) : null/.test(src)
+      && /desde: oculto \? 'oculta-creep:habilidad' : 'habilidad', \.\.\.\(oculto \? \{ficha: oculto\.ficha\} : \{\}\)/.test(src));
   });
 })();
 

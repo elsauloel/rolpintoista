@@ -123,6 +123,7 @@ function plantarEstandarte(sc, h){
 async function estandarteCrear(sc, e, celda, tOrig, origId, h){   // h: la habilidad (su nombre queda guardado: «Ver detalle», js/127)
   // Uno por creep (de cada clase: un estandarte y un tótem pueden convivir): el que ya tenía se va.
   const sil = !!e.silencio;
+  const oculto = estandarteOcultoCtx(sc);   // 🙈 (P311) ¿lo clava alguien escondido? (antes de crear el token)
   for(const [id, t] of [...tokens.entries()]){
     const p = estandarteInfo(t) && creepPrivadoDe(t.fichaId);
     if(p && p.estandarte && p.estandarte.de === sc.id && !!p.estandarte.silencio === sil) await estandarteQuitar(id, t, 'reemplazo');
@@ -153,17 +154,33 @@ async function estandarteCrear(sc, e, celda, tOrig, origId, h){   // h: la habil
   await lote.commit();
   await modificarCreep(nuevo.id, x => { CreepCalculo.actualizarHpMaxPorCon(x); x.hp = x.hpMax; });   // arma lo público (vida, estados, el aura) como cualquier creep
   await pegarTokenEn({nombre, color, tipo: 'creep', rotacion: 0, oculto: false}, celda, nuevo.id, nombre);
-  if(sil){
-    const txt = `${sc.nombre} clava un tótem de silencio: sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP mientras siga en pie (${vida} de vida, sin defensas)`;
-    try{ mesaLinea(`🤐 ${txt}`, 'recordatorio'); }catch(err){}
-    try{ momentoAbrir({tipo: 'estandarte', icono: '🤐', titulo: `${sc.nombre} clava un tótem de silencio`, resultado: `Sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP, hasta que lo rompan.`, estado: 'listo', datos: {centro: true}}); }catch(err){}
-    toast(`🤐 ${nombre}: clavado`);
-    return;
-  }
-  const txt = `${sc.nombre} clava un estandarte de guerra: sus aliados a ${radio} casillas o menos suman +${pdg} a la Probabilidad de Golpe y +${dano} al daño mientras siga en pie (${vida} de vida, sin defensas)`;
-  try{ mesaLinea(`🚩 ${txt}`, 'recordatorio'); }catch(err){}
-  try{ momentoAbrir({tipo: 'estandarte', icono: '🚩', titulo: `${sc.nombre} clava un estandarte de guerra`, resultado: `Sus aliados a ${radio} casillas o menos: +${pdg} PdG y +${dano} al daño, hasta que lo rompan.`, estado: 'listo', datos: {centro: true}}); }catch(err){}
-  toast(`🚩 ${nombre}: clavado`);
+  const ic = sil ? '🤐' : '🚩';
+  const txt = q => sil ? `${q} clava un tótem de silencio: sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP mientras siga en pie (${vida} de vida, sin defensas)`
+    : `${q} clava un estandarte de guerra: sus aliados a ${radio} casillas o menos suman +${pdg} a la Probabilidad de Golpe y +${dano} al daño mientras siga en pie (${vida} de vida, sin defensas)`;
+  const titulo = q => `${q} clava ${sil ? 'un tótem de silencio' : 'un estandarte de guerra'}`;
+  const resultado = sil ? `Sus rivales a ${radio} casillas o menos no pueden usar habilidades que cuestan SP, hasta que lo rompan.`
+    : `Sus aliados a ${radio} casillas o menos: +${pdg} PdG y +${dano} al daño, hasta que lo rompan.`;
+  await estandarteAnunciar(oculto, sc, ic, txt, titulo, resultado);
+  toast(`${ic} ${nombre}: clavado`);
+}
+/* 🙈 «Alguien clava un tótem…» (P311 b, 2026-11-26, dueño: si el creep está escondido —oculto para los jugadores o en sigilo—, los jugadores leen
+   «Alguien clava…» en la Mesa y en la Crónica; el GM sigue viendo el nombre). El mismo mecanismo que lo de un escondido en un duelo o una zona (js/130,
+   js/29): con el contexto del escondido, la línea de la Mesa va marcada `oculta-creep` y el momento `datos.escondido` (los ven el GM y quien lo vea
+   ahora, con el nombre); con `sin`, la otra versión, `sinoculta-creep` / `datos.sinEscondido`, para los que no lo ven, con «Alguien». La línea ⚡ de la
+   habilidad (js/12 `acMesaHabilidad`) también va marcada: a los que no lo ven no les llega (ya leen «Alguien clava…»). */
+function estandarteOcultoCtx(sc){
+  const orig = [...tokens.entries()].find(([, t]) => t.tipo === 'creep' && t.fichaId === sc.id);
+  const esc = orig && typeof escondidoDe === 'function' ? escondidoDe(orig[0]) : null;
+  return esc ? {tipo: 'creep', ficha: String(sc.id || '').slice(0, 80), tokenId: orig[0], veo: true, delatado: false} : null;
+}
+async function estandarteAnunciar(oculto, sc, ic, txt, titulo, resultado){
+  const publicar = async q => {
+    try{ await mesaLinea(`${ic} ${txt(q)}`, 'recordatorio'); }catch(err){}
+    try{ await momentoAbrir({tipo: 'estandarte', icono: ic, titulo: titulo(q), resultado, estado: 'listo', datos: {centro: true}}); }catch(err){}
+  };
+  if(!oculto || typeof areaOcultaConCtx !== 'function'){ await publicar(sc.nombre); return; }
+  await areaOcultaConCtx(oculto, () => publicar(sc.nombre));
+  await areaOcultaConCtx({...oculto, sin: true}, () => publicar(NoVisto.ALGUIEN));
 }
 // Sacarlo del mapa y borrar su ficha (al romperse, o al clavar otro).
 async function estandarteQuitar(id, t, motivo){

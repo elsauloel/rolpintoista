@@ -472,11 +472,13 @@ function acElegirObjetivo(sc, ataque, suelto, alDisparar){
    colocan con un clic, como las de un personaje. */
 function acMesaHabilidad(sc, h, extra){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
+  // 🙈 (P311) El tótem o el estandarte de un creep escondido: su ⚡ lo leen solo los que lo ven (los demás leen «Alguien clava…», js/73).
+  const oculto = h && h.estandarte && typeof estandarteOcultoCtx === 'function' ? estandarteOcultoCtx(sc) : null;
   fbDb.collection(fbRutaCampana('tiradas')).add({
     uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String((sc && sc.nombre) || '').slice(0, 60),
     origen: String((h && h.nombre) || 'Habilidad').slice(0, 80),
     formula: [CreepCalculo.habTextoMesa(h), extra || ''].filter(Boolean).join(' ').slice(0, 300),   // sin el aviso ⚙/✋ para el GM
-    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    rolls: [], mod: 0, total: 0, desde: oculto ? 'oculta-creep:habilidad' : 'habilidad', ...(oculto ? {ficha: oculto.ficha} : {}),
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
 }

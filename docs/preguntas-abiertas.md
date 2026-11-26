@@ -2417,6 +2417,9 @@ uno (por ejemplo, el del GM con 🤝 y el de mano a mano con 🫴, o al revés).
 
 **Decidido (dueño, 2026-11-23): (b)** — si el creep está escondido, la Mesa y la Crónica dicen «Alguien clava…». En la cola de programación.
 
+> ✅ **Aplicada (2026-11-26)** (`vtt-hexgrid/js/73` `estandarteAnunciar`, js/12, js/130, js/29, `comun/mesa.js`): con el creep escondido, la versión con
+> el nombre va marcada para el GM (y quien lo vea) y la de «Alguien» para los demás; la línea ⚡ de la habilidad, solo para los que lo ven. Probado con clics.
+
 Con P281 el token ya no nombra al creep, y «Ver detalle» dice «Alguien» si quien lo clavó no está a la vista. Pero al clavarlo, la Mesa y la Crónica
 siempre dicen «Blanco creep clava un tótem de silencio…» (y el ⚡ con el nombre de la habilidad), aunque el creep esté oculto o en sigilo. ¿Se hace como
 con otras acciones de un creep escondido (una frase incierta, «Alguien clava un tótem…», o solo para el GM), o queda así? Mientras, quedó como estaba.

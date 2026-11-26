@@ -2767,8 +2767,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   detalle»): la casilla «🎁 Permitir agregar gratis» del generador de tiendas y los efectos de arma de la Guía de diseño. Mostrárselos al dueño
   con captura y proponer.
 
-- **⬜ en cola — 🪧 «Alguien clava un tótem…» si el creep está escondido (P311 decidida, b)** (dueño, 2026-11-23): la línea de la Mesa y la
+- **✅ hecho (2026-11-26) — 🪧 «Alguien clava un tótem…» si el creep está escondido (P311 decidida, b)** (dueño, 2026-11-23): la línea de la Mesa y la
   tarjeta de la Crónica al clavar un tótem o un estandarte no nombran al creep si está oculto o en sigilo; el GM lo sigue viendo.
+  *Resultado:* si el creep está escondido para los jugadores (oculto por el GM, en sigilo, adentro de una nube), la Mesa y la Crónica salen dos
+  veces: con el nombre, solo para el GM (y para quien lo esté viendo), y «Alguien clava un tótem de silencio…» / «Alguien clava un estandarte de
+  guerra…» para los demás. La línea ⚡ de la habilidad también lo nombraba: ahora la leen solo los que lo ven (los demás ya leen «Alguien
+  clava…»). Con el creep a la vista, todo como antes, con el nombre para todos. Es el mismo mecanismo de lo escondido en un duelo o una zona
+  (vtt-hexgrid/js/130 y js/29), con su otra cara para la Mesa (`sinoculta-…`, como `sinEscondido` de la Crónica). Probado con clics en
+  «Prueba · General» (GM y Jugador 1): el tótem con el creep oculto, el estandarte con el creep en sigilo y el tótem con el creep a la vista.
+  La pantalla del GM que lo clava no lo pone en su propia Crónica (como siempre: ya lo ve en el aviso y en la Mesa).
 - **⬜ en cola — ⚖ Probar: el sobrepeso al sacar del baúl y al comprar en la tienda** (2026-11-23, de la tarea del sobrepeso con la mochila, P312):
   con la tienda abierta, sacar del 📦 baúl con la mochila llena (tiene que preguntar «Sacar igual» con la cuenta) y comprar algo que te deje con
   sobrepeso (cartel «⚖ Tenés sobrepeso» en el mapa y en la ficha). No se probó con clics: hacía falta abrir una tienda.

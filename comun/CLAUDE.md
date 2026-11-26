@@ -1091,6 +1091,9 @@ versión parecida en más de una, es candidato a juntar.
   (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
   {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
   nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
+- **🙈 `mesa.js`, la otra cara de una línea oculta** (2026-11-26, P311): además de `oculta-<pj|creep>:<desde>` (la ve el bando del escondido), una línea
+  `sinoculta-<pj|creep>:<desde>` la ven justo los demás (como `datos.sinEscondido` de la Crónica): `mesaOcultaParte` → `{tipo, desde, sin: true}`;
+  `mesaOcultaSinMapa` y el mapa (vtt-hexgrid/js/29 `mesaOcultaVer`) la reparten al revés. La usa el tótem o el estandarte de un creep escondido (js/73).
 - **🎭 Acción incierta en la Mesa** (2026-10-09): `mesa.js` pasa los documentos por `mesaFiltrar(docs)` si la página lo define (el mapa,
   `vtt-hexgrid/js/29-accion-incierta.js`) y dibuja las líneas `desde: 'incierta' | 'incierta-pj' | 'incierta-creep'` en violeta;
   `mesaRefiltrar()` vuelve a pasar lo último; `mesaLinea(texto, desde, quien)` acepta de quién es. `TokensAuto.colocarTrampas` anuncia cada

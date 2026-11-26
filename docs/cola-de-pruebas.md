@@ -2884,10 +2884,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (más adelante) — 🧑 Que el personaje de un jugador diga qué clase / rol es** (dueño, 2026-11-24, de la pregunta 4 de las etiquetas):
   hoy no lo dice en ningún lado; hace falta para abrir «+ Pasiva» con su rol ya marcado (y quizás para otras cosas).
 
-- **⬜ en cola — Probar: 🏷 «+ Pasiva» de una invocación y subir una pasiva con etiquetas de verdad** (2026-11-24, de las etiquetas de las pasivas):
+- **✅ hecho (2026-11-26) — Probar: 🏷 «+ Pasiva» de una invocación y subir una pasiva con etiquetas de verdad** (2026-11-24, de las etiquetas de las pasivas):
   con clics se probó «+ Pasiva» en la ficha, en un creep de GM Tools (con su rol marcado) y en el asistente de personaje nuevo, y la ventana de
   «Subir a la biblioteca» con los botoncitos (sin subir). Falta ver «+ Pasiva» de una invocación y subir una pasiva de verdad (y borrarla después)
   para ver que la Biblioteca la muestre filtrable con sus etiquetas.
+  **Hecho**, con clics en «Claude · pruebas 2» (Jugador 1, su ficha y su Abeja de prueba):
+  (1) **🐞 Error encontrado y arreglado:** el «+ Pasiva» de la invocación (está en «✎ Editar» → paso 6, Pasivas) abría la ventana de la Biblioteca
+  **detrás** del editor de la invocación: se veía oscurecida y no se podía tocar. Ahora se abre encima (`abrirPasivaNuevaInv`, js/04, `z: 99600`, como
+  las trampas preconstruidas). Con eso: las tres filas (Rol, Estilo, Función), «☑ sumar las de 🌐 Cualquiera» tildado y «Mostrando 47 de 47»; Support
+  → 22, sin Cualquiera → 7, + Distancia + Recursos → 2; «✕ Limpiar filtros» y el buscador andan. Se le sumó Callo de batalla, se guardó, se le sacó
+  con la × y se volvió a guardar (quedó solo con Vuela). Capturas `cola132/01` a `09` (la del error, `02`; arreglado, `03`).
+  (2) **Subida de verdad:** se creó en la ficha «Prueba de etiquetas (borrar)» (+1 Percepción); «⬆ Subir» abrió con «Percepción» ya marcada (la
+  sugerida por lo que suma) y se marcaron 🏹 Shooter y 🎯 Distancia con los botoncitos; subió («ya lo pueden usar todos»). En la Biblioteca apareció
+  (48 de 48, «🔶 sin auditar», «🏹 Shooter · 🎯 Distancia · Percepción · de Jugador 1») y se la encuentra filtrando Shooter sin Cualquiera (13),
+  + Distancia (13) y + Percepción (4); con Tanque sin Cualquiera, Cuerpo a cuerpo o Sigilo no aparece. Se borró con el botón «Borrar» de la
+  Biblioteca (el autor puede borrar lo suyo sin auditar): el documento ya no existe en la base y la lista volvió a 47. Se sacó la pasiva de la ficha
+  (Editar → Eliminar). Capturas `cola132/10` a `18`. Duda nueva: P358 («Limpiar filtros» no vuelve a tildar «sumar las de Cualquiera»).
+  `restaurar.js`: «quedó igual». Pruebas: 1163 en verde.
 
 - **⬜ en cola — 🏷 Responder P315: ¿el asistente de personaje nuevo marca la clase elegida en el filtro de pasivas?** (dueño, 2026-11-24: «anotá
   las nuevas preguntas en la cola»). Recomendación: sí. Ver `docs/preguntas-abiertas.md`.

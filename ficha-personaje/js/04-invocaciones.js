@@ -132,7 +132,8 @@ function abrirItemNuevoInv(invId){
 function abrirPasivaNuevaInv(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  Biblioteca.abrir({tipo: 'pasivas', titulo: `Pasiva para ${inv.nombre}`, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
+  // z: por encima del editor de la invocación (paso a paso, z 52), desde donde se abre; sin esto quedaba tapada (2026-11-26).
+  Biblioteca.abrir({tipo: 'pasivas', titulo: `Pasiva para ${inv.nombre}`, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [], z: 99600,
     ...(typeof FiltroPasivas !== 'undefined' ? {filtro: FiltroPasivas.paraBiblioteca([])} : {}),   // 🏷 (una invocación no tiene rol: sin marcar)
     subtitulo: e2 => (e2.datos && e2.datos.detalle ? ` · ${e2.datos.detalle.slice(0, 60)}` : ''),
     alElegir: datos => {

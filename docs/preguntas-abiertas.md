@@ -3033,3 +3033,12 @@ El Escudo del sereno (solo contra lo físico) y el Escudo de la mañana (solo co
 50 % ni se recortan. ¿Está bien así, o tienen que contar dentro del mismo tope que la Vida extra?
 
 > ✅ **Decidida (dueño, 2026-11-26, «como sugerís»):** está bien así: los escudos de los anillos no son Vida extra y quedan fuera del tope.
+
+
+### P358 — 🏷 ¿«✕ Limpiar filtros» de «+ Pasiva» también vuelve a tildar «sumar las de 🌐 Cualquiera»? (2026-11-26, Claude, probando las etiquetas)
+
+En la ventana de «+ Pasiva» (y en el paso Pasivas del asistente de personaje nuevo), «✕ Limpiar filtros» desmarca los botoncitos de Rol, Estilo y
+Función, pero deja la casilla «sumar las de 🌐 Cualquiera» como estaba: si la habías destildado, sigue destildada, y el próximo rol que marques
+muestra solo las de ese rol (sin las que le sirven a cualquiera). No es un error (la casilla se ve), pero puede confundir. ¿«Limpiar» tiene que
+dejar todo como al abrir la ventana (la casilla tildada otra vez), o así está bien? Recomendación: que vuelva a tildarla (es un cambio de una línea en
+`FiltroPasivas.clic`, comun/pasivas.js).

@@ -2842,9 +2842,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   entraban 8 (la del GM sí sumaba la Botella; el daño que se aplicaba era el bueno). Ahora la Botella va en lo público del creep
   (`CreepCalculo.tarjetaPublica` → `botella`, `talismanDe` de js/53) y las dos pantallas dan la misma cuenta (probado con la Abeja: 3 + 2 = 5 en las dos).
 
-- **⬜ en cola (para evaluar más adelante) — 🗺 GM Tools avisa cuando en el mapa pasan cosas que requieren ir ahí** (dueño, 2026-11-23, sobre
-  P283: «casi siempre todo esto va a suceder en el mapa. Quizás lo que debería pasar en GM Tools es que te avise que están pasando cosas en el mapa
-  que requieren que vayas ahí»). Pensar qué cosas (duelos esperando al GM, momentos pendientes, zonas por tirar…) y cómo avisarlas; conversarlo antes.
 
 - **⬜ en cola — 🎲 Al cargar el mapa (o con F5) a veces se ven muchas tiradas de dados animadas juntas** (dueño, 2026-11-23: «a veces cuando
   aprieto F5 o cargo el mapa por primera vez aparece la animación de muchas tiradas de dados, juntas. Asumo que será la acumulación de tiradas
@@ -3208,6 +3205,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🔘 La Armadura rota de un personaje con su iconito alrededor del token (P352 decidida)** (dueño, 2026-11-26): hoy, en un
   personaje, la Armadura rota viene del equipo roto y no sale entre los iconitos (ni de cerca ni en la pastilla de lejos; solo en la ventana ◎). Que
   tenga su iconito, en la familia 🎯 marcas y debilidades, como el ⚖ del sobrepeso (que también viene del equipo).
+- **⬜ en cola (para evaluar más adelante; dueño 2026-11-26: al final, se hace si toca cuando pueda prestarle atención, si no se sigue postergando) — 🗺 GM Tools avisa cuando en el mapa pasan cosas que requieren ir ahí** (dueño, 2026-11-23, sobre
+  P283: «casi siempre todo esto va a suceder en el mapa. Quizás lo que debería pasar en GM Tools es que te avise que están pasando cosas en el mapa
+  que requieren que vayas ahí»). Pensar qué cosas (duelos esperando al GM, momentos pendientes, zonas por tirar…) y cómo avisarlas; conversarlo antes.
+  Contado al dueño (2026-11-26): ejemplos de avisos (duelo esperando al GM, turno de un creep, zona o trampa por tirar, un jugador que pide algo, un
+  creep caído) y formas (cartelito con «Ir al mapa», numerito rojo, sonido opcional); recomendado dejarlo para cuando juegue sesiones reales con GM Tools.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

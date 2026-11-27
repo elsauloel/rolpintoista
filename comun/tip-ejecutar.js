@@ -10,9 +10,11 @@
 const TipEjecutar = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
   const sinNotas = t => String(t || '').split(/\s*[⚙✋]/)[0].trim();
-  function attrs(nombre, detalle){
+  // 📋 `reglas` (2026-11-27): el detalle de reglas de la habilidad, aparte de la descripción (ItemCorto.reglasLista); va en el globo debajo.
+  function attrs(nombre, detalle, reglas){
     const t = sinNotas(detalle);
-    return t ? `data-tip-hab="${esc(t)}" data-tip-nombre="${esc(nombre || '')}"` : '';
+    const l = typeof ItemCorto !== 'undefined' && ItemCorto.reglasLista ? ItemCorto.reglasLista({reglas}) : [];
+    return t || l.length ? `data-tip-hab="${esc(t)}" data-tip-nombre="${esc(nombre || '')}"${l.length ? ` data-tip-reglas="${esc(l.join('\n'))}"` : ''}` : '';
   }
   const CSS = `#tip-ejecutar{position:fixed;z-index:100000;max-width:380px;background:#1c1714;border:1px solid #4a3a30;border-radius:8px;
     box-shadow:0 8px 24px rgba(0,0,0,.55);padding:11px 14px 12px;font-size:13px;line-height:1.55;color:#DCCFC5;pointer-events:auto}
@@ -20,6 +22,10 @@ const TipEjecutar = (() => {
     #tip-ejecutar .te-lbl{display:block;color:#d08a4f;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
       margin-bottom:5px;padding-top:6px;border-top:1px dashed #4a3a30}
     #tip-ejecutar .te-txt{white-space:pre-wrap}
+    #tip-ejecutar .te-reglas{margin-top:8px;border:1px solid #3d5a6e;border-left:3px solid #6fa8cf;border-radius:6px;padding:5px 9px 6px;
+      background:rgba(80,130,170,.12);font-size:12px;line-height:1.45}
+    #tip-ejecutar .te-reglas .te-lbl{color:#8fc0e0;border-top:0;padding-top:0;margin-bottom:3px}
+    #tip-ejecutar .te-reglas ul{margin:0;padding-left:16px}
     #tip-ejecutar .te-pie{margin-top:8px;font-size:11.5px;color:#b9a99b}`;
   let tip = null, boton = null, cerrarT = null, posBoton = null;
   function cssUnaVez(){
@@ -41,8 +47,12 @@ const TipEjecutar = (() => {
     const marcado = typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(txt) : esc(txt);
     tip = document.createElement('div');
     tip.id = 'tip-ejecutar';
+    const mk = t => typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(t) : esc(t);
+    const reglas = String(b.dataset.tipReglas || '').split('\n').filter(Boolean);
     tip.innerHTML = (b.dataset.tipNombre ? `<div class="te-nom">${esc(b.dataset.tipNombre)}</div>` : '')
-      + `<span class="te-lbl">Detalle</span><div class="te-txt">${marcado}</div>` + (pie ? `<div class="te-pie">${esc(pie)}</div>` : '');
+      + (txt ? `<span class="te-lbl">${reglas.length ? 'Qué hace' : 'Detalle'}</span><div class="te-txt">${marcado}</div>` : '')
+      + (reglas.length ? `<div class="te-reglas"><span class="te-lbl">📋 Detalle</span><ul>${reglas.map(r => `<li>${mk(r)}</li>`).join('')}</ul></div>` : '')
+      + (pie ? `<div class="te-pie">${esc(pie)}</div>` : '');
     document.body.appendChild(tip);
     tip.addEventListener('mouseenter', () => { clearTimeout(cerrarT); cerrarT = null; });
     tip.addEventListener('mouseleave', () => { clearTimeout(cerrarT); cerrarT = setTimeout(() => { cerrarT = null; cerrar(); }, 180); });
@@ -59,7 +69,7 @@ const TipEjecutar = (() => {
     } else tip.style.top = Math.max(m, Math.min(r.top - 10, innerHeight - h - m)) + 'px';
     tip.style.left = left + 'px';
   }
-  const claveDe = b => (b.dataset.tipNombre || '') + '|' + (b.dataset.tipHab || '');
+  const claveDe = b => (b.dataset.tipNombre || '') + '|' + (b.dataset.tipHab || '') + '|' + (b.dataset.tipReglas || '');
   const botonDe = e => (e.composedPath ? e.composedPath() : [e.target]).find(n => n && n.dataset && n.dataset.tipHab !== undefined) || null;
   function iniciar(){
     // Con mousemove (no mouseover): las Acciones y la Botonera del mapa se redibujan solas y, adentro de su recuadro aislado, el navegador no

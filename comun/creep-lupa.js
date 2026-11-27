@@ -177,7 +177,8 @@ const CreepLupa = (() => {
       const partes = [];
       partes.push(K.costoHabTxt(sc, h));
       if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
-      const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}`;
+      const reglas = typeof ItemCorto !== 'undefined' && ItemCorto.reglasLista ? ItemCorto.reglasLista(h) : [];   // 📋 el detalle aparte (2026-11-27)
+      const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}${reglas.length ? '\n📋 Detalle:\n· ' + reglas.join('\n· ') : ''}`;
       return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
     }).join('');
 

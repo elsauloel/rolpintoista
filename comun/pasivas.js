@@ -108,7 +108,11 @@ const PASIVAS_BASE = [
   // ⚔ Devolver gentileza (dueño, 2026-11-05: «una habilidad pasiva que sí habilite el contraataque… tenés que ganar el parry y el bloqueo, y solo en
   // ese contexto te permite contraatacar»). El contraataque libre tras un Bloqueo exitoso se fue: ahora hace falta esta pasiva o la habilidad Contraataque.
   {poolId: 'devolver-gentileza', nombre: 'Devolver gentileza', jobCosto: 1, etiquetas: ['warrior', 'tanque', 'cuerpo a cuerpo', 'ataque', 'defensa'],
-   detalle: 'Si ganás el Parry y el Bloqueo contra un golpe cuerpo a cuerpo, podés contraatacar al que te atacó con un arma cuerpo a cuerpo (no con un arma de rango ni una varita; si tenés una cuerpo a cuerpo en la otra mano, con esa): cuesta lo de un primer ataque y no cuenta como tu ataque del turno. Sin bonus (la habilidad Contraataque, en cambio, te deja contestar apenas ganás la Evasión o el Parry y suma +2 a la Probabilidad de Golpe). ⚙ Automatizado: el duelo te pregunta «¿Contraatacás?».', mods: [{stat: 'gentileza', val: 1}]},
+   detalle: 'Si ganás el Parry y el Bloqueo contra un golpe cuerpo a cuerpo, podés contraatacar al que te atacó, sin bonus. Cuesta los No2 de tu primer ataque del turno.',
+   // 📋 el detalle aparte (dueño, 2026-11-27): las minucias, en renglones cortos.
+   reglas: ['Con un arma cuerpo a cuerpo: con un arma de rango o una varita no; si tenés una cuerpo a cuerpo en la otra mano, contraatacás con esa.',
+     'No cuenta como tu ataque del turno.',
+     '⚙ Automatizado: el duelo te pregunta «¿Contraatacás?».'].join('\n'), mods: [{stat: 'gentileza', val: 1}]},
   {poolId: 'sed-de-sangre', nombre: 'Sed de sangre', jobCosto: 1, etiquetas: ['warrior', 'asalto', 'turnos'],
    detalle: 'Cuando un rival cae por tu golpe, el subidón te pone primero en la fila: subís 2 lugares en el orden de turnos (si ya jugaste esta ronda, al empezar la próxima). ⚙ Automatizado: lo hace el mapa del GM cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedsangre', val: 2}]},
   // ⚔ Sed de batalla (dueño, 2026-11-05, del boceto del W1 Hachero: «sumamos Sed de batalla como pasiva, que la puedan elegir los jugadores también»).

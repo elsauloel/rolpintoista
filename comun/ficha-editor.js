@@ -20,7 +20,7 @@ const FichaEditor = (() => {
     cinturon: {titulo:'Ítem del cinturón', campos:['nombre','imagen','tipoItem','precioCompra','precioVentaAuto','unidades','consumible','cargaMax','cargaActual','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
     catalogo: {titulo:'Ítem del catálogo', campos:['nombre','imagen','tipoItem','peso','tipoDado','danoFijo','danoAmplificado','armaDeRango','precioCompra','precioVentaAuto','consumible','cargaMax','curahp','curaspPct','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:true},
     habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
-    pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','compras','regenHp','origen','detalle'], mods:true},
+    pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','compras','regenHp','origen','detalle','reglas'], mods:true},
     // El dado ya no se escribe a mano: sale del nivel (botón "+ Nivel" en la lista).
     sociales: {titulo:'Talento', campos:['nombre','imagen','detalle'], mods:false},
     efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','permanente','activo','popup','detalle'], mods:true},
@@ -56,6 +56,14 @@ const FichaEditor = (() => {
       forzarNitros:'', mitadPdgEva:false, armaduraRota:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
       equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
     return item ? Object.assign({}, defaults, item) : defaults;
+  }
+
+  // 📋 El campo del detalle de reglas (`reglas`, 2026-11-27): aparte de la descripción, un renglón por cosa. Lo usan el paso «Qué es» de una
+  // habilidad y el de una pasiva.
+  function reglasCampoHtml(draft){
+    const v = Array.isArray(draft.reglas) ? draft.reglas.join('\n') : String(draft.reglas || '');
+    return `<div class="f"><label>📋 Detalle (opcional)</label><textarea data-c="reglas" rows="7" placeholder="Un renglón por cosa: excepciones, casos raros, qué pasa en el turno de otro, ⚙ Automatizado…">${esc(v)}</textarea>
+      <div class="hint" style="margin-top:5px">Va en un cuadro aparte, debajo de la descripción. La descripción, corta: qué hace y cuánto cuesta.</div></div>`;
   }
 
   function getModVal(draft, statId){
@@ -499,7 +507,8 @@ const FichaEditor = (() => {
       }
       if(info.id === 'que'){
         html += `<div class="f"><label>Nombre</label><input data-c="nombre" value="${esc(draft.nombre)}" placeholder="ej. Golpe certero" data-hab-enter="1"></div>
-      <div class="f"><label>Descripción</label><textarea data-c="detalle" rows="4" placeholder="ej. Un golpe preciso que ignora la mitad de la Defensa del rival.">${esc(draft.detalle)}</textarea></div>`;
+      <div class="f"><label>Descripción</label><textarea data-c="detalle" rows="4" placeholder="ej. Un golpe preciso que ignora la mitad de la Defensa del rival.">${esc(draft.detalle)}</textarea></div>
+      ${reglasCampoHtml(draft)}`;
       }
       if(info.id === 'costo'){
         // Nitros: un número fijo, X (se elige al usarla) o lo que cueste un ataque con el arma que se elija al ejecutarla.
@@ -556,6 +565,7 @@ const FichaEditor = (() => {
         html += `<div class="resumen-hab">
       <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
       <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+      ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(draft) : ''}
       ${fila('Ejecución', `${MODOS_HAB[modo].icono} ${MODOS_HAB[modo].nombre} (${MODOS_HAB[modo].corto})`)}
       ${modo === 'auto' ? fila('Paso a paso', esc(FichaBotonera.dueloDe(draft) ? resumenEjecucionHab(FichaBotonera.dueloDe(draft)) : 'sin configurar')) : ''}
       ${habLegado(draft).length ? fila('Del sistema anterior', esc(habLegado(draft).join(' · '))) : ''}
@@ -600,7 +610,7 @@ const FichaEditor = (() => {
       const sc = SCHEMA[key];
       const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaDeRango'];
       const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
-      const cortos = sc.campos.filter(c => c!=='detalle' && !ESPECIALES.includes(c) && !FLAGS.includes(c));
+      const cortos = sc.campos.filter(c => c!=='detalle' && c!=='reglas' && !ESPECIALES.includes(c) && !FLAGS.includes(c));
       const flags = sc.campos.filter(c => FLAGS.includes(c));
       const esArma = ES_ARMA(draft.tipoItem);
       const CATEGORIAS = FichaEquipo.CATEGORIAS;
@@ -705,6 +715,7 @@ const FichaEditor = (() => {
       });
       if(sc.campos.includes('detalle') && en('detalle'))
         html += `<div class="f"><label>${key === 'efectos' || key === 'pasivas' || key === 'sociales' ? 'Qué hace (en palabras)' : 'Detalle'}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
+      if(sc.campos.includes('reglas') && en('reglas')) html += reglasCampoHtml(draft);
 
       if(sc.mods && en('mods')){
         const esEstado = key === "efectos";
@@ -738,7 +749,7 @@ const FichaEditor = (() => {
       const esItem = key === 'inventario' || key === 'cinturon' || key === 'catalogo';
       const P = (id, corto, titulo, ayuda, bloques) => ({id, corto, titulo, ayuda, bloques});
       const lista = key === 'pasivas' ? [
-        P('que', 'Qué es', '¿Qué es?', 'El nombre y qué hace, en palabras: es lo que se lee en la ficha.', ['nombre', 'detalle', 'imagen']),
+        P('que', 'Qué es', '¿Qué es?', 'El nombre y qué hace, en palabras: es lo que se lee en la ficha. Corta: las minucias van en el 📋 Detalle.', ['nombre', 'detalle', 'reglas', 'imagen']),
         P('numeros', 'Números', '¿Qué suma?', 'Los bonos que da mientras la tengas, la vida que recupera en cada Mantenimiento y cuántas veces la compraste (los efectos se multiplican; cada copia cuesta 1 de Job más que la anterior).', ['mods', 'regenHp', 'compras']),
         P('job', 'Cómo se consiguió', '¿Cómo se consiguió?', 'Con puntos de Job (cuenta para el presupuesto del nivel) o de otra forma: un premio, la historia, un objeto.', ['job', 'jobCosto', 'origen']),
       ] : key === 'sociales' ? [
@@ -776,6 +787,7 @@ const FichaEditor = (() => {
           + (mods ? fila('Bonos', mods) : '');
       }
       if((draft.detalle || '').trim()) h += `<p class="hint" style="margin-top:10px">${esc(draft.detalle)}</p>`;
+      if(typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml) h += ItemCorto.reglasHtml(draft);
       return `<div class="resumen-hab">${h}</div>`;
     }
     function abrirFormularioPaso(){

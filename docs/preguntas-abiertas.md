@@ -3075,3 +3075,16 @@ disparo). Hoy el sistema aplica la regla nueva (no ofrece el contraataque con el
 - (a) **La regla nueva manda**: se saca del Parry a distancia lo del contraataque y el dodge roll del arco (queda como una defensa más).
 - (b) **El Parry a distancia es una excepción**: con él sí se contraataca con el arma de rango (habría que programarla como excepción).
 Recomendación: (a), para que la regla sea una sola.
+
+### P361 — 📋 Dos cuadros debajo de una habilidad: «📋 Detalle» y «Detalles técnicos» (2026-11-27, Claude, al hacer el detalle aparte)
+
+Con el detalle aparte (`reglas`), el «Ver» de una habilidad muestra ahora **tres cosas**: «Qué hace» (la descripción corta), el **📋 Detalle** (las
+reglas finas, con el «⚙ Automatizado») y, debajo, el recuadro gris **«Detalles técnicos»** que ya existía (de qué texto del borrador de clases se
+adaptó, y las notas ⚙/✋ que hayan quedado dentro de la descripción). En las **habilidades de creep**, además, el programa le pega a toda descripción
+una línea armada sola («⚙ Automatizado: cuesta 0 No2; cooldown 2 (con SP: 2 SP); … ✋ A mano: nada…»), que termina en «Detalles técnicos»; en el
+editor del creep esa línea se ve dentro de la Descripción. ¿Qué hacemos?
+- (a) **Dejarlo así**: 📋 Detalle para las reglas; «Detalles técnicos» para el origen y lo que arma el programa.
+- (b) **Un solo cuadro**: lo de «Detalles técnicos» pasa al final del 📋 Detalle (y en los creeps la línea armada sola va al Detalle, no a la
+  descripción), así hay un cuadro debajo de la descripción y no dos.
+Recomendación: (b), cuando se haga la limpieza general («🧹 Descripciones sintéticas con el detalle aparte»).
+

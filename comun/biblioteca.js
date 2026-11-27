@@ -423,9 +423,12 @@ const Biblioteca = (() => {
   function cuerpoDe(st, e){
     const conCorto = typeof ItemCorto !== 'undefined';
     const cuerpo = st.opts.cuerpo || (actual === 'trampas' && conCorto && e.datos ? (x => ItemCorto.trampaHtml(x.datos)) : null);
-    if(!cuerpo) return e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : '';
+    // 📋 el detalle de reglas de una habilidad o pasiva (`reglas`, 2026-11-27), plegado; una habilidad de creep de fábrica lo trae en su receta (`sp`).
+    const reglasDe = e.datos ? (e.datos.reglas || (e.datos.sp && e.datos.sp.reglas) || '') : '';
+    const reg = conCorto && ItemCorto.reglasHtml && reglasDe ? ItemCorto.reglasHtml({reglas: reglasDe}, {plegable: true}) : '';
+    if(!cuerpo) return (e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : '') + reg;
     const tec = st.opts.tecnico ? st.opts.tecnico(e) : conCorto ? ItemCorto.tecnicoHtml(e.descripcion || '') : '';
-    return `<div class="desc">${cuerpo(e)}</div>${tec ? `<details class="bib-tec"><summary>Ver detalles técnicos</summary>${tec}</details>` : ''}`;
+    return `<div class="desc">${cuerpo(e)}</div>${reg}${tec ? `<details class="bib-tec"><summary>Ver detalles técnicos</summary>${tec}</details>` : ''}`;
   }
   // Lo que queda a la vista con los filtros y el buscador.
   function filtrada(st){

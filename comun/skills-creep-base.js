@@ -229,7 +229,14 @@
     duelo: {modo: 'flash', flash: {en: ['pdg', 'parry', 'bloqueo', 'dano'], bono: 3}}});
   // ⚔ Contraataque (de clase; dueño: «que no ataque gratis sin nitros, que gaste los nitros de un primer ataque»): al ganar la Evasión o el Parry, el duelo
   // pregunta «¿Contraataca?» (comun/creep-duelo.js); +1 PdG (CreepAcciones.bonoEspecial). Flash: su SP o su cooldown, al doble (es en turno ajeno).
-  H('Contraataque', 'D', '*', 'm', 2, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Si gana la Evasión o el Parry (antes de tirar el Bloqueo) contra un ataque cuerpo a cuerpo, le contesta al que lo atacó: un ataque con un arma cuerpo a cuerpo (no con un arma de rango ni una varita; si tiene una cuerpo a cuerpo en la otra mano, con esa) con +2 a la Probabilidad de Golpe, que paga lo de un primer ataque y no cuenta como su ataque del turno. Tras un Parry ganado, si contraataca no se tira el Bloqueo: el golpe queda parado del todo, sin daño; si no, sigue el Bloqueo de siempre. ⚙ Automatizado: el duelo lo pregunta solo («¿Contraataca?»), tras un Parry antes del Bloqueo; contra un ataque a distancia o sin un arma cuerpo a cuerpo, no lo ofrece.',
+  H('Contraataque', 'D', '*', 'm', 2, {detalle: '⚡ Flash. Si gana la Evasión o el Parry contra un ataque cuerpo a cuerpo, contraataca con +2 a la Probabilidad de Golpe. Paga los No2 de su primer ataque del turno.',
+    // 📋 el detalle aparte (dueño, 2026-11-27: «la descripción de la habilidad sea bien sintética y clara… los detalles mecánicos y de reglas y
+    // excepciones que estén en un cuadro aparte»).
+    reglas: ['Con un arma cuerpo a cuerpo: con un arma de rango o una varita no; si tiene una cuerpo a cuerpo en la otra mano, contraataca con esa.',
+      'Tras un Parry ganado, se decide antes del Bloqueo: si contraataca, no se tira el Bloqueo y el golpe queda parado del todo, sin daño; si no, sigue el Bloqueo de siempre.',
+      'En el turno de otro cuesta el doble, como todo Flash.',
+      'No cuenta como su ataque del turno.',
+      '⚙ Automatizado: el duelo lo pregunta solo («¿Contraataca?»), tras un Parry antes del Bloqueo; contra un ataque a distancia o sin un arma cuerpo a cuerpo, no lo ofrece.'].join('\n'),
     no2: 0, spCosto: 2, auditada: true, contraEsquiva: true, ataqueTxt: 'al ganar la Evasión o el Parry: un contraataque con +2 PdG (lo de un primer ataque)'});
   // ⚔ Dos al hilo ✦ (antes «Golpe que sigue»; nombre nuevo del dueño, 2026-11-10: «le vamos a poner dos al hilo») (A5; dueño: «vamos así»): otro rival pegado (vtt-hexgrid/js/78). Cambio del dueño (2026-10-30): «me hace ruido que tenga que matar
   // para funcionar… si pega, pasa al siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante». El segundo, el siguiente del

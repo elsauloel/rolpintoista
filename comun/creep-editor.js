@@ -94,6 +94,8 @@ const CreepEditor = (() => {
       <div class="hc-paso" data-hc-paso="0">
         <div class="f"><label>Nombre</label><input type="text" data-hc="nombre" placeholder="ej. Mordida venenosa" data-hc-enter="1"></div>
         <div class="f" style="margin-top:8px"><label>Descripción</label><textarea data-hc="detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
+        <div class="f" style="margin-top:8px"><label>📋 Detalle (opcional)</label><textarea data-hc="reglas" rows="7" placeholder="Un renglón por cosa: excepciones, casos raros, qué pasa en el turno de otro, ⚙ Automatizado…"></textarea>
+          <div class="hint" style="margin-top:5px">Va en un cuadro aparte, debajo de la descripción. La descripción, corta: qué hace y cuánto cuesta.</div></div>
       </div>
       <div class="hc-paso" data-hc-paso="1">
         <div class="f" style="margin-bottom:8px"><label>No2 que gasta</label>
@@ -309,6 +311,7 @@ const CreepEditor = (() => {
       const cd = num($h('cd').value);
       return `<div class="resumen-nombre">${esc($h('nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml && $h('reglas') ? ItemCorto.reglasHtml({reglas: $h('reglas').value}) : ''}
     ${fila('Ejecución', (m => `${m.icono} ${m.nombre} (${m.corto})`)(MODOS_HAB_CREEP[e.modo || 'semi']))}
     ${fila("No2", $h('nitros-modo').value === "ataque" ? "como un ataque" : fmt(Math.max(0, num($h('acciones').value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
@@ -341,6 +344,7 @@ const CreepEditor = (() => {
       $h('cd-arranca').checked = !!h.cdArranca;
       $h('flash').checked = !!h.flash;   // ⚡ (2026-10-30, dueño: «si quisiera marcar que una habilidad tiene flash, ¿existe una ruta? no la encuentro»)
       $h('detalle').value = h.detalle || '';
+      $h('reglas').value = Array.isArray(h.reglas) ? h.reglas.join('\n') : String(h.reglas || '');
       $h('tirada').value = h.tiradaExtra || '';
       $h('tirada-stat').innerHTML = opcionesStat(h.tiradaStat || "");
       $h('efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + opcionesEstadosHtml(ctx.personalizados());
@@ -388,7 +392,7 @@ const CreepEditor = (() => {
         nombre: $h('nombre').value.trim() || 'Sin nombre', costo: $h('costo').value,
         nitrosCosto: $h('nitros-modo').value === "ataque" ? "ATAQUE" : Math.max(0, num($h('acciones').value) || 0),
         cd: Math.max(0, num($h('cd').value) || 0), hpCosto: Math.max(0, num($h('hpcosto').value) || 0), cdArranca: $h('cd-arranca').checked, flash: $h('flash').checked,
-        detalle: $h('detalle').value, tiradaExtra: $h('tirada').value.trim(), tiradaStat: $h('tirada-stat').value,
+        detalle: $h('detalle').value, reglas: $h('reglas') ? $h('reglas').value : '', tiradaExtra: $h('tirada').value.trim(), tiradaStat: $h('tirada-stat').value,
         efectoNombre: $h('efecto-nombre').value.trim(), efectoTurnos: Math.max(0, num($h('efecto-turnos').value) || 0),
         efectoStacks: Math.max(1, num($h('efecto-stacks').value) || 1), efectoHpTurno: num($h('efecto-hpturno').value) || 0,
         efectoPermanente: $h('efecto-permanente').checked, efectoDetalle: $h('efecto-detalle').value, efectoPolaridad: $h('efecto-polaridad').value || 'otro',
@@ -407,6 +411,7 @@ const CreepEditor = (() => {
         if(h.cdArranca && (!eraLenta || !ed.habId)) h.cdActual = h.cd;
         if(v.flash) h.flash = true; else delete h.flash;   // ⚡ Flash: el botón instantáneo del GM (vtt-hexgrid/js/71) y el doble en turno ajeno (js/12)
         h.detalle = v.detalle;
+        if(String(v.reglas || '').trim()) h.reglas = v.reglas; else delete h.reglas;   // 📋 el detalle aparte (2026-11-27)
         h.tiradaExtra = v.tiradaExtra;
         h.tiradaStat = v.tiradaStat;
         h.efectoNombre = v.efectoNombre;

@@ -455,7 +455,7 @@ function verCreepDatos(sc, completo){
                 <button type="button" class="btn ghost" data-vc-hab="bib" data-vc-id="${esc(h.id)}"${verCreepBib && verCreepBib.habsEditadas.has(h.id) ? '' : ' disabled'} title="${verCreepBib && verCreepBib.habsEditadas.has(h.id) ? 'Proponer tu versión de esta habilidad a la biblioteca' : 'Editá la habilidad para poder proponer tu versión'}">📚 Biblioteca</button>
               </span></div>
             <div class="equipo-item-meta">${esc([costoHabCreepTxt(sc, h), num(h.cd) > 0 ? `CD ${fmt(num(h.cd))}` : '', h.cdArranca ? 'lenta (arranca en cooldown)' : ''].filter(Boolean).join(' · '))}</div>
-            ${h.detalle ? `<div class="arma-detalle">${esc(h.detalle)}</div>` : ''}</div>`).join('') : '<div class="hint">Sin habilidades.</div>')
+            ${h.detalle ? `<div class="arma-detalle">${esc(h.detalle)}</div>` : ''}${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}</div>`).join('') : '<div class="hint">Sin habilidades.</div>')
     : undefined;
   const v = CreepLupa.verCreep(sc, {habilidades: habsCompleto});
   $('#view-title-header').textContent = v.titulo;
@@ -541,6 +541,7 @@ function habHtml(sc, h){
       <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
     </div>
     <div class="hab-detalle-text${h.detalle ? '' : ' vacio'}">${h.detalle ? esc(h.detalle) : 'Sin detalle — tocá ✎ para escribir uno.'}</div>
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}
     <div class="hab-bottom">
       <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
       <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>${botonHabCreepTxt(h)}</button>

@@ -154,6 +154,7 @@ function abrirHabClase(claseId, yaLeido){
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}
         <div class="hint" style="margin-top:4px">${glo(h.detalle)}</div>
+        ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}
         ${h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${glo(h.original)}»</div>` : ''}
       </div>`;
     }).join('') || `<div class="hint">${esCustomPool && listaCompleta.length ? 'Ninguna con ese filtro.' : 'Todavía no hay ninguna acá.'}</div>`}</div>`;
@@ -238,7 +239,7 @@ function abrirVersionNuevaPasiva(p){
     actualizarTxt: 'cambia su nombre, descripción, costo en Job y bonos por los nuevos; las veces que la compraste quedan.',
     alActualizar: () => {
       const d = e.datos;
-      Object.assign(p, {nombre: d.nombre || p.nombre, detalle: d.detalle || '', jobCosto: Math.max(0, jobCostoPasiva(d.jobCosto)),
+      Object.assign(p, {nombre: d.nombre || p.nombre, detalle: d.detalle || '', reglas: d.reglas || '', jobCosto: Math.max(0, jobCostoPasiva(d.jobCosto)),
         mods: (d.mods || []).map(m => ({...m})), regenHp: num(d.regenHp) || 0, bibOrigen: {tipo: 'pasivas', id: e.id, version: e.version || 1}});
       delete p.bibIgnorada;
       toast(`${p.nombre} actualizada a la versión ${fmt(e.version || 1)}`);
@@ -311,7 +312,7 @@ function agregarPasivaDeCatalogo(datos, meta){
 function proponerPasiva(id){
   const p = S.pasivas.find(x => x.id === id);
   if(!p) return;
-  const datos = {nombre: p.nombre, detalle: p.detalle || '', jobCosto: Math.max(1, num(p.jobCosto) || 1),
+  const datos = {nombre: p.nombre, detalle: p.detalle || '', ...(String(p.reglas || '').trim() ? {reglas: String(p.reglas)} : {}), jobCosto: Math.max(1, num(p.jobCosto) || 1),
     mods: (p.mods || []).map(m => ({stat: m.stat, val: num(m.val)})), regenHp: num(p.regenHp) || 0};
   const o = origenDePasiva(p);
   Biblioteca.guardar({tipo: 'pasivas', datos, nombre: p.nombre, nivel: datos.jobCosto, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],

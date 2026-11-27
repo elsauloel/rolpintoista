@@ -256,6 +256,7 @@ function invHabHtml(inv, h){
     </div>
     <div class="hint">${esc(costoHabInvTxt(inv, h))}${num(h.cd) > 0 ? ` · CD ${fmt(num(h.cd))}` : ''}</div>
     ${h.detalle ? `<div class="hint">${esc(h.detalle)}</div>` : ''}
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}
   </div>`;
 }
 
@@ -750,7 +751,7 @@ function cerrarEditorHabInv(){
   if(e && e.pap) e.pap.cerrar();
 }
 function hiDatosPantalla(){
-  return ['hi-nombre', 'hi-detalle', 'hi-nitros-modo', 'hi-acciones', 'hi-cd', 'hi-hpcosto', 'hi-tirada', 'hi-tirada-stat', 'hi-efecto-nombre', 'hi-efecto-turnos', 'hi-efecto-hpturno', 'hi-efecto-detalle']
+  return ['hi-nombre', 'hi-detalle', 'hi-reglas', 'hi-nitros-modo', 'hi-acciones', 'hi-cd', 'hi-hpcosto', 'hi-tirada', 'hi-tirada-stat', 'hi-efecto-nombre', 'hi-efecto-turnos', 'hi-efecto-hpturno', 'hi-efecto-detalle']
     .map(id => $('#' + id).value).concat([$('#hi-efecto-permanente').checked, $('#hi-trampa-on').checked]);
 }
 
@@ -769,6 +770,7 @@ function hiResumenHtml(){
   const cd = num($('#hi-cd').value);
   return `<div class="resumen-nombre">${esc($('#hi-nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml({reglas: $('#hi-reglas').value}) : ''}
     ${fila('Ejecución', (m => `${m.icono} ${m.nombre} (${m.corto})`)(MODOS_HAB[editingHabInv.modo || 'semi']))}
     ${editingHabInv.modo === 'auto' ? fila('Paso a paso', editingHabInv.duelo ? resumenEjecucionHab(editingHabInv.duelo) : 'sin configurar') : ''}
     ${fila('No2', $('#hi-nitros-modo').value === 'ataque' ? 'como un ataque' : fmt(Math.max(0, num($('#hi-acciones').value))))}
@@ -833,6 +835,7 @@ function abrirEditorHabInv(invId, habId){
   $('#hi-cd').value = h.cd || 0;
   $('#hi-hpcosto').value = h.hpCosto || 0;
   $('#hi-detalle').value = h.detalle || '';
+  $('#hi-reglas').value = Array.isArray(h.reglas) ? h.reglas.join('\n') : String(h.reglas || '');
   $('#hi-tirada').value = h.tiradaExtra || '';
   $('#hi-tirada-stat').innerHTML = hiOpcionesStat(h.tiradaStat || '');
   $('#hi-efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEfectosPresetHtml();
@@ -881,6 +884,7 @@ function guardarEditorHabInv(){
   const hpCostoInv = Math.max(0, num($('#hi-hpcosto').value) || 0);
   if(hpCostoInv) h.hpCosto = hpCostoInv; else delete h.hpCosto;
   h.detalle = $('#hi-detalle').value;
+  if($('#hi-reglas').value.trim()) h.reglas = $('#hi-reglas').value; else delete h.reglas;   // 📋 el detalle aparte (2026-11-27)
   h.tiradaExtra = $('#hi-tirada').value.trim();
   h.tiradaStat = $('#hi-tirada-stat').value;
   h.efectoNombre = $('#hi-efecto-nombre').value.trim();
@@ -1021,6 +1025,7 @@ const LISTS = {
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}<span class="tag cost" title="${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre)}: ${esc(MODOS_HAB[modoHab(i) || 'semi'].corto)}">${MODOS_HAB[modoHab(i) || 'semi'].icono} ${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre.toLowerCase())}</span>${i.para === 'creep' ? ' <span class="tag cost" title="Habilidad pensada para creeps: paga con cooldown, no con SP. En la ficha no hay cooldown: revisale el costo.">🐾 de creep</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
+          ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(i, {plegable: true}) : ''}
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button><button class="mini" data-subirhab="${i.id}" title="Subir a la biblioteca con toda su configuración: queda disponible para todos al instante">⬆</button></div>
       </div>

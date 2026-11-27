@@ -117,8 +117,8 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
 </div>
 
 <script src="../comun/confirmar.js?v=20261031cart"></script>
-<script src="../comun/skills-clase.js?v=20261127contra"></script>
-<script src="../comun/plantillas.js?v=20261125nube"></script>
+<script src="../comun/skills-clase.js?v=20261127detalle"></script>
+<script src="../comun/plantillas.js?v=20261127detalle"></script>
 <script src="../comun/combatiente.js?v=20261127contra"></script>
 <script src="../comun/estados-presets.js?v=20261126tope"></script>
 <script src="../comun/estados-aplicar.js?v=20261126tope"></script>
@@ -351,6 +351,7 @@ function renderEditor(h){
   cuerpo.innerHTML = `
     <div class="campo"><label>Nombre</label><input type="text" id="c-nombre" value="${esc(h.nombre)}"></div>
     <div class="campo"><label>Descripción (lo que se publica en la Mesa y ve el jugador)</label><textarea id="c-detalle">${esc(h.detalle || '')}</textarea></div>
+    <div class="campo"><label>📋 Detalle (opcional: las reglas finas, un renglón por cosa; se ve en un cuadro aparte)</label><textarea id="c-reglas">${esc(Array.isArray(h.reglas) ? h.reglas.join('\n') : (h.reglas || ''))}</textarea></div>
     <div class="campo"><label><input type="checkbox" id="c-auto" ${h.automatizada !== false ? 'checked' : ''}> Auditada (automatizada) — destildado = «🚧 Sin auditar», solo se anuncia</label>
       <div class="nota">Por convención, una sin auditar arranca la descripción con «(Sin auditar) ». <button type="button" id="c-prefijo" style="margin-top:4px">Anteponer/quitar «(Sin auditar) »</button></div></div>
 
@@ -413,6 +414,7 @@ function renderEditor(h){
   const q = sel => cuerpo.querySelector(sel);
   q('#c-nombre').oninput = e => { h.nombre = e.target.value; $('#editor-titulo').textContent = `Editar · ${h.nombre || '(sin nombre)'}`; autosave(); };
   q('#c-detalle').oninput = e => { h.detalle = e.target.value; autosave(); };
+  q('#c-reglas').oninput = e => { if(e.target.value.trim()) h.reglas = e.target.value; else delete h.reglas; autosave(); };
   q('#c-auto').onchange = e => { h.automatizada = e.target.checked; autosave(); };
   q('#c-prefijo').onclick = () => {
     const marca = '(Sin auditar) ';

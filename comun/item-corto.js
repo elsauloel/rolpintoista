@@ -25,6 +25,15 @@ const ItemCorto = (() => {
 .ic-tecnico ul{margin:0;padding-left:16px}
 .ic-tecnico li{margin:1px 0}
 .ic-tecnico .ic-pie{margin-top:4px;font-size:11px;opacity:.8}
+.ic-reglas{margin-top:8px;border:1px solid #3d5a6e;border-left:3px solid #6fa8cf;border-radius:6px;padding:6px 10px 7px;background:rgba(80,130,170,.10);font-size:12px;line-height:1.45;color:var(--paper,#EDE3D2)}
+.ic-reglas > b,.ic-reglas > summary{display:block;font-family:"Space Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8fc0e0;margin-bottom:3px}
+.ic-reglas > summary{cursor:pointer;margin-bottom:0;list-style:none}
+.ic-reglas > summary::-webkit-details-marker{display:none}
+.ic-reglas > summary::after{content:' ▸';}
+.ic-reglas[open] > summary::after{content:' ▾';}
+.ic-reglas[open] > summary{margin-bottom:3px}
+.ic-reglas ul{margin:0;padding-left:16px}
+.ic-reglas li{margin:1px 0}
 .ic-trampa{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:5px;padding:2px 9px;border:1px solid #C9A227;border-radius:999px;background:rgba(201,162,39,.16);color:#F0D27A;font-family:"Space Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .ic-trampa span{font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted,#9A867E);font-size:11px}
 `
@@ -249,13 +258,31 @@ const ItemCorto = (() => {
     return `<div class="ic-tecnico"><b>Detalles técnicos</b>${lineas.length ? `<ul>${lineas.map(l => `<li>${mk(l)}</li>`).join('')}</ul>` : ''}`
       + `${p.auditar ? '<div class="ic-pie">Creada automáticamente: las cifras están para auditar.</div>' : ''}</div>`;
   }
-  // Lo de «Ver»: qué hace (una trampa, en datos cortos), el Detalle sin las notas técnicas y el recuadro «Detalles técnicos».
+  /* 📋 El detalle de reglas de una habilidad o una pasiva (dueño, 2026-11-27: «que todas las aclaraciones de las minucias vayan en un cuadro
+     aparte, que sea el detalle, que la descripción de la habilidad sea bien sintética y clara»). Campo `reglas`: texto con un renglón por cosa
+     (un salto de línea entre renglones; se acepta también una lista). La descripción (`detalle`) queda corta; acá van las excepciones, los
+     casos raros y el «⚙ Automatizado / ✋ A mano». `reglasHtml(h, {plegable})`: el cuadro (plegado en las listas, abierto en «Ver»). */
+  function reglasLista(h){
+    const r = h && h.reglas;
+    const arr = Array.isArray(r) ? r : String(r || '').split(/\n+/);
+    return arr.map(x => String(x || '').replace(/^\s*[-•·]\s*/, '').trim()).filter(Boolean);
+  }
+  function reglasHtml(h, o){
+    const l = reglasLista(h);
+    if(!l.length) return '';
+    estilos();
+    const ul = `<ul>${l.map(x => `<li>${mk(x)}</li>`).join('')}</ul>`;
+    return o && o.plegable ? `<details class="ic-reglas"><summary>📋 Detalle</summary>${ul}</details>` : `<div class="ic-reglas"><b>📋 Detalle</b>${ul}</div>`;
+  }
+  // Lo de «Ver»: qué hace (una trampa, en datos cortos), la descripción sin las notas técnicas, el 📋 Detalle (las reglas finas) y el recuadro
+  // «Detalles técnicos».
   function verHtml(item){
     if(!item) return '';
     const p = partes(item.detalle);
     return (item.trampaDatos ? `<div class="view-detalle"><span class="view-label">Qué hace</span>${trampaHtml(item.trampaDatos)}</div>` : '')
-      + (p.hace ? `<div class="view-detalle"><span class="view-label">Detalle</span>${mk(p.hace)}</div>` : '')
+      + (p.hace ? `<div class="view-detalle"><span class="view-label">${reglasLista(item).length ? 'Qué hace' : 'Detalle'}</span>${mk(p.hace)}</div>` : '')
+      + reglasHtml(item)
       + tecnicoHtml(item);
   }
-  return {CSS, partes, trampaFilas, trampaHtml, filasHtml, grillaHtml, tecnicoHtml, verHtml, armaEsencial, armaTecnico};
+  return {CSS, partes, reglasLista, reglasHtml, trampaFilas, trampaHtml, filasHtml, grillaHtml, tecnicoHtml, verHtml, armaEsencial, armaTecnico};
 })();

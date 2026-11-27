@@ -22,7 +22,7 @@ const Plantillas = (() => {
      En este orden. Lo vacío se omite (salvo id/nombre/detalle/nitrosCosto: nitrosCosto ausente vale lo de siempre al
      cargarla en la ficha, no 0); los efecto* solo si hay efectoNombre; `automatizada` solo cuando es false.
      `original` (2026-10-11, dueño): el texto del borrador de clases del que se adaptó una skill auditada; se ve en «Detalles técnicos». */
-  const HAB = ['id', 'nombre', 'detalle', 'original', 'automatizada', 'modo', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp', 'xMax', 'costoSube', 'costoSubePor', 'cambioGuardiaMapa',
+  const HAB = ['id', 'nombre', 'detalle', 'reglas', 'original', 'automatizada', 'modo', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp', 'xMax', 'costoSube', 'costoSubePor', 'cambioGuardiaMapa',
     'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
     'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
     'zonaMapa', 'zonaRadio', 'portalMapa', 'aceleradorMapa', 'transfusionMapa', 'empower', 'enyetar', 'reroll', 'parryDistancia', 'contraEsquiva', 'cargaElemental', 'armaElemental', 'azarElegir', 'soloRango', 'unaVezPorTurno', 'trampaColocar', 'duelo',
@@ -68,6 +68,7 @@ const Plantillas = (() => {
   function pasiva(p){
     const out = {nombre: String(p.nombre || ''), detalle: String(p.detalle || ''), jobCosto: (p.jobCosto === 0 || p.jobCosto === '0') ? 0 : Math.max(1, Number(p.jobCosto) || 1),   // (0: la racial, 2026-10-28)
       mods: (p.mods || []).filter(m => m && m.stat).map(m => ({stat: m.stat, val: Number(m.val) || 0}))};
+    if(String(p.reglas || '').trim()) out.reglas = String(p.reglas);   // 📋 el detalle de reglas, aparte (2026-11-27)
     if(Number(p.regenHp)) out.regenHp = Number(p.regenHp);
     if(String(p.estado || '').trim()) out.estado = String(p.estado).trim();   // la pasiva que da un estado (2026-10-16, Vuela)
     if(Array.isArray(p.etiquetas) && p.etiquetas.length) out.etiquetas = [...p.etiquetas];

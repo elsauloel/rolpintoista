@@ -2397,3 +2397,10 @@ versión parecida en más de una, es candidato a juntar.
   con `otra`, o null). El gancho `armaContra` devuelve `sinCuerpo` si solo hay armas de rango; `duelo.js` lo mira en `alcanceContra` (`contraMotivo`) y
   en `pasivaContra` (Devolver gentileza: `contraPasiva` o `contraPasivaNo`), y antes de abrir el contraataque; `contraPreparar(d, arma)` (creep) pone en la
   mano la otra arma (`ataque.armaCreepId`). Duda: P360 (Parry a distancia).
+- **📋 El detalle aparte de una habilidad o pasiva** (2026-11-27, dueño: «que la descripción de la habilidad sea bien sintética y clara… los detalles
+  mecánicos y de reglas y excepciones que estén en un cuadro aparte»): campo **`reglas`** (texto, un renglón por cosa) en las habilidades de personaje,
+  invocación y creep, y en las pasivas; `detalle` queda corto (qué hace y cuánto cuesta). `ItemCorto.reglasLista(h)` / `reglasHtml(h, {plegable})` (el
+  cuadro «📋 Detalle»; `verHtml` lo pone abierto entre la descripción y «Detalles técnicos»); `TipEjecutar.attrs(nombre, detalle, reglas)` (el globo de
+  «Ejecutar»); `biblioteca.js` lo muestra plegado (de `datos.reglas` o, en una de creep de fábrica, `datos.sp.reglas`); `creeps-base.js armarHab` copia
+  `sp.reglas`. Viaja en `Plantillas.HAB` y `Plantillas.pasiva`. Se edita en el paso «Qué es» de `ficha-editor.js` (habilidad y pasiva) y `creep-editor.js`
+  (y en la ficha, `#hi-reglas` de las invocaciones). Modelo: el Contraataque y Devolver gentileza. Dudas: P361.

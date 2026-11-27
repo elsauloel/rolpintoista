@@ -3368,6 +3368,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `original`…) de `comun/skills-clase.js`, `skills-creep-base.js`, `pasivas.js`, `estados-presets.js`, `catalogo.js`, `creeps-base.js`, `trampas-base.js`,
   `armas-naturales-base.js` y lo que se arme con textos en el código (carteles, «Ver detalle», el manual), y mover esas notas a un comentario o a `docs/`
   sin cambiar ninguna regla. Revisar si las copias guardadas (habilidades de clase, ítems) se ponen al día solas. Nueva regla en `docs/memoria-claude.md`.
+  **Cuántas habría** (contado el 2026-11-27, con el criterio «la descripción sin las notas ⚙/✋ pasa de unos 250 caracteres»): 57 de las 77
+  habilidades de clase auditadas, la del pool custom, 136 de las 177 habilidades de creep auditadas y 7 de las 47 pasivas (unas 200 en total). El
+  campo y el cuadro ya existen (`reglas`, «📋 Detalle»): la limpieza es mover texto, como en el Contraataque.
 - **⬜ en cola — ⚔ Las invocaciones no contraatacan nunca** (2026-11-27, Claude, al programar «Contraataque solo cuerpo a cuerpo»). El duelo de una
   invocación (`comun/inv-duelo.js`) no tiene el gancho `armaContra` (ni `contraPasiva`), así que una invocación con la pasiva Devolver gentileza o con
   la habilidad Contraataque nunca recibe la pregunta «¿Contraataca?» (las reglas de combate son iguales para personajes, creeps e invocaciones). Ver si
@@ -3384,6 +3387,24 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   mano). Manual (06-combate, «Contraataque») al día. Pruebas: 1170 (dos nuevas). Probado en el mapa «Prueba · General» con el Warrior · Hachero contra
   Blanco J1 (con el Cuchillo: ofrece; con el Arco corto y con la Varita arcana: no) y el Rango · Tirador disparándole (con el Cuchillo: no). Duda
   nueva: P360 (el Parry a distancia del Shooter promete contraatacar con el arma de rango).
+- **✅ hecho (2026-11-27) — 📋 El detalle aparte en las habilidades, con el Contraataque como modelo** (dueño: «la descripción de la habilidad sea
+  bien sintética y clara… los detalles mecánicos y de reglas y excepciones que estén en un cuadro aparte»). Campo nuevo **`reglas`** (texto, un
+  renglón por cosa) en las habilidades de personaje, de invocación y de creep, y en las pasivas. Se ve en un cuadro aparte, **«📋 Detalle»** (fondo
+  azulado, renglones con viñeta): abierto en el «Ver» (ficha, invocación, creep, también desde la Botonera del mapa y las Acciones), plegado en las
+  listas (tarjeta de la habilidad en la ficha, tarjeta de la invocación, «+ Habilidad → de clase», la biblioteca de habilidades de creep y de pasivas,
+  la tarjeta de la habilidad del creep en GM Tools) y en el globo del botón «Ejecutar» de las tres botoneras (debajo de «Qué hace»). Se escribe en el
+  paso «Qué es» de los editores (habilidad de personaje, de invocación, de creep, pasiva) y en `datos/auditoria-skills.html`; el resumen del editor lo
+  muestra. Viaja al guardar y al subir (`Plantillas.HAB`, `Plantillas.pasiva`; la de creep va entera) y en la puesta al día de las copias de clase
+  (`habClaseId`: va con el resto de la habilidad). Pieza común: `ItemCorto.reglasLista` / `reglasHtml(h, {plegable})`; `TipEjecutar.attrs(nombre,
+  detalle, reglas)`. **Contraataque** (de clase y de creep) y **Devolver gentileza**: descripción corta y lo demás en el detalle, sin cambiar ninguna
+  regla; se sacó «Sin esta habilidad, solo se contraataca con la pasiva…» y Devolver gentileza ya no nombra a la habilidad. La ficha lite no muestra
+  habilidades (ver «Ficha lite: un botón para ver las habilidades»). Pruebas: 1171 (una nueva). Probado con clics en «Prueba · General» (Blanco J1 con
+  el Contraataque: catálogo, tarjeta, Ver, editor, globo y Ver de la Botonera del mapa; el Contraataque de creep en GM Tools: biblioteca, globo de las
+  Acciones, Ver y editor; Devolver gentileza en «+ Pasiva»). Capturas en `cola137/`. `restaurar.js`: «quedó igual». Duda nueva: P361.
+- **⬜ en cola — 📋 Las copias viejas de Devolver gentileza y del Contraataque de creep siguen con el texto largo** (2026-11-27, Claude). Las habilidades
+  de clase se ponen al día solas (`habClaseId`), pero una pasiva ya comprada y una habilidad de creep ya puesta en un creep guardado no: muestran la
+  descripción de antes, sin el 📋 Detalle, hasta que se vuelvan a agregar. Ver si conviene ponerlas al día solas (por `poolId` / por nombre), como las
+  de clase, respetando las editadas a mano.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

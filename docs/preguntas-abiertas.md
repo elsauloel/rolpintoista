@@ -3249,7 +3249,7 @@ también»); 3 «la moneda de reroll lo que hace es modificar una tirada, reempl
 por otra». Las tres, en la cola. 4: «hacerlo como lo recomendás vos» (queda como está: el 🪙 ofrece primero el último duelo). 5: «queda como está». Sin cambios de código para 4 y 5.
 
 
-### P369 — 🏹 ¿Quién mueve una flecha (o un arma) que quedó en el piso? (2026-11-27, Claude, al hacer que se pueda mover)
+### P369 ✅ — 🏹 ¿Quién mueve una flecha (o un arma) que quedó en el piso? (2026-11-27, Claude, al hacer que se pueda mover)
 
 Una flecha especial que erra queda en el piso (js/33), igual que un arma que se cae (js/27). Va fijada (para que nadie la arrastre sin querer al mover
 el mapa) y no había forma de moverla. Ahora **el GM y quien la dejó** (la cuenta que tiró la flecha, o el GM si se le cayó un arma en un duelo) la
@@ -3260,3 +3260,5 @@ token que esa pantalla no mueve** (la flecha que erra suele caer en la casilla d
 2. **Debajo de un token que el GM mueve** (un creep parado encima de la flecha), el clic del GM toma el token: tiene que correrlo primero. ¿Hace falta
    otra forma (por ejemplo, un botón en el cartel de la flecha)?
 Por ahora queda así (lo recomendado: lo mismo que cualquier elemento del mapa, que lo mueven su dueño y el GM).
+
+**✅ Decidido (dueño, 2026-11-27): «está bien como está. Dejá los 2 puntos así como están».** Sin cambios.

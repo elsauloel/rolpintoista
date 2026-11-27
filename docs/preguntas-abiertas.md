@@ -3311,7 +3311,7 @@ Otro caso chico: los No2 «llenos» (todavía sin número, al empezar) que se ga
 los dos gastos), porque la pantalla no sabe cuántos eran.
 
 
-### P372 — 🚩 ¿Un área, una onda o una zona le pueden pegar a un tótem o a un estandarte? (2026-11-27, Claude, al sacar el Estandarte del Shockwave)
+### P372 ✅ — 🚩 ¿Un área, una onda o una zona le pueden pegar a un tótem o a un estandarte? (2026-11-27, Claude, al sacar el Estandarte del Shockwave)
 
 **Contexto:** el dueño (2026-11-27): «el estandarte de guerra no debe tirar resistencia a shockwave». Hasta ahora un tótem o un estandarte (los
 «objetos inertes», que clava un creep con Estandarte de guerra o Tótem de silencio) entraba como un rival más en todo lo que pega en área: la onda
@@ -3327,3 +3327,9 @@ romper con un ataque o una habilidad dirigida a ellos (se los elige con un clic,
 
 **Quedó sin tocar (para decidir junto con esto):** el **Barrido / Remolino** (el giro con el arma a todos los de alrededor) es un ataque con arma,
 no un área, y **sí** le sigue pegando a un estandarte que esté pegado.
+
+**✅ Decidido (dueño, 2026-11-27), ni A ni B ni C:** «hay ciertos efectos de área que sí deberían afectarlos, en particular el daño. Los estados
+alterados no lo afectan, pero el daño sí… una ráfaga de fuego debería hacerle daño a un tótem, pero una nube de veneno no, porque el tótem no respira.
+Entonces, en vez de estar en las minucias de los casos particulares y las excepciones… en vez de abrirse el duelo de manera directa con los objetos que
+tienen HP, los efectos en área le debe aparecer al propietario del objeto o al GM en su defecto una notificación que diga: tal objeto está dentro del
+área de tal efecto. ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve a mano. Y listo.» Va a la cola (primero).

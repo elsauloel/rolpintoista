@@ -3549,3 +3549,16 @@ aviso. La vuelta, «quedó igual». **Falta ver:**
 - El defensor **creep** o **invocación**; un estado con stacks que ya tenía (Veneno ×2 → ×5 → vuelve a ×2); Espinas / Drena de quien pegó.
 - Una tirada con dados de verdad (en la prueba el PdG era a mano: «14 y 14»).
 
+
+## 😈 Enyetar C: cualquier tirada del último duelo, y la Moneda / el Golpe de suerte que deshacen (2026-11-27)
+
+Probado con clics en «Prueba · General» (GM, J1, J2; capturas fuera del repo; dados de verdad salvo donde se dice): la lista del 🐈‍⬛ con «↩ Daño de
+Warrior · Hachero (15)»; J2 enyeta el daño del último duelo (la vida de J1 vuelve de 36 a 50, el daño se repite 15 y 12 → queda 12 y J1 lo vuelve a
+aplicar); los d20 de un crítico (el PdG del Hachero a mano en 20 para que saliera: 11 y 18 → queda 11, ×2); J1 usa la Moneda sobre su defensa de ese
+duelo (era un Parry; se deshizo, la volvió a tirar con Evasión); J2 usa el Golpe de suerte sobre esa Evasión de J1 (4 y 1 → queda 4); y, en curso, la
+fila de J2 ofrece «😈 Enyetar · Daño de Warrior · Hachero (15)» antes de que J1 lo aplique (la maldición ganó: queda 10). La maldición sobre el daño del
+último duelo perdió dos veces con dados de verdad; la tercera, el PdG.Esp de J2 fue a mano (8). **Falta ver:**
+- La moneda desde la fila del cuadro («↩ Re-roll (WC-Moneda) y deshacer») y con la **WildCard** (las dos, «¿Con qué volvés a tirar?»).
+- El Golpe de suerte sobre el **daño** propio todavía sin aplicar (un personaje que pega) y sobre una tirada de una habilidad.
+- Enyetar el daño de una **habilidad** (un Rayo mágico) y el de un arco con el «+1 dado» del primer disparo.
+- Una tirada con «÷2» (Pajaritos, Lisiado…) repetida en el mapa (en las pruebas automáticas sí).

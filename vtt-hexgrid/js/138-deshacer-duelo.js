@@ -177,8 +177,15 @@ async function deshacerTacharMesa(x, motivo){
   }
 }
 
-/* La maldición ganó sobre el último duelo terminado (lo llama enyetarAplicar, js/38, en la pantalla del GM). → lo de `Duelo.enyetarTirada` o null. */
+/* ↩ Lo que se usó para deshacer (Enyetar C, 2026-11-27, P366 2: «la Moneda / WC Re-roll y el Golpe de suerte también pueden deshacer el último duelo»):
+   la maldición de Enyetar (queda la peor), el Golpe de suerte (queda la mejor) o la moneda / la carta (vale la segunda: se vuelve a tirar con el botón). */
+const DESHACER_QUE = {enyetar: '😈 Enyetar', reroll: '🧚 Golpe de suerte', moneda: '🪙 Re-roll (WC-Moneda)'};
+const deshacerTipo = y => (y && DESHACER_QUE[y.tipo] ? y.tipo : 'enyetar');
+
+/* Lo hace la pantalla del GM (la que aplicó el daño): la maldición ganó (lo llama enyetarAplicar, js/38), o el Golpe de suerte ya se pagó o la moneda ya se
+   usó (`deshacerPausa`). Devuelve lo que dejó el duelo y lo vuelve a esa tirada. → lo de `Duelo.enyetarTirada` / `Duelo.reabrirDeshecho`, o null. */
 async function deshacerYReabrir(id, x, y, hijo){
+  const tipo = deshacerTipo(y), QUE = DESHACER_QUE[tipo];
   const modo = (y.deshacer && y.deshacer.modo) === 'mano' ? 'mano' : 'auto';
   const quien = y.porNombre || 'alguien', A = x.atacante.nombre, D = x.defensor.nombre;
   let hecho = [], mano = [...((y.deshacer && y.deshacer.mano) || [])];
@@ -188,48 +195,121 @@ async function deshacerYReabrir(id, x, y, hijo){
     mano = [...new Set([...mano, ...a.mano, ...b.mano])];
   }else mano = [`todo lo que dejó el duelo (se eligió «Resolver a mano»): la vida, los estados y lo demás`, ...mano];
   let r = null;
-  try{ r = await Duelo.enyetarTirada(id, y.lado, 'peor', {campo: y.campo, yeta: true, hijo, deshacer: true}); }
-  catch(err){ console.error('Deshacer: no se pudo volver el duelo a esa tirada', err); }
+  try{
+    r = tipo === 'moneda' ? await Duelo.reabrirDeshecho(id, y.campo)
+      : await Duelo.enyetarTirada(id, y.lado, tipo === 'reroll' ? 'mejor' : 'peor', {campo: y.campo, yeta: true, tipo, hijo, deshacer: true});
+  }catch(err){ console.error('Deshacer: no se pudo volver el duelo a esa tirada', err); }
   if(!r){
     try{ await Duelo.yetaSeguir(id, 'no se pudo volver el duelo a esa tirada'); }catch(err){}
     mesaLinea(`↩ ${quien}: no se pudo volver el duelo ${A} → ${D} a esa tirada. ${hecho.length ? 'Ya se había devuelto: ' + hecho.join('; ') + '. ' : ''}✋ Resolvelo a mano.`, 'alerta-roja');
     return null;
   }
-  const tacha = await deshacerTacharMesa(x, `↩ cambiado por 😈 Enyetar de ${quien}`);
+  const tacha = await deshacerTacharMesa(x, `↩ cambiado por ${QUE} de ${quien}`);
   const sinRegla = tacha === 'sin-regla';
   const formula = [hecho.length ? `Se devolvió: ${hecho.join('; ')}.` : (modo === 'auto' ? 'No había nada para devolver.' : ''), mano.length ? `✋ Revisá a mano: ${mano.join('; ')}.` : '',
     sinRegla ? '(Falta pegar la regla nueva de Firestore para tachar la línea vieja de la Mesa: avisale al GM.)' : ''].filter(Boolean).join('\n');
+  const vuelve = tipo === 'moneda' ? `vuelve a su ${r.etq} (era ${fmt(r.antes)}: se vuelve a tirar y vale la segunda)`
+    : `vuelve a su ${r.etq} (${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}, ${tipo === 'reroll' ? 'la mejor' : 'la peor'})`;
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-      origen: `↩ Deshecho por 😈 Enyetar de ${quien}: el duelo ${A} → ${D} vuelve a su ${r.etq} (${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}) y se resuelve de nuevo`.slice(0, 200),
+      origen: `↩ Deshecho por ${QUE} de ${quien}: el duelo ${A} → ${D} ${vuelve} y se resuelve de nuevo`.slice(0, 200),
       formula: formula.slice(0, 900), rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('Deshacer: no se pudo anotar en la Mesa', err); }
-  try{ momentoAbrir({tipo: 'deshecho', icono: '↩', titulo: `↩ Deshecho por 😈 Enyetar de ${quien}`, estado: 'listo',
+  try{ momentoAbrir({tipo: 'deshecho', icono: '↩', titulo: `↩ Deshecho por ${QUE} de ${quien}`, estado: 'listo',
     resultado: `El duelo ${A} → ${D} se vuelve a resolver desde su ${r.etq}.${hecho.length ? ' Se devolvió: ' + hecho.join('; ') + '.' : ''}${mano.length ? ' ✋ A mano: ' + mano.join('; ') + '.' : ''}`, datos: {dueloId: id}}); }catch(err){}
   if(sinRegla) toast('↩ Falta pegar la regla nueva de Firestore (tachar una línea de la Mesa): quedó la línea «↩ Deshecho» sin tachar la vieja');
   return r;
 }
 
-/* La confirmación (la pantalla de quien echa la yeta), antes de poner la pausa: qué se deshace y qué no (P363 B, dueño: «un mensaje y una confirmación»).
-   → lo de enyetarElegir (true / false). */
-async function enyetarConfirmarDeshacer(tokenId, o){
+/* ↩ El Golpe de suerte (ya pagado) o la moneda (ya usada) sobre el último duelo terminado: lo llama la pantalla del GM desde comun/duelo.js (`yetaRevisarTodos`,
+   gancho `deshacerPausa`). Una sola pantalla lo toma (`Duelo.yetaReclamar`). */
+async function deshacerPausa(d){
+  if(!soyGM || !(await Duelo.yetaReclamar(d.id))) return;
+  let x = null;
+  try{ const doc = await fbDb.collection(fbRutaCampana('duelos')).doc(d.id).get(); x = doc.exists ? {id: doc.id, ...doc.data()} : null; }
+  catch(err){ console.error('Deshacer: no se pudo leer el duelo', err); }
+  const y = x && x.ataque && x.ataque.yeta;
+  if(!y){ return; }
+  const r = await deshacerYReabrir(d.id, x, y, '');
+  if(r && deshacerTipo(y) === 'reroll') await publicarRepeticion(y.aNombre || 'su aliado', r, 'mejor', 'mapa');
+}
+
+/* La confirmación (la pantalla de quien lo usa), antes de poner la pausa: qué se deshace y qué no (P363 B, dueño: «un mensaje y una confirmación»).
+   tipo: 'enyetar' | 'reroll' | 'moneda'. → {modo, mano} o null (canceló, o no se puede). */
+async function deshacerConfirmar(tipo, o){
   let x = null;
   try{ const doc = await fbDb.collection(fbRutaCampana('duelos')).doc(o.dueloId).get(); x = doc.exists ? {id: doc.id, ...doc.data()} : null; }
-  catch(err){ console.error('Enyetar: no se pudo leer el duelo', err); }
+  catch(err){ console.error('Deshacer: no se pudo leer el duelo', err); }
   const plan = Duelo.deshacerPlan(x, {hayDefensor: !!(x && x.defensor && tokens.get(x.defensor.tokenId))});
   if(!plan.puede){
     AvisoCombate.mostrar({icono: '↩', titulo: 'No se puede deshacer', texto: `Ese duelo no se puede volver atrás: ${plan.motivo}.`});
-    return false;
+    return null;
   }
   const lineas = l => l.map(t => `• ${t}`).join('\n');
-  const texto = `${x.atacante.nombre} → ${x.defensor.nombre} ya terminó. Primero tirás la maldición (PdG.Esp contra Res.Esp de ${o.nombre}); si gana, se deshace lo que dejó ese duelo y se vuelve a resolver desde su ${o.etq}, que repite y se queda con la peor. Si pierde, no se toca nada.\n\n`
+  const etq = String(o.etq || 'tirada');
+  const que = tipo === 'reroll' ? `Se deshace lo que dejó ese duelo y ${o.nombre} repite su ${etq} y se queda con la mejor; después se vuelve a resolver. Cuesta ${rerollCosto}.`
+    : tipo === 'moneda' ? `Se deshace lo que dejó ese duelo y volvés a tirar tu ${etq} con la moneda o la carta (vale la segunda tirada); después se vuelve a resolver.`
+    : `Primero tirás la maldición (PdG.Esp contra Res.Esp de ${o.nombre}); si gana, se deshace lo que dejó ese duelo y se vuelve a resolver desde su ${etq}, que repite y se queda con la peor. Si pierde, no se toca nada.`;
+  const texto = `${x.atacante.nombre} → ${x.defensor.nombre} ya terminó. ${que}\n\n`
     + (plan.auto.length ? `Se devuelve solo:\n${lineas(plan.auto)}\n\n` : '')
     + (plan.mano.length ? `✋ Esto no se deshace solo (queda para revisar a mano):\n${lineas(plan.mano)}` : '');
+  const boton = tipo === 'reroll' ? '↩ Deshacer y Golpe de suerte' : tipo === 'moneda' ? '↩ Deshacer y volver a tirar' : '↩ Deshacer y enyetar';
   const opciones = plan.mano.length
     ? [{valor: 'auto', texto: '⚙ Aplicar automático', detalle: 'devuelve lo de arriba y te deja la lista de lo que hay que revisar'},
       {valor: 'mano', texto: '✋ Resolver a mano', detalle: 'no toca la vida ni los estados: el duelo se vuelve a resolver y la mesa corrige lo demás'}]
-    : [{valor: 'auto', texto: '↩ Deshacer y enyetar', detalle: 'si la maldición gana'}];
-  const modo = await Confirmar.elegir(texto.trim(), {titulo: `↩ Enyetar el último duelo`, icono: '😈', no: 'Cancelar', opciones});
-  if(!modo) return false;
-  return enyetarElegir(tokenId, {...o, deshacer: {modo, mano: plan.mano}});
+    : [{valor: 'auto', texto: boton, detalle: tipo === 'enyetar' ? 'si la maldición gana' : 'se deshace al toque'}];
+  const titulo = tipo === 'reroll' ? '↩ Golpe de suerte sobre el último duelo' : tipo === 'moneda' ? '↩ Re-roll (WC-Moneda) sobre el último duelo' : '↩ Enyetar el último duelo';
+  const modo = await Confirmar.elegir(texto.trim(), {titulo, icono: tipo === 'reroll' ? '🧚' : tipo === 'moneda' ? '🪙' : '😈', no: 'Cancelar', opciones});
+  return modo ? {modo, mano: plan.mano} : null;
+}
+// → lo de enyetarElegir (true / false).
+async function enyetarConfirmarDeshacer(tokenId, o){
+  const c = await deshacerConfirmar('enyetar', o);
+  if(!c) return false;
+  return enyetarElegir(tokenId, {...o, deshacer: c});
+}
+// 🧚 El Golpe de suerte sobre una tirada propia o de un aliado del último duelo terminado: confirma, pone la pausa, cobra; el GM deshace.
+async function rerollConfirmarDeshacer(porId, o){
+  const yo = tokens.get(porId);
+  if(!yo) return false;
+  const c = await deshacerConfirmar('reroll', o);
+  if(!c) return false;
+  const ok = await Duelo.yetaPausar(o.dueloId, {tipo: 'reroll', lado: o.lado, campo: o.campo, por: porId, porNombre: nombreDe(yo), a: o.tokenId, aNombre: o.nombre, deshacer: c})
+    .catch(err => { console.error('Golpe de suerte: no se pudo poner en pausa el duelo', err); return false; });
+  if(!ok){ toast('🧚 Esa tirada ya no se puede cambiar (el duelo siguió, o ya tiene algo encima)'); return false; }
+  try{ if(Duelo.abiertoId() !== o.dueloId) Duelo.abrir(o.dueloId); }catch(err){}
+  const usada = await rerollUsar(yo, {id: o.dueloId, lado: o.lado, campo: o.campo, nombre: o.nombre, etq: o.etq, total: o.total, contra: o.contra, deshacer: true});
+  if(!usada) await Duelo.yetaSeguir(o.dueloId, 'no se llegó a usar el Golpe de suerte').catch(err => console.error(err));
+  return usada;
+}
+// 🪙 La moneda o la carta sobre una tirada propia del último duelo terminado (la fila del duelo o el botón fijo): confirma y la usa (comun/duelo.js).
+async function monedaConfirmarDeshacer(d, o){
+  const c = await deshacerConfirmar('moneda', {...o, dueloId: d.id});
+  if(!c) return false;
+  return Duelo.monedaDeshacer(d, {...o, modo: c.modo, mano: c.mano});
+}
+/* 🪙 El botón fijo de la moneda (js/02): si el personaje principal estuvo en el último duelo terminado, primero ofrece sus tiradas de ese duelo («↩»), y
+   «Otra tirada» abre la lista de siempre (las de la Mesa). → true si mostró la lista. */
+async function monedaUltimoAbrir(fichaId){
+  if(modoMapa !== 'combate') return false;
+  const id = Duelo.ultimoTerminadoAhora();
+  if(!id) return false;
+  let d = null;
+  try{ const doc = await fbDb.collection(fbRutaCampana('duelos')).doc(id).get(); d = doc.exists ? {id: doc.id, ...doc.data()} : null; }catch(err){ return false; }
+  if(!d || d.estado !== 'resuelto' || !enyetarReciente(d.creado)) return false;   // (solo uno reciente: si no, la lista de siempre)
+  const lado = ['atacante', 'defensor'].find(l => d[l] && String(d[l].ref || '') === String(fichaId));
+  if(!lado) return false;
+  const r = (fichasPub.get(fichaId) || {}).resumen || {};
+  const w = Math.max(0, Math.round(num(r.wildcards))), con = [...(w ? ['wildcard'] : []), ...(r.moneda === true ? ['moneda'] : [])];
+  if(!con.length) return false;
+  const campos = Duelo.tiradasDeLado(d, lado).filter(c => !(d.rerollUsado && d.rerollUsado[c]));
+  if(!campos.length) return false;
+  const otro = d[lado === 'atacante' ? 'defensor' : 'atacante'] || {}, yo = d[lado];
+  const botones = campos.map(c => { const t = Duelo.tiroDe(d, c), etq = Duelo.etqCampo(d, c);
+    return {fila: true, texto: `↩ Tu ${etq} (${fmt(num(t.total))})`, detalle: `🔒 el último duelo que terminó (contra ${otro.nombre || 'el otro'}): se deshace lo que dejó y la volvés a tirar (vale la segunda) · antes te muestro qué se deshace`,
+      alClic: () => { AvisoCombate.cerrar(); monedaConfirmarDeshacer(d, {lado, campo: c, etq, total: num(t.total), con, w, donde: '', tokenId: yo.tokenId, nombre: yo.nombre}); }}; });
+  botones.push({fila: true, texto: '🪙 Otra tirada', detalle: 'la lista de siempre: tus últimas tiradas de la Mesa', alClic: () => { AvisoCombate.cerrar(); abrirRerollMapa(fichaId); }});
+  botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
+  AvisoCombate.mostrar({icono: '🪙', titulo: 'Re-roll (WC-Moneda)', botones, texto: '¿Qué tirada volvés a tirar?'});
+  return true;
 }

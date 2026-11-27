@@ -2920,3 +2920,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   'sin-regla' → aviso), la línea «↩ Deshecho…» y la tarjeta `deshecho` de la Crónica. `deshacerFoto(d)` (lo llaman `dueloAplicarDano` y
   `dueloAplicarEfecto`, js/13) guarda `ataque.previo` antes de lo primero que le pasa a quien recibe. Probado con clics en «Prueba · General».
 
+- **😈 Enyetar C: cualquier tirada, y la Moneda / el Golpe de suerte que deshacen** (2026-11-27; dudas P368; lo puro en comun/duelo.js). El 🐈‍⬛
+  (`enyetarCandidatos(yo, {incluirCerrados: true, todas: true})`, js/38) y la fila (js/137, `todas: true`) listan cada tirada del enemigo como
+  «Daño de Warrior · Hachero (14)»: en curso, las que todavía se pueden cambiar (el daño tirado y sin aplicar, los d20); del último duelo terminado,
+  todas con «↩». **El Golpe de suerte** (js/39 `abrirReroll` y la fila): `Duelo.tiradasEnyetables(…, {todas: true, marca: '🍀'})` sobre tiradas propias
+  o de aliados; una del último duelo → `rerollConfirmarDeshacer(porId, o)` (js/138: el cartel, la pausa `tipo: 'reroll'` con `deshacer`, `rerollUsar(…,
+  {deshacer: true})` cobra y marca `listo`). **La Moneda / WC:** el 🪙 fijo (js/02) prueba primero `monedaUltimoAbrir(fichaId)` (js/138: tus tiradas del
+  último duelo, si es de hace menos de 10 min, y «🪙 Otra tirada» → `abrirRerollMapa`); la fila trae «↩ Re-roll (WC-Moneda) y deshacer»
+  (`filaMonedaDeshacer`); los dos van a `monedaConfirmarDeshacer(d, o)` → `Duelo.monedaDeshacer`. **El GM** (`deshacerPausa(d)`, gancho
+  `deshacerPausa` de js/14, con `Duelo.yetaReclamar`) corre `deshacerYReabrir`, ahora para los tres (`DESHACER_QUE`): Enyetar y el Golpe de suerte con
+  `Duelo.enyetarTirada(…, {tipo, deshacer: true})` (la peor / la mejor), la Moneda con `Duelo.reabrirDeshecho` (la tirada se borra y se vuelve a tirar con
+  el botón). El cartel de confirmación es uno solo, `deshacerConfirmar(tipo, o)`. Probado con clics en «Prueba · General» (GM, J1, J2): el daño y los d20
+  del último duelo enyetados, la Moneda de J1 sobre su defensa, el Golpe de suerte de J2 sobre la Evasión de J1 y el daño en curso desde la fila.

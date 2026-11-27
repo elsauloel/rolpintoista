@@ -57,27 +57,27 @@ function dueloOpcionesFila(d){
     // ↩ Parte B (2026-11-27): si este es el último duelo que terminó, también sus tiradas (se deshace lo que dejó y se vuelve a resolver, js/138).
     const ultimo = d.estado === 'resuelto' && Duelo.ultimoTerminadoAhora() === d.id;
     Duelo.tiradasEnyetables([d], {esRival: tid => { const x = tokens.get(tid); return !!(x && dueloEsRival(t, x)); },
-      alcanza: tid => { const x = tokens.get(tid); return !!x && distanciaHex(t, x) <= rng && filaVe(x); }, incluirCerrados: ultimo})
-      .filter(o => o.cerrado || Duelo.parListo(d, o.campo))
+      alcanza: tid => { const x = tokens.get(tid); return !!x && distanciaHex(t, x) <= rng && filaVe(x); }, incluirCerrados: ultimo, todas: true})   // 😈 Enyetar C: todas sus tiradas (el daño, los d20…)
       .forEach(o => ops.push({clave: 'enyetar', icono: o.cerrado ? '↩' : '😈', txt: o.cerrado ? 'Enyetar y deshacer' : 'Enyetar', sub: `${o.etq} de ${o.nombre} (${fmt(o.total)}) · ${c.txt}`,
         titulo: o.cerrado ? `${nombreDe(t)}: el duelo ya terminó; si la maldición gana, se deshace lo que dejó y se vuelve a resolver (antes te muestra qué se deshace)`
           : `${nombreDe(t)}: tirás PdG.Esp contra su Res.Esp, acá mismo; si ganás, repite esa tirada y se queda con la peor`, por: id, o}));
   });
-  // 🧚 Golpe de suerte (Support): una tirada tuya o de un aliado a tu alcance; queda la mejor.
+  // 🧚 Golpe de suerte (Support): una tirada tuya o de un aliado a tu alcance; queda la mejor. Enyetar C: cualquiera de sus tiradas y, si este es el
+  // último duelo terminado, también deshaciendo lo que dejó (js/138).
   mios.forEach(([id, t]) => {
     const r = filaResumen(t);
     if(!(r.reroll || r.suerte)) return;
     const c = filaCostoTxt(id, REROLL.sp, REROLL.spAjeno);
     if(num(r.sp) < c.sp) return;
     const rng = filaRango(t);
-    lados.forEach(lado => {
-      const x = tokDe(lado);
-      if(!x || x.tipo !== 'pj' || (x !== t && (dueloEsRival(t, x) || distanciaHex(t, x) > rng))) return;
-      const s = Duelo.tiradaSumable(d, lado);
-      if(!s || s.afortunada || !Duelo.parListo(d, s.campo)) return;
-      ops.push({clave: 'reroll', icono: '🧚', txt: 'Golpe de suerte', sub: `${x === t ? 'tu ' : ''}${s.etq}${x === t ? '' : ` de ${d[lado].nombre}`} (${fmt(s.total)}) · ${c.txt}`,
-        titulo: `${nombreDe(t)}: repite esa tirada y se queda con la mejor`, por: id, lado, campo: s.campo, etq: s.etq, total: s.total});
-    });
+    const ultimo = d.estado === 'resuelto' && Duelo.ultimoTerminadoAhora() === d.id;
+    Duelo.tiradasEnyetables([d], {todas: true, marca: '🍀', incluirCerrados: ultimo,
+      esRival: tid => { const x = tokens.get(tid); return !!x && x.tipo === 'pj' && (x === t || (!dueloEsRival(t, x) && distanciaHex(t, x) <= rng)); }})
+      .forEach(o => { const propio = o.tokenId === id;
+        ops.push({clave: 'reroll', icono: o.cerrado ? '↩' : '🧚', txt: 'Golpe de suerte' + (o.cerrado ? ' y deshacer' : ''), cerrado: !!o.cerrado,
+          sub: `${propio ? 'tu ' : ''}${propio ? o.etq.toLowerCase() : o.etq}${propio ? '' : ` de ${o.nombre}`} (${fmt(o.total)}) · ${c.txt}`,
+          titulo: o.cerrado ? `${nombreDe(t)}: el duelo ya terminó; se deshace lo que dejó, se repite esa tirada y queda la mejor (antes te muestra qué se deshace)` : `${nombreDe(t)}: repite esa tirada y se queda con la mejor`,
+          por: id, lado: o.lado, campo: o.campo, etq: o.etq, total: o.total, o}); });
   });
   // 🧿 Mal de ojo (el GM): un creep que lo tiene listo, sobre la tirada de un personaje a su alcance.
   if(soyGM && typeof malDeOjoCreeps === 'function'){
@@ -125,6 +125,8 @@ async function dueloUsarFila(d, o){
     await polillaDespues(t, idx, p, otro);
     return true;
   }
+  if(o.clave === 'moneda' && o.cerrado) return !!(await monedaConfirmarDeshacer(d, o));   // ↩ la moneda sobre el último duelo terminado (js/138)
+  if(o.clave === 'reroll' && o.cerrado) return !!(await rerollConfirmarDeshacer(o.por, o.o));   // ↩ el Golpe de suerte sobre el último duelo terminado (js/138)
   if(o.clave === 'reroll'){
     const yo = tokens.get(o.por), l = d[o.lado] || {};
     if(!yo) return false;

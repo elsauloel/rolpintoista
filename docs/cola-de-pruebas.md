@@ -21,7 +21,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
-- **⬜ en cola (PRÓXIMO, después del «Golpe de suerte») — 😈 Enyetar C: elegir CUALQUIER tirada del último duelo (también el daño y los d20 del crítico), y
+- **✅ hecho (2026-11-27) — 😈 Enyetar C: elegir CUALQUIER tirada del último duelo (también el daño y los d20 del crítico), y
   que la Moneda / WC y el Golpe de suerte también puedan deshacer el último duelo** (dueño, 2026-11-27): «puede que la persona quiera rerolear no
   necesariamente la tirada de probabilidad de golpe, sino la tirada de daño, por ejemplo… Tira enyetar y te dice: del último duelo tenés estas tiradas,
   ¿cuál querés enyetar?… Todo si la descripción de enyetar lo permite». La descripción de Enyetar dice «obliga a repetir una tirada y quedarse con el
@@ -30,6 +30,27 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tiradas de ese enemigo en el último duelo (PdG, daño, d20 del crítico, Bloqueo, Evasión, la de una habilidad…) y elegís cuál; al deshacer, se vuelve a
   ese punto (enyetar el daño: se deshace el daño y se vuelve a tirar con la peor). Y (P366 2) la Moneda / WC Re-roll y el Golpe de suerte también pueden
   deshacer el último duelo, por el mismo camino (js/138), cada uno con su regla (la Moneda: vale la segunda; el Golpe de suerte: la mejor).
+  - **Hecho (2026-11-27, Claude).** **Todas las tiradas:** la lista del 🐈‍⬛ y la fila «⚡ Entre tiradas» muestran cada tirada de ese enemigo, con su
+    nombre y su número («Daño de Warrior · Hachero (14)», «D20 del crítico de…», el PdG, la Fuerza, la Evasión, el Bloqueo, la tirada y la resistencia de
+    una habilidad): las del duelo en curso que todavía se pueden cambiar (**el daño ya tirado y todavía sin aplicar** también, y los d20 del crítico) y,
+    del último duelo terminado, todas con «↩». En curso: la pausa y la maldición de siempre (A); si la tirada ya pasó o el duelo terminó: la B, con el
+    mismo cartel de lo que se deshace. **El daño:** se devuelve lo que dejó, se repite con los mismos dados y lo mismo que se le sumó (la espalda, la
+    presa…), queda el más bajo y hay que volver a tocar «💔 Aplicar el daño». **Los d20 del crítico:** se repiten y el multiplicador sale de los nuevos
+    (queda el peor); el daño se vuelve a aplicar con ese multiplicador. **Las reglas de cada tirada se respetan al repetirla** (antes no): el «÷2» de un
+    estado, la Evasión que no baja de 1, el daño que no baja de 0. **La Moneda / WC y el Golpe de suerte sobre el último duelo** (P366 2): en sus botones
+    fijos (🪙 ofrece primero tus tiradas del último duelo, si es de los últimos 10 minutos, y «Otra tirada» abre la lista de siempre; 🧚 lista también el
+    último duelo) y en la fila, con «↩»: el mismo cartel de lo que se deshace, sin maldición. La Moneda: se cobra (la moneda o la carta), la pantalla del
+    GM deshace y la tirada se borra para volver a tirarla con el botón de siempre (vale la segunda). El Golpe de suerte: se paga y la pantalla del GM
+    deshace, repite la tirada y queda la mejor. Tiradas propias (Moneda) o propias y de aliados (Golpe de suerte). Los textos de Enyetar y del Golpe de
+    suerte se pusieron al día (las copias guardadas se actualizan solas). Sin reglas nuevas. Probado con clics en «Prueba · General» (GM, J1, J2; dados
+    de verdad salvo donde se dice): el Hachero le pega a J1 (15) y J2 enyeta **el daño** del último duelo (la maldición perdió dos veces con dados de
+    verdad; la tercera, con el PdG.Esp de J2 elegido a mano en 8): la vida de J1 vuelve de 36 a 50, el daño se repite (15 y 12 → queda 12) y J1 lo
+    vuelve a aplicar (39); **un crítico** (el PdG del Hachero a mano en 20 para que salga; los d20 de verdad, 11 y 2): J2 enyeta los d20 (salió 18 →
+    queda 11, ×2) y la vida vuelve; **J1 usa la Moneda** sobre su defensa de ese duelo (era un Parry: la vida vuelve de 11 a 39, se borra la tirada, la
+    vuelve a tirar con Evasión, 4); **J2 usa el Golpe de suerte** sobre esa Evasión de J1 (4 y 1 → queda 4; la vida vuelve de 5 a 39 y se resuelve de
+    nuevo); y **en curso**, J2 enyeta el daño todavía sin aplicar desde la fila (la maldición ganó con dados de verdad: 15 y 10 → queda 10). La vuelta,
+    «quedó igual». Pruebas: 1192. Sin probar con clics (a `docs/pruebas-en-el-mapa.md`): la moneda desde la fila del cuadro y con la WildCard, y el
+    Golpe de suerte sobre el daño en curso. Dudas: P368.
 - **✅ hecho (2026-11-27) — 🧚 «Re-roll» del Support pasa a llamarse «Golpe de suerte»** — Hecho: el nombre nuevo en la habilidad de clase
   (`support-reroll`, el id interno no cambió; no hay versión de creep), el botón fijo 🧚 (`comun/flotantes.js`, js/39), la fila «⚡ Entre tiradas»
   (js/137), la pausa del duelo (`comun/duelo.js`), la Mesa, la Crónica, los avisos (js/38, js/39), la guía de diseño y el manual (09 y 07, recompilado).

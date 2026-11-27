@@ -30,31 +30,25 @@ setInterval(() => { try{ renderRerollBoton(); }catch(e){} }, 1500);
 async function abrirReroll(tokenId){
   const yo = tokens.get(tokenId);
   if(!yo) return;
-  const nomYo = nombreDe(yo), rng = num((rangoDeToken(yo) || {}).rng), vistos = new Set(), lista = [];
+  const nomYo = nombreDe(yo), rng = num((rangoDeToken(yo) || {}).rng);
   const alcanza = t => !!t && (t === yo || (t.tipo === 'pj' && !dueloEsRival(yo, t) && distanciaHex(yo, t) <= rng));
+  let lista = [];
   try{
-    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(10).get();
-    q.docs.forEach(doc => {
-      const x = doc.data();
-      if(!x || x.estado === 'cancelado' || x.hab || !enyetarReciente(x.creado)) return;
-      ['atacante', 'defensor'].forEach(lado => {
-        const p = x[lado], t = p && tokens.get(p.tokenId);
-        if(!alcanza(t) || vistos.has(p.tokenId)) return;
-        vistos.add(p.tokenId);
-        const s = Duelo.tiradaSumable(x, lado);
-        if(!s || s.afortunada) return;   // una vez por tirada
-        const otro = x[lado === 'atacante' ? 'defensor' : 'atacante'] || {};
-        lista.push({id: doc.id, lado, nombre: p.nombre || nombreDe(t), etq: s.etq, total: s.total, contra: otro.nombre || 'el otro'});
-      });
-    });
+    // 🧚 Enyetar C (2026-11-27): cualquier tirada tuya o de un aliado (también el daño y los d20 del crítico) que todavía se pueda cambiar y, del último
+    // duelo terminado, todas («↩»: se deshace lo que dejó y se vuelve a resolver; js/138). Lo puro en Duelo.tiradasEnyetables.
+    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(15).get();
+    const duelos = q.docs.map(doc => ({id: doc.id, ...doc.data()}));
+    lista = Duelo.tiradasEnyetables(duelos, {todas: true, marca: '🍀', reciente: enyetarReciente, incluirCerrados: true,
+      esRival: id => alcanza(tokens.get(id)), nombreDe: id => { const t = tokens.get(id); return t ? nombreDe(t) : ''; }});
   }catch(err){ console.error('Golpe de suerte: no se pudieron ver los duelos', err); }
   if(!lista.length){
-    AvisoCombate.mostrar({icono: '🧚', titulo: `Golpe de suerte · ${nomYo}`, texto: `No hay ninguna tirada reciente tuya ni de un aliado a tu alcance (Rango ${fmt(rng)}) en un duelo que todavía se pueda cambiar.`});
+    AvisoCombate.mostrar({icono: '🧚', titulo: `Golpe de suerte · ${nomYo}`, texto: `No hay ninguna tirada reciente tuya ni de un aliado a tu alcance (Rango ${fmt(rng)}) en un duelo que todavía se pueda cambiar ni en el último duelo que terminó.`});
     return;
   }
-  const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.nombre} · ${o.etq} (${fmt(o.total)})`,
-    detalle: `en el duelo contra ${o.contra}: repite y queda la mejor; el duelo se vuelve a resolver · ${rerollCosto}`,
-    alClic: () => { AvisoCombate.cerrar(); rerollUsar(yo, o); }}));
+  const botones = lista.slice(0, 10).map(o => ({fila: true, texto: `${o.cerrado ? '↩ ' : ''}${o.etq} de ${o.nombre} (${fmt(o.total)})`,
+    detalle: o.cerrado ? `🔒 el último duelo que terminó (${o.hab ? `${o.hab}, ` : ''}contra ${o.contra}): se deshace lo que dejó y se vuelve a resolver · antes te muestro qué se deshace · ${rerollCosto}`
+      : `${o.hab ? `en ${o.hab}, ` : 'en el duelo '}contra ${o.contra}: repite y queda la mejor; el duelo se vuelve a resolver · ${rerollCosto}`,
+    alClic: () => { AvisoCombate.cerrar(); if(o.cerrado) rerollConfirmarDeshacer(tokenId, o); else rerollUsar(yo, {id: o.dueloId, lado: o.lado, campo: o.campo, nombre: o.nombre, etq: o.etq, total: o.total, contra: o.contra}); }}));
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
   AvisoCombate.mostrar({icono: '🧚', titulo: `Golpe de suerte · ${nomYo}`, botones, texto: '¿Qué tirada se repite?'});
 }
@@ -81,6 +75,18 @@ async function rerollUsar(yo, o){
     return true;
   });
   if(!ok){ toast(falta !== null ? `No te alcanza el SP: Golpe de suerte cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Golpe de suerte'); return false; }
+  // ↩ Sobre el último duelo terminado (Enyetar C): pagado, queda listo para que la pantalla del GM deshaga lo que dejó el duelo y repita la tirada (js/138).
+  if(o.deshacer){
+    const listo = await Duelo.yetaMarcar(o.id, {listo: true}).catch(err => { console.error('Golpe de suerte: no se pudo avisar', err); return false; });
+    const texto = listo ? `${nomYo} le dio un Golpe de suerte a ${o.nombre} sobre el duelo que ya terminó: se deshace lo que dejó y ${o.nombre} repite su ${o.etq} y se queda con la mejor.`
+      : `El duelo ya no esperaba el Golpe de suerte: ✋ que ${o.nombre} repita su ${o.etq} y se quede con la mejor, a mano.`;
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nomYo, origen: `🧚 ${nomYo} usó Golpe de suerte (−${fmt(pago.sp)} SP${no2 ? ` · −${fmt(no2)} No2` : ''})`,
+        formula: `sobre ${o.nombre} · ↩ el último duelo`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    }catch(err){ console.error('Golpe de suerte: no se pudo avisar en la Mesa', err); }
+    if(!listo) toast(texto);
+    return true;
+  }
   const r = await Duelo.enyetarTirada(o.id, o.lado, 'mejor', o.campo ? {campo: o.campo, yeta: true, tipo: 'reroll'} : undefined);
   let texto;
   if(!r) texto = `La tirada de ${o.nombre} ya no se puede cambiar (el duelo siguió): ✋ que la repita y se quede con la mejor, a mano.`;

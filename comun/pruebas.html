@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127suerte"></script>
+<script src="duelo.js?v=20261127enyC"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -127,7 +127,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
 <script src="pasivas.js?v=20261127detalle"></script>
-<script src="skills-clase.js?v=20261127suerte"></script>
+<script src="skills-clase.js?v=20261127enyC"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261127unico2"></script>
 <script src="skills-creep-base.js?v=20261127detalle"></script>
@@ -1132,10 +1132,51 @@ prueba('↩ Enyetar parte B: lo de quien pegó (Espinas, Espejo, Drena, Luz sana
 prueba('↩ Enyetar parte B en el código: la foto de antes, el deshacer en la pantalla del GM, la fila, la línea tachada y la regla nueva', async () => {
   const [t13, t38, t137, t138, du, me, mh, reglas] = await Promise.all(['../vtt-hexgrid/js/13-tokens-portal-duelo.js', '../vtt-hexgrid/js/38-enyetar.js', '../vtt-hexgrid/js/137-fila-duelo.js',
     '../vtt-hexgrid/js/138-deshacer-duelo.js', 'duelo.js', 'mesa.js', '../vtt-hexgrid/mapa.html', '../firebase/firestore.rules'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
-  igual([(t13.match(/await deshacerFoto\(d\)/g) || []).length, /y\.deshacer \? await deshacerYReabrir\(doc\.id, x, y, d\.id\)/.test(t38), /enyetarCandidatos\(yo, \{incluirCerrados: true\}\)/.test(t38),
+  igual([(t13.match(/await deshacerFoto\(d\)/g) || []).length, /y\.deshacer \? await deshacerYReabrir\(doc\.id, x, y, d\.id\)/.test(t38), /enyetarCandidatos\(yo, \{incluirCerrados: true(, todas: true)?\}\)/.test(t38),
     /enyetarConfirmarDeshacer\(o\.por, o\.o\)/.test(t137), /deshacer: true\}\)/.test(t138), /Confirmar\.elegir/.test(t138), /'ataque\.resumenMesa': linea\.id/.test(du),
     /aplicando\.has\(kAp\)/.test(du), /t\.deshecha/.test(me), /js\/138-deshacer-duelo\.js\?v=/.test(mh), /affectedKeys\(\)\.hasOnly\(\['deshecha'\]\)/.test(reglas)],
     [2, true, true, true, true, true, true, true, true, true, true]);
+});
+prueba('😈 Enyetar C: la lista muestra TODAS las tiradas del enemigo (el daño sin aplicar, los d20; del último duelo terminado, todas con ↩)', () => {
+  const rival = id => id !== 'yo', cerca = () => true;
+  const enCurso = {id: 'c', estado: 'esperando', fase: 'dano', creado: 9000, resultado: 'pego', atacante: {tokenId: 'hach', nombre: 'Warrior · Hachero'}, defensor: {tokenId: 'yo', nombre: 'Blanco J1'}, ataque: {},
+    pdg: {total: 12, formula: '1d12', rolls: [12], mod: 0}, eva: {total: 3, formula: '1d6', rolls: [3], mod: 0}, crit: {critico: true, d20: [14], mejor: 14, mult: 2},
+    dano: {crudo: 14, formula: '2d6+4', rolls: [5, 5], mod: 4, aplicado: false, reclamado: 'libre', tiroBase: {total: 14, formula: '2d6+4', rolls: [5, 5], mod: 4}}};
+  const ultimo = {...enCurso, id: 'u', estado: 'resuelto', fase: 'fin', creado: 5000, dano: {...enCurso.dano, aplicado: true, hpAntes: 50, hpDespues: 40}};
+  const l = Duelo.tiradasEnyetables([enCurso], {esRival: rival, alcanza: cerca, todas: true});
+  const lu = Duelo.tiradasEnyetables([ultimo], {esRival: rival, alcanza: cerca, todas: true, incluirCerrados: true});
+  const aliado = Duelo.tiradasEnyetables([ultimo], {esRival: id => id === 'yo', alcanza: cerca, todas: true, incluirCerrados: true, marca: '🍀'});
+  const yaEnyetado = Duelo.tiradasEnyetables([{...enCurso, dano: {...enCurso.dano, formula: '2d6+4 🐈'}}], {esRival: rival, todas: true});
+  igual([l.map(o => [o.campo, o.etq, o.total, !!o.cerrado]), lu.map(o => [o.campo, o.etq, o.total, !!o.cerrado]), aliado.map(o => [o.campo, o.etq, !!o.cerrado]), yaEnyetado.map(o => o.campo),
+    `${l[1].etq} de ${l[1].nombre} (${l[1].total})`, Duelo.tiradasEnyetables([ultimo], {esRival: rival, todas: true}).length],
+    [[['critico', 'D20 del crítico', 14, false], ['dano', 'Daño', 14, false]],
+      [['pdg', 'PdG', 12, true], ['critico', 'D20 del crítico', 14, true], ['dano', 'Daño', 14, true]], [['eva', 'Evasión', true]], ['critico'], 'Daño de Warrior · Hachero (14)', 0]);
+});
+prueba('😈 Enyetar C: qué tiradas se pueden cambiar sin deshacer (el daño tirado y sin aplicar sí; aplicado o tomado, no) y la regla de cada una al repetirla', () => {
+  const d = {estado: 'esperando', fase: 'dano', crit: {critico: true, d20: [9], mejor: 9, mult: 2}, dano: {crudo: 6, formula: '1d8', rolls: [6], mod: 0, aplicado: false, reclamado: 'libre'}, pdg: {total: 9}, eva: {total: 2}};
+  const r = (f, rolls, c, mod) => Duelo.repetirTotal({formula: f, mod: mod || 0}, rolls, c);
+  igual([Duelo.puedeCambiar(d, 'dano'), Duelo.puedeCambiar(d, 'critico'), Duelo.puedeCambiar({...d, dano: {...d.dano, aplicado: true}}, 'dano'), Duelo.puedeCambiar({...d, dano: {...d.dano, reclamado: 'gm1'}}, 'dano'),
+    Duelo.puedeCambiar({...d, dano: {...d.dano, aplicado: true}}, 'critico'), Duelo.puedeCambiar({...d, dano: null}, 'critico'), Duelo.puedeCambiar({...d, dano: {...d.dano, formula: 'la diferencia'}}, 'dano'), !!Duelo.tiroDe({...d, dano: {...d.dano, aplicado: true, cuenta: [{txt: 'Tirada de daño', v: 6}]}}, 'dano'),
+    Duelo.tiradasDeLado(d, 'atacante'), Duelo.tiroDe(d, 'critico').total,
+    r('1d6 ÷2', [1], 'eva'), r('1d6', [1], 'eva', -3), r('1d8 ÷2', [7], 'pdg', 2), r('1d8 ÷2 +2 🦋', [7], 'pdg', 4), r('1d4', [1], 'dano', -5), r('2d6+4', [2, 3], 'dano', 4)],
+    [true, true, false, false, false, true, false, true, ['pdg', 'critico', 'dano'], 9, 1, 1, 4, 6, 0, 9]);
+});
+prueba('↩ Enyetar C: lo que queda del daño al deshacerlo (sin lo de la aplicación) y los efectos sin tirar; la pantalla del GM deshace el Golpe de suerte o la moneda ya usados', () => {
+  const dn = {crudo: 9, formula: '1d8+2', rolls: [7], mod: 2, tiroBase: {total: 9}, reclamado: 'gm', aplicado: true, aceptado: 'j1', hpAntes: 50, hpDespues: 41, recibido: 9, defensa: 0,
+    magico: {tipo: 'fuego', total: 3, formula: '1d6', rolls: [3], recibido: 3, hpAntes: 41, hpDespues: 38}};
+  const efs = [{nombre: 'Sangrado', res: {dado: 4, exito: true}, aplicado: true, nota: 'ok'}, {nombre: 'Veneno', omitido: true, motivo: 'el golpe no hizo daño (la armadura lo absorbió)'}, {nombre: 'Stun', omitido: true, motivo: 'lo resistió'}];
+  const p = (x) => ({id: 'o', estado: 'resuelto', ataque: {yeta: {tipo: 'reroll', por: 'j2', a: 'j1', campo: 'eva', lado: 'defensor', desde: 100000, deshacer: {modo: 'auto'}, ...x}}});
+  igual([Duelo.danoBase(dn), Duelo.efectosReset(efs), Duelo.yetaQueHacer(p({listo: true}), [], false, 110000).accion, Duelo.yetaQueHacer(p({listo: 'gm1'}), [], false, 110000).accion,
+    Duelo.yetaQueHacer(p({}), [], false, 170000).accion, Duelo.monedaDeshace({...p({tipo: 'moneda'}), estado: 'resuelto'}, 'eva'), Duelo.monedaDeshace({...p({tipo: 'moneda', listo: true})}, 'eva')],
+    [{crudo: 9, formula: '1d8+2', rolls: [7], mod: 2, tiroBase: {total: 9}, magico: {tipo: 'fuego', total: 3, formula: '1d6', rolls: [3]}, reclamado: 'libre', aplicado: false},
+      [{nombre: 'Sangrado'}, {nombre: 'Veneno'}, {nombre: 'Stun', omitido: true, motivo: 'lo resistió'}], 'deshacer', 'esperar', 'seguir', true, false]);
+});
+prueba('😈 Enyetar C en el código: la lista completa, el Golpe de suerte y la moneda sobre el último duelo, y la pantalla del GM que deshace', async () => {
+  const [t02, t14, t38, t39, t137, t138] = await Promise.all(['../vtt-hexgrid/js/02-modo-niebla-sigilo.js', '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../vtt-hexgrid/js/38-enyetar.js',
+    '../vtt-hexgrid/js/39-reroll.js', '../vtt-hexgrid/js/137-fila-duelo.js', '../vtt-hexgrid/js/138-deshacer-duelo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+  igual([/incluirCerrados: true, todas: true/.test(t38), /todas: true, marca: '🍀'/.test(t39), /rerollConfirmarDeshacer\(o\.por, o\.o\)/.test(t137), /monedaConfirmarDeshacer\(d, o\)/.test(t137),
+    /Duelo\.reabrirDeshecho\(id, y\.campo\)/.test(t138), /Duelo\.yetaReclamar\(d\.id\)/.test(t138), /deshacerPausa: d =>/.test(t14), /monedaUltimoAbrir\(fid\)/.test(t02), /Duelo\.yetaMarcar\(o\.id, \{listo: true\}\)/.test(t39)],
+    [true, true, true, true, true, true, true, true, true]);
 });
 prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la Runa aceleradora, consumible del Bazar arcano', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-acelerador');
@@ -8176,6 +8217,39 @@ prueba('un golpe crítico también rompe armadura (2026-10-23, dueño: se borró
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
 
+prueba('↩ Enyetar C: enyetar el daño (en curso y del último duelo), los d20 del crítico y una Evasión partida a la mitad, con dados de verdad (los dados salen 1)', () => { const pp = fbFalsoCola.then(async () => {
+  const docs = {};
+  const tx = {get: async r => ({exists: !!docs[r.id], data: () => structuredClone(docs[r.id])}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
+  const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana, firebase: window.firebase, random: Math.random};
+  window.fbDb = {collection: () => ({doc: id => ({id}), add: async () => ({id: 'l'})}), runTransaction: fn => fn(tx)}; window.fbRutaCampana = p => p;
+  window.firebase = {firestore: {FieldValue: {delete: () => '__borrar', arrayUnion: x => ({union: x}), serverTimestamp: () => 'ahora'}}};
+  Math.random = () => 0;
+  try{
+    const base = {estado: 'esperando', fase: 'dano', resultado: 'pego', atacante: {nombre: 'Hachero', tokenId: 'h'}, defensor: {nombre: 'Blanco J1', tokenId: 'j1'},
+      pdg: {total: 12, formula: '1d12', rolls: [12], mod: 0}, eva: {total: 3, formula: '1d6', rolls: [3], mod: 0}, contacto: {gana: 'atacante'}};
+    const dano = {crudo: 11, formula: '1d8+2 +2 espalda', rolls: [7], mod: 4, reclamado: 'libre', aplicado: false, aceptado: 'j1', tiroBase: {total: 9, formula: '1d8+2', rolls: [7], mod: 2}};
+    // (1) en curso: el daño tirado, todavía sin aplicar → 1 + 2 + 2 de la espalda = 5; vuelve a pedir el «Aplicar»
+    docs.a = {...base, crit: null, dano, ataque: {yeta: {tipo: 'enyetar', campo: 'dano', lado: 'atacante', por: 'j2', a: 'h'}}};
+    const ra = await Duelo.enyetarTirada('a', 'atacante', 'peor', {campo: 'dano', yeta: true});
+    // (2) el último duelo terminado: el daño ya aplicado → se borra lo de la aplicación y los efectos tirados, vuelve a la fase del daño
+    docs.b = {...base, estado: 'resuelto', fase: 'fin', crit: null, dano: {...dano, aplicado: true, hpAntes: 50, hpDespues: 39, recibido: 11}, efectos: [{nombre: 'Sangrado', res: {exito: true}, aplicado: true}],
+      ataque: {yeta: {tipo: 'enyetar', campo: 'dano', lado: 'atacante', por: 'j2', a: 'h', deshacer: {modo: 'auto'}}, previo: {hp: 50}}};
+    const rb = await Duelo.enyetarTirada('b', 'atacante', 'peor', {campo: 'dano', yeta: true, deshacer: true});
+    // (3) los d20 del crítico del último duelo: un 1 no multiplica
+    docs.c = {...base, estado: 'resuelto', fase: 'fin', crit: {critico: true, d20: [18], mejor: 18, mult: 2, potente: 0}, dano: {...dano, aplicado: true, hpAntes: 50, hpDespues: 28},
+      ataque: {yeta: {tipo: 'enyetar', campo: 'critico', lado: 'atacante', por: 'j2', a: 'h', deshacer: {modo: 'auto'}}}};
+    const rc = await Duelo.enyetarTirada('c', 'atacante', 'peor', {campo: 'critico', yeta: true, deshacer: true});
+    // (4) una Evasión con Pajaritos (÷2) del aliado y el Golpe de suerte: 1 ÷ 2 → 1 (nunca baja de 1); no mejora, queda la de antes
+    docs.d = {...base, fase: 'contacto', estado: 'esperando', contacto: null, eva: {total: 2, formula: '1d6 ÷2', rolls: [5], mod: 0}, pdg: {total: 1, formula: '1d12', rolls: [1], mod: 0}, crit: null, dano: null, ataque: {}};
+    const rd = await Duelo.enyetarTirada('d', 'defensor', 'mejor', {campo: 'eva'});
+    igual([[ra.antes, ra.nueva, ra.ahora, docs.a.dano.crudo, docs.a.dano.aceptado, docs.a.dano.formula.includes('🐈'), docs.a.fase, docs.a['ataque.yeta']],
+      [rb.ahora, docs.b.fase, docs.b.estado, docs.b.dano.aplicado, docs.b.dano.hpAntes, docs.b.efectos, docs.b.resultado, docs.b['ataque.previo']],
+      [rc.antes, rc.ahora, docs.c.crit.mult, docs.c.crit.marca, docs.c.dano.crudo, docs.c.dano.aplicado, docs.c.fase],
+      [rd.nueva, rd.ahora, docs.d.eva.formula]],
+      [[11, 5, 5, 5, undefined, true, 'dano', '__borrar'], [5, 'dano', 'esperando', false, undefined, [{nombre: 'Sangrado'}], 'pego', '__borrar'],
+        [18, 1, 1, '🐈', 11, false, 'dano'], [1, 2, '1d6 ÷2 🍀']]);
+  }finally{ Object.assign(window, {fbDb: antes.fbDb, fbRutaCampana: antes.fbRutaCampana, firebase: antes.firebase}); Math.random = antes.random; }
+}); fbFalsoCola = pp.catch(() => {}); return pp; });
 prueba('efecto de arma con turnos: Sangrado por 2 turnos vence (deja de ser permanente); Veneno 3 stacks = 3 turnos', () => {
   const sp = Duelo.specDeEfecto({nombre: 'Sangrado', turnos: 2}), sv = Duelo.specDeEfecto({nombre: 'Envenenar', stacks: 3});
   const es = EstadosAplicar.componer(sp), ev = EstadosAplicar.componer(sv), ep = EstadosAplicar.componer({nombre: 'Sangrado'});

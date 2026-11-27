@@ -46,7 +46,7 @@ async function enyetarCandidatos(yo, o){
     esRival: id => { const t = tokens.get(id); return !!(t && dueloEsRival(yo, t)); },
     alcanza: id => { const t = tokens.get(id); return !!t && distanciaHex(yo, t) <= rng && !(typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(t)); },
     nombreDe: id => { const t = tokens.get(id); return t ? nombreDe(t) : ''; },
-    incluirCerrados: !!(o && o.incluirCerrados),
+    incluirCerrados: !!(o && o.incluirCerrados), todas: !!(o && o.todas),   // 😈 Enyetar C (2026-11-27): todas las tiradas de ese enemigo (el daño, los d20 del crítico…)
   });
 }
 async function abrirEnyetar(tokenId){
@@ -54,12 +54,12 @@ async function abrirEnyetar(tokenId){
   if(!yo) return;
   const nomYo = nombreDe(yo);
   let lista = [];
-  try{ lista = await enyetarCandidatos(yo, {incluirCerrados: true}); }catch(err){ console.error('Enyetar: no se pudieron ver los duelos', err); }
+  try{ lista = await enyetarCandidatos(yo, {incluirCerrados: true, todas: true}); }catch(err){ console.error('Enyetar: no se pudieron ver los duelos', err); }
   if(!lista.length){
     AvisoCombate.mostrar({icono: '🐈‍⬛', titulo: `Enyetar · ${nomYo}`, texto: `No hay ninguna tirada reciente de un enemigo a tu alcance (Rango ${fmt(num((rangoDeToken(yo) || {}).rng))}) que se pueda enyetar.`});
     return;
   }
-  const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.cerrado ? '↩ ' : ''}${o.nombre} · ${o.etq} (${fmt(o.total)})`,
+  const botones = lista.slice(0, 10).map(o => ({fila: true, texto: `${o.cerrado ? '↩ ' : ''}${o.etq} de ${o.nombre} (${fmt(o.total)})`,
     detalle: o.cerrado ? `🔒 el último duelo que terminó (${o.hab ? `${o.hab}, ` : ''}contra ${o.contra}): si la maldición gana, se deshace lo que dejó y se vuelve a resolver · antes te muestro qué se deshace · 5 SP (turno ajeno 10)`
       : `${o.hab ? `en ${o.hab}, ` : 'en el duelo '}contra ${o.contra}${o.terminado ? ' (ya terminó, pero esa tirada todavía se puede cambiar)' : ''} · el duelo espera mientras tirás PdG.Esp contra su Res.Esp; si ganás, repite esa tirada y queda la peor · 5 SP (turno ajeno 10)`,
     alClic: () => { AvisoCombate.cerrar(); if(o.cerrado) enyetarConfirmarDeshacer(tokenId, o); else enyetarElegir(tokenId, o); }}));

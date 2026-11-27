@@ -3229,3 +3229,17 @@ Con el nombre nuevo, **«Golpe de suerte»**, el botón fijo, la fila «⚡ Entr
 eligió el 2026-10-12 entre «un trébol o un hadita»). La tirada que queda ya lleva la marca **🍀** (el trébol). ¿Pasamos el ícono del Golpe de suerte
 al **🍀**, que dice «suerte» de un vistazo, o queda el 🧚? (Ojo: el 🍀 también lo usa el Anillo del trébol; si se cambia, el botón fijo sigue
 teniendo su brillo verde con chispitas.) Por ahora queda el 🧚.
+
+### P368 — 😈 Enyetar C: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar C)
+
+Lo que se programó y se puede cambiar:
+1. **Un duelo en curso que ya aplicó el daño** (está tirando los efectos): sus tiradas no aparecen hasta que termina; ahí sí, con «↩» y deshaciendo. ¿Está
+   bien, o tendría que poder deshacerse también mientras se tiran los efectos?
+2. **El daño de elemento de un arma** (el 🔥 1d6 aparte) **y el d6 del Orbe salvaje no están en la lista**: se repite el daño del arma (con lo que se le
+   sumó) y los d20 del crítico. ¿Los sumamos como tiradas aparte?
+3. **La Moneda sobre el daño o los d20 de un duelo terminado**: se deshace y se borra esa tirada; la vuelve a tirar quien la hizo con su botón (vale la
+   segunda, como siempre). En un duelo en curso la Moneda sigue como antes (no llega al daño ya tirado). ¿Bien?
+4. **El 🪙 fijo** ofrece primero tus tiradas del último duelo terminado si es de los últimos 10 minutos y estuviste en él; «Otra tirada» abre la lista de
+   siempre. ¿Bien, o siempre la lista de siempre con el último duelo adentro?
+5. **Los d20 del crítico «peor»**: queda el multiplicador más bajo (y, si empatan, el d20 más bajo). ¿Bien?
+

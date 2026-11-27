@@ -2532,7 +2532,74 @@ const Duelo = (() => {
   }
   // La última tirada que hizo ese lado que todavía se puede reabrir (la más avanzada primero).
   const campoReabrible = (m, lado) => (lado === 'atacante' ? ['critico', 'fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => puedeReabrir(m, c)) || null;
-  const etqCampo = (d, c) => c === 'pdg' ? etqTira(d) : c === 'eva' ? etqContra(d) : c === 'critico' ? 'los d20 del crítico' : ETIQ[c];
+  const etqCampo = (d, c) => c === 'pdg' ? etqTira(d) : c === 'eva' ? etqContra(d) : c === 'critico' ? 'd20 del crítico' : c === 'dano' ? 'daño' : ETIQ[c];
+  // Cómo se nombra en una lista («Daño de Warrior · Hachero (14)»).
+  const etqLista = (d, c) => c === 'critico' ? 'D20 del crítico' : c === 'dano' ? 'Daño' : etqCampo(d, c);
+  /* 😈 ENYETAR C (2026-11-27, dueño: «puede que la persona quiera rerolear no necesariamente la tirada de probabilidad de golpe, sino la tirada de daño…
+     del último duelo tenés estas tiradas, ¿cuál querés enyetar?»): TODAS las tiradas de cada lado, también el daño y los d20 del crítico.
+     · `tiroDe(m, campo)` → {total, formula, rolls, mod} de esa tirada (el daño: el total con lo de este objetivo; los d20 del crítico: el mejor);
+     · `tiradasDeLado(m, lado)` → los campos con tirada de ese lado (el atacante: PdG, Fuerza, d20 del crítico, daño; el defensor: Evasión, Bloqueo);
+     · `puedeCambiar(m, campo, tipo)` → esa tirada todavía se puede cambiar sin deshacer nada (el daño: tirado y sin aplicar; los d20: sin daño aplicado);
+     · `repetirTotal(t0, rolls, campo)` → el total de los dados nuevos con las MISMAS reglas que la tirada de antes: el «÷2» de un estado (para abajo,
+       mínimo 1, antes de lo que se sumó después: la Polilla, el Empower), la Evasión que nunca baja de 1 y el daño que no baja de 0. */
+  const CAMPOS_LADO = {atacante: ['pdg', 'fuerza', 'critico', 'dano'], defensor: ['eva', 'bloqueo']};
+  const tieneDados = f => /\d*d\d+/.test(String(f || ''));
+  function tiroDe(m, campo){
+    if(!m) return null;
+    if(campo === 'critico'){
+      const c = m.crit;
+      return c && c.critico && Array.isArray(c.d20) && c.d20.length ? {total: _num(c.mejor), formula: `${c.d20.length}d20${c.marca ? ' ' + c.marca : ''}`, rolls: c.d20.map(_num), mod: 0} : null;
+    }
+    if(campo === 'dano'){
+      const dn = m.dano;
+      if(!dn || dn.cuenta === true || dn.compartido || (m.hab && m.hab.soloTirada) || !tieneDados((dn.tiroBase && dn.tiroBase.formula) || dn.formula)) return null;
+      return {total: _num(dn.crudo), formula: String(dn.formula || ''), rolls: (dn.rolls || []).map(_num), mod: _num(dn.mod)};
+    }
+    const t = m[campo];
+    return t && (campo === 'pdg' || campo === 'eva' || campo === 'fuerza' || campo === 'bloqueo') ? t : null;
+  }
+  const tiradasDeLado = (m, lado) => (CAMPOS_LADO[lado] || []).filter(c => !!tiroDe(m, c));
+  function repetirTotal(t0, rolls, campo){
+    const f = String((t0 && t0.formula) || ''), mit = (f.match(/÷2/g) || []).length;
+    const suma = (rolls || []).reduce((a, b) => a + _num(b), 0);
+    let t = suma + _num(t0 && t0.mod);
+    if(mit){
+      const post = [...f.slice(f.lastIndexOf('÷2')).matchAll(/\+(\d+)\s*(?:🦋|💪)/gu)].reduce((a, x) => a + _num(x[1]), 0);
+      t -= post;
+      for(let i = 0; i < mit; i++) t = Math.max(1, Math.floor(t / 2));
+      t += post;
+    }
+    if(campo === 'eva') return Math.max(1, t);
+    if(campo === 'dano') return Math.max(0, t);
+    return t;
+  }
+  function puedeCambiar(m, campo, tipo){
+    if(campo === 'pdg' || campo === 'eva' || campo === 'fuerza' || campo === 'bloqueo') return puedeReabrir({...(m || {}), rerollUsado: null}, campo, tipo);
+    if(!m || m.estado === 'cancelado' || !tiroDe(m, campo) || (enYeta(m) && yetaTipo(m) !== tipo)) return false;
+    if((m.efectos || []).some(e => e && (e.res || e.aplicado || e.aplicar))) return false;
+    const dn = m.dano;
+    return !dn || (!dn.aplicado && !tomado(dn));
+  }
+  // ↩ Al deshacer el daño o los d20 del crítico: el daño vuelve a como lo dejó quien lo tiró (sin lo que anotó al aplicarse) y los efectos, sin tirar.
+  const DANO_BASE = ['crudo', 'formula', 'rolls', 'mod', 'tiroBase', 'drenaPct', 'defensaManual', 'magico', 'salvaje', 'compartido'];
+  const MAGICO_BASE = ['tipo', 'total', 'formula', 'rolls', 'pend', 'mult', 'porDano', 'cadena', 'identidadTurnos', 'luzSanadora'];
+  function danoBase(dn){
+    const o = {};
+    DANO_BASE.forEach(k => { if(dn && dn[k] !== undefined) o[k] = dn[k]; });
+    if(o.magico){ const mg = {}; MAGICO_BASE.forEach(k => { if(o.magico[k] !== undefined) mg[k] = o.magico[k]; }); o.magico = mg; }
+    return {...o, reclamado: LIBRE, aplicado: false};
+  }
+  function efectosReset(efs){
+    if(!Array.isArray(efs)) return efs || null;
+    return efs.map(e => {
+      if(!e) return e;
+      const {res, aplicado, aplicar, nota, sinEfecto, ...r} = e;
+      if(r.omitido && /no hizo daño|Invulnerable/.test(String(r.motivo || ''))){ delete r.omitido; delete r.motivo; }
+      return r;
+    });
+  }
+  // El daño tirado vuelve a esperar a que lo acepten y lo apliquen (lo que se cambia antes de aplicarlo: la tirada nueva de daño o de los d20).
+  function danoSinAceptar(dn){ if(!dn) return dn; const {aceptado, aMano, ...r} = dn; return {...r, reclamado: LIBRE}; }
   async function reabrir(id, campo, con){   // `con`: 'wildcard' | 'moneda' (lo que dice la Mesa; 2026-10-20: con la carta decía «Moneda»)
     const ref = col().doc(id);
     let ok = false, anuncio = '';
@@ -2541,18 +2608,19 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
+      const quien = campoDeLado(campo) === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
+      // ↩ Enyetar C (P366 2): la moneda sobre el último duelo terminado. Acá solo queda anotado que se usó (la página cobra la moneda o la carta);
+      // la pantalla del GM deshace lo que dejó el duelo y lo vuelve a esa tirada (`reabrirDeshecho`), que se vuelve a tirar (vale la segunda).
+      if(monedaDeshace(m, campo)){
+        tx.update(ref, {'ataque.yeta.listo': true, 'ataque.yeta.con': con === 'wildcard' ? 'wildcard' : 'moneda'});
+        ok = true;
+        anuncio = `${con === 'wildcard' ? '🃏' : '🪙'} ${quien} usó ${con === 'wildcard' ? 'una wildcard' : 'una Moneda Re-Roll'} sobre su ${etqCampo(m, campo)} del duelo que ya terminó: se deshace lo que dejó y la vuelve a tirar`;
+        return;
+      }
       if(!puedeReabrir(m, campo, 'moneda')) return;
       const conPausa = enYeta(m);   // ⏸ la pausa de la fila (A2): la moneda la levanta al usarse
       m.rerollUsado = {...(m.rerollUsado || {}), [campo]: true};
-      const quien = (campo === 'pdg' || campo === 'fuerza' || campo === 'critico') ? m.atacante.nombre : m.defensor.nombre;
-      if(campo === 'critico'){ m.crit = {...m.crit, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
-      else if(campo === 'fuerza' || campo === 'bloqueo'){ m[campo] = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
-      else{
-        m[campo] = null; if(campo === 'eva') m.defensa = null;
-        m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto';
-        if(m.hab) m.efectos = null;
-      }
-      m.estado = 'esperando';
+      limpiarParaReabrir(m, campo);
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
       if(conPausa) Object.assign(upd, yetaFin(m, 'gano', {motivo: con === 'wildcard' ? 'usó una wildcard' : 'usó una Moneda Re-Roll'}));
@@ -2563,6 +2631,63 @@ const Duelo = (() => {
     if(ok) anunciarMesa(anuncio, id);
     return ok;
   }
+  // Borra esa tirada para que quien la hizo la vuelva a tirar con su botón (la Moneda Re-Roll, la WildCard).
+  function limpiarParaReabrir(m, campo){
+    if(campo === 'dano'){ m.dano = null; m.efectos = null; m.fase = 'dano'; }
+    else if(campo === 'critico'){ const {supercritico, marca, ...c} = m.crit || {}; m.crit = {...c, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
+    else if(campo === 'fuerza' || campo === 'bloqueo'){ m[campo] = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+    else{
+      m[campo] = null; if(campo === 'eva') m.defensa = null;
+      m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto';
+      if(m.hab) m.efectos = null;
+    }
+    m.estado = 'esperando';
+  }
+  // ↩ ¿Este duelo terminado espera la moneda (o la carta) de quien hizo esa tirada, para deshacerse? (la pausa ya puesta, sin usar todavía)
+  const monedaDeshace = (m, campo) => !!(m && m.estado === 'resuelto' && enYeta(m) && yetaTipo(m) === 'moneda' && m.ataque.yeta.deshacer && m.ataque.yeta.campo === campo && !m.ataque.yeta.listo);
+  /* ↩ La moneda o la carta sobre el último duelo terminado, ya cobradas: lo que dejó el duelo ya lo devolvió la pantalla del GM (js/138); acá el duelo
+     vuelve a esa tirada, que se borra para volver a tirarla con el botón de siempre (vale la segunda). → {campo, etq, antes} o null. */
+  async function reabrirDeshecho(id, campo){
+    const ref = col().doc(id);
+    let res = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      res = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()}, y = m.ataque && m.ataque.yeta;
+      if(!enYeta(m) || yetaTipo(m) !== 'moneda' || !y.deshacer || y.campo !== campo || m.estado !== 'resuelto') return;
+      const t0 = tiroDe(m, campo) || {}, etq = etqCampo(m, campo);
+      if(campo !== 'dano' && campo !== 'critico') deshacerLimpiar(m, campo);
+      else{ m.dano = null; m.efectos = null; }
+      m.rerollUsado = {...(m.rerollUsado || {}), [campo]: true};
+      m.resumido = false;
+      limpiarParaReabrir(m, campo);
+      const upd = cambiosDe(m);
+      Object.assign(upd, yetaFin(m, 'gano', {motivo: y.con === 'wildcard' ? 'usó una wildcard' : 'usó una Moneda Re-Roll'}));
+      Object.assign(upd, {'ataque.previo': firebase.firestore.FieldValue.delete(), 'ataque.deshechos': firebase.firestore.FieldValue.arrayUnion({por: txtCorto(y.porNombre, 40),
+        campo, modo: y.deshacer.modo === 'mano' ? 'mano' : 'auto', antes: _num(t0.total), cuando: Date.now()})});
+      tx.update(ref, upd);
+      res = {campo, etq, antes: _num(t0.total)};
+      anuncio = `${y.con === 'wildcard' ? '🃏' : '🪙'} ${campoDeLado(campo) === 'atacante' ? m.atacante.nombre : m.defensor.nombre} vuelve a tirar su ${etq} (era ${_fmt(_num(t0.total))}): vale la segunda`;
+    });
+    if(anuncio) anunciarMesa(anuncio, id);
+    return res;
+  }
+  // ↩ La pantalla del GM toma una pausa lista para deshacer (el Golpe de suerte ya pagado, la moneda ya usada): una sola pantalla. → true si es suya.
+  async function yetaReclamar(id){
+    const ref = col().doc(id);
+    let mio = false;
+    await fbDb.runTransaction(async tx => {
+      mio = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = doc.data();
+      if(!enYeta(m) || !m.ataque.yeta.deshacer || m.ataque.yeta.listo !== true) return;
+      tx.update(ref, {'ataque.yeta.listo': String(yo() || 'gm')});
+      mio = true;
+    });
+    return mio;
+  }
   /* 🦋 Polilla mística dentro del duelo (dueño, 2026-10-08: «yo saco 7, el rival 8, perdí; uso la polilla: 9 contra 8, se tiene que revertir el
      resultado»): le suma +n a la última tirada que hizo ese lado (la Fuerza del golpe o el Bloqueo si ya se llegó ahí; si no, el PdG o la defensa)
      y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
@@ -2571,6 +2696,12 @@ const Duelo = (() => {
   // Con una tirada cambiada (Polilla, Empower, Enyetar), el paso vuelve a resolverse desde ahí.
   // ↩ Parte B: lo que vino después de esa tirada se borra (el duelo ya terminado vuelve a esa tirada).
   function deshacerLimpiar(m, campo){
+    if(campo === 'dano' || campo === 'critico'){   // (Enyetar C) el contacto queda; el daño, sin aplicar; los efectos, sin tirar
+      if(m.dano) m.dano = danoBase(m.dano);
+      m.efectos = efectosReset(m.efectos);
+      m.fase = 'dano'; m.estado = 'esperando'; m.resumido = false;
+      return;
+    }
     m.dano = null; m.crit = null; m.efectos = null; m.resultado = null;
     if(campo === 'pdg' || campo === 'eva'){ m.fuerza = null; m.bloqueo = null; m.bloq = null; }
     m.resumido = false;
@@ -2630,9 +2761,16 @@ const Duelo = (() => {
       // crítico); el Empower no cambia una tirada hecha: es para la que sigue (sin campo).
       let etq = '';
       if(tipo === 'empower') etq = 'su próxima tirada';
+      else if(y.deshacer){   // ↩ parte B: el último duelo terminado; si la maldición gana (o al usar el Golpe de suerte o la moneda: Enyetar C), se deshace lo que dejó y se vuelve a resolver
+        const t = y.campo && tiroDe(m, y.campo), marca = tipo === 'reroll' ? '🍀' : tipo === 'enyetar' ? '🐈' : '';
+        if(!['enyetar', 'reroll', 'moneda'].includes(tipo) || m.estado !== 'resuelto' || !t || campoDeLado(y.campo) !== y.lado || (marca && String(t.formula || '').includes(marca))) return;
+        if(tipo === 'moneda' && m.rerollUsado && m.rerollUsado[y.campo]) return;   // una moneda por tirada
+        etq = etqCampo(m, y.campo);
+      }
       else if(tipo === 'moneda'){ if(!y.campo || !puedeReabrir(m, y.campo)) return; etq = etqCampo(m, y.campo); }
-      else if(y.deshacer){   // ↩ parte B: el último duelo terminado; si la maldición gana, se deshace lo que dejó y se vuelve a resolver
-        if(tipo !== 'enyetar' || m.estado !== 'resuelto' || !y.campo || campoDeLado(y.campo) !== y.lado || !m[y.campo] || String(m[y.campo].formula || '').includes('🐈')) return;
+      else if((tipo === 'enyetar' || tipo === 'reroll') && y.campo){   // 😈 Enyetar C: la tirada elegida, cualquiera que todavía se pueda cambiar (también el daño y los d20)
+        const t = tiroDe(m, y.campo);
+        if(!t || campoDeLado(y.campo) !== y.lado || !puedeCambiar(m, y.campo) || !parListo(m, y.campo) || String(t.formula || '').includes(tipo === 'reroll' ? '🍀' : '🐈')) return;
         etq = etqCampo(m, y.campo);
       }
       else{
@@ -2644,7 +2782,12 @@ const Duelo = (() => {
         lado: y.lado || '', campo: y.campo || '', etq: txtCorto(etq, 40), uid: yo(), desde: firebase.firestore.FieldValue.serverTimestamp(),   // (la hora del servidor: se compara con la del duelo de la maldición)
         ...(y.deshacer ? {deshacer: {modo: y.deshacer.modo === 'mano' ? 'mano' : 'auto', mano: (y.deshacer.mano || []).slice(0, 14).map(t => txtCorto(t, 160))}} : {})}});
       ok = true;
-      if(y.deshacer){ anuncio = `${P.icono} ${y.porNombre || 'Alguien'} le echa la yeta a ${y.aNombre || 'su rival'} sobre el duelo que ya terminó (${etq}): si gana, se deshace lo que dejó ese duelo y se vuelve a resolver`; return; }
+      if(y.deshacer){
+        anuncio = tipo === 'reroll' ? `🧚 ${y.porNombre || 'Alguien'} le da un Golpe de suerte a ${y.aNombre || 'un aliado'} sobre el duelo que ya terminó (${etq}): se deshace lo que dejó ese duelo y se vuelve a resolver`
+          : tipo === 'moneda' ? `🪙 ${y.porNombre || 'Alguien'} usa un Re-roll (WC-Moneda) sobre su ${etq} del duelo que ya terminó: se deshace lo que dejó ese duelo y se vuelve a resolver`
+          : `${P.icono} ${y.porNombre || 'Alguien'} le echa la yeta a ${y.aNombre || 'su rival'} sobre el duelo que ya terminó (${etq}): si gana, se deshace lo que dejó ese duelo y se vuelve a resolver`;
+        return;
+      }
       anuncio = String(y.por) && String(y.por) === String(y.a) ? `${P.icono} ${y.porNombre || 'Alguien'} usa ${P.que} sobre su ${etq}: el duelo espera`   // (la Polilla o la moneda propias)
         : `${P.icono} ${y.porNombre || 'Alguien'} ${P.hace} ${y.aNombre || 'su rival'} (${etq}): el duelo espera`;
     });
@@ -2702,6 +2845,9 @@ const Duelo = (() => {
     // ⏸ Lo demás de la fila (A2): lo resuelve quien lo usa, en segundos; si en 60 s no pasó nada, el duelo sigue (con su aviso). El Mal de ojo, una vez
     // echado (`echado`: el jugador ya tiene su cartel para repetir la tirada), espera a que la repita (el GM y quien lo echó tienen «▶ Seguir»).
     if(tipo !== 'enyetar'){
+      // ↩ Enyetar C: el Golpe de suerte (pagado) o la moneda (usada) sobre el último duelo terminado → la pantalla del GM lo deshace.
+      if(y.deshacer && y.listo === true) return {accion: 'deshacer'};
+      if(y.deshacer && y.listo) return {accion: 'esperar'};   // (ya lo tomó una pantalla del GM)
       if(tipo === 'maldeojo' && y.echado) return {accion: 'esperar'};
       if(ahora - msDe(y.desde) > YETA_SIN_DUELO_MS) return {accion: 'seguir', resultado: 'tiempo', motivo: `no se llegó a usar ${PAUSA_TIPOS[tipo].que} en 60 s`};
       return {accion: 'esperar'};
@@ -2729,6 +2875,12 @@ const Duelo = (() => {
       const k = d.id + ':' + msDe(d.ataque.yeta.desde);   // cada pausa es otra (un mismo duelo puede tener varias, de a una)
       const r = yetaQueHacer(d, todosDuelos, yetaVistos.has(k), ahora);
       if(r.visto) yetaVistos.add(k);
+      if(r.accion === 'deshacer'){   // ↩ (Enyetar C) lo hace el mapa del GM (js/138): devuelve lo que dejó el duelo y lo vuelve a esa tirada
+        yetaLiberando.add(d.id);
+        Promise.resolve(typeof cfgEscuchar.deshacerPausa === 'function' ? cfgEscuchar.deshacerPausa(d) : yetaSeguir(d.id, 'esta pantalla no sabe deshacer el duelo'))
+          .catch(err => console.error('Deshacer: no se pudo', err)).finally(() => setTimeout(() => yetaLiberando.delete(d.id), 3000));
+        return;
+      }
       let seguir = r.accion === 'seguir';
       if(r.accion === 'esperarAplicada'){   // la maldición ganó y su efecto ya no se va a aplicar solo (✋ a mano): unos segundos y sigue
         if(!yetaAplicadaDesde.has(k)) yetaAplicadaDesde.set(k, ahora);
@@ -2756,6 +2908,17 @@ const Duelo = (() => {
         if(!p || !p.tokenId || (o.esRival && !o.esRival(p.tokenId)) || (o.alcanza && !o.alcanza(p.tokenId))) return;
         const otro = x[lado === 'atacante' ? 'defensor' : 'atacante'] || {};
         const base = {tokenId: p.tokenId, nombre: p.nombre || (o.nombreDe ? o.nombreDe(p.tokenId) : '') || '?', contra: otro.nombre || 'el otro', dueloId: x.id, lado, ref: p.ref || '', hab: x.hab ? (x.hab.nombre || 'una habilidad') : '', terminado: x.estado === 'resuelto'};
+        if(o.todas){   // 😈 Enyetar C: todas las tiradas de ese lado (las que todavía se pueden cambiar y, del último duelo terminado, todas)
+          const marca = o.marca || '🐈', esUlt = !!(ult && x.id === ult.id && x.estado === 'resuelto');
+          tiradasDeLado(x, lado).forEach(c => {
+            const t = tiroDe(x, c);
+            if(String(t.formula || '').includes(marca) || (o.sinUsadas && x.rerollUsado && x.rerollUsado[c])) return;
+            const cambia = puedeCambiar(x, c) && parListo(x, c) && !(esUlt && o.soloDeshacer);   // (la moneda del último duelo: siempre deshaciendo)
+            if(!cambia && !esUlt) return;
+            lista.push({...base, campo: c, etq: etqLista(x, c), total: _num(t.total), rolls: t.rolls || [], ...(cambia ? {} : {cerrado: true})});
+          });
+          return;
+        }
         const s = tiradaSumable(x, lado);
         if(s){ if(!s.enyetada) lista.push({...base, campo: s.campo, etq: s.etq, total: s.total, rolls: (x[s.campo] && x[s.campo].rolls) || []}); return; }
         if(!ult || x.id !== ult.id || x.estado !== 'resuelto') return;
@@ -2902,30 +3065,60 @@ const Duelo = (() => {
       const tipoP = o.yeta && enYeta(m) && yetaTipo(m) === (o.tipo || 'enyetar') ? yetaTipo(m) : undefined;   // la pausa que la tirada repetida levanta (Enyetar, Mal de ojo, Re-roll): solo la suya
       // ↩ Parte B: la yeta sobre el último duelo terminado. Lo que dejó ya lo devolvió la pantalla del GM (js/138): acá se borra lo que vino después de
       // esa tirada (el daño, el crítico, los efectos, el Bloqueo si es sobre el contacto) y el duelo se vuelve a resolver desde ahí.
-      const desh = tipoP === 'enyetar' && m.estado === 'resuelto' && m.ataque && m.ataque.yeta && m.ataque.yeta.deshacer ? m.ataque.yeta.deshacer : null;
+      // ↩ Enyetar C: también el Golpe de suerte sobre el último duelo terminado (la misma pausa con `deshacer`, tipo 'reroll').
+      const desh = tipoP && m.estado === 'resuelto' && m.ataque && m.ataque.yeta && m.ataque.yeta.deshacer ? m.ataque.yeta.deshacer : null;
       if(o.deshacer && !desh) return;
       if(desh) deshacerLimpiar(m, o.campo);
-      const campo = o.campo ? (campoDeLado(o.campo) === lado && m[o.campo] && puedeReabrir({...m, rerollUsado: null}, o.campo, tipoP) ? o.campo : null) : campoPolilla(m, lado, tipoP);
+      // (con la pausa de deshacer, la tirada ya se validó al ponerla: lo de después se acaba de borrar)
+      const campo = o.campo ? (campoDeLado(o.campo) === lado && tiroDe(m, o.campo) && (desh || puedeCambiar(m, o.campo, tipoP)) ? o.campo : null) : campoPolilla(m, lado, tipoP);
       if(!campo) return;
-      const t0 = m[campo] || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
+      const t0 = tiroDe(m, campo) || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
       if(String(t0.formula || '').includes(marca)) return;
+      const tb = campo === 'dano' ? (m.dano.tiroBase || {total: m.dano.crudo, formula: m.dano.formula, rolls: m.dano.rolls, mod: m.dano.mod}) : t0;   // el daño: lo que se tiró, sin lo de este objetivo
       if(!tiro){   // se tira una sola vez aunque la transacción se repita
-        const dados = String(t0.formula || '').match(/\d*d\d+/g) || [], rolls = [];
+        const dados = campo === 'critico' ? [`${t0.rolls.length}d20`] : String(tb.formula || '').match(/\d*d\d+/g) || [], rolls = [];
         dados.forEach(dd => { const [c, f] = dd.split('d'); for(let i = 0; i < Math.min(20, Math.max(1, _num(c) || 1)); i++) rolls.push(1 + Math.floor(Math.random() * Math.max(1, _num(f)))); });
-        tiro = {rolls, dados: dados.join('+'), total: rolls.reduce((a, b) => a + b, 0) + _num(t0.mod)};
+        tiro = {rolls, dados: dados.join('+')};
       }
-      const queda = mejor ? tiro.total > _num(t0.total) : tiro.total < _num(t0.total);
-      m[campo] = {...t0, ...(queda ? {total: tiro.total, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} ${marca}`.slice(0, 60)};
-      reabrirPaso(m, campo);
-      anuncio = avanzar(m) || '';
+      let nueva, queda, ahora;
+      if(campo === 'critico'){
+        // 💥 los d20 del crítico: el multiplicador sale de los nuevos (Critico.resultadoD20, con el Crítico potente y el supercrítico); queda el peor (o el mejor).
+        const c0 = m.crit, r = typeof Critico !== 'undefined' && Critico.resultadoD20 ? Critico.resultadoD20(tiro.rolls, c0.potente) : {mejor: Math.max(...tiro.rolls), mult: _num(c0.mult)};
+        nueva = _num(r.mejor);
+        const dm = _num(r.mult) - _num(c0.mult), dd = nueva - _num(c0.mejor);
+        queda = mejor ? (dm > 0 || (dm === 0 && dd > 0)) : (dm < 0 || (dm === 0 && dd < 0));
+        const {supercritico, ...c1} = c0;
+        m.crit = queda ? {...c1, d20: tiro.rolls, mejor: nueva, mult: _num(r.mult), ...(r.supercritico ? {supercritico: r.veintes} : {}), marca: `${c0.marca || ''}${marca}`}
+          : {...c0, marca: `${c0.marca || ''}${marca}`};
+        ahora = _num(m.crit.mejor);
+        if(m.dano && !desh) m.dano = danoSinAceptar(m.dano);   // el daño ya tirado se vuelve a aceptar con el multiplicador nuevo
+        m.fase = 'dano'; m.estado = 'esperando';
+      }else if(campo === 'dano'){
+        // 🎲 el daño: los mismos dados, con lo mismo que se le sumó (la espalda, la presa, el estandarte…); no baja de 0.
+        const base = repetirTotal(tb, tiro.rolls, 'dano'), extra = _num(m.dano.crudo) - _num(tb.total);
+        nueva = Math.max(0, base + extra);
+        queda = mejor ? nueva > _num(t0.total) : nueva < _num(t0.total);
+        const dn = desh ? m.dano : danoSinAceptar(m.dano), nb = (tb.rolls || []).length;
+        m.dano = {...dn, ...(queda ? {crudo: nueva, rolls: [...tiro.rolls, ...(dn.rolls || []).slice(nb)].slice(0, 20).map(_num), tiroBase: {...tb, total: base, rolls: tiro.rolls}} : {}),
+          formula: `${dn.formula || ''} ${marca}`.slice(0, 60)};
+        ahora = _num(m.dano.crudo);
+        m.fase = 'dano'; m.estado = 'esperando';
+      }else{
+        nueva = repetirTotal(t0, tiro.rolls, campo);   // (el «÷2» y la Evasión mínima 1, como la tirada de antes)
+        queda = mejor ? nueva > _num(t0.total) : nueva < _num(t0.total);
+        m[campo] = {...t0, ...(queda ? {total: nueva, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} ${marca}`.slice(0, 60)};
+        ahora = _num(m[campo].total);
+        reabrirPaso(m, campo);
+        anuncio = avanzar(m) || '';
+      }
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;
-      if(tipoP) Object.assign(upd, yetaFin(m, 'gano', {antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, hijo: o.hijo}));
+      if(tipoP) Object.assign(upd, yetaFin(m, 'gano', {antes: _num(t0.total), nueva, ahora, hijo: o.hijo}));
       if(desh) Object.assign(upd, {'ataque.previo': firebase.firestore.FieldValue.delete(), 'ataque.deshechos': firebase.firestore.FieldValue.arrayUnion({por: txtCorto(m.ataque.yeta.porNombre, 40),
-        campo, modo: desh.modo === 'mano' ? 'mano' : 'auto', antes: _num(t0.total), ahora: m[campo].total, cuando: Date.now()})});
+        campo, modo: desh.modo === 'mano' ? 'mano' : 'auto', antes: _num(t0.total), ahora, cuando: Date.now()})});
       tx.update(ref, upd);
-      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
-        dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(t0.rolls) ? t0.rolls : []).map(_num), mod: _num(t0.mod), nuevaQueda: queda};
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva, ahora, contra: otro && m[otro] ? _num(m[otro].total) : null,
+        dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(tb.rolls) ? tb.rolls : []).map(_num), mod: _num(tb.mod), nuevaQueda: queda};
     });
     if(anuncio) anunciarMesa(anuncio, id);
     return res;
@@ -2997,7 +3190,7 @@ const Duelo = (() => {
      «⚡ Tenés algo para usar acá». Con el duelo en pausa no hay fila: la tirada está congelada (A3). */
   const filaAbierta = new Set();
   // ¿Ya está la tirada de los dos en ese par? (los d20 del crítico: ya se tiraron)
-  const parListo = (d, campo) => campo === 'critico' ? !!(d.crit && d.crit.d20) : (campo === 'pdg' || campo === 'eva') ? !!(d.pdg && d.eva) : !!(d.fuerza && d.bloqueo);
+  const parListo = (d, campo) => campo === 'dano' ? !!d.dano : campo === 'critico' ? !!(d.crit && d.crit.d20) : (campo === 'pdg' || campo === 'eva') ? !!(d.pdg && d.eva) : !!(d.fuerza && d.bloqueo);
   function filaMoneda(d){
     const lado = ladoMio(d);
     if(!lado) return null;
@@ -3013,17 +3206,53 @@ const Duelo = (() => {
     return {clave: 'moneda', icono: '🪙', txt: 'Re-roll (WC-Moneda)', sub: `volver a tirar tu ${etq}${con.length > 1 ? ' · elegís cuál' : con[0] === 'wildcard' ? ` · 🃏 WildCard (te quedan ${w})` : ' · Moneda Re-Roll'}`,
       lado, campo, con, w, donde: info.donde || ''};
   }
+  // ↩ Enyetar C (P366 2): en el último duelo terminado, la moneda o la carta sobre cualquier tirada propia (se deshace lo que dejó y se vuelve a tirar).
+  function filaMonedaDeshacer(d){
+    const lado = ladoMio(d);
+    if(!lado) return [];
+    const k = d.id + ':' + lado;
+    if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return []; }
+    const info = rerollInfo[k];
+    if(!info.disponible) return [];
+    const conMoneda = info.moneda !== false, w = Math.max(0, Math.round(_num(info.wildcards)));
+    if(!conMoneda && !w) return [];
+    const con = [...(w ? ['wildcard'] : []), ...(conMoneda ? ['moneda'] : [])];
+    return tiradasDeLado(d, lado).filter(c => !(d.rerollUsado && d.rerollUsado[c])).map(c => ({clave: 'moneda', cerrado: true, icono: '↩', txt: 'Re-roll (WC-Moneda) y deshacer',
+      sub: `tu ${etqCampo(d, c)} (${_fmt(_num(tiroDe(d, c).total))}) · ${con.length > 1 ? 'elegís con qué' : con[0] === 'wildcard' ? `🃏 WildCard (te quedan ${w})` : 'Moneda Re-Roll'}`,
+      titulo: 'El duelo ya terminó: se deshace lo que dejó y volvés a tirar esa tirada (vale la segunda). Antes te muestra qué se deshace.',
+      lado, campo: c, etq: etqCampo(d, c), total: _num(tiroDe(d, c).total), con, w, donde: info.donde || '', tokenId: (d[lado] || {}).tokenId, nombre: (d[lado] || {}).nombre}));
+  }
+  /* ↩ La moneda o la carta sobre el último duelo terminado, ya confirmada (js/138 mostró qué se deshace): con las dos, pregunta con cuál; pone la pausa
+     con `deshacer` y le pide a la página del personaje que la use (cobra la moneda o la carta y avisa: `reabrir`). La pantalla del GM hace el resto. */
+  async function monedaDeshacer(d, o){
+    let con = (o.con || [])[0] || 'moneda';
+    if((o.con || []).length > 1 && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      con = await Confirmar.elegir(`¿Con qué volvés a tirar tu ${etqCampo(d, o.campo)}?`, {titulo: 'Re-roll (WC-Moneda)', icono: '🪙', no: 'Cancelar', opciones: [
+        {valor: 'wildcard', texto: '🃏 WildCard', detalle: `se gasta siempre · te quedan ${_fmt(o.w)}`},
+        {valor: 'moneda', texto: '🪙 Moneda Re-Roll', detalle: `${o.donde ? `en ${o.donde} · ` : ''}después se tira la moneda: par se conserva, impar se rompe`}]});
+      if(!con) return false;
+    }
+    const l = d[o.lado] || {};
+    const ok = await yetaPausar(d.id, {tipo: 'moneda', lado: o.lado, campo: o.campo, por: l.tokenId, porNombre: l.nombre, a: l.tokenId, aNombre: l.nombre, deshacer: {modo: o.modo, mano: o.mano || []}});
+    if(!ok){ _toast('Esa tirada ya no se puede repetir'); return false; }
+    enviar(l, {tipo: 'duelo-reroll', id: d.id, campo: o.campo, con});
+    delete rerollInfo[d.id + ':' + o.lado]; rerollPedidas.delete(d.id + ':' + o.lado);
+    setTimeout(() => { const x = todosDuelos.find(z => z.id === d.id); if(x && enYeta(x) && yetaTipo(x) === 'moneda' && !x.ataque.yeta.listo && x.ataque.yeta.uid === yo()) yetaSeguir(d.id, 'no se llegó a usar el Re-roll').catch(() => {}); }, 20000);
+    return true;
+  }
   // ↩ El último duelo terminado de los que ve esta pantalla (parte B): su fila ofrece Enyetar (deshacer y volver a resolver).
   const ultimoTerminadoAhora = () => ((ultimoTerminado(todosDuelos.length ? todosDuelos : listaDuelos) || {}).id || '');
   function filaOpciones(d){
     if(!d || d.estado === 'cancelado' || enYeta(d)) return [];
-    const cerrado = !!d.dano || (d.efectos || []).some(e => e && (e.aplicado || e.res));
-    if(cerrado && !(d.estado === 'resuelto' && ultimoTerminadoAhora() === d.id)) return [];
+    // (Enyetar C) un daño tirado y todavía sin aplicar se puede enyetar: lo que cierra la fila es el daño aplicado (o tomado) y los efectos tirados.
+    const cerrado = !!(d.dano && (d.dano.aplicado || tomado(d.dano))) || (d.efectos || []).some(e => e && (e.aplicado || e.res));
+    const ultimo = d.estado === 'resuelto' && ultimoTerminadoAhora() === d.id;
+    if(cerrado && !ultimo) return [];
     let ops = [];
     try{ ops = (cfgEscuchar.opcionesFila ? cfgEscuchar.opcionesFila(d) : []) || []; }catch(err){ console.error('Duelo: las opciones de la fila', err); ops = []; }
-    if(cerrado) return ops.filter(o => o && o.clave === 'enyetar');
-    const mon = filaMoneda(d);
-    return mon ? [...ops, mon] : ops;
+    if(cerrado) ops = ops.filter(o => o && (o.clave === 'enyetar' || (o.clave === 'reroll' && o.cerrado)));   // ↩ el último duelo terminado: Enyetar, el Golpe de suerte y la moneda
+    const mon = cerrado ? (ultimo ? filaMonedaDeshacer(d) : []) : [filaMoneda(d)].filter(Boolean);
+    return [...ops, ...mon];
   }
   const esPropio = d => esMio(d.atacante) || esMio(d.defensor) || (soyGM() && ((d.atacante && d.atacante.tipo === 'creep') || (d.defensor && d.defensor.tipo === 'creep')));
   function filaHtml(d, ops){
@@ -3482,6 +3711,12 @@ const Duelo = (() => {
       chico = `Sobre su ${etq}, que queda congelada hasta que se resuelva. Primero la maldición: PdG.Esp de ${quien} contra Res.Esp de ${aQuien}. Si gana, ${aQuien} repite su ${etq} y se queda con la peor; si no, el duelo sigue como estaba.`;
       sub = yetaSubHtml(d, y);
     }
+    else if((tipo === 'reroll' || tipo === 'moneda') && y.deshacer){   // ↩ Enyetar C: el Golpe de suerte o la moneda sobre el último duelo terminado
+      const a = y.deshacer.modo === 'mano' ? ' (a mano: no se toca la vida ni los estados)' : ' (la vida, los estados…)';
+      chico = tipo === 'reroll'
+        ? `Sobre la ${etq} de ${aQuien}, en este duelo que ya terminó. ${y.listo ? 'Ya se pagó: se' : `Cuando ${quien} lo pague, se`} deshace lo que dejó este duelo${a}, ${aQuien} repite su ${etq} y se queda con la mejor; después se vuelve a resolver.`
+        : `Sobre su ${etq}, en este duelo que ya terminó. ${y.listo ? 'Ya la usó: se' : 'Cuando la use, se'} deshace lo que dejó este duelo${a} y ${quien} vuelve a tirar su ${etq} (vale la segunda); después se vuelve a resolver.`;
+    }
     else if(tipo === 'maldeojo') chico = y.echado ? `${aQuien} tiene que volver a tirar su ${etq} y quedarse con la peor (le llegó el cartel). El duelo espera.` : `Sobre su ${etq}, que queda congelada. El duelo espera.`;
     else if(tipo === 'empower') chico = `+3 a ${aQuien} para su próxima tirada. El duelo espera a que se pague.`;
     else chico = `Sobre ${tipo === 'moneda' || tipo === 'polilla' ? 'su' : 'la'} ${etq}${tipo === 'moneda' || tipo === 'polilla' ? '' : ` de ${aQuien}`}. El duelo espera a que se resuelva.`;
@@ -3576,7 +3811,7 @@ const Duelo = (() => {
     if(h.resultado === 'perdio') return `${P.icono} ${a} resistió la maldición de ${quien}: su ${etq} quedó como estaba.`;
     if(h.resultado === 'gano'){
       if(h.tipo === 'empower') return `💪 ${quien} le dio Empower a ${a}: +3 a su próxima tirada.`;
-      if(h.tipo === 'moneda') return `🪙 ${quien} ${h.motivo || 'usó un Re-roll'}: vuelve a tirar su ${etq}.`;
+      if(h.tipo === 'moneda') return `🪙 ${quien} ${h.motivo || 'usó un Re-roll'}: vuelve a tirar su ${etq}.${h.deshacer ? ' ↩ Se deshizo lo que había dejado el duelo y se vuelve a resolver (en la Mesa, lo que quedó para revisar a mano).' : ''}`;
       const num = h.ahora !== undefined ? `: ${_fmt(h.antes)} → queda ${_fmt(h.ahora)}` : '';
       return h.tipo === 'polilla' ? `🦋 ${quien} usó la Polilla mística en su ${etq}${num}.` : `${P.icono} ${a} repitió su ${etq}${h.ahora !== undefined ? `: ${_fmt(h.antes)} y ${_fmt(h.nueva)} → queda ${_fmt(h.ahora)}` : ''}.${h.deshacer ? ' ↩ Se deshizo lo que había dejado el duelo y se vuelve a resolver (en la Mesa, lo que quedó para revisar a mano).' : ''}`;
     }
@@ -4332,7 +4567,7 @@ const Duelo = (() => {
       if(!o) return;
       f.querySelectorAll('[data-fila]').forEach(x => { x.disabled = true; });
       let ok = false;
-      try{ ok = o.clave === 'moneda' ? await filaUsarMoneda(d, o) : !!(cfgEscuchar.usarFila && await cfgEscuchar.usarFila(d, o)); }
+      try{ ok = o.clave === 'moneda' && !o.cerrado ? await filaUsarMoneda(d, o) : !!(cfgEscuchar.usarFila && await cfgEscuchar.usarFila(d, o)); }
       catch(err){ console.error('Duelo: la fila', err); _toast('No se pudo usar: ' + (err.message || err)); }
       if(!ok && actual && actual.dato) dibujar();
     });
@@ -4387,8 +4622,8 @@ const Duelo = (() => {
         return;
       }
       if(m.tipo === 'duelo-reroll'){   // usar la moneda: verifica, cobra, reabre la tirada y tira la moneda
-        const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
-        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo, 'moneda')){ _toast('Esa tirada ya no se puede repetir'); return; }
+        const lado = campoDeLado(m.campo) === 'atacante' ? d.atacante : d.defensor;
+        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !(puedeReabrir(d, m.campo, 'moneda') || monedaDeshace(d, m.campo))){ _toast('Esa tirada ya no se puede repetir'); return; }   // (↩ o sobre el último duelo terminado: Enyetar C)
         await h.rerollUsar(d, m.campo, m.con === 'wildcard' ? 'wildcard' : m.con === 'moneda' ? 'moneda' : undefined);
         return;
       }
@@ -5169,5 +5404,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, etqCampo, tiroDe, tiradasDeLado, puedeCambiar, repetirTotal, danoBase, efectosReset, reabrirDeshecho, yetaReclamar, monedaDeshacer, monedaDeshace, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

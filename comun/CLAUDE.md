@@ -2456,4 +2456,19 @@ versión parecida en más de una, es candidato a juntar.
   resumen) llevan la generación: un duelo deshecho se vuelve a aplicar. `filaOpciones` deja la fila en el último terminado (solo Enyetar);
   `yetaHtml`/`yetaAvisoTxt` lo dicen. **`mesa.js`**: una línea con `deshecha` se dibuja tachada con el motivo (regla nueva de `tiradas`: solo sumar
   `deshecha`, ≤ 200; hay que pegarla).
+- **😈 `duelo.js`, Enyetar C: cualquier tirada, y la Moneda / el Golpe de suerte que deshacen** (2026-11-27, dudas P368). Puras: `tiroDe(m, campo)`
+  ({total, formula, rolls, mod}; `'critico'` = los d20, `'dano'` = el daño con lo de este objetivo, sin la cuenta de proyectiles ni el compartido de un
+  área), `tiradasDeLado(m, lado)` (atacante: pdg, fuerza, critico, dano; defensor: eva, bloqueo), `puedeCambiar(m, campo, tipo)` (el daño: tirado y sin
+  aplicar ni tomado; los d20: sin daño aplicado), `repetirTotal(t0, rolls, campo)` (el «÷2» —antes de la Polilla/Empower—, la Evasión ≥ 1, el daño ≥ 0;
+  antes la repetición se los salteaba), `danoBase(dn)` (el daño sin lo que anotó la aplicación) y `efectosReset(efs)`, `etqCampo`. `tiradasEnyetables(…,
+  {todas, marca, soloDeshacer, sinUsadas})`: con `todas`, cada tirada que se puede cambiar y, del último terminado, todas (`cerrado`); sin `todas`, como
+  antes (el Mal de ojo). `enyetarTirada` acepta `campo` 'dano' (repite con los dados de `tiroBase` y conserva lo sumado) y 'critico' (`Critico.resultadoD20`;
+  `crit.marca`); en curso, el daño vuelve a pedir el «💔 Aplicar» (`danoSinAceptar`); con `deshacer` vale también para el Golpe de suerte (tipo 'reroll').
+  `deshacerLimpiar(m, 'dano'|'critico')` deja el contacto y el crítico, el daño sin aplicar y los efectos sin tirar. `yetaPausar` con `deshacer` acepta
+  'enyetar', 'reroll' y 'moneda'; sin deshacer, Enyetar y el Golpe de suerte usan `puedeCambiar`. **La moneda sobre el último duelo:** `filaMonedaDeshacer`
+  (la fila, «↩ Re-roll (WC-Moneda) y deshacer»), `monedaDeshacer(d, o)` (con cuál, la pausa, `duelo-reroll`), `reabrir` con `monedaDeshace` → solo
+  `ataque.yeta.listo` (la página cobra) y `reabrirDeshecho(id, campo)` (la pantalla del GM, después de devolver: borra esa tirada, `limpiarParaReabrir`).
+  **La pantalla del GM:** `yetaQueHacer` → 'deshacer' con `yeta.listo === true`; `yetaRevisarTodos` llama a `cfg.deshacerPausa(d)` (js/138), que toma la
+  pausa con `yetaReclamar`. `filaOpciones`: lo que cierra la fila es el daño aplicado (no el tirado).
+
 

@@ -392,7 +392,9 @@ $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }
   if(!rerollTieneMoneda()){ toast('🪙 No tenés una Moneda Re-Roll (hace falta una en el cinturón o la mochila) ni wildcards'); return; }
-  abrirRerollMapa(fid);   // el mapa (js/11, A6a)
+  // ↩ Enyetar C (P366 2): si estuvo en el último duelo terminado, primero sus tiradas de ese duelo (js/138); si no, la lista de siempre.
+  Promise.resolve(typeof monedaUltimoAbrir === 'function' ? monedaUltimoAbrir(fid) : false).catch(() => false)
+    .then(ya => { if(!ya) abrirRerollMapa(fid); });   // el mapa (js/11, A6a)
 };
 
 let verZonas = false;          // modo lentes prendido

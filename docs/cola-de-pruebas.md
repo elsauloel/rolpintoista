@@ -3476,6 +3476,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   no desaparece sino que queda apagado, y al tocarlo te ofrece reactivarlo»; (3) «si el GM selecciona un token de jugador, en el menú circular de los ⋯,
   ahí le debe aparecer la opción de sumarle una WC». **Recordatorio: preguntarle al dueño si las WC se acumulan** (tener más de una) antes de programar (3).
   Ver cómo se guarda hoy la WC / la Moneda Re-Roll (`comun/CLAUDE.md`, Re-roll) y el botón 🃏 del mapa.
+- **⬜ en cola — 💍 El anillo de impulso suma a la tirada del duelo, como la Polilla (P365 6, dueño 2026-11-27: «sí, sumar a la tirada»)**: hoy le suma
+  a la última línea de la Mesa; que sume a la tirada del duelo (reabriéndola como la Polilla) y que aparezca en la fila «⚡ Entre tiradas».
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

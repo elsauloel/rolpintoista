@@ -3168,6 +3168,8 @@ resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **
 > **(2b) cambió con la A2 (dueño, 2026-11-27):** «si alguien tira enyetar, rerroll, etc., el duelo se pausa hasta que se resuelva»: ahora todo lo de la
 > fila (Polilla, Re-roll, Moneda/WC, Mal de ojo, Empower) pone la misma pausa.
 
+> **Ajuste (dueño, 2026-11-27) al límite de la B:** «te tiene que poder permitir reabrir el último duelo concluido» — solo **el último duelo que terminó**, no cualquiera del turno.
+
 ### ✅ P364 — 😈 La pausa de Enyetar: cuánto espera y qué se puede hacer mientras (2026-11-27, Claude, al programar la parte A de P363)
 
 Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta que se resuelve la maldición. Lo que quedó así mientras tanto (se puede cambiar):
@@ -3184,7 +3186,7 @@ Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta q
 > se resuelve enyetar, y sobre esa misma tirada se puede aplicar otra cosa una vez resuelta». (3) Sí, la lista puede mostrar un duelo terminado si la
 > tirada todavía se puede cambiar.
 
-### P365 — ⚡ La fila entre tiradas: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar A2 y A3)
+### ✅ P365 — ⚡ La fila entre tiradas: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar A2 y A3)
 
 Lo que se programó y se puede cambiar:
 1. **Los botoncitos de arriba** (🐈‍⬛ 🧚 🧿 💪 🦋 🪙 🃏) se esconden mientras quien mira tiene un duelo abierto en pantalla; vuelven con el cuadro
@@ -3199,3 +3201,5 @@ Lo que se programó y se puede cambiar:
    jugador repita su tirada (sin límite; el GM y quien lo echó tienen «▶ Seguir sin el mal de ojo»). ¿Bien?
 6. **El anillo de impulso** no va a la fila: hoy le suma el bono a la última línea de la Mesa, no a la tirada del duelo. ¿Lo pasamos a la tirada del
    duelo, como la Polilla?
+
+> ✅ **Decidida (dueño, 2026-11-27):** 1–5 quedan como están; **6: sí**, el anillo de impulso suma a la tirada del duelo, como la Polilla (en la cola).

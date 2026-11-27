@@ -3353,7 +3353,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   están «📊 Stats», «🎒 Abrir la mochila» y «📜 Ver mi ficha completa»): «acá debería haber un botón para ver las habilidades». Sumar «⚡ Habilidades»
   que muestre las habilidades del personaje (y de la invocación / creep si aplica) con lo esencial de cada una (costo, enfriamiento, qué hace) y,
   si es el dueño, que deje usarlas igual que la Botonera. Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`.
-- **⬜ en cola — 🧹 Sacar de los textos que ve el jugador las notas de desarrollo «(fecha, dueño: …)»** (dueño, 2026-11-27: «hay muchas notas y
+- **⬜ en cola — 🧹 Descripciones sintéticas con el detalle aparte, y sin las notas de desarrollo «(fecha, dueño: …)»** (sumado 2026-11-27: el dueño
+  pide además descripciones bien sintéticas, con las minucias en un cuadro de detalle aparte; el Contraataque es el primero, hecho como modelo) (dueño, 2026-11-27: «hay muchas notas y
   aclaraciones tipo "fecha,dueño:" todo eso no debe llegar al jugador»). Revisar las descripciones visibles (`detalle`, `descripcion`, `efectoDetalle`,
   `original`…) de `comun/skills-clase.js`, `skills-creep-base.js`, `pasivas.js`, `estados-presets.js`, `catalogo.js`, `creeps-base.js`, `trampas-base.js`,
   `armas-naturales-base.js` y lo que se arme con textos en el código (carteles, «Ver detalle», el manual), y mover esas notas a un comentario o a `docs/`

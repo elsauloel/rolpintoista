@@ -65,6 +65,10 @@
 - **Los textos que ve el jugador no llevan notas de desarrollo** (dueño, 2026-11-27: «hay muchas notas y aclaraciones tipo "fecha, dueño:" todo eso no
   debe llegar al jugador»): la descripción de una habilidad, ítem, pasiva, estado, trampa o creep dice solo qué hace (con «⚙ Automatizado / ✋ A mano»);
   las fechas, las citas del dueño y el porqué de un cambio van a `docs/` (cola, preguntas) o a un comentario del código, nunca al texto visible.
+- **Descripciones sintéticas; las minucias, en un cuadro aparte** (dueño, 2026-11-27, sobre el Contraataque: «es muy reiterativo, se entiende con
+  menos… que todas las aclaraciones de las minucias vayan en un cuadro aparte, que sea el detalle, que la descripción de la habilidad sea bien
+  sintética y clara»): la descripción dice en una o dos frases qué hace y cuánto cuesta; las excepciones, los casos raros, lo que pasa con el Bloqueo,
+  el turno ajeno, lo automatizado, etc., van al **detalle** (cuadro aparte). Nada que hable de otra habilidad o pasiva («sin esta habilidad…»).
 
 - **La Percepción siempre incierta** (2026-11-11, dueño: «que no se sepa bien para qué estás tirando… no importa si es el máster o un jugador»):
   todo cartel que pide Percepción nombra solo a quien percibe con una frase incierta («Fulano siente un movimiento extraño…»,

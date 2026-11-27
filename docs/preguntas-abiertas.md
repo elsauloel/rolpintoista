@@ -2520,7 +2520,7 @@ zonas, las trampas, las habilidades sobre sí, GM Tools, los avisos a la ficha),
 
 **Mientras tanto (lo conservador):** la ventana ◎ muestra solo lo que ya existe; no se inventa el origen de los que no lo traen.
 
-### P315 — 🏷 ¿El asistente de personaje nuevo marca el rol de la clase que se eligió? (2026-11-24, Claude, al programar las etiquetas de las pasivas)
+### ✅ P315 — 🏷 ¿El asistente de personaje nuevo marca el rol de la clase que se eligió? (2026-11-24, Claude, al programar las etiquetas de las pasivas)
 
 En el asistente de personaje nuevo, la clase se elige en el primer paso (Warrior, Tanque, Asalto…), así que ahí sí se sabe el rol cuando se llega a
 «Pasivas». El pedido decía que en los personajes de los jugadores no se marque ningún rol (todavía no dicen su clase en la ficha), así que no se marca.
@@ -2530,7 +2530,10 @@ cuántas quedan afuera).
 
 **Mientras tanto (lo conservador):** el asistente abre las pasivas sin ningún rol marcado, como «+ Pasiva» en la ficha.
 
-### P316 — 🏷 Las pasivas subidas antes de las etiquetas nuevas, y el «✎ Etiquetas» del dueño (2026-11-24, Claude)
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el asistente de personaje nuevo abre las pasivas con el rol de la clase elegida ya marcado.
+
+
+### ✅ P316 — 🏷 Las pasivas subidas antes de las etiquetas nuevas, y el «✎ Etiquetas» del dueño (2026-11-24, Claude)
 
 Hoy hay una sola pasiva subida a la Biblioteca: la **corrección de Regeneración** (auditada), sin etiquetas. Como reemplaza a la de fábrica, en
 «+ Pasiva» se ve como «🏷 sin etiquetar» y aparece con cualquier filtro (nunca se esconde). Para que se filtre como las demás, hay que ponerle
@@ -2541,6 +2544,9 @@ que escribir las palabras a mano.
 
 **Mientras tanto (lo conservador):** las que no tienen ninguna etiqueta nueva se muestran siempre, marcadas «🏷 sin etiquetar»; una pasiva con
 etiquetas nuevas en una familia y ninguna en otra cuenta como «cualquiera» en la que le falta.
+
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el «✎ Etiquetas» de la Biblioteca usa los mismos botoncitos por familia que «Subir».
+
 
 ### ✅ P317 — 🧪 Los consumibles que sube el grupo no se ven en el catálogo abierto (2026-11-24, Claude)
 
@@ -3035,10 +3041,12 @@ El Escudo del sereno (solo contra lo físico) y el Escudo de la mañana (solo co
 > ✅ **Decidida (dueño, 2026-11-26, «como sugerís»):** está bien así: los escudos de los anillos no son Vida extra y quedan fuera del tope.
 
 
-### P358 — 🏷 ¿«✕ Limpiar filtros» de «+ Pasiva» también vuelve a tildar «sumar las de 🌐 Cualquiera»? (2026-11-26, Claude, probando las etiquetas)
+### ✅ P358 — 🏷 ¿«✕ Limpiar filtros» de «+ Pasiva» también vuelve a tildar «sumar las de 🌐 Cualquiera»? (2026-11-26, Claude, probando las etiquetas)
 
 En la ventana de «+ Pasiva» (y en el paso Pasivas del asistente de personaje nuevo), «✕ Limpiar filtros» desmarca los botoncitos de Rol, Estilo y
 Función, pero deja la casilla «sumar las de 🌐 Cualquiera» como estaba: si la habías destildado, sigue destildada, y el próximo rol que marques
 muestra solo las de ese rol (sin las que le sirven a cualquiera). No es un error (la casilla se ve), pero puede confundir. ¿«Limpiar» tiene que
 dejar todo como al abrir la ventana (la casilla tildada otra vez), o así está bien? Recomendación: que vuelva a tildarla (es un cambio de una línea en
 `FiltroPasivas.clic`, comun/pasivas.js).
+
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: «✕ Limpiar filtros» deja todo como al abrir (también vuelve a tildar «sumar las de Cualquiera»).

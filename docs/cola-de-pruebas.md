@@ -3331,6 +3331,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   el catálogo», el Tier («solo importa si lo publicás en el catálogo») y el botón dice «Crear y equipar», aunque un consumible propio no se equipa a
   un creep ni va al catálogo (P317): ahora pasa a 🤝 Dar a un jugador. Propuesta: con un consumible, esconder «Equipar a» y el Tier, y que el botón
   diga «Crear y dar a un jugador». Captura `cola134/13-GM-item-custom-consumible.png`.
+- **⬜ en cola — 🩸 Corregir «Transfusión sanguínea»: no deja pasar vida de una invocación aliada a un personaje aliado** (dueño, 2026-11-27:
+  «corregir tranfusion sanguinea: no permitió pasar hp de una invocación aliado a un pj aliado»). Reproducirlo con clics (una invocación aliada como
+  origen y un personaje aliado como destino), ver por qué no la ofrece o no la deja, y arreglarlo.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

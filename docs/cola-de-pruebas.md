@@ -3417,6 +3417,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de clase se ponen al día solas (`habClaseId`), pero una pasiva ya comprada y una habilidad de creep ya puesta en un creep guardado no: muestran la
   descripción de antes, sin el 📋 Detalle, hasta que se vuelvan a agregar. Ver si conviene ponerlas al día solas (por `poolId` / por nombre), como las
   de clase, respetando las editadas a mano.
+- **⬜ en cola — 🪤 Rearmar una trampa disparada (el ⚙ de la trampa hoy no hace nada)** (dueño, 2026-11-27, con captura de una trampa ya disparada
+  en el mapa, con su engranaje): «el engranaje no hace nada. Me gustaría poder rearmar una trampa. Al rearmarla se vuelve a ocultar. Lo puede hacer el GM
+  o el jugador propietario de la trampa». Que el ⚙ de una trampa disparada ofrezca «🔁 Rearmar»: vuelve a quedar armada y oculta (como al colocarla),
+  solo para el GM o el dueño de la trampa; revisar por qué hoy el ⚙ no responde.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -1,0 +1,491 @@
+diff --git a/comun/ficha-lite.js b/comun/ficha-lite.js
+index 70419da6..ef22df4e 100644
+--- a/comun/ficha-lite.js
++++ b/comun/ficha-lite.js
+@@ -1,11 +1,16 @@
+ /* ficha-lite.js (FichaLite) — la ficha LITE (2026-10-02, pedido del dueño): lo que hace falta a mano en un combate, en una
+-   ventanita encima del mapa. Arriba, en una franja horizontal, el equipo: qué hay en cada mano, la Defensa y las cinco
+-   resistencias a crítico (al pasar el mouse, de dónde sale cada número: qué ítem, qué estado, qué pasiva); abajo, el resto del
+-   equipo puesto, los estados alterados y, en el personaje, DDE y Despojos. Los botones los pone cada pantalla.
++   ventanita encima del mapa. Arriba, en una franja horizontal, el equipo: qué hay en cada mano, la Defensa y las cuatro
++   resistencias a crítico (al pasar el mouse, de dónde sale cada número: qué ítem, qué estado, qué pasiva); debajo, los atributos con
++   sus stats derivados y la Defensa especial con las resistencias elementales (2026-11-27, dueño: «que se vean los stats, los stats
++   derivados, las resistencias elementales»; el Sigilo va con los demás, sin destacarlo); abajo, el resto del equipo puesto, los
++   estados alterados y, en el personaje, DDE y Despojos. Los botones los pone cada pantalla.
+    Un solo dibujo para los tres: `personaje(S)`, `creep(sc)` e `invocacion(inv)` arman el mismo modelo
+-   {titulo, subtitulo, manos[], defensa, crit[], equipo[], estados[], extras[]} y `html(modelo, botones)` lo dibuja (con `CSS`).
++   {titulo, subtitulo, manos[], defensa, crit[], stats: {attrs[], res[]}, equipo[], estados[], extras[]} y `html(modelo, botones)` lo dibuja
++   (con `CSS`). ⚡ Habilidades + pasivas (2026-11-27): `habsPersonaje(S)`, `habsCreep(sc)`, `habsInvocacion(inv)` → {habilidades[], pasivas[]}
++   (nombre, costo, la descripción corta y el «📋 Detalle» plegado de ItemCorto) y `habsHtml(h, {usar, titulo, nota})`: el segundo recuadro.
+    Solo arma HTML: no lee Firebase ni toca pantalla. Necesita ficha-calculo.js y ficha-combate.js (personaje), creep-calculo.js
+-   (creep), inv-calculo.js (invocación) y ficha-resumen.js (estados derivados del personaje). */
++   (creep), inv-calculo.js (invocación) y ficha-resumen.js (estados derivados del personaje); item-corto.js y ficha-botonera.js, si
++   están, para las habilidades. */
+ const FichaLite = (() => {
+   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+   const fmt = n => Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100);
+@@ -39,9 +44,30 @@ const FichaLite = (() => {
+     return {valor: total, lineas};
+   }
+ 
+-  // Los extras de la franja de abajo (2026-10-04): Sigilo, Defensa especial y las resistencias elementales.
++  // Las resistencias elementales (2026-10-04) y, con ellas, la Defensa especial (2026-11-27: en su bloque, ya no como chip suelto).
+   const ELEM = {resfuego: 'fuego', reshielo: 'hielo', resrayo: 'rayo', restoxico: 'toxico', resacido: 'acido', resluz: 'luz', ressiniestro: 'siniestro'};
+-  const ETQ_EXTRA = {sigilo: '🕶 Sigilo', armadmg: '✨ Defensa especial', resfuego: '🔥 Res. fuego', reshielo: '❄ Res. hielo', resrayo: '⚡ Res. eléctrica', restoxico: '☠ Res. tóxico', resacido: '🧪 Res. ácido', resluz: '☀ Res. luz', ressiniestro: '🌑 Res. siniestro'};
++  const ETQ_RES = {armadmg: '✨ Def. especial', resfuego: '🔥 Fuego', reshielo: '❄ Hielo', resrayo: '⚡ Eléctrica', restoxico: '☠ Tóxico', resacido: '🧪 Ácido', resluz: '☀ Luz', ressiniestro: '🌑 Siniestro'};
++  const RES_IDS = ['armadmg', ...Object.keys(ELEM)];
++  const fullDe = id => { const F = typeof FichaCalculo !== 'undefined' ? FichaCalculo : null; return (F && F.STAT_FULL && F.STAT_FULL[id]) || etq(id); };
++  const colorDe = attr => { const g = typeof FichaCalculo !== 'undefined' ? FichaCalculo.GRUPOS.find(x => x.id === attr) : null; return g ? g.color : ''; };
++  const ATTR_NOMBRE = {con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
++  const ATTR_CORTO = {con: 'Con', fue: 'Fue', agl: 'Agi', des: 'Des', esp: 'Esp'};
++  /* 📊 Los atributos y sus derivados de un creep o una invocación (guardan los números sueltos): `valorDe(id)` = el número final, `aportes(id)` =
++     [{nombre, val, tipo?}] (equipo, estados, pasivas). Las líneas del globo: de qué atributo sale (o la base) + cada aporte; si no cierra, «Otros». */
++  function statsGuardados(o, grupos, valorDe, aportes, resDe){
++    const notaDe = a => a.tipo === 'estado alterado' ? 'estado' : a.tipo === 'pasiva' ? 'pasiva' : '';
++    const lin = (id, attr) => {
++      const L = attr ? [{txt: `De ${ATTR_NOMBRE[attr] || attr}`, val: num(valorDe(attr))}] : [{txt: 'Base', val: num(o[id])}];
++      (aportes(id) || []).forEach(a => L.push({txt: a.nombre, val: num(a.val), nota: notaDe(a)}));
++      return L.filter(l => l.val);
++    };
++    return {
++      attrs: grupos.map(g => { const a = cerrar(lin(g.id), num(valorDe(g.id)));
++        return {id: g.id, label: ATTR_CORTO[g.id] || g.id, full: ATTR_NOMBRE[g.id] || g.id, color: colorDe(g.id), valor: a.valor, lineas: a.lineas,
++          der: g.der.map(d => { const x = cerrar(lin(d.id, g.id), num(valorDe(d.id))); return {id: d.id, label: d.label, full: d.full || fullDe(d.id), valor: x.valor, lineas: x.lineas}; })}; }),
++      res: RES_IDS.map(id => { const x = cerrar(lin(id), num(resDe(id))); return {id, etq: ETQ_RES[id], full: fullDe(id), valor: x.valor, lineas: x.lineas}; }),
++    };
++  }
+ 
+   /* 🔨 Lo que suma la familia del arma con ESA arma (2026-11-20, Maestría en armas pesadas y los guantes): el PdG al atacar (pdgt4/6/8/10, pdgdist) y el
+      Parry al parar (parryt…, solo con un arma de ese Tipo). `valorDe(stat)` = lo que suma ese stat; `fuentes(stat)` = de dónde sale (nombres). */
+@@ -142,9 +168,14 @@ const FichaLite = (() => {
+         {etq: 'DDE', valor: fmt(num(meta.dde)), lineas: [{txt: 'Tu dinero: para comprar en las tiendas; es lo que cobrás al vender.'}]},
+         {etq: 'Despojos', valor: `${fmt(num(S.loot && S.loot.normal))} · ${fmt(num(S.loot && S.loot.magico))} · ${fmt(esp)}`,
+           lineas: [{txt: 'Normales · mágicos · especiales: los materiales que soltaron los rivales. Las tiendas los compran y sirven para reparar.'}]},
+-        // Sigilo y las resistencias que no están en 0 (2026-10-04), con de dónde salen.
+-        ...['sigilo', 'armadmg', ...Object.keys(ELEM)].filter(id => id === 'sigilo' || id === 'armadmg' || num(c.final[id]) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(c.final[id])), lineas: lineasFicha(S, c, id).lineas})),
++        // (El Sigilo y la Defensa especial ya no van acá, 2026-11-27: el Sigilo, con los stats de la Destreza; la Defensa especial, con las resistencias.)
+       ],
++      stats: {
++        attrs: FichaCalculo.GRUPOS.map(g => { const a = lineasFicha(S, c, g.id);
++          return {id: g.id, label: g.label, full: g.full, color: g.color, valor: a.valor, lineas: a.lineas,
++            der: g.derived.map(d => { const x = lineasFicha(S, c, d.id); return {id: d.id, label: d.label, full: d.full, valor: x.valor, lineas: x.lineas}; })}; }),
++        res: RES_IDS.map(id => { const x = lineasFicha(S, c, id); return {id, etq: ETQ_RES[id], full: fullDe(id), valor: x.valor, lineas: x.lineas}; }),
++      },
+     };
+   }
+ 
+@@ -228,9 +259,10 @@ const FichaLite = (() => {
+       crit: [0, 1, 2, 3].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
+       equipo: equipoGuardado(sc, C.slotDe),
+       estados: estadosLista(sc.estados),
+-      extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(C.statValor(sc, 'sigilo')), lineas: []},
+-        {etq: ETQ_EXTRA.armadmg, valor: fmt(C.armadmgEfectiva(sc)), lineas: []},
+-        ...Object.keys(ELEM).filter(el => C.resElemental && C.resElemental(sc, ELEM[el]) > 0).map(el => ({etq: ETQ_EXTRA[el], valor: fmt(C.resElemental(sc, ELEM[el])), lineas: []}))],
++      extras: [],
++      stats: statsGuardados(sc, Object.entries(C.DERIVADOS_POR_ATTR).map(([id, ds]) => ({id, der: ds.map(([d, label]) => ({id: d, label}))})),
++        id => C.statValor(sc, id), id => C.aportesMod(sc, id),
++        id => id === 'armadmg' ? C.armadmgEfectiva(sc) : C.resElemental ? C.resElemental(sc, ELEM[id]) : num(sc[id])),
+     };
+   }
+   function invocacion(inv, duenoNombre){
+@@ -246,11 +278,66 @@ const FichaLite = (() => {
+       crit: [0, 1, 2, 3].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
+       equipo: equipoGuardado(inv, slotDe),
+       estados: estadosLista(inv.estados),
+-      extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(I.statValor(inv, 'sigilo')), lineas: []},
+-        ...['armadmg', ...Object.keys(ELEM)].filter(id => id === 'armadmg' || num(I.statValor(inv, id)) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(I.statValor(inv, id))), lineas: []}))],
++      extras: [],
++      stats: statsGuardados(inv, I.ATTR_IDS_INV.map(id => ({id, der: (I.INV_DERIVADOS_POR_ATTR[id] || []).map(d => ({id: d.id, label: d.label, full: d.full}))})),
++        id => I.statValor(inv, id), id => I.aportesMod(inv, id), id => I.statValor(inv, id)),
+     };
+   }
+ 
++  /* ---------- ⚡ Habilidades + pasivas (2026-11-27, dueño: «entre los botones de la base debería haber uno que diga "habilidades + pasivas",
++     que abra un segundo recuadro que te permita verlas») ----------
++     Cada una: el nombre, lo que cuesta (SP, No2, cooldown), la descripción corta y el «📋 Detalle» plegado (la pieza común, ItemCorto). Sin
++     ItemCorto cargado, la descripción tal cual y sin cuadro. `usar` lo decide la pantalla: el botón «Usar» lleva data-fl="usar:<id>". */
++  const IC = () => typeof ItemCorto !== 'undefined' ? ItemCorto : null;
++  const cdTxt = h => [num(h.cd) > 0 ? `CD ${fmt(num(h.cd))}` : '', num(h.cdActual) > 0 ? `⏳ en cooldown: ${fmt(num(h.cdActual))} turno${num(h.cdActual) === 1 ? '' : 's'}` : ''].filter(Boolean);
++  function filaHab(h, costo, extra){
++    const ic = IC();
++    return {id: h.id || '', nombre: h.nombre || '(sin nombre)', costo: [costo, ...cdTxt(h), ...(extra || [])].filter(Boolean).join(' · '),
++      desc: ic ? ic.descripcion(h) : String(h.detalle || h.descripcion || ''), detalle: ic ? ic.detalleHtml(h, {plegable: true}) : ''};
++  }
++  function filaPasiva(p){
++    const ic = IC(), compras = Math.max(1, Math.floor(num(p && p.compras)) || 1);
++    const mods = typeof Combatiente !== 'undefined' && Combatiente.modsPasiva ? modsTxt(Combatiente.modsPasiva(p).map(m => ({...m, val: num(m.val) * compras}))) : '';
++    return {id: p.id || '', nombre: (p.nombre || '(sin nombre)') + (compras > 1 ? ` ×${compras}` : ''), costo: mods ? `Suma: ${mods}` : '',
++      desc: ic ? ic.descripcion(p) : String(p.detalle || ''), detalle: ic ? ic.detalleHtml(p, {plegable: true}) : ''};
++  }
++  const pasivasDe = lista => (lista || []).filter(p => p && p.activa !== false).map(filaPasiva);
++  function habsPersonaje(S){
++    const B = typeof FichaBotonera !== 'undefined' ? FichaBotonera : null;
++    return {
++      habilidades: (S.habilidades || []).filter(Boolean).map(h => {
++        const hv = B && B.detalleVigente ? {...h, detalle: B.detalleVigente(h)} : h;   // la de clase, con su texto de hoy (como la Botonera)
++        const auto = B && B.habAutomatizada ? B.habAutomatizada(h) : true;
++        return filaHab(hv, B ? (B.costoHabilidadTxt(S, h) || (auto ? 'sin costo' : '📣 se anuncia: la mesa la resuelve')) : String(h.costo || ''));
++      }),
++      pasivas: pasivasDe(S.pasivas),
++    };
++  }
++  function habsCreep(sc){
++    const C = CreepCalculo;
++    return {habilidades: (sc.habilidades || []).filter(Boolean).map(h => filaHab(h, C.costoHabTxt(sc, h))), pasivas: pasivasDe(sc.pasivas)};
++  }
++  function habsInvocacion(inv){
++    const I = InvCalculo;
++    return {habilidades: (inv.habilidades || []).filter(Boolean).map(h => filaHab(h, I.costoHabTxt(inv, h))), pasivas: pasivasDe(inv.pasivas)};
++  }
++  function habsHtml(h, o){
++    o = o || {};
++    const item = (x, usar) => `<div class="fl-hab">
++        <div class="fl-hab-cab"><b>${esc(x.nombre)}</b>${usar && x.id ? `<button type="button" class="fl-btn fl-usar" data-fl="usar:${esc(x.id)}" title="Lo mismo que su botón de la Botonera">Usar</button>` : ''}</div>
++        ${x.costo ? `<div class="fl-hab-costo">${esc(x.costo)}</div>` : ''}
++        ${x.desc ? `<div class="fl-hab-desc">${esc(x.desc)}</div>` : ''}
++        ${x.detalle || ''}
++      </div>`;
++    const lista = (tit, xs, usar, vacio) => `<div class="fl-bloque"><div class="fl-bloque-tit">${esc(tit)} (${xs.length})</div>${xs.length ? xs.map(x => item(x, usar)).join('') : `<div class="fl-gris">${esc(vacio)}</div>`}</div>`;
++    return `<div class="fl-ventana fl-habs" role="dialog" aria-label="Habilidades y pasivas">
++      <header><div><h3>⚡ Habilidades y pasivas</h3><div class="fl-subtit">${esc(o.titulo || '')}</div></div>
++        <button type="button" class="fl-cerrar" data-fl="habs" title="Cerrar este recuadro">✕</button></header>
++      ${o.nota ? `<div class="fl-gris fl-habs-nota">${esc(o.nota)}</div>` : ''}
++      <div class="fl-habs-cuerpo">${lista('Habilidades', h.habilidades || [], !!o.usar, 'Sin habilidades.')}${lista('Pasivas', h.pasivas || [], false, 'Sin pasivas.')}</div>
++    </div>`;
++  }
++
+   /* ---------- Dibujo ---------- */
+   function tip(titulo, lineas, total){
+     const filas = (lineas || []).map(l => l.val === undefined || l.val === null
+@@ -281,12 +368,20 @@ const FichaLite = (() => {
+     const estados = m.estados.length
+       ? m.estados.map(e => `<span class="fl-chip fl-estado ${e.pol}">${esc(e.nombre)}${e.datos ? ` <i>${esc(e.datos)}</i>` : ''}${tip(e.nombre, e.lineas)}</span>`).join('')
+       : '<span class="fl-gris">Ninguno.</span>';
++    const der = (x, i) => `<div class="fl-der-fila"><span>${esc(x.label)}</span><b>${esc(Number.isFinite(x.valor) ? fmt(x.valor) : '?')}</b>${tip(x.full || x.label, x.lineas, x.valor)}</div>`;
++    const stats = m.stats ? `<div class="fl-bloque"><div class="fl-bloque-tit">Atributos y stats</div><div class="fl-stats">${
++      m.stats.attrs.map(a => `<div class="fl-attr"${a.color ? ` style="--c:${esc(a.color)}"` : ''}>
++        <div class="fl-attr-cab"><span>${esc(a.label)}</span><b>${esc(Number.isFinite(a.valor) ? fmt(a.valor) : '?')}</b>${tip(a.full, a.lineas, a.valor)}</div>
++        ${a.der.map(der).join('')}</div>`).join('')}</div></div>
++      <div class="fl-bloque"><div class="fl-bloque-tit">Defensa especial y resistencias elementales</div><div class="fl-res">${
++      m.stats.res.map(x => `<div class="fl-res-celda${num(x.valor) > 0 ? ' pos' : num(x.valor) < 0 ? ' neg' : ''}"><span>${esc(x.etq)}</span><b>${esc(Number.isFinite(x.valor) ? fmt(x.valor) : '?')}</b>${tip(x.full, x.lineas, x.valor)}</div>`).join('')}</div></div>` : '';
+     const extras = (m.extras || []).map(x => `<span class="fl-chip fl-extra"><i>${esc(x.etq)}</i> <b>${esc(x.valor)}</b>${tip(x.etq, x.lineas)}</span>`).join('');
+-    const bots = (botones || []).map(b => `<button type="button" class="fl-btn" data-fl="${esc(b.id)}" title="${esc(b.tip || '')}">${b.txt}</button>`).join('');
++    const bots = (botones || []).map(b => `<button type="button" class="fl-btn${b.activo ? ' activo' : ''}" data-fl="${esc(b.id)}" title="${esc(b.tip || '')}">${b.txt}</button>`).join('');
+     return `<div class="fl-ventana" role="dialog" aria-label="Ficha lite de ${esc(m.titulo)}">
+       <header><div><h3>${esc(m.titulo)}</h3><div class="fl-subtit">${esc(m.subtitulo || '')}</div></div>
+         <button type="button" class="fl-cerrar" data-fl="cerrar" title="Cerrar (F o Esc)">✕</button></header>
+       <div class="fl-franja">${franja}</div>
++      ${stats}
+       <div class="fl-bloque"><div class="fl-bloque-tit">Equipo puesto</div><div class="fl-chips">${equipo}</div></div>
+       <div class="fl-bloque"><div class="fl-bloque-tit">Estados alterados</div><div class="fl-chips">${estados}</div></div>
+       ${extras ? `<div class="fl-bloque"><div class="fl-chips">${extras}</div></div>` : ''}
+@@ -349,6 +444,37 @@ h3{margin:0;font-family:Fraunces,Georgia,serif;font-size:19px;color:var(--brass)
+ .fl-botones{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+ .fl-btn{background:var(--panel2);border:1px solid var(--line);color:var(--paper);border-radius:4px;padding:8px 12px;cursor:pointer;font:inherit}
+ .fl-btn:hover{border-color:var(--copper);background:rgba(201,133,69,.14)}
++.fl-btn.activo{border-color:var(--copper);background:rgba(201,133,69,.22)}
++/* 📊 Atributos y stats (2026-11-27): una columna por atributo, sus derivados debajo; al pasar el mouse, de dónde sale. */
++.fl-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:start}
++.fl-attr{background:var(--panel2);border:1px solid var(--line);border-top:3px solid var(--c,var(--copper));border-radius:5px;padding:4px 7px 5px}
++.fl-attr-cab,.fl-der-fila,.fl-res-celda{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:6px;cursor:help}
++.fl-attr-cab{font-weight:700;font-size:13px;border-bottom:1px solid var(--line);padding-bottom:2px;margin-bottom:2px}
++.fl-attr-cab b{font-size:16px;color:var(--c,var(--brass))}
++.fl-der-fila{font-size:12px;line-height:1.45;padding:0 2px;border-radius:3px}
++.fl-der-fila span{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
++.fl-der-fila:hover,.fl-attr-cab:hover,.fl-res-celda:hover{background:rgba(201,133,69,.12)}
++.fl-res{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
++.fl-res-celda{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px}
++.fl-res-celda span{color:var(--muted);white-space:nowrap}
++.fl-res-celda b{opacity:.55}
++.fl-res-celda.pos b{opacity:1;color:var(--bueno)}
++.fl-res-celda.neg b{opacity:1;color:var(--malo)}
++.fl-attr-cab:hover>.fl-tip,.fl-der-fila:hover>.fl-tip,.fl-res-celda:hover>.fl-tip{display:block}
++.fl-attr:nth-child(n+4) .fl-tip,.fl-res-celda:nth-child(n+6)>.fl-tip{left:auto;right:0}
++/* Las dos ventanas juntas: la ficha lite y, al lado, Habilidades + pasivas. */
++.fl-par{display:flex;gap:12px;align-items:flex-start;justify-content:center;flex-wrap:wrap;max-width:calc(100vw - 32px)}
++.fl-habs{width:min(440px,calc(100vw - 32px));max-height:calc(100vh - 32px);display:flex;flex-direction:column}
++.fl-habs-cuerpo{overflow-y:auto;padding-right:4px;margin-right:-4px}
++.fl-habs-cuerpo>.fl-bloque:first-child{margin-top:0}
++.fl-habs-nota{margin:-4px 0 8px}
++.fl-hab{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:6px 9px;margin-bottom:6px}
++.fl-hab-cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
++.fl-hab-cab b{color:var(--brass)}
++.fl-hab-costo{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);margin-top:1px}
++.fl-hab-desc{font-size:12.5px;margin-top:3px}
++.fl-usar{padding:3px 12px;font-size:12px;border-color:var(--copper)}
++@media (max-height:800px){.fl-ventana:not(.fl-habs){max-height:calc(100vh - 24px);overflow-y:auto}}
+ `;
+-  return {personaje, creep, invocacion, html, CSS, estadosLista};
++  return {personaje, creep, invocacion, html, CSS, estadosLista, habsPersonaje, habsCreep, habsInvocacion, habsHtml};
+ })();
+diff --git a/comun/pruebas.html b/comun/pruebas.html
+index eb0e1308..67558562 100644
+--- a/comun/pruebas.html
++++ b/comun/pruebas.html
+@@ -125,7 +125,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
+ <script src="grupo-botin.js?v=20261125gas"></script>
+ <script src="aviso-propuestas.js"></script>
+ <script src="creep-editor.js"></script>
+-<script src="ficha-lite.js?v=20261125sil"></script>
++<script src="ficha-lite.js?v=20261127lite"></script>
+ <script src="pasivas.js?v=20261127detalle"></script>
+ <script src="skills-clase.js?v=20261127detalle"></script>
+ <script src="armas-naturales-base.js?v=20261104ig"></script>
+@@ -7819,6 +7819,40 @@ prueba('invocación: arma, Defensa y estados; el HTML trae los tres orígenes y
+   cierto(/Resistencia a crítico de armas Tipo 4/.test(h) && /data-fl="botonera"/.test(h) && /Daña 2 HP en cada Mantenimiento/.test(h), 'falta algo en el HTML');
+ });
+ 
++prueba('📊 personaje: los cinco atributos con sus derivados (el Sigilo con la Destreza) y las resistencias; sin chips de Sigilo ni Defensa especial (2026-11-27)', () => {
++  const S = fichaBotonera({inventario: [{id: 'p', nombre: 'Capa ignífuga', tipoItem: 'armadura', equipado: true, peso: 1, mods: [{stat: 'resfuego', val: 2}, {stat: 'sigilo', val: 1}]}]});
++  const m = FichaLite.personaje(S), c = FichaCalculo.calcular(S);
++  const des = m.stats.attrs.find(a => a.id === 'des'), sig = des.der.find(d => d.id === 'sigilo'), fuego = m.stats.res.find(x => x.id === 'resfuego');
++  igual([m.stats.attrs.map(a => a.id), des.valor, sig.valor, fuego.valor, m.stats.res.map(x => x.id)[0], m.extras.map(x => x.etq)],
++    [['con', 'fue', 'agl', 'des', 'esp'], c.final.des, c.final.sigilo, c.final.resfuego, 'armadmg', ['DDE', 'Despojos']]);
++  cierto(fuego.lineas.some(l => l.txt === 'Capa ignífuga' && l.val === 2), 'la resistencia al fuego tendría que venir de la capa');
++  const h = FichaLite.html(m, []);
++  cierto(/fl-stats/.test(h) && /Defensa especial y resistencias elementales/.test(h) && !/🕶 Sigilo/.test(h), 'el HTML no trae los bloques nuevos (o sigue el chip del Sigilo)');
++});
++prueba('📊 creep e invocación: atributos, derivados y resistencias con los números del motor', () => {
++  const sc = creepPrueba({resfuego: 1, equipo: [{nombre: 'Escamas', tipoItem: 'armadura_rigida', def: 1, mods: [{stat: 'resfuego', val: 1}, {stat: 'eva', val: 1}]}]});
++  const m = FichaLite.creep(sc), agl = m.stats.attrs.find(a => a.id === 'agl');
++  igual([agl.valor, agl.der.find(d => d.id === 'eva').valor, m.stats.res.find(x => x.id === 'resfuego').valor, m.extras.length],
++    [CreepCalculo.statValor(sc, 'agl'), CreepCalculo.statValor(sc, 'eva'), CreepCalculo.resElemental(sc, 'fuego'), 0]);
++  const suma = x => x.lineas.filter(l => l.val != null).reduce((a, l) => a + l.val, 0);
++  igual(suma(agl.der.find(d => d.id === 'eva')), CreepCalculo.statValor(sc, 'eva'), 'la cuenta de la Evasión no cierra');
++  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, estados: []});
++  const mi = FichaLite.invocacion(inv, 'Silvia');
++  igual([mi.stats.attrs.find(a => a.id === 'agl').valor, mi.stats.attrs.find(a => a.id === 'des').der.some(d => d.id === 'sigilo'), mi.stats.res.length], [InvCalculo.statValor(inv, 'agl'), true, 8]);
++});
++prueba('⚡ Habilidades + pasivas: nombre, costo, descripción corta y «📋 Detalle» plegado; «Usar» solo si la pantalla lo pide', () => {
++  const S = fichaBotonera({habilidades: [{id: 'h1', nombre: 'Golpe de prueba', costo: '2', nitrosCosto: 1, cd: 2, detalle: 'Pega fuerte.', reglas: 'Ignora 1 de Defensa.', modo: 'auto'}],
++    pasivas: [{id: 'p1', nombre: 'Piel dura', detalle: 'Aguanta más.', mods: [{stat: 'def', val: 1}], compras: 2}]});
++  const h = FichaLite.habsPersonaje(S);
++  igual([h.habilidades[0].nombre, /CD 2/.test(h.habilidades[0].costo), h.habilidades[0].desc, /<details class="ic-reglas"><summary>📋 Detalle/.test(h.habilidades[0].detalle), h.pasivas[0].nombre, h.pasivas[0].costo],
++    ['Golpe de prueba', true, 'Pega fuerte.', true, 'Piel dura ×2', 'Suma: Defensa +2']);
++  const con = FichaLite.habsHtml(h, {usar: true, titulo: 'X'}), sin = FichaLite.habsHtml(h, {usar: false, titulo: 'X', nota: 'Solo para mirar'});
++  cierto(/data-fl="usar:h1"/.test(con) && !/data-fl="usar:/.test(sin) && /Solo para mirar/.test(sin) && /data-fl="habs"/.test(con), 'el botón Usar o el cierre no están donde van');
++  const sc = creepPrueba({habilidades: [{id: 'c1', nombre: 'Mordisco', nitrosCosto: 2, cd: 3, detalle: 'Muerde.'}]});
++  const hc = FichaLite.habsCreep(sc);
++  igual([hc.habilidades[0].nombre, /No2/.test(hc.habilidades[0].costo), /CD 3/.test(hc.habilidades[0].costo)], ['Mordisco', true, true]);
++});
++
+ grupo('Por la espalda (2026-10-03: en sigilo y en el punto ciego del defensor)');
+ prueba('el bono se limpia: solo positivos y enteros; todo en 0 = nada', () => {
+   igual([Duelo.limpiarEspalda({pdg: 2, fijo: '1.4', critpot: -3}), Duelo.limpiarEspalda({pdg: 0}), Duelo.limpiarEspalda(null)],
+diff --git a/herramientas/simulador-encuentro.html b/herramientas/simulador-encuentro.html
+index e949287c..4e501ff3 100644
+--- a/herramientas/simulador-encuentro.html
++++ b/herramientas/simulador-encuentro.html
+@@ -93,7 +93,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
+ <script src="../comun/creep-lupa.js?v=20261127unico2"></script>
+ <script src="../comun/combate-fin.js"></script>
+ <script src="../comun/creep-editor.js"></script>
+-<script src="../comun/ficha-lite.js?v=20261125sil"></script>
++<script src="../comun/ficha-lite.js?v=20261127lite"></script>
+ <script src="../comun/skills-clase.js?v=20261127detalle"></script>
+ <script src="../comun/creeps-base.js?v=20261127unico2"></script>
+ <script src="../comun/skills-creep-base.js?v=20261127detalle"></script>
+diff --git a/vtt-hexgrid/js/10-hud-y-vida.js b/vtt-hexgrid/js/10-hud-y-vida.js
+index 5eab7fa9..266c2b29 100644
+--- a/vtt-hexgrid/js/10-hud-y-vida.js
++++ b/vtt-hexgrid/js/10-hud-y-vida.js
+@@ -99,7 +99,7 @@ function hudHtml(t){
+   const sueltoHud = TokensAuto.esSuelto(t) && !inerteHud;
+   if(hudNivel === 'resto') return '<div class="hud-anillo">' +
+     (t.tipo === 'creep' || sueltoHud ? icono('tarjeta', '🪪', sueltoHud ? 'Ver tarjeta: imagen y descripción' : 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
+-    (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
++    (fichaDeToken ? icono('ficha', '📜', 'La ficha lite: stats, equipo, estados y habilidades (de ahí, la completa)') : '') +
+     (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) && !inerteHud ? icono('ficha', '📜', 'Ver la ficha del creep (la misma ventana «Ver» de GM Tools)') : '') +
+     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
+     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
+@@ -1761,14 +1761,15 @@ function puedeAgregarEstado(t){
+ function abrirFichaDeToken(t){
+   // Ficha lite (2026-10-02, js/15): un creep vinculado (el GM), y un personaje o una invocación mío — o cualquiera, siendo GM (dueño, 2026-10-05:
+   // «que ese botón siempre muestre la ficha lite; desde la lite se puede ir a la completa») — abren encima del mapa lo esencial del combate.
+-  // La de otro jugador, para un jugador, se abre en otra pestaña como antes.
++  // La de otro jugador, para un jugador, también la lite (2026-11-27, dueño: ver sus stats y sus habilidades), solo para mirar; antes se abría la
++  // ficha completa en otra pestaña (ahora, con su botón de la lite).
+   if(t.tipo === 'creep' && typeof esInerte === 'function' && esInerte(t)){ hudGlobo = 'tarjeta'; pedirDibujo(); return; }   // 🚩 un inerte no lleva ficha lite: su carnet
+   if(TokensAuto.esSuelto(t)){ hudGlobo = 'tarjeta'; pedirDibujo(); return; }   // ＋ un token suelto no tiene ficha: su tarjeta (2026-11-22)
+   if(t.tipo === 'creep' && t.fichaId && soyGM){ abrirFichaLite({tipo: 'creep', creepId: t.fichaId}); return; }
+   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+   if(!fichaId) return;
+   const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+-  if(fbUsuario && (t.duenoUid === fbUsuario.uid || controloFicha(fichaId) || soyGM)){
++  if(fbUsuario && fbMiembro){
+     abrirFichaLite(invId ? {tipo: 'inv', fichaId, invId} : {tipo: 'pj', fichaId});
+     return;
+   }
+diff --git a/vtt-hexgrid/js/15-ficha-lite.js b/vtt-hexgrid/js/15-ficha-lite.js
+index 37565760..3a88f76f 100644
+--- a/vtt-hexgrid/js/15-ficha-lite.js
++++ b/vtt-hexgrid/js/15-ficha-lite.js
+@@ -2,14 +2,18 @@
+ /* ---------- Ficha lite ----------
+    El 📜 de un token (o la F) abre encima del mapa —centrada, sin oscurecer— lo que hace falta a mano en un combate: qué hay en cada
+    mano, la Defensa y las resistencias a crítico (al pasar el mouse, de dónde sale cada número), el resto del equipo, los estados y,
+-   en un personaje, DDE y Despojos. El dibujo es común (comun/ficha-lite.js); acá se leen los datos y se atienden los botones.
+-   - Un personaje o una invocación: su dueño, o el GM (con o sin 🎮 el control: dueño, 2026-10-05, siempre la lite; la completa, con su
+-     botón). Los lee con FichaSesion (en vivo, sin guardar nada).
+-   - Un creep: el GM (de su parte privada, `creepsPriv`).
++   en un personaje, DDE y Despojos, más los atributos con sus derivados y las resistencias (2026-11-27). El dibujo es común
++   (comun/ficha-lite.js); acá se leen los datos y se atienden los botones.
++   - Un personaje o una invocación: cualquiera de la partida (2026-11-27: también otro jugador, solo para mirar; antes se le abría la ficha
++     completa en otra pestaña, que sigue a un botón). El dueño y el GM ven todos los botones; otro jugador, solo «⚡ Habilidades + pasivas» y
++     la ficha completa. Los lee con FichaSesion (en vivo, sin guardar nada).
++   - Un creep: el GM (de su parte privada, `creepsPriv`). Un jugador sigue viendo la tarjeta 🪪 del creep, sin números.
++   - ⚡ Habilidades + pasivas: un segundo recuadro al lado (`fl.habs`). «Usar» (quien lo maneja: `bnManejo`; un creep, el GM) abre su Botonera o
++     sus Acciones y aprieta el mismo botón de la habilidad (`flUsar`): el mismo camino de siempre, sin código aparte.
+    Se cierra con F, Esc, ✕ o un clic afuera. Los botones abren las ventanas de siempre (Stats, Equipo y mochila, Tienda, Botín en la
+    ficha del marco; Botonera, Acciones, Ver) o la ficha completa / GM Tools en otra pestaña. */
+ var fl = null;   // {host, raiz, clave, tipo: 'pj'|'inv'|'creep', fichaId, invId, creepId, sesion, fichaIdSesion, S, tienda}
+-const FL_PIEZA = '../comun/ficha-lite.js?v=20261125sil';
++const FL_PIEZA = '../comun/ficha-lite.js?v=20261127lite';
+ const flAbierta = () => !!(fl && fl.host.style.display !== 'none');
+ 
+ function flCrear(){
+@@ -17,14 +21,14 @@ function flCrear(){
+   host.id = 'ficha-lite';
+   host.style.cssText = 'position:fixed;inset:0;z-index:88;display:none;align-items:center;justify-content:center';
+   const raiz = host.attachShadow({mode: 'open'});
+-  raiz.innerHTML = `<style>${FichaLite.CSS}</style><div id="fl-contenido"></div>`;
++  raiz.innerHTML = `<style>${FichaLite.CSS}${typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : ''}</style><div id="fl-contenido"></div>`;   // (el «📋 Detalle» de las habilidades)
+   document.body.appendChild(host);
+   raiz.addEventListener('click', e => {
+     const b = e.composedPath().find(x => x && x.dataset && x.dataset.fl);
+     if(b) flBoton(b.dataset.fl);
+   });
+   // Clic afuera de la ventanita: se cierra (en el recuadro aislado, el primer elemento del recorrido es el recuadro mismo).
+-  host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && t.id === 'fl-contenido')) cerrarFichaLite(); });
++  host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && (t.id === 'fl-contenido' || (t.classList && t.classList.contains('fl-par'))))) cerrarFichaLite(); });
+   return {host, raiz};
+ }
+ 
+@@ -35,7 +39,7 @@ async function abrirFichaLite(q){
+   try{ await bnCargarPiezas(); await cargarPiezas([FL_PIEZA]); }
+   catch(err){ console.error(err); toast('No se pudo abrir la ficha lite'); return; }
+   if(!fl) fl = Object.assign({sesion: null, fichaIdSesion: '', S: null}, flCrear());
+-  Object.assign(fl, {clave, tipo: q.tipo, fichaId: q.fichaId || '', invId: q.invId || '', creepId: q.creepId || '', tienda: false});
++  Object.assign(fl, {clave, tipo: q.tipo, fichaId: q.fichaId || '', invId: q.invId || '', creepId: q.creepId || '', tienda: false, habs: false});
+   if(q.tipo !== 'creep' && (fl.fichaIdSesion !== q.fichaId || !fl.sesion)) flEscuchar(q.fichaId);
+   fl.host.style.display = 'flex';
+   flDibujar();
+@@ -83,7 +87,12 @@ function flDibujar(){
+   if(!flAbierta()) return;
+   const cuerpo = fl.raiz.querySelector('#fl-contenido');
+   const aviso = txt => { cuerpo.innerHTML = `<div class="fl-ventana"><header><div class="fl-gris">${esc(txt)}</div><button type="button" class="fl-cerrar" data-fl="cerrar">✕</button></header></div>`; };
+-  let modelo, botones;
++  let modelo, botones, habs = null;
++  // ⚡ Quién puede «Usar» una habilidad desde acá: quien maneja al personaje (su dueño, o quien tenga 🎮 el control); un creep, el GM.
++  const maneja = fl.tipo === 'creep' ? !!soyGM : (typeof bnManejo === 'function' && bnManejo(fl.fichaId));
++  const esDueno = fl.tipo !== 'creep' && fbUsuario && fl.sesion && fl.sesion.duenoUid === fbUsuario.uid;
++  const veTodo = fl.tipo === 'creep' || soyGM || esDueno || maneja;   // otro jugador: solo mirar
++  const btnHabs = {id: 'habs', txt: '⚡ Habilidades + pasivas', tip: 'Ver sus habilidades y pasivas, en un recuadro al lado', activo: fl.habs};
+   try{
+     if(fl.tipo === 'creep'){
+       const crudo = creepPrivadoDe(fl.creepId);
+@@ -91,7 +100,9 @@ function flDibujar(){
+       let sc = structuredClone(crudo);
+       try{ sc = CreepCalculo.normalizar(sc) || sc; }catch(err){}
+       modelo = FichaLite.creep(sc);
++      if(fl.habs) habs = {datos: FichaLite.habsCreep(sc), titulo: sc.nombre || 'Creep'};
+       botones = [
++        btnHabs,
+         {id: 'acciones', txt: '⚡ Acciones', tip: 'Las Acciones del creep (también con B)'},
+         {id: 'ver', txt: '🔍 Ver todo', tip: 'La ficha completa del creep, de solo lectura, encima del mapa'},
+         {id: 'gmtools', txt: '⚔ Editar en GM Tools', tip: 'Abre GM Tools en otra pestaña, con este creep para editarlo'},
+@@ -101,18 +112,23 @@ function flDibujar(){
+       if(fl.tipo === 'inv'){
+         const cruda = (fl.S.invocaciones || []).find(x => x && x.id === fl.invId);
+         if(!cruda){ aviso('Esa invocación ya no está.'); return; }
+-        modelo = FichaLite.invocacion(InvCalculo.migrar(structuredClone(cruda)), fl.S.meta && fl.S.meta.nombre);
++        const inv = InvCalculo.migrar(structuredClone(cruda));
++        modelo = FichaLite.invocacion(inv, fl.S.meta && fl.S.meta.nombre);
++        if(fl.habs) habs = {datos: FichaLite.habsInvocacion(inv), titulo: inv.nombre || 'Invocación'};
+         botones = [
+-          {id: 'botonera', txt: '⚡ Botonera', tip: 'La Botonera de la invocación (también con B)'},
++          ...(veTodo ? [{id: 'botonera', txt: '⚡ Botonera', tip: 'La Botonera de la invocación (también con B)'}] : []),
++          btnHabs,
+           {id: 'completa', txt: '📜 Ver la ficha completa', tip: 'La ficha del personaje que la invocó, en otra pestaña'},
+         ];
+       }else{
+         modelo = FichaLite.personaje(fl.S);
+-        botones = [
+-          {id: 'stats', txt: '📊 Stats', tip: 'Tus atributos y stats'},
++        if(fl.habs) habs = {datos: FichaLite.habsPersonaje(fl.S), titulo: (fl.S.meta && fl.S.meta.nombre) || 'Personaje'};
++        botones = !veTodo ? [btnHabs, {id: 'completa', txt: '📜 Ver su ficha completa', tip: 'Su ficha completa, en otra pestaña (solo para mirar)'}] : [
++          {id: 'stats', txt: '📊 Stats', tip: 'Repartir los puntos de los atributos y ver la cuenta de cada stat (la ficha lite ya muestra los números)'},
+           {id: 'mochila', txt: '🎒 Abrir la mochila', tip: 'Equipo y mochila: equipar, sacar, cambiar'},
+           ...(fl.tienda ? [{id: 'tienda', txt: '🏪 Tienda', tip: 'La tienda que publicó el GM: comprar, vender y reparar'}] : []),
+           ...(combatePublicado() ? [{id: 'botin', txt: '🎁 Botín', tip: 'El botín del último combate'}] : []),
++          btnHabs,
+           {id: 'completa', txt: '📜 Ver mi ficha completa', tip: 'Tu ficha completa, en otra pestaña'},
+         ];
+       }
+@@ -131,13 +147,18 @@ function flDibujar(){
+         lineas: [{txt: e.detalle}, {txt: 'Viene de un área: se va al salir de ella'}]}));
+     }
+   }catch(err){ console.error('Ficha lite:', err); aviso('No se pudo armar la ficha lite'); return; }
+-  cuerpo.innerHTML = FichaLite.html(modelo, botones);
++  const lite = FichaLite.html(modelo, botones);
++  if(!habs){ cuerpo.innerHTML = lite; return; }
++  const nota = maneja ? '' : fl.tipo === 'creep' ? '' : 'Solo para mirar: las usa quien maneja a este personaje.';
++  cuerpo.innerHTML = `<div class="fl-par">${lite}${FichaLite.habsHtml(habs.datos, {usar: maneja && !(typeof pausaSoloMirar === 'function' && pausaSoloMirar()), titulo: habs.titulo, nota})}</div>`;
+ }
+ function flBoton(id){
+   if(!fl) return;
+   const {fichaId, invId, creepId} = fl;
+   const fichaUrl = '../ficha-personaje/ficha.html?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaId);
+   if(id === 'cerrar'){ cerrarFichaLite(); return; }
++  if(id === 'habs'){ fl.habs = !fl.habs; flDibujar(); return; }   // ⚡ el segundo recuadro (abre o cierra)
++  if(id.startsWith('usar:')){ flUsar(id.slice(5)); return; }
+   if(id === 'completa'){ window.open(fichaUrl, '_blank', 'noopener'); return; }
+   if(id === 'gmtools'){ window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(creepId), '_blank', 'noopener'); return; }
+   cerrarFichaLite();   // lo demás abre otra ventana encima del mapa
+@@ -149,6 +170,27 @@ function flBoton(id){
+   else if(id === 'acciones') abrirAcciones(creepId);
+   else if(id === 'ver') abrirVerCreepMapa(creepId);   // el mapa (js/12, A6a)
+ }
++/* ⚡ «Usar» una habilidad desde Habilidades + pasivas (2026-11-27): abre la Botonera del personaje (o de la invocación) o las Acciones del creep
++   y aprieta ahí el botón de esa habilidad, el mismo de siempre (FichaAcciones.ejecutarHabilidad, InvHabilidades, CreepAcciones.ejecutarHab, con
++   sus preguntas, el objetivo y el cobro). Si la Botonera no llega a mostrarlo, avisa. */
++async function flUsar(habId){
++  if(!fl) return;
++  const {tipo, fichaId, invId, creepId} = fl;
++  cerrarFichaLite();
++  const boton = (raiz, attr, valor) => raiz ? [...raiz.querySelectorAll(`[${attr}]`)].find(b => b.getAttribute(attr) === valor) || null : null;
++  const esperar = async f => { for(let i = 0; i < 60; i++){ const b = f(); if(b) return b; await new Promise(r => setTimeout(r, 150)); } return null; };
++  let b = null;
++  if(tipo === 'creep'){
++    if(!(ac && ac.creepId === creepId && !ac.host.hidden)) await abrirAccionesNuevas(creepId);
++    b = await esperar(() => ac && ac.creepId === creepId && !ac.host.hidden ? boton(ac.raiz, 'data-ejecutar', creepId + ':' + habId) : null);
++  }else{
++    if(!(bn && bn.fichaId === fichaId && (bn.invId || '') === (invId || '') && !bn.host.hidden)) abrirBotonera(fichaId, undefined, invId || undefined);
++    b = await esperar(() => bn && bn.fichaId === fichaId && (bn.invId || '') === (invId || '') && bn.S && !bn.host.hidden
++      ? (invId ? boton(bn.raiz, 'data-ejecutarhabinv', invId + ':' + habId) : boton(bn.raiz, 'data-ejecutar', habId)) : null);
++  }
++  if(!b){ toast('No se pudo usar desde acá: abrí la Botonera y usala desde ahí'); return; }
++  b.click();
++}
+ // El creep cambió (su parte privada): si su ficha lite está abierta, se redibuja (lo llama actualizarEscuchasCreeps).
+ function flCreepCambio(id){ if(flAbierta() && fl.tipo === 'creep' && fl.creepId === id) flDibujar(); }
+ document.addEventListener('keydown', e => {
+diff --git a/vtt-hexgrid/mapa.html b/vtt-hexgrid/mapa.html
+index e67f57ca..7d43dcec 100644
+--- a/vtt-hexgrid/mapa.html
++++ b/vtt-hexgrid/mapa.html
+@@ -283,12 +283,12 @@
+ <script src="js/07-tokens-y-elementos.js?v=20261125incend"></script>
+ <script src="js/08-mover-trampas-y-zonas.js?v=20261125p342"></script>
+ <script src="js/09-colocar-y-panel.js?v=20261126bot"></script>
+-<script src="js/10-hud-y-vida.js?v=20261126tope"></script>
++<script src="js/10-hud-y-vida.js?v=20261127lite"></script>
+ <script src="js/11-botonera-nueva.js?v=20261127detalle"></script>
+ <script src="js/12-acciones-nuevas.js?v=20261127detalle"></script>
+ <script src="js/13-tokens-portal-duelo.js?v=20261126tope"></script>
+ <script src="js/14-herramientas-y-arranque.js?v=20261124trp"></script>
+-<script src="js/15-ficha-lite.js?v=20261125sil"></script>
++<script src="js/15-ficha-lite.js?v=20261127lite"></script>
+ <script src="js/16-momentos.js?v=20261124agu"></script>
+ <script src="js/17-oportunidad.js?v=20261124p266"></script>
+ <script src="js/18-ventanas-gm.js?v=20261127sim"></script>

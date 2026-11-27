@@ -21,7 +21,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
-- **⬜ en cola (PRÓXIMO, después de Enyetar A; dueño 2026-11-27: «cuando termines con tu tarea actual avanzá con esto») — 📜 Ficha lite: stats, derivados,
+- **⏸ PAUSADA (dueño, 2026-11-27: «pausá la ficha lite»; lo hecho, sin subir, en `docs/pausado/ficha-lite-2026-11-27.patch` — se recupera con `git apply`; faltaba la prueba con clics, las capturas del «ahora», el commit y la nota en `vtt-hexgrid/CLAUDE.md`; ojo: el parche hace que el 📜 del token de otro jugador abra su ficha lite (solo mirar) en vez de su ficha completa, a confirmar con el dueño) — 📜 Ficha lite: stats, derivados,
   resistencias elementales y un botón «Habilidades + pasivas»** (dueño, 2026-11-27, con captura de la ficha lite de un personaje): «en la ficha lite me
   gustaría que se vean los stats, los stats derivados, las resistencias elementales. No entiendo por qué elegiste destacar "sigilo" entre la información
   relevante por sobre la demás… también acá entre los botones de la base debería haber uno que diga "habilidades + pasivas", que abra un segundo recuadro

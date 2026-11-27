@@ -48,6 +48,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     lugar, termina el turno, contraataque, la cascada de un área): el duelo guarda la vida de antes y la de después (`dano.hpAntes/hpDespues`) y los
     estados aplicados, pero no todo lo demás. (6) La Mesa no deja editar una línea ya publicada (`tiradas` es solo crear): para tacharla hace falta una
     regla nueva; sin regla, se suma una línea «↩ deshecho».
+  - **✅ Parte A hecha (2026-11-27, Claude; sigue en cola por la B).** Al elegir una tirada en la lista del 🐈‍⬛, ese duelo queda **en pausa** con el
+    cartel «😈 X le está echando la yeta a Y…» (violeta, en el lugar del veredicto): no se tira el daño, los d20 del crítico, los efectos ni el desempate
+    (y si la yeta es sobre el contacto, tampoco el Bloqueo), y lo que pasa «cuando se resuelve un duelo» (el resumen de la Mesa, la cascada de un área,
+    termina el turno…) espera. Si la maldición gana, se repite **exactamente la tirada elegida** (se arregló la falla de buscar «la más reciente») y el
+    duelo sigue desde ahí; si pierde, se cancela o nunca se llega a echar (60 s sin el duelo de la maldición), sigue como estaba. **«▶ Seguir sin la
+    yeta»** para el GM y para quien la echó. La lista suma **las tiradas de habilidades** (la de un Rayo mágico, la resistencia de un objetivo) y avisa
+    si el duelo ya terminó pero esa tirada todavía se puede cambiar. Re-roll, Mal de ojo, Empower y la Polilla no hacen esperar (el 🧿 ahora también
+    repite la tirada exacta que eligió el GM). Sin reglas nuevas: la pausa vive adentro de `ataque` (`ataque.yeta`). **Para la B queda:** la lista ya
+    sabe mostrar los duelos cerrados (`incluirCerrados`, apagado) y cada duelo anota sus yetas en `ataque.yetaHist` (quién, a quién, qué tirada,
+    antes / nueva / queda, cómo terminó). Probado con clics en «Prueba · General» (GM, J1, J2): la yeta que gana sobre el PdG de un creep antes del
+    crítico, la que pierde, la de una habilidad (Maldición de la coraza) y «Seguir sin la yeta»; la vuelta, «quedó igual». Pruebas: 1177. Duda: P364.
+    La pausa sirve tal cual para la A2 (cualquier botón entre tiradas puede poner la misma pausa).
 
   **A2 — los botones entre tiradas (dueño, 2026-11-27, con boceto sobre el cuadro del duelo):** «me gustaría que los botones aparezcan en el menú, entre
   tiradas, siempre que vengan al caso. En los duelos propios del jugador, así. Con ese espacio dividiéndose en botones por cada opción disponible (por

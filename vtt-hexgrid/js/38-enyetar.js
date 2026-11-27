@@ -6,7 +6,11 @@
    En combate, quien la tiene ve un botón fijo 🐈‍⬛ (Flotantes.enyetar, arriba como el 💪 de Empower): elegís la tirada de un enemigo en un
    duelo reciente (Duelo.tiradaSumable: la misma que la Polilla) y se ejecuta la habilidad contra él, sin tener que marcarlo en el mapa
    (bn.objetivoFijo → dueloElegirObjetivoMapa). Si gana la maldición, el mapa del GM repite esa tirada (js/13, efecto «Enyetar» →
-   Duelo.enyetarTirada): toma la tirada más reciente de ese enemigo que todavía se pueda cambiar.
+   Duelo.enyetarTirada).
+   😈 Parte A de P363 (2026-11-27, dueño): al elegir la tirada, ESE duelo queda en pausa («X le está echando la yeta a Y…», `ataque.yeta`,
+   Duelo.yetaPausar) hasta que se resuelve la maldición: si gana, se repite exactamente la tirada elegida y el duelo sigue desde ahí; si pierde, se
+   cancela o no llega a echarse, sigue como estaba (lo levanta la pantalla del GM, Duelo.yetaSeguir). El GM y quien la echó tienen «▶ Seguir sin la
+   yeta». La lista suma las tiradas de habilidades. Re-roll, Mal de ojo, Empower y la Polilla no hacen esperar.
    ========================================================= */
 const ENYETAR_MS = 10 * 60 * 1000;
 const enyetarReciente = ts => !!(ts && ts.toMillis && Date.now() - ts.toMillis() < ENYETAR_MS);
@@ -29,25 +33,20 @@ function renderEnyetarBoton(){
 }
 setInterval(() => { try{ renderEnyetarBoton(); }catch(e){} }, 1500);
 
-// La tirada más reciente de cada enemigo a tu alcance que todavía se pueda cambiar (una por enemigo: la que tomaría la maldición).
-async function enyetarCandidatos(yo){
-  const rng = num((rangoDeToken(yo) || {}).rng), vistos = new Set(), lista = [];
-  const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(10).get();
-  q.docs.forEach(doc => {
-    const x = doc.data();
-    if(!x || x.estado === 'cancelado' || x.hab || !enyetarReciente(x.creado)) return;
-    ['atacante', 'defensor'].forEach(lado => {
-      const p = x[lado], t = p && tokens.get(p.tokenId);
-      if(!t || vistos.has(p.tokenId) || !dueloEsRival(yo, t) || distanciaHex(yo, t) > rng) return;
-      if(typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(t)) return;
-      vistos.add(p.tokenId);
-      const s = Duelo.tiradaSumable(x, lado);
-      if(!s || s.enyetada) return;
-      const otro = x[lado === 'atacante' ? 'defensor' : 'atacante'] || {};
-      lista.push({tokenId: p.tokenId, nombre: p.nombre || nombreDe(t), etq: s.etq, total: s.total, contra: otro.nombre || 'el otro', dueloId: doc.id, lado, ref: p.ref || '', rolls: s.rolls || []});
-    });
+// Las tiradas de los enemigos a tu alcance que todavía se pueden cambiar (2026-11-27, P363 A): una por lado de cada duelo reciente, también las de
+// habilidades (la tirada de un Rayo mágico, la resistencia de un objetivo). Lo puro en Duelo.tiradasEnyetables (comun/duelo.js). Lo usa también el
+// 🧿 Mal de ojo (js/60). `o.incluirCerrados` queda para la parte B (los duelos ya cerrados, «🔒 ya resuelto»).
+async function enyetarCandidatos(yo, o){
+  const rng = num((rangoDeToken(yo) || {}).rng);
+  const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(15).get();
+  const duelos = q.docs.map(doc => ({id: doc.id, ...doc.data()}));
+  return Duelo.tiradasEnyetables(duelos, {
+    reciente: enyetarReciente,
+    esRival: id => { const t = tokens.get(id); return !!(t && dueloEsRival(yo, t)); },
+    alcanza: id => { const t = tokens.get(id); return !!t && distanciaHex(yo, t) <= rng && !(typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(t)); },
+    nombreDe: id => { const t = tokens.get(id); return t ? nombreDe(t) : ''; },
+    incluirCerrados: !!(o && o.incluirCerrados),
   });
-  return lista;
 }
 async function abrirEnyetar(tokenId){
   const yo = tokens.get(tokenId);
@@ -60,20 +59,32 @@ async function abrirEnyetar(tokenId){
     return;
   }
   const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.nombre} · ${o.etq} (${fmt(o.total)})`,
-    detalle: `en el duelo contra ${o.contra} · tirás PdG.Esp contra su Res.Esp; si ganás, repite y queda la peor · 5 SP (turno ajeno 10)`,
-    alClic: () => { AvisoCombate.cerrar(); enyetarUsar(yo, o.tokenId); }}));
+    detalle: `${o.hab ? `en ${o.hab}, ` : 'en el duelo '}contra ${o.contra}${o.terminado ? ' (ya terminó, pero esa tirada todavía se puede cambiar)' : ''} · el duelo espera mientras tirás PdG.Esp contra su Res.Esp; si ganás, repite esa tirada y queda la peor · 5 SP (turno ajeno 10)`,
+    alClic: () => { AvisoCombate.cerrar(); enyetarElegir(tokenId, o); }}));
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
   AvisoCombate.mostrar({icono: '🐈‍⬛', titulo: `Enyetar · ${nomYo}`, botones, texto: '¿A qué tirada de un enemigo le echás la yeta?'});
 }
-// Ejecuta la habilidad (cobra el SP con su pregunta de Flash) contra ese enemigo, sin tener que marcarlo en el mapa.
+// 😈 Elegida la tirada: ese duelo queda en pausa («X le está echando la yeta a Y…») y recién ahí se ejecuta la habilidad (P363 A).
+async function enyetarElegir(tokenId, o){
+  const yo = tokens.get(tokenId);
+  if(!yo) return;
+  let ok = false;
+  try{ ok = await Duelo.yetaPausar(o.dueloId, {lado: o.lado, campo: o.campo, por: tokenId, porNombre: nombreDe(yo), a: o.tokenId, aNombre: o.nombre}); }
+  catch(err){ console.error('Enyetar: no se pudo poner en pausa el duelo', err); }
+  if(!ok){ toast(`🐈‍⬛ Esa tirada de ${o.nombre} ya no se puede enyetar (el duelo siguió, o ya tiene una yeta encima)`); return; }
+  const usada = await enyetarUsar(yo, o.tokenId);
+  if(!usada) try{ await Duelo.yetaSeguir(o.dueloId, 'no se pudo echar la maldición'); }catch(err){ console.error(err); }
+}
+// Ejecuta la habilidad (cobra el SP con su pregunta de Flash) contra ese enemigo, sin tener que marcarlo en el mapa. → false si no se pudo ni empezar.
 async function enyetarUsar(yo, objetivoId){
   abrirBotonera(yo.fichaId);
   for(let i = 0; i < 40 && !(bn && bn.fichaId === yo.fichaId && bn.S && bn.sesion && bn.sesion.cargada); i++) await new Promise(r => setTimeout(r, 150));
-  if(!(bn && bn.S)){ toast('Enyetar: no se pudo abrir el personaje'); return; }
+  if(!(bn && bn.S)){ toast('Enyetar: no se pudo abrir el personaje'); return false; }
   const it = (bn.S.habilidades || []).find(h => h && h.enyetar);
-  if(!it){ toast(`${nombreDe(yo)} no tiene Enyetar`); return; }
+  if(!it){ toast(`${nombreDe(yo)} no tiene Enyetar`); return false; }
   bn.objetivoFijo = objetivoId;
   FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
+  return true;
 }
 
 /* La tirada repetida en la Mesa (2026-10-12, dueño: «cuando se tiran los dos dados, el seleccionado tiene que tener una animación»): ruedan los dos
@@ -92,25 +103,28 @@ async function publicarRepeticion(nom, r, modo, desde, titulo){
       desde, cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('No se pudo publicar la tirada repetida', err); }
 }
-// El efecto «Enyetar» (lo aplica el mapa del GM, js/13): la tirada más reciente de ese enemigo que se pueda cambiar se repite y queda la peor.
+// El efecto «Enyetar» (lo aplica el mapa del GM, js/13). Desde el 2026-11-27 (P363 A) va EXACTAMENTE a la tirada que se eligió en la lista: la del duelo
+// que quedó en pausa por esta maldición (`ataque.yeta` de quien la echó sobre ese enemigo). Antes buscaba «la más reciente de ese enemigo» y podía
+// tomar otra. La repetición saca la pausa en la misma transacción; si ya no se puede (alguien la cambió con otra cosa), el duelo sigue y queda ✋ a mano.
 async function enyetarAplicar(d, t){
   const nom = nombreDe(t);
   try{
-    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(10).get();
-    for(const doc of q.docs){
-      if(doc.id === d.id) continue;
-      const x = doc.data();
-      if(!x || x.estado === 'cancelado' || x.hab || !enyetarReciente(x.creado)) continue;
-      const lado = x.atacante && x.atacante.tokenId === d.defensor.tokenId ? 'atacante' : x.defensor && x.defensor.tokenId === d.defensor.tokenId ? 'defensor' : '';
-      if(!lado) continue;
-      const s = Duelo.tiradaSumable(x, lado);
-      if(!s || s.enyetada) continue;
-      const r = await Duelo.enyetarTirada(doc.id, lado);
-      if(!r) continue;
-      const otro = (lado === 'atacante' ? x.defensor : x.atacante) || {};
+    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(25).get();
+    const doc = q.docs.find(x => {
+      const y = x.id !== d.id && x.data().ataque && x.data().ataque.yeta;
+      return y && String(y.por) === String(d.atacante.tokenId) && String(y.a) === String(d.defensor.tokenId);
+    });
+    if(doc){
+      const x = doc.data(), y = x.ataque.yeta;
+      const r = await Duelo.enyetarTirada(doc.id, y.lado, 'peor', {campo: y.campo, yeta: true});
+      if(!r){
+        await Duelo.yetaSeguir(doc.id, 'la tirada ya no se podía cambiar');
+        return {manual: true, nota: `${nom}: esa tirada ya no se podía cambiar: ✋ que la repita y se quede con la peor, a mano`};
+      }
+      const otro = (y.lado === 'atacante' ? x.defensor : x.atacante) || {};
       await publicarRepeticion(nom, r, 'peor', t.tipo === 'creep' ? 'gm' : 'mapa');
-      return {nota: `${nom} repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}; el duelo contra ${otro.nombre || 'el otro'} se volvió a resolver`};
+      return {nota: `${nom} repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}; el duelo contra ${otro.nombre || 'el otro'} sigue desde ahí`};
     }
   }catch(err){ console.error('Enyetar: no se pudo ver el duelo', err); }
-  return {manual: true, nota: `${nom} no tiene una tirada reciente que se pueda cambiar: ✋ que repita su última tirada y se quede con la peor, a mano`};
+  return {manual: true, nota: `${nom}: no se encontró la tirada elegida (el duelo ya no estaba en pausa): ✋ que la repita y se quede con la peor, a mano`};
 }

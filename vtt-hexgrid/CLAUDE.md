@@ -2026,6 +2026,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   tirada más reciente de cada enemigo a tu alcance que se pueda cambiar y ejecuta la habilidad contra él sin marcarlo (`bn.objetivoFijo` →
   `dueloElegirObjetivoMapa({objetivoFijo})`). Si gana la maldición, el efecto «Enyetar» (js/13 → `enyetarAplicar`) llama a `Duelo.enyetarTirada`
   (repite los mismos dados, queda la peor, el duelo se vuelve a resolver) y publica la tirada repetida en la Mesa.
+  **😈 La pausa (2026-11-27, P363 parte A):** elegir la tirada (`enyetarElegir`) pone el duelo en pausa con `Duelo.yetaPausar` (`ataque.yeta`: quién,
+  a quién, qué tirada) y recién ahí ejecuta la habilidad; si no se puede ni abrir, `Duelo.yetaSeguir`. La lista sale de `Duelo.tiradasEnyetables`
+  (también las tiradas de habilidades; una por lado de cada duelo; avisa «ya terminó, pero…»; `enyetarCandidatos(yo, {incluirCerrados})` para la B).
+  `enyetarAplicar` busca el duelo en pausa de quien la echó contra ese enemigo y repite **esa** tirada (`enyetarTirada(id, lado, 'peor', {campo,
+  yeta: true})`, que saca la pausa); sin pausa, ✋ a mano (ya no adivina «la más reciente»). Lo demás de la pausa (el cartel, «▶ Seguir sin la yeta»,
+  qué frena, quién la levanta) está en `comun/duelo.js` (ver comun/CLAUDE.md). El 🧿 Mal de ojo (js/60) usa la misma lista y repite el `campo` elegido,
+  sin pausa. Probado con clics en «Prueba · General».
 - **🎯 Mecánicas de ballesta al apuntar** (2026-10-11, también en `js/35-arcos.js`): alcance con caída, apuntada firme (`seMovioTurnoAnterior`, js/04:
   ahora se guardan los movimientos de este turno y del anterior), tirador de apoyo (`arcoAliadoPegado`), remate (`arcoQuieto`) y el +1 dado del primer
   disparo (`primerDisparoUsados`). La Remachadora la lleva el mapa del GM (`remachadoraCuenta`, `remachadoraPerfora` en `dueloAplicarDano`, js/13;

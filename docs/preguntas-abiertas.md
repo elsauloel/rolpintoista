@@ -3165,3 +3165,15 @@ resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **
 > Firebase: el dueño la pega). (7) Al deshacer, **«Aplicar automático / Resolver a mano»: sí**. Sin respuesta (queda lo recomendado mientras): (2b) si
 > Re-roll, Mal de ojo y Polilla también hacen esperar al duelo → por ahora solo Enyetar; (3) el límite de B → solo el turno actual y sin un duelo más
 > nuevo entre esos dos.
+
+### P364 — 😈 La pausa de Enyetar: cuánto espera y qué se puede hacer mientras (2026-11-27, Claude, al programar la parte A de P363)
+
+Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta que se resuelve la maldición. Lo que quedó así mientras tanto (se puede cambiar):
+1. **Si la maldición nunca se llega a echar** (por ejemplo, el jugador tocó «Cancelar» en «¿Es tu turno?»), la pantalla del GM levanta la pausa sola a
+   los **60 segundos** y el duelo sigue como estaba (además del «▶ Seguir sin la yeta», que el GM y quien la echó tienen siempre). ¿Está bien ese tiempo?
+2. **Mientras está en pausa, la Moneda Re-Roll, la Polilla y el Empower se pueden seguir usando** sobre esa misma tirada (no hacen esperar). Si cambian
+   la tirada, la maldición se aplica sobre el número nuevo. ¿Está bien, o mientras hay una yeta encima esa tirada queda «congelada»?
+3. **La lista muestra también un duelo ya terminado si esa tirada todavía se puede cambiar** (un ataque que falló, sin daño ni efectos): dice «ya
+   terminó, pero esa tirada todavía se puede cambiar». Si la yeta lo da vuelta, el duelo sigue (por ejemplo, ahora pega). ¿Está bien, o solo duelos
+   abiertos?
+

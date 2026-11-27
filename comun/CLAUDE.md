@@ -2416,3 +2416,15 @@ versión parecida en más de una, es candidato a juntar.
   (`armarDetalle` devuelve `{descripcion, tecnico}`); las ya guardadas con la línea pegada no se reescriben (se separan al mostrarlas). Quien lea esa línea
   mira las dos: `CreepCalculo.habPartes` (la Mesa: descripción + lo de «a mano»), `migrarHabPdg` y las migraciones de cooldown de `creep-calculo.js`.
   Viaja en `Plantillas.HAB` y `Plantillas.pasiva`. Modelo: el Contraataque y Devolver gentileza. Dudas: P362.
+- **😈 `duelo.js`, la pausa de Enyetar** (2026-11-27, P363 parte A): un duelo con `ataque.yeta` = {por, porNombre, a, aNombre, lado, campo, etq, uid,
+  desde (hora del servidor)} está en pausa (`Duelo.enYeta`). Sin regla nueva: vive adentro de `ataque` (como `ataque.desarme`). `yetaFrena(m, que)`
+  ('critico' | 'dano' | 'efectos' | 'desempate', y 'fuerza'/'bloqueo' si la yeta es sobre el contacto) la respetan las transacciones (`tirarCritico`,
+  `guardarDano`, `guardarMagico`, `aceptarDano`, `reclamarAplicacion`, `tirarEfecto(s)`, `marcarEfecto` con `aplicar`, `reclamarEfecto`,
+  `terminarEfectos`, `elegirParidad`, `elegirPpt`, `guardarTiro` del Bloqueo); el cuadro muestra `yetaHtml` (violeta, «▶ Seguir sin la yeta» para el GM
+  y quien la echó) en lugar del crítico, el daño, los efectos y el veredicto; en `escuchar`, los avisos de «se resolvió» (resumen, cascada del área,
+  termina el turno, dodge libre…) usan `listaH`/`todosH` (sin los que están en pausa) y `revisarOcultos` los saltea. La levantan
+  `enyetarTirada(id, lado, modo, {campo, yeta: true})` (repite EXACTAMENTE ese `campo`, si `puedeReabrir`) y `yetaSeguir(id, motivo, resultado)`; la
+  pantalla del GM (`yetaRevisarTodos`, cada 3 s y con cada cambio) mira la maldición con `dueloDeLaYeta` / `yetaQueHacer` (puras): perdió → sigue;
+  cancelada o nunca creada en 60 s → sigue; ganó y su efecto quedó a mano → sigue a los 5 s. Cada fin queda en `ataque.yetaHist` (para la parte B).
+  `tiradasEnyetables(duelos, {esRival, alcanza, nombreDe, reciente, incluirCerrados})` es la lista del 🐈‍⬛ y del 🧿 (pura). Dudas: P364.
+

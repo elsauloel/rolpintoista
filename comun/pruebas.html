@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127unico2"></script>
+<script src="duelo.js?v=20261127yeta2"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -1002,6 +1002,47 @@ prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.E
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.enyetar, ej.objetivo, ej.tira.stat, ej.contra.map(c => c.stat), (ej.efectos || []).map(e => e.nombre), /Sin auditar/.test(hab.detalle), /Enyetar \[5\]/.test(hab.original),
     sin, FichaResumen.resumen(S).enyetar, Duelo.tiradaSumable(d, 'atacante').enyetada, Duelo.tiradaSumable(d, 'defensor').enyetada, typeof Duelo.enyetarTirada],
     ['5', 0, '10', true, 'enemigo', 'pdgmg', ['resmg'], ['Enyetar'], false, true, false, true, false, true, 'function']);
+});
+prueba('😈 Enyetar parte A (P363, 2026-11-27): la pausa frena daño, crítico, efectos y desempate (y el Bloqueo si la yeta es sobre el contacto)', () => {
+  const y = c => ({estado: 'esperando', ataque: {yeta: {campo: c, lado: c === 'pdg' || c === 'fuerza' ? 'atacante' : 'defensor', por: 'yo', a: 'ene', desde: 1000}}});
+  const que = ['critico', 'dano', 'efectos', 'desempate', 'fuerza', 'bloqueo'];
+  igual([que.map(q => Duelo.yetaFrena(y('pdg'), q)), que.map(q => Duelo.yetaFrena(y('fuerza'), q)), que.map(q => Duelo.yetaFrena({estado: 'esperando', ataque: {}}, q)),
+    Duelo.enYeta(y('eva')), Duelo.enYeta({...y('eva'), estado: 'cancelado'}), Duelo.enYeta({estado: 'resuelto', ataque: {}})],
+    [[true, true, true, true, true, true], [true, true, true, true, false, false], [false, false, false, false, false, false], true, false, false]);
+});
+prueba('😈 Enyetar parte A: la lista suma las tiradas de habilidades y deja afuera lo cancelado, lo ya enyetado, lo que tiene una yeta y la propia maldición', () => {
+  const rival = id => id !== 'yo', cerca = () => true;
+  const duelos = [
+    {id: 'd1', estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'gob', nombre: 'Goblin'}, defensor: {tokenId: 'yo', nombre: 'Yo'}, ataque: {}, pdg: {total: 9, formula: '1d12', rolls: [9], mod: 0}},
+    {id: 'd2', estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'yo', nombre: 'Yo'}, defensor: {tokenId: 'kob', nombre: 'Kobold'}, ataque: {}, hab: {nombre: 'Rayo mágico', contra: [{stat: 'resmg', etq: 'Res.Esp'}]},
+      pdg: {total: 8, formula: '1d10'}, eva: {total: 4, formula: '1d6'}},
+    {id: 'd3', estado: 'cancelado', atacante: {tokenId: 'gob'}, defensor: {tokenId: 'yo'}, ataque: {}, pdg: {total: 3, formula: '1d6'}},
+    {id: 'd4', estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'orco', nombre: 'Orco'}, defensor: {tokenId: 'yo'}, ataque: {}, pdg: {total: 5, formula: '1d6 🐈'}},
+    {id: 'd5', estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'lobo', nombre: 'Lobo'}, defensor: {tokenId: 'yo'}, ataque: {yeta: {por: 'otro', a: 'lobo', campo: 'pdg', lado: 'atacante'}}, pdg: {total: 5, formula: '1d6'}},
+    {id: 'd6', estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'yo'}, defensor: {tokenId: 'gob', nombre: 'Goblin'}, ataque: {}, hab: {nombre: 'Enyetar', efectos: [{nombre: 'Enyetar'}]}, pdg: {total: 6, formula: '1d8'}, eva: {total: 2, formula: '1d4'}},
+    {id: 'd7', estado: 'resuelto', fase: 'fin', resultado: 'pego', atacante: {tokenId: 'gob', nombre: 'Goblin'}, defensor: {tokenId: 'yo'}, ataque: {}, pdg: {total: 11, formula: '1d12'}, eva: {total: 3, formula: '1d6'}, dano: {crudo: 4}},
+  ];
+  const l = Duelo.tiradasEnyetables(duelos, {esRival: rival, alcanza: cerca});
+  const lc = Duelo.tiradasEnyetables(duelos, {esRival: rival, alcanza: cerca, incluirCerrados: true});
+  igual([l.map(o => [o.dueloId, o.lado, o.campo, o.total, o.hab, !!o.cerrado]), lc.filter(o => o.cerrado).map(o => [o.dueloId, o.campo, o.total]),
+    Duelo.tiradasEnyetables(duelos, {esRival: rival, alcanza: id => id !== 'kob'}).length],
+    [[['d1', 'atacante', 'pdg', 9, '', false], ['d2', 'defensor', 'eva', 4, 'Rayo mágico', false]], [['d7', 'pdg', 11]], 1]);
+});
+prueba('😈 Enyetar parte A: qué hace la pantalla del GM con una pausa, según la maldición (espera, perdió, se canceló, nunca llegó, se resolvió a mano)', () => {
+  const pausa = {id: 'o', estado: 'esperando', ataque: {yeta: {por: 'yo', a: 'gob', aNombre: 'Goblin', campo: 'pdg', lado: 'atacante', desde: 100000}}};
+  const mal = (x) => ({id: 'm', hab: {nombre: 'Enyetar', efectos: [{nombre: 'Enyetar'}]}, atacante: {tokenId: 'yo'}, defensor: {tokenId: 'gob'}, creado: 101000, ...x});
+  const q = (lista, visto, ahora) => { const r = Duelo.yetaQueHacer(pausa, [pausa, ...lista], visto, ahora || 110000); return [r.accion, r.resultado || '', r.motivo || '']; };
+  igual([q([]), q([], false, 200000), q([], true), q([mal({estado: 'esperando'})]), q([mal({estado: 'resuelto', resultado: 'fallo'})]),
+    q([mal({estado: 'resuelto', resultado: 'pego', efectos: [{nombre: 'Enyetar', aplicado: true, nota: 'a mano'}]})])[0],
+    q([mal({estado: "esperando", creado: 98000})]), (Duelo.dueloDeLaYeta(pausa.ataque.yeta, [mal({estado: 'esperando', atacante: {tokenId: 'otro'}})]) || {}).id || ''],
+    [['esperar', '', ''], ['seguir', '', 'no se llegó a echar la maldición'], ['seguir', '', 'se canceló la maldición'], ['esperar', '', ''],
+      ['seguir', 'perdio', 'Goblin resistió la maldición'], 'esperarAplicada', ['esperar', '', ''], '']);
+});
+prueba('😈 Enyetar parte A en el código: la lista, la pausa antes de ejecutar, la tirada exacta y «Seguir sin la yeta» (js/38, comun/duelo.js)', async () => {
+  const [t38, du, t60] = await Promise.all(['../vtt-hexgrid/js/38-enyetar.js', 'duelo.js', '../vtt-hexgrid/js/60-mal-de-ojo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+  igual([/Duelo\.tiradasEnyetables\(/.test(t38), /Duelo\.yetaPausar\(o\.dueloId/.test(t38), /enyetarTirada\(doc\.id, y\.lado, 'peor', \{campo: y\.campo, yeta: true\}\)/.test(t38),
+    /x\.hab \|\| !enyetarReciente/.test(t38), /data-yeta-seguir/.test(du), /todosH\.forEach\(publicarResumenSiCorresponde\)/.test(du), /dt\.campo \? \{campo: dt\.campo\}/.test(t60)],
+    [true, true, true, false, true, true, true]);
 });
 prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la Runa aceleradora, consumible del Bazar arcano', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-acelerador');
@@ -11756,7 +11797,7 @@ grupo('🙈 Un área contra alguien que no se ve (P263, vtt-hexgrid/js/130, comu
     const src = await traer('duelo.js');
     cierto(/\.\.\.\(g\.oculto \? \{oculto: true\} : \{\}\)/.test(src));
     cierto(/listaDuelos = todosDuelos\.filter\(veoOculto\)/.test(src));
-    cierto(/todosDuelos\.forEach\(publicarResumenSiCorresponde\)/.test(src) && /\(esOculto\(datos\) && ocultaMesa\(datos\.id, 'reporte', datos\)\) \|\| \{desde: 'reporte'\}/.test(src));
+    cierto(/todos(Duelos|H)\.forEach\(publicarResumenSiCorresponde\)/.test(src) && /\(esOculto\(datos\) && ocultaMesa\(datos\.id, 'reporte', datos\)\) \|\| \{desde: 'reporte'\}/.test(src));
     cierto(/const OCULTO_MS = 40 \* 1000/.test(src) && /setInterval\(revisarOcultos, 5000\)/.test(src));
     cierto(/const puedeAtq = esMio\(d\.atacante\) \|\| soyGM\(\) \|\| porOcultoAtq\(d\)/.test(src));
     cierto(!/anunciarMesa\(anuncio\);/.test(src) && !/mesaPublicar\(publicar\.origen, publicar\.r\)/.test(src));   // todas las líneas pasan por la marca
@@ -11920,7 +11961,7 @@ grupo('🙈 Lo que salta con el golpe a un escondido no lo delata (P320, vtt-hex
     cierto(iDel > 0 && iTal > iDel && /const info = await areaOcultaCon\(d, async \(\) => \{ const r = await dueloAplicarDanoBase\(d, o\)/.test(m13));
     cierto(/areaOcultaCon\(d, \(\) => dueloAplicarEfecto\(d, ef\)\)/.test(m14) && /areaOcultaCon\(d, \(\) => talContrahechizo\(d\)\)/.test(m14) && /areaOcultaCon\(m, \(\) => talSalvajeAnunciar/.test(m14));
     cierto(/sinPorque/.test(m53) && /nombre: 'un Espejito'/.test(m53) && /Una Cruz de plata le rebota/.test(m53) && /'su objetivo'/.test(m53));
-    cierto(/todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'atacante'/.test(duelo) && /todosDuelos\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'defensor'/.test(duelo));
+    cierto(/todos(Duelos|H)\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'atacante'/.test(duelo) && /todos(Duelos|H)\.forEach\(d => \{\n\s+if\(!d\.contacto \|\| d\.contacto\.gana !== 'defensor'/.test(duelo));   // (😈 todosH: sin los que están en pausa por Enyetar, P363)
     cierto(/conOculta\(d\.id, \{\.\.\.r, quien: d\.atacante\.nombre/.test(duelo));
   });
   prueba('si el golpe lo delata, el duelo queda «delatado» y lo que sigue (la cuenta del daño, el resumen) va sin marca: también en la ficha suelta y GM Tools (cola, 2026-11-24)', async () => {

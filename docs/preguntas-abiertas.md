@@ -3052,10 +3052,12 @@ dejar todo como al abrir la ventana (la casilla tildada otra vez), o así está 
 > ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: «✕ Limpiar filtros» deja todo como al abrir (también vuelve a tildar «sumar las de Cualquiera»). **Aplicada el 2026-11-27**: también vacía el buscador, y el rol que venía marcado (un creep, la clase del asistente) también se desmarca («Limpiar» es limpiar; se vuelve a marcar con un clic).
 
 
-### P359 — 🔮 En la simulación del fin del combate, ¿el oro y los consumibles al azar de un creep que se marca «cae» van como una tirada de muestra o como un rango? (2026-11-27, Claude, al programar «Simular quién cae»)
+### ✅ P359 — 🔮 En la simulación del fin del combate, ¿el oro y los consumibles al azar de un creep que se marca «cae» van como una tirada de muestra o como un rango? (2026-11-27, Claude, al programar «Simular quién cae»)
 
 En 🔮 Simular ahora se puede marcar que cae un creep que sigue en pie. Para la cuenta, su oro sale con la variación de siempre (±20 %) y, si es un
 creep viejo sin consumible al azar, su consumible sale con la chance de siempre: **se tira una vez, como muestra**, y queda fijo mientras dure la
 simulación (destildarlo y volver a tildarlo no lo cambia; 🎲 cambia un consumible). La lista lo avisa: «son un **estimado**». Es lo mismo que ya
 hacía la simulación con los creeps caídos de verdad. ¿Está bien así, o preferís que en la simulación se vea un rango («entre 32 y 48 DDE», «45 % de
 soltar un consumible») como en 💰 Botín estimado del mapa? Recomendación: dejarlo así (se ve lo mismo que en Avanzar y se puede mirar ítem por ítem).
+
+> ✅ **Decidida (dueño, 2026-11-27):** «queda así» — una tirada de muestra, avisada como «estimado».

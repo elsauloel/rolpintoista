@@ -3434,6 +3434,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   en el mapa, con su engranaje): «el engranaje no hace nada. Me gustaría poder rearmar una trampa. Al rearmarla se vuelve a ocultar. Lo puede hacer el GM
   o el jugador propietario de la trampa». Que el ⚙ de una trampa disparada ofrezca «🔁 Rearmar»: vuelve a quedar armada y oculta (como al colocarla),
   solo para el GM o el dueño de la trampa; revisar por qué hoy el ⚙ no responde.
+- **⬜ en cola — 🃏 Las WildCard (WC): elegir entre la WC y la Moneda, prenderla y apagarla desde su botón, y que el GM pueda sumar una** (dueño,
+  2026-11-27, con capturas de los botones de arriba del mapa: la 🃏 y el 😇): (1) «en el caso de "Re-roll WC-Moneda", si el usuario tiene las dos opciones,
+  el juego te da a elegir cuál querés usar»; (2) «las WC me gustaría poder activarlas y desactivarlas desde este mismo botón. Cuando no tenés WC el botón
+  no desaparece sino que queda apagado, y al tocarlo te ofrece reactivarlo»; (3) «si el GM selecciona un token de jugador, en el menú circular de los ⋯,
+  ahí le debe aparecer la opción de sumarle una WC». **Recordatorio: preguntarle al dueño si las WC se acumulan** (tener más de una) antes de programar (3).
+  Ver cómo se guarda hoy la WC / la Moneda Re-Roll (`comun/CLAUDE.md`, Re-roll) y el botón 🃏 del mapa.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

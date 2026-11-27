@@ -151,8 +151,8 @@ function itemDelCatalogoGM(item, catalogo){
 function abrirDarJugadorGM(o){
   o = o || {};
   const catalogo = catalogoGMCompleto();
-  const item = o.item ? itemDelCatalogoGM(o.item, catalogo) : null;
-  DarJugador.abrir({marcados: o.marcados || [], item, catalogo: () => catalogo, toast: t => toast(t), verItem: it => CreepLupa.verItem(it)});
+  const item = o.nuevo || (o.item ? itemDelCatalogoGM(o.item, catalogo) : null);   // o.nuevo: un ítem que no es del catálogo (el consumible propio de «✎ Ítem custom»)
+  DarJugador.abrir({marcados: o.marcados || [], item, itemN: o.n || 1, catalogo: () => catalogo, toast: t => toast(t), verItem: it => CreepLupa.verItem(it)});
 }
 // 🤝 Dar, en el menú de la izquierda (2026-11-22, dueño, opción A): GM Tools es solo del GM, así que abre siempre «Dar a un jugador», sin nadie marcado.
 $('#btn-dar-dock').onclick = () => {

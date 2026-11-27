@@ -17,7 +17,8 @@
    El aviso: {fichaId, duenoUid, nombre, xp: 0, dde, despojos, despojosMagicos, despojosEsp: [{nombre, cantidad}], items: [json, …] (uno por
    unidad, como el botín: así una pantalla con la versión anterior igual los recibe), regalo: true, de, aplicada: false, creado}.
 
-   DarJugador.abrir({catalogo() → ítems, marcados: [fichaId], item, toast(t), verItem(it) → {titulo, html}}) — la ventana (solo el GM).
+   DarJugador.abrir({catalogo() → ítems, marcados: [fichaId], item, itemN, toast(t), verItem(it) → {titulo, html}}) — la ventana (solo el GM).
+   `item` llega ya en la lista (`itemN` unidades, 1 si no se dice).
    DarJugador.aviso(ficha, que, de) → el documento · .texto(que) → «Hacha ×2 · 50 DDE · 3 despojos» · .mesaTexto(nombres, que)
    DarJugador.recibir(S, r) → {partes, lineas, items, pasada} (lo llama Recibidos.recompensa cuando el aviso es un regalo)
    DarJugador.cartel({nombre, de, lineas, pasada}) — el cartel de quien recibe (si ya hay uno abierto, se suma abajo).
@@ -409,7 +410,7 @@ const DarJugador = (() => {
       const ya = yo.que.items.find(x => x.clave === js);
       if(ya) ya.n = Math.min(MAX_UNIDADES, ya.n + (n || 1)); else yo.que.items.push({clave: js, item: copia(item), n: n || 1});
     };
-    if(o.item) sumarItem(o.item, 1);
+    if(o.item) sumarItem(o.item, Math.max(1, Math.min(MAX_UNIDADES, entero(o.itemN) || 1)));   // itemN: cuántos (el consumible propio de «✎ Ítem custom» de GM Tools)
 
     function dibujarQuien(){
       $('[data-dj-quien]').innerHTML = yo.pjs.length

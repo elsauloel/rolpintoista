@@ -306,7 +306,16 @@ function abrirItemCustomGM(){
     }],
     onGuardar: (d, scId) => {
       // ✋ Un consumible propio no va al equipo de un creep (su cinturón usa los del catálogo) ni al catálogo (P317): se da a un jugador.
-      if(d.tipoItem === 'consumibles'){ toast('Un consumible propio no se le equipa a un creep: dáselo a un jugador con 🤝 Dar a un jugador (los consumibles a mano son de la partida: no van al catálogo)'); return false; }
+      // (2026-11-27) En vez de solo avisar, pasa directo a 🤝 Dar a un jugador con el consumible ya en la lista (con sus unidades y su 🎲 tirada):
+      // así no hay que volver a armarlo ahí (P284 (1): «avisa y deja dárselo a un jugador»).
+      if(d.tipoItem === 'consumibles'){
+        if(!(fbMiembro && fbMiembro.gm)){ toast('Un consumible propio no se le equipa a un creep: lo da el GM con 🤝 Dar a un jugador'); return false; }
+        const item = structuredClone(d), n = Math.max(1, Math.round(Number(d.unidades) || 1));
+        delete item.id; item.equipado = false; item.consumible = true; item.unidades = 1;
+        setTimeout(() => abrirDarJugadorGM({nuevo: item, n}), 0);
+        toast('Un consumible propio no se le equipa a un creep: elegí a qué jugador dárselo (los consumibles a mano son de la partida: no van al catálogo)');
+        return true;
+      }
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
       if(CreepCalculo.vaAlEquipo(d)){ ponerEquipoEnCreep(sc, d); const nuevo = sc.equipo[sc.equipo.length - 1]; hacerLugarEnManosCreep(sc, nuevo, true).then(() => renderAll()); }   // (una varita va al equipo; ✋ hace lugar)

@@ -2924,9 +2924,19 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   para qué sirve y quién lo ve (con captura); después, el caso particular: hoy deja guardar ahí un consumible «a mano» (P317: esos no van al
   catálogo compartido). Decidir con el dueño si también se saca de ahí.
 
-- **⬜ en cola — Probar: 🎲 el consumible a mano con tirada desde el cinturón y armado en GM Tools** (2026-11-24, del consumible con tirada): con clics se
+- **✅ hecho (2026-11-27) — Probar: 🎲 el consumible a mano con tirada desde el cinturón y armado en GM Tools** (2026-11-24, del consumible con tirada): con clics se
   probó crearlo en la ficha y consumirlo de la mochila (ficha y Botonera del mapa). Falta: pasarlo al cinturón y consumirlo de ahí, y armarlo en GM Tools
   («✎ Ítem custom» → 🤝 Dar a un jugador) con su tirada y que al jugador le llegue y le tire al consumirlo.
+  *Resultado:* en «Claude · pruebas 2», con clics. **Cinturón:** el Jugador 1 creó en su ficha «Brebaje de prueba» (consumible, 2 unidades, 🎲 1d6;
+  el asistente no ofrece ⬆ Subir, P317) y lo pasó con «→ Cinturón» (pasa de a una y conserva la tirada). Consumido del cinturón en la ficha: 1d6 = 1
+  en la Mesa junto al «✋ a mano», −1 No2, se fue del cinturón; la otra unidad, al cinturón y consumida desde la Botonera del mapa: 1d6 = 3, −1 No2.
+  **GM Tools:** se encontró un tropiezo: en «✎ Ítem custom», con un consumible, «Crear y equipar» solo avisaba «dáselo con 🤝 Dar a un jugador» y no
+  pasaba nada más (el ítem armado quedaba ahí; había que volver a armarlo en 🤝 Dar → ✎ Ítem nuevo). **Arreglado:** ahora «Crear y equipar» con un
+  consumible cierra el asistente y abre 🤝 Dar a un jugador con el consumible ya en la lista, con sus unidades y su tirada (P284 (1): «avisa y deja
+  dárselo a un jugador»). Probado: el GM armó «Elixir del GM de prueba» (2 unidades, 🎲 2d4+1), se abrió Dar con «Elixir ×2», marcó a Blanco J1 y
+  dio; a J1 le saltó el cartel «El GM te dio algo» y le entró a la mochila con la tirada (el Ver dice «🎲 al consumirlo: 2d4+1»). Consumido en la
+  ficha (2d4+1 = 5, −2 No2) y en la Botonera del mapa (2d4+1 = 9, −2 No2); la Mesa del GM ve las dos. `comun/dar-jugador.js` (`itemN`),
+  `gm-toolset/js/04` y `05`. Pruebas 1167 en verde. `restaurar.js`: «quedó igual». Capturas `cola134/`. Lo que quedó: la entrada de abajo.
 
 - **✅ hecho (2026-11-24, con permiso del dueño) — Probar: 🕊️ «Registro nuevo» se lleva los mensajes de antes del combate anterior** (2026-11-24, de los ajustes de los mensajes): no se
   probó porque borra de verdad, en «Claude · pruebas 2», las tiradas, el 📜 historial y los mensajes de antes del combate anterior. Probarlo cuando el
@@ -3304,6 +3314,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cuánto ganan de experiencia y qué equipos le quedan con los creeps muertos. Entonces al poner simulación uno debe elegir cada uno de los creeps
   presentes y poder poner si están vivos o muertos». En 🔮 Simular (`comun/combate-fin.js`): una lista con cada creep presente y un interruptor
   vivo / muerto (arranca como están de verdad), y la experiencia y el botín se recalculan con esa elección; no se guarda nada (es simulación).
+- **⬜ en cola — ✎ Ítem custom con un consumible: que no hable de creeps ni del catálogo** (2026-11-27, visto al probar el consumible con tirada):
+  en GM Tools, «✎ Ítem custom» con la categoría Consumible igual muestra «Equipar a: (un creep)», «Si no lo equipás a nadie, igual lo podés publicar en
+  el catálogo», el Tier («solo importa si lo publicás en el catálogo») y el botón dice «Crear y equipar», aunque un consumible propio no se equipa a
+  un creep ni va al catálogo (P317): ahora pasa a 🤝 Dar a un jugador. Propuesta: con un consumible, esconder «Equipar a» y el Tier, y que el botón
+  diga «Crear y dar a un jugador». Captura `cola134/13-GM-item-custom-consumible.png`.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -3061,3 +3061,17 @@ hacía la simulación con los creeps caídos de verdad. ¿Está bien así, o pre
 soltar un consumible») como en 💰 Botín estimado del mapa? Recomendación: dejarlo así (se ve lo mismo que en Avanzar y se puede mirar ítem por ítem).
 
 > ✅ **Decidida (dueño, 2026-11-27):** «queda así» — una tirada de muestra, avisada como «estimado».
+
+
+### P360 — 🏹 El «Parry a distancia» del Shooter y el contraataque solo cuerpo a cuerpo (2026-11-27, Claude, al aplicar «Contraataque solo con armas cuerpo a cuerpo»)
+
+Desde hoy (dueño, 2026-11-27) **el contraataque es solo cuerpo a cuerpo**: el ataque que se recibe tiene que ser cuerpo a cuerpo y se contesta con un
+arma cuerpo a cuerpo (no con un arco, una ballesta, un arma de fuego ni una varita). Vale para la habilidad Contraataque y para la pasiva Devolver
+gentileza. Pero la habilidad **Parry a distancia** (Shooter) dice: «si ganás, el golpe queda anulado y cuenta como un Parry ganado: **podés
+contraatacar**. Con un arco, para contraatacar, antes tenés que hacer el dodge roll…; con una ballesta no hace falta». Con la regla nueva, quien
+para con el arco o la ballesta ya no puede contraatacar con esa arma (solo si tiene un arma cuerpo a cuerpo en la otra mano, y nunca contra un
+disparo). Hoy el sistema aplica la regla nueva (no ofrece el contraataque con el arco), pero el texto del Parry a distancia sigue prometiéndolo.
+¿Qué hacemos?
+- (a) **La regla nueva manda**: se saca del Parry a distancia lo del contraataque y el dodge roll del arco (queda como una defensa más).
+- (b) **El Parry a distancia es una excepción**: con él sí se contraataca con el arma de rango (habría que programarla como excepción).
+Recomendación: (a), para que la regla sea una sola.

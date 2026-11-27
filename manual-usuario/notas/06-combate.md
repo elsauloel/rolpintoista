@@ -132,7 +132,7 @@ Regla del dueño (2026-09-26). **El botón Atacar no tira directo: te pregunta q
 |---|---|---|
 | **Ataque normal** | **el primero del turno con esa arma: la mitad de su Tipo** (redondeo del primer ataque); **el segundo y los siguientes: el Tipo completo** | **Sí** |
 | **Ataque de oportunidad** | **siempre la mitad del Tipo** de tu arma | No |
-| **[[Contraataque]]** (tras ganar un [[Parry]] y un [[Bloqueo]]) | **siempre la mitad del Tipo** de tu arma | No |
+| **[[Contraataque]]** (con la habilidad o la pasiva Devolver gentileza; solo cuerpo a cuerpo) | **siempre la mitad del Tipo** de tu arma | No |
 Los tres tiran el **PdG** del arma. Los dos especiales no encarecen tus demás ataques del turno.
 
 +++
@@ -141,11 +141,15 @@ alias: [Contraatacar, Contraataque tras Parry]
 tags: [combate, regla, a-prueba]
 estado: borrador
 +++
-**Regla a prueba** (dueño, 2026-09-26; precisada el 2026-10-01). **Por definición, solo se puede contraatacar después de un [[Parry]] y un [[Bloqueo]] exitosos, los dos**: ganar el Parry solo no alcanza. El Parry puede ser **con arma o con escudo**.
-- **En el duelo:** cuando el defensor gana el Parry y el Bloqueo, el golpe queda **bloqueado** y el paso siguiente es una pregunta: **¿Contraatacás? Sí o No**. Con **Sí** empieza un duelo nuevo, paso a paso como siempre, pero **al revés**: quien defendía ataca y quien atacaba defiende. Con **No**, el duelo termina ahí.
-- **Costo:** el contraataque **siempre cuesta lo mismo que un primer ataque** con esa arma (Tipo ÷ 2, redondeado como el primer ataque), **sin importar cuántos ataques hiciste en tu turno**.
-- **Fuera del duelo:** desde el botón **Atacar** (ver [[Ataque, tipos de ataque]]): eligís **Contraataque** en el menú; tira el **PdG** con el arma elegida y descuenta esos Nitros. El botón no puede saber si ganaste el Parry y el Bloqueo (eso pasa en la mesa), así que lo recuerda en su texto y te deja seguir: **usalo solo cuando ganaste los dos**. **No suma al conteo de ataques del turno**, así que no encarece tus demás ataques.
-- **Con escudo:** el escudo solo sirve para parar; el golpe sale de **otra arma equipada** (la de la otra mano). Sin arma equipada se contraataca con los puños (Tipo provisorio).
+**Contraatacar** es contestarle el golpe a quien te atacó, en el mismo momento. **Solo cuerpo a cuerpo** (dueño, 2026-11-27): el ataque que recibiste tiene que haber sido **cuerpo a cuerpo** y contestás con un **arma cuerpo a cuerpo** (no con un arco, una ballesta, un arma de fuego ni una varita; si tenés una cuerpo a cuerpo en la otra mano, contraatacás con esa; con las manos vacías, a puño). Contra un disparo o un hechizo no hay contraataque.
+Hay dos formas:
+- **La habilidad [[Contraataque]] (Warrior, Flash):** cuando ganás la [[Evasión]] o el [[Parry]], el duelo te pregunta **¿Contraatacás?**, si lo alcanzás con tu arma. Tras un Parry se pregunta **antes del [[Bloqueo]]**: con Sí no se tira el Bloqueo y el golpe queda parado del todo, sin daño; con No sigue el Bloqueo. Suma **+2 a la Probabilidad de Golpe** y cuesta 1 SP (2 en el turno de otro) más los Nitros de un primer ataque.
+- **La pasiva Devolver gentileza:** si ganás el Parry **y** el Bloqueo, el duelo te pregunta si contraatacás. Sin bonus.
+Sin la habilidad ni la pasiva, no hay contraataque.
+- **En el duelo:** con **Sí** empieza un duelo nuevo, paso a paso como siempre, pero **al revés**: quien defendía ataca y quien atacaba defiende. Con **No**, sigue lo de siempre.
+- **Costo en Nitros:** el contraataque **siempre cuesta lo mismo que un primer ataque** con esa arma (Tipo ÷ 2), **sin importar cuántos ataques hiciste en tu turno**, y **no suma al conteo de ataques del turno**.
+- **Fuera del duelo:** desde el botón **Atacar** (ver [[Ataque, tipos de ataque]]) eligís **Contraataque** en el menú; el botón no puede saber si se dan las condiciones (eso pasa en la mesa), así que te deja seguir.
+- **Con escudo:** el escudo solo sirve para parar; el golpe sale de **otra arma equipada** (la de la otra mano).
 > [!question] Lo que se decide probando
 > - ¿Cómo se relaciona con el [[Ataque de oportunidad]]?
 
@@ -178,7 +182,7 @@ El **Parry** (de [[Destreza]]) es la alternativa a la [[Evasión]]: en vez de es
 - Si ganás el Parry, pasás a una segunda tirada de [[Bloqueo]].
 - **Sin nada equipado:** el Parry igual cuesta 1 Nitro.
 - **Los creeps y las invocaciones** funcionan igual: su Parry cuesta 1 Nitro y su Bloqueo suma su Bloqueo + el Peso de su arma.
-- **Contraataque** (regla a prueba): un Parry, con arma o con escudo, permite contraatacar por lo de un primer ataque: ver [[Contraataque]].
+- **Contraataque**: con la habilidad Contraataque o la pasiva Devolver gentileza, un Parry ganado contra un golpe cuerpo a cuerpo permite contraatacar con un arma cuerpo a cuerpo: ver [[Contraataque]].
 - Estados como [[Lisiado]] te bajan el Parry a la mitad.
 
 +++
@@ -549,7 +553,7 @@ Cuando alguien ataca, **se abre un cuadro compartido: el duelo**. Lo ven **todos
 
 ## Los pasos
 1. **Contacto.** El atacante tira su **PdG** y el defensor **elige a ciegas** cómo defenderse (antes de ver el PdG): **Evasión** o **Parry** con cada arma o escudo equipado. Cada botón muestra **cuánto tirarías** (y, en un Parry, el **Bloqueo** que tirarías si ganás). Los números **quedan secretos** (quien ya tiró ve solo la suya) y **se revelan juntos cuando tiraron los dos**, primero con los dados 3D y después en el cuadro.
-2. **Bloqueo** (si el defensor ganó un Parry): **Fuerza del golpe** contra **Bloqueo**. *Antes*, si el defensor tiene la habilidad **[[Contraataque]]**, el duelo le pregunta si contraataca: con Sí **no se tira el Bloqueo**, el golpe queda **parado del todo (sin daño)** y se abre el contraataque; con No sigue el Bloqueo. Si el defensor gana el Bloqueo, el golpe queda **bloqueado** y, con la pasiva Devolver gentileza, el duelo le pregunta si quiere **contraatacar** (Sí abre un duelo nuevo con los papeles al revés); si pierde, pasa **la mitad del daño** (redondeada para arriba) y el arma o escudo con el que bloqueó **pierde 1 punto de [[Durabilidad]]**.
+2. **Bloqueo** (si el defensor ganó un Parry): **Fuerza del golpe** contra **Bloqueo**. *Antes*, si el defensor tiene la habilidad **[[Contraataque]]** (y el golpe fue cuerpo a cuerpo y tiene un arma cuerpo a cuerpo), el duelo le pregunta si contraataca: con Sí **no se tira el Bloqueo**, el golpe queda **parado del todo (sin daño)** y se abre el contraataque; con No sigue el Bloqueo. Si el defensor gana el Bloqueo, el golpe queda **bloqueado** y, con la pasiva Devolver gentileza, el duelo le pregunta si quiere **contraatacar** (Sí abre un duelo nuevo con los papeles al revés); si pierde, pasa **la mitad del daño** (redondeada para arriba) y el arma o escudo con el que bloqueó **pierde 1 punto de [[Durabilidad]]**.
 3. **Crítico.** Si el golpe pega, se compara el PdG con la defensa usada (Evasión o Parry). Si se alcanza el crítico, **es crítico**: se tiran los d20 (se ve la **tabla** de valores, y si el atacante tiene Crítico potente, cómo y por qué está modificada) y el mejor decide el multiplicador (×2, ×3 o ×4; un d20 bajo da ×1). **Un crítico siempre ignora la Defensa.**
 4. **Daño.** El atacante tira el daño de su arma. Con crítico: todo el daño × el multiplicador, **derecho a la vida**. Sin crítico: daño − Defensa. El **GM** aplica el daño a la vida (respeta Invulnerable y Escudo mágico).
 5. **Efectos del golpe.** Cada efecto del arma con probabilidad (por ejemplo Lisiado 25 %) es **un momento propio**: se tira el dado, sale «¡FUNCIONÓ!» o «No funcionó» y, si funcionó, se toca **Aplicar** (lo aplica el GM). Los efectos que necesitan daño (Envenenar, Sangrado, Lisiado…) **no entran si el golpe no hizo daño**.

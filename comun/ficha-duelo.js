@@ -354,8 +354,9 @@ const FichaDuelo = (() => {
               arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
         });
         // ⚔ Contraataque (Warrior, 2026-10-13): con la habilidad, si esquiva con la Evasión puede contraatacar (2 SP + un primer ataque).
-        if((S.habilidades || []).some(x => x && x.contraEsquiva)) ops.filter(o => o.modo === 'evasion' || o.modo === 'parry' || o.modo === 'parrydist').forEach(o => { o.contraEsquiva = true; o.info = [...o.info, `⚔ si ganás ${o.modo === 'evasion' ? 'la Evasión' : 'el Parry'}, podés contraatacar con +2 PdG (Contraataque: 2 SP + un primer ataque), si lo alcanzás`]; });
-        if(num(compute().final.gentileza) > 0) ops.filter(o => o.modo === 'parry').forEach(o => { o.info = [...o.info, '⚔ si ganás el Parry y el Bloqueo, podés contraatacar (Devolver gentileza)']; });
+        const sinContra = Combatiente.motivoSinContra(d, H.armaContra(d));   // ⚔ solo cuerpo a cuerpo (2026-11-27)
+        if((S.habilidades || []).some(x => x && x.contraEsquiva)) ops.filter(o => o.modo === 'evasion' || o.modo === 'parry' || o.modo === 'parrydist').forEach(o => { o.contraEsquiva = true; o.info = [...o.info, sinContra ? `⚔ Contraataque: ahora no (${sinContra})` : `⚔ si ganás ${o.modo === 'evasion' ? 'la Evasión' : 'el Parry'}, podés contraatacar con +2 PdG (Contraataque: 2 SP + un primer ataque), si lo alcanzás`]; });
+        if(num(compute().final.gentileza) > 0) ops.filter(o => o.modo === 'parry').forEach(o => { o.info = [...o.info, sinContra ? `⚔ Devolver gentileza: ahora no (${sinContra})` : '⚔ si ganás el Parry y el Bloqueo, podés contraatacar (Devolver gentileza)']; });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
         if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
         return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
@@ -407,7 +408,12 @@ const FichaDuelo = (() => {
       armaContra: d => {
         const S = getS();
         const usada = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null;
-        const conDano = FichaCombate.armasEquipadasConDano(S);
+        const todas = FichaCombate.armasEquipadasConDano(S);
+        // ⚔ Solo con un arma cuerpo a cuerpo (dueño, 2026-11-27): un arco, una ballesta o una varita no sirven; si hay una cuerpo a cuerpo en la otra
+        // mano, con esa. Con las manos vacías, a puño (como siempre). Con solo armas de rango: `sinCuerpo` (no se ofrece).
+        const conDano = todas.filter(a => Combatiente.sirveParaContra(a.item));
+        const enMano = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i) && FichaCombate.esMano(i.tipoItem) && FichaCombate.esArma(i.tipoItem));   // (una varita no tiene daño: también cuenta)
+        if(!conDano.length && enMano.length && !enMano.some(i => Combatiente.sirveParaContra(i))) return {armaId: '', armaNombre: '', tipoDado: 0, alcance: 1, sinCuerpo: true};
         const it = (usada && conDano.some(a => a.item.id === usada.id)) ? usada : (conDano.length ? conDano[0].item : null);
         return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: FichaCombate.tipoAtaque(it), alcance: FichaCombate.alcanceDeArma(S, it), maestria: Combatiente.maestriaTxt(st => compute().final[st], it, 'contra')};   // ⚔ lo de las maestrías, para el cuadro (2026-11-20)
       },

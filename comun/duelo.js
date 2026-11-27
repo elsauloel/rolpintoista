@@ -542,8 +542,19 @@ const Duelo = (() => {
     const A = cubo(a), B = cubo(b);
     return (Math.abs(A.q - B.q) + Math.abs(A.r - B.r) + Math.abs(A.s - B.s)) / 2;
   };
+  // ⚔ Solo cuerpo a cuerpo (dueño, 2026-11-27): el ataque recibido tiene que ser cuerpo a cuerpo y se contesta con un arma cuerpo a cuerpo
+  // (Combatiente.motivoSinContra). Vale para la habilidad Contraataque y para Devolver gentileza. '' = se puede.
+  const motivoContra = (d, arma) => typeof Combatiente !== 'undefined' && Combatiente.motivoSinContra ? Combatiente.motivoSinContra(d, arma) : '';
+  // La pasiva Devolver gentileza en la defensa: {contraPasiva: true}, o {contraPasivaNo: motivo} si no se puede (para decirlo en el cuadro).
+  function pasivaContra(d, h){
+    if(d.hab || !h || !h.contraPasiva || !h.contraPasiva(d)) return {};
+    const m = motivoContra(d, (h.armaContra && h.armaContra(d)) || {});
+    return m ? {contraPasivaNo: m} : {contraPasiva: true};
+  }
   async function alcanceContra(d, h){
     const arma = (h.armaContra && h.armaContra(d)) || {};
+    const motivo = motivoContra(d, arma);
+    if(motivo) return {contraAlcanza: false, contraMotivo: motivo};
     const alcance = Math.max(1, _num(arma.alcance) || 1);
     try{
       const toks = await tokensDelMapa();
@@ -787,7 +798,8 @@ const Duelo = (() => {
             ...(cfg.ataque.critico.efectos && cfg.ataque.critico.efectos.length ? {efectos: limpiarEfectos(cfg.ataque.critico.efectos)} : {}),
             ...(cfg.ataque.critico.efectosNota ? {efectosNota: txtCorto(cfg.ataque.critico.efectosNota, 200)} : {}),
           }} : {})}
-        : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango, ...(cfg.ataque.tipo === 'contra' && cfg.ataque.contraHab ? {contraHab: true} : {})},
+        : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango, ...(cfg.ataque.tipo === 'contra' && cfg.ataque.contraHab ? {contraHab: true} : {}),
+          ...(cfg.ataque.armaCreepId ? {armaCreepId: String(cfg.ataque.armaCreepId).slice(0, 80)} : {})},   // ⚔ el contraataque de un creep con su otra arma (2026-11-27)
       defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
       contraDe: contraDe || '',
       creadoPor: yo(),
@@ -2730,7 +2742,7 @@ const Duelo = (() => {
       const H = hooks();
       if(!h && H && H.soy && H.soy(d.defensor)) h = H;
       const op = h && h.opcionesDefensa ? (h.opcionesDefensa(d) || []).find(o => o.modo === defensa.modo && o.contraEsquiva) : null;
-      const conPas = h && h.contraPasiva && h.contraPasiva(d) ? {contraPasiva: true} : {};
+      const conPas = pasivaContra(d, h);   // ⚔ Devolver gentileza, solo cuerpo a cuerpo (2026-11-27)
       return op ? {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h)), ...conPas} : {...defensa, ...conPas};
     }catch(err){ console.error('Duelo: el contraataque de una defensa a mano', err); return defensa; }
   }
@@ -3027,11 +3039,14 @@ const Duelo = (() => {
     else if(contraPorHab(d) && !d.contra && !faltaDodgeArco){   // (el creep, también tras ganar el Parry, 2026-10-27)
       // ⚔ Contraataque (Warrior, 2026-10-13, dueño): esquivó con la Evasión → puede contestar, si lo alcanza: 2 SP + el No2 de un primer ataque.
       const propio = esMio(d.defensor);
-      if(!d.defensa.contraAlcanza) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} esquivó, pero no alcanza a ${_esc(d.atacante.nombre)} para contraatacar (distancia ${_fmt(d.defensa.contraDist)}, su alcance ${_fmt(d.defensa.contraAlcance)})</div>`;
+      if(!d.defensa.contraAlcanza && d.defensa.contraMotivo) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} no puede contraatacar: ${_esc(d.defensa.contraMotivo)}</div>`;
+      else if(!d.defensa.contraAlcanza) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} esquivó, pero no alcanza a ${_esc(d.atacante.nombre)} para contraatacar (distancia ${_fmt(d.defensa.contraDist)}, su alcance ${_fmt(d.defensa.contraAlcance)})</div>`;
       else if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${d.resultado === 'mitad' ? _esc(d.defensor.nombre) + ' ganó el Parry' : propio ? 'Esquivaste' : _esc(d.defensor.nombre) + ' esquivó'}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b> (Contraataque)<br><span style="opacity:.8">${d.defensor.tipo === 'creep' ? 'Cuesta su Contraataque (Flash: en turno ajeno, con SP el doble de SP; con turnos de espera, un 50 % más de espera)' : 'Cuesta 2 SP'} y lo de un primer ataque con su arma; se abre un duelo nuevo con los papeles al revés.</span></div>`
         + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
       else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
     }
+    else if(!d.hab && d.resultado === 'bloqueado' && d.defensa && d.defensa.contraPasivaNo && !d.contra && !disparoParado)   // ⚔ (2026-11-27)
+      contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} no puede contraatacar con Devolver gentileza: ${_esc(d.defensa.contraPasivaNo)}</div>`;
     else if(d.contra === 'no') contra = `<div class="duelo-mini">${_esc(d.defensor.nombre)} decidió no contraatacar</div>`;
     else if(d.contra) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} contraatacó: hay otro duelo abierto</div>`;
     return caja + contra;
@@ -3839,11 +3854,14 @@ const Duelo = (() => {
       if(m.tipo === 'duelo-contra' && m.pre){   // ⚔ Contraataque antes del Bloqueo (2026-11-11): Sí → golpe parado sin daño + el contraataque
         if(!h.soy || !h.soy(d.defensor) || !h.armaContra || !contraPrePendiente(d)) return;
         const arma = h.armaContra(d) || {};
+        const sinC = motivoContra(d, arma);   // ⚔ solo cuerpo a cuerpo (2026-11-27)
+        if(sinC){ _toast('No se puede contraatacar: ' + sinC); return; }
         const err = h.contraEsquivaPagar ? await h.contraEsquivaPagar(d, arma) : 'esta página no sabe cobrar el Contraataque';
         if(err){ _toast('No se pudo contraatacar: ' + err); return; }
+        if(h.contraPreparar) await h.contraPreparar(d, arma);   // ⚔ un creep con la otra arma: esa queda en la mano (2026-11-27)
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
         await col().doc(d.id).update({'defensa.contraPre': 'si', resultado: 'fallo', fase: 'fin', estado: 'resuelto'});
-        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, contraHab: true, ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, contraHab: true, ...(arma.armaCreepId ? {armaCreepId: arma.armaCreepId} : {}), ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
         if(nid) await col().doc(d.id).update({contra: nid});
         return;
       }
@@ -3851,12 +3869,15 @@ const Duelo = (() => {
         const porPasiva = contraPorPasiva(d), alEsquivar = contraPorHab(d) && d.defensa.contraAlcanza;   // ⚔ reglas del 2026-11-05   // ⚔ Contraataque (Warrior; el creep, también tras el Parry)
         if(!h.soy || !h.soy(d.defensor) || !h.armaContra || (!porPasiva && !alEsquivar) || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
         const arma = h.armaContra(d) || {};
+        const sinC = motivoContra(d, arma);   // ⚔ solo cuerpo a cuerpo (2026-11-27)
+        if(sinC){ _toast('No se puede contraatacar: ' + sinC); return; }
         if(alEsquivar){
           const err = h.contraEsquivaPagar ? await h.contraEsquivaPagar(d, arma) : 'esta página no sabe cobrar el Contraataque';
           if(err){ _toast('No se pudo contraatacar: ' + err); return; }
         }
+        if(h.contraPreparar) await h.contraPreparar(d, arma);   // ⚔ un creep con la otra arma: esa queda en la mano (2026-11-27)
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
-        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, ...(alEsquivar ? {contraHab: true} : {}), ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8, ...(arma.armaCreepId ? {armaCreepId: arma.armaCreepId} : {}), ...(alEsquivar ? {contraHab: true} : {}), ...(arma.maestria ? {maestria: arma.maestria} : {})}}, tok, d.defensor.tokenId, d.id);
         await col().doc(d.id).update({contra: nid});
         return;
       }
@@ -3874,7 +3895,7 @@ const Duelo = (() => {
         if(!op || op.motivoNo || (op.reglaNo2 && !m.forzarNo2)) return;
         defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {}), ...(op.natural ? {natural: true} : {})};   // (escudo, natural: para Desarmar, 2026-10-22)
         if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
-        if(!d.hab && h.contraPasiva && h.contraPasiva(d)) defensa = {...defensa, contraPasiva: true};   // ⚔ Devolver gentileza (2026-11-05)
+        if(!d.hab) defensa = {...defensa, ...pasivaContra(d, h)};   // ⚔ Devolver gentileza (2026-11-05; solo cuerpo a cuerpo, 2026-11-27)
       }
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;

@@ -273,8 +273,8 @@ const CreepDuelo = (() => {
         });
         else if(disparo && C().defensa(sc)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: C().defensa(sc).nombre, etiqueta: `🗡 Parry · ${C().defensa(sc).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
         // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
-        const ct = contraListo(sc);
-        if(ct.h && !d.hab) ops.forEach(o => { o.contraEsquiva = true; o.info = [...(o.info || []), ct.motivo ? `⚔ ${ct.h.nombre}: ahora no (${ct.motivo})` : `⚔ si gana, puede contraatacar (${ct.h.nombre}: ${C().modoSP(sc) ? `${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`} + un primer ataque)`]; });
+        const ct = contraListo(sc), sinContra = Combatiente.motivoSinContra(d, Combatiente.contraArmaDe(sc) ? null : {sinCuerpo: true});   // ⚔ solo cuerpo a cuerpo (2026-11-27)
+        if(ct.h && !d.hab) ops.forEach(o => { o.contraEsquiva = true; o.info = [...(o.info || []), (ct.motivo || sinContra) ? `⚔ ${ct.h.nombre}: ahora no (${ct.motivo || sinContra})` : `⚔ si gana, puede contraatacar (${ct.h.nombre}: ${C().modoSP(sc) ? `${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`} + un primer ataque)`]; });
         // 🔎 De dónde sale cada modificador (2026-11-11, dueño): «Modificado por: Pajaritos ÷2 · …» debajo de la Evasión y el Parry.
         if(typeof ModTirada !== 'undefined' && ModTirada.porQue) ops.forEach(o => { if(!o || o.motivoNo || !['evasion', 'parry'].includes(o.modo)) return;
           const t = ModTirada.porQue(o.modo === 'evasion' ? Combatiente.ciegoContraDistancia(d, sc.estados) : sc.estados, o.modo === 'evasion' ? 'eva' : 'parry');
@@ -331,8 +331,16 @@ const CreepDuelo = (() => {
       },
       armaContra: d => {
         const sc = deLado(d.defensor);
-        const a = Combatiente.ataqueConSuArma(sc, 'contra', undefined, st => C().modTotal(sc, st));
-        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado, ...(a.maestria ? {maestria: a.maestria} : {})};
+        // ⚔ Solo con un arma cuerpo a cuerpo (dueño, 2026-11-27): la de la mano si sirve; si no, la otra que tenga en la mano (`armaCreepId`: el
+        // duelo nuevo la pone en la mano al contraatacar, gancho `contraPreparar`); con solo un arco, una ballesta o una varita, `sinCuerpo`.
+        const x = Combatiente.contraArmaDe(sc);
+        if(!x) return {armaId: '', armaNombre: '', tipoDado: 0, sinCuerpo: true};
+        const a = Combatiente.ataqueConSuArma(x.sc, 'contra', undefined, st => C().modTotal(x.sc, st));
+        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado, ...(x.otra ? {armaCreepId: x.otra} : {}), ...(a.maestria ? {maestria: a.maestria} : {})};
+      },
+      contraPreparar: async (d, arma) => {   // ⚔ contraataca con la otra arma de la mano: esa queda en la mano (como «Atacar con…»)
+        if(!arma || !arma.armaCreepId) return;
+        await ui.cambiar(d.defensor.ref, c => { if(Combatiente.armasDeMano(c).some(it => it.id === arma.armaCreepId)) c.armaActiva = arma.armaCreepId; return {ok: true}; });
       },
     };
   }

@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261126tope"></script>
+<script src="combatiente.js?v=20261127contra"></script>
 <script src="creep-calculo.js?v=20261126bot"></script>
 <script src="creep-botonera.js?v=20261122prisa5"></script>
 <script src="creep-acciones.js?v=20261126ve"></script>
@@ -113,7 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261125miasma"></script>
+<script src="duelo.js?v=20261127contra"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261125sil"></script>
@@ -125,11 +125,11 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
-<script src="pasivas.js?v=20261127p358"></script>
-<script src="skills-clase.js?v=20261126tope"></script>
+<script src="pasivas.js?v=20261127contra"></script>
+<script src="skills-clase.js?v=20261127contra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
-<script src="skills-creep-base.js?v=20261126tope"></script>
+<script src="skills-creep-base.js?v=20261127contra"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
 <script src="biblioteca.js?v=20261127p358"></script>
 <script src="editar-item.js"></script>
@@ -4124,6 +4124,23 @@ prueba('sin arma ni escudo solo se defiende con Evasión; con arma y escudo, un 
   const con = FichaDuelo.hooks(() => fichaBotonera({nitros: 5, inventario: [espada, escudo]}), uiDuelo([], {}));
   igual([sin.opcionesDefensa(dueloPrueba()).map(o => o.modo), con.opcionesDefensa(dueloPrueba()).map(o => o.modo + ':' + (o.itemId || '')), sin.puedeParry(dueloPrueba())],
     [['evasion'], ['evasion:', 'parry:esp', 'parry:esc'], false]);
+});
+prueba('⚔ Contraataque solo cuerpo a cuerpo (dueño, 2026-11-27): con arma de rango no se ofrece; contra un ataque a distancia tampoco; con la otra mano cuerpo a cuerpo, con esa', () => {
+  const arco = {id: 'arc', nombre: 'Arco corto', tipoItem: 'arma_2m', equipado: true, peso: 2, tipoDado: 6, armaDeRango: true, arco: true};
+  const varita = {id: 'var', nombre: 'Varita', tipoItem: 'arma_1m', equipado: true, peso: 1, especial: {sp: 1, dano: '1d6'}};
+  const ballesta = {id: 'bal', nombre: 'Ballesta de mano', tipoItem: 'arma_1m', equipado: true, peso: 2, tipoDado: 8, armaDeRango: true};
+  const daga = {id: 'dag', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, tipoDado: 4};
+  const contra = {id: 'ct', nombre: 'Contraataque', contraEsquiva: true, costo: '1'};
+  const hk = inv => FichaDuelo.hooks(() => fichaBotonera({nitros: 8, inventario: inv, habilidades: [contra]}), uiDuelo([], {}));
+  const cuerpo = dueloPrueba(), lejos = dueloPrueba(null, {ataque: {tipo: 'normal', armaId: '', tipoDado: 6, rango: true}});
+  const infoContra = (h, d) => h.opcionesDefensa(d).filter(o => o.contraEsquiva).map(o => o.info.find(t => t.startsWith('⚔')) || '');
+  const conArco = hk([arco]), conVarita = hk([varita]), conDaga = hk([ballesta, daga]), conEspada = hk([espada]);
+  igual([conArco.armaContra(cuerpo).sinCuerpo, conVarita.armaContra(cuerpo).sinCuerpo, conDaga.armaContra(cuerpo).armaNombre, !!conEspada.armaContra(cuerpo).sinCuerpo,
+    Combatiente.motivoSinContra(cuerpo, conArco.armaContra(cuerpo)) !== '', Combatiente.motivoSinContra(cuerpo, conDaga.armaContra(cuerpo)),
+    Combatiente.motivoSinContra(lejos, conEspada.armaContra(lejos)) !== '',
+    infoContra(conArco, cuerpo).every(t => /ahora no/.test(t)), infoContra(conEspada, cuerpo).every(t => /podés contraatacar/.test(t)), infoContra(conEspada, lejos).every(t => /ahora no.*distancia/.test(t)),
+    Combatiente.sirveParaContra(null), Combatiente.sirveParaContra(espada)],
+    [true, true, 'Daga', false, true, '', true, true, true, true, true, true]);
 });
 prueba('con sobrepeso la Evasión se ofrece pagando 1 No2 o con la penalidad', () => {
   const pesado = fichaBotonera({nitros: 3, attrs: {con: 1, fue: 0, agl: 6, des: 5, esp: 4}, inventario: [{id: 'y', nombre: 'Yunque', tipoItem: 'armadura_rigida', equipado: true, peso: 40}]});
@@ -8400,7 +8417,7 @@ prueba('⚔ Contraataque de creep (2026-10-27; +2 PdG desde el 2026-11-05, va en
   const ops = hk.opcionesDefensa({id: 'd', defensor: {ref: 'c1'}, ataque: {tipo: 'normal'}});
   const t1 = CreepAcciones.tiradaAtaque(sc, 'contra', 2), t0 = CreepAcciones.tiradaAtaque(sin, 'contra');
   const cl = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');
-  igual([h.contraEsquiva, h.modo, ops.every(o => o.contraEsquiva), t1.r.formula !== t0.r.formula, cl.costo, cl.turnoAjenoSp, /FLASH/.test(cl.detalle)],
+  igual([h.contraEsquiva, h.modo, ops.every(o => o.contraEsquiva), t1.r.formula !== t0.r.formula, cl.costo, cl.turnoAjenoSp, /^⚡ Flash\./.test(cl.detalle)],
     [true, 'manual', true, true, '1', '2', true]);
 });
 prueba('⚔ Reglas del Contraataque (2026-11-05): sin habilidad ni pasiva no hay contraataque tras el Bloqueo; Devolver gentileza lo habilita en el creep', () => {
@@ -8410,6 +8427,19 @@ prueba('⚔ Reglas del Contraataque (2026-11-05): sin habilidad ni pasiva no hay
   const hkSin = CreepDuelo.hooks({creep: () => sin, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
   const d = {defensor: {ref: 'x'}};
   igual([!!pas, pas.mods[0].stat, hkCon.contraPasiva(d), hkSin.contraPasiva(d)], [true, 'gentileza', true, false]);
+});
+prueba('⚔ Contraataque de creep solo cuerpo a cuerpo (2026-11-27): con solo un arco no; con la daga en la otra mano, con esa; contra un disparo, no', () => {
+  const arco = {id: 'a1', nombre: 'Arco corto', tipoItem: 'arma_2m', equipado: true, peso: 2, tipoDado: 6, armaDeRango: true, arco: true};
+  const daga = {id: 'd1', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, tipoDado: 4};
+  // un creep: con solo un arco no; con arco en la mano y una daga, con la daga (`armaCreepId`); contra un disparo, no.
+  const h = chp('Contraataque');
+  const scArco = creepPrueba({id: 'k1', habilidades: [h], armaNombre: arco.nombre, armaTipo: 6, armaPeso: 2, armaFijo: 0, armaDeRango: true, armaManos: 'arma_2m'});
+  const scDos = creepPrueba({id: 'k2', habilidades: [h], armaNombre: 'Ballesta de mano', armaTipo: 8, armaPeso: 2, armaFijo: 0, armaDeRango: true, armaManos: 'arma_1m'}); scDos.equipo.push(daga);
+  const hkC = sc => CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const dC = {id: 'd', defensor: {ref: 'k'}, ataque: {tipo: 'normal'}}, dL = {id: 'd', defensor: {ref: 'k'}, ataque: {tipo: 'normal', rango: true}};
+  const aDos = hkC(scDos).armaContra(dC);
+  igual([!!hkC(scArco).armaContra(dC).sinCuerpo, aDos.armaNombre, aDos.armaCreepId, hkC(scDos).opcionesDefensa(dL).filter(o => o.contraEsquiva).every(o => o.info.some(t => /ahora no.*distancia/.test(t)))],
+    [true, 'Daga', 'd1', true]);
 });
 prueba('💨 Segundo aliento (2026-10-27): se cura 6 + su Constitución, le saca el debuff elegido y es una vez por combate', () => {
   const h = chp('Segundo aliento'), sc = creepPrueba({hp: 5, hpMax: 40, habilidades: [h], estados: [{id: 'r', nombre: 'Rengo', polaridad: 'debuff', turnos: 2, activo: true, mods: []}]});

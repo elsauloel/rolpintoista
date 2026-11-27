@@ -2392,3 +2392,8 @@ versión parecida en más de una, es candidato a juntar.
 - **🔄 Los ítems de fábrica que cambian, también en el cinturón** (2026-11-25, P295: el Gas adormecedor y el somnífero): `Combatiente.ponerAlDiaItemsFabrica`
   (la lista `ITEMS_AL_DIA`) ahora se aplica también al cinturón de un personaje (`FichaGuardado.completar` y la ficha, js/05) y al de un creep
   (`CreepCalculo.normalizar`), no solo a la mochila y al equipo: los consumibles (las trampas) se llevan ahí.
+- **⚔ El contraataque, solo cuerpo a cuerpo** (2026-11-27, dueño): `Combatiente.sirveParaContra(item)` (no de rango, ni varita, ni orbe),
+  `ataqueCuerpoACuerpo(d)`, `motivoSinContra(d, arma)` ('' = se puede) y `contraArmaDe(x)` (creeps e invocaciones: la de la mano, la otra cuerpo a cuerpo
+  con `otra`, o null). El gancho `armaContra` devuelve `sinCuerpo` si solo hay armas de rango; `duelo.js` lo mira en `alcanceContra` (`contraMotivo`) y
+  en `pasivaContra` (Devolver gentileza: `contraPasiva` o `contraPasivaNo`), y antes de abrir el contraataque; `contraPreparar(d, arma)` (creep) pone en la
+  mano la otra arma (`ataque.armaCreepId`). Duda: P360 (Parry a distancia).

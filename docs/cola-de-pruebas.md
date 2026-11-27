@@ -3358,6 +3358,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   `original`…) de `comun/skills-clase.js`, `skills-creep-base.js`, `pasivas.js`, `estados-presets.js`, `catalogo.js`, `creeps-base.js`, `trampas-base.js`,
   `armas-naturales-base.js` y lo que se arme con textos en el código (carteles, «Ver detalle», el manual), y mover esas notas a un comentario o a `docs/`
   sin cambiar ninguna regla. Revisar si las copias guardadas (habilidades de clase, ítems) se ponen al día solas. Nueva regla en `docs/memoria-claude.md`.
+- **⬜ en cola — ⚔ Las invocaciones no contraatacan nunca** (2026-11-27, Claude, al programar «Contraataque solo cuerpo a cuerpo»). El duelo de una
+  invocación (`comun/inv-duelo.js`) no tiene el gancho `armaContra` (ni `contraPasiva`), así que una invocación con la pasiva Devolver gentileza o con
+  la habilidad Contraataque nunca recibe la pregunta «¿Contraataca?» (las reglas de combate son iguales para personajes, creeps e invocaciones). Ver si
+  hace falta y, si sí, sumarle los ganchos como `comun/creep-duelo.js` (con `Combatiente.contraArmaDe`, que ya sirve para invocaciones).
+- **✅ hecho (2026-11-27) — ⚔ Contraataque solo con armas cuerpo a cuerpo y descripción prolija** (dueño: «Contraataque debería ser posible sólo con
+  armas cuerpo a cuerpo. También me gustaría que emprolijaras un poco la descripción»; y sobre el ataque recibido: «solo cuerpo a cuerpo también»).
+  El contraataque se ofrece solo si **el ataque recibido fue cuerpo a cuerpo** y quien contraataca tiene **un arma cuerpo a cuerpo** (no de rango, ni
+  varita, ni orbe; un báculo sí; con las manos vacías, a puño); si tiene una cuerpo a cuerpo en la otra mano, contraataca con esa (un creep la pone en
+  la mano al contraatacar). Vale para la habilidad Contraataque y para la pasiva **Devolver gentileza** (comparten `armaContra` y el cuadro del
+  duelo), en personajes y creeps. La regla vive en `Combatiente.sirveParaContra` / `ataqueCuerpoACuerpo` / `motivoSinContra` / `contraArmaDe`; la usan
+  `comun/duelo.js` (alcance, la pregunta, el cobro), `ficha-duelo.js` y `creep-duelo.js` (qué arma, el aviso «⚔ Contraataque: ahora no (…)» en
+  «Elegí cómo te defendés»). En el cuadro: «⚔ Blanco J1 no puede contraatacar: …». Descripción nueva de Contraataque (de clase y de creep) y de Devolver
+  gentileza, sin fechas ni citas. Las copias guardadas en las fichas se ponen al día solas (`FichaGuardado.migrarHabsDeClase`, salvo una copia editada a
+  mano). Manual (06-combate, «Contraataque») al día. Pruebas: 1170 (dos nuevas). Probado en el mapa «Prueba · General» con el Warrior · Hachero contra
+  Blanco J1 (con el Cuchillo: ofrece; con el Arco corto y con la Varita arcana: no) y el Rango · Tirador disparándole (con el Cuchillo: no). Duda
+  nueva: P360 (el Parry a distancia del Shooter promete contraatacar con el arma de rango).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

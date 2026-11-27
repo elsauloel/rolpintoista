@@ -21,6 +21,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
+- **⬜ en cola (PRÓXIMO, dueño 2026-11-27) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
+  se cerró un duelo, no te permite. Y hay veces que los duelos avanzan y el tipo de "no, quiero tirar a enyetar" se dice en el momento. Entonces, que enyetar
+  te permita reabrir un duelo y volver atrás con la resolución. Como que si tirás a enyetar, te aparezca la lista de las últimas tiradas en duelos
+  abiertos o en duelos cerrados. Y que, entre comillas, se vuelva atrás, se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule
+  con enyetar»). Pasos: (1) al usar Enyetar, una lista de las últimas tiradas en duelos abiertos y cerrados (de quién, qué tirada, de qué duelo); (2) al
+  elegir una, el duelo se reabre en ese punto: se deshace lo que se resolvió desde esa tirada (daño, estados, No2/SP cobrados, vida, Mesa marcada como
+  deshecha) y se recalcula con Enyetar; (3) proponerle al dueño hasta dónde se puede deshacer (cuánto tiempo atrás, qué pasa si ya se movieron tokens o
+  empezó otro turno) antes de programar. Relacionada con la nota «⚔ Que los duelos no se cierren solos, para poder usar Enyetar» (de abajo).
+
 - **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
 - **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).

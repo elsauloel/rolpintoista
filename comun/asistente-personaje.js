@@ -85,6 +85,7 @@ const AsistentePersonaje = (() => {
     const st = {
       claseId: '', claseOtra: '', concepto: '', historia: '',
       fp: typeof FiltroPasivas !== 'undefined' ? FiltroPasivas.inicial([]) : null, buscaPasiva: '',   // 🏷 filtros de las pasivas (2026-11-24)
+      fpClase: '',            // la clase cuyo rol ya se marcó en las pasivas (P315)
       habs: new Map(),        // `${claseId}:${habId}` → {claseId, habId}
       pasivas: new Set(),     // índice en ctx.pasivas()
       talentos: [],           // [{nombre, puntos}]
@@ -193,7 +194,15 @@ const AsistentePersonaje = (() => {
         })();
     }
     // Las pasivas, con los mismos filtros que «+ Pasiva» (comun/pasivas.js, FiltroPasivas: Rol, Estilo y Función; 2026-11-24, reemplaza a las 5
-    // categorías) y un buscador. Sin rol marcado al abrir (todavía no se decidió marcar el de la clase elegida: P315).
+    // categorías) y un buscador. Abre con el rol de la clase elegida en «Idea» ya marcado (P315, dueño 2026-11-27); se saca con un clic. Si
+    // después se cambia la clase, se cambia ese rol (los demás botoncitos quedan como estaban); si no, se respeta lo que se tocó.
+    function rolDeLaClase(){
+      if(!st.fp || st.fpClase === st.claseId) return;
+      const viejo = FiltroPasivas.rolDeClase(st.fpClase), nuevo = FiltroPasivas.rolDeClase(st.claseId);
+      if(viejo) st.fp.filtros.delete(viejo);
+      if(nuevo) st.fp.filtros.add(nuevo);
+      st.fpClase = st.claseId;
+    }
     const etiquetasDe = p => (p.meta && Array.isArray(p.meta.etiquetas) && p.meta.etiquetas.length ? p.meta.etiquetas : (p.datos || {}).etiquetas) || [];
     const sinTildes = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const pasivaVisible = p => {
@@ -202,6 +211,7 @@ const AsistentePersonaje = (() => {
       return !st.fp || FiltroPasivas.pasa(etiquetasDe(p), st.fp.filtros, st.fp);
     };
     function pasoPasivas(){
+      rolDeLaClase();
       const jt = jobTotal(), ju = jobUsado();
       const tarjeta = ({p, i}) => {
         const d = p.datos || {}, on = st.pasivas.has(i);
@@ -214,7 +224,7 @@ const AsistentePersonaje = (() => {
       return guia('Las pasivas funcionan solas, siempre: más vida, más SP, regenerar… Comparten el Job con las habilidades. Los filtros ayudan a encontrar; podés elegir cualquiera.')
         + contador(`Job: ${ju} de ${jt} (habilidades + pasivas)${ju > jt ? ` · ${ju - jt} de más` : ''}`, ju > jt)
         + `<div class="pap-fila" style="margin:4px 0 6px"><input id="ap-busca-pasiva" type="search" placeholder="Buscar por nombre o descripción…" value="${esc(st.buscaPasiva)}"></div>`
-        + (st.fp ? `<div class="ap-fp" style="margin-bottom:8px">${FiltroPasivas.filasHtml(st.fp, {chip: 'ap-chip', on: 'on', n: visibles.length, total: todas.length})}</div>` : '')
+        + (st.fp ? `<div class="ap-fp" style="margin-bottom:8px">${FiltroPasivas.filasHtml(st.fp, {chip: 'ap-chip', on: 'on', n: visibles.length, total: todas.length, hayTexto: !!st.buscaPasiva})}</div>` : '')
         + (visibles.length ? `<div class="ap-grid">${visibles.map(tarjeta).join('')}</div>` : '<div class="ap-aviso">No hay pasivas con ese filtro.</div>');
     }
     function pasoTalentos(){
@@ -348,7 +358,8 @@ const AsistentePersonaje = (() => {
         catch(err){ if(err && err.message !== 'cancelado' && ctx.toast) ctx.toast('No se pudo usar esa imagen'); }
       },
       alClic: e => {
-        if(st.fp && FiltroPasivas.clic(e.target, st.fp)){ api.redibujar(); return; }
+        const fpClic = st.fp && FiltroPasivas.clic(e.target, st.fp);
+        if(fpClic){ if(fpClic === 'limpiar') st.buscaPasiva = ''; api.redibujar(); return; }   // P358: «Limpiar» también vacía el buscador
         const b = e.target.closest('button'); if(!b) return;
         const d = b.dataset;
         if(d.apClase !== undefined){ st.claseId = st.claseId === d.apClase ? '' : d.apClase; api.redibujar(); return; }

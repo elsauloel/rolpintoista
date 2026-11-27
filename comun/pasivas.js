@@ -257,18 +257,24 @@ const FiltroPasivas = (() => {
     const filas = GRUPOS.map(g => `<div class="fp-fila"><span class="fp-nom">${e(g.nombre)}</span>${g.tags.map(chip).join('')}${g.comodin
       ? `<button type="button" class="${cl} fp-sumar${st.cualquiera ? ' ' + on : ''}" data-fp-cualquiera="1" title="Con un rol marcado, mostrar también las que le sirven a cualquiera">${st.cualquiera ? '☑' : '☐'} sumar las de 🌐 Cualquiera</button>` : ''}</div>`).join('');
     const n = o && o.n !== undefined ? o.n : null, total = o && o.total !== undefined ? o.total : null;
-    const pie = `<div class="fp-pie">${n !== null ? `Mostrando ${n} de ${total}` : ''}${st.filtros.size ? ` · <button type="button" class="${cl}" data-fp-limpiar="1">✕ Limpiar filtros</button>` : ''}</div>`;
+    const pie = `<div class="fp-pie">${n !== null ? `Mostrando ${n} de ${total}` : ''}${hayAlgo(st, o) ? ` · <button type="button" class="${cl}" data-fp-limpiar="1">✕ Limpiar filtros</button>` : ''}</div>`;
     return `<div class="fp-filas">${filas}${pie}</div>`;
   }
-  // Un clic en las filas: true si lo atendió (marca o desmarca, «sumar las de Cualquiera», «Limpiar»).
+  // ¿Hay algo que limpiar? Un botoncito marcado, «sumar las de Cualquiera» destildado o algo escrito en el buscador (`o.hayTexto`).
+  const hayAlgo = (st, o) => !!(st.filtros.size || !st.cualquiera || (o && o.hayTexto));
+  // Un clic en las filas: true si lo atendió (marca o desmarca, «sumar las de Cualquiera»), 'limpiar' si fue «✕ Limpiar filtros».
+  // P358 (dueño, 2026-11-27): «Limpiar» deja todo como al abrir: ningún botoncito marcado (tampoco el rol que venía marcado: es limpiar)
+  // y «sumar las de Cualquiera» tildado otra vez. El buscador lo vacía quien lo tiene (la Biblioteca y el asistente, al ver 'limpiar').
   function clic(el, st){
     const b = el && el.closest && el.closest('[data-fp-tag], [data-fp-cualquiera], [data-fp-limpiar]');
     if(!b) return false;
     if(b.dataset.fpTag){ const t = b.dataset.fpTag; if(st.filtros.has(t)) st.filtros.delete(t); else st.filtros.add(t); }
     else if(b.dataset.fpCualquiera) st.cualquiera = !st.cualquiera;
-    else st.filtros.clear();
+    else { st.filtros.clear(); st.cualquiera = true; return 'limpiar'; }
     return true;
   }
+  // El rol de una clase del asistente de personaje nuevo (P315: abre con ese rol marcado). Las clases se llaman como los roles.
+  const rolDeClase = claseId => { const t = norm(claseId); return GRUPOS[0].tags.includes(t) && t !== 'cualquiera' ? t : ''; };
   function css(){
     if(typeof document === 'undefined' || document.getElementById('fp-css')) return;
     const s = document.createElement('style'); s.id = 'fp-css';
@@ -283,11 +289,12 @@ const FiltroPasivas = (() => {
   // El filtro para la ventana de la Biblioteca (`opts.filtro` de Biblioteca.abrir): `roles` = los que vienen marcados.
   function paraBiblioteca(roles){
     return {inicial: () => inicial(roles), pasa: (e, st) => pasa(e.etiquetas, st.filtros, st), clic, rotular: e => rotular(e.etiquetas),
-      html: (st, o) => { css(); return filasHtml(st, {chip: 'bib-chip', on: 'on', n: o.n, total: o.total}); }};
+      html: (st, o) => { css(); return filasHtml(st, {chip: 'bib-chip', on: 'on', n: o.n, total: o.total, hayTexto: o.hayTexto}); },
+      grupos: () => grupos(), rotulos: ROTULO};   // (el «✎ Etiquetas» del dueño usa los mismos botoncitos que «⬆ Subir», P316)
   }
   // Lo que «Subir a la biblioteca» necesita para etiquetar con los mismos botoncitos (Biblioteca.guardar).
-  const grupos = () => GRUPOS.map(g => ({nombre: g.nombre, tags: [...g.tags]}));
-  return {GRUPOS, ROTULO, AYUDA, TODAS, nuevas, sinEtiquetar, rotulo, rotular, pasa, sugeridas, paraSubir, rolesDeCreep, inicial, filasHtml, clic, css,
+  function grupos(){ return GRUPOS.map(g => ({nombre: g.nombre, tags: [...g.tags]})); }
+  return {GRUPOS, ROTULO, AYUDA, TODAS, nuevas, sinEtiquetar, rotulo, rotular, pasa, sugeridas, paraSubir, rolesDeCreep, rolDeClase, inicial, filasHtml, clic, hayAlgo, css,
     paraBiblioteca, grupos};
 })();
 

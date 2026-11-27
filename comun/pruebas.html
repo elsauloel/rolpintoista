@@ -125,13 +125,13 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
-<script src="pasivas.js?v=20261124tags2"></script>
+<script src="pasivas.js?v=20261127p358"></script>
 <script src="skills-clase.js?v=20261126tope"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261112sind2"></script>
 <script src="skills-creep-base.js?v=20261126tope"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
-<script src="biblioteca.js?v=20261124tags"></script>
+<script src="biblioteca.js?v=20261127p358"></script>
 <script src="editar-item.js"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6218,6 +6218,28 @@ prueba('personaje nuevo: pool custom (2 de Job), una habilidad propia armada en 
   igual([pedida, trasCrear, armada, conPool, chips.length, recursos, datos && datos.habilidades.map(h => h.nombre + ' ' + h.jobCosto), FiltroPasivas.sugeridas({mods: [{stat: 'resmg', val: 1}]}), FiltroPasivas.sugeridas({regenHp: 2}), dde300, datos && datos.meta.dde],
     [null, 'Job: 2 de 3 (habilidades + pasivas)', true, 'Job: 4 de 3 (habilidades + pasivas) · 1 de más', 24, ['Reserva de poder', 'Recuperación mental', 'Impulso', 'Sed de batalla'], ['Mi grito 2', 'Rayo casero 2'], ['resistencias'], ['aguante'], '300', 450]);
 });
+prueba('personaje nuevo (P315): las pasivas abren con el rol de la clase elegida marcado; se saca con un clic, cambiar la clase cambia el rol y «Limpiar» vacía el buscador', () => {
+  const asis = AsistentePersonaje.abrir({
+    base: () => FichaGuardado.normalizar({}).S, clases: CLASES_SKILLS, pool: c => ((CLASES_SKILLS.find(x => x.id === c) || {}).habilidades || []),
+    habilidad: (c, h) => ({nombre: h, jobCosto: 1}), pasivas: () => PASIVAS_BASE.map(p => ({datos: p, meta: null})), pasiva: d => ({...structuredClone(d)}),
+    tienda: async () => null, ddeInicial: async () => 300, alCrear: () => {},
+  });
+  const v = papUltima();
+  const marcados = () => [...v.mia.querySelectorAll('[data-fp-tag].on')].map(b => b.dataset.fpTag);
+  v.escribir('#ap-nombre', 'Prueba');
+  v.ir('Pasivas'); const sinClase = marcados();
+  v.ir('Idea'); v.clic('[data-ap-clase="tanque"]');
+  v.ir('Pasivas'); const conTanque = marcados(), pieT = v.q('.fp-pie').textContent;
+  v.clic('[data-fp-tag="aguante"]');
+  v.ir('Talentos'); v.ir('Pasivas'); const vuelve = marcados();
+  v.clic('[data-fp-tag="tanque"]'); const sacado = marcados();
+  v.ir('Idea'); v.clic('[data-ap-clase="mago"]'); v.ir('Pasivas'); const conMago = marcados();
+  v.escribir('#ap-busca-pasiva', 'zzz'); v.clic('[data-fp-limpiar]');
+  const limpio = [marcados(), v.q('#ap-busca-pasiva').value, v.q('[data-fp-cualquiera]').textContent.trim().slice(0, 1)];
+  asis.cerrar();   // (sin el cartel de «¿Cancelar?»: no se cruza con las otras pruebas)
+  igual([sinClase, conTanque, /^Mostrando \d+ de 47 · ✕ Limpiar filtros$/.test(pieT), vuelve, sacado, conMago, limpio],
+    [[], ['tanque'], true, ['tanque', 'aguante'], ['aguante'], ['mago', 'aguante'], [[], '', '☑']]);
+});
 /* ---------- 🏷 Etiquetas y filtros de las pasivas (2026-11-24, dueño; docs/etiquetas-pasivas.md) ---------- */
 prueba('pasivas: las 47 de fábrica con Rol y Función (sin «stat» ni las palabras viejas); racial y criatura se conservan, sin ser filtro', () => {
   const F = FiltroPasivas, viejas = ['stat', 'ofensiva', 'defensiva', 'utilidad', 'resistencia', 'regeneración', 'visión', 'movimiento'];
@@ -6943,7 +6965,52 @@ prueba('pasivas: «+ Pasiva» (la Biblioteca) con las filas por familia, el rol 
   document.getElementById('bib-x').click();
   igual([familias, marcados, p1, vieja1, tagVieja, p2, p3, p4, p5, f5],
     [['🎭 Rol', '🤺 Estilo', '🧩 Función'], ['tanque'], 'Mostrando 25 de 48 · ✕ Limpiar filtros', true, '🏷 sin etiquetar · stat · ofensiva', 'Mostrando 16 de 48 · ✕ Limpiar filtros',
-     'Mostrando 16 de 48 · ✕ Limpiar filtros', 'Mostrando 48 de 48', 'Mostrando 1 de 48', ['Aguante de trinchera']]);
+     'Mostrando 16 de 48 · ✕ Limpiar filtros', 'Mostrando 48 de 48', 'Mostrando 1 de 48 · ✕ Limpiar filtros', ['Aguante de trinchera']]);
+}));
+prueba('pasivas (P358): «✕ Limpiar filtros» deja todo como al abrir: sin botoncitos, «sumar las de Cualquiera» tildado y el buscador vacío (también sin el rol del creep)', () => conFbFalso({}, async () => {
+  await new Promise(r => setTimeout(r, 4000));   // (después de las pruebas de capas y carteles, que miran las ventanas abiertas)
+  await Biblioteca.abrir({tipo: 'pasivas', titulo: 'Prueba pasivas', base: PASIVAS_BASE, alElegir: () => {}, filtro: FiltroPasivas.paraBiblioteca(['tanque'])});
+  const pie = () => document.querySelector('#bib-chips .fp-pie').textContent, clic = sel => document.querySelector('#bib-chips ' + sel).click();
+  const sumar = () => document.querySelector('#bib-chips [data-fp-cualquiera]').textContent.trim().slice(0, 1);
+  clic('[data-fp-cualquiera]'); clic('[data-fp-tag="tanque"]');
+  const sinRolSinSumar = [pie(), sumar()];   // («sumar» destildado sin nada marcado: igual se ofrece limpiar)
+  const b = document.getElementById('bib-buscar'); b.value = 'piel'; b.dispatchEvent(new Event('input'));
+  clic('[data-fp-limpiar]');
+  const marcados = [...document.querySelectorAll('#bib-chips .bib-chip.on[data-fp-tag]')].length, despues = [pie(), sumar(), b.value];
+  document.getElementById('bib-x').click();
+  igual([sinRolSinSumar, marcados, despues], [['Mostrando 47 de 47 · ✕ Limpiar filtros', '☐'], 0, ['Mostrando 47 de 47', '☑', '']]);
+}));
+prueba('pasivas (P358): FiltroPasivas.clic devuelve «limpiar» y vuelve a tildar «sumar las de Cualquiera»; hayAlgo y rolDeClase (P315)', () => {
+  const F = FiltroPasivas, st = F.inicial(['mago']);
+  const b = sel => { const d = document.createElement('div'); d.innerHTML = F.filasHtml(st, {hayTexto: false}); return d.querySelector(sel); };
+  F.clic(b('[data-fp-cualquiera]'), st);
+  const antes = [st.cualquiera, F.hayAlgo(st), F.hayAlgo({filtros: new Set(), cualquiera: true}), F.hayAlgo({filtros: new Set(), cualquiera: true}, {hayTexto: true})];
+  const r = F.clic(b('[data-fp-limpiar]'), st);
+  igual([antes, r, st.filtros.size, st.cualquiera, ['warrior', 'Tanque', 'asalto', 'cualquiera', '', 'misceláneas'].map(F.rolDeClase)],
+    [[false, true, false, true], 'limpiar', 0, true, ['warrior', 'tanque', 'asalto', '', '', '']]);
+});
+const DB_ETIQ_PASIVA = {'biblioteca_pasivas/e1': {nombre: 'Prueba de etiquetas', etiquetas: ['tanque', 'racial'], descripcion: '', nivel: 1, json: JSON.stringify({nombre: 'Prueba de etiquetas', detalle: '+1 Defensa', jobCosto: 1, mods: [{stat: 'def', val: 1}]})}};
+prueba('pasivas (P316): «✎ Etiquetas» del dueño usa los botoncitos por familia, arranca con las que tiene y guarda lo marcado (las sueltas se conservan)', () => conFbFalso(DB_ETIQ_PASIVA, async () => {
+  await new Promise(r => setTimeout(r, 4000));   // (después de las pruebas de capas y carteles, que miran las ventanas abiertas)
+  window.fbUsuario = {uid: 'gm', email: BIBLIOTECA_DUENO_EMAIL, emailVerified: true};
+  DB_ETIQ_PASIVA['biblioteca_pasivas/e1'].auditado = true;
+  window.fbDb.collection = (orig => ruta => ({...orig(ruta), doc: id => ({update: async d => { Object.assign(DB_ETIQ_PASIVA[ruta + '/' + id], d); }})}))(window.fbDb.collection);
+  await Biblioteca.abrir({tipo: 'pasivas', titulo: 'Prueba pasivas', base: PASIVAS_BASE, alElegir: () => {}, filtro: FiltroPasivas.paraBiblioteca([])});
+  const fila = [...document.querySelectorAll('#bib-lista .bib-fila')].find(f => f.textContent.includes('Prueba de etiquetas'));
+  fila.querySelector('[data-bibacc="etiquetas"]').click();
+  await new Promise(r => setTimeout(r, 0));
+  const caja = document.getElementById('bibe-tags'), abierta = document.getElementById('scrim-biblioteca-etiquetas').classList.contains('open');
+  const familias = [...caja.querySelectorAll('span')].map(x => x.textContent), menus = caja.querySelectorAll('[data-bibggrupo]').length;
+  const marcados = [...caja.querySelectorAll('.bib-chip.on')].map(c => c.textContent);
+  caja.querySelector('[data-bibgtag="tanque"]').click(); caja.querySelector('[data-bibgtag="warrior"]').click(); caja.querySelector('[data-bibgtag="aguante"]').click();
+  const campo = document.getElementById('bibe-etiquetas').value;
+  document.getElementById('bibe-ok').click();
+  for(let i = 0; i < 20 && DB_ETIQ_PASIVA['biblioteca_pasivas/e1'].etiquetas.includes('tanque'); i++) await new Promise(r => setTimeout(r, 0));
+  await new Promise(r => setTimeout(r, 0));
+  const tags = [...document.querySelectorAll('#bib-lista .bib-fila')].find(f => f.textContent.includes('Prueba de etiquetas')).querySelector('.tags').textContent;
+  document.getElementById('bib-x').click();
+  igual([abierta, familias, menus, marcados, campo, DB_ETIQ_PASIVA['biblioteca_pasivas/e1'].etiquetas, tags, document.getElementById('scrim-biblioteca-etiquetas').classList.contains('open')],
+    [true, ['🎭 Rol', '🤺 Estilo', '🧩 Función'], 0, ['🛡 Tanque'], 'racial, warrior, aguante', ['racial', 'warrior', 'aguante'], '⚔ Warrior · Aguante · racial', false]);
 }));
 const DB_SUBIR_PASIVA = {};
 prueba('pasivas: «Subir a la biblioteca» etiqueta con los mismos botoncitos, en fila, con las sugeridas ya marcadas', () => conFbFalso(DB_SUBIR_PASIVA, async () => {

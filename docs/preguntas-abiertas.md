@@ -2530,7 +2530,7 @@ cuántas quedan afuera).
 
 **Mientras tanto (lo conservador):** el asistente abre las pasivas sin ningún rol marcado, como «+ Pasiva» en la ficha.
 
-> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el asistente de personaje nuevo abre las pasivas con el rol de la clase elegida ya marcado.
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el asistente de personaje nuevo abre las pasivas con el rol de la clase elegida ya marcado. **Aplicada el 2026-11-27.**
 
 
 ### ✅ P316 — 🏷 Las pasivas subidas antes de las etiquetas nuevas, y el «✎ Etiquetas» del dueño (2026-11-24, Claude)
@@ -2545,7 +2545,7 @@ que escribir las palabras a mano.
 **Mientras tanto (lo conservador):** las que no tienen ninguna etiqueta nueva se muestran siempre, marcadas «🏷 sin etiquetar»; una pasiva con
 etiquetas nuevas en una familia y ninguna en otra cuenta como «cualquiera» en la que le falta.
 
-> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el «✎ Etiquetas» de la Biblioteca usa los mismos botoncitos por familia que «Subir».
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: el «✎ Etiquetas» de la Biblioteca usa los mismos botoncitos por familia que «Subir». **Aplicada el 2026-11-27.**
 
 
 ### ✅ P317 — 🧪 Los consumibles que sube el grupo no se ven en el catálogo abierto (2026-11-24, Claude)
@@ -3049,4 +3049,4 @@ muestra solo las de ese rol (sin las que le sirven a cualquiera). No es un error
 dejar todo como al abrir la ventana (la casilla tildada otra vez), o así está bien? Recomendación: que vuelva a tildarla (es un cambio de una línea en
 `FiltroPasivas.clic`, comun/pasivas.js).
 
-> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: «✕ Limpiar filtros» deja todo como al abrir (también vuelve a tildar «sumar las de Cualquiera»).
+> ✅ **Decidida (dueño, 2026-11-27, la recomendación):** sí: «✕ Limpiar filtros» deja todo como al abrir (también vuelve a tildar «sumar las de Cualquiera»). **Aplicada el 2026-11-27**: también vacía el buscador, y el rol que venía marcado (un creep, la clase del asistente) también se desmarca («Limpiar» es limpiar; se vuelve a marcar con un clic).

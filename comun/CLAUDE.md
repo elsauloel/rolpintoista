@@ -28,6 +28,9 @@ versión parecida en más de una, es candidato a juntar.
   **`opts.filtro`** (2026-11-24, las pasivas): un filtro a medida `{inicial(), html(fp, {n, total}), pasa(e, fp), clic(el, fp), rotular?(e)}` en vez de los
   chips sueltos; el conteo «Mostrando N de M» va en su pie. `guardar` acepta `etiquetas` (las que vienen marcadas), `gruposEnFila` (cada familia en su
   renglón, sin «Otros») y `rotulos`.
+  **«✎ Etiquetas» con botoncitos** (2026-11-27, P316): `editarEtiquetas(st, ent)` abre su propia ventana (`#scrim-biblioteca-etiquetas`) con los mismos
+  botoncitos que «Subir» (`pintarTags(T)`, compartido): con `opts.filtro.grupos`/`rotulos` (las pasivas) cada familia en su renglón; si no, los menús
+  de `opts.grupos`. Un clic de `opts.filtro.clic` que devuelve `'limpiar'` también vacía el buscador (P358).
 - **`creeps-base.js`** — `CREEPS_BASE`: 173 creeps (60 por escenario + 20 goblins + 14 kobolds + 15 hombres cabra + 20 debuffers + 30 humanos + tramperos/sigilosos, a auditar), en la biblioteca de creeps de gm-tools.
 - **`pasivas.js`** — `PASIVAS_BASE`: catálogo base de pasivas de Job (bonos a stats con escalones y regeneración de HP). La ficha lo ofrece en "+ Pasiva → catálogo"; se suma a las aprobadas desde Firebase (`biblioteca_pasivas`).
   **🏷 Etiquetas y filtros** (2026-11-24, `docs/etiquetas-pasivas.md`): `FiltroPasivas` — tres familias (`GRUPOS`: 🎭 Rol = las 7 clases + `cualquiera`,
@@ -35,7 +38,9 @@ versión parecida en más de una, es candidato a juntar.
   sin etiqueta de una familia = cualquiera en esa familia; «sumar las de Cualquiera»), `rotular` («🏷 sin etiquetar» si no tiene ninguna nueva),
   `sugeridas(datos)`/`paraSubir(datos)` (por lo que suma), `rolesDeCreep(sc, {base, subidos})` (por su `bibOrigen`; el Híbrido esencial = warrior y
   tanque), `filasHtml`/`clic`/`inicial` (las filas de botoncitos, también en el asistente de personaje nuevo) y `paraBiblioteca(roles)` (el
-  `opts.filtro` de `Biblioteca.abrir`). Retira `CATEGORIAS_PASIVA`/`categoriaDePasiva`. `racial` y `criatura` quedan como etiquetas sueltas, sin filtro.
+  `opts.filtro` de `Biblioteca.abrir`). Retira `CATEGORIAS_PASIVA`/`categoriaDePasiva`. `racial` y `criatura` quedan como etiquetas sueltas, sin filtro. (2026-11-27) `clic` devuelve `'limpiar'` en «✕ Limpiar
+  filtros» y vuelve a tildar «sumar las de Cualquiera» (P358; el buscador lo vacía quien lo tiene); `hayAlgo(st, {hayTexto})` (¿se muestra Limpiar?);
+  `rolDeClase(claseId)` (P315: el asistente de personaje nuevo abre con el rol de la clase marcado); `paraBiblioteca` suma `grupos()` y `rotulos` (P316).
 - **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
   partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida
   actuales (`fbMiembro`, `fbPartida`). `fbEntrarAPartida()` es lo que cada

@@ -193,6 +193,20 @@ const Biblioteca = (() => {
           <button class="btn primary" id="bibg-ok">⬆ Subir</button>
         </footer>
       </div>
+    </div>
+    <div class="scrim" id="scrim-biblioteca-etiquetas">
+      <div class="modal" style="max-width:520px">
+        <header><h3 id="bibe-titulo">🏷 Etiquetas</h3><button class="iconbtn" id="bibe-x">Cerrar</button></header>
+        <div class="body" style="display:flex;flex-direction:column;gap:10px">
+          <div class="hint" id="bibe-aviso"></div>
+          <div class="bib-grupos" id="bibe-tags"></div>
+          <input id="bibe-etiquetas" placeholder="Las que elijas arriba aparecen acá; podés escribir otras, separadas por coma">
+        </div>
+        <footer>
+          <button class="btn ghost" id="bibe-cancel">Cancelar</button>
+          <button class="btn primary" id="bibe-ok">Guardar</button>
+        </footer>
+      </div>
     </div>`;
     document.body.append(...cont.children);
 
@@ -207,7 +221,11 @@ const Biblioteca = (() => {
     });
     q('bib-chips').addEventListener('click', e => {
       const stF = estado[actual];
-      if(stF && stF.opts.filtro && stF.opts.filtro.clic(e.target, stF.fp)){ pintarChips(); pintarLista(); return; }
+      const fpClic = stF && stF.opts.filtro && stF.opts.filtro.clic(e.target, stF.fp);
+      if(fpClic){
+        if(fpClic === 'limpiar'){ stF.texto = ''; q('bib-buscar').value = ''; }   // P358: «✕ Limpiar filtros» deja todo como al abrir (también el buscador)
+        pintarChips(); pintarLista(); return;
+      }
       const g = e.target.closest('[data-bibgrupo]');
       if(g){
         const st = estado[actual];
@@ -236,39 +254,75 @@ const Biblioteca = (() => {
     });
     q('bib-lista').addEventListener('click', accionFila);
 
-    // Selector de etiquetas de "Guardar en la biblioteca": el campo de texto es la fuente de verdad, los chips lo escriben.
-    q('bibg-tags').addEventListener('click', e => {
-      const g = e.target.closest('[data-bibggrupo]');
-      if(g){ tagsGuardar.abierto = tagsGuardar.abierto === g.dataset.bibggrupo ? null : g.dataset.bibggrupo; pintarTagsGuardar(); return; }
-      const b = e.target.closest('[data-bibgtag]'); if(!b) return;
-      const sel = limpiarEtiquetas(q('bibg-etiquetas').value);
-      const t = b.dataset.bibgtag.toLowerCase().slice(0, 30);
-      q('bibg-etiquetas').value = (sel.includes(t) ? sel.filter(x => x !== t) : [...sel, t]).join(', ');
-      pintarTagsGuardar();
-    });
-    q('bibg-etiquetas').addEventListener('input', pintarTagsGuardar);
-    q('scrim-biblioteca-guardar').addEventListener('mousedown', e => {
-      if(tagsGuardar.abierto && !e.target.closest('.bib-grupo')){ tagsGuardar.abierto = null; pintarTagsGuardar(); }
+    // Selector de etiquetas de "Guardar en la biblioteca" y de «✎ Etiquetas» (P316, 2026-11-27: los mismos botoncitos):
+    // el campo de texto es la fuente de verdad, los chips lo escriben.
+    [[tagsGuardar, 'scrim-biblioteca-guardar'], [tagsEditar, 'scrim-biblioteca-etiquetas']].forEach(([T, scrim]) => {
+      q(T.cont).addEventListener('click', e => {
+        const g = e.target.closest('[data-bibggrupo]');
+        if(g){ T.abierto = T.abierto === g.dataset.bibggrupo ? null : g.dataset.bibggrupo; pintarTags(T); return; }
+        const b = e.target.closest('[data-bibgtag]'); if(!b) return;
+        const sel = limpiarEtiquetas(q(T.input).value);
+        const t = b.dataset.bibgtag.toLowerCase().slice(0, 30);
+        q(T.input).value = (sel.includes(t) ? sel.filter(x => x !== t) : [...sel, t]).join(', ');
+        pintarTags(T);
+      });
+      q(T.input).addEventListener('input', () => pintarTags(T));
+      q(scrim).addEventListener('mousedown', e => {
+        if(T.abierto && !e.target.closest('.bib-grupo')){ T.abierto = null; pintarTags(T); }
+      });
     });
   }
 
-  const tagsGuardar = {grupos: [], abierto: null, enFila: false, rotulos: null};
-  function pintarTagsGuardar(){
-    const sel = new Set(limpiarEtiquetas(document.getElementById('bibg-etiquetas').value));
-    const chip = t => `<button type="button" class="bib-chip${sel.has(t.toLowerCase()) ? ' on' : ''}" data-bibgtag="${esc(t)}">${esc((tagsGuardar.rotulos && tagsGuardar.rotulos[t]) || t)}</button>`;
+  const tagsGuardar = {cont: 'bibg-tags', input: 'bibg-etiquetas', grupos: [], abierto: null, enFila: false, rotulos: null};
+  const tagsEditar = {cont: 'bibe-tags', input: 'bibe-etiquetas', grupos: [], abierto: null, enFila: false, rotulos: null};
+  const pintarTagsGuardar = () => pintarTags(tagsGuardar);
+  function pintarTags(T){
+    const sel = new Set(limpiarEtiquetas(document.getElementById(T.input).value));
+    const chip = t => `<button type="button" class="bib-chip${sel.has(t.toLowerCase()) ? ' on' : ''}" data-bibgtag="${esc(t)}">${esc((T.rotulos && T.rotulos[t]) || t)}</button>`;
     // `enFila` (las pasivas, 2026-11-24): cada familia en su renglón, con los botoncitos a la vista (sin menú desplegable).
-    if(tagsGuardar.enFila){
-      document.getElementById('bibg-tags').innerHTML = `<div style="display:flex;flex-direction:column;gap:5px;width:100%">${tagsGuardar.grupos.filter(g => g.nombre !== 'Otros').map(g =>   // (las sueltas de antes no se ofrecen; se pueden escribir igual)
+    if(T.enFila){
+      document.getElementById(T.cont).innerHTML = `<div style="display:flex;flex-direction:column;gap:5px;width:100%">${T.grupos.filter(g => g.nombre !== 'Otros').map(g =>   // (las sueltas de antes no se ofrecen; se pueden escribir igual)
         `<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center"><span style="font-size:12px;font-weight:700;min-width:84px;opacity:.85">${esc(g.nombre)}</span>${g.tags.map(chip).join('')}</div>`).join('')}</div>`;
       return;
     }
-    document.getElementById('bibg-tags').innerHTML = tagsGuardar.grupos.map(g => {
+    document.getElementById(T.cont).innerHTML = T.grupos.map(g => {
       const n = g.tags.filter(t => sel.has(t.toLowerCase())).length;
-      return `<div class="bib-grupo${tagsGuardar.abierto === g.nombre ? ' abierto' : ''}">
+      return `<div class="bib-grupo${T.abierto === g.nombre ? ' abierto' : ''}">
         <button type="button" class="btn${n ? ' primary' : ''}" data-bibggrupo="${esc(g.nombre)}">${esc(g.nombre)}${n ? ` <span class="n">${n}</span>` : ''} ▾</button>
         <div class="bib-pop"><div class="bib-chips">${g.tags.map(chip).join('')}</div></div></div>`;
     }).join('');
   }
+  // «✎ Etiquetas» del dueño (P316, 2026-11-27): los mismos botoncitos que «⬆ Subir» (las pasivas: cada familia en su renglón, con su rótulo;
+  // lo demás: los menús por grupo), arrancando con las que ya tiene. Devuelve la lista nueva, o null si se cancela.
+  function editarEtiquetas(st, ent){
+    asegurarVentana();
+    const q = id => document.getElementById(id);
+    const F = st.opts && st.opts.filtro;
+    const conocidas = new Set(SUGERENCIAS[actual] || []);
+    [...(st.oficial || []), ...(st.propuestas || [])].forEach(e => (e.etiquetas || []).forEach(t => conocidas.add(t)));
+    if(F && F.grupos){
+      tagsEditar.grupos = F.grupos(); tagsEditar.enFila = true; tagsEditar.rotulos = F.rotulos || null;
+    }else{
+      (st.opts && st.opts.grupos || []).forEach(g => g.tags.forEach(t => conocidas.add(t)));
+      tagsEditar.grupos = armarGruposTags(st.opts && st.opts.grupos, conocidas); tagsEditar.enFila = false; tagsEditar.rotulos = null;
+    }
+    tagsEditar.abierto = null;
+    q('bibe-titulo').textContent = `🏷 Etiquetas · ${ent.nombre}`;
+    q('bibe-aviso').textContent = tagsEditar.enFila
+      ? 'Marcá las que correspondan en cada familia (una familia sin ninguna cuenta como «cualquiera»). Podés escribir otras abajo, separadas por coma.'
+      : 'Elegí las etiquetas en los menús, o escribilas abajo separadas por coma.';
+    q('bibe-etiquetas').value = (ent.etiquetas || []).join(', ');
+    pintarTags(tagsEditar);
+    // Encima de la Biblioteca (que puede estar arriba de otra ventana, `opts.z`); comun/capas.js la sube más si hiciera falta.
+    q('scrim-biblioteca-etiquetas').style.zIndex = String((parseInt(getComputedStyle(q('scrim-biblioteca')).zIndex, 10) || 50) + 1);
+    q('scrim-biblioteca-etiquetas').classList.add('open');
+    return new Promise(res => {
+      const fin = v => { q('scrim-biblioteca-etiquetas').classList.remove('open'); q('bibe-ok').onclick = q('bibe-x').onclick = q('bibe-cancel').onclick = null; res(v); };
+      q('bibe-x').onclick = q('bibe-cancel').onclick = () => fin(null);
+      q('bibe-ok').onclick = () => fin(limpiarEtiquetas(q('bibe-etiquetas').value));
+    });
+  }
+
   // Todas las etiquetas disponibles: las de los grupos definidos + las que ya usan las entradas de la biblioteca + las sugeridas del tipo.
   function armarGruposTags(defGrupos, tags){
     const usadas = new Set();
@@ -322,7 +376,7 @@ const Biblioteca = (() => {
     if(st.opts.filtro){   // 🏷 un filtro a medida (las pasivas: filas por familia, comun/pasivas.js); el conteo va en su pie
       const cont = document.getElementById('bib-chips');
       cont.className = '';
-      cont.innerHTML = st.opts.filtro.html(st.fp, {n: filtrada(st).length, total: listaVista(st).length});
+      cont.innerHTML = st.opts.filtro.html(st.fp, {n: filtrada(st).length, total: listaVista(st).length, hayTexto: !!st.texto});
       return;
     }
     const cuenta = {};
@@ -437,9 +491,9 @@ const Biblioteca = (() => {
         aviso(`"${ent.nombre}" quedó auditado`);
         pintar();
       }else if(acc === 'etiquetas'){
-        const txt = await Confirmar.texto('Etiquetas (separadas por coma):', {titulo: 'Etiquetas', icono: '🏷', valor: ent.etiquetas.join(', '), si: 'Guardar', max: 300});
-        if(txt === null) return;
-        ent.etiquetas = limpiarEtiquetas(txt);
+        const nuevas = await editarEtiquetas(st, ent);
+        if(nuevas === null) return;
+        ent.etiquetas = nuevas;
         await fbDb.collection(coleccion).doc(ent.id).update({etiquetas: ent.etiquetas});
         pintar();
       }else if(acc === 'aprobar'){

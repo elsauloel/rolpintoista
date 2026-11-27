@@ -312,7 +312,8 @@ Boceto (la ventana de siempre de la Biblioteca, con las familias en filas):
   «Mostrando N de 47», «✕ Limpiar filtros» y el buscador de siempre. Cada fila muestra sus etiquetas con su rótulo.
 - **Rol ya marcado**: solo en los **creeps** cuyo rol se sabe (los que salieron de la biblioteca de creeps: el rol sale de las etiquetas de esa
   entrada; el Híbrido esencial = Warrior y Tanque). Un creep armado a mano o sin origen abre sin rol. Personajes, invocaciones y el asistente de
-  personaje nuevo abren sin rol marcado (P315).
+  personaje nuevo abren sin rol marcado (P315). **Cambiado el 2026-11-27 (P315):** el asistente de personaje nuevo abre con el rol de la clase
+  elegida en «Idea» ya marcado (ver abajo).
 - **El asistente de personaje nuevo** dejó sus 5 categorías: usa las mismas filas (con su propio buscador); una pasiva ya elegida no se esconde.
 - **Subir una pasiva** («⬆ Subir» de la ficha): las etiquetas se eligen con los mismos botoncitos, cada familia en su renglón; arrancan marcadas las
   que ya tenía (una copia de fábrica) o, si no tiene, las sugeridas por lo que suma. Se puede seguir escribiendo una propia en el campo de texto.
@@ -320,3 +321,19 @@ Boceto (la ventana de siempre de la Biblioteca, con las familias en filas):
   así nunca queda escondida. Una pasiva con etiquetas de una familia y ninguna de otra cuenta como «cualquiera» en la que le falta (P316).
 - Pruebas automáticas: 5 nuevas en `comun/pruebas.html` (1075 en verde). Con clics: «+ Pasiva» en la ficha, en un creep de GM Tools (Escudero:
   Tanque marcado) y el paso Pasivas del asistente; la ventana de subir, sin subir nada. Falta con clics: la invocación y una subida real (en la cola).
+
+### ✅ Programado (2026-11-27): P315, P316 y P358
+
+- **P315 — el asistente de personaje nuevo marca el rol de la clase.** En el paso «Pasivas», el filtro abre con el rol de la clase elegida en
+  «Idea» ya marcado (las clases se llaman como los roles: `FiltroPasivas.rolDeClase`); se saca con un clic. Si se vuelve a «Pasivas» sin cambiar la
+  clase, el filtro queda como se dejó; si se cambia la clase, se cambia ese rol y los demás botoncitos quedan. «Otra» o sin clase: sin rol.
+  Personajes e invocaciones fuera del asistente siguen abriendo sin rol (la ficha todavía no dice la clase).
+- **P316 — «✎ Etiquetas» con botoncitos.** El «✎ Etiquetas» del dueño en la Biblioteca abre una ventana con los mismos botoncitos que «⬆ Subir»
+  (en las pasivas, Rol, Estilo y Función, cada una en su renglón), arrancando con las que ya tiene marcadas; abajo, el campo de texto para las
+  sueltas (racial, criatura…), que se conservan. Cancelar no cambia nada. La corrección de **Regeneración** sigue sin etiquetas: se le ponen cuando
+  el dueño lo diga.
+- **P358 — «✕ Limpiar filtros» deja todo como al abrir.** Desmarca los botoncitos (también el rol que venía marcado: un creep o la clase del
+  asistente), vuelve a tildar «sumar las de 🌐 Cualquiera» y vacía el buscador. El botón aparece apenas hay algo que limpiar (un botoncito, «sumar…»
+  destildado o algo escrito en el buscador).
+- Pruebas automáticas: 4 nuevas (1167 en verde). Con clics: «+ Pasiva» de un creep (GM), el asistente (Jugador 1, sin crear el personaje) y una
+  pasiva de prueba subida, re-etiquetada y borrada (GM).

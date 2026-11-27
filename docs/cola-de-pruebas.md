@@ -2902,10 +2902,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   (Editar → Eliminar). Capturas `cola132/10` a `18`. Duda nueva: P358 («Limpiar filtros» no vuelve a tildar «sumar las de Cualquiera»).
   `restaurar.js`: «quedó igual». Pruebas: 1163 en verde.
 
-- **⬜ en cola — 🏷 Responder P315: ¿el asistente de personaje nuevo marca la clase elegida en el filtro de pasivas?** (dueño, 2026-11-24: «anotá
-  las nuevas preguntas en la cola»). Recomendación: sí. Ver `docs/preguntas-abiertas.md`.
-- **⬜ en cola — 🏷 Responder P316: ¿el «✎ Etiquetas» de la biblioteca usa los mismos botoncitos en vez de texto libre?** (dueño, 2026-11-24).
-  Recomendación: sí (así se etiqueta la corrección de Regeneración, hoy «🏷 sin etiquetar»).
+- **✅ hecho (2026-11-27) — 🏷 Responder P315: ¿el asistente de personaje nuevo marca la clase elegida en el filtro de pasivas?** (dueño, 2026-11-24: «anotá
+  las nuevas preguntas en la cola»; decidida el 2026-11-27, la recomendación). En el paso «Pasivas» del asistente, el filtro abre con el rol de la
+  clase elegida en «Idea» ya marcado (Tanque → 🛡 Tanque); se saca con un clic y, si se vuelve a «Pasivas» sin cambiar la clase, queda como se dejó.
+  Si se cambia la clase, se cambia ese rol (los demás botoncitos quedan). Clase «Otra» o ninguna: sin rol. `comun/asistente-personaje.js`
+  (`rolDeLaClase`) y `FiltroPasivas.rolDeClase` (`comun/pasivas.js`). **Probado con clics** (Jugador 1, sin crear el personaje: se canceló): Tanque →
+  «Mostrando 24 de 47» con Tanque marcado; un clic lo saca (47 de 47) y al volver de Talentos sigue sacado; cambiando a Mago abre con Mago (23 de 47).
+  Capturas `cola133/10` a `13`.
+- **✅ hecho (2026-11-27) — 🏷 Responder P316: ¿el «✎ Etiquetas» de la biblioteca usa los mismos botoncitos en vez de texto libre?** (dueño, 2026-11-24;
+  decidida el 2026-11-27, la recomendación). «✎ Etiquetas» (solo el dueño del proyecto) abre una ventana con los mismos botoncitos que «⬆ Subir»: en
+  las pasivas, cada familia (Rol, Estilo, Función) en su renglón, con su rótulo, arrancando con las que ya tiene marcadas; abajo el campo de texto
+  (las etiquetas sueltas, como «racial», se conservan ahí). Las demás bibliotecas (creeps, trampas…) usan los menús por grupo, como al subir.
+  Cancelar no cambia nada. `comun/biblioteca.js` (`editarEtiquetas`, `pintarTags` compartido con «Subir»). **Probado con clics** (cuenta del GM, que
+  es la del dueño): se subió «Prueba de etiquetas (borrar)» con Tanque, Cuerpo a cuerpo y Defensa; «✎ Etiquetas» abrió con esas tres marcadas; se
+  cambió a Warrior + Cuerpo a cuerpo + Defensa + Aguante y se guardó: la fila y el filtro lo toman (aparece con Warrior, no con Shooter); se borró
+  con «Borrar» y en la base quedó solo la corrección de Regeneración, **sin tocar** (sigue sin etiquetas: ponérselas, cuando el dueño diga).
+  Capturas `cola133/04` a `09`.
 
 - **⬜ en cola — 📒 Revisar qué es el «catálogo propio» de un personaje («+ Ítem al catálogo» de la ficha)** (dueño, 2026-11-24: «no sé a qué te
   referís con el catálogo propio del personaje… revisar qué es eso y después revisar también el caso particular»). Explicarle al dueño qué es,
@@ -3278,6 +3290,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   «como sugerís»): (1) si baja la vida máxima, la Vida extra que quede por encima del tope nuevo (50 % del máximo) se recorta sola, con un aviso;
   (2) el GM puede pasar el tope a mano (por ejemplo para un jefe), con un aviso que lo diga; los jugadores no. (P357: los escudos de los anillos
   siguen fuera del tope, sin cambios.) Regla común en `comun/combatiente.js` (commit e1bd62dc).
+- **✅ hecho (2026-11-27) — P358: «✕ Limpiar filtros» de las pasivas deja todo como al abrir** (dueño, 2026-11-27, la recomendación). En «+ Pasiva»
+  (la ventana de la Biblioteca: personaje, invocación y creep) y en el paso «Pasivas» del asistente de personaje nuevo, «✕ Limpiar filtros» desmarca
+  los botoncitos, vuelve a tildar «sumar las de 🌐 Cualquiera» y vacía el buscador. El botón aparece también si solo se destildó «sumar…» o solo se
+  escribió algo en el buscador. **El rol que venía marcado (un creep, la clase del asistente) también se va**: «Limpiar» es limpiar (si volviera a
+  marcar el rol, el botón no haría nada a la vista cuando lo único marcado es ese rol); el rol se vuelve a marcar con un clic. `FiltroPasivas.clic`
+  devuelve `'limpiar'` y `hayAlgo` (comun/pasivas.js); la Biblioteca y el asistente vacían su buscador. **Probado con clics** (GM, «+ Pasiva» del
+  Tanque · Escudero; Jugador 1, el asistente). Nota: los siete creeps del mapa «Prueba · General» no guardan de qué entrada de la biblioteca salieron,
+  así que su «+ Pasiva» abre sin rol marcado (no es un error del código: un Escudero agregado desde el pool esencial sí lo trae). Capturas
+  `cola133/01` a `03` y `14`. Pruebas automáticas: 4 nuevas (1167 en verde). `restaurar.js`: «quedó igual».
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

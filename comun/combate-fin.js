@@ -88,7 +88,7 @@ const CombateFin = (() => {
   /* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
      El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
      ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
-  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosDespojos: true, simulacion: false}; }
+  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosDespojos: true, simulacion: false, simCae: {}}; }
 
   /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
      puede haber muchos creeps armados de antemano que no están en la pelea. Devuelve el Set de sus ids. */
@@ -97,7 +97,10 @@ const CombateFin = (() => {
     const mapaId = act.exists && act.data().mapaId ? act.data().mapaId : '_principal';
     const ruta = mapaId === '_principal' ? 'tokens' : `mapas/${mapaId}/tokens`;
     const [snap, esc] = await Promise.all([fbDb.collection(fbRutaCampana(ruta)).get(), escapadosLeer()]);
-    return unirEscapados(new Set(snap.docs.map(d => d.data()).filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId)), esc);
+    const creeps = snap.docs.map(d => d.data()).filter(t => t.tipo === 'creep' && t.fichaId);
+    const s = unirEscapados(new Set(creeps.map(t => t.fichaId)), esc);
+    s.ocultos = new Set(creeps.filter(t => t.oculto).map(t => t.fichaId));   // 🙈 los que los jugadores no ven (cuentan igual; la lista de 🔮 Simular lo dice)
+    return s;
   }
 
   /* 🌀 Los que se fueron por un Town portal durante el combate (2026-11-20, dueño: «un creep escapó con un portal, y ahora en la simulación no
@@ -422,14 +425,23 @@ const CombateFin = (() => {
         mods: [], efectosGolpe: [], detalle: '', descripcionNarrativa: '', consumible: false, estimado: false}}));
   }
 
+  /* 🔮 Simular quién cae (dueño, 2026-11-27: «al poner simulación uno debe elegir cada uno de los creeps presentes y poder poner si están vivos o
+     muertos»): en una simulación, `rep.simCae` = {creepId: true (cae) | false (sigue)} pisa lo de verdad (la vida en 0) SOLO para la cuenta; lo que
+     no está en la lista queda como está. Lo que sale de acá (XP, oro, ítems, despojos) es la cuenta de siempre. Nada se escribe: ni en el creep ni
+     en el combate, y en Avanzar (`simulacion` = false) no cuenta. */
+  const caeDeVerdad = sc => num(sc.hp) <= 0;
+  function cae(rep, sc){
+    const s = rep && rep.simulacion && rep.simCae;
+    return s && Object.prototype.hasOwnProperty.call(s, sc.id) ? !!s[sc.id] : caeDeVerdad(sc);
+  }
   function generar(rep, creeps, cat){
     const filas = creeps.filter(sc => !sc.recompensado && rep.enMapa && rep.enMapa.has(sc.id)).map(sc => {
-      const derrotado = num(sc.hp) <= 0;
+      const derrotado = cae(rep, sc), deVerdad = caeDeVerdad(sc);
       const xpBase = xpDeCreep(sc).total;   // ⭐ P237
       const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
       const cuenta = derrotado || rep.contarEscapados;
       const portal = !derrotado && !!(rep.enMapa.portal && rep.enMapa.portal.has(sc.id));   // 🌀 se fue por un Town portal
-      return {sc, derrotado, portal, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
+      return {sc, derrotado, deVerdad, simulado: derrotado !== deVerdad, oculto: !!(rep.enMapa.ocultos && rep.enMapa.ocultos.has(sc.id)), portal, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
     });
     const xpTotal = filas.reduce((a, f) => a + (f.cuenta ? f.xp : 0), 0);
     return {filas, xpTotal};
@@ -575,7 +587,30 @@ const CombateFin = (() => {
   function vista(rep, creeps, cat){
     const v = vistaReporte(rep, creeps, cat);
     if(!rep.simulacion) return v;
-    return {...v, html: CARTEL_SIMULACION + v.html, publicar: 'oculto'};
+    return {...v, html: CARTEL_SIMULACION + simListaHtml(rep, creeps, cat) + v.html, publicar: 'oculto'};
+  }
+  /* 🔮 La lista de quién cae (2026-11-27): cada creep presente (los del mapa publicado, también los ocultos, y los que se fueron por un portal) con
+     su casilla «cae». Arranca como está de verdad; cambiarla recalcula todo al momento. Arriba, el total, para verlo en cualquier paso. */
+  function simListaHtml(rep, creeps, cat){
+    if(rep.enMapa === null) return '';
+    const r = generar(rep, creeps, cat);
+    if(!r.filas.length) return '';
+    const rp = calcularReparto(rep, r);
+    const items = itemsPublicables(rep, r), algunoSimulado = r.filas.some(f => f.simulado);
+    const real = f => f.deVerdad ? 'cayó' : f.portal || (rep.enMapa.portal && rep.enMapa.portal.has(f.sc.id)) ? 'escapó por un portal 🌀' : 'sigue en pie';
+    const filas = r.filas.map(f => `<label class="rep-sim-creep" style="display:grid;grid-template-columns:22px minmax(0,1fr) 92px 190px;gap:8px;align-items:center;padding:4px 8px;margin:0;border-radius:8px;cursor:pointer;background:${f.derrotado ? 'rgba(220,80,80,.14)' : 'rgba(120,200,140,.10)'}${f.simulado ? ';outline:1px dashed #9b6cff' : ''}">
+        <input type="checkbox" data-rep-sim-cae="${esc(f.sc.id)}"${f.derrotado ? ' checked' : ''} style="width:16px;height:16px;margin:0">
+        <span style="min-width:0"><b>${esc(f.sc.nombre)}</b> <span class="hint">Lv ${fmt(num(f.sc.nivel) || 1)}${f.oculto ? ' · 🙈 oculto' : ''} · de verdad ${real(f)}</span></span>
+        <span style="font-weight:700;color:${f.derrotado ? '#ff9b9b' : '#9fe0b0'}">${f.derrotado ? '☠ Cae' : f.portal ? '🌀 Escapó' : '🏃 Sigue'}</span>
+        <span class="hint" style="text-align:right">${f.cuenta ? `+${fmt(f.xp)} XP` : 'no suma XP'}${f.derrotado ? ((k => ` · ${fmt(f.oro)} DDE · ${k} ítem${k === 1 ? '' : 's'}`)(f.items.filter(i => !rep.quitados.has(i.clave)).length)) : ''}</span></label>`).join('');
+    return `<div style="padding:10px 12px;border:1px solid rgba(155,108,255,.55);border-radius:10px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="color:#d9c8ff">☠ Quién cae</b><span class="hint" style="flex:1;min-width:220px">Tildá los creeps que caen y destildá los que siguen: la experiencia y el botín se recalculan solos. No cambia nada de verdad.</span>
+        <button type="button" class="iconbtn" data-rep-sim-todos title="Marca que caen todos">☠ Todos caen</button>
+        <button type="button" class="iconbtn" data-rep-sim-real title="Vuelve a como están de verdad"${algunoSimulado ? '' : ' disabled'}>↺ Como están</button></div>
+      ${filas}
+      <div class="reporte-total rep-sim-total" style="margin-top:4px">Con esto: <b>${fmt(rp.xpTotal)} XP</b>${rp.n ? ` (<b>${fmt(rp.xpValor)}</b> por jugador)` : ''} · <b>${fmt(rp.oroTotal)} DDE</b>${rp.n ? ` (${fmt(rp.ddeValor)} c/u)` : ''} · ${items.length} ítem${items.length === 1 ? '' : 's'} en el botín${rp.despojosEquipo ? ` · ${fmt(rp.despojosEquipo)} despojos` : ''}</div>
+      ${algunoSimulado ? '<div class="hint" style="font-size:12px">El oro (±20 %) y los consumibles al azar de un creep que marcás como caído salen de una tirada de muestra: son un <b>estimado</b> (no cambian si lo destildás y lo volvés a tildar; 🎲 cambia un consumible).</div>' : ''}
+    </div>`;
   }
   function vistaReporte(rep, creeps, cat){
     if(rep.enMapa === null) return {html: `<div class="hint">Buscando los creeps que están en el mapa publicado…</div>`, publicar: 'oculto', faltanJugadores: false};
@@ -682,6 +717,7 @@ const CombateFin = (() => {
     }
     if(d.repEscapados !== undefined){ rep.contarEscapados = t.checked; return true; }
     if(d.repOcultos !== undefined){ rep.ocultosDespojos = t.checked; return true; }
+    if(d.repSimCae !== undefined){ if(!rep.simulacion) return false; (rep.simCae = rep.simCae || {})[d.repSimCae] = !!t.checked; return true; }   // 🔮 solo en memoria
     return false;
   }
   // Un botón de la ventana (evento click): true (redibujar) | {ver: ítem} | {toast} | null (no era de acá). `raiz` = donde están los campos.
@@ -694,7 +730,14 @@ const CombateFin = (() => {
       return it ? {ver: it.template} : null;
     }
     if(d.repIr !== undefined){ rep.paso = d.repIr; return true; }   // 📋 los pasos
-    if(d.repAvanzar !== undefined){ rep.simulacion = false; return true; }   // 🔮 → ▶ el fin de combate de verdad, con lo ajustado
+    if(d.repAvanzar !== undefined){ rep.simulacion = false; rep.simCae = {}; return true; }   // (en Avanzar cuentan los creeps como están)
+    if(d.repSimReal !== undefined){ rep.simCae = {}; return true; }
+    if(d.repSimTodos !== undefined){
+      if(!rep.simulacion) return null;
+      rep.simCae = {};
+      generar(rep, creeps || [], cat || []).filas.forEach(f => { rep.simCae[f.sc.id] = true; });
+      return true;
+    }   // 🔮 → ▶ el fin de combate de verdad, con lo ajustado
     if(d.repGrupo !== undefined){   // 📋 Ver el grupo (2026-11-03, dueño): slots vacíos, stats, resistencias y debilidades de los que cobran (comun/grupo-botin.js)
       const items = itemsPublicables(rep, generar(rep, creeps, cat));
       const jugadores = (rep.jugadores || []).filter(j => j.incluido);
@@ -986,7 +1029,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {AVISO_NARRATIVO, AVISO_NARRATIVO_FIN, elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {AVISO_NARRATIVO, AVISO_NARRATIVO_FIN, elegirModo, venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, cae, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, unirEscapados, escapadosLimpiar, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, progresoXp, progresoXpTexto, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

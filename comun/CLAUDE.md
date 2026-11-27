@@ -1763,6 +1763,11 @@ versión parecida en más de una, es candidato a juntar.
 - **`combate-fin.js`, 🔮 Simular** (2026-11-20, dueño): `elegirModo()` (el cartel ▶ Avanzar / 🔮 Simular de «Finalizar combate», mapa js/18 y GM Tools
   js/06) y `rep.simulacion`: `vista` suma el cartel «Simulación: no se guarda nada» con «▶ Pasar a Avanzar» (`data-rep-avanzar`, lo maneja `clic`) y
   esconde Publicar; `publicar` se niega. `cambio`/`clic` no escriben nada (quién cobra queda en `rep.jugadores`, no pasa por `fueraCambiar`).
+  **☠ Quién cae** (2026-11-27, dueño): en una simulación, `vista` suma la lista de los creeps presentes (`simListaHtml`: casillas `data-rep-sim-cae`,
+  botones `data-rep-sim-todos` / `data-rep-sim-real`, el total `.rep-sim-total`). `rep.simCae = {creepId: true|false}` pisa la vida en 0 solo para la
+  cuenta (`CombateFin.cae(rep, sc)`, que usa `generar`; las filas traen además `deVerdad`, `simulado` y `oculto`); fuera de una simulación no cuenta,
+  y «Pasar a Avanzar» la vacía. `creepsEnMapa()` suma `.ocultos` (los tokens `oculto`). El oro y los consumibles al azar de un creep marcado salen de
+  la tirada de siempre (una vez, en `rep.oro` / `rep.drops`): «estimado» (P359). GM Tools vacía `simCae` al abrir el reporte (js/08).
 - **`combate-fin.js` + `tokens-auto.js`, 🌿 al terminar el combate el mapa vuelve a narrativo** (2026-11-20, dueño: «al poner finalizar combate y
   terminar con todo ese proceso, el mapa automáticamente se vuelva a poner en modo narrativo»): `TokensAuto.rutaModo(mapaId)` / `ponerModo(mapaId, modo)`
   es **la única escritura del modo de un mapa** (la usa el interruptor del mapa, js/04) y `TokensAuto.volverANarrativo()` pasa el mapa **publicado** a

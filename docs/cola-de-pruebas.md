@@ -3309,11 +3309,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Tanque · Escudero; Jugador 1, el asistente). Nota: los siete creeps del mapa «Prueba · General» no guardan de qué entrada de la biblioteca salieron,
   así que su «+ Pasiva» abre sin rol marcado (no es un error del código: un Escudero agregado desde el pool esencial sí lo trae). Capturas
   `cola133/01` a `03` y `14`. Pruebas automáticas: 4 nuevas (1167 en verde). `restaurar.js`: «quedó igual».
-- **⬜ en cola (dueño: «desarrollarlo ahora mismo», 2026-11-27) — 🔮 Simular el fin del combate eligiendo qué creeps quedan vivos o muertos**
+- **✅ hecho (2026-11-27) — 🔮 Simular el fin del combate eligiendo qué creeps quedan vivos o muertos**
   (dueño, 2026-11-27): «en el simulador del final del combate uno puede poner que los creeps que siguen vivos estén muertos, entonces para saber
   cuánto ganan de experiencia y qué equipos le quedan con los creeps muertos. Entonces al poner simulación uno debe elegir cada uno de los creeps
   presentes y poder poner si están vivos o muertos». En 🔮 Simular (`comun/combate-fin.js`): una lista con cada creep presente y un interruptor
   vivo / muerto (arranca como están de verdad), y la experiencia y el botín se recalculan con esa elección; no se guarda nada (es simulación).
+  **Hecho:** en 🔮 Simular, arriba de los pasos, el recuadro «☠ Quién cae» con cada creep presente (los del mapa publicado, también los ocultos —
+  dice «🙈 oculto»— y los que se fueron por un Town portal) y su casilla: tildada = cae, destildada = sigue (cuenta como «Escapó», con su 20 % de XP
+  si está tildado contar a los que escaparon). Arranca como está cada uno de verdad («de verdad sigue en pie / cayó / escapó por un portal»); lo
+  cambiado se ve con un borde punteado. Al cambiar una casilla se recalcula todo al momento con la cuenta de siempre (`generar`): la XP de cada creep
+  y por jugador, el oro, el equipo, los consumibles y los despojos, en los cinco pasos y en el renglón «Con esto: … XP · … DDE · … ítems en el botín».
+  Botones «☠ Todos caen» y «↺ Como están». El oro (±20 %) y el consumible al azar de un creep que se marca como caído salen de una tirada de muestra,
+  fija mientras dure la simulación: la lista dice que son un **estimado** (P359). Nada se guarda (`rep.simCae`, en memoria; en GM Tools se vacía al
+  reabrir); «▶ Pasar a Avanzar» lo descarta y en Avanzar cuentan los creeps como están. Mapa y GM Tools. **Probado con clics** (GM, «Prueba · General»
+  en combate, los siete creeps): al marcar el Hachero y el Tirador la cuenta pasó de 49 XP / 0 DDE / 0 ítems a 105 XP / 28 DDE / 8 ítems; al cerrar,
+  la vida de los siete creeps, el combate, el botín y las recompensas quedaron igual; al reabrir arrancó como están; Avanzar, sin la lista, igual que
+  antes (mirado sin publicar). Capturas `cola135/04`, `05`, `06`, `09`, `13`, `15` y `16`. Pruebas automáticas: 1 nueva (1168 en verde).
+  `restaurar.js`: «quedó igual».
 - **⬜ en cola — ✎ Ítem custom con un consumible: que no hable de creeps ni del catálogo** (2026-11-27, visto al probar el consumible con tirada):
   en GM Tools, «✎ Ítem custom» con la categoría Consumible igual muestra «Equipar a: (un creep)», «Si no lo equipás a nadie, igual lo podés publicar en
   el catálogo», el Tier («solo importa si lo publicás en el catálogo») y el botón dice «Crear y equipar», aunque un consumible propio no se equipa a

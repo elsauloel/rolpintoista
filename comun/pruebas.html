@@ -4785,6 +4785,44 @@ prueba('🔮 fin del combate simulado (2026-11-20): misma ventana con el cartel,
   igual([v1.publicar, v1.html.includes('Simulación: no se guarda nada'), v1.html.includes('data-rep-avanzar'), n, !!(pub && pub.error), r, rep.simulacion, v2.publicar, v2.html.includes('Simulación')],
     ['oculto', true, true, 1, true, true, false, 'activo', false]);
 });
+prueba('🔮 simular quién cae (2026-11-27, dueño): cada creep presente con su casilla; arranca como está; al cambiarla se recalculan la XP y el botín; no toca el creep; en Avanzar no cuenta', () => {
+  const rep = CombateFin.nuevo(); rep.simulacion = true;
+  rep.enMapa = CombateFin.unirEscapados(new Set(['a', 'b', 'c']), ['p']); rep.enMapa.ocultos = new Set(['c']);
+  const creeps = [creepPrueba({id: 'a', nivel: 2, hp: 0}), creepPrueba({id: 'b', nivel: 1, hp: 6, oroBase: 40}), creepPrueba({id: 'c', nivel: 1, hp: 3}), creepPrueba({id: 'p', nivel: 1, hp: 5})];
+  rep.jugadores = [{id: 'p1', nombre: 'Ana', estado: 'en pie', incluido: true}, {id: 'p2', nombre: 'Beto', estado: 'en pie', incluido: true}];
+  const xp = sc => CombateFin.xpDeCreep(sc).total, esc20 = sc => Math.round(xp(sc) * CombateFin.XP_ESCAPO_PCT);
+  const r0 = CombateFin.generar(rep, creeps, []), h0 = CombateFin.vista(rep, creeps, []).html;
+  const antes = JSON.stringify(creeps);
+  CombateFin.cambio(rep, {dataset: {repSimCae: 'b'}, checked: true});
+  CombateFin.cambio(rep, {dataset: {repSimCae: 'p'}, checked: true});
+  const r1 = CombateFin.generar(rep, creeps, []), rp1 = CombateFin.calcularReparto(rep, r1), fb = r1.filas.find(f => f.sc.id === 'b'), h1 = CombateFin.vista(rep, creeps, []).html;
+  const oroB = fb.oro;
+  CombateFin.cambio(rep, {dataset: {repSimCae: 'b'}, checked: false}); CombateFin.cambio(rep, {dataset: {repSimCae: 'b'}, checked: true});
+  const oroB2 = CombateFin.generar(rep, creeps, []).filas.find(f => f.sc.id === 'b').oro;
+  CombateFin.cambio(rep, {dataset: {repSimCae: 'a'}, checked: false});   // el caído de verdad, «sigue» en la simulación
+  const ra = CombateFin.generar(rep, creeps, []).filas.find(f => f.sc.id === 'a');
+  CombateFin.clic(rep, {dataset: {repSimTodos: ''}}, null, creeps, []);
+  const rT = CombateFin.generar(rep, creeps, []);
+  CombateFin.clic(rep, {dataset: {repSimReal: ''}}, null, creeps, []);
+  const rR = CombateFin.generar(rep, creeps, []);
+  CombateFin.cambio(rep, {dataset: {repSimCae: 'b'}, checked: true});
+  CombateFin.clic(rep, {dataset: {repAvanzar: ''}});
+  const rV = CombateFin.generar(rep, creeps, []), hV = CombateFin.vista(rep, creeps, []).html;
+  const real = CombateFin.nuevo(); real.enMapa = rep.enMapa; real.simCae = {b: true};   // fuera de una simulación, simCae no cuenta
+  CombateFin.cambio(real, {dataset: {repSimCae: 'c'}, checked: true});
+  igual([r0.filas.map(f => f.derrotado), (h0.match(/data-rep-sim-cae=/g) || []).length, h0.includes('🙈 oculto'), h0.includes('escapó por un portal 🌀'), h0.includes('data-rep-sim-real title="Vuelve a como están de verdad" disabled'),
+    r0.xpTotal === xp(creeps[0]) + esc20(creeps[1]) + esc20(creeps[2]) + esc20(creeps[3]),
+    r1.filas.map(f => f.derrotado), r1.xpTotal === xp(creeps[0]) + xp(creeps[1]) + esc20(creeps[2]) + xp(creeps[3]), fb.simulado, fb.oro >= 32 && fb.oro <= 48, fb.items.length > 0,
+    rp1.xpValor === Math.ceil(r1.xpTotal / 2), rp1.oroTotal > 0, h1.includes('estimado'), h1.includes(`<b>${r1.xpTotal} XP</b>`), oroB2 === oroB, r1.filas.find(f => f.sc.id === 'p').portal,
+    [ra.derrotado, ra.xp === esc20(creeps[0]), ra.items.length, ra.oro],
+    rT.filas.every(f => f.derrotado), rR.filas.map(f => f.derrotado), rV.filas.map(f => f.derrotado), rep.simulacion, JSON.stringify(rep.simCae), hV.includes('data-rep-sim-cae'),
+    JSON.stringify(creeps) === antes, CombateFin.generar(real, creeps, []).filas.map(f => f.derrotado), JSON.stringify(real.simCae)],
+    [[true, false, false, false], 4, true, true, true, true,
+    [true, true, false, true], true, true, true, true, true, true, true, true, true, false,
+    [false, true, 0, 0],
+    true, [true, false, false, false], [true, false, false, false], false, '{}', false,
+    true, [true, false, false, false], '{"b":true}']);
+});
 prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catálogo con su poder, una pieza propia con sus rasgos, lo guardado también', () => {
   const varita = CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago');
   const tal = CATALOGO_BASE.find(i => i && !i.archivo && (i.espejito || i.relicario));

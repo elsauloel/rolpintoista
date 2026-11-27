@@ -69,6 +69,7 @@ function mesaLineaVerde(origen, formula){ return CombateFin.lineaVerde(origen, f
 function abrirReporteFinalizar(simular){
   if(!!combateRep.simulacion !== !!simular){ combateRep = nuevoCombateRep(); combateRep.simulacion = !!simular; }
   combateRep.enMapa = null;
+  combateRep.simCae = {};   // 🔮 quién cae en la simulación (2026-11-27): arranca siempre como están de verdad
   renderReporteCombate();
   cargarCreepsEnMapa();
   cargarJugadoresCombate();

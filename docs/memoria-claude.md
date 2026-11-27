@@ -62,6 +62,10 @@
 
 ## Diseño del juego
 
+- **Los textos que ve el jugador no llevan notas de desarrollo** (dueño, 2026-11-27: «hay muchas notas y aclaraciones tipo "fecha, dueño:" todo eso no
+  debe llegar al jugador»): la descripción de una habilidad, ítem, pasiva, estado, trampa o creep dice solo qué hace (con «⚙ Automatizado / ✋ A mano»);
+  las fechas, las citas del dueño y el porqué de un cambio van a `docs/` (cola, preguntas) o a un comentario del código, nunca al texto visible.
+
 - **La Percepción siempre incierta** (2026-11-11, dueño: «que no se sepa bien para qué estás tirando… no importa si es el máster o un jugador»):
   todo cartel que pide Percepción nombra solo a quien percibe con una frase incierta («Fulano siente un movimiento extraño…»,
   `Combatiente.percepcionIncierta`) — nunca quién está escondido, cuántos, qué hace (moverse, poner una trampa, robar), dónde ni el paso. El

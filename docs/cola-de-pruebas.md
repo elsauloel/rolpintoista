@@ -3338,6 +3338,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   están «📊 Stats», «🎒 Abrir la mochila» y «📜 Ver mi ficha completa»): «acá debería haber un botón para ver las habilidades». Sumar «⚡ Habilidades»
   que muestre las habilidades del personaje (y de la invocación / creep si aplica) con lo esencial de cada una (costo, enfriamiento, qué hace) y,
   si es el dueño, que deje usarlas igual que la Botonera. Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`.
+- **⬜ en cola — 🧹 Sacar de los textos que ve el jugador las notas de desarrollo «(fecha, dueño: …)»** (dueño, 2026-11-27: «hay muchas notas y
+  aclaraciones tipo "fecha,dueño:" todo eso no debe llegar al jugador»). Revisar las descripciones visibles (`detalle`, `descripcion`, `efectoDetalle`,
+  `original`…) de `comun/skills-clase.js`, `skills-creep-base.js`, `pasivas.js`, `estados-presets.js`, `catalogo.js`, `creeps-base.js`, `trampas-base.js`,
+  `armas-naturales-base.js` y lo que se arme con textos en el código (carteles, «Ver detalle», el manual), y mover esas notas a un comentario o a `docs/`
+  sin cambiar ninguna regla. Revisar si las copias guardadas (habilidades de clase, ítems) se ponen al día solas. Nueva regla en `docs/memoria-claude.md`.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127yeta2"></script>
+<script src="duelo.js?v=20261127fila"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -1035,14 +1035,46 @@ prueba('😈 Enyetar parte A: qué hace la pantalla del GM con una pausa, según
   igual([q([]), q([], false, 200000), q([], true), q([mal({estado: 'esperando'})]), q([mal({estado: 'resuelto', resultado: 'fallo'})]),
     q([mal({estado: 'resuelto', resultado: 'pego', efectos: [{nombre: 'Enyetar', aplicado: true, nota: 'a mano'}]})])[0],
     q([mal({estado: "esperando", creado: 98000})]), (Duelo.dueloDeLaYeta(pausa.ataque.yeta, [mal({estado: 'esperando', atacante: {tokenId: 'otro'}})]) || {}).id || ''],
-    [['esperar', '', ''], ['seguir', '', 'no se llegó a echar la maldición'], ['seguir', '', 'se canceló la maldición'], ['esperar', '', ''],
+    [['esperar', '', ''], ['seguir', 'tiempo', 'no se llegó a echar la maldición en 60 s'], ['seguir', '', 'se canceló la maldición'], ['esperar', '', ''],
       ['seguir', 'perdio', 'Goblin resistió la maldición'], 'esperarAplicada', ['esperar', '', ''], '']);
 });
 prueba('😈 Enyetar parte A en el código: la lista, la pausa antes de ejecutar, la tirada exacta y «Seguir sin la yeta» (js/38, comun/duelo.js)', async () => {
   const [t38, du, t60] = await Promise.all(['../vtt-hexgrid/js/38-enyetar.js', 'duelo.js', '../vtt-hexgrid/js/60-mal-de-ojo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
-  igual([/Duelo\.tiradasEnyetables\(/.test(t38), /Duelo\.yetaPausar\(o\.dueloId/.test(t38), /enyetarTirada\(doc\.id, y\.lado, 'peor', \{campo: y\.campo, yeta: true\}\)/.test(t38),
-    /x\.hab \|\| !enyetarReciente/.test(t38), /data-yeta-seguir/.test(du), /todosH\.forEach\(publicarResumenSiCorresponde\)/.test(du), /dt\.campo \? \{campo: dt\.campo\}/.test(t60)],
+  igual([/Duelo\.tiradasEnyetables\(/.test(t38), /Duelo\.yetaPausar\(o\.dueloId/.test(t38), /enyetarTirada\(doc\.id, y\.lado, 'peor', \{campo: y\.campo, yeta: true, hijo: d\.id\}\)/.test(t38),
+    /x\.hab \|\| !enyetarReciente/.test(t38), /data-yeta-seguir/.test(du), /todosH\.forEach\(publicarResumenSiCorresponde\)/.test(du), /dt\.campo \? \{campo: dt\.campo, yeta: true, tipo: 'maldeojo'\}/.test(t60)],
     [true, true, true, false, true, true, true]);
+});
+prueba('⏸ Enyetar A2/A3: la pausa sirve para todo lo de la fila y congela la tirada (Moneda, Polilla, Re-roll y Empower esperan)', () => {
+  const base = {estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'gob', nombre: 'Goblin'}, defensor: {tokenId: 'yo', nombre: 'Yo'}, pdg: {total: 9, formula: '1d12', rolls: [9], mod: 0}, eva: {total: 4, formula: '1d6', rolls: [4], mod: 0}};
+  const con = tipo => ({...base, ataque: {yeta: {tipo, por: 'j2', a: 'gob', campo: 'pdg', lado: 'atacante', desde: 1000}}});
+  const libre = {...base, ataque: {}};
+  igual([Duelo.puedeReabrir(libre, 'pdg'), Duelo.puedeReabrir(con('enyetar'), 'pdg'), Duelo.puedeReabrir(con(undefined), 'pdg', 'enyetar'), Duelo.puedeReabrir(con('enyetar'), 'pdg', 'moneda'),
+    Duelo.puedeReabrir(con('moneda'), 'pdg', 'moneda'), !!Duelo.tiradaSumable(libre, 'atacante'), Duelo.tiradaSumable(con('enyetar'), 'atacante'), !!Duelo.tiradaSumable(con('polilla'), 'atacante', 'polilla'),
+    Duelo.yetaTipo(con(undefined)), Duelo.yetaTipo(con('maldeojo')), Duelo.yetaTipo(con('cualquiera')),
+    ['fuerza', 'bloqueo', 'dano'].map(q => Duelo.yetaFrena({...con('empower'), ataque: {yeta: {tipo: 'empower', campo: '', lado: 'defensor'}}}, q))],
+    [true, false, true, false, true, true, null, true, 'enyetar', 'maldeojo', 'enyetar', [true, true, true]]);
+});
+prueba('⏸ Enyetar A2/A3: la pantalla del GM con las pausas de la fila (60 s y sigue; el Mal de ojo ya echado espera)', () => {
+  const p = (tipo, x) => ({id: 'o', estado: 'esperando', ataque: {yeta: {tipo, por: 'j1', a: 'gob', campo: 'pdg', lado: 'atacante', desde: 100000, ...x}}});
+  const q = (d, ahora) => { const r = Duelo.yetaQueHacer(d, [d], false, ahora); return [r.accion, r.resultado || '', r.motivo || '']; };
+  igual([q(p('moneda'), 130000), q(p('moneda'), 170000), q(p('polilla'), 170000)[2], q(p('maldeojo'), 170000)[0], q(p('maldeojo', {echado: true}), 900000)[0], q(p('empower'), 161000)[0]],
+    [['esperar', '', ''], ['seguir', 'tiempo', 'no se llegó a usar el Re-roll (WC-Moneda) en 60 s'], 'no se llegó a usar la Polilla en 60 s', 'seguir', 'esperar', 'seguir']);
+});
+prueba('⏱ Enyetar A3: el aviso que queda en el cuadro dice qué pasó con la pausa', () => {
+  const t = x => Duelo.yetaAvisoTxt({porNombre: 'Blanco J2', aNombre: 'Hachero', etq: 'PdG', ...x});
+  igual([t({tipo: 'enyetar', resultado: 'tiempo'}), t({tipo: 'enyetar', resultado: 'perdio'}), t({tipo: 'enyetar', resultado: 'gano', antes: 13, nueva: 4, ahora: 4}),
+    t({tipo: 'empower', resultado: 'gano'}), t({tipo: 'polilla', resultado: 'gano', antes: 7, ahora: 9}), t({tipo: 'moneda', resultado: 'seguir', motivo: 'lo decidió el GM'})],
+    ['😈 Blanco J2 no llegó a usar la yeta a tiempo (60 s): el duelo siguió solo, como estaba.', '😈 Hachero resistió la maldición de Blanco J2: su PdG quedó como estaba.',
+      '😈 Hachero repitió su PdG: 13 y 4 → queda 4.', '💪 Blanco J2 le dio Empower a Hachero: +3 a su próxima tirada.', '🦋 Blanco J2 usó la Polilla mística en su PdG: 7 → queda 9.',
+      '🪙 El duelo siguió sin el Re-roll (WC-Moneda): lo decidió el GM.']);
+});
+prueba('⚡ Enyetar A2: la fila entre tiradas (par completo, sin fila con el duelo en pausa) y los botoncitos de arriba que se esconden', async () => {
+  const d = {estado: 'esperando', fase: 'contacto', atacante: {tokenId: 'a'}, defensor: {tokenId: 'b'}, pdg: {total: 3}, ataque: {}};
+  const [t137, fl, du, mh] = await Promise.all(['../vtt-hexgrid/js/137-fila-duelo.js', 'flotantes.js', 'duelo.js', '../vtt-hexgrid/mapa.html'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+  igual([Duelo.parListo(d, 'pdg'), Duelo.parListo({...d, eva: {total: 2}}, 'pdg'), Duelo.parListo({crit: {d20: [4]}}, 'critico'), Duelo.filaOpciones({...d, eva: {total: 2}, ataque: {yeta: {por: 'x'}}}),
+    /function dueloOpcionesFila\(d\)/.test(t137), /function dueloUsarFila\(d, o\)/.test(t137), /Duelo\.yetaPausar\(d\.id, y\)/.test(t137), /EN_FILA = \['enyetar-flotante'/.test(fl),
+    /Re-roll \(WC-Moneda\)/.test(du), /data-fila-abrir/.test(du), /Tenés algo para usar acá/.test(du), /js\/137-fila-duelo\.js\?v=/.test(mh), /yetaSubHtml\(d, y\)/.test(du)],
+    [false, true, true, [], true, true, true, true, true, true, true, true, true]);
 });
 prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la Runa aceleradora, consumible del Bazar arcano', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-acelerador');

@@ -53,10 +53,11 @@ async function abrirEmpower(tokenId){
     texto: `¿A quién le das Empower? Su próxima tirada, la que sea, suma +${EMPOWER_SUMA}. A vos o a un aliado a tu alcance (Rango ${fmt(rng)}). Otro Empower antes de que tire se suma y cuesta 1 SP más (⚡ Flash: el doble en turno ajeno).`});
 }
 
+// → true si se dio (la fila del duelo lo espera para levantar la pausa, 2026-11-27 A2).
 async function empowerUsar(yo, t, previos){
   const nomYo = nombreDe(yo), nomT = nombreDe(t), propio = t.fichaId === yo.fichaId;
   const pago = await ConfirmarTurno.flash('Empower', {sp: 2 + previos}, {quien: nomYo, spAjeno: 4 + previos, ident: {nombre: nomYo, ref: yo.fichaId}});
-  if(!pago) return;
+  if(!pago) return false;
   let falta = null;
   const ok = await editarPersonajeMapa(yo.fichaId, async S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
@@ -66,7 +67,7 @@ async function empowerUsar(yo, t, previos){
     if(propio){ S.efectos = S.efectos || []; Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Empower'}, estadosPresetFicha())); }   // a vos: ya, para la tirada que sigue
     return true;
   });
-  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Empower cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el SP de Empower'); return; }
+  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Empower cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el SP de Empower'); return false; }
   if(!propio){
     try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Empower'}, origen: `${nomYo} · Empower`}); }
     catch(err){ console.error('Empower: no se pudo dar el estado', err); toast(`No se pudo darle Empower a ${nomT}: sumale +${EMPOWER_SUMA} a mano a su próxima tirada`); }
@@ -77,6 +78,7 @@ async function empowerUsar(yo, t, previos){
   const uids = [...new Set([fbUsuario.uid, t.duenoUid].filter(Boolean))];
   momentoAbrir({tipo: 'empower', icono: '💪', titulo: `${nomYo} usó Empower`, resultado: texto, estado: 'listo',
     datos: {paraUids: uids, aviso: true, boton: 'Entendido', pasos: [{titulo: '💪 Empower', texto}]}});
+  return true;
 }
 
 // Una tirada que tiró el mapa por un personaje (con los números de su resumen: una zona, Percepción, la Iniciativa…) y que sumó su Empower:

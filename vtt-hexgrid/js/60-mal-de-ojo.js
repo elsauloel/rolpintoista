@@ -61,6 +61,7 @@ async function abrirMalDeOjo(){
    «🎲 Tirar …»; al tocarlo, Duelo.enyetarTirada repite esa tirada y se queda con la peor (el duelo se vuelve a resolver), y en la Mesa ruedan los dos
    juegos (el de antes cae en su número) con el más bajo marcado «maldito» (publicarRepeticion, js/38). El GM puede tirar por él desde la Crónica.
    Sin la contienda de antes (P230: a confirmar). */
+// → true si se echó (la fila del duelo, 2026-11-27 A2, lo anota en la pausa: desde ahí espera a que el jugador repita la tirada).
 async function malDeOjoUsar(c, o){
   const k = malDeOjoCosto(c), fichaId = String(c.t.fichaId), nomC = nombreDe(c.t);
   let error = '';
@@ -75,7 +76,7 @@ async function malDeOjoUsar(c, o){
       return {};
     });
   }catch(err){ console.error('Mal de ojo: no se pudo cobrar', err); error = 'no se pudo cobrar'; }
-  if(error){ toast(`🧿 ${nomC}: ${error}`); return; }
+  if(error){ toast(`🧿 ${nomC}: ${error}`); return false; }
   // Quién la vuelve a tirar: el dueño del personaje, o quien tiene 🎮 su control.
   const fichaPj = String(o.ref || '').split(SEP_INVOCACION)[0], f = fichasPub.get(fichaPj);
   const uid = (f && f.resumen && f.resumen.control) || (f && f.duenoUid) || '';
@@ -85,6 +86,7 @@ async function malDeOjoUsar(c, o){
     await momentoAbrir({tipo: 'mal-de-ojo', icono: '🧿', titulo: `${nomC} le echa el mal de ojo a ${o.nombre}: vuelve a tirar su ${etq}`, estado: 'esperando',
       datos: {paraUid: uid, dueloId: o.dueloId, lado: o.lado, campo: o.campo || '', etq, total: num(o.total), rolls: (o.rolls || []).slice(0, 20), creep: nomC, objetivo: o.nombre, contra: o.contra}});
   }catch(err){ console.error('Mal de ojo: no se pudo avisar', err); toast('🧿 No se pudo avisar al jugador: que repita la tirada a mano y se quede con la peor'); }
+  return true;
 }
 /* ---------- Quien la vuelve a tirar ---------- */
 const malDeOjoVistos = new Set(), malDeOjoTirandoAca = new Set();
@@ -111,8 +113,9 @@ async function malDeOjoTirar(id, d, porGM){
   catch(err){ console.error('Mal de ojo: no se pudo tomar la tirada', err); }
   if(!tomo){ toast('Esa tirada ya se hizo'); AvisoCombate.cerrar(); return; }
   let r = null;
-  try{ r = await Duelo.enyetarTirada(dt.dueloId, dt.lado, undefined, dt.campo ? {campo: dt.campo} : undefined); }catch(err){ console.error('Mal de ojo: no se pudo repetir la tirada', err); }
+  try{ r = await Duelo.enyetarTirada(dt.dueloId, dt.lado, undefined, dt.campo ? {campo: dt.campo, yeta: true, tipo: 'maldeojo'} : undefined); }catch(err){ console.error('Mal de ojo: no se pudo repetir la tirada', err); }
   if(!r){
+    try{ await Duelo.yetaSeguir(dt.dueloId, 'la tirada ya no se podía cambiar'); }catch(err){}   // (si el duelo esperaba este mal de ojo, sigue)
     await momentoActualizar(id, {estado: 'listo', resultado: `✋ La tirada ya no se podía cambiar: que ${dt.objetivo} la repita a mano y se quede con la peor.`});
     AvisoCombate.mostrar({clave: 'mal-de-ojo:' + id, icono: '🧿', titulo: `${dt.creep} te tiró mal de ojo`, texto: 'Esa tirada ya no se puede cambiar (el duelo siguió). Resolvelo a mano con el GM.',
       botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});

@@ -195,6 +195,25 @@ const Duelo = (() => {
 .duelo-veredicto.duelo-yeta{background:linear-gradient(180deg,#3a1d57,#1f0f33);border:2px solid #a96bff;color:#eadbff;animation:duelo-yeta-late 2.4s ease-in-out infinite}
 @keyframes duelo-yeta-late{0%,100%{box-shadow:0 0 0 rgba(169,107,255,0)}50%{box-shadow:0 0 18px rgba(169,107,255,.55)}}
 @media (prefers-reduced-motion: reduce){.duelo-veredicto.duelo-yeta{animation:none}}
+/* 😈 La maldición adentro del cuadro (A3) y el aviso de lo que pasó con la pausa */
+.duelo-yeta-sub{margin:14px 0 2px;padding:12px;border-radius:12px;background:rgba(10,6,22,.55);border:1px solid #7d52c4;text-align:left;font-weight:500;letter-spacing:0}
+.duelo-yeta-sub h5{margin:0 0 8px;font-size:14px;color:#e2cfff;font-weight:800}
+.duelo-yeta-sub .duelo-tiros{margin:0}
+.duelo-yeta-aviso{margin:12px 0;padding:9px 12px;border-radius:10px;background:rgba(169,107,255,.12);border:1px solid #8a5fd0;color:#e6d7ff;font-size:13.5px;font-weight:600}
+.duelo-yeta-aviso.tiempo{background:rgba(255,190,60,.12);border-color:#d9a43a;color:#ffe6ad}
+/* ⚡ La fila de botones entre tiradas (A2): el espacio se divide en un botón por opción */
+.duelo-fila{margin:12px 0;padding:10px 10px 8px;border-radius:12px;background:#101a2e;border:1px solid #3a5a8c}
+.duelo-fila-tit{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#9fc0ef;margin:0 2px 8px}
+.duelo-fila-tit span{font-weight:500;letter-spacing:0;text-transform:none;color:#8a9bbb}
+.duelo-fila-bts{display:flex;gap:8px;flex-wrap:wrap}
+.duelo-fila-bts button{flex:1 1 0;min-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 8px;border-radius:10px;background:#1b2b48;border:1px solid #4f78b8;color:#e6eefc;font-size:14px;cursor:pointer}
+.duelo-fila-bts button:hover:not([disabled]){background:#24395f;border-color:#79a6ee}
+.duelo-fila-bts button small{font-size:11.5px;font-weight:500;opacity:.85;text-align:center}
+.duelo-fila-bts button[disabled]{opacity:.5;cursor:default}
+.duelo-fila.ajena{border-style:dashed;padding:6px}
+.duelo-fila-abrir{width:100%;background:transparent;border:0;color:#9fc0ef;font-size:13px;font-weight:700;cursor:pointer;padding:4px}
+.duelo-fila-abrir small{font-weight:500;opacity:.8}
+.duelo-fila-cerrar{background:transparent;border:1px solid #3a5a8c;color:#9fc0ef;border-radius:6px;padding:0 6px;cursor:pointer;font-size:12px}
 .duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
 .duelo-ef{background:#12172a;border:1px solid #2f3852;border-radius:10px;padding:10px 12px;margin-bottom:8px}
 .duelo-ef-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}
@@ -912,7 +931,8 @@ const Duelo = (() => {
     const ref = await col().add(inicial);
     if(veoOculto({...inicial, id: ref.id})){   // 🙈 (P263) el de un escondido no se le abre a la pantalla del GM que lo crea si no lo ve
       autoAbiertos.add(ref.id);
-      if(!enIframe()) abrir(ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
+      const pa = esDueloYeta(inicial) ? yetaPadreDe({...inicial, id: ref.id}) : null;   // 😈 una maldición va adentro del duelo en pausa (A3)
+      if(!enIframe()) abrir(pa ? pa.id : ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
     }
     return ref.id;
   }
@@ -2269,6 +2289,8 @@ const Duelo = (() => {
       if(!doc.exists){ _toast('Ese duelo ya no existe'); cerrar(); return; }
       if(!actual || actual.id !== id) return;
       actual.dato = {id, ...doc.data()};
+      // 😈 El duelo de una maldición que va adentro de otro (A3): en vez de su cuadro, el del duelo en pausa (ahí se tira).
+      { const pa = esDueloYeta(actual.dato) ? yetaPadreDe(actual.dato) : null; if(pa){ const pid = pa.id; setTimeout(() => abrir(pid), 0); return; } }
       if(!actual.otroToken){ const o = ladoDelOtro(actual.dato); actual.otroToken = (o && o.tokenId) || ''; }
       // 🛡 Cambió el defensor (Interponerse): el cuadro vuelve al que defendía y sale de nuevo del que se interpuso, como un duelo nuevo.
       { const defTok = String((actual.dato.defensor && actual.dato.defensor.tokenId) || '');
@@ -2491,8 +2513,12 @@ const Duelo = (() => {
      vuelve a tirar con el botón de siempre (dados 3D, mismo empate). Solo se puede mientras no pasó a una etapa posterior con tiradas (Bloqueo, crítico, daño) ni se aplicó daño ni
      efectos. El botón flotante 🪙 del cuadro lo ve quien tiene una moneda y puede reabrir alguna de sus tiradas; la página del dueño cobra los No2, tira la moneda (par se conserva,
      impar se rompe) y reabre. */
-  function puedeReabrir(m, campo){
+  // `tipo` (2026-11-27, A2/A3): lo que está usando la pausa del duelo ('enyetar', 'moneda', 'polilla'…). Mientras hay una pausa encima, la tirada
+  // queda CONGELADA (dueño: «primero se resuelve enyetar, y sobre esa misma tirada se puede aplicar otra cosa una vez resuelta»): solo la puede cambiar
+  // lo que pausó el duelo.
+  function puedeReabrir(m, campo, tipo){
     if(!m || m.estado === 'cancelado' || m.dano) return false;
+    if(enYeta(m) && yetaTipo(m) !== tipo) return false;
     if(m.rerollUsado && m.rerollUsado[campo]) return false;   // una moneda por tirada: esta ya usó la suya
     if((m.efectos || []).some(e => e && (e.res || e.aplicado || e.aplicar))) return false;
     const critHecho = !!(m.crit && m.crit.d20);
@@ -2512,7 +2538,8 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      if(!puedeReabrir(m, campo)) return;
+      if(!puedeReabrir(m, campo, 'moneda')) return;
+      const conPausa = enYeta(m);   // ⏸ la pausa de la fila (A2): la moneda la levanta al usarse
       m.rerollUsado = {...(m.rerollUsado || {}), [campo]: true};
       const quien = (campo === 'pdg' || campo === 'fuerza' || campo === 'critico') ? m.atacante.nombre : m.defensor.nombre;
       if(campo === 'critico'){ m.crit = {...m.crit, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
@@ -2525,6 +2552,7 @@ const Duelo = (() => {
       m.estado = 'esperando';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      if(conPausa) Object.assign(upd, yetaFin(m, 'gano', {motivo: con === 'wildcard' ? 'usó una wildcard' : 'usó una Moneda Re-Roll'}));
       tx.update(ref, upd);
       ok = true;
       anuncio = con === 'wildcard' ? `🃏 ${quien} usó una wildcard: vuelve a tirar ${etqCampo(m, campo)}` : `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
@@ -2536,7 +2564,7 @@ const Duelo = (() => {
      resultado»): le suma +n a la última tirada que hizo ese lado (la Fuerza del golpe o el Bloqueo si ya se llegó ahí; si no, el PdG o la defensa)
      y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
      de los d20 del crítico, del daño y de aplicar efectos). lado: 'atacante' | 'defensor'. → {campo, etq, antes, ahora, contra, resultado} o null. */
-  const campoPolilla = (m, lado) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c)) || null;
+  const campoPolilla = (m, lado, tipo) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c, tipo)) || null;
   // Con una tirada cambiada (Polilla, Empower, Enyetar), el paso vuelve a resolverse desde ahí.
   function reabrirPaso(m, campo){
     if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
@@ -2551,16 +2579,30 @@ const Duelo = (() => {
      · `yetaSeguir(id, motivo)`: la maldición perdió, se canceló, no se llegó a echar, o el GM (o quien la echó) tocó «▶ Seguir sin la yeta».
      Cada fin queda en `ataque.yetaHist` ([{por, a, lado, campo, resultado, motivo, antes, nueva, ahora, cuando}], para la parte B). */
   const enYeta = m => !!(m && m.ataque && m.ataque.yeta && m.estado !== 'cancelado');
+  /* ⏸ La pausa, para todos (2026-11-27, A2; dueño: «si alguien tira enyetar, rerroll, etc., el duelo se pausa hasta que se resuelva»): la misma
+     `ataque.yeta`, con `tipo` = lo que se está usando (sin tipo = Enyetar, como en la parte A). Lo de cada tipo: el ícono y cómo se dice. */
+  const PAUSA_TIPOS = {
+    enyetar: {icono: '😈', hace: 'le está echando la yeta a', que: 'la yeta'},
+    maldeojo: {icono: '🧿', hace: 'le está echando el mal de ojo a', que: 'el mal de ojo'},
+    reroll: {icono: '🧚', hace: 'le está dando un Re-roll a', que: 'el Re-roll'},
+    moneda: {icono: '🪙', hace: 'está usando un Re-roll (WC-Moneda) sobre', que: 'el Re-roll (WC-Moneda)'},
+    polilla: {icono: '🦋', hace: 'está usando la Polilla mística sobre', que: 'la Polilla'},
+    empower: {icono: '💪', hace: 'le está dando Empower a', que: 'el Empower'},
+  };
+  const yetaTipo = m => (m && m.ataque && m.ataque.yeta && PAUSA_TIPOS[m.ataque.yeta.tipo] ? m.ataque.yeta.tipo : 'enyetar');
+  const pausaInfo = y => PAUSA_TIPOS[(y && y.tipo) || 'enyetar'] || PAUSA_TIPOS.enyetar;
   const campoDeLado = c => (c === 'pdg' || c === 'fuerza' || c === 'critico' || c === 'dano') ? 'atacante' : 'defensor';
   // ¿La pausa frena esta acción? 'critico' | 'dano' | 'efectos' | 'desempate' | 'fuerza' | 'bloqueo' (estos dos, solo si la yeta es sobre el contacto).
   function yetaFrena(m, que){
     if(!enYeta(m)) return false;
-    if(que === 'fuerza' || que === 'bloqueo') return ['pdg', 'eva'].includes(m.ataque.yeta.campo);
+    if(que === 'fuerza' || que === 'bloqueo') return ['pdg', 'eva'].includes(m.ataque.yeta.campo) || yetaTipo(m) === 'empower';   // 💪 el Empower es para la tirada que sigue: espera también el Bloqueo
     return ['critico', 'dano', 'efectos', 'desempate'].includes(que);
   }
   function yetaFin(m, resultado, extra){
     const y = m.ataque.yeta || {};
+    const hijo = (extra && extra.hijo) || y.hijo || '';   // 😈 el duelo de la maldición (A3: se dibuja adentro de este cuadro y no tiene cuadro propio)
     const h = {por: String(y.por || ''), porNombre: txtCorto(y.porNombre, 40), a: String(y.a || ''), aNombre: txtCorto(y.aNombre, 40), lado: y.lado || '', campo: y.campo || '',
+      tipo: yetaTipo(m), etq: txtCorto(y.etq, 40), ...(hijo ? {hijo: String(hijo)} : {}),
       resultado, motivo: txtCorto(extra && extra.motivo, 80), cuando: Date.now(), ...(extra && extra.ahora !== undefined ? {antes: _num(extra.antes), nueva: _num(extra.nueva), ahora: _num(extra.ahora)} : {})};
     return {'ataque.yeta': firebase.firestore.FieldValue.delete(), 'ataque.yetaHist': firebase.firestore.FieldValue.arrayUnion(h)};
   }
@@ -2574,12 +2616,22 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.estado === 'cancelado' || enYeta(m) || !m.ataque) return;
-      const s = tiradaSumable(m, y.lado);
-      if(!s || s.campo !== y.campo || s.enyetada) return;
-      tx.update(ref, {'ataque.yeta': {por: String(y.por || ''), porNombre: txtCorto(y.porNombre, 40), a: String(y.a || ''), aNombre: txtCorto(y.aNombre, 40),
-        lado: y.lado, campo: y.campo, etq: txtCorto(s.etq, 40), uid: yo(), desde: firebase.firestore.FieldValue.serverTimestamp()}});   // (la hora del servidor: se compara con la del duelo de la maldición)
+      const tipo = PAUSA_TIPOS[y.tipo] ? y.tipo : 'enyetar', P = PAUSA_TIPOS[tipo];
+      // Qué tirada: la que se puede cambiar (Enyetar, Mal de ojo, Re-roll, la Polilla); la moneda, la que se puede reabrir (también los d20 del
+      // crítico); el Empower no cambia una tirada hecha: es para la que sigue (sin campo).
+      let etq = '';
+      if(tipo === 'empower') etq = 'su próxima tirada';
+      else if(tipo === 'moneda'){ if(!y.campo || !puedeReabrir(m, y.campo)) return; etq = etqCampo(m, y.campo); }
+      else{
+        const s = tiradaSumable(m, y.lado);
+        if(!s || s.campo !== y.campo || (tipo === 'reroll' ? s.afortunada : s.enyetada)) return;
+        etq = s.etq;
+      }
+      tx.update(ref, {'ataque.yeta': {tipo, por: String(y.por || ''), porNombre: txtCorto(y.porNombre, 40), a: String(y.a || ''), aNombre: txtCorto(y.aNombre, 40),
+        lado: y.lado || '', campo: y.campo || '', etq: txtCorto(etq, 40), uid: yo(), desde: firebase.firestore.FieldValue.serverTimestamp()}});   // (la hora del servidor: se compara con la del duelo de la maldición)
       ok = true;
-      anuncio = `😈 ${y.porNombre || 'Alguien'} le está echando la yeta a ${y.aNombre || 'su rival'} (${s.etq}): el duelo espera`;
+      anuncio = String(y.por) && String(y.por) === String(y.a) ? `${P.icono} ${y.porNombre || 'Alguien'} usa ${P.que} sobre su ${etq}: el duelo espera`   // (la Polilla o la moneda propias)
+        : `${P.icono} ${y.porNombre || 'Alguien'} ${P.hace} ${y.aNombre || 'su rival'} (${etq}): el duelo espera`;
     });
     if(ok) anunciarMesa(anuncio, id);
     return ok;
@@ -2595,9 +2647,23 @@ const Duelo = (() => {
       if(!enYeta(m)) return;
       tx.update(ref, yetaFin(m, resultado || 'seguir', {motivo}));
       ok = true;
-      anuncio = `▶ El duelo sigue sin la yeta${motivo ? ': ' + motivo : ''}`;
+      anuncio = resultado === 'gano' ? '' : `▶ El duelo sigue sin ${pausaInfo(m.ataque.yeta).que}${motivo ? ': ' + motivo : ''}`;   // (lo que sí se usó, como el Empower, ya dejó su línea)
     });
-    if(ok) anunciarMesa(anuncio, id);
+    if(ok && anuncio) anunciarMesa(anuncio, id);
+    return ok;
+  }
+  // 🧿 Anotar algo en la pausa (el Mal de ojo ya echado: el jugador tiene su cartel; desde ahí espera a que repita la tirada).
+  async function yetaMarcar(id, cambios){
+    const ref = col().doc(id);
+    let ok = false;
+    await fbDb.runTransaction(async tx => {
+      ok = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists || !enYeta(doc.data())) return;
+      const upd = {};
+      Object.keys(cambios || {}).forEach(k => { if(/^[a-z]{1,12}$/i.test(k)) upd['ataque.yeta.' + k] = cambios[k]; });
+      if(Object.keys(upd).length){ tx.update(ref, upd); ok = true; }
+    });
     return ok;
   }
   /* El duelo de la maldición que corresponde a una pausa: un duelo de habilidad (Enyetar o Mal de ojo) de quien la echó contra el de la tirada, creado
@@ -2617,10 +2683,18 @@ const Duelo = (() => {
     const y = d && d.ataque && d.ataque.yeta;
     if(!y) return {accion: 'nada'};
     if(!msDe(y.desde)) return {accion: 'esperar'};   // todavía sin la hora del servidor
+    const tipo = PAUSA_TIPOS[y.tipo] ? y.tipo : 'enyetar';
+    // ⏸ Lo demás de la fila (A2): lo resuelve quien lo usa, en segundos; si en 60 s no pasó nada, el duelo sigue (con su aviso). El Mal de ojo, una vez
+    // echado (`echado`: el jugador ya tiene su cartel para repetir la tirada), espera a que la repita (el GM y quien lo echó tienen «▶ Seguir»).
+    if(tipo !== 'enyetar'){
+      if(tipo === 'maldeojo' && y.echado) return {accion: 'esperar'};
+      if(ahora - msDe(y.desde) > YETA_SIN_DUELO_MS) return {accion: 'seguir', resultado: 'tiempo', motivo: `no se llegó a usar ${PAUSA_TIPOS[tipo].que} en 60 s`};
+      return {accion: 'esperar'};
+    }
     const h = dueloDeLaYeta(y, duelos, d.id);
     if(!h){
       if(visto) return {accion: 'seguir', motivo: 'se canceló la maldición'};
-      if(ahora - msDe(y.desde) > YETA_SIN_DUELO_MS) return {accion: 'seguir', motivo: 'no se llegó a echar la maldición'};
+      if(ahora - msDe(y.desde) > YETA_SIN_DUELO_MS) return {accion: 'seguir', resultado: 'tiempo', motivo: 'no se llegó a echar la maldición en 60 s'};
       return {accion: 'esperar'};
     }
     if(h.estado === 'cancelado') return {accion: 'seguir', motivo: 'se canceló la maldición', visto: true};
@@ -2690,7 +2764,8 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      const campo = o.campo ? (campoDeLado(o.campo) === lado && m[o.campo] && puedeReabrir({...m, rerollUsado: null}, o.campo) ? o.campo : null) : campoPolilla(m, lado);
+      const tipoP = o.yeta && enYeta(m) && yetaTipo(m) === (o.tipo || 'enyetar') ? yetaTipo(m) : undefined;   // la pausa que la tirada repetida levanta (Enyetar, Mal de ojo, Re-roll): solo la suya
+      const campo = o.campo ? (campoDeLado(o.campo) === lado && m[o.campo] && puedeReabrir({...m, rerollUsado: null}, o.campo, tipoP) ? o.campo : null) : campoPolilla(m, lado, tipoP);
       if(!campo) return;
       const t0 = m[campo] || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
       if(String(t0.formula || '').includes(marca)) return;
@@ -2705,7 +2780,7 @@ const Duelo = (() => {
       anuncio = avanzar(m) || '';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;
-      if(o.yeta && enYeta(m)) Object.assign(upd, yetaFin(m, 'gano', {antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total}));
+      if(tipoP) Object.assign(upd, yetaFin(m, 'gano', {antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, hijo: o.hijo}));
       tx.update(ref, upd);
       res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
         dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(t0.rolls) ? t0.rolls : []).map(_num), mod: _num(t0.mod), nuevaQueda: queda};
@@ -2714,7 +2789,9 @@ const Duelo = (() => {
     return res;
   }
   // usa (2026-10-12, Empower): el nombre de lo que suma, para el aviso del empate (por defecto, la Polilla).
-  async function sumarATirada(id, lado, n, marca, usa = 'la Polilla'){
+  // o.pausa (2026-11-27, A2): el tipo de la pausa que pidió esta suma (la Polilla desde la fila del duelo): esa tirada se puede tocar y la pausa se levanta.
+  async function sumarATirada(id, lado, n, marca, usa = 'la Polilla', o){
+    o = o || {};
     const ref = col().doc(id);
     let res = null, anuncio = '';
     await fbDb.runTransaction(async tx => {
@@ -2722,7 +2799,8 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      const campo = campoPolilla(m, lado);
+      const conPausa = !!(o.pausa && enYeta(m) && yetaTipo(m) === o.pausa);
+      const campo = campoPolilla(m, lado, conPausa ? o.pausa : undefined);
       if(!campo) return;
       const t0 = m[campo], otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
       m[campo] = {...t0, total: _num(t0.total) + n, mod: _num(t0.mod) + n, formula: `${t0.formula || ''} +${n}${marca ? ' ' + marca : ''}`.slice(0, 60)};
@@ -2738,6 +2816,7 @@ const Duelo = (() => {
       else anuncio = avanzar(m) || '';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      if(conPausa) Object.assign(upd, yetaFin(m, 'gano', {motivo: `usó ${usa}`, antes: _num(t0.total), nueva: _num(t0.total) + n, ahora: m[campo].total}));
       tx.update(ref, upd);
       res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa /.test(anuncio),
         resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
@@ -2746,8 +2825,8 @@ const Duelo = (() => {
     return res;
   }
   // 💪 Empower (2026-10-12): la tirada de ese lado a la que todavía se le puede sumar (la misma que la Polilla) y cuántos Empower ya lleva.
-  function tiradaSumable(m, lado){
-    const c = campoPolilla(m, lado);
+  function tiradaSumable(m, lado, tipo){
+    const c = campoPolilla(m, lado, tipo);
     if(!c) return null;
     const t = m[c] || {};
     return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length, enyetada: String(t.formula || '').includes('🐈'), afortunada: String(t.formula || '').includes('🍀')};
@@ -2767,23 +2846,63 @@ const Duelo = (() => {
     rerollInfo[id + ':' + lado] = info || {disponible: false};
     if(actual && actual.id === id && actual.dato) dibujar();
   }
-  function rerollBtnHtml(d){
-    if(d.estado === 'cancelado') return '';
+  /* ⚡ La fila de botones entre tiradas (2026-11-27, A2; dueño, con un boceto: «que los botones aparezcan en el menú, entre tiradas, siempre que vengan al
+     caso… ese espacio dividiéndose en botones por cada opción disponible… polilla · enyetar · re-roll (WC-MONEDA)… si alguien tira enyetar, rerroll,
+     etc., el duelo se pausa hasta que se resuelva»). Un botón por cada cosa que QUIEN MIRA puede usar sobre una tirada de este duelo que todavía se
+     puede cambiar (y cuyo par ya se tiró: así no se adelanta ningún número secreto). Lo de cada pantalla lo da `cfg.opcionesFila(d)` (el mapa: la
+     Polilla, Enyetar, el Re-roll del Support, el Mal de ojo, el Empower) y lo usa `cfg.usarFila(d, opcion)`; el «Re-roll (WC-Moneda)» lo arma acá
+     (la Moneda Re-Roll y la 🃏 WildCard del personaje propio, `rerollInfo`). En un duelo propio la fila va abierta; en uno ajeno, plegada en
+     «⚡ Tenés algo para usar acá». Con el duelo en pausa no hay fila: la tirada está congelada (A3). */
+  const filaAbierta = new Set();
+  // ¿Ya está la tirada de los dos en ese par? (los d20 del crítico: ya se tiraron)
+  const parListo = (d, campo) => campo === 'critico' ? !!(d.crit && d.crit.d20) : (campo === 'pdg' || campo === 'eva') ? !!(d.pdg && d.eva) : !!(d.fuerza && d.bloqueo);
+  function filaMoneda(d){
     const lado = ladoMio(d);
-    if(!lado) return '';
+    if(!lado) return null;
     const campo = campoReabrible(d, lado);
-    if(!campo){ return ''; }
+    if(!campo || !parListo(d, campo)) return null;
     const k = d.id + ':' + lado;
-    if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
+    if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return null; }
     const info = rerollInfo[k];
-    if(!info.disponible) return '';
-    // 🃏 Wildcard (2026-10-15): al lado de la moneda, si tiene; se gasta al usarla. Una info vieja (sin `moneda`) es una moneda.
-    const etq = _esc(etqCampo(d, campo)), conMoneda = info.moneda !== false, w = Math.max(0, Math.round(_num(info.wildcards)));
-    const bMoneda = conMoneda ? `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}:moneda" title="Volver a tirar ${etq} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Moneda<small>volver a tirar ${etq}</small></button>` : '';
-    const bWild = w ? `<button type="button" class="duelo-reroll wildcard" data-reroll="${_esc(lado)}:${_esc(campo)}:wildcard" title="Volver a tirar ${etq} gastando una wildcard (te quedan ${w}), sin costo de No2">🃏 Wildcard<small>volver a tirar ${etq}</small></button>` : '';
-    return bMoneda && bWild ? `<div class="duelo-reroll-fila">${bWild}${bMoneda}</div>` : bMoneda || bWild;
+    if(!info.disponible) return null;
+    const conMoneda = info.moneda !== false, w = Math.max(0, Math.round(_num(info.wildcards)));
+    if(!conMoneda && !w) return null;
+    const etq = etqCampo(d, campo), con = [...(w ? ['wildcard'] : []), ...(conMoneda ? ['moneda'] : [])];
+    return {clave: 'moneda', icono: '🪙', txt: 'Re-roll (WC-Moneda)', sub: `volver a tirar tu ${etq}${con.length > 1 ? ' · elegís cuál' : con[0] === 'wildcard' ? ` · 🃏 WildCard (te quedan ${w})` : ' · Moneda Re-Roll'}`,
+      lado, campo, con, w, donde: info.donde || ''};
   }
-
+  function filaOpciones(d){
+    if(!d || d.estado === 'cancelado' || enYeta(d) || d.dano) return [];
+    let ops = [];
+    try{ ops = (cfgEscuchar.opcionesFila ? cfgEscuchar.opcionesFila(d) : []) || []; }catch(err){ console.error('Duelo: las opciones de la fila', err); ops = []; }
+    const mon = filaMoneda(d);
+    return mon ? [...ops, mon] : ops;
+  }
+  const esPropio = d => esMio(d.atacante) || esMio(d.defensor) || (soyGM() && ((d.atacante && d.atacante.tipo === 'creep') || (d.defensor && d.defensor.tipo === 'creep')));
+  function filaHtml(d, ops){
+    if(!ops.length) return '';
+    const propio = esPropio(d), abierta = propio || filaAbierta.has(d.id);
+    if(!abierta) return `<div class="duelo-fila ajena"><button type="button" class="duelo-fila-abrir" data-fila-abrir title="Hay algo que podés usar sobre una tirada de este duelo">⚡ Tenés algo para usar acá <small>(${_fmt(ops.length)})</small></button></div>`;
+    return `<div class="duelo-fila${propio ? '' : ' ajena'}"><div class="duelo-fila-tit">⚡ Entre tiradas${propio ? '' : ' · <button type="button" class="duelo-fila-cerrar" data-fila-cerrar title="Plegar">▴</button>'}<span>tocá uno y el duelo espera hasta que se resuelva</span></div>
+      <div class="duelo-fila-bts">${ops.map((o, i) => `<button type="button" data-fila="${i}"${o.motivoNo ? ' disabled' : ''} title="${_esc(o.titulo || o.sub || '')}"><b>${_esc(o.icono || '⚡')} ${_esc(o.txt)}</b>${o.sub ? `<small>${_esc(o.sub)}</small>` : ''}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div></div>`;
+  }
+  async function filaUsarMoneda(d, o){
+    let con = o.con[0];
+    if(o.con.length > 1 && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      con = await Confirmar.elegir(`¿Con qué volvés a tirar tu ${etqCampo(d, o.campo)}?`, {titulo: 'Re-roll (WC-Moneda)', icono: '🪙', no: 'Cancelar', opciones: [
+        {valor: 'wildcard', texto: '🃏 WildCard', detalle: `se gasta siempre · te quedan ${_fmt(o.w)}`},
+        {valor: 'moneda', texto: '🪙 Moneda Re-Roll', detalle: `${o.donde ? `en ${o.donde} · ` : ''}después se tira la moneda: par se conserva, impar se rompe`}]});
+      if(!con) return false;
+    }
+    const l = d[o.lado] || {};
+    const ok = await yetaPausar(d.id, {tipo: 'moneda', lado: o.lado, campo: o.campo, por: l.tokenId, porNombre: l.nombre, a: l.tokenId, aNombre: l.nombre});
+    if(!ok){ _toast('Esa tirada ya no se puede repetir'); return false; }
+    enviar(l, {tipo: 'duelo-reroll', id: d.id, campo: o.campo, con});
+    delete rerollInfo[d.id + ':' + o.lado]; rerollPedidas.delete(d.id + ':' + o.lado);
+    // Si la página del personaje no llegó a usarla (no tenía la moneda, falló), el duelo no queda trabado.
+    setTimeout(() => { const x = todosDuelos.find(z => z.id === d.id); if(x && enYeta(x) && yetaTipo(x) === 'moneda' && x.ataque.yeta.uid === yo()) yetaSeguir(d.id, 'no se llegó a usar el Re-roll').catch(() => {}); }, 15000);
+    return true;
+  }
 
   const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : d.defensa.modo === 'parrydist' ? '🏹 Parry a distancia' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
@@ -2886,9 +3005,10 @@ const Duelo = (() => {
       return op ? {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h)), ...conPas} : {...defensa, ...conPas};
     }catch(err){ console.error('Duelo: el contraataque de una defensa a mano', err); return defensa; }
   }
-  async function usarManual(d, campo){
+  async function usarManual(d, campo, raiz){   // raiz: dónde buscar los campos (el paso de la maldición de una yeta, A3); si no, el documento
+    raiz = raiz || document;
     const k = d.id + ':' + campo;
-    const input = document.querySelector(`[data-mtirada="${campo}"]`);
+    const input = raiz.querySelector(`[data-mtirada="${campo}"]`);
     const txt = String(input ? input.value : '').trim().replace(/\s+/g, '');
     let r = null;
     if(/^-?\d+$/.test(txt)){ const n = parseInt(txt, 10); r = {formula: String(n), rolls: [], mod: n, total: n}; }
@@ -2896,7 +3016,7 @@ const Duelo = (() => {
     if(!r){ _toast('Escribí una fórmula de dados (1d10+3) o un número'); return; }
     r = {...r, formula: `${r.formula || txt} (manual)`.slice(0, 60)};
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
-    const selModo = document.querySelector('[data-mmodo]');
+    const selModo = raiz.querySelector('[data-mmodo]');
     const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
     const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
     const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
@@ -3198,12 +3318,126 @@ const Duelo = (() => {
 
   // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
   // 😈 El cartel de la pausa de Enyetar (P363 A), con la salida a mano «▶ Seguir sin la yeta» para el GM y para quien la echó.
+  // 😈 El cartel de la pausa (P363 A; para todo lo de la fila desde A2), con la salida a mano «▶ Seguir» para el GM y para quien la puso.
+  // A3 (dueño, 2026-11-27: «ensamblar la tirada del enyetar dentro del mismo duelo, no tener que minimizar un menú para abrir otro»): la maldición
+  // (PdG.Esp de quien la echa contra Res.Esp del dueño de la tirada) se tira ACÁ, como un paso más, con sus botones de siempre; su duelo no tiene
+  // cuadro propio (`yetaHijoDe` / `yetaPadreDe`).
   function yetaHtml(d){
-    const y = (d.ataque && d.ataque.yeta) || {};
+    const y = (d.ataque && d.ataque.yeta) || {}, P = pausaInfo(y), tipo = yetaTipo(d);
     const puedo = soyGM() || (y.uid && y.uid === yo());
-    return `<div class="duelo-veredicto mitad duelo-yeta"><div class="grande">😈 ${_esc(y.porNombre || 'Alguien')} le está echando la yeta a ${_esc(y.aNombre || 'su rival')}…</div>
-      <div class="chico">El duelo espera. Si la maldición gana, ${_esc(y.aNombre || 'su rival')} repite su ${_esc(y.etq || 'tirada')} y se queda con la peor; si no, el duelo sigue como estaba.</div>
-      ${puedo ? `<div style="margin-top:12px"><button type="button" class="sec" data-yeta-seguir title="Por si la maldición se trabó: el duelo sigue como estaba, sin la yeta">▶ Seguir sin la yeta</button></div>` : ''}</div>`;
+    const quien = _esc(y.porNombre || 'Alguien'), aQuien = _esc(y.aNombre || 'su rival'), etq = _esc(y.etq || 'tirada');
+    let chico, sub = '';
+    if(tipo === 'enyetar'){
+      chico = `Sobre su ${etq}, que queda congelada hasta que se resuelva. Primero la maldición: PdG.Esp de ${quien} contra Res.Esp de ${aQuien}. Si gana, ${aQuien} repite su ${etq} y se queda con la peor; si no, el duelo sigue como estaba.`;
+      sub = yetaSubHtml(d, y);
+    }
+    else if(tipo === 'maldeojo') chico = y.echado ? `${aQuien} tiene que volver a tirar su ${etq} y quedarse con la peor (le llegó el cartel). El duelo espera.` : `Sobre su ${etq}, que queda congelada. El duelo espera.`;
+    else if(tipo === 'empower') chico = `+3 a ${aQuien} para su próxima tirada. El duelo espera a que se pague.`;
+    else chico = `Sobre ${tipo === 'moneda' || tipo === 'polilla' ? 'su' : 'la'} ${etq}${tipo === 'moneda' || tipo === 'polilla' ? '' : ` de ${aQuien}`}. El duelo espera a que se resuelva.`;
+    const seguir = tipo === 'enyetar' ? '▶ Seguir sin la yeta' : `▶ Seguir sin ${P.que}`;
+    return `<div class="duelo-veredicto mitad duelo-yeta"><div class="grande">${P.icono} ${quien} ${_esc(P.hace)} ${aQuien}…</div>
+      <div class="chico">${chico}</div>${sub}
+      ${puedo ? `<div style="margin-top:12px"><button type="button" class="sec" data-yeta-seguir title="Por si se trabó: el duelo sigue como estaba">${seguir}</button></div>` : ''}</div>`;
+  }
+  // El duelo de la maldición de una pausa de Enyetar (o null), y al revés: el duelo en pausa al que pertenece un duelo de maldición.
+  const yetaHijoDe = d => enYeta(d) && yetaTipo(d) === 'enyetar' ? dueloDeLaYeta(d.ataque.yeta, todosDuelos, d.id) : null;
+  function yetaPadreDe(h){
+    if(!h || !esDueloYeta(h)) return null;
+    return todosDuelos.find(d => d.id !== h.id && enYeta(d) && yetaTipo(d) === 'enyetar' && d.ataque.yeta.por === String((h.atacante || {}).tokenId)
+      && d.ataque.yeta.a === String((h.defensor || {}).tokenId) && (!msDe(h.creado) || !msDe(d.ataque.yeta.desde) || msDe(h.creado) >= msDe(d.ataque.yeta.desde) - 1000)) || null;
+  }
+  // Los duelos de maldición que ya terminaron adentro de otro (quedan en el `yetaHist` de su duelo): tampoco tienen botón propio.
+  function yetaHijosCerrados(){
+    const s = new Set();
+    todosDuelos.forEach(d => ((d.ataque && d.ataque.yetaHist) || []).forEach(h => { if(h && h.hijo) s.add(String(h.hijo)); }));
+    return s;
+  }
+  const esHijoDeYeta = h => !!h && esDueloYeta(h) && (!!yetaPadreDe(h) || yetaHijosCerrados().has(h.id));
+  // Los botones del paso de la maldición llevan otros nombres (data-y…) para que no se mezclen con los del duelo de afuera.
+  const renombrarSub = html => String(html || '').replace(/data-(tirar|def|tirarpor|mtg|musar|flash|reintentar-def|par|ppt-elegir)=/g, 'data-y$1=').replace(/data-reintentar-def(?=[ >])/g, 'data-yreintentar-def');
+  function yetaSubHtml(d, y){
+    const h = yetaHijoDe(d);
+    if(!h){
+      const mia = y.uid && y.uid === yo();
+      return `<div class="duelo-yeta-sub"><div class="duelo-nota">${mia ? '😈 Confirmá la maldición en el cartel (¿es tu turno?): después se tira acá mismo.' : `esperando que ${_esc(y.porNombre || 'quien la echa')} eche la maldición…`}</div></div>`;
+    }
+    const tit = `<h5>😈 La maldición: ${_esc(etqTira(h))} de ${_esc(h.atacante.nombre)} contra ${_esc(etqContra(h))} de ${_esc(h.defensor.nombre)}</h5>`;
+    const listo = !!(h.pdg && h.eva), k = h.id + ':ycont';
+    if(!listo) delete revelado[k];
+    if(listo && !revelado[k]){
+      revelado[k] = 'espera';
+      esperarDados(() => { revelado[k] = true; if(actual && actual.dato && actual.dato.id === d.id) dibujar(); });
+    }
+    if(listo && revelado[k] === 'espera') return `<div class="duelo-yeta-sub" data-ysub="${_esc(h.id)}">${tit}<div class="duelo-nota">🎲 tiraron los dos…</div></div>`;
+    let res = '';
+    if(h.estado === 'empate' && h.empate) res = empateHtml(h, false);
+    else if(h.contacto && h.contacto.gana === 'atacante') res = `<div class="duelo-mini r">😈 ¡La maldición entra! ${_esc(h.defensor.nombre)} repite su ${_esc(y.etq || 'tirada')} y se queda con la peor…</div>`;
+    else if(h.contacto && h.contacto.gana) res = `<div class="duelo-mini g">✘ ${_esc(h.defensor.nombre)} resistió la maldición: el duelo sigue como estaba.</div>`;
+    else if(h.estado === 'cancelado') res = '<div class="duelo-mini g">Se canceló la maldición.</div>';
+    const nuevo = listo && revelado[k] === true && !revelado[k + ':visto'];
+    if(listo) revelado[k + ':visto'] = true;
+    return `<div class="duelo-yeta-sub" data-ysub="${_esc(h.id)}">${tit}<div class="duelo-tiros">${renombrarSub(cajaHtml(h, 'pdg', 'eva', nuevo) + cajaHtml(h, 'eva', 'pdg', nuevo))}</div>${renombrarSub(res)}</div>`;
+  }
+  // Los botones del paso de la maldición (los mismos que los del duelo, contra el duelo de la maldición).
+  function yetaSubConectar(f){
+    const caja = f.querySelector('[data-ysub]');
+    if(!caja) return;
+    const h = todosDuelos.find(x => x.id === caja.dataset.ysub);
+    if(!h) return;
+    caja.querySelectorAll('[data-ytirar]').forEach(b => b.onclick = () => {
+      const campo = b.dataset.ytirar;
+      b.disabled = true; b.textContent = 'Tirando…';
+      enviar(campo === 'pdg' ? h.atacante : h.defensor, {tipo: 'duelo-tirar', id: h.id, campo, flash: flashSel[h.id + ':' + campo] || ''});
+      setTimeout(() => { if(actual && actual.dato) dibujar(); }, 8000);
+    });
+    caja.querySelectorAll('[data-ydef]').forEach(b => b.onclick = () => {
+      const o = (opciones[h.id] || [])[Number(b.dataset.ydef)];
+      if(!o) return;
+      caja.querySelectorAll('[data-ydef]').forEach(x => x.disabled = true);
+      enviar(h.defensor, {tipo: 'duelo-tirar', id: h.id, campo: 'eva', modo: o.modo, itemId: o.itemId || '', flash: flashSel[h.id + ':eva'] || ''});
+      setTimeout(() => { if(actual && actual.dato){ opcionesPedidas.delete(h.id); dibujar(); } }, 8000);
+    });
+    caja.querySelectorAll('[data-yflash]').forEach(b => b.onclick = () => { const [campo, habId] = b.dataset.yflash.split(':'), kk = h.id + ':' + campo; flashSel[kk] = flashSel[kk] === habId ? '' : habId; dibujar(); });
+    caja.querySelectorAll('[data-ytirarpor]').forEach(b => b.onclick = () => tirarPorAusente(h, b.dataset.ytirarpor, caja));
+    caja.querySelectorAll('[data-ymtg]').forEach(c => c.onchange = () => { const kk = h.id + ':' + c.dataset.ymtg; if(c.checked) manualAbierto.add(kk); else manualAbierto.delete(kk); dibujar(); });
+    caja.querySelectorAll('[data-ymusar]').forEach(b => b.onclick = () => usarManual(h, b.dataset.ymusar, caja));
+    const brd = caja.querySelector('[data-yreintentar-def]');
+    if(brd) brd.onclick = () => { opcionesPedidas.delete(h.id); delete opcionesFalla[h.id]; delete opciones[h.id]; dibujar(); };
+    caja.querySelectorAll('[data-ypar]').forEach(b => b.onclick = () => { const [q, e] = b.dataset.ypar.split(':'); caja.querySelectorAll('[data-ypar]').forEach(x => x.disabled = true); elegirParidad(h.id, q, e).catch(err => { console.error(err); _toast('No se pudo tirar el desempate'); }); });
+    caja.querySelectorAll('[data-yppt-elegir]').forEach(b => b.onclick = () => { b.disabled = true; elegirPpt(h.id).catch(err => console.error(err)); });
+  }
+  /* 😈 La maldición ganó: quien la echó pide aplicar su efecto («Enyetar» → la pantalla del GM repite la tirada en este duelo), sin tener que abrir el
+     duelo de la maldición (no tiene cuadro propio). Una vez por duelo; si esta pantalla no es la de quien la echó, no hace nada. */
+  const yetaAplicando = new Set();
+  function yetaAplicarHijo(h){
+    if(!h || h.fase !== 'efectos' || yetaAplicando.has(h.id) || !(esMio(h.atacante) || (soyGM() && h.atacante.tipo === 'creep'))) return;
+    const i = (h.efectos || []).findIndex(e => e && /^(enyetar|mal de ojo)$/i.test(String(e.nombre || '').trim()) && !e.aplicado && !e.aplicar && (siempreEf(e) || (e.res && e.res.exito)));
+    if(i < 0) return;
+    yetaAplicando.add(h.id);
+    marcarEfecto(h.id, i, {aplicar: 'pedido-lados'}).catch(err => { console.error('Enyetar: no se pudo pedir la repetición', err); yetaAplicando.delete(h.id); });
+  }
+  /* ⏱ Qué pasó con la última pausa (A3, dueño: «avisando lo que pasó para que no sea confuso», en el cuadro del duelo y no solo en la Mesa): un cartel chico
+     durante un minuto y medio después de que terminó. */
+  const YETA_AVISO_MS = 90 * 1000;
+  function yetaAvisoTxt(h){
+    const P = PAUSA_TIPOS[h.tipo] || PAUSA_TIPOS.enyetar, quien = h.porNombre || 'Alguien', a = h.aNombre || 'el rival', etq = h.etq || 'tirada';
+    if(h.resultado === 'tiempo') return `${P.icono} ${quien} no llegó a usar ${P.que} a tiempo (60 s): el duelo siguió solo, como estaba.`;
+    if(h.resultado === 'perdio') return `${P.icono} ${a} resistió la maldición de ${quien}: su ${etq} quedó como estaba.`;
+    if(h.resultado === 'gano'){
+      if(h.tipo === 'empower') return `💪 ${quien} le dio Empower a ${a}: +3 a su próxima tirada.`;
+      if(h.tipo === 'moneda') return `🪙 ${quien} ${h.motivo || 'usó un Re-roll'}: vuelve a tirar su ${etq}.`;
+      const num = h.ahora !== undefined ? `: ${_fmt(h.antes)} → queda ${_fmt(h.ahora)}` : '';
+      return h.tipo === 'polilla' ? `🦋 ${quien} usó la Polilla mística en su ${etq}${num}.` : `${P.icono} ${a} repitió su ${etq}${h.ahora !== undefined ? `: ${_fmt(h.antes)} y ${_fmt(h.nueva)} → queda ${_fmt(h.ahora)}` : ''}.`;
+    }
+    return `${P.icono} El duelo siguió sin ${P.que}${h.motivo ? ': ' + h.motivo : ''}.`;
+  }
+  function yetaAvisoHtml(d){
+    if(enYeta(d)) return '';
+    const hs = (d.ataque && d.ataque.yetaHist) || [], h = hs[hs.length - 1];
+    if(!h || !h.cuando || Date.now() - _num(h.cuando) > YETA_AVISO_MS) return '';
+    const k = d.id + ':yaviso:' + h.cuando;
+    if(!revelado[k]){ revelado[k] = true; setTimeout(() => { if(actual && actual.dato && actual.dato.id === d.id) dibujar(); }, YETA_AVISO_MS + 500); }
+    return `<div class="duelo-yeta-aviso${h.resultado === 'tiempo' ? ' tiempo' : ''}">${_esc(yetaAvisoTxt(h))}</div>`;
   }
   function efectosHtml(d){
     const efs = d.efectos || [];
@@ -3718,6 +3952,7 @@ const Duelo = (() => {
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
+    const filaOps = filaOpciones(d);   // ⚡ la fila entre tiradas (A2)
     const mostrarBloqueo = (d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza) && !yetaFrena(d, 'fuerza');
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
@@ -3739,6 +3974,7 @@ const Duelo = (() => {
           ${miniHtml(d, 'bloqueo')}`}
         </div>` : ''}
         ${d.fase === 'dodge' ? dodgeHtml(d, nuevaClave('dodge')) : ''}
+        ${filaHtml(d, filaOps)}${yetaAvisoHtml(d)}
         ${d.crit && !pausaYeta ? criticoHtml(d) : ''}
         ${(d.fase === 'dano' || d.dano) && !pausaYeta ? danoHtml(d) : ''}
         ${pausaYeta ? '' : efectosHtml(d)}
@@ -3750,7 +3986,7 @@ const Duelo = (() => {
           <button type="button" class="sec" data-min2>Minimizar</button>
           ${enCurso(d) ? '' : '<button type="button" class="sec" data-x2>Cerrar</button>'}
         </div>
-      </div></div>${rerollBtnHtml(d)}`;
+      </div></div>`;
     if(min) f.classList.add('min');
     // 📜 El texto de la habilidad o del arma, a la izquierda (2026-10-15, dueño: «durante un duelo tener a la izquierda el recuadro del texto de la
     // habilidad, para saber qué está sucediendo y qué debería suceder»). Viaja en `ataque.texto` (lo arma crear()).
@@ -3939,8 +4175,23 @@ const Duelo = (() => {
       delete rerollInfo[d.id + ':' + lado]; rerollPedidas.delete(d.id + ':' + lado);
       setTimeout(() => { if(actual && actual.dato) dibujar(); }, 4000);
     });
+    // ⚡ La fila entre tiradas (A2): cada botón pausa el duelo y hace lo suyo.
+    f.querySelectorAll('[data-fila]').forEach(b => b.onclick = async () => {
+      const o = filaOps[Number(b.dataset.fila)];
+      if(!o) return;
+      f.querySelectorAll('[data-fila]').forEach(x => { x.disabled = true; });
+      let ok = false;
+      try{ ok = o.clave === 'moneda' ? await filaUsarMoneda(d, o) : !!(cfgEscuchar.usarFila && await cfgEscuchar.usarFila(d, o)); }
+      catch(err){ console.error('Duelo: la fila', err); _toast('No se pudo usar: ' + (err.message || err)); }
+      if(!ok && actual && actual.dato) dibujar();
+    });
+    const bfa = f.querySelector('[data-fila-abrir]');
+    if(bfa) bfa.onclick = () => { filaAbierta.add(d.id); dibujar(); };
+    const bfc = f.querySelector('[data-fila-cerrar]');
+    if(bfc) bfc.onclick = () => { filaAbierta.delete(d.id); dibujar(); };
+    yetaSubConectar(f);   // 😈 el paso de la maldición, adentro de este cuadro (A3)
     const bys = f.querySelector('[data-yeta-seguir]');
-    if(bys) bys.onclick = () => { bys.disabled = true; bys.textContent = 'Siguiendo…'; yetaSeguir(d.id, soyGM() ? 'lo decidió el GM' : `${(d.ataque.yeta || {}).porNombre || 'quien la echaba'} la dejó`)
+    if(bys) bys.onclick = () => { bys.disabled = true; bys.textContent = 'Siguiendo…'; yetaSeguir(d.id, soyGM() ? 'lo decidió el GM' : `${(d.ataque.yeta || {}).porNombre || 'quien la usaba'} lo dejó`)
       .then(ok => { if(!ok) dibujar(); }).catch(err => { console.error(err); _toast('No se pudo seguir el duelo'); bys.disabled = false; }); };
     const bfin = f.querySelector('[data-fin-duelo]');
     { const caja = f.querySelector('.duelo-caja'); if(caja && autoCierre && autoCierre.id === d.id && !autoCierre.quieto) caja.addEventListener('pointerdown', ev => { if(!ev.target.closest('[data-fin-duelo]')) autoCierreQuieto(); }, {once: true}); }
@@ -3986,7 +4237,7 @@ const Duelo = (() => {
       }
       if(m.tipo === 'duelo-reroll'){   // usar la moneda: verifica, cobra, reabre la tirada y tira la moneda
         const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
-        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo)){ _toast('Esa tirada ya no se puede repetir'); return; }
+        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo, 'moneda')){ _toast('Esa tirada ya no se puede repetir'); return; }
         await h.rerollUsar(d, m.campo, m.con === 'wildcard' ? 'wildcard' : m.con === 'moneda' ? 'moneda' : undefined);
         return;
       }
@@ -4136,15 +4387,16 @@ const Duelo = (() => {
   });
 
   // A mano: el GM (o el dueño) escribe el valor del stat y se tira con dados.
-  async function tirarPorAusente(d, campo){
-    const input = document.querySelector(`[data-manual="${campo}"]`);
+  async function tirarPorAusente(d, campo, raiz){
+    raiz = raiz || document;
+    const input = raiz.querySelector(`[data-manual="${campo}"]`);
     const valor = Math.round(_num(input ? input.value : manual[campo]));
     const f = typeof formulaParaValor === 'function' ? formulaParaValor(valor) : null;
     if(!f){ _toast('Escribí el valor del stat (un número mayor que 0)'); return; }
     const rolls = f.combo.map(x => 1 + Math.floor(Math.random() * x));
     const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
-    const selModo = document.querySelector('[data-manual-modo]');
+    const selModo = raiz.querySelector('[data-manual-modo]');
     const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
     const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
     const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
@@ -4254,8 +4506,10 @@ const Duelo = (() => {
   function dibujarChips(){
     const mostrar = new Map();
     const ahora = Date.now();
+    const hijosCerrados = yetaHijosCerrados();
     listaDuelos.forEach(d => {
       if(descartados.has(d.id)) return;
+      if(esDueloYeta(d) && (hijosCerrados.has(d.id) || yetaPadreDe(d))) return;   // 😈 la maldición va adentro del cuadro del otro duelo (A3)
       const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
       if(abierto(d) && ahora - t > VIGENCIA_MS) return;
       if(d.estado === 'resuelto' && ahora - (resueltoDesde.get(d.id) || t) > RESUELTO_VISIBLE_MS) return;   // a contar desde que se resolvió
@@ -4465,6 +4719,9 @@ const Duelo = (() => {
         const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
         if(ahora - t > AUTOABRIR_MS) return;
         autoAbiertos.add(d.id);
+        // 😈 Una maldición nueva adentro de otro duelo (A3): se abre (o se queda) el duelo en pausa, que es donde se tira.
+        const pa = esDueloYeta(d) ? yetaPadreDe(d) : null;
+        if(pa){ if(!actual || actual.id !== pa.id || actual.min) abrir(pa.id); return; }
         if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
         // 🏃 (2026-11-14) Con el cuadro de otro duelo minimizado (el «¿Esquiva?» mientras se arrastra el token del dodge roll), un duelo nuevo donde esta
         // pantalla tiene que hacer algo (el ataque de oportunidad que le cae a quien esquiva) se abre igual: si no, quedaba en un botón abajo y nadie lo veía.
@@ -4472,6 +4729,13 @@ const Duelo = (() => {
       });
       revisarPasos();
       dibujarChips();
+      // 😈 El paso de la maldición se dibuja en el cuadro del duelo en pausa: con cada cambio de la maldición, se vuelve a dibujar (A3). Y si ganó,
+      // quien la echó pide su efecto solo (no hay otro cuadro donde tocar «Aplicar»).
+      todosDuelos.forEach(x => { if(esDueloYeta(x) && yetaPadreDe(x)) yetaAplicarHijo(x); });
+      if(actual && actual.dato && enYeta(actual.dato) && yetaTipo(actual.dato) === 'enyetar' && !actual.reteniendo && !actual.min){
+        const h = yetaHijoDe(actual.dato), firma = h ? [h.id, h.estado, h.fase, !!h.pdg, !!h.eva, h.empate ? 1 : 0].join('|') : '';
+        if(firma !== actual.yetaFirma){ actual.yetaFirma = firma; dibujar(); }
+      }
       // 😈 Un duelo en pausa por Enyetar (P363 A) todavía no «se resolvió»: el resumen, la cascada del área, termina el turno y los demás avisos esperan
       // a que siga (lo que le pase a la tirada elegida puede darlo vuelta).
       const listaH = listaDuelos.filter(x => !enYeta(x)), todosH = todosDuelos.filter(x => !enYeta(x));
@@ -4753,5 +5017,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

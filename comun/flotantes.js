@@ -133,7 +133,12 @@ const Flotantes = (() => {
      capa 25, y el duelo usa 99000). Mientras el cuadro está abierto (no minimizado), todos los que haya van en una columna pegada a su costado
      derecho (o al izquierdo, si no entran), por encima del duelo; al cerrarlo o minimizarlo, vuelven a su lugar. Como arriba (dueño, el mismo día):
      solo el emoji, con su animación, y el mouse explica qué es. */
+  /* ⚡ Lo que ya está en la fila del cuadro del duelo (2026-11-27, Enyetar A2; recomendado mientras el dueño no diga otra cosa): con un duelo abierto
+     en pantalla, estos no van a la columna: se esconden (se usan desde la fila, sobre la tirada de ese duelo). Fuera de los duelos (o con el cuadro
+     minimizado o cerrado) vuelven a su lugar de siempre. */
+  const EN_FILA = ['enyetar-flotante', 'reroll-flotante', 'maldeojo-flotante', 'empower-flotante', 'polilla-flotante', 'wildcard-flotante', 'moneda-flotante'];
   const CSS_DUELO = `
+.flot-en-fila.flot-en-fila{display:none!important}
 .flot-duelo.flot-duelo{z-index:99010!important;bottom:auto!important;right:auto!important}   /* doble clase: le gana a .flot-arriba (capa 25) aunque su estilo se cargue después */
 #flot-duelo-tit{position:fixed;z-index:99010;font:800 11px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:#9fb0d0;pointer-events:none}`;
   function cajaDuelo(){
@@ -145,7 +150,8 @@ const Flotantes = (() => {
   }
   function columnaDuelo(caja){
     if(!document.getElementById('flot-duelo-css')){ const st = document.createElement('style'); st.id = 'flot-duelo-css'; st.textContent = CSS_DUELO; document.head.appendChild(st); }
-    const lista = ORDEN.map(id => document.getElementById(id)).filter(Boolean);
+    EN_FILA.forEach(id => { const b = document.getElementById(id); if(b) b.classList.add('flot-en-fila'); });
+    const lista = ORDEN.filter(id => !EN_FILA.includes(id)).map(id => document.getElementById(id)).filter(Boolean);
     let tit = document.getElementById('flot-duelo-tit');
     if(!lista.length){ if(tit) tit.remove(); return; }
     if(!document.getElementById('flot-arriba-css')){ const st = document.createElement('style'); st.id = 'flot-arriba-css'; st.textContent = CSS_ARRIBA; document.head.appendChild(st); }
@@ -178,7 +184,7 @@ const Flotantes = (() => {
     const caja = cajaDuelo();
     if(caja){ columnaDuelo(caja); return; }
     const titD = document.getElementById('flot-duelo-tit'); if(titD) titD.remove();
-    ORDEN.forEach(id => { const b = document.getElementById(id); if(b){ b.classList.remove('flot-duelo'); b.style.visibility = ''; } });
+    ORDEN.forEach(id => { const b = document.getElementById(id); if(b){ b.classList.remove('flot-duelo', 'flot-en-fila'); b.style.visibility = ''; } });
     const barra = document.getElementById('flotantes-mapa');
     const rb = barra && barra.offsetWidth ? barra.getBoundingClientRect() : null;
     if(rb){

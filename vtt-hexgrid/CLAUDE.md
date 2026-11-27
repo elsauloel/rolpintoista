@@ -2896,3 +2896,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   con 👁). Lo usan en js/08 `zonaResolverBanner` (envuelve a `zonaResolverBannerBase`), `zonaMomentoAbrir`, `zonaVenenoContar`, `zonaRenovarEstado` y
   `zonaSumarStack` (estas tres ahora escriben con `mesaLinea`). Marcado, `zonaQuienPublico` lo nombra (`zonaOcultaMarcando`). El daño con dados que va al
   cuadro del duelo (P326) corre fuera de la marca (`areaOcultaAfuera`), y si el daño lo delata, desde ahí todo a la vista (`areaOcultaDelatado`). Dudas: P345.
+
+- **⚡ La fila entre tiradas del cuadro del duelo** (2026-11-27, Enyetar A2 y A3; `js/137-fila-duelo.js`): `dueloOpcionesFila(d)` (lo que puede usar
+  esta pantalla sobre una tirada de ese duelo: 🦋 la Polilla de su personaje, 😈 Enyetar si le alcanza el SP, 🧚 el Re-roll del Support, 🧿 el Mal de ojo
+  del GM con un creep listo, 💪 el Empower a sí mismo o a un aliado del duelo; `filaManejo` = `bnManejo`) y `dueloUsarFila(d, o)` (pausa con
+  `Duelo.yetaPausar` y lo de siempre: `enyetarElegir` js/38 —que ahora abre el cuadro de ese duelo—, `polillaDespues` js/02 —salió de
+  `usarPolillaMapa`—, `rerollUsar` js/39 con `campo`, `malDeOjoUsar` js/60 + `Duelo.yetaMarcar(…, {echado})`, `empowerUsar` js/37; las cuatro
+  devuelven true/false). Se engancha en `Duelo.escuchar` (js/14: `opcionesFila`, `usarFila`). `enyetarAplicar` pasa `hijo` y mira solo pausas de
+  Enyetar; `malDeOjoTirar` repite con `{yeta: true, tipo: 'maldeojo'}` y, si ya no se puede, sigue el duelo. Lo que se ve y la pausa: comun/CLAUDE.md.
+  Probado con clics en «Prueba · General» (GM, J1, J2); falta lo anotado en `docs/pruebas-en-el-mapa.md`. Dudas: P365.

@@ -2428,3 +2428,19 @@ versión parecida en más de una, es candidato a juntar.
   cancelada o nunca creada en 60 s → sigue; ganó y su efecto quedó a mano → sigue a los 5 s. Cada fin queda en `ataque.yetaHist` (para la parte B).
   `tiradasEnyetables(duelos, {esRival, alcanza, nombreDe, reciente, incluirCerrados})` es la lista del 🐈‍⬛ y del 🧿 (pura). Dudas: P364.
 
+- **⚡ `duelo.js`, la fila entre tiradas y la pausa para todos** (2026-11-27, Enyetar A2 y A3): `ataque.yeta` ahora lleva `tipo` (`PAUSA_TIPOS`:
+  'enyetar' —sin tipo, como en A—, 'maldeojo', 'reroll', 'moneda', 'polilla', 'empower'; `yetaTipo(m)`, `pausaInfo(y)`). `yetaPausar(id, {tipo, lado,
+  campo, por, porNombre, a, aNombre})` (la moneda pide `puedeReabrir`; el Empower va sin campo y frena también el Bloqueo). **Congelada:**
+  `puedeReabrir(m, campo, tipo)`, `campoPolilla(m, lado, tipo)` y `tiradaSumable(m, lado, tipo)` dan no mientras hay una pausa de otro tipo; lo que
+  la levanta en la misma escritura: `reabrir` (la moneda), `sumarATirada(…, usa, {pausa})` (la Polilla), `enyetarTirada(…, {campo, yeta: true, tipo,
+  hijo})` (Enyetar, Mal de ojo, Re-roll). `yetaSeguir` (motivo; con resultado 'gano' no deja línea), `yetaMarcar(id, {echado})` (el Mal de ojo ya echado
+  espera sin límite). `yetaQueHacer`: lo que no es Enyetar sigue a los 60 s con `resultado: 'tiempo'`. **La fila** (`filaHtml`, `filaOpciones(d)`):
+  después del contacto/Bloqueo y antes del crítico, un botón por opción de `cfg.opcionesFila(d)` (la pantalla) más «🪙 Re-roll (WC-Moneda)» (`filaMoneda`,
+  con `rerollInfo`; con WildCard y Moneda, `Confirmar.elegir`); solo con el par tirado (`parListo`), sin pausa y sin daño. Propia (`esPropio`) abierta;
+  ajena, plegada «⚡ Tenés algo para usar acá» (`filaAbierta`). Al tocar: `filaUsarMoneda` o `cfg.usarFila(d, o)`. Reemplaza al 🪙/🃏 flotante del
+  cuadro (`rerollBtnHtml`, retirado). **A3, la maldición adentro**: `yetaHijoDe(d)` / `yetaPadreDe(h)` / `esHijoDeYeta`; `yetaSubHtml` dibuja el
+  contacto del duelo de la maldición en el cartel de la pausa (los botones renombrados `data-y…`, `renombrarSub`; `yetaSubConectar`; `usarManual` y
+  `tirarPorAusente` aceptan una raíz); el duelo de la maldición no abre cuadro (`abrir` y `crear` mandan al de la pausa) ni botón (`dibujarChips`, también
+  los ya terminados por `yetaHist[].hijo`); `yetaAplicarHijo` pide el efecto solo en la pantalla de quien la echó. **El aviso**: `yetaAvisoHtml` /
+  `yetaAvisoTxt(h)` (90 s después de cada fin). `flotantes.js`: `EN_FILA` (🐈‍⬛ 🧚 🧿 💪 🦋 🃏 🪙) se esconden con el cuadro abierto (`.flot-en-fila`).
+  Dudas: P365.

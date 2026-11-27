@@ -3525,3 +3525,12 @@ ver `docs/cola-de-pruebas.md`. **Quedó sin ver en pantalla:**
 - [x] **P262 (5)**: «Dar a un jugador» con 30 ítems para J1 (mochila de 20): aviso abajo y «¿Dar igual?» al tocar Dar; desde el mapa y desde GM Tools.
   Se canceló (no se dio nada).
 - [ ] **Sin ver:** «🎁 Dar igual» de verdad (el jugador recibe, con su cartel de mochila pasada, como antes).
+
+## ⚡ La fila entre tiradas y la yeta adentro del mismo cuadro (Enyetar A2 y A3, 2026-11-27)
+
+Probado con clics en «Prueba · General» (GM, J1, J2): la fila propia de J1 (Polilla, Re-roll WC-Moneda eligiendo la Moneda), la plegada de J2, Enyetar
+desde la fila con la maldición adentro del mismo cuadro y la tirada congelada, el Empower de J2 a J1, la Polilla y el aviso a los 60 s. **Falta ver:**
+- 🧿 El Mal de ojo desde la fila del GM (un creep con Mal de ojo listo y a su alcance): la pausa, el cartel al jugador y que siga al repetir la tirada.
+- 🧚 El Re-roll del Support desde la fila (a un aliado y a uno mismo).
+- La maldición que empata (el desempate adentro del cuadro) y la que pierde (el aviso «resistió»).
+- Enyetar sobre la tirada de una habilidad (la Res.Esp de un objetivo), desde la fila.

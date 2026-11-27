@@ -10,7 +10,8 @@
    😈 Parte A de P363 (2026-11-27, dueño): al elegir la tirada, ESE duelo queda en pausa («X le está echando la yeta a Y…», `ataque.yeta`,
    Duelo.yetaPausar) hasta que se resuelve la maldición: si gana, se repite exactamente la tirada elegida y el duelo sigue desde ahí; si pierde, se
    cancela o no llega a echarse, sigue como estaba (lo levanta la pantalla del GM, Duelo.yetaSeguir). El GM y quien la echó tienen «▶ Seguir sin la
-   yeta». La lista suma las tiradas de habilidades. Re-roll, Mal de ojo, Empower y la Polilla no hacen esperar.
+   yeta». La lista suma las tiradas de habilidades. Desde A2/A3 (2026-11-27) todo lo de la fila del duelo pone la misma pausa (js/137) y la
+   maldición se tira adentro del cuadro del duelo en pausa (comun/duelo.js, `yetaSubHtml`).
    ========================================================= */
 const ENYETAR_MS = 10 * 60 * 1000;
 const enyetarReciente = ts => !!(ts && ts.toMillis && Date.now() - ts.toMillis() < ENYETAR_MS);
@@ -71,9 +72,11 @@ async function enyetarElegir(tokenId, o){
   let ok = false;
   try{ ok = await Duelo.yetaPausar(o.dueloId, {lado: o.lado, campo: o.campo, por: tokenId, porNombre: nombreDe(yo), a: o.tokenId, aNombre: o.nombre}); }
   catch(err){ console.error('Enyetar: no se pudo poner en pausa el duelo', err); }
-  if(!ok){ toast(`🐈‍⬛ Esa tirada de ${o.nombre} ya no se puede enyetar (el duelo siguió, o ya tiene una yeta encima)`); return; }
+  if(!ok){ toast(`🐈‍⬛ Esa tirada de ${o.nombre} ya no se puede enyetar (el duelo siguió, o ya tiene una yeta encima)`); return false; }
+  try{ if(Duelo.abiertoId() !== o.dueloId) Duelo.abrir(o.dueloId); }catch(err){}   // 😈 la maldición se tira adentro de ESE cuadro (A3)
   const usada = await enyetarUsar(yo, o.tokenId);
   if(!usada) try{ await Duelo.yetaSeguir(o.dueloId, 'no se pudo echar la maldición'); }catch(err){ console.error(err); }
+  return usada;
 }
 // Ejecuta la habilidad (cobra el SP con su pregunta de Flash) contra ese enemigo, sin tener que marcarlo en el mapa. → false si no se pudo ni empezar.
 async function enyetarUsar(yo, objetivoId){
@@ -112,11 +115,11 @@ async function enyetarAplicar(d, t){
     const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(25).get();
     const doc = q.docs.find(x => {
       const y = x.id !== d.id && x.data().ataque && x.data().ataque.yeta;
-      return y && String(y.por) === String(d.atacante.tokenId) && String(y.a) === String(d.defensor.tokenId);
+      return y && Duelo.yetaTipo(x.data()) === 'enyetar' && String(y.por) === String(d.atacante.tokenId) && String(y.a) === String(d.defensor.tokenId);
     });
     if(doc){
       const x = doc.data(), y = x.ataque.yeta;
-      const r = await Duelo.enyetarTirada(doc.id, y.lado, 'peor', {campo: y.campo, yeta: true});
+      const r = await Duelo.enyetarTirada(doc.id, y.lado, 'peor', {campo: y.campo, yeta: true, hijo: d.id});   // (hijo: la maldición, que se vio adentro de este duelo, A3)
       if(!r){
         await Duelo.yetaSeguir(doc.id, 'la tirada ya no se podía cambiar');
         return {manual: true, nota: `${nom}: esa tirada ya no se podía cambiar: ✋ que la repita y se quede con la peor, a mano`};

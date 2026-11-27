@@ -273,10 +273,15 @@ async function usarPolillaMapa(){
       dueloPolilla = await Duelo.sumarATirada(doc.id, lado, 2, '🦋');
     }
   }catch(err){ console.error('No se pudo ver el duelo de la Polilla:', err); }
+  if(dueloPolilla){ await polillaDespues(t, idx, dueloPolilla, otro); return; }
+  await polillaSinDuelo(t, idx, otro);
+}
+// 🦋 Lo que pasa después de sumarle el +2 a una tirada de un duelo (el botón de arriba o la fila del duelo, 2026-11-27 A2): se gasta la Polilla,
+// la línea de la Mesa y el aviso a los dos.
+async function polillaDespues(t, idx, p, otro){
   const uidOtro = otro ? (otro.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || otro.uid) : otro.uid) : '';
-  if(dueloPolilla){
+  {
     try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('No se pudo sacar el estado de la Polilla mística:', err); }
-    const p = dueloPolilla;
     const texto = `${nombreDe(t)} usó la Polilla mística en su ${p.etq}: ${fmt(p.antes)} → ${fmt(p.ahora)}${p.contra !== null ? ` contra ${fmt(p.contra)}` : ''}. ${p.empate ? ` Quedó empatado: quien usa la Polilla pierde los empates, así que gana ${otro.nombre || 'el otro'}.` : ` El duelo contra ${otro.nombre || 'el otro'} se volvió a resolver con el número nuevo.`}`;
     try{ await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nombreDe(t), origen: `🦋 ${nombreDe(t)} usó la Polilla mística`,
       formula: `+2 a su ${p.etq} del duelo: ${fmt(p.antes)} → ${fmt(p.ahora)}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()}); }
@@ -285,8 +290,10 @@ async function usarPolillaMapa(){
       datos: {paraUids: [fbUsuario.uid, uidOtro].filter(Boolean), aviso: true, boton: 'Entendido', pasos: [{titulo: '🦋 Polilla mística', texto}]}});
     mesaMiUltima = null;
     renderPolillaBoton();
-    return;
   }
+}
+async function polillaSinDuelo(t, idx, otro){
+  const uidOtro = otro ? (otro.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || otro.uid) : otro.uid) : '';
   if(!mesaMiUltima){ toast('Todavía no hiciste ninguna tirada para sumarle el +2'); return; }
   const origen = mesaMiUltima.origen, nuevoTotal = num(mesaMiUltima.total) + 2;
   try{ await hudEstadoCambiar(t, idx, 'quitar'); }   // la polilla se gasta

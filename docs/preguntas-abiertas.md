@@ -3165,6 +3165,8 @@ resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **
 > Firebase: el dueño la pega). (7) Al deshacer, **«Aplicar automático / Resolver a mano»: sí**. Sin respuesta (queda lo recomendado mientras): (2b) si
 > Re-roll, Mal de ojo y Polilla también hacen esperar al duelo → por ahora solo Enyetar; (3) el límite de B → solo el turno actual y sin un duelo más
 > nuevo entre esos dos.
+> **(2b) cambió con la A2 (dueño, 2026-11-27):** «si alguien tira enyetar, rerroll, etc., el duelo se pausa hasta que se resuelva»: ahora todo lo de la
+> fila (Polilla, Re-roll, Moneda/WC, Mal de ojo, Empower) pone la misma pausa.
 
 ### ✅ P364 — 😈 La pausa de Enyetar: cuánto espera y qué se puede hacer mientras (2026-11-27, Claude, al programar la parte A de P363)
 
@@ -3181,3 +3183,19 @@ Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta q
 > en la Mesa). (2) **La tirada que se está enyetando queda congelada:** «sobre la tirada que va a ser rerolleada, no, porque no serviría de nada. Primero
 > se resuelve enyetar, y sobre esa misma tirada se puede aplicar otra cosa una vez resuelta». (3) Sí, la lista puede mostrar un duelo terminado si la
 > tirada todavía se puede cambiar.
+
+### P365 — ⚡ La fila entre tiradas: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar A2 y A3)
+
+Lo que se programó y se puede cambiar:
+1. **Los botoncitos de arriba** (🐈‍⬛ 🧚 🧿 💪 🦋 🪙 🃏) se esconden mientras quien mira tiene un duelo abierto en pantalla; vuelven con el cuadro
+   minimizado o cerrado. Los que no cambian una tirada del duelo (😇 el Pacto, el anillo de impulso, el trébol, Shield, Blindaje…) siguen en «Podés
+   usar», al costado. ¿Está bien, o también se sacan de ahí?
+2. **En un duelo ajeno** la fila sale solo si tenés algo para usar ahí, plegada en «⚡ Tenés algo para usar acá (N)»; un clic la abre. ¿Bien así?
+3. **Cuándo aparece**: recién cuando ya tiraron los dos de ese par (PdG y Evasión, o Fuerza y Bloqueo), para no adelantar un número secreto (antes,
+   el 🐈‍⬛ dejaba enyetar un PdG antes de que el otro eligiera su defensa). ¿Está bien, o tiene que aparecer apenas tira uno?
+4. **El Empower en la fila** no cambia una tirada ya hecha (desde el 2026-10-22 es «+3 a la próxima tirada»): el botón es «💪 Empower a X: +3 a su
+   próxima tirada», y el duelo espera solo hasta que se paga. ¿Así, o el Empower de la fila tendría que sumarle a la tirada que se acaba de hacer?
+5. **Los 60 s** valen para todo: si en 60 s no se usó lo que se tocó, el duelo sigue con su aviso. El Mal de ojo, una vez echado, espera a que el
+   jugador repita su tirada (sin límite; el GM y quien lo echó tienen «▶ Seguir sin el mal de ojo»). ¿Bien?
+6. **El anillo de impulso** no va a la fila: hoy le suma el bono a la última línea de la Mesa, no a la tirada del duelo. ¿Lo pasamos a la tirada del
+   duelo, como la Polilla?

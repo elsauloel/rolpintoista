@@ -58,14 +58,15 @@ async function abrirReroll(tokenId){
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
   AvisoCombate.mostrar({icono: '🧚', titulo: `Re-roll · ${nomYo}`, botones, texto: '¿Qué tirada se repite?'});
 }
+// → true si se usó (la fila del duelo, 2026-11-27 A2: con `o.campo` va EXACTAMENTE a esa tirada y levanta la pausa del duelo en la misma escritura).
 async function rerollUsar(yo, o){
   const nomYo = nombreDe(yo);
   const pago = await ConfirmarTurno.flash('Re-roll', {sp: REROLL.sp}, {quien: nomYo, spAjeno: REROLL.spAjeno, ident: {nombre: nomYo, ref: yo.fichaId}});
-  if(!pago) return;
+  if(!pago) return false;
   // Los No2: con Extenuado, más caros; si no alcanzan, se pregunta y se hace igual (gasta los que tenga, con su línea roja).
   const r0 = (fichasPub.get(yo.fichaId) || {}).resumen || {};
   const no2 = REROLL.no2 ? REROLL.no2 + num(r0.extenuado) : 0;
-  if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return;
+  if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return false;
   let falta = null;
   const ok = await editarPersonajeMapa(yo.fichaId, async S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
@@ -78,8 +79,8 @@ async function rerollUsar(yo, o){
     }
     return true;
   });
-  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Re-roll cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Re-roll'); return; }
-  const r = await Duelo.enyetarTirada(o.id, o.lado, 'mejor');
+  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Re-roll cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Re-roll'); return false; }
+  const r = await Duelo.enyetarTirada(o.id, o.lado, 'mejor', o.campo ? {campo: o.campo, yeta: true, tipo: 'reroll'} : undefined);
   let texto;
   if(!r) texto = `La tirada de ${o.nombre} ya no se puede cambiar (el duelo siguió): ✋ que la repita y se quede con la mejor, a mano.`;
   else{
@@ -92,5 +93,6 @@ async function rerollUsar(yo, o){
   }catch(err){ console.error('Re-roll: no se pudo avisar en la Mesa', err); }
   momentoAbrir({tipo: 'reroll', icono: '🧚', titulo: `${nomYo} usó Re-roll`, resultado: texto, estado: 'listo',
     datos: {paraUids: [fbUsuario.uid], aviso: true, boton: 'Entendido', pasos: [{titulo: '🧚 Re-roll', texto}]}});
+  return true;
 }
 window.abrirReroll = abrirReroll;

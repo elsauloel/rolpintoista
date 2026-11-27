@@ -3103,3 +3103,58 @@ Con el paso 1 de P361, las **habilidades y las pasivas** tienen un solo cuadro �
    cuesta…; cooldown…» porque esa línea se arma con el nivel del creep al agregarla (en el «👁 Ver» de cada una sí aparece, calculada). ¿Se muestra
    también en la fila, calculada para el nivel del creep que se está editando?
    - (a) Sí. (b) No: alcanza con el «👁 Ver». Recomendación: (b).
+
+### P363 — 😈 Enyetar sobre un duelo que ya avanzó o se cerró: ¿hasta dónde se vuelve atrás? (2026-11-27, Claude, investigando el pedido del dueño)
+
+Pedido del dueño (cola, «😈 Enyetar puede reabrir un duelo y volver atrás»): «que enyetar te permita reabrir un duelo y volver atrás con la resolución…
+se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule con enyetar».
+
+**Cómo está hoy.** Enyetar (Debuffer, Flash, 5 SP; 10 en turno ajeno; sin No2): el botón fijo 🐈‍⬛ lista la última tirada de cada enemigo a tu alcance,
+de los duelos de los últimos 10 minutos. Se tira tu PdG.Esp contra su Res.Esp. Si ganás, esa tirada se repite y queda la peor. Después el duelo se
+vuelve a resolver desde ahí. **Por qué no anda con un duelo cerrado:** una tirada se puede cambiar solo hasta que se tira el daño, los d20 del crítico o
+un efecto. Es la misma regla que la Moneda Re-Roll y la Polilla. Que el cuadro se cierre solo a los 10 s no tiene nada que ver: es solo lo que se ve.
+Encima, la maldición es un duelo aparte, y mientras se resuelve el duelo original sigue andando. Cuando gana, casi siempre llega tarde y sale
+«✋ a mano». Además, al aplicar no usa la tirada que elegiste en la lista: busca de nuevo la más reciente de ese enemigo. Y las tiradas de
+habilidades no aparecen en la lista.
+
+**Qué pasa al resolver un golpe, fuera del duelo:** la vida del que recibe (el duelo guarda la de antes y la de después), los estados aplicados (el
+duelo los anota), la durabilidad del Bloqueo, Espinas, Espejo, Drenar y Luz sanadora (la vida del atacante), el salto del rayo a otros, Sed de
+sangre, el Último aliento, la Llama de Fénix y el Ankh, el empujón, cambiar de lugar, la flecha clavada, «termina el turno», el contraataque (otro duelo),
+la cascada de un área (los que siguen), la Mesa y la Crónica.
+
+**Opciones**
+- **(A) Que Enyetar llegue a tiempo, sin deshacer nada.** (1) Al elegir la tirada en la lista, ese duelo queda **en pausa**: «😈 X le está echando la
+  yeta a Y…». No se puede tirar el daño hasta que termine la maldición, y la maldición se aplica a **esa** tirada. (2) Opcional: cuando un enemigo
+  tira y hay alguien con Enyetar (o Mal de ojo, o Re-roll) a tu alcance que puede pagarlo, el duelo espera un momento antes del daño, con un aviso
+  «😈 ¿Alguien quiere enyetar? · Seguir». (3) Las tiradas de habilidades también entran en la lista.
+  Lo bueno: no se rompe nada ni se deshace nada, y cubre el caso de quien lo dice «en el momento». Lo malo: si ya se tiró el daño, sigue sin poder.
+  La espera del punto 2 frena un poco los duelos donde hay un Debuffer. Trabajo: 2 o 3 tareas chicas.
+- **(B) A + deshacer el último golpe, con límite.** La lista suma las tiradas de duelos ya cerrados (marcadas «🔒 ya resuelto: se deshace»). Al elegir
+  una y ganar la maldición: se devuelve lo que anotó ese duelo (la vida del que recibió, los estados que le puso, la vida que ganó o perdió el atacante
+  por Espinas o Drenar, la durabilidad del Bloqueo), el duelo vuelve a esa tirada con la yeta y se sigue resolviendo como siempre. Lo que no se
+  puede devolver solo aparece en un cartel «✋ Revisá a mano: …» (el empujón, el salto del rayo, cambiar de lugar, la flecha). **No se deja si**: ya
+  empezó el turno de otro, o hay un duelo más nuevo con alguno de los dos tokens, o el golpe lo hizo caer y usó el Ankh, la Llama de Fénix o el Último
+  aliento, o fue parte de un área en cascada, o abrió un contraataque que ya se tiró. En esos casos dice por qué y ofrece «✋ a mano».
+  Lo bueno: cubre el «lo dije tarde» en lo común (un golpe y su daño) y no inventa nada que no esté anotado. Lo malo: hay casos que no se pueden
+  deshacer y quedan a mano; la vida vuelve con la diferencia (si mientras tanto se curó, se respeta la cura). Trabajo: unas 6 tareas
+  (2 medianas: devolver vida y estados por cada camino —personaje, invocación, creep— y las verificaciones).
+- **(C) Deshacer cualquier duelo y todo lo que vino después.** Lo mismo que B, pero sin límite: deshace en cadena los duelos y efectos posteriores.
+  Lo bueno: es lo más fiel al pedido. Lo malo: hoy no hay registro de «qué cambió por qué» para cada cosa, así que habría que armar un registro de
+  deshacer en cada uno de los más de veinte efectos del golpe. Es frágil, y puede volver atrás cosas que la mesa ya dio por buenas (movimientos,
+  turnos). Trabajo: grande (más de 15 tareas, varias medianas).
+
+**En la Mesa y en la Crónica:** no se borra nada. Se suma una línea «↩ Deshecho por 😈 Enyetar de X: el golpe de A a B (N de daño) se vuelve a
+resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **tachar** la línea vieja de la Mesa hace falta una regla nueva de Firestore
+(hoy una línea publicada no se puede editar); la Crónica sí podría marcarla.
+
+**Recomendación:** A ahora (es chica y resuelve la carrera de hoy) y B después, con el límite de «este turno y nada más nuevo con esos dos». C no.
+
+**Preguntas para el dueño**
+1. ¿A, A + B o C?
+2. En A: ¿el duelo espera solo cuando se elige Enyetar, o también avisa «¿alguien quiere enyetar?» antes del daño? Si espera, ¿cuánto (unos 5 s, o hasta
+   que alguien toque «Seguir»)? ¿Vale lo mismo para Re-roll, Mal de ojo, Empower y la Polilla?
+3. En B, el límite: ¿solo el turno actual? ¿o los últimos X minutos? ¿Y si ya hubo otro duelo con esos tokens?
+4. Si el golpe lo mató y volvió (Ankh, Fénix, Último aliento): ¿no se deja deshacer, o se deshace y se devuelve el Ankh o la Llama?
+5. ¿Las tiradas de habilidades (un Rayo mágico, una Res.Esp) también se pueden enyetar?
+6. ¿Tachar la línea vieja de la Mesa (regla nueva que hay que pegar) o alcanza con la línea «↩ deshecho»?
+7. ¿Necesita «Aplicar automático / Resolver a mano» al deshacer? (Propuesta: sí, en el cartel de B.)

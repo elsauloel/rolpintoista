@@ -29,6 +29,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   elegir una, el duelo se reabre en ese punto: se deshace lo que se resolvió desde esa tirada (daño, estados, No2/SP cobrados, vida, Mesa marcada como
   deshecha) y se recalcula con Enyetar; (3) proponerle al dueño hasta dónde se puede deshacer (cuánto tiempo atrás, qué pasa si ya se movieron tokens o
   empezó otro turno) antes de programar. Relacionada con la nota «⚔ Que los duelos no se cierren solos, para poder usar Enyetar» (de abajo).
+  - **🔎 Investigado (2026-11-27, Claude, sin programar) → la propuesta y las preguntas están en P363 (`preguntas-abiertas.md`).** Lo que se encontró:
+    (1) que el cuadro se cierre a los 10 s (`AUTOCIERRE_MS`) es solo lo que se ve: lo que de verdad frena a Enyetar es `puedeReabrir`/`campoPolilla`
+    (`comun/duelo.js`): apenas hay daño tirado, d20 del crítico o un efecto tirado, ninguna tirada se puede cambiar (lo mismo que la Moneda y la
+    Polilla). La ventana real dura lo que tarda el atacante en tirar el daño, unos segundos. (2) Enyetar es una habilidad con su propio duelo (PdG.Esp
+    contra Res.Esp): mientras se resuelve, el duelo de origen sigue andando, y cuando gana la maldición ya está cerrado → sale «✋ a mano». (3) Al
+    aplicar, `enyetarAplicar` (js/38) no usa la tirada que se eligió en la lista: busca de nuevo la más reciente de ese enemigo. (4) La lista deja
+    afuera las tiradas de habilidades (`x.hab`), los duelos de más de 10 minutos y mira solo los últimos 10 duelos. (5) Al aplicar el daño pasan
+    muchas cosas fuera del duelo (vida, Espinas, Drenar, salto del rayo, Sed de sangre, Ankh/Fénix/Último aliento, durabilidad, empujón, cambiar de
+    lugar, termina el turno, contraataque, la cascada de un área): el duelo guarda la vida de antes y la de después (`dano.hpAntes/hpDespues`) y los
+    estados aplicados, pero no todo lo demás. (6) La Mesa no deja editar una línea ya publicada (`tiradas` es solo crear): para tacharla hace falta una
+    regla nueva; sin regla, se suma una línea «↩ deshecho».
 
 - **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
 - **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
@@ -36,7 +47,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
-- **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar).
+- **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
+  no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).
 - **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
 - **⬜ en cola (primero) — 🕊️ Que el GM pueda mandar mensajes privados a los jugadores** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» (revisar si hoy puede y por qué no anduvo).
 - **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».

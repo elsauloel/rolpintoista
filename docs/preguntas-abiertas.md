@@ -3223,12 +3223,13 @@ Lo que se programó y se puede cambiar:
 
 > ✅ **Decidida (dueño, 2026-11-27):** 1, 3, 4, 5 y 6 quedan como están. **2: sí** — la Moneda / WC Re-roll y el Golpe de suerte también pueden deshacer el último duelo (en la cola).
 
-### P367 — 🧚 Golpe de suerte: ¿el hada o el trébol? (2026-11-27, Claude, al cambiarle el nombre al «Re-roll» del Support)
+### P367 ✅ — 🧚 Golpe de suerte: ¿el hada o el trébol? (2026-11-27, Claude, al cambiarle el nombre al «Re-roll» del Support)
 
 Con el nombre nuevo, **«Golpe de suerte»**, el botón fijo, la fila «⚡ Entre tiradas», la Mesa y la Crónica siguen con el **🧚 hada** (el dueño la
 eligió el 2026-10-12 entre «un trébol o un hadita»). La tirada que queda ya lleva la marca **🍀** (el trébol). ¿Pasamos el ícono del Golpe de suerte
 al **🍀**, que dice «suerte» de un vistazo, o queda el 🧚? (Ojo: el 🍀 también lo usa el Anillo del trébol; si se cambia, el botón fijo sigue
 teniendo su brillo verde con chispitas.) Por ahora queda el 🧚.
+**✅ Decidido (dueño, 2026-11-27): «deja el hada, me gusta».** Queda el 🧚.
 
 ### P368 — 😈 Enyetar C: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar C)
 
@@ -3242,4 +3243,8 @@ Lo que se programó y se puede cambiar:
 4. **El 🪙 fijo** ofrece primero tus tiradas del último duelo terminado si es de los últimos 10 minutos y estuviste en él; «Otra tirada» abre la lista de
    siempre. ¿Bien, o siempre la lista de siempre con el último duelo adentro?
 5. **Los d20 del crítico «peor»**: queda el multiplicador más bajo (y, si empatan, el d20 más bajo). ¿Bien?
+
+**Respuestas (dueño, 2026-11-27):** 1 sí («se puede deshacer mientras están tirando los efectos»); 2 sí («la tirada de elemento y del orbe salvaje
+también»); 3 «la moneda de reroll lo que hace es modificar una tirada, reemplaza una tirada por otra. Entonces, cualquier tirada puede ser reemplazada
+por otra». Las tres, en la cola. 4 sin respuesta. 5: no la entendió; se le explicó y espera su respuesta.
 

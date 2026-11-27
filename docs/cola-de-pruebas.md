@@ -3536,6 +3536,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Ver cómo se guarda hoy la WC / la Moneda Re-Roll (`comun/CLAUDE.md`, Re-roll) y el botón 🃏 del mapa.
 - **⬜ en cola — 💍 El anillo de impulso suma a la tirada del duelo, como la Polilla (P365 6, dueño 2026-11-27: «sí, sumar a la tirada»)**: hoy le suma
   a la última línea de la Mesa; que sume a la tirada del duelo (reabriéndola como la Polilla) y que aparezca en la fila «⚡ Entre tiradas».
+- **⬜ en cola — 😈 Enyetar / Moneda: lo que decidió el dueño en la P368 (2026-11-27)**: (1) «sí, se puede deshacer mientras están tirando los
+  efectos»: las tiradas de un duelo que ya aplicó el daño y está tirando los efectos también aparecen (con «↩», deshaciendo). (2) «la tirada de elemento
+  y del Orbe salvaje también»: el 🔥 1d6 de elemento del arma y el d6 del Orbe salvaje entran en la lista como tiradas aparte. (3) «la moneda de reroll lo
+  que hace es modificar una tirada, reemplaza una tirada por otra. Entonces, cualquier tirada puede ser reemplazada por otra»: la Moneda / WC llega a
+  cualquier tirada, también al daño ya tirado de un duelo en curso. (4) y (5) de la P368: esperan respuesta.
+- **⬜ en cola — 🧪 Probar con clics: la Moneda desde la fila del cuadro y con la WildCard** (Enyetar C, 2026-11-27): «↩ Re-roll (WC-Moneda) y deshacer»
+  desde la fila «⚡ Entre tiradas», y con las dos (Moneda y WildCard) para ver el «¿Con qué volvés a tirar?». Ver `docs/pruebas-en-el-mapa.md`.
+- **⬜ en cola — 🧪 Probar con clics: el Golpe de suerte sobre un daño propio sin aplicar y sobre una tirada de habilidad** (Enyetar C, 2026-11-27).
+- **⬜ en cola — 🧪 Probar con clics: Enyetar el daño de una habilidad** (Enyetar C, 2026-11-27): un Rayo mágico, y el de un arco con el «+1 dado» del
+  primer disparo.
+- **⬜ en cola — 🧪 Probar con clics: una tirada con «÷2» repetida en el mapa** (Enyetar C, 2026-11-27): Pajaritos, Lisiado… (en las pruebas
+  automáticas ya está).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

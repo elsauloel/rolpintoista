@@ -3415,6 +3415,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cartel de siempre en la pantalla del GM, no un renglón), alguien que **entra** a la nube ya puesta y se mueve adentro (una sola vez por ronda), y
   la puesta al día de una copia vieja en una **mochila** y en el **cinturón** de un personaje o de un creep. Con clics se probó el Gas adormecedor
   con orden de turnos sobre dos personajes, una invocación que vuela y un escondido.
+- **⬜ en cola — 🔥 El Muro de fuego siempre con fuego amigo** (dueño, 2026-11-27: «que el muro de fuego siempre tenga fuego amigo»): el muro (de
+  la habilidad, de la Varita del muro de fuego y el de un creep) le pega a cualquiera que lo cruce o empiece su turno adentro, aliados de quien lo puso
+  incluidos (y él mismo), como la regla general de que lo de área tiene fuego amigo (2026-10-03). Revisar hoy qué hace cada uno y que todos lo cumplan;
+  textos al día (habilidad, varita, «Ver detalle», cartel).
 
 ## En cola
 

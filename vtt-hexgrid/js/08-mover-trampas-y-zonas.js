@@ -326,6 +326,7 @@ function zonaResuelvoYo(t){
 function zonaEsRival(el, t){ return el.zonaCasteadorTipo === 'creep' ? t.tipo === 'pj' : t.tipo === 'creep'; }
 function zonaAplicaA(el, t){
   if(!t.fichaId || (t.fichaId === el.zonaCasteadorRef && t.tipo === el.zonaCasteadorTipo)) return false;   // no afecta a quien la creó
+  if(typeof esInerte === 'function' && esInerte(t)) return false;   // 🪵 ni a un tótem o un estandarte: no son rivales que se resistan (2026-11-27, dueño, P372)
   return el.zonaAmiga || zonaEsRival(el, t);
 }
 // ¿Todavía le falta algo a este par (zona, token)? El daño se vuelve a chequear siempre (como el fuego); el

@@ -182,6 +182,13 @@ el Acelerador; la ficha suelta en una pestaña dormida; +N de vida con la vida l
 resurrección** con el duelo abierto o desde lejos; el Foco en una invocación (Dash / Salto / Parpadeo y el creep: hechos, cola 2026-11-21); y el cartel «todavía no
 está en este mapa» con dos personajes propios (no se puede en las partidas de prueba).
 
+## 🚩 Tótems y estandartes fuera de las áreas (2026-11-27, P372)
+
+Con clics se vio el Shockwave con el Estandarte de guerra al lado (solo el creep tiró resistencia). Falta ver con clics:
+- [ ] Un **hechizo de área o un cono de daño** (Bola de fuego, Sonic Boom, Hálito polar) con un tótem adentro: no lo cuenta, sigue con los demás.
+- [ ] Una **nube o zona del suelo** (Pedos Tóxicos, Muro de fuego) que queda encima de un tótem o un estandarte: no le pide nada.
+- [ ] El **Tótem de silencio** al lado de un Shockwave (lo mismo que el estandarte).
+
 ## 👥 Personajes y tokens · ＋ Token suelto (2026-11-22)
 
 - [ ] **Con las reglas nuevas pegadas** (campo `descripcion` de los tokens): un jugador crea un token suelto **con descripción**; el otro jugador y el

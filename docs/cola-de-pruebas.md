@@ -173,7 +173,14 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   los No2 y el SP volvieron a 6/6 y 24/24; **después**, quedan 4/6 y 22/24 con los despojos nuevos, y la ficha vieja se pone al día sola. También: un
   gasto en cada pantalla (suman), el mapa atrasado guardando encima de un cambio de la ficha, recibir daño, ⟳ Pasar de ronda del GM (una sola vez) y
   el aviso «No se pudo guardar… se reintenta sola» sin red (guardó al volver). La vuelta, «quedó igual». Pruebas: 1198. Dudas: P371. Sin reglas nuevas.
-- **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).
+- **✅ hecho (2026-11-27) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).
+  **Hecho:** un tótem o un estandarte ya no entra en nada que pegue en área: ni en las ondas (Shockwave, Pisotón, Nova arcana…), ni en los conos, las
+  líneas, los hechizos de área o el Meteoro (`dueloElegirAreaMapa`, js/13: el filtro de `esInerte` ahora vale siempre, no solo en lo de apoyo), ni en
+  las nubes y zonas del suelo (`zonaAplicaA`, js/08). Se lo sigue rompiendo con un ataque o una habilidad dirigida a él. Los tokens sueltos con vida
+  siguen recibiendo daño como antes. **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General»: el Support · Sanador clavó el Estandarte
+  de guerra (desde sus Acciones, como en el juego) pegado a Blanco J1, y J1 tiró Shockwave con el Sanador y el estandarte al lado. Con el código de
+  antes la cascada armó dos duelos (el segundo, «Estandarte de guerra se resiste»); con el nuevo, uno solo, contra el Sanador. Duda nueva: P372
+  (¿un área que hace daño debería romper un tótem?; quedó la A: no los cuenta). El Barrido / Remolino (giro con el arma) no se tocó.
 - **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).

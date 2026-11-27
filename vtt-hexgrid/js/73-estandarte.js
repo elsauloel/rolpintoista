@@ -27,7 +27,8 @@ function estandarteInfo(t){
   return radio > 0 ? {radio, pdg: Math.max(0, Math.round(num(v.estandartePdg))), dano: Math.max(0, Math.round(num(v.estandarteDano))), silencio: num(v.estandarteSilencio) > 0} : null;
 }
 // 🪵 Inertes (2026-10-25, dueño: «los tótems serían otra categoría, invocaciones inertes, no sé bien cómo llamarlas»): los tokens que pone una habilidad
-// y no actúan (el estandarte, el tótem). Las ondas y áreas de apoyo («a sus aliados») no los cuentan; los ataques sí (se los rompe).
+// y no actúan (el estandarte, el tótem). Las ondas, conos, líneas y áreas (de apoyo o de daño) y las zonas no los cuentan (2026-11-27, dueño: «el
+// estandarte de guerra no debe tirar resistencia a shockwave»; P372); un ataque o una habilidad dirigida a él sí (se los rompe).
 const esInerte = t => !!estandarteInfo(t);
 function estandarteEnPie(id, t){
   if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) return false;

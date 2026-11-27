@@ -3310,3 +3310,20 @@ mismo par de segundos), pero puede pasar.
 Otro caso chico: los No2 «llenos» (todavía sin número, al empezar) que se gastan en dos pantallas a la vez quedan en el menor de los dos (no se suman
 los dos gastos), porque la pantalla no sabe cuántos eran.
 
+
+### P372 — 🚩 ¿Un área, una onda o una zona le pueden pegar a un tótem o a un estandarte? (2026-11-27, Claude, al sacar el Estandarte del Shockwave)
+
+**Contexto:** el dueño (2026-11-27): «el estandarte de guerra no debe tirar resistencia a shockwave». Hasta ahora un tótem o un estandarte (los
+«objetos inertes», que clava un creep con Estandarte de guerra o Tótem de silencio) entraba como un rival más en todo lo que pega en área: la onda
+del Shockwave (y las otras ondas), los conos, las líneas, los hechizos de área, el Meteoro y las nubes o zonas del suelo; solo quedaban afuera de lo
+de apoyo («a sus aliados»). Desde hoy **no entran en ninguno**: el área sigue con los demás como si el tótem no estuviera. Se los sigue pudiendo
+romper con un ataque o una habilidad dirigida a ellos (se los elige con un clic, como siempre).
+
+**Qué decidir:**
+- **A (recomendada, la que quedó):** nada de lo que pega en área los cuenta, ni de daño ni de estados. Para romperlos, hay que ir a pegarles.
+- **B:** las áreas que hacen **daño** sí les pegan (sin tirar resistencia: el daño entra directo, porque no tienen defensa), y las que solo ponen
+  un estado (Pajaritos del Shockwave, Silencio, Veneno…) no. Así una Bola de fuego también rompe el tótem que quedó adentro.
+- **C:** como A, pero con una marca en la habilidad («rompe objetos») para las pocas que sí deberían pegarles.
+
+**Quedó sin tocar (para decidir junto con esto):** el **Barrido / Remolino** (el giro con el arma a todos los de alrededor) es un ataque con arma,
+no un área, y **sí** le sigue pegando a un estandarte que esté pegado.

@@ -3148,6 +3148,17 @@ prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estand
     O.ocupaLugar({...estandarte, iniciativa: true}, pubEst), O.ocupaLugar({...suelto, iniciativa: false}, null), O.ocupaLugar({trampa: true}, null), O.ocupaLugar(null, null)],
     [true, true, true, true, true, false, false, true, true, false, false, false]);
 });
+prueba('🚩 Ni el tótem ni el estandarte entran a un área, onda, cono, línea o zona (2026-11-27, dueño: «el estandarte de guerra no debe tirar resistencia a shockwave»; P372)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const t13 = await leer('13-tokens-portal-duelo.js'), t08 = await leer('08-mover-trampas-y-zonas.js'), t73 = await leer('73-estandarte.js');
+  cierto(/\.filter\(t => typeof esInerte !== 'function' \|\| !esInerte\(t\)\)/.test(t13) && !/\.filter\(t => !hab\.aliados \|\| typeof esInerte/.test(t13), 'la cascada de las áreas los saca siempre, no solo en las de apoyo');
+  const fZona = t08.slice(t08.indexOf('function zonaEsRival('), t08.indexOf('// ¿Todavía le falta algo a este par'));
+  const aplica = new Function('esInerte', fZona + '\nreturn zonaAplicaA;')(t => t.fichaId === 'tot');
+  const el = {zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj'};
+  igual([aplica(el, {tipo: 'creep', fichaId: 'tot'}), aplica(el, {tipo: 'creep', fichaId: 'rata'}), aplica(el, {tipo: 'pj', fichaId: 'f1'}), aplica({...el, zonaAmiga: true}, {tipo: 'pj', fichaId: 'f2'})],
+    [false, true, false, true]);
+  cierto(/const esInerte = t => !!estandarteInfo\(t\);/.test(t73), 'el criterio es el de siempre (js/73)');
+});
 prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, ▶ Siguiente, Iniciar combate, invocaciones y refuerzos (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t04 = await leer('04-mantenimiento-e-iniciativa.js'), t86 = await leer('86-prisa.js'), t31 = await leer('31-copiar-token.js');

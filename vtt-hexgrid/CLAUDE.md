@@ -2310,6 +2310,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
   dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
   ficha). El aura, `estandarteDibujar(z)` desde js/05.
+  **No entran en nada de área** (2026-11-27, dueño: «el estandarte de guerra no debe tirar resistencia a shockwave»; P372): `esInerte` saca al tótem y al
+  estandarte de la cascada de `dueloElegirAreaMapa` (js/13: ondas, conos, líneas, áreas, Meteoro, de daño o de apoyo) y de las zonas (`zonaAplicaA`,
+  js/08). Un ataque o una habilidad dirigida a él sí le pega (se lo rompe). El Barrido / Remolino (js/108) no se tocó.
   **El nombre no delata al creep** (P281, 2026-11-23): el token, su ficha y su nota se llaman como la habilidad («Estandarte de guerra», «Tótem de silencio»;
   `ZonaDetalle.nombreInerte` / `notasInerte`), sin «de <creep>»; de quién es lo dice «Ver detalle» con su regla (P259 4). Los clavados antes («Estandarte de
   <creep>») los renombra una vez la pantalla del GM (`estandarteRenombrar`, en el mismo intervalo que saca los rotos): token, ficha pública y privada y nota.

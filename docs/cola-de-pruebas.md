@@ -49,6 +49,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     estados aplicados, pero no todo lo demás. (6) La Mesa no deja editar una línea ya publicada (`tiradas` es solo crear): para tacharla hace falta una
     regla nueva; sin regla, se suma una línea «↩ deshecho».
 
+  **A2 — los botones entre tiradas (dueño, 2026-11-27, con boceto sobre el cuadro del duelo):** «me gustaría que los botones aparezcan en el menú, entre
+  tiradas, siempre que vengan al caso. En los duelos propios del jugador, así. Con ese espacio dividiéndose en botones por cada opción disponible (por
+  ejemplo estos tres) [Polilla · Enyetar · Re-roll (WC-Moneda)]. WC = WildCard. De esta manera se ve más claro sin interrumpir la partida. Seguimos con la
+  idea de que si alguien tira enyetar, re-roll, etc., el duelo se pausa hasta que se resuelva». En el cuadro del duelo, entre una tirada y la siguiente
+  (por ejemplo entre «PdG contra Evasión» y «Daño»), una fila de botones, uno por cada opción que ese jugador tiene disponible para esas tiradas
+  (Polilla, Enyetar, Re-roll «WC-Moneda», Mal de ojo, Empower…); al tocar uno, el duelo **se pausa** hasta que se resuelva (ya no solo Enyetar: cambia
+  lo decidido en P363 2b). La Moneda Re-Roll se muestra como «Re-roll (WC-Moneda)». **Para evaluar con el dueño antes de programar:** (1) si queda
+  redundante con el botoncito lateral (🐈‍⬛ / 🪙 / 🦋) o si el lateral se saca; (2) la distinción entre duelos propios y de terceros: el Empower del
+  Support se usa mucho sobre tiradas ajenas, ¿en un duelo entre otros también aparece la fila (para quien tenga algo que usar), más chica o plegada?
 - **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
 - **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).

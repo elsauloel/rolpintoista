@@ -19,6 +19,21 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 > **Cómo se avanza (dueño, 2026-11-22):** una tarea por vez y **solo cuando el dueño dice «avanzá»**. Al terminarla se le pasan los
 > resultados y se espera; sus comentarios que correspondan se agregan al final de esta cola. Ya no se encadena sola (ver `memoria-claude.md`).
 
+### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
+
+- **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
+- **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
+- **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).
+- **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
+- **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
+- **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
+- **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar).
+- **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
+- **⬜ en cola (primero) — 🕊️ Que el GM pueda mandar mensajes privados a los jugadores** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» (revisar si hoy puede y por qué no anduvo).
+- **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».
+- **⬜ en cola (primero) — ☠ Que al morir se borren los estados alterados** (dueño, 2026-11-27, notas de la sesión): «que cuando mueran se le borren los estados alterados» (hoy se van al volver de la muerte, 2026-11-20; el dueño lo quiere al morir: revisar con él qué queda, como en `quedaAlVolver`).
+
+
 - **✅ hecho (2026-11-20) — 💰 «Pasar a un aliado» en el menú de DDE y despojos** (dueño, 2026-11-20, con captura: «este menú de DDE y despojos debería tener un
   botón para poder pasarle a un aliado»). La ventanita «💰 DDE y despojos» de la ficha tiene abajo el botón **🤝 Pasar a un aliado**: cierra la ventanita y abre
   la misma ventana de siempre («Pasarle algo a otro personaje», la del 🤝 Pasar de la Mochila; `comun/intercambio.js`, sin tocar): a quién, cuántos DDE, qué

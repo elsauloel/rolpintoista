@@ -163,6 +163,16 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   turno pasó lo mismo a las 23:53, pero se corrigió solo a los 13 s. Leído solo de Firestore (Mesa, duelos, Historial), sin abrir pantallas de la
   partida. En «Prueba · General», con una sola pantalla, Arrastrar + ataque cobraron bien. **Queda P370** (¿tenía dos pestañas? y cómo evitar que una
   pantalla vieja pise la ficha). Pruebas: 1192.
+- **✅ hecho (2026-11-27) — 💾 Que una pantalla vieja no pise la ficha (P370, la A)** (dueño, 2026-11-27: «vamos con la solución A»).
+  **Hecho:** antes de guardar, cada pantalla (la ficha, el mapa) mira en Firebase si esa parte de la ficha cambió desde la última vez que la leyó.
+  Si cambió, no la pisa: suma encima lo que cambió ella. La vida, el SP gastado, los No2 y los ataques del turno van como diferencia (si una gastó 2 y
+  la otra 2, quedan 4 gastados); lo que esta pantalla no tocó queda como está; si las dos cambiaron la misma lista (mochila, estados…), queda la de
+  la que guarda, solo en esa lista (P371). Si la pantalla estaba atrasada, primero se pone al día y recién después escribe el resumen que ven los
+  tokens. Con una sola pantalla todo sigue igual. **Probado con clics** en «Prueba · General» (Jugador 1 con el mapa y la ficha en otra pestaña; la
+  pestaña de la ficha «dormida», sin escuchar): **antes** del arreglo, Arrastrar desde el mapa (−2 No2, −2 SP) y la ficha vieja cambia los despojos →
+  los No2 y el SP volvieron a 6/6 y 24/24; **después**, quedan 4/6 y 22/24 con los despojos nuevos, y la ficha vieja se pone al día sola. También: un
+  gasto en cada pantalla (suman), el mapa atrasado guardando encima de un cambio de la ficha, recibir daño, ⟳ Pasar de ronda del GM (una sola vez) y
+  el aviso «No se pudo guardar… se reintenta sola» sin red (guardó al volver). La vuelta, «quedó igual». Pruebas: 1198. Dudas: P371. Sin reglas nuevas.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).
 - **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).

@@ -7259,15 +7259,30 @@ prueba('pasivas: «Subir a la biblioteca» etiqueta con los mismos botoncitos, e
 }));
 /* ---------- Un aviso tomado que no se pierde y el guardado de la sesión (2026-11-20, «después de revivir con el Pacto dejan de entrarle los debuffs») ---------- */
 // Una sesión de mentira para FichaSesion.guardar: `commits` = lo que se mandó a escribir; cada commit espera a que se lo libere (`soltar()`).
-function sesionFalsa(partes){
-  const commits = [], pend = [], errores = [];
-  const db = {doc: () => ({collection: () => ({doc: id => ({id})})}),
-    batch: () => { const op = {sets: {}, upd: null}; return {set: (r, d) => { op.sets[r.id] = d.json; }, update: (r, d) => { if(JSON.stringify(d) !== JSON.stringify(d, (k, v) => v === undefined ? '__indef' : v)) throw new Error('undefined en el lote'); op.upd = d; },
-      commit: () => new Promise((ok, mal) => { pend.push({ok: () => { commits.push(op); ok(); }, mal}); })}; }};
+// 💾 P370: ahora guarda en una transacción (lee cada parte antes de escribirla). `servidor`: lo que hay en Firebase (por defecto, lo mismo que leyó esta pantalla).
+function sesionFalsa(partes, servidor){
+  const commits = [], pend = [], errores = [], aplicadas = [];
+  const serv = {partes: {...(servidor || partes)}, doc: {}};
+  const snap = r => r.id === '_doc' ? {exists: true, data: () => serv.doc} : {exists: serv.partes[r.id] !== undefined, data: () => ({json: serv.partes[r.id]})};
+  const base = {id: '_doc', collection: () => ({doc: id => ({id, get: async () => snap({id})})})};
+  const db = {doc: () => base,
+    runTransaction: async fn => {
+      const op = {sets: {}, upd: null, leidas: []};
+      await fn({get: async r => { op.leidas.push(r.id); return snap(r); }, set: (r, d) => { op.sets[r.id] = d.json; },
+        update: (r, d) => { if(JSON.stringify(d) !== JSON.stringify(d, (k, v) => v === undefined ? '__indef' : v)) throw new Error('undefined en el lote'); op.upd = d; }});
+      await new Promise((ok, mal) => { pend.push({ok: () => { Object.assign(serv.partes, op.sets); if(op.upd) Object.assign(serv.doc, op.upd); commits.push(op); ok(); }, mal}); });
+    }};
   const f = FichaSesion.nueva('x', 'u', true, false);
   const o = {db, ruta: 'r', marcaDeTiempo: () => 't', partes: () => ({...partes}), resumen: () => ({hp: 1}), nombre: () => 'Blanco', miniatura: async () => '', vigente: () => true, alError: err => errores.push(String(err && err.message))};
   Object.assign(f.ultimo, partes);
-  return {f, o, commits, pend, errores, partes, soltar: () => { const p = pend.shift(); if(p) p.ok(); return new Promise(r => setTimeout(r, 0)); }};
+  f.aplicarDeAfuera = lista => lista.forEach(([p, j]) => { aplicadas.push([p, j]); partes[p] = j; });   // lo que haría `escuchar`
+  return {f, o, commits, pend, errores, partes, serv, aplicadas, soltar: () => { const p = pend.shift(); if(p) p.ok(); return new Promise(r => setTimeout(r, 0)); }};
+}
+// Va soltando las escrituras hasta que termina `p` (o se rinde: 'colgado').
+async function soltarHasta(x, p){
+  let fin = false; p.then(() => { fin = true; }, () => { fin = true; });
+  for(let i = 0; i < 60 && !fin; i++){ await new Promise(r => setTimeout(r, 0)); await x.soltar(); }
+  return fin ? p : 'colgado';
 }
 prueba('FichaSesion.guardar: un segundo cambio que llega mientras el primero se está escribiendo se guarda apenas termina (antes no se escribía nunca)', async () => {
   const x = sesionFalsa({general: 'g0', efectos: 'e0'});
@@ -7275,7 +7290,7 @@ prueba('FichaSesion.guardar: un segundo cambio que llega mientras el primero se 
   const p1 = FichaSesion.guardar(x.f, true, x.o);          // el primero: queda escribiendo
   x.partes.efectos = 'e1 con Miedo';
   const r2 = await FichaSesion.guardar(x.f, true, x.o);    // el segundo llega mientras tanto
-  await x.soltar(); await x.soltar(); await p1;
+  await soltarHasta(x, p1);
   igual([r2, x.commits.map(c => c.sets), x.f.ultimo.efectos, x.f.escribiendo, FichaSesion.pendiente(x.f, x.o.partes)],
     [false, [{general: 'g1'}, {efectos: 'e1 con Miedo'}], 'e1 con Miedo', false, false]);
 });
@@ -7287,7 +7302,7 @@ prueba('FichaSesion.guardar: si armar lo que se escribe falla, la sesión no que
   const r1 = await FichaSesion.guardar(x.f, true, x.o);
   const trabada = x.f.escribiendo;
   roto = false;
-  const p2 = FichaSesion.guardar(x.f, true, x.o); await x.soltar(); const r2 = await p2;
+  const r2 = await soltarHasta(x, FichaSesion.guardar(x.f, true, x.o));
   igual([r1, trabada, x.errores, r2, x.commits.map(c => [c.sets, c.upd.resumen]), x.f.ultimo.efectos],
     [false, false, ['resumen roto'], true, [[{efectos: 'e1'}, {hp: 1, lista: [{a: 1}]}]], 'e1']);
 });
@@ -7299,9 +7314,67 @@ prueba('FichaSesion.marcar: lo que cambió una acción queda como deuda hasta qu
   const a2 = {...x.partes}; x.partes.general = 'g1';
   const c2 = FichaSesion.marcar(x.f, a2, {...x.partes});              // la acción 2 cambió general
   const deuda = FichaSesion.debe(x.f).sort();
-  const p = FichaSesion.asentar(x.f, x.o, 2, 0); await x.soltar(); const ok = await p;
+  const ok = await soltarHasta(x, FichaSesion.asentar(x.f, x.o, 2, 0));
   igual([c1, c2, deuda, ok, x.commits.map(c => c.sets), FichaSesion.debe(x.f), x.f.ultimo.otros],
     [['efectos'], ['general'], ['efectos', 'general'], true, [{general: 'g1', efectos: 'e1 con Miedo'}], [], 'o-armado-distinto']);
+});
+/* ---------- 💾 Dos pantallas con el mismo personaje no se pisan (P370, 2026-11-27) ---------- */
+const gP370 = o => JSON.stringify(Object.assign({meta: {nombre: 'Blanco'}, hp: 50, spGastado: 0, nitros: 6, ataquesTurno: 0, ataquesArma: {}, loot: {normal: 0}}, o));
+prueba('FichaSesion.mezclar: lo que esta pantalla no tocó queda como en Firebase; lo que solo cambió esta, se escribe; los contadores suman la diferencia', () => {
+  const base = gP370(), serv = gP370({spGastado: 2, nitros: 4, ataquesTurno: 1, ataquesArma: {c1: 1}});   // la otra pantalla gastó 2 SP y 2 No2 (un ataque)
+  const a = FichaSesion.mezclar('general', base, gP370({loot: {normal: 1}}), serv);                     // esta, vieja, solo cambió los despojos
+  const b = FichaSesion.mezclar('general', base, gP370({spGastado: 3, nitros: 5, hp: 45}), serv);       // esta también gastó (3 SP, 1 No2) y recibió 5 de daño
+  const c = FichaSesion.mezclar('general', base, base, serv);                                       // esta no cambió nada
+  const d = FichaSesion.mezclar('general', base, serv, serv);                                       // las dos gastaron lo mismo (2 SP y 2 No2 cada una)
+  igual([JSON.parse(a.json), a.choques, JSON.parse(b.json), b.choques, c.json === serv, [JSON.parse(d.json).spGastado, JSON.parse(d.json).nitros, JSON.parse(d.json).ataquesTurno, JSON.parse(d.json).ataquesArma]],
+    [JSON.parse(gP370({spGastado: 2, nitros: 4, ataquesTurno: 1, ataquesArma: {c1: 1}, loot: {normal: 1}})), [],
+     JSON.parse(gP370({spGastado: 5, nitros: 3, hp: 45, ataquesTurno: 1, ataquesArma: {c1: 1}})), [], true, [4, 2, 2, {c1: 2}]]);
+});
+prueba('FichaSesion.mezclar: vida y SP no bajan de 0, los No2 sí (deuda); No2 «llenos» (null) → el menor; la marca _golpe no se suma; una lista que cambiaron las dos → la de esta pantalla, con aviso', () => {
+  const r1 = JSON.parse(FichaSesion.mezclar('general', gP370({hp: 4, spGastado: 2, nitros: 2}), gP370({hp: 0, spGastado: 0, nitros: 0}), gP370({hp: 1, spGastado: 1, nitros: 0})).json);
+  const r2 = JSON.parse(FichaSesion.mezclar('general', gP370({nitros: null}), gP370({nitros: 4}), gP370({nitros: 1})).json);
+  const r3 = JSON.parse(FichaSesion.mezclar('general', gP370(), gP370({ataquesArma: {_golpe: 1}}), gP370({ataquesArma: {_golpe: 1, c1: 2}})).json);
+  const ef = v => JSON.stringify({efectos: v, efectosPersonalizados: []});
+  const r4 = FichaSesion.mezclar('efectos', ef([]), ef([{nombre: 'Veneno'}]), ef([{nombre: 'Miedo'}]));
+  const r5 = FichaSesion.mezclar('efectos', ef([]), ef([{nombre: 'Veneno'}]), ef([{nombre: 'Veneno'}]));
+  igual([[r1.hp, r1.spGastado, r1.nitros], r2.nitros, r3.ataquesArma, JSON.parse(r4.json).efectos, r4.choques, r5.choques],
+    [[0, 0, -2], 1, {_golpe: 1, c1: 2}, [{nombre: 'Veneno'}], ['efectos'], []]);
+});
+prueba('FichaSesion.guardar (P370): una pantalla vieja guarda despojos y NO devuelve los No2 y el SP que otra pantalla gastó; lo sumado vuelve a esta pantalla y el resumen va después, con todo', async () => {
+  const x = sesionFalsa({general: gP370(), efectos: 'e0'}, {general: gP370({spGastado: 2, nitros: 4}), efectos: 'e0'});
+  x.partes.general = gP370({loot: {normal: 1}});
+  const ok = await soltarHasta(x, FichaSesion.guardar(x.f, true, x.o));
+  const g = JSON.parse(x.serv.partes.general);
+  igual([ok, [g.spGastado, g.nitros, g.loot.normal], x.aplicadas.map(a => a[0]), x.commits.map(c => [Object.keys(c.sets), !!(c.upd && c.upd.resumen)]), x.f.ultimo.general === x.serv.partes.general, FichaSesion.pendiente(x.f, x.o.partes)],
+    [true, [2, 4, 1], ['general'], [[['general'], false], [[], true]], true, false]);
+});
+prueba('FichaSesion.guardar (P370): con el resumen de Firebase distinto del último que vio, se pone al día con las otras partes (las aplica) antes de escribir el resumen', async () => {
+  const x = sesionFalsa({general: gP370(), efectos: 'e0'}, {general: gP370(), efectos: 'e1 con Veneno'});
+  x.serv.doc = {nombre: 'Blanco', resumen: {hp: 7}};
+  x.f.ultimoResumen = 'lo que vio antes';
+  x.partes.general = gP370({loot: {normal: 1}});
+  const ok = await soltarHasta(x, FichaSesion.guardar(x.f, true, x.o));
+  igual([ok, x.aplicadas, x.commits.map(c => [Object.keys(c.sets), !!(c.upd && c.upd.resumen)]), x.f.ultimo.efectos, JSON.parse(x.serv.partes.general).loot.normal, x.serv.doc.resumen],
+    [true, [['efectos', 'e1 con Veneno']], [[['general'], false], [[], true]], 'e1 con Veneno', 1, {hp: 1}]);
+});
+prueba('FichaSesion.guardar (P370): lo que llega de otra pantalla mientras esa parte se escribe no se pierde (se relee al terminar y se suma)', async () => {
+  const x = sesionFalsa({general: gP370(), efectos: 'e0'});
+  x.partes.general = gP370({loot: {normal: 1}});
+  const p = FichaSesion.guardar(x.f, true, x.o);
+  await new Promise(r => setTimeout(r, 0)); await new Promise(r => setTimeout(r, 0));
+  // se libera la escritura y, enseguida, otra pantalla gasta 2 SP: su cambio llega mientras esta todavía está «escribiendo»
+  const otra = gP370({loot: {normal: 1}, spGastado: 2});
+  x.f.llegoDurante.general = otra;
+  const pend = x.pend.shift(); pend.ok(); x.serv.partes.general = otra;   // (la otra pantalla escribió justo después)
+  const ok = await soltarHasta(x, p);
+  igual([ok, JSON.parse(x.partes.general).spGastado, JSON.parse(x.partes.general).loot.normal, x.f.ultimo.general === x.serv.partes.general],
+    [true, 2, 1, true]);
+});
+prueba('FichaSesion.guardar (P370): con una sola pantalla todo sigue igual (escribe lo suyo de una, sin mezclar)', async () => {
+  const x = sesionFalsa({general: gP370(), efectos: 'e0'});
+  x.partes.general = gP370({spGastado: 3});
+  const ok = await soltarHasta(x, FichaSesion.guardar(x.f, true, x.o));
+  igual([ok, x.commits.length, x.commits[0].sets.general === x.partes.general, x.aplicadas, !!x.commits[0].upd.resumen], [true, 1, true, [], true]);
 });
 prueba('un estado que llega de afuera y lo frena una inmunidad (Invulnerable / Titilando): no entra, toast a quien lo recibe y una línea para la Mesa con el motivo; sin la inmunidad, entra', () => {
   const S = structuredClone(FichaGuardado.DEFAULT); S.meta.nombre = 'Blanco J1'; S.hp = 12;

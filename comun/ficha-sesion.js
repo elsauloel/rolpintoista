@@ -4,8 +4,9 @@
    Lo que antes vivía en ficha-personaje/js/12 y no es pantalla: escuchar el personaje en Firebase, armarlo la primera vez,
    aplicar lo que cambia desde otra ventana, guardar SOLO las partes que cambiaron (cuando dejan de cambiar 1,2 s, o cada
    5 s como mucho si no paran) y reintentar si falla. Así la ficha y el mapa abren un personaje con el MISMO código: dos
-   pantallas con el mismo personaje se comportan como hoy dos ventanas de la ficha (en cada parte gana la última que
-   guarda; la otra se actualiza sola).
+   pantallas con el mismo personaje se comportan como dos ventanas de la ficha (la otra se actualiza sola). Desde el 2026-11-27
+   (P370) ya no gana la última que guarda: antes de escribir, cada pantalla mira si la parte cambió en Firebase y, si cambió,
+   suma lo suyo encima (`mezclar`; los No2, el SP y la vida como diferencia).
    Cada pantalla le dice qué hacer en cada momento (las opciones de `escuchar` y `guardar`): la ficha muestra sus carteles
    y dibuja; otra pantalla puede no mostrar nada. El objeto de la sesión (`nueva`) es el mismo de siempre (`fichaVivo` en
    la ficha): id, duenoUid, cargada, soloLectura, editaGM, control, ultimo, sucias, enviando, escribiendo, reintentarDesde…
@@ -46,6 +47,12 @@ const FichaSesion = (() => {
     : JSON.stringify(v === undefined ? null : v);
   function escuchar(f, o){
     const base = o.db.doc(o.ruta);
+    // 💾 P370: lo que `guardar` tuvo que sumar de otra pantalla se aplica acá igual que un cambio que llega de afuera.
+    f.aplicarDeAfuera = lista => {
+      if(!o.vigente() || !f.cargada) return;
+      lista.forEach(([parte, json]) => o.aplicarParte(parte, FichaGuardado.leerParte(parte, json)));
+      if(lista.length) o.alCambiar();
+    };
     f.cortes.push(base.onSnapshot(doc => {
       if(!o.vigente()) return;
       // Lo que quedó escrito en el servidor (2026-10-20, probado en el mapa): el daño de un duelo escribe el resumen desde afuera
@@ -85,6 +92,9 @@ const FichaSesion = (() => {
           if(ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
           const json = String(ch.doc.data().json || '');
           if(json === f.ultimo[ch.doc.id] || json === f.enviando[ch.doc.id]) return;
+          // 💾 P370: esta pantalla está escribiendo esa parte ahora mismo: no se aplica acá (se perdería lo que se está escribiendo); lo
+          // resuelve `guardar` al terminar (si es algo que la escritura no tenía, lo vuelve a leer y lo suma).
+          if(f.enviando[ch.doc.id] !== undefined){ (f.llegoDurante = f.llegoDurante || {})[ch.doc.id] = json; return; }
           o.aplicarParte(ch.doc.id, FichaGuardado.leerParte(ch.doc.id, json));
           f.ultimo[ch.doc.id] = json;
           delete f.sucias[ch.doc.id];
@@ -122,6 +132,69 @@ const FichaSesion = (() => {
   const sinIndefinidos = v => Array.isArray(v) ? v.map(x => x === undefined ? null : sinIndefinidos(x))
     : (v && typeof v === 'object' && Object.getPrototypeOf(v) === Object.prototype) ? Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => [k, sinIndefinidos(x)]))
     : v;
+  /* ---------- 💾 Dos pantallas con el mismo personaje (P370, 2026-11-27) ----------
+     En una partida, una pestaña dormida con una copia vieja del personaje guardó encima y le devolvió al jugador los No2 y el SP que había
+     gastado (ganaba la última que guardaba). Ahora, antes de escribir una parte, `guardar` la lee en Firebase (en una transacción): si cambió
+     desde la última vez que esta pantalla la leyó, no la pisa: le suma encima lo que esta pantalla cambió (`mezclar`, pura).
+     - Lo que esta pantalla no tocó (igual a lo leído) queda como está en Firebase; lo que solo cambió esta pantalla, se escribe.
+     - Si las dos cambiaron el mismo dato y es un contador (la vida, el SP gastado, los No2, los ataques del turno), se suma la DIFERENCIA:
+       si acá se gastaron 2 y allá 5, quedan los 7 gastados.
+     - Si las dos cambiaron el mismo dato y no es un contador (una lista: la mochila, los estados…; un texto), gana esta pantalla, solo en ese
+       dato (`choques`; la duda: P371).
+     - Si las dos tienen en ese dato el mismo valor, queda ese. */
+  // Las reglas de los contadores, por parte. contador: se suma la diferencia (con `min`: no baja de ahí); hijos: la misma regla para cada clave
+  // de un objeto ({idArma: ataques}); max: una marca (se queda el mayor); nulo 'menor': los No2 en null = llenos (no se sabe cuántos son: se
+  // queda el menor de los dos, para no devolver nada gastado).
+  const CONTADORES = {
+    general: {
+      hp: {contador: true, min: 0},
+      spGastado: {contador: true, min: 0},
+      nitros: {contador: true, nulo: 'menor'},   // puede quedar en negativo (la deuda de una defensa sin No2)
+      ataquesTurno: {contador: true, min: 0},
+      ataquesArma: {hijos: {contador: true, min: 0}, claves: {_golpe: {max: true}}},
+    },
+  };
+  const esObjeto = v => !!v && typeof v === 'object' && !Array.isArray(v);
+  const igual = (a, b) => estable(a) === estable(b);
+  function mezclarValor(b, m, s, regla, ruta, choques){
+    if(igual(m, b)) return s;          // esta pantalla no lo tocó: lo de Firebase
+    if(igual(s, b)) return m;          // solo lo cambió esta pantalla
+    if(regla && regla.max && typeof m === 'number' && typeof s === 'number') return Math.max(m, s);
+    // Un contador que cambiaron las dos (aunque haya quedado en el mismo número: dos gastos de 2 son 4 gastados).
+    if(regla && regla.contador && typeof m === 'number' && typeof s === 'number'){
+      let v;
+      if(typeof b === 'number') v = s + (m - b);
+      else if(b === null && regla.nulo === 'menor') v = Math.min(m, s);
+      else if(b === undefined || b === null) v = s + m;   // no estaba: lo de las dos
+      if(v !== undefined) return regla.min !== undefined ? Math.max(regla.min, v) : v;
+    }
+    if(esObjeto(m) && esObjeto(s)){
+      const bb = esObjeto(b) ? b : {};
+      const r = {};
+      [...Object.keys(m), ...Object.keys(s).filter(k => !(k in m))].forEach(k => {
+        const sub = regla ? ((regla.claves && regla.claves[k]) || regla.hijos) : undefined;
+        const v = mezclarValor(bb[k], m[k], s[k], sub, ruta ? ruta + '.' + k : k, choques);
+        if(v !== undefined) r[k] = v;
+      });
+      return r;
+    }
+    if(igual(m, s)) return m;          // las dos dejaron lo mismo
+    choques.push(ruta || '(todo)');
+    return m;
+  }
+  /* parte: el id de la parte; base: el json que esta pantalla había leído; mio: el de esta pantalla; servidor: el que está ahora en Firebase.
+     → {json, choques: [rutas donde las dos cambiaron lo mismo y quedó lo de esta pantalla]}. */
+  function mezclar(parte, base, mio, servidor){
+    if(servidor === null || servidor === undefined || base === undefined || base === null || servidor === base) return {json: mio, choques: []};
+    // (Si las dos quedaron iguales no se da por «ya escrito»: dos gastos iguales hechos en dos pantallas son dos gastos.)
+    if(mio === base) return {json: servidor, choques: []};
+    let b, m, s;
+    try{ b = JSON.parse(base); m = JSON.parse(mio); s = JSON.parse(servidor); }catch(e){ return {json: mio, choques: ['(todo)']}; }
+    const choques = [];
+    const r = mezclarValor(b, m, s, CONTADORES[parte] ? {claves: CONTADORES[parte]} : undefined, '', choques);
+    return {json: JSON.stringify(r === undefined ? null : r), choques};
+  }
+
   async function guardar(f, forzar, o){
     if(!f || f.soloLectura || !f.cargada) return false;
     if(f.escribiendo){ if(forzar) f.otraVez = true; return false; }   // se guarda apenas termine la escritura en curso
@@ -147,41 +220,99 @@ const FichaSesion = (() => {
 
     f.escribiendo = true;
     f.revisarResumen = false;
+    // Lo que esta pantalla había leído de cada parte (la base de la mezcla), tomado ANTES de esperar nada: lo que llegue de afuera mientras
+    // tanto no se aplica (ver `escuchar`, f.llegoDurante).
+    const bases = {};
+    f.llegoDurante = {};
+    listas.forEach(([parte, json]) => { bases[parte] = f.ultimo[parte]; f.enviando[parte] = json; });
     let ok = false;
     try{
       estado();
       const ts = o.marcaDeTiempo();
       const base = o.db.doc(o.ruta);
-      const batch = o.db.batch();
-      listas.forEach(([parte, json]) => {
-        batch.set(base.collection('partes').doc(parte), {json, actualizado: ts});
-        f.enviando[parte] = json;
-      });
-      const cambios = {};
+      const ref = parte => base.collection('partes').doc(parte);
       const nombre = o.nombre();
       const resumen = sinIndefinidos(o.resumen());
       const resumenJson = estable([nombre, resumen]);
-      if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
+      const fijos = {};
       const retrato = listas.find(([parte]) => parte === 'retrato');
-      if(retrato) cambios.miniatura = await o.miniatura();
+      if(retrato) fijos.miniatura = await o.miniatura();
       else if(f.reponerMiniatura){
         const mini = await o.miniatura();
-        if(mini) cambios.miniatura = mini;
+        if(mini) fijos.miniatura = mini;
         f.reponerMiniatura = false;
       }
-      if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
-
-      const antes = listas.map(([parte, json]) => [parte, f.ultimo[parte], json]);   // para el registro de la pausa (lo de antes y lo de ahora)
-      await batch.commit();
-      if(typeof Pausa !== 'undefined') try{ Pausa.alGuardar(antes, nombre); }catch(err){ console.error('El registro de la pausa:', err); }   // ⏸ partida en pausa: lo importante que cambió queda anotado para el GM
-      listas.forEach(([parte, json]) => {
-        f.ultimo[parte] = json;
-        if(f.sucias[parte] && f.sucias[parte].json === json) delete f.sucias[parte];
-        if(f.debe) delete f.debe[parte];
+      const sabido = f.ultimoResumen;
+      const leerJson = d => d && d.exists ? String((d.data() || {}).json || '') : null;
+      let r = null;
+      await o.db.runTransaction(async t => {
+        const rr = {escritas: [], adoptadas: [], resumenServidor: '', resumen: false};
+        const [doc, ...docs] = await Promise.all([t.get(base), ...listas.map(([parte]) => t.get(ref(parte)))]);
+        const dd = doc.exists ? (doc.data() || {}) : null;
+        rr.resumenServidor = dd ? estable([dd.nombre, dd.resumen]) : '';
+        // ¿Esta pantalla está atrasada? (el resumen de Firebase ya no es el último que vio): entonces lee también las otras partes, para
+        // ponerse al día con lo que cambió otra pantalla.
+        const atrasada = !!(dd && sabido && rr.resumenServidor !== sabido);
+        listas.forEach(([parte, mio], i) => {
+          const servidor = leerJson(docs[i]);
+          const m = mezclar(parte, bases[parte], mio, servidor);
+          rr.escritas.push({parte, mio, escrito: m.json, base: bases[parte], servidor, choques: m.choques});
+        });
+        if(atrasada){
+          const resto = Object.keys(actuales).filter(p => !listas.some(([q]) => q === p));
+          const ds = await Promise.all(resto.map(p => t.get(ref(p))));
+          resto.forEach((p, i) => {
+            const servidor = leerJson(ds[i]);
+            if(servidor !== null && f.ultimo[p] !== undefined && servidor !== f.ultimo[p]) rr.adoptadas.push({parte: p, base: f.ultimo[p], servidor});
+          });
+        }
+        rr.escritas.forEach(e => t.set(ref(e.parte), {json: e.escrito, actualizado: ts}));
+        const mezclo = rr.escritas.some(e => e.escrito !== e.mio) || rr.adoptadas.length > 0;
+        const cambios = {...fijos};
+        // El resumen público sale de lo que tiene esta pantalla: si tuvo que sumar algo de otra, se escribe recién cuando lo tenga aplicado.
+        if(!mezclo && resumenJson !== rr.resumenServidor){ cambios.nombre = nombre; cambios.resumen = resumen; rr.resumen = true; }
+        if(Object.keys(cambios).length){ cambios.actualizado = ts; t.update(base, cambios); }
+        rr.mezclo = mezclo;
+        r = rr;
       });
-      f.ultimoResumen = resumenJson;
+
+      // Algo que llegó de afuera mientras se escribía y no estaba en lo que se leyó: se vuelve a leer (lo último de Firebase) y se suma.
+      for(const e of r.escritas){
+        const llego = f.llegoDurante[e.parte];
+        if(llego === undefined || llego === e.escrito || llego === e.servidor) continue;
+        try{
+          const d = await ref(e.parte).get({source: 'server'});
+          const servidor = leerJson(d);
+          if(servidor !== null && servidor !== e.escrito){ r.adoptadas.push({parte: e.parte, base: e.escrito, servidor, tarde: true}); r.mezclo = true; }
+        }catch(err){ console.error('No se pudo releer una parte del personaje:', err); }
+      }
+
+      const antes = r.escritas.map(e => [e.parte, e.base, e.escrito]);   // para el registro de la pausa (lo de antes y lo de ahora)
+      if(typeof Pausa !== 'undefined') try{ Pausa.alGuardar(antes, nombre); }catch(err){ console.error('El registro de la pausa:', err); }   // ⏸ partida en pausa: lo importante que cambió queda anotado para el GM
+      // Lo que quedó en Firebase vuelve a esta pantalla (sumado a lo que se haya cambiado acá mientras se escribía).
+      const local = o.partes();
+      const aplicar = [];
+      const incorporar = (parte, baseLocal, nuevo) => {
+        const actual = local[parte];
+        const queda = actual === baseLocal ? nuevo : mezclar(parte, baseLocal, actual, nuevo).json;
+        f.ultimo[parte] = nuevo;
+        delete f.sucias[parte];
+        if(f.debe) delete f.debe[parte];
+        if(queda !== actual) aplicar.push([parte, queda]);
+        if(queda !== nuevo){ f.debe = f.debe || {}; f.debe[parte] = true; f.otraVez = true; }   // lo que se cambió acá mientras tanto: se escribe enseguida
+      };
+      r.escritas.forEach(e => {
+        const tarde = r.adoptadas.find(a => a.tarde && a.parte === e.parte);
+        incorporar(e.parte, e.mio, tarde ? tarde.servidor : e.escrito);   // lo último de Firebase (si llegó algo más nuevo, ya trae lo escrito)
+        if(e.choques.length) console.warn(`💾 ${nombre}: otra pantalla cambió lo mismo en «${e.parte}» (${e.choques.join(', ')}); quedó lo de esta.`);
+      });
+      r.adoptadas.filter(a => !a.tarde).forEach(a => incorporar(a.parte, a.base, a.servidor));
+      if(aplicar.length && f.aplicarDeAfuera) f.aplicarDeAfuera(aplicar);
+      if(r.resumen) f.ultimoResumen = resumenJson;
+      else if(r.mezclo){ f.ultimoResumen = r.resumenServidor; f.revisarResumen = true; f.otraVez = true; }   // ahora sí: el resumen con todo
+      else f.ultimoResumen = r.resumenServidor || f.ultimoResumen;
       // 🏷 Un nombre nuevo: su dueño pone al día el de sus tokens en todos los mapas (comun/tokens-auto.js, 2026-11-20).
-      if(cambios.nombre && typeof TokensAuto !== 'undefined' && TokensAuto.nombresPonerAlDia && typeof fbUsuario !== 'undefined' && fbUsuario && f.duenoUid === fbUsuario.uid)
+      if(r.resumen && typeof TokensAuto !== 'undefined' && TokensAuto.nombresPonerAlDia && typeof fbUsuario !== 'undefined' && fbUsuario && f.duenoUid === fbUsuario.uid)
         TokensAuto.nombresPonerAlDia({fichaId: f.id, nombre}).catch(() => {});
       f.reintentarDesde = 0;
       if(juntos && o.juntosListo) o.juntosListo();
@@ -192,10 +323,11 @@ const FichaSesion = (() => {
       f.reintentarDesde = Date.now() + REINTENTO_MS;
     }finally{
       listas.forEach(([parte]) => { delete f.enviando[parte]; });
+      f.llegoDurante = {};
       f.escribiendo = false;
       try{ if(!o.vigente || o.vigente()) estado(); }catch(e){}
     }
-    // Llegó otro cambio mientras se escribía: se guarda ahora (lo que haya quedado distinto de lo escrito).
+    // Llegó otro cambio mientras se escribía (o hubo que sumar lo de otra pantalla): se guarda ahora (lo que haya quedado distinto de lo escrito).
     if(f.otraVez){ f.otraVez = false; if(ok) return guardar(f, true, o); }
     return ok;
   }
@@ -233,5 +365,5 @@ const FichaSesion = (() => {
     return Object.keys(actuales).some(p => actuales[p] !== f.ultimo[p]);
   }
 
-  return {QUIETO_MS, MAX_MS, nueva, escuchar, cortar, guardar, pendiente, marcar, debe, asentar};
+  return {QUIETO_MS, MAX_MS, CONTADORES, nueva, escuchar, cortar, guardar, pendiente, marcar, debe, asentar, mezclar};
 })();

@@ -3572,3 +3572,16 @@ Falta ver:
 - Un disparo de verdad que erra (en combate) y mover la flecha después, en el turno del que la tiró y fuera de su turno.
 - Un arma que se cae en un duelo (la deja el GM) y que el GM la mueve.
 - El GM con una flecha debajo de un creep (hoy tiene que correr el creep primero: P369 2).
+
+## 💾 Una pantalla vieja no pisa la ficha (2026-11-27, P370)
+
+Probado con clics en «Prueba · General» (Jugador 1 con el mapa y la ficha en otra pestaña; GM para pasar de ronda; la pestaña «dormida» se simuló
+cortándole las escuchas): antes del arreglo, la ficha vieja devolvía los No2 y el SP de Arrastrar; después se mantienen, se suman los gastos de las
+dos pantallas, el mapa atrasado no pisa un cambio de la ficha, el daño desde el token, ⟳ Pasar de ronda (una sola vez) y el aviso sin red.
+**Falta ver:**
+- Una pestaña **dormida de verdad** (en segundo plano un rato largo, en Chrome) y la compu + el celular con el mismo personaje.
+- Un ataque con duelo (no solo Arrastrar «sin objetivo») con las dos pantallas abiertas.
+- El GM con 🎮 el control y el jugador con su ficha abierta a la vez; «Editar como GM».
+- Las listas que cambian las dos a la vez (estados, mochila, una invocación herida en dos pantallas): queda la última (P371).
+- Algo que llega de afuera mientras esa misma parte se está escribiendo (`llegoDurante`: probado solo en lo automático).
+

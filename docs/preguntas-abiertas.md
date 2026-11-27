@@ -3291,3 +3291,22 @@ atrás). No se tocó código.
    - **C:** dejarlo así, con un aviso cuando el mismo personaje está abierto en dos pantallas («jugá con una sola»), y corregir a mano si pasa.
 
 **✅ Decidido (dueño, 2026-11-27): la A** («vamos con la solución A»): antes de guardar, cada pantalla mira si la ficha cambió desde que la leyó; si cambió, no pisa: suma lo suyo encima (No2, SP y vida como diferencia). Va a la cola.
+
+### P371 — 💾 Dos pantallas que cambian la misma lista de la ficha a la vez: ¿cómo se juntan? (2026-11-27, Claude, al hacer la A de P370)
+
+**Contexto:** con la A de P370, si dos pantallas del mismo personaje guardan casi a la vez, la segunda suma lo suyo encima de lo de la primera: los
+números que se gastan (vida, SP gastado, No2, ataques del turno) como diferencia, y lo que una sola tocó, de esa. Pero si **las dos cambiaron la
+misma lista** (la mochila, el cinturón, los estados alterados, las habilidades, las invocaciones, la bitácora del personaje) o el mismo texto, hoy
+queda **la de la pantalla que guarda última, solo en esa lista** (lo demás se junta bien). Ejemplo: en el mapa le entra un Veneno y, en una pestaña
+dormida de la ficha, el jugador se saca un estado: queda la lista de la ficha (sin el Veneno). Es raro (dos pantallas tocando la misma lista en el
+mismo par de segundos), pero puede pasar.
+
+**Qué decidir:**
+- **A (recomendada, la que quedó por ahora):** así: gana la última, solo en esa lista. Lo que se pierde se ve en la Mesa y se arregla a mano.
+- **B:** juntar las listas elemento por elemento (por su id): lo que agregó cada una queda, lo que sacó cada una se va; si las dos cambiaron el mismo
+  elemento (los turnos de un mismo estado), gana la última. Más trabajo; sirve sobre todo para los estados y la mochila.
+- **C:** como A, pero con un aviso a quien guardó («otra pantalla cambió también tus estados al mismo tiempo: revisá») para que no pase callado.
+
+Otro caso chico: los No2 «llenos» (todavía sin número, al empezar) que se gastan en dos pantallas a la vez quedan en el menor de los dos (no se suman
+los dos gastos), porque la pantalla no sabe cuántos eran.
+

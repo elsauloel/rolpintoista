@@ -56,6 +56,7 @@ async function abrirEmpower(tokenId){
 // → true si se dio (la fila del duelo lo espera para levantar la pausa, 2026-11-27 A2).
 async function empowerUsar(yo, t, previos){
   const nomYo = nombreDe(yo), nomT = nombreDe(t), propio = t.fichaId === yo.fichaId;
+  await confirmarTurnoListo();
   const pago = await ConfirmarTurno.flash('Empower', {sp: 2 + previos}, {quien: nomYo, spAjeno: 4 + previos, ident: {nombre: nomYo, ref: yo.fichaId}});
   if(!pago) return false;
   let falta = null;

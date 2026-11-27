@@ -2593,7 +2593,7 @@ const Duelo = (() => {
   const PAUSA_TIPOS = {
     enyetar: {icono: '😈', hace: 'le está echando la yeta a', que: 'la yeta'},
     maldeojo: {icono: '🧿', hace: 'le está echando el mal de ojo a', que: 'el mal de ojo'},
-    reroll: {icono: '🧚', hace: 'le está dando un Re-roll a', que: 'el Re-roll'},
+    reroll: {icono: '🧚', hace: 'le está dando un Golpe de suerte a', que: 'el Golpe de suerte'},
     moneda: {icono: '🪙', hace: 'está usando un Re-roll (WC-Moneda) sobre', que: 'el Re-roll (WC-Moneda)'},
     polilla: {icono: '🦋', hace: 'está usando la Polilla mística sobre', que: 'la Polilla'},
     empower: {icono: '💪', hace: 'le está dando Empower a', que: 'el Empower'},
@@ -2885,7 +2885,7 @@ const Duelo = (() => {
   }
   /* 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, dueño): esa misma tirada de ese lado se repite (los mismos dados, con el mismo «+») y queda la más baja;
      el duelo se vuelve a resolver (un empate, con la regla de siempre). Una vez por tirada (queda 🐈 en su fórmula).
-     modo 'mejor' (🧚 Re-roll, Support, el reverso): queda la más alta (y la marca es 🍀). Cada una, una vez por tirada.
+     modo 'mejor' (🧚 Golpe de suerte, Support, el reverso): queda la más alta (y la marca es 🍀). Cada una, una vez por tirada.
      → {campo, etq, antes, nueva, ahora, contra, dados, rolls, rollsAntes, nuevaQueda} o null (no se puede: ya siguió, o ya la tenía). */
   // o.campo (2026-11-27, P363 A): EXACTAMENTE esa tirada (la que se eligió en la lista del 🐈‍⬛), no «la última que se pueda cambiar»; con o.yeta, en la
   // misma transacción se levanta la pausa del duelo («😈 X le está echando la yeta…») y queda anotada en `ataque.yetaHist`.

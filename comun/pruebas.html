@@ -75,7 +75,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261126tope"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261123c73"></script>
+<script src="ficha-resumen.js?v=20261127suerte"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
 <script src="inv-botonera.js?v=20261127unico2"></script>
@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127deshacer"></script>
+<script src="duelo.js?v=20261127suerte"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -127,7 +127,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
 <script src="pasivas.js?v=20261127detalle"></script>
-<script src="skills-clase.js?v=20261127detalle"></script>
+<script src="skills-clase.js?v=20261127suerte"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261127unico2"></script>
 <script src="skills-creep-base.js?v=20261127detalle"></script>
@@ -912,6 +912,22 @@ prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno 
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.reroll, !!hab.duelo, /Sin auditar/.test(hab.detalle), Plantillas.limpiar('skills', hab).reroll, sin, con, vieja,
     sup.some(h => h.id === 'support-afortunado'), a.enyetada, a.afortunada, b.enyetada, b.afortunada],
     ['2', 0, '4', true, false, false, true, false, true, true, false, true, false, false, true]);
+});
+prueba('🧚 Golpe de suerte (antes «Re-roll», 2026-11-27): el nombre nuevo, la descripción corta con su Detalle, las copias se ponen al día solas y la Moneda sigue igual', async () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-reroll');
+  // Una copia de antes (con el nombre viejo, sin tocar a mano): FichaGuardado.migrarHabsDeClase la pone al día y conserva lo propio.
+  const vieja = {...structuredClone(hab), nombre: 'Re-roll', detalle: 'FLASH. Sin No2. Vos o un aliado…', id: 'c1', habClaseId: 'support-reroll', job: 2};
+  delete vieja.reglas;
+  vieja.claseHuella = FichaGuardado.huellaHab(vieja);
+  const aMano = {...structuredClone(vieja), id: 'c2', nombre: 'Mi re-roll'};   // editada a mano después: se respeta
+  const S = {habilidades: [vieja, aMano]};
+  const cambiadas = FichaGuardado.migrarHabsDeClase(S);
+  const [t39, fl, du, t137] = await Promise.all(['../vtt-hexgrid/js/39-reroll.js', 'flotantes.js', 'duelo.js', '../vtt-hexgrid/js/137-fila-duelo.js'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+  igual([hab.nombre, /^⚡ Flash\./.test(hab.detalle), hab.detalle.length < 120, /20\d\d-/.test(hab.detalle + hab.reglas + hab.original), /Rango/.test(hab.reglas), /\(4\)/.test(hab.reglas),
+    cambiadas, S.habilidades[0].nombre, S.habilidades[0].id, S.habilidades[0].job, !!S.habilidades[0].reglas, S.habilidades[1].nombre,
+    /Golpe de suerte · \$\{nomYo\}/.test(t39), /'Re-roll'/.test(t39), /'Golpe de suerte',/.test(fl), /txt: 'Golpe de suerte'/.test(t137),
+    /hace: 'le está dando un Golpe de suerte a'/.test(du), /txt: 'Re-roll \(WC-Moneda\)'/.test(du)],
+    ['Golpe de suerte', true, true, false, true, true, ['Golpe de suerte'], 'Golpe de suerte', 'c1', 2, true, 'Mi re-roll', true, false, true, true, true, true]);
 });
 prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al pagar No2 (costo − 1, +1 por stack) y cada 2 casillas al moverse', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-tormentosa');
@@ -3040,7 +3056,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261127clic');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -10762,7 +10778,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127clic', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -10886,7 +10902,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127clic', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

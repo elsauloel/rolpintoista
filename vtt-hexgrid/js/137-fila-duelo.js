@@ -9,7 +9,7 @@
    cambia (en la misma escritura) o, si no se llega a usar, la pantalla del GM a los 60 s (con el aviso en el cuadro). Lo de cada uno:
    · 🦋 la Polilla (si la tiene activa el personaje que maneja esta pantalla y es parte del duelo) → +2 a esa tirada (js/02 `polillaDespues`);
    · 😈 Enyetar (si le alcanza el SP) → la maldición se tira adentro del mismo cuadro (js/38, A3);
-   · 🧚 el Re-roll del Support (a vos o a un aliado a tu alcance) → repite esa tirada y queda la mejor (js/39);
+   · 🧚 el Golpe de suerte del Support (antes «Re-roll») (a vos o a un aliado a tu alcance) → repite esa tirada y queda la mejor (js/39);
    · 🧿 el Mal de ojo (el GM, con un creep que lo tenga listo) → el cartel al jugador para repetirla (js/60);
    · 💪 el Empower (a vos o a un aliado del duelo a tu alcance) → +3 a su próxima tirada (js/37);
    · 🪙 «Re-roll (WC-Moneda)» lo arma el propio cuadro (la Moneda Re-Roll o la 🃏 WildCard del personaje).
@@ -63,7 +63,7 @@ function dueloOpcionesFila(d){
         titulo: o.cerrado ? `${nombreDe(t)}: el duelo ya terminó; si la maldición gana, se deshace lo que dejó y se vuelve a resolver (antes te muestra qué se deshace)`
           : `${nombreDe(t)}: tirás PdG.Esp contra su Res.Esp, acá mismo; si ganás, repite esa tirada y se queda con la peor`, por: id, o}));
   });
-  // 🧚 Re-roll (Support): una tirada tuya o de un aliado a tu alcance; queda la mejor.
+  // 🧚 Golpe de suerte (Support): una tirada tuya o de un aliado a tu alcance; queda la mejor.
   mios.forEach(([id, t]) => {
     const r = filaResumen(t);
     if(!(r.reroll || r.suerte)) return;
@@ -75,7 +75,7 @@ function dueloOpcionesFila(d){
       if(!x || x.tipo !== 'pj' || (x !== t && (dueloEsRival(t, x) || distanciaHex(t, x) > rng))) return;
       const s = Duelo.tiradaSumable(d, lado);
       if(!s || s.afortunada || !Duelo.parListo(d, s.campo)) return;
-      ops.push({clave: 'reroll', icono: '🧚', txt: 'Re-roll', sub: `${x === t ? 'tu' : 'el'} ${s.etq}${x === t ? '' : ` de ${d[lado].nombre}`} (${fmt(s.total)}) · ${c.txt}`,
+      ops.push({clave: 'reroll', icono: '🧚', txt: 'Golpe de suerte', sub: `${x === t ? 'tu ' : ''}${s.etq}${x === t ? '' : ` de ${d[lado].nombre}`} (${fmt(s.total)}) · ${c.txt}`,
         titulo: `${nombreDe(t)}: repite esa tirada y se queda con la mejor`, por: id, lado, campo: s.campo, etq: s.etq, total: s.total});
     });
   });
@@ -131,7 +131,7 @@ async function dueloUsarFila(d, o){
     if(!(await pausar({tipo: 'reroll', lado: o.lado, campo: o.campo, por: o.por, porNombre: nombreDe(yo), a: l.tokenId, aNombre: l.nombre}))){ toast('🧚 Esa tirada ya no se puede cambiar'); return false; }
     const otro = o.lado === 'atacante' ? d.defensor : d.atacante;
     const ok = await rerollUsar(yo, {id: d.id, lado: o.lado, campo: o.campo, nombre: l.nombre, etq: o.etq, total: o.total, contra: (otro && otro.nombre) || 'el otro'});
-    if(!ok) await seguir('no se llegó a usar el Re-roll');
+    if(!ok) await seguir('no se llegó a usar el Golpe de suerte');
     return ok;
   }
   if(o.clave === 'maldeojo'){

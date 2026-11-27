@@ -232,7 +232,7 @@ const FichaResumen = (() => {
         .map(h => ({clave: h.habClaseId, id: String(h.id), sp: num(h.costo) || 0, spAjeno: num(h.turnoAjenoSp) || 0})),
       // 🤺 Desarmar (Warrior, 2026-10-21): el botón instantáneo del mapa en el paso del Bloqueo (vtt-hexgrid/js/62), con su SP y el de turno ajeno.
       desarmar: (h => h ? {id: String(h.id), sp: num(h.costo) || 0, spAjeno: num(h.turnoAjenoSp) || 0} : null)((S.habilidades || []).find(h => h && h.desarmar)),
-      reroll: (S.habilidades || []).some(h => h && (h.reroll || h.suerte)),   // 🧚 Re-roll: su botón fijo (una copia vieja de Afortunado, `suerte`, cuenta igual)   // 🧚 Afortunado (2026-10-12): su botón fijo   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
+      reroll: (S.habilidades || []).some(h => h && (h.reroll || h.suerte)),   // 🧚 Golpe de suerte (antes Re-roll): su botón fijo (una copia vieja de Afortunado, `suerte`, cuenta igual)   // 🧚 Afortunado (2026-10-12): su botón fijo   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
       // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).

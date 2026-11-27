@@ -1,5 +1,5 @@
 /* =========================================================
-   🧚 RE-ROLL (Support, 2026-10-12, dueño). Vos o un aliado a la vista (dentro de tu Rango) repite su última tirada de un duelo y se queda con
+   🧚 GOLPE DE SUERTE (Support, 2026-10-12, dueño; se llamaba «Re-roll» hasta el 2026-11-27, el id interno sigue siendo `reroll`). Vos o un aliado a la vista (dentro de tu Rango) repite su última tirada de un duelo y se queda con
    la más alta; el duelo se vuelve a resolver. Sin tirada de por medio (no hay nada que resistir). 2 SP, Flash (4 en turno ajeno), sin No2
    (dueño: «le puse dos nitros porque era lento, pero como tiene flash, cuesta cero»).
    Una vez por tirada (la marca 🍀). Era Afortunado, una skill aparte que salió de Enyetar al revés; el dueño la juntó con Re-roll: «que no
@@ -9,7 +9,7 @@
    ========================================================= */
 const REROLL = {sp: 2, spAjeno: 4, no2: 0};
 const rerollCosto = `${REROLL.sp} SP (turno ajeno ${REROLL.spAjeno})${REROLL.no2 ? ` + ${REROLL.no2} No2` : ''}`;
-// ¿Tiene Re-roll? (un personaje que todavía tenga la copia de Afortunado cuenta igual: `suerte`).
+// ¿Tiene Golpe de suerte? (un personaje que todavía tenga la copia de Afortunado cuenta igual: `suerte`).
 function rerollToken(){
   if(modoMapa !== 'combate' || !fbUsuario) return null;
   const ok = t => { const r = t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t) && ((fichasPub.get(t.fichaId) || {}).resumen || {}); return !!(r && (r.reroll || r.suerte)); };
@@ -47,52 +47,53 @@ async function abrirReroll(tokenId){
         lista.push({id: doc.id, lado, nombre: p.nombre || nombreDe(t), etq: s.etq, total: s.total, contra: otro.nombre || 'el otro'});
       });
     });
-  }catch(err){ console.error('Re-roll: no se pudieron ver los duelos', err); }
+  }catch(err){ console.error('Golpe de suerte: no se pudieron ver los duelos', err); }
   if(!lista.length){
-    AvisoCombate.mostrar({icono: '🧚', titulo: `Re-roll · ${nomYo}`, texto: `No hay ninguna tirada reciente tuya ni de un aliado a tu alcance (Rango ${fmt(rng)}) en un duelo que todavía se pueda cambiar.`});
+    AvisoCombate.mostrar({icono: '🧚', titulo: `Golpe de suerte · ${nomYo}`, texto: `No hay ninguna tirada reciente tuya ni de un aliado a tu alcance (Rango ${fmt(rng)}) en un duelo que todavía se pueda cambiar.`});
     return;
   }
   const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.nombre} · ${o.etq} (${fmt(o.total)})`,
     detalle: `en el duelo contra ${o.contra}: repite y queda la mejor; el duelo se vuelve a resolver · ${rerollCosto}`,
     alClic: () => { AvisoCombate.cerrar(); rerollUsar(yo, o); }}));
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
-  AvisoCombate.mostrar({icono: '🧚', titulo: `Re-roll · ${nomYo}`, botones, texto: '¿Qué tirada se repite?'});
+  AvisoCombate.mostrar({icono: '🧚', titulo: `Golpe de suerte · ${nomYo}`, botones, texto: '¿Qué tirada se repite?'});
 }
 // → true si se usó (la fila del duelo, 2026-11-27 A2: con `o.campo` va EXACTAMENTE a esa tirada y levanta la pausa del duelo en la misma escritura).
 async function rerollUsar(yo, o){
   const nomYo = nombreDe(yo);
-  const pago = await ConfirmarTurno.flash('Re-roll', {sp: REROLL.sp}, {quien: nomYo, spAjeno: REROLL.spAjeno, ident: {nombre: nomYo, ref: yo.fichaId}});
+  await confirmarTurnoListo();
+  const pago = await ConfirmarTurno.flash('Golpe de suerte', {sp: REROLL.sp}, {quien: nomYo, spAjeno: REROLL.spAjeno, ident: {nombre: nomYo, ref: yo.fichaId}});
   if(!pago) return false;
   // Los No2: con Extenuado, más caros; si no alcanzan, se pregunta y se hace igual (gasta los que tenga, con su línea roja).
   const r0 = (fichasPub.get(yo.fichaId) || {}).resumen || {};
   const no2 = REROLL.no2 ? REROLL.no2 + num(r0.extenuado) : 0;
-  if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return false;
+  if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Golpe de suerte cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return false;
   let falta = null;
   const ok = await editarPersonajeMapa(yo.fichaId, async S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
-    if(!(await FichaAcciones.confirmarMaldito(S, pago.sp, {}, 'Re-roll'))) return false;   // 🩸 Maldito: avisa y deja cancelar
-    FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Re-roll');   // 🩸 Maldito
+    if(!(await FichaAcciones.confirmarMaldito(S, pago.sp, {}, 'Golpe de suerte'))) return false;   // 🩸 Maldito: avisa y deja cancelar
+    FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Golpe de suerte');   // 🩸 Maldito
     if(no2){
-      S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Re-roll') : no2);
-      FichaAcciones.tormentaPj(S, no2, 'usar Re-roll');   // ⛈ Atormentado
+      S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Golpe de suerte') : no2);
+      FichaAcciones.tormentaPj(S, no2, 'usar Golpe de suerte');   // ⛈ Atormentado
     }
     return true;
   });
-  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Re-roll cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Re-roll'); return false; }
+  if(!ok){ toast(falta !== null ? `No te alcanza el SP: Golpe de suerte cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Golpe de suerte'); return false; }
   const r = await Duelo.enyetarTirada(o.id, o.lado, 'mejor', o.campo ? {campo: o.campo, yeta: true, tipo: 'reroll'} : undefined);
   let texto;
   if(!r) texto = `La tirada de ${o.nombre} ya no se puede cambiar (el duelo siguió): ✋ que la repita y se quede con la mejor, a mano.`;
   else{
     await publicarRepeticion(o.nombre, r, 'mejor', 'mapa');
-    texto = `${nomYo} le dio un Re-roll a ${o.nombre}: repite su ${r.etq}, ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}. El duelo contra ${o.contra} se volvió a resolver.`;
+    texto = `${nomYo} le dio un Golpe de suerte a ${o.nombre}: repite su ${r.etq}, ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}. El duelo contra ${o.contra} se volvió a resolver.`;
   }
   try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nomYo, origen: `🧚 ${nomYo} usó Re-roll (−${fmt(pago.sp)} SP${no2 ? ` · −${fmt(no2)} No2` : ''})`,
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nomYo, origen: `🧚 ${nomYo} usó Golpe de suerte (−${fmt(pago.sp)} SP${no2 ? ` · −${fmt(no2)} No2` : ''})`,
       formula: `sobre ${o.nombre}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-  }catch(err){ console.error('Re-roll: no se pudo avisar en la Mesa', err); }
-  momentoAbrir({tipo: 'reroll', icono: '🧚', titulo: `${nomYo} usó Re-roll`, resultado: texto, estado: 'listo',
-    datos: {paraUids: [fbUsuario.uid], aviso: true, boton: 'Entendido', pasos: [{titulo: '🧚 Re-roll', texto}]}});
+  }catch(err){ console.error('Golpe de suerte: no se pudo avisar en la Mesa', err); }
+  momentoAbrir({tipo: 'reroll', icono: '🧚', titulo: `${nomYo} usó Golpe de suerte`, resultado: texto, estado: 'listo',
+    datos: {paraUids: [fbUsuario.uid], aviso: true, boton: 'Entendido', pasos: [{titulo: '🧚 Golpe de suerte', texto}]}});
   return true;
 }
 window.abrirReroll = abrirReroll;

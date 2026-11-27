@@ -117,8 +117,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261127clic', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261126tope', '../comun/ficha-calculo.js?v=20261125sil', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261127detalle', '../comun/ficha-habilidades.js?v=20261126tope',
-  '../comun/catalogo.js?v=20261126tope', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261125gas', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261127unico2', '../comun/ficha-resumen.js?v=20261123c73', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261127unico2', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261126tope', '../comun/inv-habilidades.js?v=20261126tope', '../comun/inv-lupa.js?v=20261127unico2',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261127clic', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261126tope', '../comun/ficha-calculo.js?v=20261125sil', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261127suerte', '../comun/ficha-habilidades.js?v=20261126tope',
+  '../comun/catalogo.js?v=20261126tope', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261125gas', '../comun/ficha-sesion.js?v=20261120cola18', '../comun/ficha-botonera.js?v=20261127unico2', '../comun/ficha-resumen.js?v=20261127suerte', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261127unico2', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261126tope', '../comun/inv-habilidades.js?v=20261126tope', '../comun/inv-lupa.js?v=20261127unico2',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261127contra', '../comun/lupa.js?v=20261122prisa5', '../comun/ficha-lupa.js?v=20261127unico2'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -170,6 +170,11 @@ function cargarPiezas(lista){
     }));
     return piezasCargadas.get(clave);
   }), Promise.resolve());
+}
+// ⚡ «¿Es tu turno?» (comun/confirmar-turno.js) es una pieza de la Botonera: el Golpe de suerte, el Empower y Desarmar la usan desde la fila del
+// duelo o su botón fijo aunque quien los usa todavía no haya abierto su Botonera (2026-11-27: sin esto, «ConfirmarTurno is not defined»).
+function confirmarTurnoListo(){
+  return typeof ConfirmarTurno !== 'undefined' ? Promise.resolve() : cargarPiezas(BN_PIEZAS.filter(s => /\/confirmar-turno\.js/.test(s)));
 }
 function bnCargarPiezas(){
   if(!bnCargando){
@@ -948,7 +953,7 @@ function bnAccionAca(b){
   if(b.dataset.ejecutar){
     const it = (bn.S.habilidades || []).find(h => h.id === b.dataset.ejecutar);
     // 💪 Empower (2026-10-12): elegir a qué tirada se le suma (js/37), como el botón fijo.
-    // 💪 🐈‍⬛ 🧚 Empower, Enyetar y Re-roll (2026-10-12; Re-roll absorbió a Afortunado, `suerte`): elegir la tirada en su menú (js/37, js/38, js/39), como su botón fijo.
+    // 💪 🐈‍⬛ 🧚 Empower, Enyetar y Golpe de suerte (2026-10-12; el «Re-roll» de entonces absorbió a Afortunado, `suerte`): elegir la tirada en su menú (js/37, js/38, js/39), como su botón fijo.
     const menuTirada = it && (it.empower ? window.abrirEmpower : it.enyetar ? window.abrirEnyetar : (it.reroll || it.suerte) ? window.abrirReroll : null);
     if(typeof menuTirada === 'function'){ const tid = [...tokens.entries()].find(([, t]) => t.fichaId === bn.fichaId); if(tid){ cerrarBotonera(); menuTirada(tid[0]); return true; } }
     if(it && it.desarmar && typeof window.abrirDesarmar === 'function'){ cerrarBotonera(); window.abrirDesarmar(); return true; }   // 🤺 Desarmar (Warrior, 2026-10-21): como el botón instantáneo

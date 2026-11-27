@@ -98,7 +98,7 @@ async function publicarRepeticion(nom, r, modo, desde, titulo){
   const malo = modo === 'peor', antes = Array.isArray(r.rollsAntes) ? r.rollsAntes : [], n = (r.rolls || []).length;
   const juntos = n > 0 && antes.length === n;
   const queda = juntos ? (r.nuevaQueda ? [...Array(n).keys()].map(i => i + n) : [...Array(n).keys()]) : (r.nuevaQueda ? [...Array(n).keys()] : []);
-  const que = malo ? 'se queda con la peor (Enyetar)' : 'se queda con la mejor (Re-roll)';
+  const que = malo ? 'se queda con la peor (Enyetar)' : 'se queda con la mejor (Golpe de suerte)';
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nom,
       origen: (titulo ? `${titulo}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (la peor)` : `${malo ? '🐈‍⬛' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`).slice(0, 160),

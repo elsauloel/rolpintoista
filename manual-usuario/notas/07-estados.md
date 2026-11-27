@@ -479,7 +479,7 @@ estado: confirmado
 **Maldito** es un debuff de 2 turnos (lo pone la **Maldición de la sangre** del Kobold maldiciente): **cada punto de SP que gastes te saca 1 de vida**, directo, **en el momento de pagar**, antes de que salga el efecto. Puede dejarte caído.
 
 - Antes de pagar te aparece un aviso: «Estás Maldito: usar tal cosa cuesta N SP y te va a bajar N de vida (de A a B)», con **Aceptar** o **Cancelar**. Si cancelás, no se cobra nada.
-- Vale para todo lo que pagás con SP: habilidades (también las de costo X, como Drenar Vida), armas especiales, Flash, Carga Elemental, Empower y Re-roll.
+- Vale para todo lo que pagás con SP: habilidades (también las de costo X, como Drenar Vida), armas especiales, Flash, Carga Elemental, Empower y Golpe de suerte.
 - A un creep no le hace nada: los creeps no usan SP.
 
 ⚙ Automatizado.

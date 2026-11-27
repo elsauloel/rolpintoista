@@ -79,7 +79,7 @@ const GuiaDiseno = (() => {
         {n: 'Curación', d: 'Curar HP o transferir SP entre aliados.', ej: 'Heal, Transferir SP', e: 'mano'},
         {n: 'Escudos y armadura temporal', d: 'Absorber daño o dar Defensa y resistencias por poco tiempo (Flash).', ej: 'Shield, Endurecimiento', e: 'mano'},
         {n: 'Movilidad aliada', d: 'Marcar casillas que dan No2 extra a quien las pisa.', ej: 'Acelerador', e: 'falta'},
-        {n: 'Repetir tiradas', d: 'Dejar que un aliado vuelva a tirar.', ej: 'Re-roll', e: 'falta'},
+        {n: 'Repetir tiradas', d: 'Dejar que un aliado vuelva a tirar.', ej: 'Golpe de suerte', e: 'auto'},
         {n: 'Daño sagrado', d: 'Un ataque inesquivable de daño "holy".', ej: 'Smite', e: 'mano'},
       ]},
     {id: 'debuffer', ico: '☠️', n: 'Debuffer', resumen: 'Maldice y debilita: estados en contra, venenos y sangre.',

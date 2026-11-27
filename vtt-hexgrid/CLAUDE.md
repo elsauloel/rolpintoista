@@ -2017,9 +2017,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `FichaMantenimiento.descansar(S)` (vida, SP y No2; terminan los estados con turnos; `S.reparadoTalento` a 0; sus invocaciones) una sola vez
   (`S.diaAplicado`); el GM termina los estados con turnos de sus creeps con token y repone la góndola (`tienda/stock.gondola`). «✎ Corregir el día»
   (`manual: true`) solo cambia el número.
-- **🧚 Re-roll** (2026-10-12, Support; `js/39-reroll.js`, absorbió a Afortunado): botón fijo 🧚 (`Flotantes.reroll`, `resumen.reroll`; una copia
+- **🧚 Golpe de suerte (ex «Re-roll»)** (2026-10-12, Support; `js/39-reroll.js`, absorbió a Afortunado): botón fijo 🧚 (`Flotantes.reroll`, `resumen.reroll`; una copia
   vieja de Afortunado con `suerte` cuenta igual); `abrirReroll` lista las tiradas recientes tuyas o de un aliado en tu Rango que se puedan cambiar y
   `rerollUsar` cobra 2 SP (Flash, 4 en turno ajeno; sin No2) y llama a `Duelo.enyetarTirada(id, lado, 'mejor')`: queda la más alta (marca 🍀).
+  **Desde el 2026-11-27 se llama «Golpe de suerte»** (el nombre visible; los ids internos —`support-reroll`, `reroll`, `abrirReroll`, `rerollUsar`,
+  `#reroll-flotante`— siguen igual). Antes de cobrar, `confirmarTurnoListo()` (js/11) carga `comun/confirmar-turno.js` si la Botonera todavía no lo
+  trajo: sin eso, el Golpe de suerte, el Empower (js/37) y Desarmar (js/62) fallaban («ConfirmarTurno is not defined») si quien los usaba no había
+  abierto antes su Botonera.
 - **🦋 La Polilla revoloteando se ve** (2026-10-12, dueño): `polillaRevolotea(est)` / `dibujarPolillita` (js/05): una polillita celeste da vueltas
   alrededor del token mientras dura el estado.
 - **🐈‍⬛ Enyetar** (2026-10-12, Debuffer; `js/38-enyetar.js`): botón fijo como Empower (`resumen.enyetar`, `Flotantes.enyetar`); su menú lista la

@@ -123,6 +123,7 @@ async function desarmarUsar(o){
   let k = desarmeCosto(o);
   const otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
   if(o.pj){   // el Warrior: pregunta el Flash (en turno ajeno, el doble) antes de marcar
+    await confirmarTurnoListo();
     const pago = await ConfirmarTurno.flash('Desarmar', {sp: num(o.pj.sp)}, {quien: o.nombre, spAjeno: num(o.pj.spAjeno) || num(o.pj.sp) * 2, ident: {nombre: o.nombre, ref: o.pj.fichaId}});
     if(!pago) return false;
     k = {...k, sp: num(pago.sp), txt: `${fmt(num(pago.sp))} SP`};

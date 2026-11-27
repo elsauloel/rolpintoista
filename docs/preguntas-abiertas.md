@@ -3222,3 +3222,10 @@ Lo que se programó y se puede cambiar:
 6. **Si cayó y volvió**, queda con la vida de antes del golpe (no la de la resurrección) y se le devuelve el Pacto, el Ankh, la Llama o el Anillo.
 
 > ✅ **Decidida (dueño, 2026-11-27):** 1, 3, 4, 5 y 6 quedan como están. **2: sí** — la Moneda / WC Re-roll y el Golpe de suerte también pueden deshacer el último duelo (en la cola).
+
+### P367 — 🧚 Golpe de suerte: ¿el hada o el trébol? (2026-11-27, Claude, al cambiarle el nombre al «Re-roll» del Support)
+
+Con el nombre nuevo, **«Golpe de suerte»**, el botón fijo, la fila «⚡ Entre tiradas», la Mesa y la Crónica siguen con el **🧚 hada** (el dueño la
+eligió el 2026-10-12 entre «un trébol o un hadita»). La tirada que queda ya lleva la marca **🍀** (el trébol). ¿Pasamos el ícono del Golpe de suerte
+al **🍀**, que dice «suerte» de un vistazo, o queda el 🧚? (Ojo: el 🍀 también lo usa el Anillo del trébol; si se cambia, el botón fijo sigue
+teniendo su brillo verde con chispitas.) Por ahora queda el 🧚.

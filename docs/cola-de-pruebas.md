@@ -30,10 +30,18 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tiradas de ese enemigo en el último duelo (PdG, daño, d20 del crítico, Bloqueo, Evasión, la de una habilidad…) y elegís cuál; al deshacer, se vuelve a
   ese punto (enyetar el daño: se deshace el daño y se vuelve a tirar con la peor). Y (P366 2) la Moneda / WC Re-roll y el Golpe de suerte también pueden
   deshacer el último duelo, por el mismo camino (js/138), cada uno con su regla (la Moneda: vale la segunda; el Golpe de suerte: la mejor).
-- **⬜ en cola (PRÓXIMO, después de Enyetar B) — 🧚 «Re-roll» del Support pasa a llamarse «Golpe de suerte»** (dueño, 2026-11-27, primero eligió «Viento en popa» y después lo cambió: «en vez de viento en popa vamos a ponerle golpe de suerte»; pidió «algo que dé a entender
+- **✅ hecho (2026-11-27) — 🧚 «Re-roll» del Support pasa a llamarse «Golpe de suerte»** — Hecho: el nombre nuevo en la habilidad de clase
+  (`support-reroll`, el id interno no cambió; no hay versión de creep), el botón fijo 🧚 (`comun/flotantes.js`, js/39), la fila «⚡ Entre tiradas»
+  (js/137), la pausa del duelo (`comun/duelo.js`), la Mesa, la Crónica, los avisos (js/38, js/39), la guía de diseño y el manual (09 y 07, recompilado).
+  Descripción corta («⚡ Flash. Repetís tu última tirada del duelo, o la de un aliado, y te quedás con la mejor. Cuesta 2 SP.») y las minucias al
+  «📋 Detalle» (`reglas`); sin fechas en el texto visible. Las copias guardadas se ponen al día solas (`FichaGuardado.migrarHabsDeClase`, salvo las
+  editadas a mano). La Moneda «Re-roll (WC-Moneda)» y la WildCard, igual. De paso: la fila decía «el Evasión de…» (ahora «Evasión de…»), y el
+  Golpe de suerte, el Empower y Desarmar fallaban con «ConfirmarTurno is not defined» si quien los usaba no había abierto antes su Botonera
+  (`confirmarTurnoListo`, js/11). Probado con J1 y J2 en «Prueba · General»; 1187 pruebas en verde. Pregunta del emoji: P367.
+  (Pedido original: dueño, 2026-11-27, primero eligió «Viento en popa» y después lo cambió: «en vez de viento en popa vamos a ponerle golpe de suerte»; pidió «algo que dé a entender
   que es algo mejorcito, algo como una bendición… buena fortuna»; era «algo… buena fortuna»). Cambiar el nombre en la habilidad de
   clase (y la de creep si existe), el botón fijo 🧚, la fila «⚡ Entre tiradas», la Mesa, la Crónica, los avisos y el manual; que las copias guardadas se
-  pongan al día solas (`habClaseId`). Sin cambiar la regla. Ojo: no confundir con la Moneda «Re-roll (WC-Moneda)», que sigue igual.
+  pongan al día solas (`habClaseId`). Sin cambiar la regla. Ojo: no confundir con la Moneda «Re-roll (WC-Moneda)», que sigue igual.)
 - **⏸ PAUSADA (dueño, 2026-11-27: «pausá la ficha lite»; lo hecho, sin subir, en `docs/pausado/ficha-lite-2026-11-27.patch` — se recupera con `git apply`; faltaba la prueba con clics, las capturas del «ahora», el commit y la nota en `vtt-hexgrid/CLAUDE.md`; ojo: el parche hace que el 📜 del token de otro jugador abra su ficha lite (solo mirar) en vez de su ficha completa, a confirmar con el dueño) — 📜 Ficha lite: stats, derivados,
   resistencias elementales y un botón «Habilidades + pasivas»** (dueño, 2026-11-27, con captura de la ficha lite de un personaje): «en la ficha lite me
   gustaría que se vean los stats, los stats derivados, las resistencias elementales. No entiendo por qué elegiste destacar "sigilo" entre la información

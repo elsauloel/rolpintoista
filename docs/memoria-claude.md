@@ -22,7 +22,7 @@
   para lo que coloca una trampa real en el mapa. «Rol Pintoísta» = el sistema y el proyecto; «Piratas en el espacio» = la campaña vieja.
 - **Nombres de armas e ítems**: mitad clásico, mitad criollo/rioplatense o fantasía absurda; nada de palabras raras en Argentina (húsar,
   matarife, alfanje). El renombrado de lo viejo está en pausa.
-- **«Botón instantáneo»** = los botones flotantes de `comun/flotantes.js` (Empower, Re-roll, Flash…), que se mudan a «Podés usar» del duelo.
+- **«Botón instantáneo»** = los botones flotantes de `comun/flotantes.js` (Empower, Golpe de suerte —el ex «Re-roll» del Support—, Flash…), que se mudan a «Podés usar» del duelo.
 
 ## Cómo trabajar
 

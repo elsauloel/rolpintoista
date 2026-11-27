@@ -3166,7 +3166,7 @@ resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **
 > Re-roll, Mal de ojo y Polilla también hacen esperar al duelo → por ahora solo Enyetar; (3) el límite de B → solo el turno actual y sin un duelo más
 > nuevo entre esos dos.
 
-### P364 — 😈 La pausa de Enyetar: cuánto espera y qué se puede hacer mientras (2026-11-27, Claude, al programar la parte A de P363)
+### ✅ P364 — 😈 La pausa de Enyetar: cuánto espera y qué se puede hacer mientras (2026-11-27, Claude, al programar la parte A de P363)
 
 Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta que se resuelve la maldición. Lo que quedó así mientras tanto (se puede cambiar):
 1. **Si la maldición nunca se llega a echar** (por ejemplo, el jugador tocó «Cancelar» en «¿Es tu turno?»), la pantalla del GM levanta la pausa sola a
@@ -3177,3 +3177,7 @@ Al elegir una tirada en la lista del 🐈‍⬛, el duelo queda en pausa hasta q
    terminó, pero esa tirada todavía se puede cambiar». Si la yeta lo da vuelta, el duelo sigue (por ejemplo, ahora pega). ¿Está bien, o solo duelos
    abiertos?
 
+> ✅ **Decidida (dueño, 2026-11-27):** (1) sí, que siga solo a los 60 s, **avisando lo que pasó** para que no sea confuso (en el cuadro del duelo, no solo
+> en la Mesa). (2) **La tirada que se está enyetando queda congelada:** «sobre la tirada que va a ser rerolleada, no, porque no serviría de nada. Primero
+> se resuelve enyetar, y sobre esa misma tirada se puede aplicar otra cosa una vez resuelta». (3) Sí, la lista puede mostrar un duelo terminado si la
+> tirada todavía se puede cambiar.

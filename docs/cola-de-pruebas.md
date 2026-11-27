@@ -29,7 +29,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   botón «⚡ Habilidades + pasivas» que abra un segundo recuadro con las dos (descripción corta y el «📋 Detalle» plegado; si es el dueño, poder usarlas
   como en la Botonera). Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`. (Reemplaza a la entrada «📜 Ficha lite: un botón para ver las
   habilidades».)
-- **⬜ en cola (la parte A en curso; la B después de la ficha lite) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
+- **⬜ en cola (A hecha; sigue la A3, después la A2 y la B; todo después de la ficha lite) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
   se cerró un duelo, no te permite. Y hay veces que los duelos avanzan y el tipo de "no, quiero tirar a enyetar" se dice en el momento. Entonces, que enyetar
   te permita reabrir un duelo y volver atrás con la resolución. Como que si tirás a enyetar, te aparezca la lista de las últimas tiradas en duelos
   abiertos o en duelos cerrados. Y que, entre comillas, se vuelva atrás, se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule
@@ -70,6 +70,12 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   lo decidido en P363 2b). La Moneda Re-Roll se muestra como «Re-roll (WC-Moneda)». **Para evaluar con el dueño antes de programar:** (1) si queda
   redundante con el botoncito lateral (🐈‍⬛ / 🪙 / 🦋) o si el lateral se saca; (2) la distinción entre duelos propios y de terceros: el Empower del
   Support se usa mucho sobre tiradas ajenas, ¿en un duelo entre otros también aparece la fila (para quien tenga algo que usar), más chica o plegada?
+  **A3 — ajustes de la A (dueño, 2026-11-27, P364 y lo visto jugando):** (1) a los 60 s, si la yeta no se echó, el duelo sigue solo **con un aviso en el
+  cuadro del duelo** que diga qué pasó; (2) mientras se enyeta una tirada, **esa tirada queda congelada**: la Moneda / WC, la Polilla y el Empower no se
+  pueden usar sobre ella hasta que se resuelva la yeta (después sí); (3) **la tirada de Enyetar, dentro del mismo cuadro del duelo**: «duelo abierto,
+  alguien tira enyetar, se abre un duelo aparte pero queda minimizado y uno seguía viendo el duelo… habría que ensamblar la tirada del enyetar dentro del
+  mismo duelo, no tener que minimizar un menú para abrir otro, resolver y volver al menú inicial» — la maldición (PdG.Esp contra Res.Esp) se resuelve
+  como un paso más del duelo original (en el lugar de la pausa), sin abrir un duelo aparte.
 - **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
 - **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).

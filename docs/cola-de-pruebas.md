@@ -21,7 +21,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
-- **⬜ en cola (PRÓXIMO, dueño 2026-11-27) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
+- **⬜ en cola (PRÓXIMO, después de Enyetar A; dueño 2026-11-27: «cuando termines con tu tarea actual avanzá con esto») — 📜 Ficha lite: stats, derivados,
+  resistencias elementales y un botón «Habilidades + pasivas»** (dueño, 2026-11-27, con captura de la ficha lite de un personaje): «en la ficha lite me
+  gustaría que se vean los stats, los stats derivados, las resistencias elementales. No entiendo por qué elegiste destacar "sigilo" entre la información
+  relevante por sobre la demás… también acá entre los botones de la base debería haber uno que diga "habilidades + pasivas", que abra un segundo recuadro
+  que te permita verlas». Que se vean los atributos, los stats derivados y las resistencias elementales (sin destacar el Sigilo por sobre lo demás), y un
+  botón «⚡ Habilidades + pasivas» que abra un segundo recuadro con las dos (descripción corta y el «📋 Detalle» plegado; si es el dueño, poder usarlas
+  como en la Botonera). Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`. (Reemplaza a la entrada «📜 Ficha lite: un botón para ver las
+  habilidades».)
+- **⬜ en cola (la parte A en curso; la B después de la ficha lite) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
   se cerró un duelo, no te permite. Y hay veces que los duelos avanzan y el tipo de "no, quiero tirar a enyetar" se dice en el momento. Entonces, que enyetar
   te permita reabrir un duelo y volver atrás con la resolución. Como que si tirás a enyetar, te aparezca la lista de las últimas tiradas en duelos
   abiertos o en duelos cerrados. Y que, entre comillas, se vuelva atrás, se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule
@@ -3370,10 +3378,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🩸 Corregir «Transfusión sanguínea»: no deja pasar vida de una invocación aliada a un personaje aliado** (dueño, 2026-11-27:
   «corregir tranfusion sanguinea: no permitió pasar hp de una invocación aliado a un pj aliado»). Reproducirlo con clics (una invocación aliada como
   origen y un personaje aliado como destino), ver por qué no la ofrece o no la deja, y arreglarlo.
-- **⬜ en cola — 📜 Ficha lite: un botón para ver las habilidades** (dueño, 2026-11-27, con captura de la ficha lite de un personaje: abajo
-  están «📊 Stats», «🎒 Abrir la mochila» y «📜 Ver mi ficha completa»): «acá debería haber un botón para ver las habilidades». Sumar «⚡ Habilidades»
-  que muestre las habilidades del personaje (y de la invocación / creep si aplica) con lo esencial de cada una (costo, enfriamiento, qué hace) y,
-  si es el dueño, que deje usarlas igual que la Botonera. Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`.
 - **⬜ en cola (en dos pasos, dueño 2026-11-27: «primero habría que unificar los recuadros y recién después auditar las habilidades») — 🧹 Descripciones sintéticas con el detalle aparte, y sin las notas de desarrollo «(fecha, dueño: …)»** — **Paso 1: ✅ hecho (2026-11-27)** — un solo cuadro de detalle (P361): el «📋 Detalle» junta, en este orden, las reglas escritas (`reglas`) y lo técnico (las notas ⚙/✋ que hayan quedado pegadas a la descripción —se separan solas al mostrarla, sin reescribir los datos—, el «📜 Adaptada del borrador de clases» y el aviso de auditar); se fue el recuadro «Detalles técnicos» de las habilidades y las pasivas. Las habilidades de creep armadas de fábrica ya no llevan la línea «⚙ Automatizado… ✋ A mano…» en la descripción: va al detalle. Al lado del duelo, solo la descripción. Igual en el Ver (ficha, Botonera del mapa, Acciones y GM Tools), las tarjetas de las listas (plegado), el globo de «Ejecutar», las bibliotecas y los editores (un solo campo de detalle; abrir y guardar sin tocar el texto lo deja como estaba). Una pieza común: `ItemCorto.detalleHtml` / `detalleLista` / `descripcion` / `separarParaEditar` / `detalleAlGuardar` / `verHabHtml`. De paso, una ⚙ o ✋ en medio de una frase («con el ⚙ del token», «o ✋ eligiéndolo») ya no corta la descripción. Pruebas: 1173. Probado con clics en «Prueba · General» (capturas en el scratchpad, cola138). Dudas: P362. **Paso 2 (sigue en cola):** reescribir las ~200 descripciones con el criterio de `memoria-claude.md` (qué hace / el detalle). (sumado 2026-11-27: el dueño
   pide además descripciones bien sintéticas, con las minucias en un cuadro de detalle aparte; el Contraataque es el primero, hecho como modelo) (dueño, 2026-11-27: «hay muchas notas y
   aclaraciones tipo "fecha,dueño:" todo eso no debe llegar al jugador»). Revisar las descripciones visibles (`detalle`, `descripcion`, `efectoDetalle`,

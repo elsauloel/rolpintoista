@@ -821,9 +821,9 @@
 > Una de las **tres listas** (dueño, 2026-11-24): desarrollo → `cola-de-pruebas.md`; compu → acá; diseño → `lista-de-diseno.md`.
 > **Orden (dueño, 2026-11-24): de lo más corto / simple a lo más largo**, para ir de menos a más. Lo hecho (✅), abajo de todo.
 
-- [ ] **📜 Chequear la ficha lite** (dueño, 2026-11-24, a raíz de si Sigilo aparece como derivado de Destreza: en la ficha sí). Mirar en la
+- [x] (✅ mirada por el dueño el 2026-11-27 → pedidos en la cola: stats, derivados, resistencias elementales y «Habilidades + pasivas») **📜 Chequear la ficha lite** (dueño, 2026-11-24, a raíz de si Sigilo aparece como derivado de Destreza: en la ficha sí). Mirar en la
   ficha lite (el 📜 de un token o la F en el mapa) que estén los stats derivados, Sigilo incluido, y lo que falte o sobre.
-- [ ] **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
+- [x] (✅ probado por el dueño el 2026-11-27, con «☠ Quién cae»: «está ok») **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
   y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
 - [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
 - [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.

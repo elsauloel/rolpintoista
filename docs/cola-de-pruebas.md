@@ -3574,6 +3574,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   primer disparo.
 - **⬜ en cola — 🧪 Probar con clics: una tirada con «÷2» repetida en el mapa** (Enyetar C, 2026-11-27): Pajaritos, Lisiado… (en las pruebas
   automáticas ya está).
+- **⬜ en cola — 💥 Shockwave de la lista de clase muestra el texto viejo** (visto por Claude, 2026-11-27, al probar el Estandarte): al agregarlo a
+  una ficha desde «+ Habilidad → De clase» sale «(Sin auditar) SP 4. Onda expansiva…» en vez de la descripción auditada. Revisar de dónde sale.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

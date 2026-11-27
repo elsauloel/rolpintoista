@@ -21,8 +21,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
-- **⬜ en cola (PRÓXIMO, después de Enyetar B) — 🧚 «Re-roll» del Support pasa a llamarse «Viento en popa»** (dueño, 2026-11-27: «algo que dé a entender
-  que es algo mejorcito, algo como una bendición… buena fortuna»; eligió «Viento en popa» entre las propuestas). Cambiar el nombre en la habilidad de
+- **⬜ en cola (PRÓXIMO, después de Enyetar B) — 🧚 «Re-roll» del Support pasa a llamarse «Golpe de suerte»** (dueño, 2026-11-27, primero eligió «Viento en popa» y después lo cambió: «en vez de viento en popa vamos a ponerle golpe de suerte»; pidió «algo que dé a entender
+  que es algo mejorcito, algo como una bendición… buena fortuna»; era «algo… buena fortuna»). Cambiar el nombre en la habilidad de
   clase (y la de creep si existe), el botón fijo 🧚, la fila «⚡ Entre tiradas», la Mesa, la Crónica, los avisos y el manual; que las copias guardadas se
   pongan al día solas (`habClaseId`). Sin cambiar la regla. Ojo: no confundir con la Moneda «Re-roll (WC-Moneda)», que sigue igual.
 - **⏸ PAUSADA (dueño, 2026-11-27: «pausá la ficha lite»; lo hecho, sin subir, en `docs/pausado/ficha-lite-2026-11-27.patch` — se recupera con `git apply`; faltaba la prueba con clics, las capturas del «ahora», el commit y la nota en `vtt-hexgrid/CLAUDE.md`; ojo: el parche hace que el 📜 del token de otro jugador abra su ficha lite (solo mirar) en vez de su ficha completa, a confirmar con el dueño) — 📜 Ficha lite: stats, derivados,

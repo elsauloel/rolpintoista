@@ -2919,7 +2919,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   con «Borrar» y en la base quedó solo la corrección de Regeneración, **sin tocar** (sigue sin etiquetas: ponérselas, cuando el dueño diga).
   Capturas `cola133/04` a `09`.
 
-- **⬜ en cola — 📒 Revisar qué es el «catálogo propio» de un personaje («+ Ítem al catálogo» de la ficha)** (dueño, 2026-11-24: «no sé a qué te
+- **✅ hecho (2026-11-27; dueño eligió (a)) — 📒 Revisar qué es el «catálogo propio» de un personaje («+ Ítem al catálogo» de la ficha)** → se sacó el botón «+ Ítem al catálogo» de la ficha (`ficha.html`): para crear un ítem, el «+ Ítem» de la mochila; para compartirlo, «⬆ Subir al catálogo». Lo que alguien ya guardó en su catálogo propio sigue viéndose (y se puede editar o borrar) hasta que lo borre. Con eso tampoco se puede guardar ahí un consumible a mano (P317). Pruebas 1167 en verde. (dueño, 2026-11-24: «no sé a qué te
   referís con el catálogo propio del personaje… revisar qué es eso y después revisar también el caso particular»). Explicarle al dueño qué es,
   para qué sirve y quién lo ve (con captura); después, el caso particular: hoy deja guardar ahí un consumible «a mano» (P317: esos no van al
   catálogo compartido). Decidir con el dueño si también se saca de ahí.

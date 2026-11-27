@@ -3540,7 +3540,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   efectos»: las tiradas de un duelo que ya aplicó el daño y está tirando los efectos también aparecen (con «↩», deshaciendo). (2) «la tirada de elemento
   y del Orbe salvaje también»: el 🔥 1d6 de elemento del arma y el d6 del Orbe salvaje entran en la lista como tiradas aparte. (3) «la moneda de reroll lo
   que hace es modificar una tirada, reemplaza una tirada por otra. Entonces, cualquier tirada puede ser reemplazada por otra»: la Moneda / WC llega a
-  cualquier tirada, también al daño ya tirado de un duelo en curso. (4) y (5) de la P368: esperan respuesta.
+  cualquier tirada, también al daño ya tirado de un duelo en curso. (4) y (5) de la P368: quedan como están (dueño, 2026-11-27).
 - **⬜ en cola — 🧪 Probar con clics: la Moneda desde la fila del cuadro y con la WildCard** (Enyetar C, 2026-11-27): «↩ Re-roll (WC-Moneda) y deshacer»
   desde la fila «⚡ Entre tiradas», y con las dos (Moneda y WildCard) para ver el «¿Con qué volvés a tirar?». Ver `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 🧪 Probar con clics: el Golpe de suerte sobre un daño propio sin aplicar y sobre una tirada de habilidad** (Enyetar C, 2026-11-27).

@@ -3231,7 +3231,7 @@ al **🍀**, que dice «suerte» de un vistazo, o queda el 🧚? (Ojo: el 🍀 t
 teniendo su brillo verde con chispitas.) Por ahora queda el 🧚.
 **✅ Decidido (dueño, 2026-11-27): «deja el hada, me gusta».** Queda el 🧚.
 
-### P368 — 😈 Enyetar C: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar C)
+### P368 ✅ — 😈 Enyetar C: lo que quedó como recomendado (2026-11-27, Claude, al programar Enyetar C)
 
 Lo que se programó y se puede cambiar:
 1. **Un duelo en curso que ya aplicó el daño** (está tirando los efectos): sus tiradas no aparecen hasta que termina; ahí sí, con «↩» y deshaciendo. ¿Está
@@ -3246,5 +3246,5 @@ Lo que se programó y se puede cambiar:
 
 **Respuestas (dueño, 2026-11-27):** 1 sí («se puede deshacer mientras están tirando los efectos»); 2 sí («la tirada de elemento y del orbe salvaje
 también»); 3 «la moneda de reroll lo que hace es modificar una tirada, reemplaza una tirada por otra. Entonces, cualquier tirada puede ser reemplazada
-por otra». Las tres, en la cola. 4 sin respuesta. 5: no la entendió; se le explicó y espera su respuesta.
+por otra». Las tres, en la cola. 4: «hacerlo como lo recomendás vos» (queda como está: el 🪙 ofrece primero el último duelo). 5: «queda como está». Sin cambios de código para 4 y 5.
 

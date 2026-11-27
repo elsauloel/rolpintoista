@@ -2186,6 +2186,7 @@ async function sueltoRotoAviso(id){
 // 🙈 (P320, 2026-11-24) el daño de un duelo oculto se aplica con el contexto de js/130: lo que salta con el golpe (talismanes, anillos, drenaje…) no lo
 // delata. La vista previa no escribe nada: va directo.
 async function dueloAplicarDano(d, o){
+  if(!(o && o.simular) && typeof deshacerFoto === 'function') await deshacerFoto(d).catch(err => console.error('Deshacer: la foto de antes', err));   // ↩ cómo estaba, por si se deshace con Enyetar (js/138)
   if((o && o.simular) || typeof areaOcultaCon !== 'function') return dueloAplicarDanoBase(d, o);
   // 🕶 Si el golpe lo delató, el duelo lo anota (`dano.delatado`): lo que sigue de ese duelo (la cuenta del daño, el resumen) va a la vista de todos,
   // también en la ficha suelta y GM Tools, que no tienen mapa para mirar si se lo ve (cola, 2026-11-24).
@@ -3247,6 +3248,7 @@ async function dueloTolera(d, ef){
     : {tirada, contra};
 }
 async function dueloAplicarEfecto(d, ef){
+  if(typeof deshacerFoto === 'function') await deshacerFoto(d).catch(err => console.error('Deshacer: la foto de antes', err));   // ↩ (js/138)
   if(ef && ef.firme) return {nota: 'no se mueve'};   // 🦶 Inamovible (js/21, 2026-11-12): no pone ningún estado; lo lee quien lo empuja
   if(num(ef && ef.trae) > 0 && typeof dueloGanchoTraer === 'function') return dueloGanchoTraer(d);   // 🪝 el gancho de Arrastrar (js/78, 2026-11-04)
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);

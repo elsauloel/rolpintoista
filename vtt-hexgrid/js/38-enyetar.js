@@ -36,7 +36,7 @@ setInterval(() => { try{ renderEnyetarBoton(); }catch(e){} }, 1500);
 
 // Las tiradas de los enemigos a tu alcance que todavía se pueden cambiar (2026-11-27, P363 A): una por lado de cada duelo reciente, también las de
 // habilidades (la tirada de un Rayo mágico, la resistencia de un objetivo). Lo puro en Duelo.tiradasEnyetables (comun/duelo.js). Lo usa también el
-// 🧿 Mal de ojo (js/60). `o.incluirCerrados` queda para la parte B (los duelos ya cerrados, «🔒 ya resuelto»).
+// 🧿 Mal de ojo (js/60). `o.incluirCerrados` (parte B, 2026-11-27): suma las tiradas del último duelo terminado, «🔒» (js/138 confirma y deshace).
 async function enyetarCandidatos(yo, o){
   const rng = num((rangoDeToken(yo) || {}).rng);
   const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(15).get();
@@ -54,14 +54,15 @@ async function abrirEnyetar(tokenId){
   if(!yo) return;
   const nomYo = nombreDe(yo);
   let lista = [];
-  try{ lista = await enyetarCandidatos(yo); }catch(err){ console.error('Enyetar: no se pudieron ver los duelos', err); }
+  try{ lista = await enyetarCandidatos(yo, {incluirCerrados: true}); }catch(err){ console.error('Enyetar: no se pudieron ver los duelos', err); }
   if(!lista.length){
     AvisoCombate.mostrar({icono: '🐈‍⬛', titulo: `Enyetar · ${nomYo}`, texto: `No hay ninguna tirada reciente de un enemigo a tu alcance (Rango ${fmt(num((rangoDeToken(yo) || {}).rng))}) que se pueda enyetar.`});
     return;
   }
-  const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.nombre} · ${o.etq} (${fmt(o.total)})`,
-    detalle: `${o.hab ? `en ${o.hab}, ` : 'en el duelo '}contra ${o.contra}${o.terminado ? ' (ya terminó, pero esa tirada todavía se puede cambiar)' : ''} · el duelo espera mientras tirás PdG.Esp contra su Res.Esp; si ganás, repite esa tirada y queda la peor · 5 SP (turno ajeno 10)`,
-    alClic: () => { AvisoCombate.cerrar(); enyetarElegir(tokenId, o); }}));
+  const botones = lista.slice(0, 8).map(o => ({fila: true, texto: `${o.cerrado ? '↩ ' : ''}${o.nombre} · ${o.etq} (${fmt(o.total)})`,
+    detalle: o.cerrado ? `🔒 el último duelo que terminó (${o.hab ? `${o.hab}, ` : ''}contra ${o.contra}): si la maldición gana, se deshace lo que dejó y se vuelve a resolver · antes te muestro qué se deshace · 5 SP (turno ajeno 10)`
+      : `${o.hab ? `en ${o.hab}, ` : 'en el duelo '}contra ${o.contra}${o.terminado ? ' (ya terminó, pero esa tirada todavía se puede cambiar)' : ''} · el duelo espera mientras tirás PdG.Esp contra su Res.Esp; si ganás, repite esa tirada y queda la peor · 5 SP (turno ajeno 10)`,
+    alClic: () => { AvisoCombate.cerrar(); if(o.cerrado) enyetarConfirmarDeshacer(tokenId, o); else enyetarElegir(tokenId, o); }}));
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
   AvisoCombate.mostrar({icono: '🐈‍⬛', titulo: `Enyetar · ${nomYo}`, botones, texto: '¿A qué tirada de un enemigo le echás la yeta?'});
 }
@@ -70,7 +71,7 @@ async function enyetarElegir(tokenId, o){
   const yo = tokens.get(tokenId);
   if(!yo) return;
   let ok = false;
-  try{ ok = await Duelo.yetaPausar(o.dueloId, {lado: o.lado, campo: o.campo, por: tokenId, porNombre: nombreDe(yo), a: o.tokenId, aNombre: o.nombre}); }
+  try{ ok = await Duelo.yetaPausar(o.dueloId, {lado: o.lado, campo: o.campo, por: tokenId, porNombre: nombreDe(yo), a: o.tokenId, aNombre: o.nombre, ...(o.deshacer ? {deshacer: o.deshacer} : {})}); }
   catch(err){ console.error('Enyetar: no se pudo poner en pausa el duelo', err); }
   if(!ok){ toast(`🐈‍⬛ Esa tirada de ${o.nombre} ya no se puede enyetar (el duelo siguió, o ya tiene una yeta encima)`); return false; }
   try{ if(Duelo.abiertoId() !== o.dueloId) Duelo.abrir(o.dueloId); }catch(err){}   // 😈 la maldición se tira adentro de ESE cuadro (A3)
@@ -118,8 +119,9 @@ async function enyetarAplicar(d, t){
       return y && Duelo.yetaTipo(x.data()) === 'enyetar' && String(y.por) === String(d.atacante.tokenId) && String(y.a) === String(d.defensor.tokenId);
     });
     if(doc){
-      const x = doc.data(), y = x.ataque.yeta;
-      const r = await Duelo.enyetarTirada(doc.id, y.lado, 'peor', {campo: y.campo, yeta: true, hijo: d.id});   // (hijo: la maldición, que se vio adentro de este duelo, A3)
+      const x = {id: doc.id, ...doc.data()}, y = x.ataque.yeta;
+      // ↩ Parte B: sobre el último duelo terminado, primero se deshace lo que dejó (js/138) y después se vuelve a esa tirada.
+      const r = y.deshacer ? await deshacerYReabrir(doc.id, x, y, d.id) : await Duelo.enyetarTirada(doc.id, y.lado, 'peor', {campo: y.campo, yeta: true, hijo: d.id});   // (hijo: la maldición, que se vio adentro de este duelo, A3)
       if(!r){
         await Duelo.yetaSeguir(doc.id, 'la tirada ya no se podía cambiar');
         return {manual: true, nota: `${nom}: esa tirada ya no se podía cambiar: ✋ que la repita y se quede con la peor, a mano`};

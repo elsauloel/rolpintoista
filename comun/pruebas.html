@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127fila"></script>
+<script src="duelo.js?v=20261127deshacer"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -1075,6 +1075,51 @@ prueba('⚡ Enyetar A2: la fila entre tiradas (par completo, sin fila con el due
     /function dueloOpcionesFila\(d\)/.test(t137), /function dueloUsarFila\(d, o\)/.test(t137), /Duelo\.yetaPausar\(d\.id, y\)/.test(t137), /EN_FILA = \['enyetar-flotante'/.test(fl),
     /Re-roll \(WC-Moneda\)/.test(du), /data-fila-abrir/.test(du), /Tenés algo para usar acá/.test(du), /js\/137-fila-duelo\.js\?v=/.test(mh), /yetaSubHtml\(d, y\)/.test(du)],
     [false, true, true, [], true, true, true, true, true, true, true, true, true]);
+});
+prueba('↩ Enyetar parte B: solo el último duelo terminado entra en la lista (no uno más viejo, ni la maldición, ni uno abierto)', () => {
+  const rival = id => id !== 'yo', cerca = () => true;
+  const base = (id, creado, x) => ({id, estado: 'resuelto', fase: 'fin', resultado: 'pego', creado, atacante: {tokenId: 'gob', nombre: 'Goblin'}, defensor: {tokenId: 'yo', nombre: 'Yo'}, ataque: {},
+    pdg: {total: 11, formula: '1d12'}, eva: {total: 3, formula: '1d6'}, dano: {crudo: 4, hpAntes: 20, hpDespues: 16}, ...x});
+  const viejo = base('v', 1000), ultimo = base('u', 5000), maldicion = base('m', 9000, {hab: {nombre: 'Enyetar', efectos: [{nombre: 'Enyetar'}]}, atacante: {tokenId: 'yo'}, defensor: {tokenId: 'gob'}});
+  const abierto = {...base('a', 8000), estado: 'esperando', fase: 'dano', dano: null};
+  const tormenta = base('t', 9500, {hab: {nombre: 'Tormenta', soloTirada: true}});
+  const l = Duelo.tiradasEnyetables([viejo, ultimo, maldicion, abierto, tormenta], {esRival: rival, alcanza: cerca, incluirCerrados: true}).filter(o => o.cerrado);
+  igual([(Duelo.ultimoTerminado([viejo, ultimo, maldicion, abierto, tormenta]) || {}).id, l.map(o => [o.dueloId, o.campo]), Duelo.tiradasEnyetables([viejo, ultimo], {esRival: rival, alcanza: cerca}).length,
+    Duelo.ultimoTerminado([]), Duelo.generacion({ataque: {deshechos: [{}, {}]}}), Duelo.generacion({})],
+    ['u', [['u', 'pdg']], 0, null, 2, 0]);
+});
+prueba('↩ Enyetar parte B: la vida se devuelve por diferencia (respeta una cura del medio) y, si cayó y volvió, vuelve a la de antes', () => {
+  const v = o => Duelo.deshacerVida(o);
+  igual([v({antes: 30, final: 22, actual: 22, max: 50}), v({antes: 30, final: 22, actual: 27, max: 50}), v({antes: 48, final: 40, actual: 45, max: 50}),
+    v({antes: 10, final: 0, actual: 0, max: 50}), v({antes: 10, final: 0, actual: 12, max: 50}), v({antes: 10, final: 1, actual: 1, max: 50}),
+    Duelo.vidaPerdida({hpAntes: 30, hpDespues: 22}), Duelo.vidaPerdida({hpAntes: 30, hpDespues: 22, magico: {recibido: 3, hpAntes: 22, hpDespues: 19}}), Duelo.vidaPerdida({crudo: 5})],
+    [30, 35, 50, 10, 10, 10, 8, 11, 0]);
+});
+prueba('↩ Enyetar parte B: los estados vuelven a como estaban (lo que puso el duelo, los escudos gastados, lo que se fue al caer)', () => {
+  const prev = [{nombre: 'Veneno', stacks: 2, hpturno: -1}, {nombre: 'Vida extra', escudoMagico: 10}, {nombre: 'Bendición', turnos: 3}, {nombre: 'Rengo', turnos: 2}];
+  const act = [{nombre: 'Veneno', stacks: 5, hpturno: -1}, {nombre: 'Vida extra', escudoMagico: 4}, {nombre: 'Stun', turnos: 1}, {nombre: 'Rengo', turnos: 1}, {nombre: 'Prisa'}];
+  const r = Duelo.deshacerEstados(prev, act, ['Veneno', 'Stun']);
+  const d = {efectos: [{nombre: 'Veneno', aplicado: true}, {spec: {nombre: 'Stun'}, aplicado: true}, {nombre: 'Lisiado', aplicado: true, nota: 'no entró: inmune'}], dano: {recibido: 4, porDano: {nombre: 'Escarcha'}}};
+  igual([r.estados.map(e => [e.nombre, e.stacks || e.escudoMagico || e.turnos || 0]), r.sacados, r.vuelven, Duelo.estadosDelDuelo(d), Duelo.deshacerEstados(null, [{nombre: 'X'}], ['X']).estados],
+    [[['Veneno', 2], ['Vida extra', 10], ['Rengo', 1], ['Prisa', 0], ['Bendición', 3]], ['Stun'], ['Veneno', 'Vida extra', 'Bendición'], ['Veneno', 'Stun', 'Escarcha', 'Marcado', 'Herida sombría'], []]);
+});
+prueba('↩ Enyetar parte B: lo de quien pegó (Espinas, Espejo, Drena, Luz sanadora) y el plan de lo que se deshace y lo que queda a mano', () => {
+  const at = Duelo.deshacerAtacante({espinas: {hpAntes: 40, hpDespues: 37}, drena: {hpAntes: 20, hpDespues: 26}, espejo: {manual: true, monto: 2}});
+  const d = {estado: 'resuelto', atacante: {nombre: 'Hachero'}, defensor: {nombre: 'Blanco J1', tokenId: 'j1'}, ataque: {previo: {hp: 50}, terminaTurno: true},
+    resultado: 'pego', dano: {hpAntes: 12, hpDespues: 0, desgaste: 'Escudo de madera'}, efectos: [{nombre: 'Sangrado', aplicado: true}, {nombre: 'Empujón', empuja: 2, aplicado: true}], contra: 'c1'};
+  const pl = Duelo.deshacerPlan(d, {hayDefensor: true});
+  igual([at.delta, at.partes.map(p => p.n), pl.puede, pl.cayo, pl.auto.length, pl.mano, Duelo.deshacerPlan(d, {hayDefensor: false}).puede, Duelo.deshacerPlan({...d, estado: 'esperando'}).motivo,
+    Duelo.deshacerPlan({...d, defensor: {nombre: 'Caja', objeto: true}}).puede, Duelo.deshacerPlan({...d, ataque: {}}).mano.some(t => /no anotó cómo estaba/.test(t))],
+    [-3, ['Espinas', 'Drena'], true, true, 4, ['si Hachero subió en el orden de turnos por Sed de sangre', 'el empujón', '«termina el turno» (el turno ya pasó)', 'el contraataque (es otro duelo y queda como está)'],
+      false, 'ese duelo todavía no terminó', false, true]);
+});
+prueba('↩ Enyetar parte B en el código: la foto de antes, el deshacer en la pantalla del GM, la fila, la línea tachada y la regla nueva', async () => {
+  const [t13, t38, t137, t138, du, me, mh, reglas] = await Promise.all(['../vtt-hexgrid/js/13-tokens-portal-duelo.js', '../vtt-hexgrid/js/38-enyetar.js', '../vtt-hexgrid/js/137-fila-duelo.js',
+    '../vtt-hexgrid/js/138-deshacer-duelo.js', 'duelo.js', 'mesa.js', '../vtt-hexgrid/mapa.html', '../firebase/firestore.rules'].map(u => fetch(u, {cache: 'no-store'}).then(r => r.text())));
+  igual([(t13.match(/await deshacerFoto\(d\)/g) || []).length, /y\.deshacer \? await deshacerYReabrir\(doc\.id, x, y, d\.id\)/.test(t38), /enyetarCandidatos\(yo, \{incluirCerrados: true\}\)/.test(t38),
+    /enyetarConfirmarDeshacer\(o\.por, o\.o\)/.test(t137), /deshacer: true\}\)/.test(t138), /Confirmar\.elegir/.test(t138), /'ataque\.resumenMesa': linea\.id/.test(du),
+    /aplicando\.has\(kAp\)/.test(du), /t\.deshecha/.test(me), /js\/138-deshacer-duelo\.js\?v=/.test(mh), /affectedKeys\(\)\.hasOnly\(\['deshecha'\]\)/.test(reglas)],
+    [2, true, true, true, true, true, true, true, true, true, true]);
 });
 prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la Runa aceleradora, consumible del Bazar arcano', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-acelerador');

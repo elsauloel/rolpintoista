@@ -33,7 +33,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   botón «⚡ Habilidades + pasivas» que abra un segundo recuadro con las dos (descripción corta y el «📋 Detalle» plegado; si es el dueño, poder usarlas
   como en la Botonera). Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`. (Reemplaza a la entrada «📜 Ficha lite: un botón para ver las
   habilidades».)
-- **⬜ en cola (A, A2 y A3 hechas; queda la B) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
+- **✅ hecho (2026-11-27) — 😈 Enyetar puede reabrir un duelo y volver atrás** (dueño, 2026-11-27: «cuando ponés a enyetar cuando ya
   se cerró un duelo, no te permite. Y hay veces que los duelos avanzan y el tipo de "no, quiero tirar a enyetar" se dice en el momento. Entonces, que enyetar
   te permita reabrir un duelo y volver atrás con la resolución. Como que si tirás a enyetar, te aparezca la lista de las últimas tiradas en duelos
   abiertos o en duelos cerrados. Y que, entre comillas, se vuelva atrás, se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule
@@ -98,6 +98,22 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     la plegada de J2, Enyetar desde la fila con la maldición adentro del mismo cuadro y la tirada congelada, el Empower de J2 a J1 (el +3 se gastó
     en la Evasión que volvió a tirar), el Re-roll eligiendo la Moneda, la Polilla y el aviso a los 60 s; la vuelta, «quedó igual». Sin probar con
     clics: el Mal de ojo y el Re-roll del Support desde la fila (`docs/pruebas-en-el-mapa.md`). Pruebas: 1181. Dudas: P365.
+  - **✅ B hecha (2026-11-27, Claude) — el último duelo terminado.** En la lista del 🐈‍⬛ y en la fila «⚡ Entre tiradas» del cuadro (si es el último
+    duelo que terminó) aparecen sus tiradas con «↩ … 🔒». Al elegir una, un cartel dice qué se deshace solo y qué no; si hay algo que no, ofrece
+    **«⚙ Aplicar automático / ✋ Resolver a mano»**; si algo lo hace imposible (quien lo recibió ya no está, era un objeto), dice por qué y no lo hace.
+    Después, la maldición adentro del mismo cuadro (como la A3). Si gana, la pantalla del GM: devuelve **la vida por diferencia** (una cura del medio
+    se respeta; si cayó y volvió, la vida de antes y lo que gastó: Pacto, Ankh, Llama de Fénix, Anillo del último aliento), **los estados** como
+    estaban antes del duelo (los que puso, los escudos que gastó, los que se fueron al caer), **la durabilidad / la Armadura rota de las piezas**, y lo
+    que ganó o perdió quien pegó (**Espinas, Espejo, Drena, Luz sanadora**); el duelo vuelve a esa tirada (repite y queda la peor) y se resuelve de
+    nuevo. **No se deshace solo** (queda en la lista a mano): el empujón o el gancho, cambiar de lugar, el dodge roll, «termina el turno», el
+    contraataque, el área en cascada, el rayo que saltó, el virote en el mapa, el orden de turnos (Demora, Sed de sangre…), el arma en el piso, el
+    Miti-Miti, la Vida extra del drenaje. **Mesa:** se tacha la línea vieja del resultado («↩ cambiado por 😈 Enyetar de X») y se suma «↩ Deshecho…»
+    con lo devuelto y lo que queda a mano; **regla nueva de Firestore** (`tiradas`: solo sumar `deshecha`) que **el dueño tiene que pegar**: sin ella
+    queda la línea «↩ Deshecho» sin tachar y avisa. **Crónica:** la tarjeta «↩ Deshecho por 😈 Enyetar de X». Para devolver los estados, el GM anota
+    cómo estaba quien recibe antes del primer daño o efecto (`ataque.previo`). Moneda / Re-roll del Support sobre el último duelo: todavía no (P366).
+    Probado con clics en «Prueba · General» (GM, J1, J2): el golpe del Hachero deshecho (40 → 50, la pieza vuelve), el golpe que lo dejó en 0
+    deshecho con «Aplicar automático» (0 → 37), la fila del último duelo, el duelo anterior sin oferta y la línea sin la regla; la vuelta, «quedó
+    igual». Falta ver lo anotado en `docs/pruebas-en-el-mapa.md`. Pruebas: 1186. Dudas: P366.
 - **⬜ en cola (primero) — 🏹 Mover una flecha silbadora puesta en el mapa** (dueño, 2026-11-27, notas de la sesión): «había una flecha silbadora en un mapa, quise moverla y no encontré cómo, debería poder hacerse con mover libre».
 - **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).

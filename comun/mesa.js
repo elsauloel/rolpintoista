@@ -359,7 +359,9 @@ function mesaRender(docs){
       // ⚔ El final de un duelo (2026-10-28, dueño): la frase de lo que pasó a la vista y el paso a paso plegado, con «🔍 Ver detalle del duelo».
       if(t.texto && /^⚔ Resumen del duelo/.test(String(t.origen || ''))){
         div.classList.add('mesa-duelo-fin');
-        div.innerHTML = `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>` +
+        // ↩ (Enyetar parte B, 2026-11-27): un resultado deshecho queda tachado, con el motivo («↩ cambiado por 😈 Enyetar de X»).
+        div.innerHTML = (t.deshecha ? `<div class="mesa-duelo-frase" style="text-decoration:line-through;opacity:.6">⚔ ${esc(t.texto)}</div><div class="mesa-detalle" style="color:#c9a5ff">${esc(t.deshecha)}</div>`
+          : `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>`) +
           `<button type="button" class="mesa-duelo-btn">🔍 Ver detalle del duelo</button>`;
         // 🔍 El detalle se abre en un recuadro (dueño, 2026-11-03: «que se abra como un recuadro… que no quede ahí en la Mesa, queda muy poco claro»).
         div.querySelector('.mesa-duelo-btn').addEventListener('click', ev => { ev.stopPropagation(); mesaDueloDetalle(String(t.origen || ''), String(t.texto || ''), lineas); });
@@ -388,7 +390,7 @@ function mesaRender(docs){
     }
     const div = document.createElement('div');
     div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
-    div.innerHTML = mesaFilaContenido(t);
+    div.innerHTML = t.deshecha ? `<div style="text-decoration:line-through;opacity:.6">${mesaFilaContenido(t)}</div><div class="mesa-detalle" style="color:#c9a5ff">${esc(t.deshecha)}</div>` : mesaFilaContenido(t);
     if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
     cuerpo.appendChild(div);
   });

@@ -2444,3 +2444,16 @@ versión parecida en más de una, es candidato a juntar.
   los ya terminados por `yetaHist[].hijo`); `yetaAplicarHijo` pide el efecto solo en la pantalla de quien la echó. **El aviso**: `yetaAvisoHtml` /
   `yetaAvisoTxt(h)` (90 s después de cada fin). `flotantes.js`: `EN_FILA` (🐈‍⬛ 🧚 🧿 💪 🦋 🃏 🪙) se esconden con el cuadro abierto (`.flot-en-fila`).
   Dudas: P365.
+- **↩ `duelo.js`, Enyetar parte B: deshacer el último duelo terminado** (2026-11-27, P363 B; dudas P366). Puras: `ultimoTerminado(duelos)` (el
+  terminado más nuevo por `creado`, sin la maldición ni `soloTirada`/`esquiva`; `ultimoTerminadoAhora()` con los duelos de esta pantalla),
+  `tiradasEnyetables(…, {incluirCerrados})` (ahora solo las del último terminado, `cerrado: true`), `deshacerPlan(d, {hayDefensor})` → {puede, motivo,
+  auto, mano, cayo} (los renglones del cartel), `vidaPerdida(dn)`, `deshacerVida({antes, final, actual, max})` (por diferencia; si cayó y volvió, la de
+  antes), `deshacerAtacante(dn)` (Espinas, Espejo, Drena, Luz sanadora), `deshacerEstados(previos, actuales, aplicados)`, `estadosDelDuelo(d)` y
+  `generacion(d)`. En el duelo: `ataque.previo` (cómo estaba quien recibe antes del primer daño o efecto; lo anota el mapa), `ataque.deshechos`
+  ([{por, campo, modo, antes, ahora, cuando}]) y `ataque.resumenMesa` (el id de la línea del resumen, para tacharla). `yetaPausar` acepta
+  `deshacer: {modo: 'auto'|'mano', mano}` sobre un duelo `resuelto`; `enyetarTirada(…, {deshacer: true})` borra lo de después de esa tirada
+  (`deshacerLimpiar`: daño, crítico, efectos y, si es el contacto, el Bloqueo) y la vuelve a resolver. Las claves de `aplicando` (daño, efectos,
+  resumen) llevan la generación: un duelo deshecho se vuelve a aplicar. `filaOpciones` deja la fila en el último terminado (solo Enyetar);
+  `yetaHtml`/`yetaAvisoTxt` lo dicen. **`mesa.js`**: una línea con `deshecha` se dibuja tachada con el motivo (regla nueva de `tiradas`: solo sumar
+  `deshecha`, ≤ 200; hay que pegarla).
+

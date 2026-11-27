@@ -54,11 +54,14 @@ function dueloOpcionesFila(d){
     const c = filaCostoTxt(id, FILA_ENYETAR.sp, FILA_ENYETAR.spAjeno);
     if(num(r.sp) < c.sp) return;
     const rng = filaRango(t);
+    // ↩ Parte B (2026-11-27): si este es el último duelo que terminó, también sus tiradas (se deshace lo que dejó y se vuelve a resolver, js/138).
+    const ultimo = d.estado === 'resuelto' && Duelo.ultimoTerminadoAhora() === d.id;
     Duelo.tiradasEnyetables([d], {esRival: tid => { const x = tokens.get(tid); return !!(x && dueloEsRival(t, x)); },
-      alcanza: tid => { const x = tokens.get(tid); return !!x && distanciaHex(t, x) <= rng && filaVe(x); }})
-      .filter(o => Duelo.parListo(d, o.campo))
-      .forEach(o => ops.push({clave: 'enyetar', icono: '😈', txt: 'Enyetar', sub: `${o.etq} de ${o.nombre} (${fmt(o.total)}) · ${c.txt}`,
-        titulo: `${nombreDe(t)}: tirás PdG.Esp contra su Res.Esp, acá mismo; si ganás, repite esa tirada y se queda con la peor`, por: id, o}));
+      alcanza: tid => { const x = tokens.get(tid); return !!x && distanciaHex(t, x) <= rng && filaVe(x); }, incluirCerrados: ultimo})
+      .filter(o => o.cerrado || Duelo.parListo(d, o.campo))
+      .forEach(o => ops.push({clave: 'enyetar', icono: o.cerrado ? '↩' : '😈', txt: o.cerrado ? 'Enyetar y deshacer' : 'Enyetar', sub: `${o.etq} de ${o.nombre} (${fmt(o.total)}) · ${c.txt}`,
+        titulo: o.cerrado ? `${nombreDe(t)}: el duelo ya terminó; si la maldición gana, se deshace lo que dejó y se vuelve a resolver (antes te muestra qué se deshace)`
+          : `${nombreDe(t)}: tirás PdG.Esp contra su Res.Esp, acá mismo; si ganás, repite esa tirada y se queda con la peor`, por: id, o}));
   });
   // 🧚 Re-roll (Support): una tirada tuya o de un aliado a tu alcance; queda la mejor.
   mios.forEach(([id, t]) => {
@@ -109,7 +112,7 @@ function dueloOpcionesFila(d){
 async function dueloUsarFila(d, o){
   const pausar = y => Duelo.yetaPausar(d.id, y);
   const seguir = motivo => Duelo.yetaSeguir(d.id, motivo).catch(err => console.error('La fila: no se pudo seguir el duelo', err));
-  if(o.clave === 'enyetar') return !!(await enyetarElegir(o.por, o.o));   // (pausa, abre este cuadro y echa la maldición: js/38)
+  if(o.clave === 'enyetar') return !!(await (o.o.cerrado ? enyetarConfirmarDeshacer(o.por, o.o) : enyetarElegir(o.por, o.o)));   // (pausa, abre este cuadro y echa la maldición: js/38; el último duelo terminado, primero la confirmación: js/138)
   if(o.clave === 'polilla'){
     const t = tokens.get(o.tokenId);
     if(!t) return false;

@@ -3203,3 +3203,21 @@ Lo que se programó y se puede cambiar:
    duelo, como la Polilla?
 
 > ✅ **Decidida (dueño, 2026-11-27):** 1–5 quedan como están; **6: sí**, el anillo de impulso suma a la tirada del duelo, como la Polilla (en la cola).
+
+### P366 — ↩ Enyetar parte B: lo que quedó como recomendado al deshacer el último duelo (2026-11-27, Claude, al programar la B de P363)
+
+Lo que se programó y se puede cambiar:
+1. **Cuál es «el último duelo terminado»**: el terminado más nuevo **por la hora en que empezó** (los duelos no guardan la hora en que terminaron). Si
+   dos duelos se pisan, puede quedar como «último» uno que terminó antes. No cuentan la maldición misma ni la cuenta de proyectiles de la Tormenta.
+   ¿Alcanza así, o guardamos la hora de fin?
+2. **La Moneda / WC Re-roll y el Re-roll del Support sobre el último duelo: por ahora no.** Se podría con el mismo camino (confirmación, deshacer en la
+   pantalla del GM y volver a esa tirada), pero sin maldición de por medio: se deshace al toque. ¿Lo sumamos? (Sería una tarea chica-mediana.)
+3. **«✋ Resolver a mano»** = no toca la vida ni los estados: el duelo vuelve a esa tirada con la yeta y se resuelve de nuevo; la mesa corrige a mano
+   lo que había dejado (queda dicho en la Mesa). ¿Es eso, o «a mano» debería no reabrir nada?
+4. **La línea «↩ Deshecho por 😈 Enyetar de X»** se suma siempre (con lo que se devolvió y lo que queda a mano), además de tachar la vieja cuando la
+   regla esté pegada. ¿Bien, o con la regla pegada alcanza con tachar?
+5. **Los estados**: vuelven a como estaban antes del duelo los que puso el duelo, los escudos que gastó el golpe (Vida extra, Escudo especial…) y los
+   que se fueron al caer o al volver de la muerte. Si entre el golpe y el deshacer se venció otro estado en el Mantenimiento, también vuelve (riesgo
+   chico: es el último duelo). ¿Bien?
+6. **Si cayó y volvió**, queda con la vida de antes del golpe (no la de la resurrección) y se le devuelve el Pacto, el Ankh, la Llama o el Anillo.
+

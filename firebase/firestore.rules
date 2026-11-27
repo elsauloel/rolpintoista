@@ -252,7 +252,11 @@ service cloud.firestore {
           && request.resource.data.rolls is list
           && request.resource.data.rolls.size() <= 100
           && request.resource.data.cuando == request.time;
-        allow update: if false;
+        // ↩ Enyetar parte B (2026-11-27): a una línea ya publicada solo se le puede sumar `deshecha` (el motivo, hasta 200 letras), para tacharla
+        // («↩ cambiado por 😈 Enyetar de X»). Nada más de la línea se puede cambiar.
+        allow update: if esMiembro(c)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deshecha'])
+          && request.resource.data.deshecha is string && request.resource.data.deshecha.size() <= 200;
         allow delete: if esGM(c);
       }
 

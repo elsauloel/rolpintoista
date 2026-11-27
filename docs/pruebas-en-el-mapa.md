@@ -3534,3 +3534,18 @@ desde la fila con la maldición adentro del mismo cuadro y la tirada congelada, 
 - 🧚 El Re-roll del Support desde la fila (a un aliado y a uno mismo).
 - La maldición que empata (el desempate adentro del cuadro) y la que pierde (el aviso «resistió»).
 - Enyetar sobre la tirada de una habilidad (la Res.Esp de un objetivo), desde la fila.
+
+## ↩ Enyetar parte B: deshacer el último duelo terminado (2026-11-27)
+
+Probado con clics en «Prueba · General» (GM, J1, J2; capturas fuera del repo): el Hachero le pega a J1 (10 de daño, Armadura rota en una pieza) → J2
+enyeta el PdG desde la lista del 🐈‍⬛ (sale solo el último duelo, «↩ … 🔒»), el cartel de confirmación, la maldición adentro del mismo cuadro, se
+devolvió la vida (40 → 50) y la durabilidad de la pieza, el duelo volvió al crítico y se resolvió de nuevo (el daño se volvió a aplicar). Segundo
+golpe que lo dejó en 0: la fila «⚡ Entre tiradas» del cuadro terminado ofrece «↩ Enyetar y deshacer», el duelo anterior ya no ofrece nada, el cartel
+«⚙ Aplicar automático / ✋ Resolver a mano» (con Sed de sangre a mano) → volvió a 37 y se levantó. Sin la regla pegada: la línea «↩ Deshecho» con el
+aviso. La vuelta, «quedó igual». **Falta ver:**
+- La línea vieja **tachada** con la regla nueva pegada (se vio solo simulada en una pantalla).
+- «✋ Resolver a mano» (no toca la vida ni los estados, solo reabre).
+- Que caiga y vuelva con el **Ankh, la Llama de Fénix, el Pacto o el Anillo del último aliento** y se le devuelva lo gastado.
+- El defensor **creep** o **invocación**; un estado con stacks que ya tenía (Veneno ×2 → ×5 → vuelve a ×2); Espinas / Drena de quien pegó.
+- Una tirada con dados de verdad (en la prueba el PdG era a mano: «14 y 14»).
+

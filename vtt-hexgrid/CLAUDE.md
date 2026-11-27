@@ -2905,3 +2905,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   devuelven true/false). Se engancha en `Duelo.escuchar` (js/14: `opcionesFila`, `usarFila`). `enyetarAplicar` pasa `hijo` y mira solo pausas de
   Enyetar; `malDeOjoTirar` repite con `{yeta: true, tipo: 'maldeojo'}` y, si ya no se puede, sigue el duelo. Lo que se ve y la pausa: comun/CLAUDE.md.
   Probado con clics en «Prueba · General» (GM, J1, J2); falta lo anotado en `docs/pruebas-en-el-mapa.md`. Dudas: P365.
+
+- **↩ Enyetar parte B: deshacer el último duelo terminado** (2026-11-27, P363 B; `js/138-deshacer-duelo.js`; dudas P366). La lista del 🐈‍⬛
+  (`enyetarCandidatos(yo, {incluirCerrados: true})`, js/38) y la fila del cuadro (js/137, si `Duelo.ultimoTerminadoAhora()` es ese duelo) ofrecen sus
+  tiradas con «↩ … 🔒». `enyetarConfirmarDeshacer(tokenId, o)` muestra el cartel con `Duelo.deshacerPlan` («⚙ Aplicar automático / ✋ Resolver a
+  mano» si hay algo a mano; si no se puede, dice por qué) y llama a `enyetarElegir` con `deshacer`. Si la maldición gana, `enyetarAplicar` (pantalla
+  del GM) va a `deshacerYReabrir(id, x, y, hijo)`: `deshacerDefensor` (personaje e invocación con `editarPersonajeMapa`, creep con `modificarCreep`:
+  la vida, los estados, Pacto / Ankh / Anillo del último aliento / SP de la Llama, la durabilidad y la Armadura rota de las piezas; `muerto` vuelve a
+  inactivo sin `volverLimpio`), `deshacerAtacante` y `Duelo.enyetarTirada(…, {deshacer: true})`; después `deshacerTacharMesa` (sin la regla:
+  'sin-regla' → aviso), la línea «↩ Deshecho…» y la tarjeta `deshecho` de la Crónica. `deshacerFoto(d)` (lo llaman `dueloAplicarDano` y
+  `dueloAplicarEfecto`, js/13) guarda `ataque.previo` antes de lo primero que le pasa a quien recibe. Probado con clics en «Prueba · General».
+

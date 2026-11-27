@@ -116,7 +116,8 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   rolls[], mod, total, desde: 'ficha'|'gm', cuando, estilo?}`. `estilo` (opcional, texto JSON ≤300) es el estilo de dados 3D de quien tiró (color, número, borde, textura, material): los demás animan esa tirada con su color. Una por tirada. La
   publica `registrarTirada()` (ficha.html y gm-tools.html, vía
   `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
-  edita; el GM puede borrarlas. `quien` es el personaje (ficha) o el creep
+  edita (salvo `deshecha`, abajo); el GM puede borrarlas. **↩ `deshecha`** (2026-11-27, Enyetar parte B; texto ≤ 200): cualquier miembro se lo puede
+  sumar a una línea ya publicada y es lo único que se puede cambiar; la Mesa la tacha con ese motivo («↩ cambiado por 😈 Enyetar de X»). `quien` es el personaje (ficha) o el creep
   (gm-tools lo separa del origen "<creep> · <qué tiró>"); la Mesa lo muestra
   en color con `(jugador)` al lado, y la última tirada con fondo verde. La Mesa vive en
   [`../comun/mesa.js`](../comun/mesa.js) (publicar, dibujar, escuchar y la

@@ -21,6 +21,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ### 📝 Notas de la sesión con los jugadores en «El origen» (dueño, 2026-11-27: «anotalas primeras en la cola… de a una»)
 
+- **⬜ en cola (PRÓXIMO, después del «Golpe de suerte») — 😈 Enyetar C: elegir CUALQUIER tirada del último duelo (también el daño y los d20 del crítico), y
+  que la Moneda / WC y el Golpe de suerte también puedan deshacer el último duelo** (dueño, 2026-11-27): «puede que la persona quiera rerolear no
+  necesariamente la tirada de probabilidad de golpe, sino la tirada de daño, por ejemplo… Tira enyetar y te dice: del último duelo tenés estas tiradas,
+  ¿cuál querés enyetar?… Todo si la descripción de enyetar lo permite». La descripción de Enyetar dice «obliga a repetir una tirada y quedarse con el
+  valor más bajo» (cualquier tirada de un enemigo), así que sí lo permite. Hoy (`Duelo.tiradasEnyetables`, comun/duelo.js) la lista ofrece una sola
+  tirada por lado: el PdG / Fuerza del atacante o la Evasión / Bloqueo del defensor; no el daño ni los d20 del crítico. Que la lista muestre todas las
+  tiradas de ese enemigo en el último duelo (PdG, daño, d20 del crítico, Bloqueo, Evasión, la de una habilidad…) y elegís cuál; al deshacer, se vuelve a
+  ese punto (enyetar el daño: se deshace el daño y se vuelve a tirar con la peor). Y (P366 2) la Moneda / WC Re-roll y el Golpe de suerte también pueden
+  deshacer el último duelo, por el mismo camino (js/138), cada uno con su regla (la Moneda: vale la segunda; el Golpe de suerte: la mejor).
 - **⬜ en cola (PRÓXIMO, después de Enyetar B) — 🧚 «Re-roll» del Support pasa a llamarse «Golpe de suerte»** (dueño, 2026-11-27, primero eligió «Viento en popa» y después lo cambió: «en vez de viento en popa vamos a ponerle golpe de suerte»; pidió «algo que dé a entender
   que es algo mejorcito, algo como una bendición… buena fortuna»; era «algo… buena fortuna»). Cambiar el nombre en la habilidad de
   clase (y la de creep si existe), el botón fijo 🧚, la fila «⚡ Entre tiradas», la Mesa, la Crónica, los avisos y el manual; que las copias guardadas se

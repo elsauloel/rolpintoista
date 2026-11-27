@@ -3204,7 +3204,7 @@ Lo que se programó y se puede cambiar:
 
 > ✅ **Decidida (dueño, 2026-11-27):** 1–5 quedan como están; **6: sí**, el anillo de impulso suma a la tirada del duelo, como la Polilla (en la cola).
 
-### P366 — ↩ Enyetar parte B: lo que quedó como recomendado al deshacer el último duelo (2026-11-27, Claude, al programar la B de P363)
+### ✅ P366 — ↩ Enyetar parte B: lo que quedó como recomendado al deshacer el último duelo (2026-11-27, Claude, al programar la B de P363)
 
 Lo que se programó y se puede cambiar:
 1. **Cuál es «el último duelo terminado»**: el terminado más nuevo **por la hora en que empezó** (los duelos no guardan la hora en que terminaron). Si
@@ -3221,3 +3221,4 @@ Lo que se programó y se puede cambiar:
    chico: es el último duelo). ¿Bien?
 6. **Si cayó y volvió**, queda con la vida de antes del golpe (no la de la resurrección) y se le devuelve el Pacto, el Ankh, la Llama o el Anillo.
 
+> ✅ **Decidida (dueño, 2026-11-27):** 1, 3, 4, 5 y 6 quedan como están. **2: sí** — la Moneda / WC Re-roll y el Golpe de suerte también pueden deshacer el último duelo (en la cola).

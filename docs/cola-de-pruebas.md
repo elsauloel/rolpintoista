@@ -3362,7 +3362,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   están «📊 Stats», «🎒 Abrir la mochila» y «📜 Ver mi ficha completa»): «acá debería haber un botón para ver las habilidades». Sumar «⚡ Habilidades»
   que muestre las habilidades del personaje (y de la invocación / creep si aplica) con lo esencial de cada una (costo, enfriamiento, qué hace) y,
   si es el dueño, que deje usarlas igual que la Botonera. Ver `comun/ficha-lite.js` y `vtt-hexgrid/js/15-ficha-lite.js`.
-- **⬜ en cola — 🧹 Descripciones sintéticas con el detalle aparte, y sin las notas de desarrollo «(fecha, dueño: …)»** (sumado 2026-11-27: el dueño
+- **⬜ en cola (en dos pasos, dueño 2026-11-27: «primero habría que unificar los recuadros y recién después auditar las habilidades») — 🧹 Descripciones sintéticas con el detalle aparte, y sin las notas de desarrollo «(fecha, dueño: …)»** — **Paso 1:** un solo cuadro de detalle (juntar el «📋 Detalle», los «Detalles técnicos» y la línea ⚙ automática de las habilidades de creep; P361). **Paso 2:** reescribir las ~200 descripciones con el criterio de `memoria-claude.md` (qué hace / el detalle). (sumado 2026-11-27: el dueño
   pide además descripciones bien sintéticas, con las minucias en un cuadro de detalle aparte; el Contraataque es el primero, hecho como modelo) (dueño, 2026-11-27: «hay muchas notas y
   aclaraciones tipo "fecha,dueño:" todo eso no debe llegar al jugador»). Revisar las descripciones visibles (`detalle`, `descripcion`, `efectoDetalle`,
   `original`…) de `comun/skills-clase.js`, `skills-creep-base.js`, `pasivas.js`, `estados-presets.js`, `catalogo.js`, `creeps-base.js`, `trampas-base.js`,

@@ -69,6 +69,9 @@
   menos… que todas las aclaraciones de las minucias vayan en un cuadro aparte, que sea el detalle, que la descripción de la habilidad sea bien
   sintética y clara»): la descripción dice en una o dos frases qué hace y cuánto cuesta; las excepciones, los casos raros, lo que pasa con el Bloqueo,
   el turno ajeno, lo automatizado, etc., van al **detalle** (cuadro aparte). Nada que hable de otra habilidad o pasiva («sin esta habilidad…»).
+  **El criterio** (dueño, 2026-11-27): la descripción, que es la que se muestra al lado del duelo mientras pasa la habilidad, dice **qué hace y cuál es
+  el efecto** («Ataca con su arma en un giro a todos a su alrededor.»; «Tira una nube que envenena.»); el detalle, las minucias mecánicas: qué se tira,
+  con qué se resiste, en qué momento se dispara el efecto, las excepciones, las dudas. Un solo cuadro de detalle (P361).
 
 - **La Percepción siempre incierta** (2026-11-11, dueño: «que no se sepa bien para qué estás tirando… no importa si es el máster o un jugador»):
   todo cartel que pide Percepción nombra solo a quien percibe con una frase incierta («Fulano siente un movimiento extraño…»,

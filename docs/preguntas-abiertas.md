@@ -3262,3 +3262,30 @@ token que esa pantalla no mueve** (la flecha que erra suele caer en la casilla d
 Por ahora queda así (lo recomendado: lo mismo que cualquier elemento del mapa, que lo mueven su dueño y el GM).
 
 **✅ Decidido (dueño, 2026-11-27): «está bien como está. Dejá los 2 puntos así como están».** Sin cambios.
+
+### P370 — 💾 Una pantalla vieja pisó la ficha de Rockardo y le devolvió los No2 de un ataque: ¿cómo evitamos que se pisen? (2026-11-27, Claude, al investigar «un ataque de Rockardo no le bajó los nitros»)
+
+**Qué pasó** (El origen, sesión del 26/11 a la noche; leído de la Mesa, los duelos y el 📜 Historial, sin abrir ninguna pantalla de la partida):
+en el primer turno de Rockardo (23:13–23:17 hora de acá) usó **Arrastrar** sobre el Goblin Alquimista (2 No2 y 2 SP: el Historial muestra «SP 7 → 5»)
+y enseguida le pegó con la **Maza** (ataque normal desde la Botonera, 25 de daño + ácido; primer ataque del turno: 5 No2). **Ocho segundos después del
+ataque** el Historial muestra «SP 5 → 7»: la ficha volvió a como estaba **antes de Arrastrar**. Los No2 viven en el mismo pedazo de la ficha que los SP,
+así que con esa vuelta atrás se fueron también los 2 No2 de Arrastrar y los 5 del ataque: lo que vio el jugador es que el ataque «no le bajó los No2»
+(le quedaron más que antes de atacar). No hubo ningún botón de devolver ni ningún aviso en la Mesa: fue una pantalla con una copia de la ficha de un
+minuto antes que la guardó encima. El resto de la sesión cobró bien (lo confirma el inicio del tercer turno: «No2 recargados a 4, se descontó la
+deuda de 5» del ataque de oportunidad). En el segundo turno pasó lo mismo (23:53, «SP 1 → 5») pero a los 13 segundos otra escritura lo dejó bien;
+ahí no se perdió nada.
+
+**Por qué puede pasar:** cada pantalla que tiene abierto a un personaje (el mapa del jugador, la ficha en otra pestaña, otra ventana del mapa…) guarda
+la ficha entera por partes y **gana la última que guarda**. Si una de esas pantallas quedó atrasada (por ejemplo una pestaña en segundo plano, que el
+navegador «duerme» y despierta una vez por minuto: las dos vueltas atrás cayeron en el segundo :46 de su minuto) y guarda algo, pisa lo nuevo con lo
+viejo. Con una sola pantalla abierta no se pudo repetir: en «Prueba · General» Arrastrar + ataque con el cuchillo cobraron bien (2 + 2 No2, sin vueltas
+atrás). No se tocó código.
+
+**Qué decidir:**
+1. **¿Rockardo tenía el mapa (o su ficha) abierto dos veces?** (dos pestañas, la compu y el celular, o la ficha completa en otra pestaña). Si sí, eso lo
+   explica.
+2. **Cómo evitar que se pisen** (vale para todos los personajes):
+   - **A (recomendada):** antes de guardar, cada pantalla mira si la ficha cambió desde la última vez que la leyó; si cambió, **no pisa**: suma lo suyo
+     arriba de lo nuevo (los No2, SP y vida que gastó o ganó se aplican como diferencia, no como número fijo).
+   - **B:** igual que A, pero si hay choque no guarda y avisa («tu ficha cambió en otra pantalla: repetí lo último»).
+   - **C:** dejarlo así, con un aviso cuando el mismo personaje está abierto en dos pantallas («jugá con una sola»), y corregir a mano si pasa.

@@ -156,7 +156,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   **Hecho:** la flecha que erró (y el arma que se cae) iba fijada y sin botones. Ahora el GM y quien la tiró la arrastran con el mouse, sin No2; un
   clic sin arrastrar sigue preguntando si la levantás. Si cayó debajo de un token que no movés, el clic la toma igual. El cartel dice «la tiró X» y
   cómo moverla. Probado con clics en «Prueba · General» (GM, J1, J2); la vuelta, «quedó igual». Pruebas: 1192. Dudas: P369.
-- **⬜ en cola (primero) — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
+- **✅ hecho (2026-11-27), investigado sin cambio de código — ⚡ Un ataque de Rockardo no le bajó los No2** (dueño, 2026-11-27, notas de la sesión): «recién en el origen de las especies un ataque de rockardo no le bajó los nitros». Investigar por qué no cobró los No2 del ataque.
+  **Qué fue:** el ataque con la Maza al Goblin Alquimista en el primer turno de Rockardo (23:14 del 26/11). Sí cobró, pero ocho segundos después otra
+  pantalla guardó encima una copia de la ficha de un minuto antes (el Historial: «SP 5 → 7» sin ningún botón ni aviso): se fueron los 2 No2 y 2 SP de
+  Arrastrar y los 5 No2 del ataque. Lo demás de la sesión cobró bien (el tercer turno descontó la deuda de 5 del ataque de oportunidad). En el segundo
+  turno pasó lo mismo a las 23:53, pero se corrigió solo a los 13 s. Leído solo de Firestore (Mesa, duelos, Historial), sin abrir pantallas de la
+  partida. En «Prueba · General», con una sola pantalla, Arrastrar + ataque cobraron bien. **Queda P370** (¿tenía dos pestañas? y cómo evitar que una
+  pantalla vieja pise la ficha). Pruebas: 1192.
 - **⬜ en cola (primero) — 🚩 El Estandarte de guerra no tira resistencia a Shockwave** (dueño, 2026-11-27, notas de la sesión): «el estandarte de guerra no debe tirar resistencia a shockwave» (un estandarte/tótem no es un rival que se resista: que la onda no lo cuente como objetivo).
 - **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).

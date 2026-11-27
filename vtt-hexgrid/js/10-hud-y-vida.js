@@ -1211,7 +1211,8 @@ function elementoQueEs(e){
   // 🗡 El arma en el piso (2026-10-07, js/27): su nombre, de quién era y cómo se levanta (el cartel de arriba a la derecha, como un token).
   if(e.arma){
     const [ref, tipo] = String(e.armaDe || '').split('|'), t = [...tokens.values()].find(x => x.fichaId === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo);
-    return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
+    return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(${/"flecha"\s*:/.test(e.armaItem || '') ? 'la tiró' : 'se le cayó a'} ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>` +
+      (puedeManipularElemento(e) ? '<div class="que-hace">🦶 Para moverlo, arrastralo con el mouse (no cuesta No2).</div>' : '');   // (2026-11-27, js/06)
   }
   // 🔥 El terreno incendiado (el mapa lo lee como zona desde el 2026-11-25, P295): primero, como lo que es.
   if(e.fuego && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien empieza su turno adentro (también volando)</span>`;

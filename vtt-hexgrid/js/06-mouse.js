@@ -92,7 +92,9 @@ lienzo.addEventListener('pointerdown', e => {
     moverTokenLibre(moverLibre, destino.col, destino.fila);
     return;
   }
-  if(id){
+  // 🏹 Una flecha o un arma en el piso debajo de un token que no movés (la flecha que erró cae en la casilla del blanco): el clic va al objeto.
+  const objetoDebajo = id && !puedoMover(tokens.get(id)) && typeof armaMovibleEn === 'function' && armaMovibleEn(m);
+  if(id && !objetoDebajo){
     seleccionar(id);
     hudPonerNivel('vital');   // el clic izquierdo, siempre lo del combate
     const t = tokens.get(id);
@@ -192,17 +194,21 @@ lienzo.addEventListener('pointerdown', e => {
     // comporta como el terreno de abajo — clickear y arrastrar mueve el
     // mapa, no el elemento (para eso está el botón de despinear).
     const casillaClic = mundoAHex(m.x, m.y);
-    const idElemento = elementoEn(casillaClic.col, casillaClic.fila);
+    const idElemento = objetoDebajo || elementoEn(casillaClic.col, casillaClic.fila);
     if(idElemento){
       const elHit = elementos.get(idElemento);
       elementoSeleccionar(idElemento);
-      if(elHit.fijado){
+      // 🏹🗡 Un objeto en el piso (la flecha que erró, el arma que se cayó; 2026-11-27, dueño: «debería poder hacerse con mover libre»): va fijado
+      // para que nadie lo arrastre sin querer, pero el GM y quien lo dejó lo mueven arrastrándolo, sin No2 (como 🦶 Mover libre). Un clic sin
+      // arrastrar sigue preguntando si lo levanta (`levantar`, al soltar).
+      const objetoPiso = elHit.arma && puedeManipularElemento(elHit);
+      if(elHit.fijado && !objetoPiso){
         paneo = {inicioX: px, inicioY: py, x: vista.x, y: vista.y};
         lienzo.style.cursor = 'grabbing';
         return;
       }
       if(puedeManipularElemento(elHit)){
-        arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false,
+        arrastreElemento = {id: idElemento, inicioX: px, inicioY: py, movio: false, levantar: objetoPiso,
           origen0: elHit.origen ? {col: elHit.origen.col, fila: elHit.origen.fila} : null,
           trampaVista: typeof trampaArrastreInicio === 'function' && trampaArrastreInicio(elHit)};   // 🪤👁 los conos de los rivales (js/79)
         lienzo.style.cursor = 'grabbing';
@@ -539,6 +545,7 @@ function soltar(){
     else{
       if(a.trampaVista && typeof trampaConosRivales !== 'undefined'){ trampaConosRivales = null; }
       if(a.movio && els) moverElemento(a.id, {origen: {col: els.origen.col, fila: els.origen.fila}});
+      else if(a.levantar && els && typeof levantadorPara === 'function' && levantadorPara(els)) armaLevantarDesdeMapa(a.id);   // 🏹 un clic: ¿lo levanta?
     }
     pedirDibujo();
   }

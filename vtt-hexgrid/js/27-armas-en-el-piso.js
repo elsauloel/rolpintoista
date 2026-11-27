@@ -172,9 +172,13 @@ function iconoDeArmaDe(t, itemId, itemNombre){
 // Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
 // hexagonales), con el 🗡️ adentro; su nombre sale en el cartel de arriba a la derecha al seleccionarla, como el de un token (js/10
 // elementoQueEs). La dibuja js/05, con el resto de los elementos.
-function armaDibujar(el, z){
+function armaDibujar(el, z, sel){
   const p = hexCentro(el.origen.col, el.origen.fila), R = HEX * 0.62;
   ctx.save();
+  if(sel){   // seleccionado: el contorno punteado de siempre (2026-11-27)
+    ctx.setLineDash([6 / z, 5 / z]); ctx.strokeStyle = 'rgba(237,227,210,.85)'; ctx.lineWidth = 1.5 / z;
+    ctx.beginPath(); ctx.arc(p.x, p.y, R * 1.45, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+  }
   // ✨ Se puede levantar (dueño, 2026-10-22): un anillo dorado que titila alrededor, sin apretar nada (levantadorPara, abajo).
   if(levantadorPara(el)){
     const f = 0.5 + 0.5 * Math.sin(performance.now() / 260);
@@ -221,10 +225,18 @@ function armasTitilan(){
 // El clic en el mapa (js/06): si en esa casilla hay algo que este personaje puede levantar, pregunta y lo levanta. → true si era eso.
 function armaClicLevantar(m){
   const c = mundoAHex(m.x, m.y);
-  const e = [...elementos.entries()].find(([, x]) => x.arma && x.origen && x.origen.col === c.col && x.origen.fila === c.fila && levantadorPara(x));
+  // (lo que esta pantalla puede mover —el GM, quien lo dejó— no: lo toma js/06, que lo deja arrastrar y pregunta al soltar sin moverlo)
+  const e = [...elementos.entries()].find(([, x]) => x.arma && x.origen && x.origen.col === c.col && x.origen.fila === c.fila && levantadorPara(x)
+    && !puedeManipularElemento(x));
   if(!e) return false;
   armaLevantarDesdeMapa(e[0]);
   return true;
+}
+// 🏹 (2026-11-27) El objeto del piso de esa casilla que esta pantalla puede mover (el GM, quien lo dejó): su id, o null.
+function armaMovibleEn(m){
+  const c = mundoAHex(m.x, m.y);
+  const e = [...elementos.entries()].find(([, x]) => x.arma && x.origen && x.origen.col === c.col && x.origen.fila === c.fila && puedeVerElemento(x) && puedeManipularElemento(x));
+  return e ? e[0] : null;
 }
 async function armaLevantarDesdeMapa(elId){
   const el = elementos.get(elId), quien = el && levantadorPara(el);

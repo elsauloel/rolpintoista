@@ -489,7 +489,7 @@ function dibujarLienzo(){
   }
   listaElementos.forEach(([id, el]) => {
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
-    if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
+    if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z, id === elementoSeleccionado); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
     const celdas = celdasDeElemento(el);
     if(el.acelerador && typeof aceleradorDibujar === 'function') aceleradorDibujar(el, z);   // ⏩ un círculo con flechitas, no la casilla (js/40)
     if(el.townPortal && typeof townPortalDibujar === 'function') townPortalDibujar(el, z);   // 🌀 la espiral azul que gira (js/84)

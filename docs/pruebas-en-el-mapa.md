@@ -3562,3 +3562,13 @@ fila de J2 ofrece «😈 Enyetar · Daño de Warrior · Hachero (15)» antes de 
 - El Golpe de suerte sobre el **daño** propio todavía sin aplicar (un personaje que pega) y sobre una tirada de una habilidad.
 - Enyetar el daño de una **habilidad** (un Rayo mágico) y el de un arco con el «+1 dado» del primer disparo.
 - Una tirada con «÷2» (Pajaritos, Lisiado…) repetida en el mapa (en las pruebas automáticas sí).
+
+## 🏹 Mover una flecha (o un arma) del piso (2026-11-27)
+
+Probado con clics en «Prueba · General» (GM, J1, J2): J1 arrastra su flecha desde debajo del token de otro jugador; J2 no la puede mover; el GM sí;
+las tres pantallas la ven en la casilla nueva; un clic sin arrastrar al lado de Blanco J1 pregunta «¿Querés levantarlo?» («No»: queda). La flecha se
+creó con la función real de la flecha que erra (sin un disparo de verdad).
+Falta ver:
+- Un disparo de verdad que erra (en combate) y mover la flecha después, en el turno del que la tiró y fuera de su turno.
+- Un arma que se cae en un duelo (la deja el GM) y que el GM la mueve.
+- El GM con una flecha debajo de un creep (hoy tiene que correr el creep primero: P369 2).

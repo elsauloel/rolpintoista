@@ -3104,7 +3104,7 @@ Con el paso 1 de P361, las **habilidades y las pasivas** tienen un solo cuadro �
    también en la fila, calculada para el nivel del creep que se está editando?
    - (a) Sí. (b) No: alcanza con el «👁 Ver». Recomendación: (b).
 
-### P363 — 😈 Enyetar sobre un duelo que ya avanzó o se cerró: ¿hasta dónde se vuelve atrás? (2026-11-27, Claude, investigando el pedido del dueño)
+### ✅ P363 — 😈 Enyetar sobre un duelo que ya avanzó o se cerró: ¿hasta dónde se vuelve atrás? (2026-11-27, Claude, investigando el pedido del dueño)
 
 Pedido del dueño (cola, «😈 Enyetar puede reabrir un duelo y volver atrás»): «que enyetar te permita reabrir un duelo y volver atrás con la resolución…
 se deshaga todo lo que se resolvió a raíz de ese tiro en adelante y se recalcule con enyetar».
@@ -3158,3 +3158,10 @@ resolver», y el duelo se marca «deshecho» en su «🔍 Ver detalle». Para **
 5. ¿Las tiradas de habilidades (un Rayo mágico, una Res.Esp) también se pueden enyetar?
 6. ¿Tachar la línea vieja de la Mesa (regla nueva que hay que pegar) o alcanza con la línea «↩ deshecho»?
 7. ¿Necesita «Aplicar automático / Resolver a mano» al deshacer? (Propuesta: sí, en el cartel de B.)
+
+> ✅ **Decidida (dueño, 2026-11-27):** **A más B.** (2) En A, el duelo espera **solo cuando alguien elige Enyetar** (no pregunta siempre). (4) Si el golpe
+> lo mató y volvió con Ankh / Fénix / Último aliento: **se deja deshacer, con mensaje y confirmación previas** (y se le devuelve lo que gastó). (5) Las
+> tiradas de habilidades **también** se pueden enyetar. (6) **Se tacha** la línea vieja de la Mesa, diciendo que cambió por Enyetar (regla nueva de
+> Firebase: el dueño la pega). (7) Al deshacer, **«Aplicar automático / Resolver a mano»: sí**. Sin respuesta (queda lo recomendado mientras): (2b) si
+> Re-roll, Mal de ojo y Polilla también hacen esperar al duelo → por ahora solo Enyetar; (3) el límite de B → solo el turno actual y sin un duelo más
+> nuevo entre esos dos.

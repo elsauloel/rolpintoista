@@ -3299,6 +3299,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Tanque · Escudero; Jugador 1, el asistente). Nota: los siete creeps del mapa «Prueba · General» no guardan de qué entrada de la biblioteca salieron,
   así que su «+ Pasiva» abre sin rol marcado (no es un error del código: un Escudero agregado desde el pool esencial sí lo trae). Capturas
   `cola133/01` a `03` y `14`. Pruebas automáticas: 4 nuevas (1167 en verde). `restaurar.js`: «quedó igual».
+- **⬜ en cola (dueño: «desarrollarlo ahora mismo», 2026-11-27) — 🔮 Simular el fin del combate eligiendo qué creeps quedan vivos o muertos**
+  (dueño, 2026-11-27): «en el simulador del final del combate uno puede poner que los creeps que siguen vivos estén muertos, entonces para saber
+  cuánto ganan de experiencia y qué equipos le quedan con los creeps muertos. Entonces al poner simulación uno debe elegir cada uno de los creeps
+  presentes y poder poner si están vivos o muertos». En 🔮 Simular (`comun/combate-fin.js`): una lista con cada creep presente y un interruptor
+  vivo / muerto (arranca como están de verdad), y la experiencia y el botín se recalculan con esa elección; no se guarda nada (es simulación).
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

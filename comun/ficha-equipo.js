@@ -593,6 +593,7 @@ const FichaEquipo = (() => {
     .sil-slot.sil-no{outline:2px solid #e06060;background:#4a2a2a}
     .sil-item{margin-top:2px}
     .sil-it{display:block}
+    .sil-slot:has(details.sil-it){cursor:pointer}
     .sil-it>summary{list-style:none;cursor:pointer;border-radius:5px;padding:1px 2px}
     .sil-it>summary::-webkit-details-marker{display:none}
     .sil-it>summary:hover{background:rgba(255,255,255,.08)}
@@ -825,6 +826,16 @@ const FichaEquipo = (() => {
       const raiz = ruta[0] && ruta[0].getRootNode ? ruta[0].getRootNode() : document;
       if(!raiz || !raiz.querySelectorAll) return;
       raiz.querySelectorAll('details.sil-it[open]').forEach(d => { if(!ruta.includes(d)) d.removeAttribute('open'); });
+    }, true);
+    // Un clic en cualquier parte del recuadro (no solo en el nombre) abre el menú del ítem, si el lugar tiene uno solo (dueño, 2026-11-27).
+    document.addEventListener('click', e => {
+      const ruta = e.composedPath ? e.composedPath() : [];
+      const slot = ruta.find(n => n && n.classList && n.classList.contains('sil-slot'));
+      if(!slot) return;
+      if(ruta.some(n => n && n.classList && (n.classList.contains('sil-it') || n.classList.contains('sil-ico') || n.classList.contains('sil-menu')))) return;
+      const ds = slot.querySelectorAll('details.sil-it');
+      if(ds.length !== 1) return;
+      ds[0].open = !ds[0].open;
     }, true);
   }
   function html(S, o){

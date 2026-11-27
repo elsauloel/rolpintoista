@@ -3263,7 +3263,7 @@ Por ahora queda así (lo recomendado: lo mismo que cualquier elemento del mapa, 
 
 **✅ Decidido (dueño, 2026-11-27): «está bien como está. Dejá los 2 puntos así como están».** Sin cambios.
 
-### P370 — 💾 Una pantalla vieja pisó la ficha de Rockardo y le devolvió los No2 de un ataque: ¿cómo evitamos que se pisen? (2026-11-27, Claude, al investigar «un ataque de Rockardo no le bajó los nitros»)
+### P370 ✅ — 💾 Una pantalla vieja pisó la ficha de Rockardo y le devolvió los No2 de un ataque: ¿cómo evitamos que se pisen? (2026-11-27, Claude, al investigar «un ataque de Rockardo no le bajó los nitros»)
 
 **Qué pasó** (El origen, sesión del 26/11 a la noche; leído de la Mesa, los duelos y el 📜 Historial, sin abrir ninguna pantalla de la partida):
 en el primer turno de Rockardo (23:13–23:17 hora de acá) usó **Arrastrar** sobre el Goblin Alquimista (2 No2 y 2 SP: el Historial muestra «SP 7 → 5»)
@@ -3289,3 +3289,5 @@ atrás). No se tocó código.
      arriba de lo nuevo (los No2, SP y vida que gastó o ganó se aplican como diferencia, no como número fijo).
    - **B:** igual que A, pero si hay choque no guarda y avisa («tu ficha cambió en otra pantalla: repetí lo último»).
    - **C:** dejarlo así, con un aviso cuando el mismo personaje está abierto en dos pantallas («jugá con una sola»), y corregir a mano si pasa.
+
+**✅ Decidido (dueño, 2026-11-27): la A** («vamos con la solución A»): antes de guardar, cada pantalla mira si la ficha cambió desde que la leyó; si cambió, no pisa: suma lo suyo encima (No2, SP y vida como diferencia). Va a la cola.

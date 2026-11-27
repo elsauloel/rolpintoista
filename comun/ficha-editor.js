@@ -62,8 +62,8 @@ const FichaEditor = (() => {
   // habilidad y el de una pasiva.
   function reglasCampoHtml(draft){
     const v = Array.isArray(draft.reglas) ? draft.reglas.join('\n') : String(draft.reglas || '');
-    return `<div class="f"><label>📋 Detalle (opcional)</label><textarea data-c="reglas" rows="7" placeholder="Un renglón por cosa: excepciones, casos raros, qué pasa en el turno de otro, ⚙ Automatizado…">${esc(v)}</textarea>
-      <div class="hint" style="margin-top:5px">Va en un cuadro aparte, debajo de la descripción. La descripción, corta: qué hace y cuánto cuesta.</div></div>`;
+    return `<div class="f"><label>📋 Detalle (opcional)</label><textarea data-c="reglas" rows="7" placeholder="Un renglón por cosa: excepciones, casos raros, qué pasa en el turno de otro, ⚙ Automatizado / ✋ A mano…">${esc(v)}</textarea>
+      <div class="hint" style="margin-top:5px">Un solo cuadro, debajo de la descripción: las reglas finas y lo técnico (⚙ / ✋). La descripción, corta: qué hace.</div></div>`;
   }
 
   function getModVal(draft, statId){
@@ -565,7 +565,7 @@ const FichaEditor = (() => {
         html += `<div class="resumen-hab">
       <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
       <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
-      ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(draft) : ''}
+      ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml(draft) : ''}
       ${fila('Ejecución', `${MODOS_HAB[modo].icono} ${MODOS_HAB[modo].nombre} (${MODOS_HAB[modo].corto})`)}
       ${modo === 'auto' ? fila('Paso a paso', esc(FichaBotonera.dueloDe(draft) ? resumenEjecucionHab(FichaBotonera.dueloDe(draft)) : 'sin configurar')) : ''}
       ${habLegado(draft).length ? fila('Del sistema anterior', esc(habLegado(draft).join(' · '))) : ''}
@@ -787,7 +787,7 @@ const FichaEditor = (() => {
           + (mods ? fila('Bonos', mods) : '');
       }
       if((draft.detalle || '').trim()) h += `<p class="hint" style="margin-top:10px">${esc(draft.detalle)}</p>`;
-      if(typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml) h += ItemCorto.reglasHtml(draft);
+      if(typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml) h += ItemCorto.detalleHtml(draft);
       return `<div class="resumen-hab">${h}</div>`;
     }
     function abrirFormularioPaso(){
@@ -831,6 +831,12 @@ const FichaEditor = (() => {
         return;
       }
       editing = {key, id, draft: structuredClone(item), paso: 0};
+      // 📋 Un solo campo de detalle (P361): lo técnico pegado a la descripción («⚙ Automatizado…», «✋ A mano…») pasa al campo del detalle.
+      if((key === 'habilidades' || key === 'pasivas') && typeof ItemCorto !== 'undefined' && ItemCorto.separarParaEditar){
+        editing.sepDetalle = ItemCorto.separarParaEditar(item);
+        editing.antesDetalle = {detalle: item.detalle, reglas: item.reglas};
+        Object.assign(editing.draft, editing.sepDetalle);
+      }
       // Una habilidad nueva arranca sin respuesta a "¿automatizarla?": es lo primero que se pregunta. Las que ya existen (sin el
       // dato) cuentan como automatizadas.
       if(key === 'habilidades' && !id && !op.draft){ editing.draft.automatizada = null; editing.draft.modo = null; editing.draft.jobCosto = HAB_JOB_CUSTOM; }
@@ -1037,6 +1043,11 @@ const FichaEditor = (() => {
         ctx.alCambiar(['inventario', 'cinturon']);
         toast(FichaEquipo.textoAlCinturon(P, draft, r));
         return;
+      }
+      if(editing.sepDetalle){   // 📋 sin tocar el texto, queda como estaba guardado
+        const d = ItemCorto.detalleAlGuardar(editing.antesDetalle, editing.sepDetalle, draft);
+        draft.detalle = d.detalle;
+        if(d.reglas.trim()) draft.reglas = d.reglas; else delete draft.reglas;
       }
       if(id){ const i = P[key].findIndex(x=>x.id===id); P[key][i] = draft; }
       else P[key].push(draft);

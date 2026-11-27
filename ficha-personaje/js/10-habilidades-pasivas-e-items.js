@@ -153,9 +153,9 @@ function abrirHabClase(claseId, yaLeido){
         ${h._bib && h._bib.subida ? `<div class="hint" style="margin-top:2px">${h._bib.auditado ? '' : '<b style="color:#e0a040" title="La subió alguien del grupo y todavía no la revisó el dueño. Se puede usar igual.">🔶 sin auditar</b> · '}${h._bib.version > 1 ? `v${fmt(h._bib.version)} · ` : ''}subida por ${esc(h._bib.autor || 'alguien')}</div>` : ''}
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}
-        <div class="hint" style="margin-top:4px">${glo(h.detalle)}</div>
-        ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}
-        ${h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${glo(h.original)}»</div>` : ''}
+        <div class="hint" style="margin-top:4px">${glo(typeof ItemCorto !== 'undefined' && ItemCorto.descripcion ? ItemCorto.descripcion(h) : h.detalle)}</div>
+        ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml(h, {plegable: true})
+          : h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${glo(h.original)}»</div>` : ''}
       </div>`;
     }).join('') || `<div class="hint">${esCustomPool && listaCompleta.length ? 'Ninguna con ese filtro.' : 'Todavía no hay ninguna acá.'}</div>`}</div>`;
   if(claseId === '_custom'){

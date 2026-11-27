@@ -4,16 +4,19 @@
    misma»). Las botoneras (comun/ficha-botonera.js, comun/inv-botonera.js, comun/creep-botonera.js) le ponen al botón `TipEjecutar.attrs(nombre,
    detalle)`: guarda el texto en `data-tip-hab`. Este archivo arma el globo en cualquier pantalla (también adentro de los recuadros aislados
    del mapa: mira `composedPath`), con los términos del glosario (Glosario.marcar) y el estilo del recuadro «Detalle» de «Ver».
-   El texto es el descriptivo: sin las notas ⚙ Automatizado / ✋ A mano. El `title` del botón (Flash, lo que falta) pasa abajo, en chico.
+   El texto es el descriptivo («Qué hace»); debajo, el cuadro único «📋 Detalle» (con las notas ⚙ / ✋). El `title` del botón (Flash, lo que falta) pasa abajo, en chico.
    El globo va al costado del botón (izquierda o derecha, donde entre), sin taparlo; se puede entrar con el mouse para leer el glosario.
    ========================================================= */
 const TipEjecutar = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-  const sinNotas = t => String(t || '').split(/\s*[⚙✋]/)[0].trim();
-  // 📋 `reglas` (2026-11-27): el detalle de reglas de la habilidad, aparte de la descripción (ItemCorto.reglasLista); va en el globo debajo.
-  function attrs(nombre, detalle, reglas){
+  // (la descripción sin las notas: ItemCorto.partes, que no corta en una ⚙ o ✋ en medio de una frase)
+  const sinNotas = t => typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(t).hace : String(t || '').split(/\s*[⚙✋]/)[0].trim();
+  // 📋 El cuadro único de detalle (P361): `hab` es la habilidad entera (o, como antes, solo su texto de `reglas`); los renglones salen de
+  // ItemCorto.detalleLista: las reglas escritas y lo técnico (las notas ⚙/✋ que hayan quedado en la descripción, el borrador de clases).
+  function attrs(nombre, detalle, hab){
     const t = sinNotas(detalle);
-    const l = typeof ItemCorto !== 'undefined' && ItemCorto.reglasLista ? ItemCorto.reglasLista({reglas}) : [];
+    const h = hab && typeof hab === 'object' ? {...hab, detalle} : {detalle, reglas: hab};
+    const l = typeof ItemCorto !== 'undefined' && ItemCorto.detalleLista ? ItemCorto.detalleLista(h) : [];
     return t || l.length ? `data-tip-hab="${esc(t)}" data-tip-nombre="${esc(nombre || '')}"${l.length ? ` data-tip-reglas="${esc(l.join('\n'))}"` : ''}` : '';
   }
   const CSS = `#tip-ejecutar{position:fixed;z-index:100000;max-width:380px;background:#1c1714;border:1px solid #4a3a30;border-radius:8px;
@@ -50,7 +53,7 @@ const TipEjecutar = (() => {
     const mk = t => typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(t) : esc(t);
     const reglas = String(b.dataset.tipReglas || '').split('\n').filter(Boolean);
     tip.innerHTML = (b.dataset.tipNombre ? `<div class="te-nom">${esc(b.dataset.tipNombre)}</div>` : '')
-      + (txt ? `<span class="te-lbl">${reglas.length ? 'Qué hace' : 'Detalle'}</span><div class="te-txt">${marcado}</div>` : '')
+      + (txt ? `<span class="te-lbl">Qué hace</span><div class="te-txt">${marcado}</div>` : '')
       + (reglas.length ? `<div class="te-reglas"><span class="te-lbl">📋 Detalle</span><ul>${reglas.map(r => `<li>${mk(r)}</li>`).join('')}</ul></div>` : '')
       + (pie ? `<div class="te-pie">${esc(pie)}</div>` : '');
     document.body.appendChild(tip);

@@ -403,7 +403,7 @@ const FichaLupa = (() => {
         <div class="view-lines">${L.filter(Boolean).join('') || '<div class="view-line"><span class="view-value">Sin datos adicionales.</span></div>'}</div>
       </div>
     </div>
-    ${ItemCorto.verHtml(key === 'habilidades' && typeof FichaBotonera !== 'undefined' && FichaBotonera.detalleVigente ? {...it, detalle: FichaBotonera.detalleVigente(it)} : it)}
+    ${ItemCorto.verHtml(key === 'habilidades' && typeof FichaBotonera !== 'undefined' && FichaBotonera.detalleVigente ? {...it, detalle: FichaBotonera.detalleVigente(it)} : it, {hab: key === 'habilidades' || key === 'pasivas'})}
     ${narrativa ? `<div class="view-detalle view-narrativa">${esc(narrativa)}</div>` : ''}
   `};
   }

@@ -423,10 +423,15 @@ const Biblioteca = (() => {
   function cuerpoDe(st, e){
     const conCorto = typeof ItemCorto !== 'undefined';
     const cuerpo = st.opts.cuerpo || (actual === 'trampas' && conCorto && e.datos ? (x => ItemCorto.trampaHtml(x.datos)) : null);
-    // 📋 el detalle de reglas de una habilidad o pasiva (`reglas`, 2026-11-27), plegado; una habilidad de creep de fábrica lo trae en su receta (`sp`).
-    const reglasDe = e.datos ? (e.datos.reglas || (e.datos.sp && e.datos.sp.reglas) || '') : '';
-    const reg = conCorto && ItemCorto.reglasHtml && reglasDe ? ItemCorto.reglasHtml({reglas: reglasDe}, {plegable: true}) : '';
-    if(!cuerpo) return (e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : '') + reg;
+    // 📋 Una habilidad o una pasiva: la descripción y el cuadro único de detalle, plegado (P361): sus reglas escritas (`reglas`; una habilidad de
+    // creep de fábrica las trae en su receta, `sp`) y lo técnico (las notas ⚙ / ✋ que hayan quedado en la descripción, el borrador de clases).
+    const hab = e.datos ? (e.datos.habilidad || e.datos) : null;
+    const reglasDe = hab ? (hab.reglas || (hab.sp && hab.sp.reglas) || '') : '';
+    const esHab = conCorto && ItemCorto.detalleHtml && ['skills', 'habs_creep', 'pasivas'].includes(actual);
+    const fuente = {detalle: e.descripcion || '', reglas: reglasDe, ...(hab && hab.original ? {original: hab.original} : {})};
+    const reg = esHab ? ItemCorto.detalleHtml(fuente, {plegable: true}) : conCorto && ItemCorto.reglasHtml && reglasDe ? ItemCorto.reglasHtml({reglas: reglasDe}, {plegable: true}) : '';
+    const desc = esHab ? ItemCorto.descripcion(fuente) : e.descripcion;
+    if(!cuerpo) return (desc ? `<div class="desc">${esc(desc)}</div>` : '') + reg;
     const tec = st.opts.tecnico ? st.opts.tecnico(e) : conCorto ? ItemCorto.tecnicoHtml(e.descripcion || '') : '';
     return `<div class="desc">${cuerpo(e)}</div>${reg}${tec ? `<details class="bib-tec"><summary>Ver detalles técnicos</summary>${tec}</details>` : ''}`;
   }

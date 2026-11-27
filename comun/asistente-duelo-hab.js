@@ -1074,7 +1074,7 @@ const AsistenteDueloHab = (() => {
       const tx = document.createElement('div');
       tx.className = 'duelo-texto';
       const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(String(cfg.detalle).trim()) : {hace: String(cfg.detalle).trim(), tecnico: ''};
-      tx.innerHTML = `<b class="t">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(pt.hace) : esc(pt.hace)}${pt.tecnico ? `<details class="tec"><summary>Detalles técnicos</summary>${esc(pt.tecnico)}</details>` : ''}`;
+      tx.innerHTML = `<b class="t">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(pt.hace) : esc(pt.hace)}`;   // solo la descripción, como en el duelo (P361)
       fondo.appendChild(tx);
       fondo.classList.add('con-texto');
     }

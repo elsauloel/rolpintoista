@@ -50,12 +50,22 @@ const ItemCorto = (() => {
     document.head.appendChild(s);
   }
 
-  // El texto de un ítem, partido: lo que hace / las notas técnicas (desde la primera ⚙ o ✋) / si dice que falta auditar.
+  // Dónde empieza una nota técnica: una ⚙ o una ✋ al principio o después de un punto («… sus aliados. ⚙ En el mapa: …»), o seguida de
+  // «Automatizado / Automático / A mano». Una ⚙ o una ✋ en medio de una frase es un ícono, no una nota («con el ⚙ del token», «o ✋ eligiéndolo»,
+  // «(⚙ automático: …)»): antes cortaban la descripción ahí (P361).
+  const NOTA_RE = /(?:(?<=^|[.!?»)"]\s{0,3})[⚙✋]|[⚙✋](?=\ufe0f?\s*(?:Automati|A mano)))/g;
+  function notas(t){
+    const idx = [...String(t || '').matchAll(NOTA_RE)].map(m => m.index);
+    return idx.map((i, k) => t.slice(i, k + 1 < idx.length ? idx[k + 1] : undefined).trim()).filter(Boolean);
+  }
+  // El texto de un ítem, partido: lo que hace / las notas técnicas (desde la primera nota ⚙ o ✋) / si dice que falta auditar.
   function partes(texto){
     let t = String(texto || '');
     const auditar = AVISO_RE.test(t);
     t = t.replace(AVISO_RE, '');
-    const i = t.search(/⚙|✋/);
+    NOTA_RE.lastIndex = 0;
+    const m = NOTA_RE.exec(t), i = m ? m.index : -1;
+    NOTA_RE.lastIndex = 0;
     return {hace: (i >= 0 ? t.slice(0, i) : t).trim(), tecnico: i >= 0 ? t.slice(i).trim() : '', auditar};
   }
 
@@ -251,38 +261,79 @@ const ItemCorto = (() => {
       const orig = originalDe(fuente);
       if(orig) extra.push(`📜 Adaptada del borrador de clases, que decía: «${orig}»`);
     }
-    const notas = String(p.tecnico || '').split(/\s*(?=[⚙✋])/).map(x => x.trim()).filter(Boolean);
-    const dicen = notas.join(' ');   // lo que ya cuentan las notas del ítem no se repite (el costo de una varita, por ejemplo)
-    const lineas = [...notas, ...extra.filter(l => !(/^Cuesta /.test(l) && /Cuesta/.test(dicen)))].filter(Boolean);
+    const ns = notas(p.tecnico);
+    const dicen = ns.join(' ');   // lo que ya cuentan las notas del ítem no se repite (el costo de una varita, por ejemplo)
+    const lineas = [...ns, ...extra.filter(l => !(/^Cuesta /.test(l) && /Cuesta/.test(dicen)))].filter(Boolean);
     if(!lineas.length && !p.auditar) return '';
     return `<div class="ic-tecnico"><b>Detalles técnicos</b>${lineas.length ? `<ul>${lineas.map(l => `<li>${mk(l)}</li>`).join('')}</ul>` : ''}`
       + `${p.auditar ? '<div class="ic-pie">Creada automáticamente: las cifras están para auditar.</div>' : ''}</div>`;
   }
-  /* 📋 El detalle de reglas de una habilidad o una pasiva (dueño, 2026-11-27: «que todas las aclaraciones de las minucias vayan en un cuadro
-     aparte, que sea el detalle, que la descripción de la habilidad sea bien sintética y clara»). Campo `reglas`: texto con un renglón por cosa
-     (un salto de línea entre renglones; se acepta también una lista). La descripción (`detalle`) queda corta; acá van las excepciones, los
-     casos raros y el «⚙ Automatizado / ✋ A mano». `reglasHtml(h, {plegable})`: el cuadro (plegado en las listas, abierto en «Ver»). */
+  /* 📋 El detalle de una habilidad o una pasiva: UN SOLO CUADRO (P361). La descripción (`detalle`) queda corta, arriba («Qué hace»: es la que se
+     ve al lado del duelo); el cuadro «📋 Detalle» junta, en este orden, las reglas escritas (campo `reglas`: texto con un renglón por cosa, o una
+     lista) y lo técnico: las notas «⚙ Automatizado / ✋ A mano» que hayan quedado pegadas a la descripción (se separan solas al mostrarla, desde la
+     primera ⚙ o ✋), de qué texto del borrador de clases se adaptó y si sus cifras están para auditar. Antes eran dos recuadros («📋 Detalle» y
+     «Detalles técnicos»). `reglasLista(h)`: solo las reglas escritas; `detalleLista(h)`: todos los renglones del cuadro; `descripcion(h)`: la
+     descripción sin las notas; `detalleHtml(h, {plegable})`: el cuadro (plegado en las listas, abierto en «Ver»; '' si no hay nada). */
   function reglasLista(h){
     const r = h && h.reglas;
     const arr = Array.isArray(r) ? r : String(r || '').split(/\n+/);
     return arr.map(x => String(x || '').replace(/^\s*[-•·]\s*/, '').trim()).filter(Boolean);
   }
-  function reglasHtml(h, o){
-    const l = reglasLista(h);
+  const textoDe = h => String((h && (typeof h === 'string' ? h : (h.detalle || h.descripcion))) || '');
+  function descripcion(h){ return partes(textoDe(h)).hace; }
+  // Lo técnico de una habilidad o pasiva, en renglones (sin las armas: eso es de los ítems).
+  function tecnicoLista(h){
+    if(!h) return [];
+    const p = partes(textoDe(h));
+    const ns = notas(p.tecnico);
+    const orig = typeof h === 'object' ? originalDe(h) : '';
+    return [...ns, ...(orig ? [`📜 Adaptada del borrador de clases, que decía: «${orig}»`] : []),
+      ...(p.auditar ? ['Creada automáticamente: las cifras están para auditar.'] : [])];
+  }
+  const normRenglon = t => String(t || '').toLowerCase().replace(/\s+/g, ' ').replace(/[.\s]+$/, '').trim();
+  function detalleLista(h){
+    const reg = reglasLista(h), ya = new Set(reg.map(normRenglon));
+    return [...reg, ...tecnicoLista(h).filter(l => !ya.has(normRenglon(l)))];
+  }
+  function detalleHtml(h, o){
+    const l = detalleLista(h);
     if(!l.length) return '';
     estilos();
     const ul = `<ul>${l.map(x => `<li>${mk(x)}</li>`).join('')}</ul>`;
     return o && o.plegable ? `<details class="ic-reglas"><summary>📋 Detalle</summary>${ul}</details>` : `<div class="ic-reglas"><b>📋 Detalle</b>${ul}</div>`;
   }
-  // Lo de «Ver»: qué hace (una trampa, en datos cortos), la descripción sin las notas técnicas, el 📋 Detalle (las reglas finas) y el recuadro
-  // «Detalles técnicos».
-  function verHtml(item){
+  const reglasHtml = detalleHtml;   // (el nombre de antes: las pantallas que lo llaman ya muestran el cuadro único)
+  // Para los editores: la descripción y el detalle en dos campos, con lo técnico pegado a la descripción ya pasado al detalle (al final). Así,
+  // al guardar, la línea ⚙ queda en el detalle y no en la descripción.
+  function separarParaEditar(h){
+    const p = partes(textoDe(h));
+    const reg = reglasLista(h), ya = new Set(reg.map(normRenglon));
+    const ns = notas(p.tecnico).filter(l => !ya.has(normRenglon(l)));
+    const aviso = AVISO_RE.test(textoDe(h)) ? '(Trampa creada automáticamente: requiere auditar.) ' : '';
+    return {detalle: (aviso + p.hace).trim(), reglas: [...reg, ...ns].join('\n')};
+  }
+  // Al guardar un editor: si no se tocaron ni la descripción ni el detalle, quedan como estaban guardados (así abrir y guardar sin cambiar el texto
+  // no cuenta como «editada a mano» para la puesta al día de las copias de clase). → {detalle, reglas} (reglas '' = sin detalle).
+  function detalleAlGuardar(antes, sep, v){
+    const igual = String(v.detalle || '') === String(sep.detalle || '') && String(v.reglas || '') === String(sep.reglas || '');
+    const r0 = Array.isArray(antes && antes.reglas) ? antes.reglas.join('\n') : String((antes && antes.reglas) || '');
+    return igual ? {detalle: String((antes && antes.detalle) || ''), reglas: r0} : {detalle: String(v.detalle || ''), reglas: String(v.reglas || '')};
+  }
+  // El «Ver» de una habilidad o pasiva: la descripción («Qué hace») y el cuadro único, abierto.
+  function verHabHtml(h){
+    if(!h) return '';
+    const hace = descripcion(h);
+    return (hace ? `<div class="view-detalle"><span class="view-label">Qué hace</span>${mk(hace)}</div>` : '') + detalleHtml(h);
+  }
+  // Lo de «Ver» de un ítem: qué hace (una trampa, en datos cortos), la descripción sin las notas técnicas y el recuadro «Detalles técnicos».
+  // Con {hab: true}, el de una habilidad o pasiva (verHabHtml).
+  function verHtml(item, o){
     if(!item) return '';
+    if((o && o.hab) || reglasLista(item).length) return verHabHtml(item);   // (un ítem no tiene `reglas`)
     const p = partes(item.detalle);
     return (item.trampaDatos ? `<div class="view-detalle"><span class="view-label">Qué hace</span>${trampaHtml(item.trampaDatos)}</div>` : '')
-      + (p.hace ? `<div class="view-detalle"><span class="view-label">${reglasLista(item).length ? 'Qué hace' : 'Detalle'}</span>${mk(p.hace)}</div>` : '')
-      + reglasHtml(item)
+      + (p.hace ? `<div class="view-detalle"><span class="view-label">Detalle</span>${mk(p.hace)}</div>` : '')
       + tecnicoHtml(item);
   }
-  return {CSS, partes, reglasLista, reglasHtml, trampaFilas, trampaHtml, filasHtml, grillaHtml, tecnicoHtml, verHtml, armaEsencial, armaTecnico};
+  return {CSS, partes, notas, reglasLista, reglasHtml, detalleLista, detalleHtml, descripcion, separarParaEditar, detalleAlGuardar, verHabHtml, trampaFilas, trampaHtml, filasHtml, grillaHtml, tecnicoHtml, verHtml, armaEsencial, armaTecnico};
 })();

@@ -130,7 +130,7 @@ const CreepLupa = (() => {
   // técnico»): la misma pieza que el «Ver» de un ítem o de una habilidad de personaje (ItemCorto.verHtml). La usa también inv-lupa.js.
   function detalleHab(h, vacio){
     if(!h.detalle) return `<div>${esc(vacio)}</div>`;
-    if(typeof ItemCorto !== 'undefined') return ItemCorto.verHtml(h);
+    if(typeof ItemCorto !== 'undefined') return ItemCorto.verHtml(h, {hab: true});   // la descripción y el cuadro único de detalle (P361)
     return `<div>${typeof Glosario !== 'undefined' ? Glosario.marcar(h.detalle) : esc(h.detalle)}</div>`;
   }
   function verHab(sc, h){
@@ -177,8 +177,9 @@ const CreepLupa = (() => {
       const partes = [];
       partes.push(K.costoHabTxt(sc, h));
       if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
-      const reglas = typeof ItemCorto !== 'undefined' && ItemCorto.reglasLista ? ItemCorto.reglasLista(h) : [];   // 📋 el detalle aparte (2026-11-27)
-      const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}${reglas.length ? '\n📋 Detalle:\n· ' + reglas.join('\n· ') : ''}`;
+      const IC = typeof ItemCorto !== 'undefined' && ItemCorto.detalleLista ? ItemCorto : null;   // 📋 la descripción y el cuadro único de detalle (P361)
+      const reglas = IC ? IC.detalleLista(h) : [];
+      const tip = `${partes.join(' · ')}\n${(IC ? IC.descripcion(h) : h.detalle) || 'Sin descripción.'}${reglas.length ? '\n📋 Detalle:\n· ' + reglas.join('\n· ') : ''}`;
       return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
     }).join('');
 

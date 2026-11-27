@@ -3089,3 +3089,17 @@ editor del creep esa línea se ve dentro de la Descripción. ¿Qué hacemos?
 Recomendación: (b), cuando se haga la limpieza general («🧹 Descripciones sintéticas con el detalle aparte»).
 
 > ✅ **Decidida (dueño, 2026-11-27):** se unifica en un solo cuadro de detalle (el «📋 Detalle», los «Detalles técnicos» y la línea ⚙ que el programa le pega a las habilidades de creep). Primero se unifica el cuadro y después se auditan las descripciones (ver la cola).
+> **Paso 1 aplicado (2026-11-27):** un solo cuadro «📋 Detalle» en habilidades y pasivas (ver la cola, «🧹 Descripciones sintéticas…»). Lo que quedó: P362.
+
+### P362 — 📋 El cuadro único de detalle: ¿también para los ítems? y la línea ⚙ en la biblioteca de habilidades de creep (2026-11-27, Claude, al hacer el paso 1 de P361)
+
+Con el paso 1 de P361, las **habilidades y las pasivas** tienen un solo cuadro «📋 Detalle» (las reglas escritas y, al final, lo técnico). Quedan dos cosas:
+1. **Los ítems** (armas, armaduras, consumibles, trampas del catálogo) siguen con su recuadro gris «Detalles técnicos» debajo del «Detalle» (que en un
+   ítem es la descripción). ¿Pasan también al cuadro único «📋 Detalle», con la descripción como «Qué hace»?
+   - (a) Sí, igual que las habilidades, para que todo se lea igual.
+   - (b) No: un ítem queda como está (su «Detalle» es la descripción y lo técnico va aparte).
+   Recomendación: (a), en otra tanda (toca el catálogo, la tienda, el generador y la mochila).
+2. **La biblioteca de habilidades de creep** («+ Habilidad» de un creep) muestra la descripción y las reglas escritas, pero no la línea «⚙ Automatizado:
+   cuesta…; cooldown…» porque esa línea se arma con el nivel del creep al agregarla (en el «👁 Ver» de cada una sí aparece, calculada). ¿Se muestra
+   también en la fila, calculada para el nivel del creep que se está editando?
+   - (a) Sí. (b) No: alcanza con el «👁 Ver». Recomendación: (b).

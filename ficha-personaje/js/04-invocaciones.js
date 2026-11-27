@@ -255,8 +255,8 @@ function invHabHtml(inv, h){
       <button type="button" class="inv-rm" data-rmhabinv="${inv.id}:${h.id}" title="Eliminar">×</button>
     </div>
     <div class="hint">${esc(costoHabInvTxt(inv, h))}${num(h.cd) > 0 ? ` · CD ${fmt(num(h.cd))}` : ''}</div>
-    ${h.detalle ? `<div class="hint">${esc(h.detalle)}</div>` : ''}
-    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(h, {plegable: true}) : ''}
+    ${(d => d ? `<div class="hint">${esc(d)}</div>` : '')(typeof ItemCorto !== 'undefined' && ItemCorto.descripcion ? ItemCorto.descripcion(h) : h.detalle)}
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml(h, {plegable: true}) : ''}
   </div>`;
 }
 
@@ -770,7 +770,7 @@ function hiResumenHtml(){
   const cd = num($('#hi-cd').value);
   return `<div class="resumen-nombre">${esc($('#hi-nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
-    ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml({reglas: $('#hi-reglas').value}) : ''}
+    ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml({detalle: $('#hi-detalle').value, reglas: $('#hi-reglas').value}) : ''}
     ${fila('Ejecución', (m => `${m.icono} ${m.nombre} (${m.corto})`)(MODOS_HAB[editingHabInv.modo || 'semi']))}
     ${editingHabInv.modo === 'auto' ? fila('Paso a paso', editingHabInv.duelo ? resumenEjecucionHab(editingHabInv.duelo) : 'sin configurar') : ''}
     ${fila('No2', $('#hi-nitros-modo').value === 'ataque' ? 'como un ataque' : fmt(Math.max(0, num($('#hi-acciones').value))))}
@@ -834,8 +834,12 @@ function abrirEditorHabInv(invId, habId){
   editingHabInvPdgAuto = false;
   $('#hi-cd').value = h.cd || 0;
   $('#hi-hpcosto').value = h.hpCosto || 0;
-  $('#hi-detalle').value = h.detalle || '';
-  $('#hi-reglas').value = Array.isArray(h.reglas) ? h.reglas.join('\n') : String(h.reglas || '');
+  // 📋 Un solo campo de detalle (P361): lo técnico pegado a la descripción («⚙ Automatizado…», «✋ A mano…») pasa al detalle.
+  editingHabInv.sepDetalle = typeof ItemCorto !== 'undefined' && ItemCorto.separarParaEditar ? ItemCorto.separarParaEditar(h)
+    : {detalle: h.detalle || '', reglas: Array.isArray(h.reglas) ? h.reglas.join('\n') : String(h.reglas || '')};
+  editingHabInv.antesDetalle = {detalle: h.detalle, reglas: h.reglas};
+  $('#hi-detalle').value = editingHabInv.sepDetalle.detalle;
+  $('#hi-reglas').value = editingHabInv.sepDetalle.reglas;
   $('#hi-tirada').value = h.tiradaExtra || '';
   $('#hi-tirada-stat').innerHTML = hiOpcionesStat(h.tiradaStat || '');
   $('#hi-efecto-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEfectosPresetHtml();
@@ -883,8 +887,12 @@ function guardarEditorHabInv(){
   h.cd = Math.max(0, num($('#hi-cd').value) || 0);
   const hpCostoInv = Math.max(0, num($('#hi-hpcosto').value) || 0);
   if(hpCostoInv) h.hpCosto = hpCostoInv; else delete h.hpCosto;
-  h.detalle = $('#hi-detalle').value;
-  if($('#hi-reglas').value.trim()) h.reglas = $('#hi-reglas').value; else delete h.reglas;   // 📋 el detalle aparte (2026-11-27)
+  // 📋 el detalle (P361): sin tocar el texto, queda como estaba guardado
+  const dg = editingHabInv.sepDetalle && typeof ItemCorto !== 'undefined' && ItemCorto.detalleAlGuardar
+    ? ItemCorto.detalleAlGuardar(editingHabInv.antesDetalle, editingHabInv.sepDetalle, {detalle: $('#hi-detalle').value, reglas: $('#hi-reglas').value})
+    : {detalle: $('#hi-detalle').value, reglas: $('#hi-reglas').value};
+  h.detalle = dg.detalle;
+  if(String(dg.reglas || '').trim()) h.reglas = dg.reglas; else delete h.reglas;
   h.tiradaExtra = $('#hi-tirada').value.trim();
   h.tiradaStat = $('#hi-tirada-stat').value;
   h.efectoNombre = $('#hi-efecto-nombre').value.trim();
@@ -1024,8 +1032,8 @@ const LISTS = {
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}<span class="tag cost" title="${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre)}: ${esc(MODOS_HAB[modoHab(i) || 'semi'].corto)}">${MODOS_HAB[modoHab(i) || 'semi'].icono} ${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre.toLowerCase())}</span>${i.para === 'creep' ? ' <span class="tag cost" title="Habilidad pensada para creeps: paga con cooldown, no con SP. En la ficha no hay cooldown: revisale el costo.">🐾 de creep</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
-          <div class="idesc">${esc(i.detalle)}</div>
-          ${typeof ItemCorto !== 'undefined' && ItemCorto.reglasHtml ? ItemCorto.reglasHtml(i, {plegable: true}) : ''}
+          <div class="idesc">${esc(typeof ItemCorto !== 'undefined' && ItemCorto.descripcion ? ItemCorto.descripcion(i) : i.detalle)}</div>
+          ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml(i, {plegable: true}) : ''}
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button><button class="mini" data-subirhab="${i.id}" title="Subir a la biblioteca con toda su configuración: queda disponible para todos al instante">⬆</button></div>
       </div>
@@ -1039,7 +1047,8 @@ const LISTS = {
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}${i.job !== false ? ` <span class="tag" title="Cada copia cuesta 1 de Job más que la anterior (1, 2, 3…)">${fmt(jobCostoDe(i))} Job · la próxima copia: ${fmt(FichaLupa.jobCostoProxima(i))}</span>` : ''}${versionNuevaDePasiva(i) ? ` <button type="button" class="mini" data-versionpasiva="${i.id}" title="Alguien corrigió la pasiva de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div><div class="idesc">${esc(i.detalle)}</div>
+        <div><div class="iname">${esc(i.nombre)}${pasivaCompras(i) > 1 ? ' <span class="tag cost">×' + pasivaCompras(i) + '</span>' : ''}${i.job !== false ? ` <span class="tag" title="Cada copia cuesta 1 de Job más que la anterior (1, 2, 3…)">${fmt(jobCostoDe(i))} Job · la próxima copia: ${fmt(FichaLupa.jobCostoProxima(i))}</span>` : ''}${versionNuevaDePasiva(i) ? ` <button type="button" class="mini" data-versionpasiva="${i.id}" title="Alguien corrigió la pasiva de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div><div class="idesc">${esc(typeof ItemCorto !== 'undefined' && ItemCorto.descripcion ? ItemCorto.descripcion(i) : i.detalle)}</div>
+        ${typeof ItemCorto !== 'undefined' && ItemCorto.detalleHtml ? ItemCorto.detalleHtml(i, {plegable: true}) : ''}
         <div class="imeta">${modTags(i.mods)}</div></div>
         <div class="rowbtns"><button class="mini" data-proponerpasiva="${i.id}" title="Subir esta pasiva a la biblioteca compartida: queda disponible para todos al instante">⬆ Subir</button><button class="mini" data-view="pasivas:${i.id}">Ver</button><button class="mini" data-edit="pasivas:${i.id}">Editar</button></div>
       </div></div>`

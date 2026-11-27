@@ -66,7 +66,7 @@ const CreepCalculo = (() => {
     const U = window.CreepsBaseUtil;
     (Array.isArray(sc.habilidades) ? sc.habilidades : []).forEach(h => {
       if(!h || h.tiradaStat || !String(h.tiradaExtra || '').trim() || h.trampaColocar) return;
-      if(!/tira [^;]*? de daño/i.test(String(h.detalle || ''))) return;
+      if(!/tira [^;]*? de daño/i.test(String(h.detalle || '') + ' ' + String(h.reglas || ''))) return;   // (la línea ⚙, en la descripción o en el detalle: P361)
       h.tiradaStat = U && U.esHabMagica && U.esHabMagica(h.nombre, h.detalle) ? 'pdgmg' : 'pdg';
     });
   }
@@ -116,18 +116,18 @@ const CreepCalculo = (() => {
         if(num(h.cd) === 3){ h.cd = 2; if(num(h.cdActual) > 2) h.cdActual = 2; }
         if(num(h.nitrosCosto) === 2) h.nitrosCosto = 1;
         if(num(h.spCosto) === 3) h.spCosto = 2;
-        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cuesta 2 No2/g, 'cuesta 1 No2').replace(/cooldown 3 \(con SP: 3 SP\)/g, 'cooldown 2 (con SP: 2 SP)');
+        ['detalle', 'reglas'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace(/cuesta 2 No2/g, 'cuesta 1 No2').replace(/cooldown 3 \(con SP: 3 SP\)/g, 'cooldown 2 (con SP: 2 SP)'); });   // (lo técnico, en la descripción o en el detalle: P361)
         h.agujaRapida = true; cambio = true;
       }
       // 🦘 El Salto aplastante arranca disponible (dueño, 2026-11-09: «que tenga cooldown 4, pero que empiece disponible»). Una vez (`saltoApDisp`).
       if(h.nombre === 'Salto aplastante' && !h.saltoApDisp){
         if(h.cdArranca){ delete h.cdArranca; if(num(h.cdActual) === num(h.cd)) h.cdActual = 0; }
-        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/ \(habilidad lenta: el combate arranca con el cooldown activo\)/g, '');
+        ['detalle', 'reglas'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace(/ \(habilidad lenta: el combate arranca con el cooldown activo\)/g, ''); });
         h.saltoApDisp = true; cambio = true;
       }
       if(MISILES_LENTOS.includes(h.nombre) && num(h.cd) === 2){
         h.cd = 4; if(num(h.cdActual) > 4) h.cdActual = 4;
-        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cooldown 2\b/g, 'cooldown 4');
+        ['detalle', 'reglas'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace(/cooldown 2\b/g, 'cooldown 4'); });
         cambio = true;
       }
     });
@@ -494,14 +494,18 @@ const CreepCalculo = (() => {
      Eso es cosa de la herramienta (se ve en Ver y en la tarjeta), no de la mesa: a la Mesa, que lee todo el mundo,
      va solo lo que hace la habilidad (la descripción más lo que se resuelve a mano, que también es lo que hace). */
   function habPartes(h){
-    const t = String((h && (h.detalle || h.descripcion)) || '');
-    const i = t.indexOf('⚙');
+    // La línea ⚙/✋ puede venir pegada a la descripción (las guardadas de antes) o, desde P361, en renglones del detalle (`reglas`).
+    const t0 = String((h && (h.detalle || h.descripcion)) || '');
+    const deReglas = (Array.isArray(h && h.reglas) ? h.reglas : String((h && h.reglas) || '').split(/\n+/)).map(x => String(x || '').trim()).filter(x => /^[⚙✋]/.test(x));
+    const i0 = t0.search(/[⚙✋]/);
+    const t = (i0 < 0 ? t0 : t0.slice(0, i0)).trim() + ' ' + [...(i0 < 0 ? [] : [t0.slice(i0)]), ...deReglas].join(' ');
+    const i = t.search(/[⚙✋]/);
     if(i < 0) return {descripcion: t.trim(), auto: '', mano: ''};
-    const resto = t.slice(i).replace(/^⚙\s*Automati[a-z]*:\s*/i, '');
+    const resto = t.slice(i).replace(/^⚙\s*Automati[a-z]*:?\s*/i, '');
     const j = resto.indexOf('✋');
-    const auto = (j < 0 ? resto : resto.slice(0, j)).trim().replace(/\.$/, '');
-    const mano = j < 0 ? '' : resto.slice(j).replace(/^✋\s*A mano:\s*/i, '').trim();
-    return {descripcion: t.slice(0, i).trim(), auto, mano: /^nada, todo está automatizado\.?$/i.test(mano) ? '' : mano};
+    const auto = (j < 0 ? resto : resto.slice(0, j)).replace(/\.?\s*⚙\s*Automati[a-z]*:?\s*/gi, '; ').trim().replace(/\.$/, '');
+    const mano = j < 0 ? '' : resto.slice(j).replace(/✋\s*A mano:?\s*/gi, ' ').replace(/nada, todo está automatizado\.?/gi, ' ').replace(/\s+/g, ' ').trim();
+    return {descripcion: t.slice(0, i).trim(), auto, mano};
   }
   function habTextoMesa(h){
     const p = habPartes(h);

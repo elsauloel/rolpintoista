@@ -2397,10 +2397,22 @@ versión parecida en más de una, es candidato a juntar.
   con `otra`, o null). El gancho `armaContra` devuelve `sinCuerpo` si solo hay armas de rango; `duelo.js` lo mira en `alcanceContra` (`contraMotivo`) y
   en `pasivaContra` (Devolver gentileza: `contraPasiva` o `contraPasivaNo`), y antes de abrir el contraataque; `contraPreparar(d, arma)` (creep) pone en la
   mano la otra arma (`ataque.armaCreepId`). Duda: P360 (Parry a distancia).
-- **📋 El detalle aparte de una habilidad o pasiva** (2026-11-27, dueño: «que la descripción de la habilidad sea bien sintética y clara… los detalles
-  mecánicos y de reglas y excepciones que estén en un cuadro aparte»): campo **`reglas`** (texto, un renglón por cosa) en las habilidades de personaje,
-  invocación y creep, y en las pasivas; `detalle` queda corto (qué hace y cuánto cuesta). `ItemCorto.reglasLista(h)` / `reglasHtml(h, {plegable})` (el
-  cuadro «📋 Detalle»; `verHtml` lo pone abierto entre la descripción y «Detalles técnicos»); `TipEjecutar.attrs(nombre, detalle, reglas)` (el globo de
-  «Ejecutar»); `biblioteca.js` lo muestra plegado (de `datos.reglas` o, en una de creep de fábrica, `datos.sp.reglas`); `creeps-base.js armarHab` copia
-  `sp.reglas`. Viaja en `Plantillas.HAB` y `Plantillas.pasiva`. Se edita en el paso «Qué es» de `ficha-editor.js` (habilidad y pasiva) y `creep-editor.js`
-  (y en la ficha, `#hi-reglas` de las invocaciones). Modelo: el Contraataque y Devolver gentileza. Dudas: P361.
+- **📋 El detalle de una habilidad o pasiva: UN SOLO CUADRO** (2026-11-27, dueño: «que la descripción de la habilidad sea bien sintética y clara… los
+  detalles mecánicos y de reglas y excepciones que estén en un cuadro aparte»; P361: un solo cuadro). Campo **`reglas`** (texto, un renglón por cosa) en
+  las habilidades de personaje, invocación y creep, y en las pasivas; `detalle` queda corto («Qué hace»). **La pieza común es `ItemCorto`**:
+  `descripcion(h)` (la descripción sin las notas), `detalleLista(h)` (los renglones del cuadro: primero `reglasLista(h)` —las reglas escritas—, después lo
+  técnico: las notas ⚙/✋ que hayan quedado pegadas a la descripción, separadas solas al mostrarlas; «📜 Adaptada del borrador de clases» (`originalDe`); el
+  aviso de auditar; sin repetir un renglón), `detalleHtml(h, {plegable})` (el cuadro «📋 Detalle»; `reglasHtml` es el mismo), `verHabHtml(h)` (el «Ver»:
+  «Qué hace» + el cuadro abierto; `verHtml(h, {hab: true})` o un ítem con `reglas` caen ahí; los ítems siguen con «Detalles técnicos», P362),
+  `separarParaEditar(h)` → `{detalle, reglas}` (los editores: lo técnico pegado pasa al campo del detalle) y `detalleAlGuardar(antes, sep, v)` (abrir y
+  guardar sin tocar el texto lo deja como estaba guardado: no cuenta como «editada a mano» para las copias de clase). `partes(texto)` / `notas(texto)`:
+  una nota empieza en una ⚙ o ✋ al principio o después de un punto, o seguida de «Automati… / A mano»; una en medio de una frase es un ícono («con el ⚙
+  del token», «o ✋ eligiéndolo») y no corta. **Dónde se ve igual**: el Ver de personaje, invocación y creep (`ficha-lupa.js`, `inv-lupa.js`,
+  `creep-lupa.js`, la ventana «Ver» de la biblioteca de GM Tools, js/05), las tarjetas de las listas plegado (ficha js/04 y js/10, GM Tools js/05), el globo
+  de «Ejecutar» (`TipEjecutar.attrs(nombre, detalle, hab)`: con la habilidad entera), las bibliotecas (`biblioteca.js cuerpoDe`, tipos skills / habs_creep /
+  pasivas) y los editores (`ficha-editor.js`, `creep-editor.js`, ficha js/04 `#hi-reglas`: un solo campo de detalle; el resumen muestra el cuadro).
+  **Al lado del duelo, solo la descripción** (`duelo.js`, y lo mismo en `asistente-duelo-hab.js`). **Las habilidades de creep de fábrica**
+  (`creeps-base.js armarHab`): `detalle` = la descripción y `reglas` = las reglas de la receta (`sp.reglas`) + «⚙ Automatizado: …» + «✋ A mano: …»
+  (`armarDetalle` devuelve `{descripcion, tecnico}`); las ya guardadas con la línea pegada no se reescriben (se separan al mostrarlas). Quien lea esa línea
+  mira las dos: `CreepCalculo.habPartes` (la Mesa: descripción + lo de «a mano»), `migrarHabPdg` y las migraciones de cooldown de `creep-calculo.js`.
+  Viaja en `Plantillas.HAB` y `Plantillas.pasiva`. Modelo: el Contraataque y Devolver gentileza. Dudas: P362.

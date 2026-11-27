@@ -51,8 +51,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261127contra"></script>
-<script src="creep-calculo.js?v=20261126bot"></script>
-<script src="creep-botonera.js?v=20261127detalle"></script>
+<script src="creep-calculo.js?v=20261127unico2"></script>
+<script src="creep-botonera.js?v=20261127unico2"></script>
 <script src="creep-acciones.js?v=20261126ve"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js?v=20261125sil"></script>
@@ -78,11 +78,11 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-resumen.js?v=20261123c73"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js?v=20261122prisa5"></script>
-<script src="inv-botonera.js?v=20261127detalle"></script>
+<script src="inv-botonera.js?v=20261127unico2"></script>
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
-<script src="inv-lupa.js?v=20261122prisa5"></script>
+<script src="inv-lupa.js?v=20261127unico2"></script>
 <script src="ficha-acciones.js?v=20261126tope"></script>
 <script src="orden-turnos.js?v=20261126fin"></script>
 <script src="ficha-mantenimiento.js?v=20261126tope"></script>
@@ -104,6 +104,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pausa.js"></script>
 <script src="glosario.js"></script>
 <script src="item-corto.js"></script>
+<script src="tip-ejecutar.js"></script>
 <script src="filtro-catalogo.js"></script>
 <script src="ficha-tienda.js"></script>
 <script src="intercambio.js"></script>
@@ -113,13 +114,13 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261127contra"></script>
+<script src="duelo.js?v=20261127unico2"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
-<script src="ficha-lupa.js?v=20261125sil"></script>
+<script src="ficha-lupa.js?v=20261127unico2"></script>
 <script src="ficha-editor.js"></script>
 <script src="capas.js"></script>
-<script src="creep-lupa.js?v=20261127detalle"></script>
+<script src="creep-lupa.js?v=20261127unico2"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js?v=20261125gas"></script>
 <script src="aviso-propuestas.js"></script>
@@ -128,10 +129,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js?v=20261127detalle"></script>
 <script src="skills-clase.js?v=20261127detalle"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
-<script src="creeps-base.js?v=20261127detalle"></script>
+<script src="creeps-base.js?v=20261127unico2"></script>
 <script src="skills-creep-base.js?v=20261127detalle"></script>
 <script src="creeps-esenciales.js?v=20261119d4"></script>
-<script src="biblioteca.js?v=20261127detalle"></script>
+<script src="biblioteca.js?v=20261127unico2"></script>
 <script src="editar-item.js"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -8428,7 +8429,37 @@ prueba('📋 El detalle aparte (dueño, 2026-11-27): el Contraataque y Devolver 
     /ic-reglas/.test(ver), /<details class="ic-reglas"/.test(plegado), ItemCorto.reglasHtml({detalle: 'x'}), Plantillas.limpiar('skills', cl).reglas === cl.reglas,
     Plantillas.limpiar('pasivas', pas).reglas === pas.reglas, /Contraataque/.test(pas.detalle), ItemCorto.reglasLista(pas).length, ItemCorto.reglasLista(hc).length, hc.detalle.startsWith('⚡ Flash.'),
     ItemCorto.reglasLista({reglas: ['a', ' - b', '']}).join('|')],
-    [true, false, 7, true, true, true, '', true, true, false, 3, 5, true, 'a|b']);
+    [true, false, 7, true, true, true, '', true, true, false, 3, 7, true, 'a|b']);   // (el Contraataque de creep: sus 5 reglas + la línea ⚙ y la ✋ armadas solas, P361)
+});
+prueba('📋 Un solo cuadro de detalle (P361): la línea ⚙ de los creeps va al detalle, lo pegado de antes se separa al mostrarlo, y el duelo lleva solo la descripción', () => {
+  const IC = ItemCorto, hc = chp('Contraataque'), l = IC.detalleLista(hc), rc = IC.reglasLista(hc);
+  // Armada de fábrica: la descripción sin notas; el detalle, primero las reglas escritas y al final lo técnico armado solo.
+  const vieja = {nombre: 'Mordida', detalle: 'Muerde fuerte. ⚙ Automatizado: cuesta 1 No2; cooldown 2. ✋ A mano: nada, todo está automatizado.', reglas: 'Solo cuerpo a cuerpo.'};
+  const sep = IC.separarParaEditar(vieja), igualSin = IC.detalleAlGuardar(vieja, sep, sep), cambiada = IC.detalleAlGuardar(vieja, sep, {...sep, detalle: 'Muerde.'});
+  const cl = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.original);
+  const ver = IC.verHabHtml(vieja), verItem = IC.verHtml({nombre: 'Daga', detalle: 'Pincha. ⚙ Automático: se suma solo.'});
+  const tip = TipEjecutar.attrs(vieja.nombre, vieja.detalle, vieja);
+  const dup = IC.detalleLista({detalle: 'Hace algo. ⚙ Automatizado: todo.', reglas: '⚙ Automatizado: todo'});
+  const p = CreepCalculo.habPartes(hc), pv = CreepCalculo.habPartes(vieja);
+  igual([/[⚙✋]/.test(hc.detalle), /^⚙ Automatizado: cuesta/.test(l[l.length - 2]), /^✋ A mano/.test(l[l.length - 1]), l[0] === rc[0],
+    IC.descripcion(vieja), IC.detalleLista(vieja), sep, igualSin, cambiada.detalle,
+    /Qué hace/.test(ver), /ic-reglas/.test(ver), /Detalles técnicos/.test(ver), /Detalles técnicos/.test(verItem), /📜 Adaptada del borrador/.test(IC.detalleHtml(cl, {plegable: true})),
+    /<details class="ic-reglas"/.test(IC.detalleHtml(vieja, {plegable: true})), /data-tip-hab="Muerde fuerte\."/.test(tip), /data-tip-reglas="[^"]*⚙ Automatizado/.test(tip), dup,
+    /[⚙✋]/.test(CreepCalculo.habTextoMesa(hc)), /cuesta 0 No2/.test(p.auto), p.mano, pv.descripcion, pv.auto, CreepCalculo.habTextoMesa(vieja)],
+    [false, true, true, true,
+      'Muerde fuerte.', ['Solo cuerpo a cuerpo.', '⚙ Automatizado: cuesta 1 No2; cooldown 2.', '✋ A mano: nada, todo está automatizado.'],
+      {detalle: 'Muerde fuerte.', reglas: 'Solo cuerpo a cuerpo.\n⚙ Automatizado: cuesta 1 No2; cooldown 2.\n✋ A mano: nada, todo está automatizado.'},
+      {detalle: vieja.detalle, reglas: 'Solo cuerpo a cuerpo.'}, 'Muerde.',
+      true, true, false, true, true, true, true, true, ['⚙ Automatizado: todo'],
+      false, true, '', 'Muerde fuerte.', 'cuesta 1 No2; cooldown 2', 'Muerde fuerte.']);
+});
+prueba('📋 Las notas ⚙ / ✋ se separan donde empieza una nota, no en un ícono en medio de una frase (P361)', () => {
+  const IC = ItemCorto;
+  const a = IC.partes('Elegís al azar o ✋ eligiéndolo (3 SP). Con el ⚙ del token se ajusta. ⚙ En el mapa: se expande. ✋ A mano: nada.');
+  const b = IC.partes('Suma +2 (⚙ automático: te queda el estado) al daño ⚙ Automatizado: todo.');
+  igual([a.hace, IC.notas(a.tecnico), b.hace, b.tecnico, IC.descripcion({detalle: 'Hace algo. ⚙ Automatizado: todo.'})],
+    ['Elegís al azar o ✋ eligiéndolo (3 SP). Con el ⚙ del token se ajusta.', ['⚙ En el mapa: se expande.', '✋ A mano: nada.'],
+      'Suma +2 (⚙ automático: te queda el estado) al daño', '⚙ Automatizado: todo.', 'Hace algo.']);
 });
 prueba('⚔ Reglas del Contraataque (2026-11-05): sin habilidad ni pasiva no hay contraataque tras el Bloqueo; Devolver gentileza lo habilita en el creep', () => {
   const pas = PASIVAS_BASE.find(p => p.poolId === 'devolver-gentileza');
@@ -8736,11 +8767,11 @@ prueba('🛡⏳ Piel de hierro +(3 + nivel) y los misiles lentos de cooldown 4 (
     const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === nm).datos, 2); return [h.cd, h.cdActual, !!h.cdArranca]; });
   // Un creep de nivel 2 guardado con lo de antes: Piel de hierro +6 y una Lengua de fuego de cooldown 2.
   const vieja = armarHabilidadDeCreep(ph.datos, 3), lf = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lengua de fuego').datos, 2);
-  lf.cd = 2; lf.detalle = lf.detalle.replace(/cooldown 4/, 'cooldown 2');
+  lf.cd = 2; lf.reglas = lf.reglas.replace(/cooldown 4/, 'cooldown 2');   // (la línea ⚙ va en el detalle desde P361)
   const sc = {nombre: 'Viejo', nivel: 2, habilidades: [vieja, lf]};
   const c1 = CreepCalculo.migrarPielYMisiles(sc), c2 = CreepCalculo.migrarPielYMisiles(sc);
   igual([val(1, 'def'), val(1, 'armadmg'), val(3, 'def'), val(5, 'armadmg'), val(1, 'tipo3'), /\+4 a la Defensa/.test(armarHabilidadDeCreep(ph.datos, 1).detalle),
-    ...mis.map(m => m.join()), c1, sc.habilidades[0].efectoMods.find(m => m.stat === 'def').val, /\+5 a la Defensa/.test(sc.habilidades[0].efectoDetalle), sc.habilidades[1].cd, /cooldown 4/.test(sc.habilidades[1].detalle), c2],
+    ...mis.map(m => m.join()), c1, sc.habilidades[0].efectoMods.find(m => m.stat === 'def').val, /\+5 a la Defensa/.test(sc.habilidades[0].efectoDetalle), sc.habilidades[1].cd, /cooldown 4/.test(sc.habilidades[1].reglas), c2],
     [4, 4, 6, 8, 1, true, ...Array(7).fill('4,0,false'), true, 5, true, 4, true, false]);
 });
 prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del mismo día + el L4), con su equipo, cinturón y habilidades de fábrica, y la biblioteca los separa', () => {
@@ -9577,13 +9608,13 @@ prueba('⚡🥶🧪 Debuffer (2026-11-03): la Aguja siniestra rápida (y los gua
   const H = nm => HABILIDADES_CREEP_BASE.find(x => x.nombre === nm);
   const ag = armarHabilidadDeCreep(H('Aguja siniestra').datos, 1), es = armarHabilidadDeCreep(H('Escalofrío').datos, 1), ep = armarHabilidadDeCreep(H('Espina tóxica').datos, 1);
   // Una Aguja guardada con lo de antes: cooldown 3, 2 No2 y 3 SP.
-  const vieja = structuredClone(ag); vieja.cd = 3; vieja.cdActual = 3; vieja.nitrosCosto = 2; vieja.spCosto = 3; vieja.detalle = vieja.detalle.replace('cuesta 1 No2', 'cuesta 2 No2').replace('cooldown 2 (con SP: 2 SP)', 'cooldown 3 (con SP: 3 SP)');
+  const vieja = structuredClone(ag); vieja.cd = 3; vieja.cdActual = 3; vieja.nitrosCosto = 2; vieja.spCosto = 3; vieja.reglas = vieja.reglas.replace('cuesta 1 No2', 'cuesta 2 No2').replace('cooldown 2 (con SP: 2 SP)', 'cooldown 3 (con SP: 3 SP)');   // (la línea ⚙, en el detalle: P361)
   const sc = {nombre: 'Viejo', nivel: 1, habilidades: [vieja]};
   const c1 = CreepCalculo.migrarPielYMisiles(sc), c2 = CreepCalculo.migrarPielYMisiles(sc);
   const ef = Combatiente.efectoDeEjecucion(ep.duelo.efectos[0], st => st === 'dmgesp' ? 9 : 0);
   const pre = ESTADOS_PRESET.find(x => x.nombre === 'Escalofrío');
   const mald = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Maldito').datos.habilidades.find(x => x.nombre === 'Aguja siniestra');
-  igual([ag.cd, ag.nitrosCosto, ag.spCosto, !!ag.cdArranca, c1, vieja.cd, vieja.cdActual, vieja.nitrosCosto, vieja.spCosto, /cooldown 2 \(con SP: 2 SP\)/.test(vieja.detalle), c2,
+  igual([ag.cd, ag.nitrosCosto, ag.spCosto, !!ag.cdArranca, c1, vieja.cd, vieja.cdActual, vieja.nitrosCosto, vieja.spCosto, /cooldown 2 \(con SP: 2 SP\)/.test(vieja.reglas), c2,
     es.cd, es.nitrosCosto, es.duelo.contra.join(), es.duelo.tipoDano, !!es.duelo.danoDirecto, es.duelo.efectos[0].nombre, pre.mods[0].stat + pre.mods[0].val, !!pre.turnosCompletos,
     ep.cd, ep.duelo.contra.join(), ep.duelo.tipoDano, !!ep.duelo.danoDirecto, ef.spec.nombre, ef.spec.stacks, JSON.stringify(ef.tolera), mald.cd,
     H('Escalofrío').etiquetas.includes('rápida'), H('Espina tóxica').etiquetas.includes('auditada')],
@@ -10963,11 +10994,12 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
     const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);
     igual([h.duelo.zonaAltura, h.duelo.zonaEstado], ['ambos', {nombre: 'Veneno', stacks: 3, unaVez: true, sumaUno: true, alEmpezar: true}]);
     const N = Combatiente.NUBE_TOXICA_CREEP;
-    ok(e.datos.sp.detalle === N.detalle && e.datos.sp.ataqueTxt === N.ataqueTxt && h.detalle.startsWith(N.detalle) && h.detalle.includes(N.ataqueTxt) && !/pasar de ronda/.test(h.detalle));
+    ok(e.datos.sp.detalle === N.detalle && e.datos.sp.ataqueTxt === N.ataqueTxt && h.detalle.startsWith(N.detalle) && h.reglas.includes(N.ataqueTxt) && !/pasar de ronda/.test(h.detalle + h.reglas));   // (la línea ⚙, en el detalle: P361)
     // La copia guardada en un creep (el texto de la habilidad + «⚙ Automatizado: cuesta…» con su resumen) se pone al día (una vez).
-    const vieja = {nombre: 'Nube tóxica', detalle: h.detalle.replace(N.detalle, N.detalleViejo).replace(N.ataqueTxt, N.ataqueViejo),
+    const juntos = h.detalle + ' ' + h.reglas.split('\n').join(' ');   // (una copia de antes de P361: la línea ⚙ pegada a la descripción)
+    const vieja = {nombre: 'Nube tóxica', detalle: juntos.replace(N.detalle, N.detalleViejo).replace(N.ataqueTxt, N.ataqueViejo),
       duelo: {objetivo: 'zona', radio: 1, tira: 'dmgesp', contra: ['resmg'], zonaDuelo: true, zonaEstado: {nombre: 'Veneno', stacks: 3, unaVez: true, sumaUno: true}}};
-    ok(/al pasar de ronda/.test(vieja.detalle) && Combatiente.migrarLuzSanadora([vieja]) && vieja.duelo.zonaEstado.alEmpezar && vieja.duelo.zonaAltura === 'ambos' && vieja.detalle === h.detalle);
+    ok(/al pasar de ronda/.test(vieja.detalle) && Combatiente.migrarLuzSanadora([vieja]) && vieja.duelo.zonaEstado.alEmpezar && vieja.duelo.zonaAltura === 'ambos' && vieja.detalle === juntos);
     ok(!Combatiente.migrarLuzSanadora([vieja]));
     // La Mina napalm: su piso ardiendo es solo de piso, pega al empezar el turno y por cada paso; la explosión sigue igual (2d6, piso y aire).
     const mina = CATALOGO_BASE.find(x => x.id === 'trampa-mina-napalm'), td = mina.trampaDatos;

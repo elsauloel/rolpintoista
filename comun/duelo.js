@@ -3607,10 +3607,11 @@ const Duelo = (() => {
     if(d.ataque && d.ataque.texto){
       const tx = document.createElement('div');
       tx.className = 'duelo-texto';
-      // Lo que pasa, con sus globos; las notas ⚙ / ✋ en «Detalles técnicos» (dueño, 2026-10-15: lo técnico no va en el texto).
+      // Solo la descripción, con sus globos (P361: un solo cuadro de detalle, que acá no va; las notas ⚙ / ✋ que hayan quedado pegadas a la
+      // descripción, tampoco: son del detalle).
       const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(d.ataque.texto) : {hace: d.ataque.texto, tecnico: ''};
       const marcar = x => typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(x) : _esc(x);
-      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${marcar(pt.hace)}${pt.tecnico ? `<details class="tec"><summary>Detalles técnicos</summary>${_esc(pt.tecnico)}</details>` : ''}`;
+      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${marcar(pt.hace)}`;
       f.appendChild(tx);
     }
     // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.

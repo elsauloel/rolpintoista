@@ -141,7 +141,8 @@
     }
     const cierra = t => /[.!?]$/.test(t) ? t : t + '.';
     const {propias, manual} = frasesDe(sp, n);
-    return `${propias.length ? propias.map(cierra).join(' ') + ' ' : ''}⚙ Automatizado: ${auto.join('; ')}. ✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`;
+    // 📋 La descripción y, aparte, lo técnico armado solo (P361: un solo cuadro de detalle; antes las dos notas iban pegadas a la descripción).
+    return {descripcion: propias.map(cierra).join(' '), tecnico: [`⚙ Automatizado: ${auto.join('; ')}.`, `✋ A mano: ${manual.length ? manual.map(cierra).join(' ') : 'nada, todo está automatizado.'}`]};
   }
   // ¿La habilidad pega con magia (PdG.Esp) o con el cuerpo (PdG)? sp.magico lo dice si se sabe (rol mágico de la biblioteca de
   // skills de creep); si no, se adivina por palabras del nombre y la descripción. Es solo el punto de partida: se edita.
@@ -149,9 +150,11 @@
   const esHabMagica = (nombre, detalle) => MAGICA_RE.test(String(nombre || '') + ' ' + String(detalle || ''));
   function armarHab(sp, n, cd, lenta){
     const arranca = lenta && !sp.disponibleAlInicio;   // (2026-10-24, el Estandarte: «cooldown 4, pero disponible desde el inicio del combate»)
-    const h = {nombre: sp.nombre, detalle: armarDetalle(sp, n, cd, arranca), cd, cdActual: arranca ? cd : 0, costo: '', nitrosCosto: sp.no2};
+    const ad = armarDetalle(sp, n, cd, arranca);
+    const h = {nombre: sp.nombre, detalle: ad.descripcion, cd, cdActual: arranca ? cd : 0, costo: '', nitrosCosto: sp.no2};
     if(arranca) h.cdArranca = true;
-    if(sp.reglas) h.reglas = String(sp.reglas);   // 📋 el detalle de reglas, aparte de la descripción (2026-11-27, el Contraataque)
+    // 📋 El detalle (P361, un solo cuadro): primero las reglas escritas de la receta, después lo técnico armado solo (⚙ / ✋).
+    h.reglas = [...(sp.reglas ? [String(sp.reglas)] : []), ...ad.tecnico].join('\n');
     // Con daño: Ejecutar tira primero la probabilidad de golpe (PdG o PdG.Esp) y el daño queda para el botón 🎲 aparte (2026-09-24).
     if(sp.dano){
       h.tiradaExtra = danoTxt(sp.dano, n);

@@ -3415,3 +3415,17 @@ Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
 5. **Las zonas comunes** (una zona con estado o daño que no es nube ni fuego, p. ej. la que arma el asistente de Zonas) también llevan el contorno
    y un relleno un poco más fuerte. **No cambian**: las formas libres, las trampas, el hielo, el charco, la zona de curación (su línea verde
    ondulada) ni el Escudo elemental de fuego (que usa el mismo dibujo del fuego: se separó para que quede como estaba).
+
+### P378 — ☁🔥 El contorno con forma de nube (C) y de llamas (E): los detalles (2026-11-28, Claude, al hacer la cola «Contorno que sigue la forma de la nube y del fuego»)
+
+Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
+1. **Las llamas nacen en el borde exacto de las casillas** (no en el borde borroso del manchón) y debajo queda la línea de hoy (P377): así se sigue
+   leyendo qué casillas queman. Las de los lados de abajo salen más cortas (las llamas se tuercen hacia arriba). Alternativa: sacar la línea y dejar
+   solo las llamas.
+2. **Tres lengüetas por lado de casilla** (dos si la zona es enorme o se mira muy de lejos), de tres colores lisos (base roja, cuerpo naranja, punta
+   amarilla), sin degradados ni desenfoque: es lo que las hace livianas.
+3. **El fuego y las nubes se animan a ~20–30 cuadros por segundo** (antes el fuego pedía todos los cuadros de la pantalla) y **lo que está fuera
+   de la pantalla no se dibuja ni se anima**. El parpadeo del fuego de adentro va al mismo ritmo.
+4. **La línea de algodón respira toda junta y una onda lenta la recorre** (se mueve muy poco: un vigésimo de casilla). La niebla de una varita
+   (encima de los tokens), la nube que aparece expandiéndose y la que se desvanece llevan la misma línea, **quieta**.
+5. **No cambian**: la lava (sigue con la línea de hoy, sin lengüetas), el Escudo elemental de fuego y las zonas comunes (la línea de hoy).

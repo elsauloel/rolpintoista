@@ -271,7 +271,7 @@ function dibujarNieblaVarita(z){
   }
   ctx.save();
   crece.forEach(c => zonaDueloExpansionDibujar(c.el, c.celdas, NUBE_GRIS, z, c.k, {gris: true}));
-  if(typeof nubeDibujar === 'function'){ if(fija.size) nubeDibujar([...fija].map(nbUnpack), NUBE_GRIS, z); }   // ☁ con el borde desparejo y borroso (js/50, 2026-10-17)
+  if(typeof nubeDibujar === 'function'){ if(fija.size) nubeDibujar([...fija].map(nbUnpack), NUBE_GRIS, z, {guardada: true}); }   // ☁ con el borde desparejo y borroso (js/50, 2026-10-17)
   else{
     ctx.beginPath();
     fija.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });

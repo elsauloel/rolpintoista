@@ -2190,6 +2190,16 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`zonaColorBorde`), con ancho en píxeles de pantalla. El fuego late (`o.pulso`; quieto con `prefers-reduced-motion`, `zonaQuieta`). Relleno más vivo:
   `FUEGO_VIVO` (el manchón del fuego, con su propia clave en `fuegoManchones`, y focos +0,1) y `nubeRelleno` (la verde y la violeta; humo, talco y
   niebla iguales). El Escudo elemental de fuego llama `fuegoDibujar` sin `o` y queda como antes (con la punteada). Detalles: P377.
+  **☁🔥 Con la forma de la nube y de las llamas** (2026-11-28, dueño eligió «C» y «E» entre ideas dibujadas; «siempre y cuando no ralenticen el
+  programa»; js/50): `zonaForma(celdas)` guarda por forma los lados de afuera, la caja y la línea de algodón (`zonaFormas`); `zonaEnPantalla(f)`.
+  **Nubes**: `nubeDibujar(celdas, color, z, o)` → la mancha (con `o.guardada`, desenfocada una vez por forma, color y zoom en `nubeManchon`) y
+  `nubeContorno`: el borde de las casillas punteado y tenue (quieto) y la línea de algodón (`nubeAlgodon`: tramos de puntos de las panzas de
+  `trazarManchon` que no caen adentro de otra ni de una casilla, más las puntas de las casillas que asoman; `nubeAlgodonCamino(alg, t)` la ondula
+  con `o.anima`, nada con `zonaQuieta()`), con un resplandor de trazo ancho (sin desenfoque). La niebla de js/05 va con `{guardada: true}` (quieta);
+  la que se expande (js/112) y la que se desvanece (js/91), quietas y sin guardar. **Fuego** (`fuegoDibujar` con `{zona: true}`): la línea de P377 y
+  encima `fuegoLenguetas` (3 por lado, 2 si hay más de 80 lados o de muy lejos; tres rellenos lisos por cuadro; quietas con `zonaQuieta()`).
+  `superficieDibujar`: una nube o un fuego fuera de la pantalla no se dibuja; los que se ven piden cuadros con `pedirAnimacionLenta` (~30 por
+  segundo) en vez de `anima`. `trazarManchon(celdas, o, g)` acepta otro contexto. La lava y el Escudo elemental no cambian. Detalles: P378.
   **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una
   habilidad de rayo o el daño eléctrico de un arma) les llega a los demás parados en ese charco (`aguaConduceRayo`, desde `dueloAplicarDano`
   de js/13): ×1,5, menos su Res. eléctrica, y la Parálisis del golpe con el doble de chance. Crónica y Mesa. (Las zonas y trampas de rayo, no.)

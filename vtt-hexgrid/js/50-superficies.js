@@ -81,9 +81,16 @@ function superficieDibujar(el, celdas, z){
   // borde desparejo y borroso, en vez de hexágonos.
   const nube = nubeColor(el);
   if(nube && typeof zonaDueloExpandiendo === 'function'){ const k = zonaDueloExpandiendo(el); if(k !== null){ zonaDueloExpansionDibujar(el, celdas, nube, z, k); return {anima: true, sinBorde: true}; } }   // 💨 recién tirada, se expande (js/112)
-  if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
+  // ☁🔥 (2026-11-28, rendimiento) Una nube o un fuego fuera de la pantalla no se dibuja ni pide cuadros; los que se ven se animan a ~30 cuadros por
+  // segundo (`pedirAnimacionLenta`, js/05) en vez de a la par de la pantalla; la nube, solo si su borde ondula (no con «reducir movimiento»).
+  if(nube || (esFuego(el) && !esLava(el))){
+    if(!zonaEnPantalla(zonaForma(celdas))) return {anima: false, sinBorde: true, fuego: !nube};
+    const lento = () => { if(typeof pedirAnimacionLenta === 'function') pedirAnimacionLenta(); else return true; return false; };
+    if(nube) return {anima: nubeDibujar(celdas, nube, z, {guardada: true, anima: true}) ? lento() : false, sinBorde: true};
+    fuegoDibujar(celdas, z, {zona: true});
+    return {anima: lento(), sinBorde: true, fuego: true};
+  }
   if(esLava(el)){ lavaDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }   // 🌋 la lava (2026-11-09)
-  if(esFuego(el)){ fuegoDibujar(celdas, z, {zona: true}); return {anima: true, sinBorde: true, fuego: true}; }
   return null;
 }
 /* 💧 El charco (2026-11-05, dueño: «el borde del charco parece una nube; tiene que ser una ondulación, como agua»). El contorno de afuera de las
@@ -368,6 +375,150 @@ function zonaContorno(celdas, z, color, o){
   ctx.strokeStyle = zonaColorBorde(color, (0.88 + 0.12 * lat).toFixed(3)); ctx.lineWidth = 2.3 * k / z; ctx.stroke(pth);      // la línea
   ctx.restore();
 }
+/* ☁🔥 El contorno con la forma de la nube y del fuego (2026-11-28, el dueño eligió entre ideas dibujadas: nubes «C», fuego «E»; «probemos,
+   siempre y cuando no ralenticen el programa»). Lo que no cambia entre cuadros se arma UNA vez por forma (las casillas) y se guarda en
+   `zonaFormas`: los lados de afuera (`lados`, para las llamas), la caja (para saber si está en pantalla) y la línea de algodón de la nube
+   (`algodon`, unos tramos de puntos en coordenadas del mapa: no depende del zoom). En cada cuadro solo se corren esos puntos un poquito. */
+const zonaFormas = new Map();
+function zonaForma(celdas){
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';');
+  let f = zonaFormas.get(clave);
+  if(f) return f;
+  const set = new Set(celdas.map(c => c.col + ',' + c.fila)), lados = [];
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  celdas.forEach(c => {
+    const cubo = hexACubo(c), h = hexCentro(c.col, c.fila);
+    x0 = Math.min(x0, h.x); y0 = Math.min(y0, h.y); x1 = Math.max(x1, h.x); y1 = Math.max(y1, h.y);
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      if(set.has(cuboACol(cubo.q + vq, cubo.r + vr) + ',' + cuboAFila(cubo.q + vq, cubo.r + vr))) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6], mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, d = Math.hypot(mx, my);
+      lados.push({ax: h.x + a[0], ay: h.y + a[1], bx: h.x + b[0], by: h.y + b[1], nx: mx / d, ny: my / d, col: c.col, fila: c.fila, i});
+    });
+  });
+  const m = HEX * 2.8;   // lo que se sale la mancha, las llamas y el resplandor
+  f = {clave, set, lados, caja: {x0: x0 - m, y0: y0 - m, x1: x1 + m, y1: y1 + m}, algodon: null};
+  if(zonaFormas.size > 80) zonaFormas.clear();
+  zonaFormas.set(clave, f);
+  return f;
+}
+// ¿Se ve algo de la forma en la pantalla? (lo que está fuera no se anima ni se dibuja)
+function zonaEnPantalla(f){
+  if(typeof vista === 'undefined' || !anchoPx) return true;
+  const z = vista.zoom, x0 = -vista.x / z, y0 = -vista.y / z, x1 = x0 + anchoPx / z, y1 = y0 + altoPx / z, c = f.caja;
+  return !(c.x1 < x0 || c.x0 > x1 || c.y1 < y0 || c.y0 > y1);
+}
+/* ☁ La línea de algodón: el borde de afuera de la mancha de la nube (las mismas panzas redondas de `trazarManchon` con la forma de la nube, y los
+   pedacitos de las casillas que asoman entre panza y panza). Se muestrea cada arco y se guardan los tramos de puntos que no caen adentro de otra
+   panza ni de una casilla de la nube; cada punto con su normal (hacia afuera) y su fase (para la onda). */
+function nubeAlgodon(f){
+  if(f.algodon) return f.algodon;
+  const R = {radio: [0.5, 0.35], sale: [0, 0.35]}, panzas = [];
+  f.lados.forEach(l => {
+    const p = hexCentro(l.col, l.fila), mx = (l.ax + l.bx) / 2 - p.x, my = (l.ay + l.by) / 2 - p.y;
+    const u = superficieAzar(l.col, l.fila, 20 + l.i), w = superficieAzar(l.col, l.fila, 30 + l.i);
+    const sale = HEX * (R.sale[0] + R.sale[1] * w), r = HEX * (R.radio[0] + R.radio[1] * u);
+    panzas.push({x: p.x + mx + l.nx * sale, y: p.y + my + l.ny * sale, r});
+  });
+  const enCelda = (x, y) => { const v = mundoAHex(x, y); return !!(v && f.set.has(v.col + ',' + v.fila)); };
+  const adentro = (x, y, salvo) => panzas.some((k, j) => j !== salvo && (x - k.x) ** 2 + (y - k.y) ** 2 < (k.r - 0.4) ** 2) || enCelda(x, y);
+  const fase = (x, y) => (x * 0.9 + y * 0.6) / HEX * 1.25;
+  const tramos = [];
+  const cortar = pts => {   // pts: [x, y, nx, ny, ok] en orden, cerrado si `cerrado`; devuelve los tramos seguidos de puntos ok
+    let ini = pts.findIndex(p => !p[4]);
+    if(ini < 0){ tramos.push(Float32Array.from(pts.concat([pts[0]]).flatMap(p => [p[0], p[1], p[2], p[3], fase(p[0], p[1])]))); return; }
+    let cur = [];
+    for(let k = 1; k <= pts.length; k++){
+      const p = pts[(ini + k) % pts.length];
+      if(p[4]) cur.push(p);
+      else if(cur.length){ if(cur.length > 1) tramos.push(Float32Array.from(cur.flatMap(q => [q[0], q[1], q[2], q[3], fase(q[0], q[1])]))); cur = []; }
+    }
+  };
+  panzas.forEach((k, j) => {
+    const n = Math.max(16, Math.ceil(Math.PI * 2 * k.r / (HEX * 0.07))), pts = [];
+    for(let s = 0; s < n; s++){
+      const a = s / n * Math.PI * 2, cx = Math.cos(a), cy = Math.sin(a), x = k.x + k.r * cx, y = k.y + k.r * cy;
+      pts.push([x, y, cx, cy, !adentro(x, y, j)]);
+    }
+    cortar(pts);
+  });
+  // Los pedacitos de los lados de las casillas que quedan fuera de toda panza (en las puntas).
+  f.lados.forEach(l => {
+    const n = 8; let cur = [];
+    for(let s = 0; s <= n; s++){
+      const t = s / n, x = l.ax + (l.bx - l.ax) * t, y = l.ay + (l.by - l.ay) * t;
+      const fuera = !panzas.some(k => (x - k.x) ** 2 + (y - k.y) ** 2 < k.r ** 2);
+      if(fuera) cur.push([x, y, l.nx, l.ny]);
+      else if(cur.length){ if(cur.length > 1) tramos.push(Float32Array.from(cur.flatMap(q => [q[0], q[1], q[2], q[3], fase(q[0], q[1])]))); cur = []; }
+    }
+    if(cur.length > 1) tramos.push(Float32Array.from(cur.flatMap(q => [q[0], q[1], q[2], q[3], fase(q[0], q[1])])));
+  });
+  f.algodon = {tramos, quieto: null};
+  return f.algodon;
+}
+// Arma el camino de la línea de algodón; `t` (segundos) la ondula: respira toda junta y una onda lenta la recorre. Sin `t`, quieta (y guardada).
+function nubeAlgodonCamino(alg, t){
+  if(t === null && alg.quieto) return alg.quieto;
+  const pth = new Path2D(), A = HEX * 0.05, resp = t === null ? 0 : Math.sin(t * 0.9);
+  alg.tramos.forEach(tr => {
+    for(let i = 0; i < tr.length; i += 5){
+      const d = t === null ? 0 : A * (0.55 * resp + 0.45 * Math.sin(t * 1.4 + tr[i + 4]));
+      const x = tr[i] + tr[i + 2] * d, y = tr[i + 1] + tr[i + 3] * d;
+      if(i) pth.lineTo(x, y); else pth.moveTo(x, y);
+    }
+  });
+  if(t === null) alg.quieto = pth;
+  return pth;
+}
+// ☁ «C»: la línea de algodón (clara, del color de la nube, con un resplandor ancho y tenue debajo) y, por adentro, el borde de las casillas que
+// toca, tenue, punteado y quieto (para que se sepa qué casillas cuentan).
+function nubeContorno(celdas, color, z, o){
+  const f = zonaForma(celdas), k = Math.max(0.85, Math.min(1.35, Math.sqrt(z)));
+  const base = NUBE_BORDE.get(color) || color, [r, g, b] = zonaRgb(base);
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.setLineDash([6 / z, 5 / z]);
+  ctx.strokeStyle = zonaColorBorde(base, 0.42); ctx.lineWidth = 1.3 * k / z; ctx.stroke(zonaContornoCamino(celdas));   // las casillas, punteado
+  ctx.setLineDash([]);
+  const t = o && o.anima && !zonaQuieta() ? performance.now() / 1000 : null;
+  const pth = nubeAlgodonCamino(nubeAlgodon(f), t);
+  ctx.strokeStyle = `rgba(${r},${g},${b},.24)`; ctx.lineWidth = 7 * k / z; ctx.stroke(pth);   // el resplandor (un trazo ancho: sin desenfoque)
+  ctx.strokeStyle = zonaColorBorde(base, 0.9); ctx.lineWidth = 2.4 * k / z; ctx.stroke(pth);   // la línea de algodón
+  ctx.restore();
+  return t !== null;
+}
+/* 🔥 «E»: lengüetas de llama por el borde de afuera de la zona, naranjas con la punta amarilla, que suben y bajan sin parar. Nacen en el borde
+   exacto de las casillas (así se sigue leyendo dónde quema) y se tuercen un poco hacia arriba, como el fuego. Todas juntas en tres rellenos por
+   cuadro (la base roja, el cuerpo naranja y la punta amarilla), sin degradados ni desenfoque. Con «reducir movimiento», quietas a media altura. */
+function fuegoLenguetas(celdas, z){
+  const f = zonaForma(celdas), quieto = zonaQuieta(), s = quieto ? 0 : performance.now() / 1000;
+  const porLado = f.lados.length > 80 || z < 0.45 ? 2 : 3;
+  const base = new Path2D(), cuerpo = new Path2D(), punta = new Path2D();
+  const lengua = (pth, bx, by, nx, ny, w, L, sway) => {
+    const tx = bx + nx * L + sway, ty = by + ny * L - L * 0.38;   // la punta, torcida hacia arriba
+    const mx = bx + nx * L * 0.5, my = by + ny * L * 0.5 - L * 0.12;
+    pth.moveTo(bx - ny * w, by + nx * w);
+    pth.quadraticCurveTo(mx - ny * w * 0.55, my + nx * w * 0.55, tx, ty);
+    pth.quadraticCurveTo(mx + ny * w * 0.55, my - nx * w * 0.55, bx + ny * w, by - nx * w);
+    pth.closePath();
+  };
+  f.lados.forEach(l => {
+    for(let j = 0; j < porLado; j++){
+      const u = superficieAzar(l.col, l.fila, 40 + l.i * 4 + j), v = superficieAzar(l.col, l.fila, 60 + l.i * 4 + j);
+      const t = (j + 0.25 + 0.5 * u) / porLado, bx = l.ax + (l.bx - l.ax) * t, by = l.ay + (l.by - l.ay) * t;
+      const sube = quieto ? 0.5 : 0.5 + 0.3 * Math.sin(s * (4 + 3 * u) + v * 6.28) + 0.2 * Math.sin(s * (7.3 + 2 * v) + u * 9);   // 0–1, desparejo
+      const L = HEX * (0.2 + 0.2 * v) * (0.45 + 0.75 * sube), w = HEX * (0.1 + 0.04 * u) * (porLado === 2 ? 1.3 : 1);
+      const sway = quieto ? 0 : Math.sin(s * 2.3 + u * 7) * L * 0.18;
+      lengua(base, bx, by, l.nx, l.ny, w * 1.25, L * 1.12, sway);
+      lengua(cuerpo, bx, by, l.nx, l.ny, w, L, sway);
+      lengua(punta, bx + l.nx * L * 0.35, by + l.ny * L * 0.35 - L * 0.12, l.nx, l.ny, w * 0.5, L * 0.62, sway * 0.7);
+    }
+  });
+  ctx.save();
+  ctx.fillStyle = 'rgba(190,40,8,.55)'; ctx.fill(base);
+  ctx.fillStyle = 'rgba(255,112,26,.9)'; ctx.fill(cuerpo);
+  ctx.fillStyle = 'rgba(255,226,102,.92)'; ctx.fill(punta);
+  ctx.restore();
+}
 // ⚡ El manchón borroso del fuego (2026-11-06, rendimiento): el desenfoque se hace UNA vez por forma y zoom, en un lienzo aparte, y después se pega
 // en cada cuadro (antes se desenfocaba en cada cuadro). Hasta 40 formas guardadas.
 const fuegoManchones = new Map();
@@ -442,7 +593,8 @@ function fuegoDibujar(celdas, z, o){
     }
   });
   ctx.restore();
-  if(vivo) zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,110,20)', pulso: 0.5 + 0.5 * Math.sin(s * 3.1) * Math.sin(s * 1.7 + 1)});   // dónde quema (2026-11-28)
+  // Dónde quema (2026-11-28): la línea en el borde exacto de las casillas y, encima, las lengüetas de llama que nacen ahí («E»).
+  if(vivo){ zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,110,20)', pulso: 0.5 + 0.5 * Math.sin(s * 3.1) * Math.sin(s * 1.7 + 1)}); fuegoLenguetas(celdas, z); }
   else bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
 }
 const FUEGO_BORDE = 'rgb(255,160,50)';
@@ -669,9 +821,10 @@ function lavaDibujar(celdas, z){
   zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,90,20)', pulso: 0.5 + 0.5 * Math.sin(s * 1.4)});   // dónde quema exactamente (2026-11-28: el contorno de las zonas)
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
-function trazarManchon(celdas, o){
+function trazarManchon(celdas, o, g){   // `g`: otro contexto (el lienzo guardado de la nube, 2026-11-28); si no, el del mapa
   const set = new Set(celdas.map(c => c.col + ',' + c.fila));
-  ctx.beginPath(); celdas.forEach(c => { const h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+  if(g){ g.beginPath(); celdas.forEach(c => { const p = hexCentro(c.col, c.fila); g.moveTo(p.x + ESQUINAS[0][0], p.y + ESQUINAS[0][1]); for(let i = 1; i < 6; i++) g.lineTo(p.x + ESQUINAS[i][0], p.y + ESQUINAS[i][1]); g.closePath(); }); }
+  else{ g = ctx; ctx.beginPath(); celdas.forEach(c => { const h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); }); }
   celdas.forEach(c => {
     const p = hexCentro(c.col, c.fila);
     for(let i = 0; i < 6; i++){
@@ -682,7 +835,7 @@ function trazarManchon(celdas, o){
       const u = superficieAzar(c.col, c.fila, 20 + i), w = superficieAzar(c.col, c.fila, 30 + i);
       const sale = HEX * (o.sale[0] + o.sale[1] * w), r = HEX * (o.radio[0] + o.radio[1] * u), d = Math.hypot(mx, my);
       const cx = p.x + mx + mx / d * sale, cy = p.y + my + my / d * sale;
-      ctx.moveTo(cx + r, cy); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      g.moveTo(cx + r, cy); g.arc(cx, cy, r, 0, Math.PI * 2);
     }
   });
 }
@@ -709,15 +862,44 @@ function nubeColor(el){
 const NUBE_RELLENO = new Map([[NUBE_TOXICA, 'rgba(108,200,58,.5)'], [NUBE_VIOLETA, 'rgba(168,98,232,.48)']]);
 const nubeRelleno = color => NUBE_RELLENO.get(color) || color;
 const NUBE_BORDE = new Map([[NUBE_TOXICA, 'rgb(120,225,60)'], [NUBE_VIOLETA, 'rgb(180,110,250)'], [NUBE_GRIS, 'rgb(215,222,236)'], [NUBE_HUMO, 'rgb(120,120,132)'], [NUBE_TALCO, 'rgb(255,255,250)']]);
-function nubeDibujar(celdas, color, z){
-  ctx.save();
-  ctx.filter = `blur(${Math.max(1.5, HEX * 0.16 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
-  trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
-  ctx.fillStyle = nubeRelleno(color); ctx.fill();
-  ctx.restore();
-  // El borde exacto de las casillas (dueño, 2026-10-26: la mancha se puede salir un poco sin que quede en duda qué casillas toca), ahora una línea
-  // marcada (2026-11-28).
-  zonaContorno(celdas, z, NUBE_BORDE.get(color) || color);
+// ⚡ (2026-11-28, rendimiento) La mancha borrosa de una nube quieta se desenfoca UNA vez por forma, color y zoom en un lienzo aparte (como el
+// manchón del fuego) y después se pega en cada cuadro: así la nube puede ondular su borde sin desenfocar todo de nuevo. Hasta 40 guardadas.
+const nubeManchones = new Map();
+function nubeManchon(celdas, color, z){
+  const esc = z * (typeof dpr === 'number' ? dpr : 1), zq = Math.round(esc * 8) / 8;
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';') + '|' + zq + '|' + color;
+  let m = nubeManchones.get(clave);
+  if(m) return m;
+  const cs = celdas.map(c => hexCentro(c.col, c.fila)), mx = HEX * 2.6;
+  const x0 = Math.min(...cs.map(p => p.x)) - mx, y0 = Math.min(...cs.map(p => p.y)) - mx, x1 = Math.max(...cs.map(p => p.x)) + mx, y1 = Math.max(...cs.map(p => p.y)) + mx;
+  const w = Math.max(1, Math.ceil((x1 - x0) * zq)), h = Math.max(1, Math.ceil((y1 - y0) * zq));
+  if(w * h > 4e6) return null;   // (una nube enorme: se dibuja como antes)
+  const lz = document.createElement('canvas'); lz.width = w; lz.height = h;
+  const g = lz.getContext('2d');
+  g.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  g.filter = `blur(${Math.max(1.5, HEX * 0.16 * zq).toFixed(1)}px)`;
+  trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]}, g);
+  g.fillStyle = nubeRelleno(color); g.fill();
+  m = {lz, x0, y0, w: (x1 - x0), h: (y1 - y0)};
+  if(nubeManchones.size > 40) nubeManchones.clear();
+  nubeManchones.set(clave, m);
+  return m;
+}
+// `o.guardada`: la mancha sale del lienzo guardado (las zonas y la niebla quietas; la que se expande o se desvanece cambia de escala en cada cuadro
+// y se desenfoca como siempre). `o.anima`: el borde de algodón ondula. Devuelve true si hace falta seguir dibujando.
+function nubeDibujar(celdas, color, z, o){
+  const man = o && o.guardada && celdas.length <= 400 ? nubeManchon(celdas, color, z) : null;
+  if(man) ctx.drawImage(man.lz, man.x0, man.y0, man.w, man.h);
+  else{
+    ctx.save();
+    ctx.filter = `blur(${Math.max(1.5, HEX * 0.16 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
+    trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
+    ctx.fillStyle = nubeRelleno(color); ctx.fill();
+    ctx.restore();
+  }
+  // El borde (2026-11-28, «C»): la línea de algodón por la forma de la nube y, tenue y punteado, el borde exacto de las casillas que toca (dueño,
+  // 2026-10-26: la mancha se puede salir un poco sin que quede en duda qué casillas toca).
+  return nubeContorno(celdas, color, z, o);
 }
 /* Al irse el hielo (lo borra el GM: js/07), queda el charco en las mismas casillas. **No vence** (dueño, 2026-10-17): queda hasta que el GM lo
    borre. */

@@ -669,7 +669,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, ...(elemSolido && elemVerEntero ? {verEntero: true} : {}), imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
-      ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
+      ...(ZonaDetalle.turnosCambio(elemTurnos, mantenimientoNumero) || {}),   // ⏳ la misma cuenta que al cambiarla después (⚙)
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {}), trampaDetectar: Math.max(1, Math.round(num(elemTrampaDetectar)) || 6)} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
       // Trampa persistente (2026-09-28): al dispararse se convierte en zona (ver trampaResolver) — acá solo se
@@ -733,6 +733,39 @@ function abrirEditorElemento(id){
   renderEditorElemento();
 }
 
+/* ⏳ La duración de un elemento ya puesto (2026-11-28, dueño: «poder programarle contador a las formas colocadas manualmente»): en el ⚙ (y el
+   «⏳ Duración» del cartel de arriba lo abre con el campo listo). Lo puede cambiar quien puede editarlo (su dueño o el GM: puedeManipularElemento). El
+   número que arranca es el del ⏳ (elementoTurnosQuedan); vacío = sin límite. */
+function elementoDuracionHtml(el){
+  const q = elementoTurnosQuedan(el);
+  return `<label class="etiqueta" for="elem-edit-turnos">⏳ Cuántos turnos dura (desde ahora)</label>
+    <div class="fila" style="margin-top:0;gap:6px;align-items:center">
+      <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${q ? q.quedan : ''}" placeholder="sin límite" style="width:90px">
+      <span class="hint">turnos</span>
+      <button type="button" class="btn" id="elem-edit-sin-limite" title="Que quede hasta que alguien lo borre">Sin límite</button>
+    </div>
+    <div class="tk-lapiz-ayuda" id="elem-edit-turnos-ayuda" style="margin-top:4px">${esc(elementoDuracionAyuda(el))}</div>`;
+}
+function elementoDuracionAyuda(el){
+  const q = elementoTurnosQuedan(el);
+  if(!q) return 'Sin límite: queda hasta que alguien lo borre.';
+  const n = q.quedan, t = n === 1 ? '1 turno' : `${n} turnos`;
+  return q.porTurnos ? `Le quedan ${t} de quien lo puso: baja uno cada vez que empieza su turno, y al llegar a 0 se va solo.`
+    : `Le quedan ${t}: baja uno cada vez que se pasa de ronda, y al llegar a 0 se va solo.`;
+}
+// El «⏳ Duración» del cartel de arriba (js/10): abre el ⚙ con el campo de los turnos listo para escribir.
+function elementoDuracionAbrir(id){
+  if(!editandoElemento || editandoElemento.id !== id) abrirEditorElemento(id);
+  const inp = $('#elem-edit-turnos');
+  if(inp){ inp.focus(); inp.select(); }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-elem-duracion]');
+  if(!b || !elementoSeleccionado) return;
+  e.preventDefault(); e.stopPropagation();
+  elementoDuracionAbrir(elementoSeleccionado);
+});
+
 function elegirImagenParaElemento(vivo){
   const entrada = $('#elemento-imagen-archivo');
   entrada.onchange = async ev => {
@@ -784,8 +817,7 @@ function renderEditorElemento(){
     <input type="range" id="elem-edit-alfa" min="0" max="100" step="5" value="${el.alfa}">
     ${el.fuego ? `<label class="etiqueta">🔥 Daño de fuego (al entrar y en cada Mantenimiento)</label>
     <input type="number" id="elem-edit-fuego" min="1" max="999" step="1" value="${el.fuegoDano || 5}">` : ''}
-    <label class="etiqueta">Turnos que le quedan (0 = sin límite)</label>
-    <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
+    ${elementoDuracionHtml(el)}
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
     ${el.solido && !el.colision ? `<label class="tk-lapiz-check" title="Si ves una parte, se ve el objeto completo (un carruaje, una roca). Lo de atrás y lo de adentro siguen tapados."><input type="checkbox" id="elem-edit-ver-entero"${el.verEntero ? ' checked' : ''}> 👁 Se ve entero</label>` : ''}
     <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
@@ -813,7 +845,8 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-guardar').onclick = () => {
     const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
-    const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
+    const tGuardar = Math.min(99, Math.round(num(el.turnos)) || 0);   // (una zona en su último paso no tiene `turnos`: no se le inventa uno)
+    const cambios = {turnos: conTurnos && tGuardar > 0 ? tGuardar : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
       ...(el.fuego ? {fuegoDano: Math.max(1, Math.min(999, Math.round(num(el.fuegoDano)) || 5))} : {}),
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, ...(el.solido ? {verEntero: !!el.verEntero} : {}), imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
@@ -833,8 +866,13 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-alfa').oninput = e => vivo({alfa: num(e.target.value)});
   const inFuego = caja.querySelector('#elem-edit-fuego');
   if(inFuego) inFuego.oninput = () => vivo({fuegoDano: Math.max(1, Math.min(999, Math.round(num(inFuego.value)) || 1))});
+  // ⏳ La duración (2026-11-28): N turnos desde ahora (ZonaDetalle.turnosCambio, la misma cuenta que al colocarla); vacío o 0 = sin límite. Se ve en vivo
+  // (el ⏳ del lienzo cambia o se va) y se guarda con Guardar.
   const inTurnos = caja.querySelector('#elem-edit-turnos');
-  if(inTurnos) inTurnos.oninput = () => { const n = Math.max(0, Math.min(99, Math.round(num(inTurnos.value)) || 0)); vivo(n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null}); };
+  const turnosVivo = () => { vivo(ZonaDetalle.turnosCambio(inTurnos.value, mantenimientoNumero) || {turnos: 0, venceMant: null}); const a = caja.querySelector('#elem-edit-turnos-ayuda'); if(a) a.textContent = elementoDuracionAyuda(el); };
+  if(inTurnos) inTurnos.oninput = turnosVivo;
+  const sinLim = caja.querySelector('#elem-edit-sin-limite');
+  if(sinLim && inTurnos) sinLim.onclick = () => { inTurnos.value = ''; turnosVivo(); };
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
   if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
   const chkVerEntero = caja.querySelector('#elem-edit-ver-entero');

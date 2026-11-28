@@ -627,7 +627,7 @@ function dibujarLienzo(){
     }
     }   // fin de lo que no es Colisión
     // ⏳ El relojito con los turnos que le quedan (2026-11-28): se junta acá —así vale lo de arriba: solo lo que esta pantalla ve— y se dibuja
-    // después de los tokens y las nubes (relojesDibujar), en una casilla sin token.
+    // después de los tokens y las nubes (relojesDibujar), sobre un vértice de la zona sin token (P384).
     if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length) relojes.push([id, el, celdas]);
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
@@ -1386,10 +1386,11 @@ function dibujarLienzo(){
 }
 
 /* ⏳ El relojito de las zonas con duración (2026-11-28, dueño: «que las zonas que están en el mapa por un tiempo determinado muestren un iconito con
-   un reloj de arena que muestre cuántos turnos les queda»). «⏳ N» con la cuenta de elementoTurnosQuedan (js/07, la misma con la que se borra), en
-   una casilla de la zona sin token a la vista (ZonaDetalle.relojLugar); si están todas ocupadas, corrido a la esquina. Del tamaño de la pantalla (entre
-   11 y 16 px según el zoom), así se lee de cerca y de lejos. Lo que no cambia no se recalcula: el lugar se guarda por elemento con una firma (sus
-   casillas, los tokens a la vista y sus casillas) y el ancho del texto, por texto y tamaño. */
+   un reloj de arena que muestre cuántos turnos les queda»). «⏳ N» con la cuenta de elementoTurnosQuedan (js/07, la misma con la que se borra), sobre
+   un VÉRTICE de la zona (ZonaDetalle.relojVertice, P384: del borde si hay uno libre, si no uno de adentro; sin token en sus tres casillas, arriba si
+   se puede, y se queda donde estaba mientras siga libre). Del tamaño de la pantalla (entre 11 y 16 px según el zoom), así se lee de cerca y de lejos.
+   Lo que no cambia no se recalcula: el lugar se guarda por elemento con una firma (sus casillas, los tokens a la vista y sus casillas) y el ancho del
+   texto, por texto y tamaño. */
 const relojCache = new Map(), relojAnchos = new Map();
 function relojOcupadas(){
   // Las casillas con un token que esta pantalla ve (los ocultos o tapados por la niebla no cuentan: no se delatan).
@@ -1404,6 +1405,7 @@ function relojIcono(el, celdas){
   if(el.fuego){ const c = celdas[Math.floor(celdas.length / 2)]; return c.col + ',' + c.fila; }
   return '';
 }
+const relojEsquinas = c => { const p = hexCentro(c.col, c.fila); return ESQUINAS.map(([dx, dy]) => ({x: p.x + dx, y: p.y + dy})); };
 function relojesDibujar(lista, z){
   if(!lista.length){ if(relojCache.size) relojCache.clear(); return; }
   const ocup = relojOcupadas(), firmaOcup = [...ocup].join(';'), vivos = new Set();
@@ -1422,17 +1424,19 @@ function relojesDibujar(lista, z){
     const icono = relojIcono(el, celdas);
     const firma = `${el.origen.col},${el.origen.fila},${el.rotacion || 0},${celdas.length},${celdas[0].col},${celdas[0].fila}|${icono}|${firmaOcup}`;
     if(c.firma !== firma){
-      c.lugar = ZonaDetalle.relojLugar(celdas, {centro: x => hexCentro(x.col, x.fila), ocupada: x => { const k = x.col + ',' + x.fila; return ocup.has(k) || k === icono; }});
+      if(el.acelerador){ const m = celdas[Math.floor(celdas.length / 2)], p0 = hexCentro(m.col, m.fila); c.lugar = {x: p0.x, y: p0.y + HEX * 0.9}; }   // el Acelerador: debajo del círculo, para no tapar las flechitas
+      else{
+        const obst = [...ocup].map(k => { const [col, fila] = k.split(',').map(Number); return hexCentro(col, fila); });
+        if(icono){ const [col, fila] = icono.split(',').map(Number); obst.push(hexCentro(col, fila)); }
+        c.lugar = ZonaDetalle.relojVertice(celdas, {esquinas: relojEsquinas, obstaculos: obst, radio: HEX, previo: c.lugar || null});
+      }
       c.firma = firma;
     }
     if(!c.lugar) return;
     const txt = c.txt, kw = txt + '|' + px;
     let w0 = relojAnchos.get(kw);
     if(w0 === undefined){ w0 = ctx.measureText(txt).width * z; relojAnchos.set(kw, w0); }   // (el ancho en píxeles de pantalla)
-    const p0 = hexCentro(c.lugar.celda.col, c.lugar.celda.fila);
-    let x = p0.x, y = p0.y;
-    if(el.acelerador) y += HEX * 0.9;   // el Acelerador: debajo del círculo, para no tapar las flechitas
-    else if(c.lugar.corrido){ x += HEX * 0.5; y -= HEX * 0.866; }   // todas con token: a la esquina de arriba a la derecha, entre casillas
+    const x = c.lugar.x, y = c.lugar.y;
     const w = (w0 + 10) / z, h = (px + 6) / z, r = 4 / z;
     ctx.beginPath();
     if(ctx.roundRect) ctx.roundRect(x - w / 2, y - h / 2, w, h, r); else ctx.rect(x - w / 2, y - h / 2, w, h);

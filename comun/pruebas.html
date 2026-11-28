@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261125gas"></script>
-<script src="zona-detalle.js?v=20261128pedos"></script>
+<script src="zona-detalle.js?v=20261128vert"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261128silelem"></script>
@@ -12612,9 +12612,87 @@ grupo('⏳ El relojito con los turnos que le quedan a una zona (2026-11-28, Zona
     const [m05, m07, m10, m104, m127] = await Promise.all(['../vtt-hexgrid/js/05-vista-y-dibujo.js', '../vtt-hexgrid/js/07-tokens-y-elementos.js', '../vtt-hexgrid/js/10-hud-y-vida.js',
       '../vtt-hexgrid/js/104-hex-info.js', '../vtt-hexgrid/js/127-zona-detalle.js'].map(traer));
     cierto(/function elementoTurnosQuedan\(el\)/.test(m07) && /ZonaDetalle\.turnosQuedan\(el, \{mant: mantenimientoNumero, enOrden\}\)/.test(m07));
-    cierto(/const q = elementoTurnosQuedan\(el\)/.test(m05) && /ZonaDetalle\.relojLugar\(/.test(m05) && /relojesDibujar\(relojes, z\)/.test(m05));
+    cierto(/const q = elementoTurnosQuedan\(el\)/.test(m05) && /ZonaDetalle\.relojVertice\(/.test(m05) && /relojesDibujar\(relojes, z\)/.test(m05));
     cierto(/elementoTurnosQuedan\(e\)/.test(m10) && /elementoTurnosQuedan\(el\)/.test(m104) && /return elementoTurnosQuedan\(el\)/.test(m127));
     cierto(!/Math\.max\(0, el\.venceMant - mantenimientoNumero\)/.test(m05 + m104 + m127));
+  });
+})();
+
+grupo('⏳ El relojito va sobre un vértice y la duración se cambia después de colocar (2026-11-28, P384, ZonaDetalle.relojVertice / turnosCambio, vtt-hexgrid/js/05, js/07 y js/10)');
+(() => {
+  const H = 40, S3 = Math.sqrt(3);
+  const centro = c => ({x: H * 1.5 * c.col, y: H * S3 * (c.fila + 0.5 * (c.col & 1))});
+  const esquinas = c => { const p = centro(c); return [0, 1, 2, 3, 4, 5].map(i => ({x: p.x + H * Math.cos(Math.PI / 3 * i), y: p.y + H * Math.sin(Math.PI / 3 * i)})); };
+  const c = (col, fila) => ({col, fila});
+  // Una flor de 7 (diámetro 3) alrededor de (2,2): el centro y sus 6 vecinas (columna par).
+  const flor = [c(2, 2), c(2, 1), c(2, 3), c(1, 1), c(1, 2), c(3, 1), c(3, 2)];
+  const cerca = (a, b) => Math.abs(a.x - b.x) < 0.01 && Math.abs(a.y - b.y) < 0.01;
+  const tapadoPor = (v, t) => Math.hypot(v.x - t.x, v.y - t.y) <= H * 1.05;
+  prueba('sin tokens: un vértice del borde, el de más arriba (y a la derecha)', () => {
+    const v = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [], radio: H});
+    cierto(v.perimetro && v.tapados === 0);
+    const todos = flor.flatMap(esquinas), minY = Math.min(...todos.map(p => p.y));
+    cierto(Math.abs(v.y - minY) < 0.01);
+    cierto(todos.filter(p => Math.abs(p.y - minY) < 0.01).every(p => p.x <= v.x + 0.01));
+  });
+  prueba('una flor de 7 tiene 6 vértices de adentro (donde se juntan tres casillas de la zona) y 18 del borde', () => {
+    const vs = new Map();
+    flor.flatMap(esquinas).forEach(p => { const k = Math.round(p.x * 10) + ',' + Math.round(p.y * 10); vs.set(k, (vs.get(k) || 0) + 1); });
+    igual([...vs.values()].filter(n => n === 3).length, 6);
+    igual([...vs.values()].filter(n => n < 3).length, 18);
+  });
+  prueba('con tokens: nunca un vértice de una casilla con token si hay otro libre; el borde antes que adentro', () => {
+    const toks = [centro(c(2, 1)), centro(c(3, 1)), centro(c(1, 1))];   // la fila de arriba con tokens
+    const v = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: toks, radio: H});
+    cierto(v.tapados === 0 && v.perimetro && !toks.some(t => tapadoPor(v, t)));
+  });
+  prueba('todo el borde tapado: uno libre de adentro; todo tapado: el que tenga menos', () => {
+    // Una flor de 19 (diámetro 5) con tokens en las 12 de afuera: el borde queda tapado y quedan libres vértices de adentro.
+    const f19 = [], cc = c(4, 4), dist = (a, b) => { const cu = x => { const q = x.col, r = x.fila - (x.col - (x.col & 1)) / 2; return [q, r, -q - r]; }; const [a1, a2, a3] = cu(a), [b1, b2, b3] = cu(b); return Math.max(Math.abs(a1 - b1), Math.abs(a2 - b2), Math.abs(a3 - b3)); };
+    for(let col = 0; col < 9; col++) for(let fila = 0; fila < 9; fila++) if(dist(c(col, fila), cc) <= 2) f19.push(c(col, fila));
+    igual(f19.length, 19);
+    const anillo = f19.filter(x => dist(x, cc) === 2).map(centro);
+    const v = ZonaDetalle.relojVertice(f19, {esquinas, obstaculos: anillo, radio: H});
+    cierto(v.tapados === 0 && !v.perimetro);
+    const sola = ZonaDetalle.relojVertice([c(2, 2)], {esquinas, obstaculos: [centro(c(2, 2))], radio: H});
+    cierto(sola.perimetro && sola.tapados === 1);
+    igual(ZonaDetalle.relojVertice([], {esquinas, obstaculos: [], radio: H}), null);
+  });
+  prueba('estable: si el de antes sigue libre se queda ahí, aunque se mueva un token; si lo tapan, se muda', () => {
+    const v0 = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [], radio: H});
+    // Otro vértice del borde, libre: el de abajo.
+    const abajo = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [centro(c(2, 1)), centro(c(1, 1)), centro(c(3, 1)), centro(c(1, 2)), centro(c(3, 2))], radio: H});
+    cierto(!cerca(abajo, v0) && abajo.tapados === 0);
+    const sigue = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [centro(c(5, 5))], radio: H, previo: abajo});
+    cierto(cerca(sigue, abajo));
+    const tapado = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [centro(c(2, 3))], radio: H, previo: abajo});
+    cierto(!cerca(tapado, abajo) && tapado.tapados === 0);
+    // El de antes de adentro no le gana a uno libre del borde.
+    const adentro = {x: centro(c(2, 2)).x + H, y: centro(c(2, 2)).y};
+    const v2 = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [], radio: H, previo: adentro});
+    cierto(v2.perimetro);
+  });
+  prueba('el dibujo propio del elemento (ficha de trampa, 🌀) cuenta como un token', () => {
+    const v = ZonaDetalle.relojVertice(flor, {esquinas, obstaculos: [centro(c(2, 1))], radio: H});
+    cierto(!tapadoPor(v, centro(c(2, 1))));
+  });
+  prueba('poner, cambiar o quitar la duración: N turnos desde ahora; vacío o 0 = sin límite; tope 99', () => {
+    igual(ZonaDetalle.turnosCambio(3, 5), {turnos: 3, venceMant: 8});
+    igual(ZonaDetalle.turnosCambio('1', 9), {turnos: 1, venceMant: 10});
+    igual([ZonaDetalle.turnosCambio('', 5), ZonaDetalle.turnosCambio(0, 5), ZonaDetalle.turnosCambio('x', 5), ZonaDetalle.turnosCambio(-2, 5)], [null, null, null, null]);
+    igual(ZonaDetalle.turnosCambio(250, 0), {turnos: 99, venceMant: 99});
+    // Lo que muestra el ⏳ después de cambiarla: N (sin orden de turnos, por rondas).
+    igual(ZonaDetalle.turnosQuedan({zona: true, ...ZonaDetalle.turnosCambio(3, 5)}, {mant: 5, enOrden: false}), {quedan: 3, porTurnos: false});
+    igual(ZonaDetalle.turnosQuedan({trampa: true, ...ZonaDetalle.turnosCambio(2, 5)}, {mant: 5, enOrden: true}), {quedan: 2, porTurnos: true});
+  });
+  prueba('el mapa: «⏳ Duración» en el cartel para quien puede editarlo, el ⚙ con la misma cuenta, y al colocar también', async () => {
+    const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+    const [m07, m10, m14, reglas] = await Promise.all(['../vtt-hexgrid/js/07-tokens-y-elementos.js', '../vtt-hexgrid/js/10-hud-y-vida.js', '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../firebase/firestore.rules'].map(traer));
+    cierto(/data-elem-duracion/.test(m10) && /puedeManipularElemento\(e\)/.test(m10));
+    cierto(/function elementoDuracionHtml\(el\)/.test(m07) && /ZonaDetalle\.turnosCambio\(inTurnos\.value, mantenimientoNumero\)/.test(m07) && /ZonaDetalle\.turnosCambio\(elemTurnos, mantenimientoNumero\)/.test(m07));
+    cierto(/elem-edit-sin-limite/.test(m07) && /⏳ Cuántos turnos dura/.test(m14));
+    // Las reglas ya dejan al dueño o al GM cambiar `turnos` y `venceMant` (no hace falta pegar nada).
+    cierto(/resource\.data\.duenoUid == request\.auth\.uid \|\| esGM\(c\)\)\s*&& request\.resource\.data\.diff\(resource\.data\)\.affectedKeys\(\)\.hasOnly\(\[[^\]]*'turnos', 'venceMant'/.test(reglas));
   });
 })();
 

@@ -3510,3 +3510,19 @@ ejemplo 60 s) o que espere solo si el duelo es contra un rival al alcance (ya lo
 
 **✅ Decidido (dueño, 2026-11-28): un tope de 90 segundos** («efectivamente, ponele un tope de 90 segundos»): el cuadro de quien puede usar algo espera, pero a los 90 s se cierra solo igual. **Aplicado** (2026-11-28, `comun/duelo.js`, `ESPERA_TOPE_MS`): cuenta desde que el duelo terminó o se volvió a resolver (en pausa por la yeta no
 cuenta), también minimizado; el cartel lleva la cuenta («· se cierra en 45 s»).
+
+### P384 — ⏳ El contador de las formas puestas a mano y el lugar del relojito (2026-11-28, Claude, al hacer «Ponerle un contador de turnos a las formas colocadas a mano»)
+
+El dueño pidió «poder programarle contador a las formas colocadas manualmente» y, del relojito, «si está en el centro va a haber muchos casos en los
+que el contador lo tape un token… quizás en algún vértice en el perímetro de la zona». Lo que se eligió (el dueño puede cambiar cualquiera):
+1. **Dónde se cambia**: al seleccionar lo que uno puso, el cartel de arriba suma **«⏳ Duración»** (o «⏳ 3 · cambiar» si ya tiene) al lado de
+   «🔍 Ver detalle»; abre el ⚙ con el campo «⏳ Cuántos turnos dura (desde ahora)» listo para escribir, un botón **Sin límite** y una frase que dice qué
+   va a pasar. Se ve en vivo en el mapa y se guarda con Guardar. **Quién**: quien lo puso y el GM (lo mismo que para moverlo o editarlo). No en la
+   Colisión del mapa ni en un arma tirada en el piso.
+2. **La cuenta**: N turnos **desde ahora**, la misma que al colocarla (baja uno cada vez que se pasa de ronda; si quien la puso está en el orden de
+   turnos, con sus turnos). «Sin límite» le saca el reloj. Vale también para zonas, trampas, nubes y fuegos que uno puso (no solo las formas).
+3. **Dónde va el reloj**: sobre un **vértice** de la zona (donde se juntan tres casillas). Primero uno del **borde** que no toque ninguna casilla con
+   token; si no hay, uno libre de adentro; si todos tocan un token, el que toque menos. Entre esos, **el de más arriba** (y a la derecha). La ficha de la
+   trampa, el 🌀 del portal y el número del fuego cuentan como un token. El Acelerador sigue con el reloj debajo de su círculo.
+4. **Estable**: si el vértice de antes sigue libre, se queda ahí aunque se muevan los tokens; se muda solo si lo tapan.
+5. **Reglas de Firestore**: no cambian (el dueño y el GM ya podían cambiar `turnos` y `venceMant`).

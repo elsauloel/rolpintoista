@@ -7,7 +7,8 @@
    descripción de la habilidad) lo decide el mapa (vtt-hexgrid/js/127-zona-detalle.js) y llega en `ctx`.
    ZonaDetalle.tiene(el) → ¿hay algo que contar? (zona, trampa, fuego, nube, portal, acelerador)
    ZonaDetalle.armar(el, ctx) → {icono, titulo, esencial, filas: [{k, v, aMano}], descripcion}
-   ZonaDetalle.turnosQuedan(el, {mant, enOrden}) → {quedan, porTurnos} | null (⏳ la cuenta de lo que le queda); relojTexto(q); relojLugar(celdas, o)
+   ZonaDetalle.turnosQuedan(el, {mant, enOrden}) → {quedan, porTurnos} | null (⏳ la cuenta de lo que le queda); relojTexto(q); relojLugar(celdas, o) (la casilla; ya no la usa el mapa);
+     relojVertice(celdas, o) (⏳ sobre un vértice, P384); turnosCambio(n, mant) → {turnos, venceMant} | null (poner / cambiar / quitar la duración)
    ZonaDetalle.entraDesdeAfuera(celdas, desde) → ¿un movimiento que termina adentro de la zona cuenta como ENTRAR? (💨 las zonas con duelo por token)
    ZonaDetalle.html(m, {glosario, cargando}) → la tarjeta en HTML, con los términos del glosario marcados una sola vez (2026-11-22)
      ctx = {statLabel(id), estadoTexto(spec), elemento (del daño: 'fuego'…), elementoNombre ('fuego'), elementoRes ('al fuego'), quedan, quedanDe ('turnos de X' | ''), sinVencer,
@@ -419,6 +420,47 @@ const ZonaDetalle = (() => {
     return !(celdas || []).some(c => c && c.col === desde.col && c.fila === desde.fila);
   }
 
-  return {tiene, armar, entraDesdeAfuera, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, A_MANO};
+  /* ⏳ Dónde va el relojito, sobre un VÉRTICE (2026-11-28, dueño: «si está en el centro va a haber muchos casos en los que el contador lo tape un
+     token… quizás en algún vértice en el perímetro de la zona puede ser mejor, porque un token inclusive lo permitiría dejar a la vista, o cualquier
+     vértice dentro de la zona también»; P384). Un vértice es donde se juntan tres casillas; es del perímetro si alguna de esas tres queda fuera de la
+     zona. Está «tapado» si hay un token (o el dibujo propio del elemento: la ficha de la trampa, el 🌀, el número del fuego) en alguna de sus tres
+     casillas, o sea, a un radio de casilla o menos. Elige, en este orden: libre y del perímetro · libre de adentro · el que tenga menos tapados (del
+     perímetro primero); entre esos, el de más arriba (y a la derecha). Estable: si `o.previo` (el vértice de antes) sigue en la zona y no quedó
+     peor que el mejor (libre del perímetro, o libre si no hay ninguno del perímetro libre, o ninguno libre), se queda ahí.
+     o = {esquinas(c) → [{x, y}] (los 6 de la casilla), obstaculos: [{x, y}] (centros de tokens e íconos), radio (el de una casilla), previo: {x, y}}.
+     → {x, y, perimetro, tapados} | null (sin casillas). */
+  function relojVertice(celdas, o){
+    if(!celdas || !celdas.length) return null;
+    o = o || {};
+    const radio = Number(o.radio) || 1, lim2 = (radio * 1.05) * (radio * 1.05), clave = p => Math.round(p.x * 10) + ',' + Math.round(p.y * 10);
+    const vs = new Map();
+    celdas.forEach(c => (o.esquinas(c) || []).forEach(p => {
+      const k = clave(p), v = vs.get(k);
+      if(v) v.n++; else vs.set(k, {x: p.x, y: p.y, n: 1});
+    }));
+    const obs = o.obstaculos || [];
+    const lista = [...vs.values()].map(v => ({x: v.x, y: v.y, perimetro: v.n < 3,
+      tapados: obs.reduce((a, t) => a + ((t.x - v.x) * (t.x - v.x) + (t.y - v.y) * (t.y - v.y) <= lim2 ? 1 : 0), 0)}));
+    const clase = v => v.tapados > 0 ? 2 : v.perimetro ? 0 : 1;
+    lista.sort((a, b) => (clase(a) - clase(b)) || ((b.perimetro ? 1 : 0) - (a.perimetro ? 1 : 0)) || (a.tapados - b.tapados) || (a.y - b.y) || (b.x - a.x));
+    const mejor = lista[0];
+    if(o.previo){
+      const kp = clave(o.previo), prev = lista.find(v => clave(v) === kp);
+      if(prev && clase(prev) === clase(mejor) && (clase(prev) < 2 || prev.tapados <= mejor.tapados)) return prev;
+    }
+    return mejor;
+  }
+  /* ⏳ Ponerle, cambiarle o quitarle la duración a lo que ya está puesto (2026-11-28, dueño: «poder programarle contador a las formas colocadas
+     manualmente»): N turnos desde ahora, con la misma cuenta que al colocarla (`turnos` = N y `venceMant` = el Mantenimiento actual + N: sin orden de
+     turnos baja uno cada vez que se pasa de ronda; con quien la puso en el orden, con sus turnos). 0, vacío o algo que no es número = sin límite
+     (→ null: se borran los dos campos). Tope 99 (las reglas). */
+  function turnosCambio(n, mant){
+    const t = Math.min(99, Math.max(0, Math.round(Number(n)) || 0));
+    if(!t) return null;
+    return {turnos: t, venceMant: (Math.round(Number(mant)) || 0) + t};
+  }
+
+  return {tiene, armar, entraDesdeAfuera, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, relojVertice, turnosCambio, A_MANO};
+
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

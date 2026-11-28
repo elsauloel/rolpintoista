@@ -296,8 +296,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tiempo: «⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 45 s». Mientras el duelo está en pausa por la yeta, no
   cuenta. Probado con clics (mismo armado: Warrior · Hachero contra Blanco J1, Blanco J2 con Enyetar): J2 vio la cuenta bajar (88 → 67 → 42 → 12 → 4 s)
   y a los ~90 s se le cerró solo; minimizado, igual. Pruebas automáticas 1221/1221.
-- **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
+- **✅ hecho (2026-11-28) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
   **Y el lugar del relojito ⏳ (dueño, 2026-11-28):** «si está en el centro va a haber muchos casos en los que el contador lo tape un token… quizás en algún vértice en el perímetro de la zona puede ser mejor, porque un token inclusive lo permitiría dejar a la vista, o cualquier vértice dentro de la zona también».
+  *Resultado:* **el contador**: al seleccionar una forma (o zona, trampa, nube, fuego) que uno puso, el cartel de arriba muestra **«⏳ Duración»** (o
+  «⏳ 3 · cambiar»); abre su ⚙ con «⏳ Cuántos turnos dura (desde ahora)», el botón **Sin límite** y una frase que explica cómo baja. Se ve en vivo y se
+  guarda con Guardar; cuenta desde ese momento con la misma cuenta del mapa (`ZonaDetalle.turnosCambio`, también al colocar). Lo pueden cambiar quien
+  lo puso y el GM; los demás no ven el botón. Al colocar, el campo se llama «⏳ Cuántos turnos dura (opcional)» y avisa que se puede cambiar después.
+  (Ya existía un «Turnos que le quedan» escondido en el ⚙: ahora usa la cuenta del reloj y no le inventa un turno a una zona en su último paso.)
+  **El relojito**: ahora va sobre un **vértice** de la zona (`ZonaDetalle.relojVertice`): uno del borde que no toque casillas con token, arriba si se
+  puede; si no hay, uno libre de adentro; y se queda donde estaba mientras siga libre. Sin reglas nuevas. **Probado con clics** en «Claude · pruebas 2»,
+  «Prueba · General» (GM, Jugador 1 y Jugador 2): J1 pintó una forma libre sin turnos → ⏳ Duración → 3 (⏳ 3 en el vértice de arriba del borde, también
+  en la pantalla del GM) → 1 (rojizo) → Sin límite (se fue el reloj) → 2 → ⟳ Pasar de ronda: 1 → otra: se fue la forma. Otra forma puesta con 3 turnos
+  desde el campo de colocar; J2 no ve «⏳ Duración» en la de J1 ni en un sólido del GM; el GM sí y la cambió a 5. Muro de fuego del Mago · Piromante
+  sobre Blanco J1 y J2: el reloj en el vértice de arriba, sin tocarlos; mover un token lejos no lo mudó; con el Warrior · Hachero parado en la casilla de
+  arriba, se mudó a un vértice libre del costado. Pruebas: 1229. Dudas: P384. La vuelta, «quedó igual». Lo que falta ver: `pruebas-en-el-mapa.md`.
 - **⬜ en cola (primero) — 🕊️ Mensajes privados entre el GM y los jugadores, en los dos sentidos** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» y «y vice versa» (que un jugador también le pueda mandar uno privado al GM). Revisar si hoy se puede en cada sentido (🕊️, `/m`, `/r`) y por qué no anduvo en la sesión.
 - **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».
 - **⬜ en cola (primero) — ☠ Que al morir se borren los estados alterados** (dueño, 2026-11-27, notas de la sesión): «que cuando mueran se le borren los estados alterados» (hoy se van al volver de la muerte, 2026-11-20; el dueño lo quiere al morir: revisar con él qué queda, como en `quedaAlVolver`).

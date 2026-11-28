@@ -3648,6 +3648,15 @@ su reloj; «Ver detalle» dice lo mismo.
 - Los **portales** y el **Acelerador** (el reloj debajo del círculo) con el reloj.
 - La **niebla de guerra** tapando el reloj de una zona fuera de la vista del jugador.
 
+## ⏳ El contador de las formas puestas a mano y el relojito en un vértice (2026-11-28, P384)
+
+Probado con clics en «Prueba · General» (GM, Jugador 1 y Jugador 2, en narrativo): una forma libre de J1 sin turnos → 3 → 1 → sin límite → 2 → dos
+⟳ Pasar de ronda (se fue); una forma puesta con 3 desde el campo de colocar; J2 sin «⏳ Duración» en lo ajeno; el GM cambiando la de J1; el Muro de fuego
+con tokens adentro (el reloj en un vértice libre del borde, estable, y se muda cuando un token se para en la casilla de arriba).
+**Falta ver:**
+- **Con orden de turnos**: cambiarle la duración a una zona o trampa de alguien que está en el orden (cuenta sus turnos).
+- El reloj en el vértice de una **trampa** (al lado de su ficha), de los **portales** (al lado del 🌀) y de un **fuego** (al lado del número).
+
 ## 💨 Las zonas con duelo por token no se disparan al caminar adentro (2026-11-28, P381)
 
 Probado con clics en «Prueba · General» (GM, Jugador 1 y Jugador 2, en narrativo), antes y después del arreglo: Blanco J1 tiró los Pedos Tóxicos con

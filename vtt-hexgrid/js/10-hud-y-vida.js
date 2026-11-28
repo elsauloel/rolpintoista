@@ -1175,9 +1175,13 @@ function actualizarEtiquetaElemento(){
   // Una trampa, una zona o un portal dicen qué son (2026-10-04, dueño: «debe ser claro lo que es el objeto al seleccionarlo»).
   const especial = elementoQueEs(e);
   // 🔍 «Ver detalle» (2026-11-20, dueño; js/127 + comun/zona-detalle.js): a la derecha del título, para lo que tiene algo que contar.
-  const verDet = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.tiene(e) ? '<button type="button" class="ee-detalle" data-zona-detalle="1" title="Qué hace, a quién, cuándo, de quién es y cuánto le queda">🔍 Ver detalle</button>' : '';
+  const verDet0 = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.tiene(e) ? '<button type="button" class="ee-detalle" data-zona-detalle="1" title="Qué hace, a quién, cuándo, de quién es y cuánto le queda">🔍 Ver detalle</button>' : '';
+  // ⏳ Duración (2026-11-28): poner, cambiar o quitar cuántos turnos dura, para quien lo puede editar (su dueño o el GM). Abre el ⚙ (js/07).
+  const qd = puedeManipularElemento(e) && !e.colision && !e.arma ? elementoTurnosQuedan(e) : undefined;
+  const verDur = qd === undefined ? '' : `<button type="button" class="ee-detalle" data-elem-duracion="1" title="Cuántos turnos dura: ponerle, cambiarle o quitarle el límite">${qd ? `⏳ ${qd.quedan} · cambiar` : '⏳ Duración'}</button>`;
+  const verDet = verDet0 + verDur;
   if(especial){
-    const clave = 'especial|' + especial;
+    const clave = 'especial|' + especial + '|' + verDet;
     if(clave === etiquetaElementoTexto) return;
     etiquetaElementoTexto = clave;
     el.className = 'especial' + (verDet ? ' con-detalle' : '');
@@ -1192,7 +1196,7 @@ function actualizarEtiquetaElemento(){
   const dueno = nombreMiembro(e.duenoUid);
   const html = `<b>${forma}</b> <span>${esc(/^\(/.test(dueno) ? dueno : `(${dueno})`)}</span> · ${estado}${extra}`;
   const clase = e.solido ? 'solido' : 'libre';
-  const clave = clase + '|' + html + (verDet ? '|d' : '');
+  const clave = clase + '|' + html + '|' + verDet;
   if(clave === etiquetaElementoTexto) return;
   etiquetaElementoTexto = clave;
   el.className = clase + (verDet ? ' con-detalle' : '');

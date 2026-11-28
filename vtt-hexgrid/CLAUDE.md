@@ -3005,6 +3005,17 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   arriba a la derecha); el Acelerador, debajo del círculo. Tamaño de pantalla 11–16 px; rojizo con 1 o 0. **Rendimiento**: `relojCache` guarda por
   elemento el número (firma: `venceMant`, `turnos`, Mantenimiento, quién la puso, el orden) y el lugar (firma: sus casillas y las de los tokens a la
   vista); `relojAnchos`, el ancho del texto. Reemplaza al «⏳N» viejo, que iba debajo de los tokens en la casilla del medio de la lista.
+  **Desde el 2026-11-28 (P384) va sobre un VÉRTICE** (dueño: «si está en el centro… lo tape un token… algún vértice en el perímetro»):
+  `ZonaDetalle.relojVertice(celdas, {esquinas, obstaculos, radio, previo})` (pura, con pruebas) reemplaza a `relojLugar` en el mapa: los vértices de
+  las casillas (`relojEsquinas`, de `ESQUINAS`); del borde si alguna de sus tres casillas queda afuera; «tapado» si hay un token a la vista (o la ficha
+  de la trampa, el 🌀, el número del fuego: `relojIcono`) en alguna de sus tres casillas. Elige libre del borde · libre de adentro · el menos tapado,
+  y el de más arriba (y a la derecha); `previo` (el `c.lugar` guardado) lo deja quieto mientras siga libre. El Acelerador sigue debajo de su círculo.
+- **⏳ Duración de lo que ya está puesto** (2026-11-28, dueño: «poder programarle contador a las formas colocadas manualmente»; P384): en el cartel
+  del elemento seleccionado (`actualizarEtiquetaElemento`, js/10) el botón `[data-elem-duracion]` («⏳ Duración» / «⏳ N · cambiar»), solo si
+  `puedeManipularElemento` (su dueño o el GM) y no es Colisión ni arma; abre el ⚙ (`elementoDuracionAbrir`, js/07) con el campo `#elem-edit-turnos`
+  enfocado (`elementoDuracionHtml`: arranca en `elementoTurnosQuedan`, «Sin límite» `#elem-edit-sin-limite`, la frase `elementoDuracionAyuda`). En
+  vivo con `ZonaDetalle.turnosCambio(n, mantenimientoNumero)` → `{turnos, venceMant}` | null (sin límite); se guarda con el Guardar del ⚙ (que ya no
+  le pone `turnos: 1` a una zona en su último paso). `guardarElemento` usa la misma función. Sin reglas nuevas.
 - **💨 Una zona con duelo por token se resiste al ENTRAR, no al caminar adentro** (2026-11-28, dueño, «la B»; P381): en `zonaRevisarToken` (js/08), al
   moverse (no en el Mantenimiento ni al empezar el turno), una zona con `zonaEsDuelo` (js/112: los Pedos Tóxicos, la Nube tóxica de los creeps, las de
   «tirada de la zona») y sin `porPaso` solo cuenta si el movimiento arrancó fuera de ella (`ZonaDetalle.entraDesdeAfuera(celdas, desde)`,

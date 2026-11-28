@@ -3690,6 +3690,10 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 - **⬜ en cola — 🧪 Probar con clics: la marca del arma encantada en la silueta** (dueño, 2026-11-28: «anotá lo que falta probar al final de la cola»): cuando el encanto lo pone otro jugador (aparece sola), cuando se terminan los turnos (se va sola) y en un arma de dos manos. Ver `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 🧪 Probar con clics: «¿Lo afecta?»** (dueño, 2026-11-28: «anotá lo que falta probar al final de la cola»): Barrido / Remolino y Salto aplastante con dos rivales, Tormenta y Meteoro, un área que alcanza solo objetos, una zona que pregunta con un duelo abierto, recargar mientras espera, y el tope de 5 min y medio. Ver `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola — 🧪 Probar con clics: el Arma elemental** (dueño, 2026-11-28: «anotá lo que falta probar al final de la cola»): un duelo entero pegando con la otra arma, un creep con dos armas (mapa y GM Tools), un desarme, y dar o vender el arma encantada. Ver `docs/pruebas-en-el-mapa.md`.
+- **⬜ en cola — ⚔ El cuadro minimizado de un duelo terminado no se vuelve a abrir desde su tira de abajo** (visto por Claude al probar «que los
+  duelos no se cierren solos», 2026-11-28): al tocar la tira, el cuadro siguió minimizado («Dejar pasar» sí lo cierra). Revisar.
+- **⬜ en cola — 🧪 Probar con clics: el cuadro que espera** con el Golpe de suerte, la Moneda / WildCard, la Polilla y el Mal de ojo del GM, y un
+  Enyetar que gana (2026-11-28). Ver `docs/pruebas-en-el-mapa.md`.
 - **🔥 Zonas, todas juntas al final** (dueño, 2026-11-25: «vamos a pasar todas las tareas pendientes, inmediatas, que tengan que ver con zonas al final
   de la cola»). Lo de abajo, hasta «En cola», es todo de zonas; se retoma cuando el dueño lo pida.
 - **⬜ en cola — 🔥 Zonas que pegan «en cada Mantenimiento», de a dos (P295): Brea pegajosa y Cola de carpintero** (solo un estado). Dueño, 2026-11-23: «verlas una por una… de a dos». Contarle qué hace cada una hoy y si conviene pasarla a «al empezar el turno de quien está adentro» (como el Muro de fuego); programar lo que elija.

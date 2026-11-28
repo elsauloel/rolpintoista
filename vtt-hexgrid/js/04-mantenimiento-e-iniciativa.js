@@ -22,6 +22,7 @@ function escucharMantenimiento(){
     toast(`⟳ Mantenimiento: pasó el turno`);
     // (🔥 el terreno incendiado va por las zonas desde el 2026-11-25, P295: zonaRevisarMantenimiento, js/08)
     trampasDisparadasBarrer();   // las trampas ya detonadas (rojas) desaparecen
+    relojesAlDia();   // ⏳ lo que cuenta la ronda deja sus turnos al día (js/07, 2026-11-28)
     zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
     // Los creeps (solo el GM): desde el 2026-10-02 (A2b) el pase de turno lo hace el mapa (js/12, mantenimientoCreeps), sin cargar GM
     // Tools en un marco invisible.

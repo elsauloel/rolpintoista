@@ -157,9 +157,10 @@ function renderHerramientaFlotante(){
       ${esTrampa ? '' : `<label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
       ${elemSolido ? `<label class="tk-lapiz-check" title="Si ves una parte, se ve el objeto completo (un carruaje, una roca). Lo de atrás y lo de adentro siguen tapados. Sin tildar, opaco por dentro (una casa)."><input type="checkbox" id="elem-ver-entero-check"${elemVerEntero ? ' checked' : ''}> 👁 Se ve entero (carruaje, roca)</label>` : ''}
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}`}
-      <label class="etiqueta" for="elem-turnos" title="Para efectos que afectan un área durante unos turnos: baja uno cada vez que se pasa de ronda y al llegar a 0 se va sola">⏳ Cuántos turnos dura (opcional)</label>
-      <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="vacío = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: muestra ⏳ N, baja uno cada vez que se pasa de ronda y al llegar a 0 se va sola">
-      <p class="tk-lapiz-ayuda" style="margin-top:4px">Vacío: sin límite. Después de ponerla, se puede cambiar o quitar con «⏳ Duración» (arriba, al seleccionarla) o desde su ⚙.</p>
+      <label class="etiqueta" for="elem-turnos" title="Para efectos que afectan un área durante unos turnos">⏳ Cuántos turnos dura (opcional)</label>
+      <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="vacío = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: muestra ⏳ N y dura N rondas completas">
+      ${soyGM ? `<label class="etiqueta" for="elem-reloj-de">Cuándo baja el número</label>${relojDeSelectHtml('elem-reloj-de', elemRelojDe || 'ronda')}` : ''}
+      <p class="tk-lapiz-ayuda" style="margin-top:4px">${soyGM ? 'Dura N rondas completas: baja uno al empezar cada ronda o al empezar el turno de quien elijas' : 'Dura N rondas completas: baja uno al empezar tu turno (sin orden de turnos, al empezar cada ronda)'}; cuando le tocaría llegar a 0, se va. Vacío: sin límite. Después de ponerla, se puede cambiar o quitar tocando su ⏳, con «⏳ Duración» (arriba, al seleccionarla) o desde su ⚙.</p>
       ${esTrampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(elemTrampaNombre || 'Sin nombre')}</b><br>${esc(trampaResumenFrase(elemTrampaNombre, trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', elemTrampaIgnoraDef, elemTrampaEstado, elemTrampaEstadoTurnos, elemTrampaAmiga, elemTrampaTeleport ? (elemTrampaDestino || 'un destino (falta marcarlo)') : ''))}</div>
       ${elemTrampaTeleport ? `<button type="button" class="btn" id="trampa-destino" style="margin-top:6px;width:100%">🌀 ${elemTrampaDestino ? 'Cambiar' : 'Elegir'} el destino en el mapa</button>` : ''}
       <button type="button" class="btn primary" id="trampa-asistente" style="margin-top:6px;width:100%" title="Nombre, superficie, daño, estado y más, paso a paso">🪄 ${elemTrampaNombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>
@@ -307,6 +308,7 @@ $('#herramienta-flotante').addEventListener('click', async e => {
   }
 });
 $('#herramienta-flotante').addEventListener('change', e => {
+  if(e.target.id === 'elem-reloj-de'){ elemRelojDe = e.target.value === 'ronda' ? '' : e.target.value; return; }   // ⏳ (2026-11-28) cómo cuenta lo que pone el GM
   if(e.target.id === 'niebla-modo-select'){
     nieblaModo = e.target.value === 'tapar' ? 'tapar' : 'destapar';
     renderHerramientaFlotante();

@@ -273,6 +273,7 @@ let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
 let elemTrampaDetectar = 6;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 6)
 let elemTrampaBibOrigen = null;   // de qué trampa de la biblioteca salió la que se está armando (para ⬆ Subir y el aviso 🔔)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
+let elemRelojDe = '';   // ⏳ (2026-11-28) el GM: cómo cuenta lo que pone ('' = baja al empezar cada ronda; "fichaId|pj|creep" = al empezar el turno de ese token).
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.
 let elemTrampa = false, elemTrampaNombre = '', elemTrampaDetalle = '', elemTrampaAmiga = false, elemTrampaDano = '', elemTrampaIgnoraDef = false;   // crear el elemento como trampa oculta (Amiga = fuego amigo)
 // Trampas recurrentes: las que el usuario deja guardadas para colocarlas más de una vez (por navegador).

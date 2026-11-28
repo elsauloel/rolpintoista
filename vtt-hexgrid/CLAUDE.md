@@ -3016,6 +3016,22 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   enfocado (`elementoDuracionHtml`: arranca en `elementoTurnosQuedan`, «Sin límite» `#elem-edit-sin-limite`, la frase `elementoDuracionAyuda`). En
   vivo con `ZonaDetalle.turnosCambio(n, mantenimientoNumero)` → `{turnos, venceMant}` | null (sin límite); se guarda con el Guardar del ⚙ (que ya no
   le pone `turnos: 1` a una zona en su último paso). `guardarElemento` usa la misma función. Sin reglas nuevas.
+- **⏳ El relojito cuenta por los turnos de quien la puso, sin cero, y se configura tocándolo** (2026-11-28, dueño; P385, revisa P380): **quién
+  cuenta** = `relojQuienDe(el)` (js/07) → `ZonaDetalle.relojQuien(el, colocadorDe(el))`: `relojModo: 'ronda'` → por ronda; `relojDe: "fichaId|pj|creep"` →
+  ese token; si no, quien la puso (`colocadorDe`, que ahora suma el Acelerador). `colocadorEnOrden` exige que siga en juego (un caído cuenta por ronda);
+  `relojPorTurnos(el)`. **Con quien cuenta en el orden, solo sus turnos**: `zonasDelQueLaTiro` (al empezar su turno, cualquier elemento con `turnos`)
+  usa `ZonaDetalle.turnoBaja(el, {mant, esperaEfecto})` → bajar (`turnos` y `venceMant` al día) / esperar su efecto del Mantenimiento (no las de
+  `alEmpezar` en combate) / borrar; `elementosVencidosBarrer` no toca lo que cuenta por turnos (se acabó «lo que pase primero» y la ronda de respaldo de
+  `crearElementoZona`, `portalesCrear` y el Acelerador). `zonaEsperaSuFin` no espera a quien está en el orden por una zona de «al empezar su turno».
+  Por ronda: `relojesAlDia()` (js/07, desde el Mantenimiento en js/04) deja `turnos` al día (`ZonaDetalle.rondaAlDia`). **Sin cero**:
+  `ZonaDetalle.turnosQuedan` ya no hace el mínimo con `venceMant`; con 0 `relojMuestra` es falso (el lienzo no lo dibuja; el cartel de la casilla y «Ver
+  detalle» dicen «se está yendo»). **Al crear** (`guardarElemento`, `pegarElemento`, `crearElementoZona` sin casteador): `relojAlCrear(n, elegido)` (un
+  jugador: su personaje, `miTokenPrincipal`; el GM: `elemRelojDe`, js/01, del selector `#elem-reloj-de` del panel, js/14). **⚙**: `elementoDuracionHtml`
+  suma para el GM `#elem-edit-reloj-de` (`relojDeSelectHtml`, `relojDeOpciones`: los pj y creeps del mapa; `relojDeCampos`); se guarda con
+  `elementoGuardarConReloj` solo si cambió. **Sin las reglas** (`relojModo`/`relojDe`): se guarda sin esos campos y avisa `RELOJ_SIN_REGLAS`
+  (`sinReloj`, `conReloj`). **El reloj es un botón**: `relojesDibujar` guarda `c.caja` (para quien `puedeManipularElemento`); `relojEn(x, y)` (js/05) y
+  el `pointerdown` del lienzo (js/06, antes que los tokens, sin herramienta activa) seleccionan el elemento y abren `elementoDuracionAbrir`. **«⏳ –»**
+  (`ZonaDetalle.RELOJ_SIN`, `relojSinPuede`: sin `venceMant`, no Colisión, arma ni sólido), tenue y punteado, solo para quien puede configurarlo.
 - **💨 Una zona con duelo por token se resiste al ENTRAR, no al caminar adentro** (2026-11-28, dueño, «la B»; P381): en `zonaRevisarToken` (js/08), al
   moverse (no en el Mantenimiento ni al empezar el turno), una zona con `zonaEsDuelo` (js/112: los Pedos Tóxicos, la Nube tóxica de los creeps, las de
   «tirada de la zona») y sin `porPaso` solo cuenta si el movimiento arrancó fuera de ella (`ZonaDetalle.entraDesdeAfuera(celdas, desde)`,

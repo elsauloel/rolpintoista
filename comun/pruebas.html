@@ -46,8 +46,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-elemental.js?v=20261106escudo"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
-<script src="hex-info.js?v=20261125gas"></script>
-<script src="zona-detalle.js?v=20261128vert"></script>
+<script src="hex-info.js?v=20261128sincero"></script>
+<script src="zona-detalle.js?v=20261128sincero"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261128silelem"></script>
@@ -11869,7 +11869,7 @@ grupo('Token suelto paso a paso: iniciativa y vida');
     cierto(/id: 'ini', nombre: 'Iniciativa'/.test(t09) && /id: 'vida', nombre: 'Vida'/.test(t09) && /typeof d\.iniciativa === 'boolean'/.test(t09) && /hpMax: Math\.round\(d\.hpMax\)/.test(t09));
     cierto(/TokensAuto\.sueltoVida\(t\)\) return dueloDanoSuelto/.test(t13) && /function sueltoHooksDuelo/.test(t13) && /sueltoHooksDuelo\(lado\) \|\| zonaGmHooksDuelo/.test(t14));
     cierto(/async function cambiarVidaSuelto/.test(t10) && /TokensAuto\.sueltoRasgos/.test(t10));
-    cierto(/'descripcion', 'iniciativa', 'hp', 'hpMax'\]\)/.test(reglas) && /d\.hp <= d\.hpMax/.test(reglas) && /'townPortal', 'trampaDestino'\]\)/.test(reglas));
+    cierto(/'descripcion', 'iniciativa', 'hp', 'hpMax'\]\)/.test(reglas) && /d\.hp <= d\.hpMax/.test(reglas) && /'townPortal', 'trampaDestino'(, 'relojModo', 'relojDe')?\]\)/.test(reglas));
     igual((reglas.match(/hasOnly\(\['nombre', 'descripcion', 'imagen', 'color', 'iniciativa', 'hp', 'hpMax'\]\)/g) || []).length, 2);
   });
   // 📦 (2026-11-25) Sin crítico contra un objeto (P306 b), sin vida no se ataca, y el aviso al romperse (P307 d).
@@ -12584,9 +12584,10 @@ grupo('⏳ El relojito con los turnos que le quedan a una zona (2026-11-28, Zona
     igual(tq({zona: true, venceMant: 7, turnos: 3}, 6, false), {quedan: 1, porTurnos: false});
     igual(tq({zona: true, venceMant: 7}, 9, false), {quedan: 0, porTurnos: false});
   });
-  prueba('con quien la puso en el orden: sus turnos; una zona de habilidad se va igual al llegar a su Mantenimiento (lo que pase primero, P380)', () => {
+  prueba('con quien la puso en el orden: solo sus turnos (2026-11-28, P380 revisada: ya no se va antes por llegar a su Mantenimiento)', () => {
     igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 8, turnos: 3}, 4, true), {quedan: 3, porTurnos: true});
-    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6, turnos: 2}, 5, true), {quedan: 1, porTurnos: false});
+    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6, turnos: 2}, 5, true), {quedan: 2, porTurnos: true});
+    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6, turnos: 2}, 9, true), {quedan: 2, porTurnos: true});
     igual(tq({portal: true, zonaCasteadorRef: 'p1', venceMant: 10, turnos: 2}, 4, true), {quedan: 2, porTurnos: true});
   });
   prueba('una trampa (o la zona que dejó) solo cuenta los turnos de quien la puso: el mapa no la borra por Mantenimiento', () => {
@@ -12596,8 +12597,9 @@ grupo('⏳ El relojito con los turnos que le quedan a una zona (2026-11-28, Zona
   prueba('el último paso: sin turnos guardados, espera su efecto de la ronda con 0', () => {
     igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6}, 6, true), {quedan: 0, porTurnos: false});
   });
-  prueba('el texto del reloj: «⏳ N»', () => {
+  prueba('el texto del reloj: «⏳ N»; sin cero: con 0 no se dibuja (se está yendo)', () => {
     igual([ZonaDetalle.relojTexto(3), ZonaDetalle.relojTexto(0), ZonaDetalle.relojTexto(-2)], ['⏳ 3', '⏳ 0', '⏳ 0']);
+    igual([ZonaDetalle.relojMuestra({quedan: 2}), ZonaDetalle.relojMuestra({quedan: 1}), ZonaDetalle.relojMuestra({quedan: 0}), ZonaDetalle.relojMuestra(null)], [true, true, false, false]);
   });
   prueba('dónde va: la casilla del centro si está libre; si tiene token, la libre más cerca; todas ocupadas → corrido', () => {
     const c = (col, fila) => ({col, fila}), centro = x => ({x: x.col * 10, y: x.fila * 10});
@@ -12693,6 +12695,68 @@ grupo('⏳ El relojito va sobre un vértice y la duración se cambia después de
     cierto(/elem-edit-sin-limite/.test(m07) && /⏳ Cuántos turnos dura/.test(m14));
     // Las reglas ya dejan al dueño o al GM cambiar `turnos` y `venceMant` (no hace falta pegar nada).
     cierto(/resource\.data\.duenoUid == request\.auth\.uid \|\| esGM\(c\)\)\s*&& request\.resource\.data\.diff\(resource\.data\)\.affectedKeys\(\)\.hasOnly\(\[[^\]]*'turnos', 'venceMant'/.test(reglas));
+  });
+})();
+
+grupo('⏳ El relojito cuenta por los turnos de quien la puso, sin cero, y se configura tocándolo (2026-11-28, ZonaDetalle.relojQuien / turnoBaja / rondaAlDia, vtt-hexgrid/js/05, 06 y 07)');
+(() => {
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  prueba('quién cuenta: «por ronda» gana; si no, el elegido (relojDe); si no, quien la puso', () => {
+    const pone = {ref: 'f1', tipo: 'pj'};
+    igual(ZonaDetalle.relojQuien({}, pone), pone);
+    igual(ZonaDetalle.relojQuien({}, null), null);
+    igual(ZonaDetalle.relojQuien({relojModo: 'ronda', relojDe: 'c9|creep'}, pone), null);
+    igual(ZonaDetalle.relojQuien({relojModo: 'turno', relojDe: 'c9|creep'}, pone), {ref: 'c9', tipo: 'creep'});
+    igual(ZonaDetalle.relojQuien({relojModo: 'turno', relojDe: 'f2|pj'}, null), {ref: 'f2', tipo: 'pj'});
+    igual([ZonaDetalle.relojDeParse(''), ZonaDetalle.relojDeParse('x|raro')], [null, {ref: 'x', tipo: 'pj'}]);
+    igual([ZonaDetalle.relojDeTxt({ref: 'c1', tipo: 'creep'}), ZonaDetalle.relojDeTxt({ref: 'f1'}), ZonaDetalle.relojDeTxt(null)], ['c1|creep', 'f1|pj', '']);
+  });
+  prueba('empieza el turno de quien cuenta: baja uno (y deja la ronda al día); al llegar a 0 se va en ese momento, sin mostrar 0', () => {
+    igual(ZonaDetalle.turnoBaja({turnos: 2}, {mant: 7}), {accion: 'bajar', cambios: {turnos: 1, venceMant: 8}});
+    igual(ZonaDetalle.turnoBaja({turnos: 1}, {mant: 7}), {accion: 'borrar'});
+    // Justo después de pasar de ronda, una zona que pega en el Mantenimiento espera ese efecto y después se va (sin `turnos`).
+    igual(ZonaDetalle.turnoBaja({turnos: 1}, {mant: 8, esperaEfecto: true}), {accion: 'esperar', cambios: {venceMant: 8}});
+    igual(ZonaDetalle.turnoBaja({}, {mant: 8}), null);
+  });
+  prueba('N turnos = N rondas completas: con 1, al empezar su siguiente turno se va; con 2, baja a 1 y se va en el siguiente', () => {
+    let el = {zona: true, ...ZonaDetalle.turnosCambio(1, 3)};
+    igual(ZonaDetalle.turnosQuedan(el, {mant: 3, enOrden: true}), {quedan: 1, porTurnos: true});
+    igual(ZonaDetalle.turnoBaja(el, {mant: 4}).accion, 'borrar');
+    el = {zona: true, ...ZonaDetalle.turnosCambio(2, 3)};
+    const p1 = ZonaDetalle.turnoBaja(el, {mant: 4});
+    el = {...el, ...p1.cambios};
+    igual(ZonaDetalle.turnosQuedan(el, {mant: 4, enOrden: true}), {quedan: 1, porTurnos: true});
+    igual(ZonaDetalle.turnoBaja(el, {mant: 5}).accion, 'borrar');
+  });
+  prueba('fuera de combate baja al pasar de ronda, y la ronda deja los turnos al día', () => {
+    const el = {venceMant: 5, turnos: 3};
+    igual(ZonaDetalle.turnosQuedan(el, {mant: 3, enOrden: false}), {quedan: 2, porTurnos: false});
+    igual(ZonaDetalle.rondaAlDia(el, 3), {turnos: 2});
+    igual(ZonaDetalle.rondaAlDia(el, 2), null);   // (ya está al día)
+    igual(ZonaDetalle.rondaAlDia(el, 5), null);   // (con 0 se va: no se escribe)
+    igual(ZonaDetalle.rondaAlDia({}, 5), null);
+  });
+  prueba('«⏳ –»: lo que no tiene contador y se le puede poner (no la Colisión, un arma en el piso ni lo sólido)', () => {
+    igual(ZonaDetalle.RELOJ_SIN, '⏳ –');
+    igual([ZonaDetalle.relojSinPuede({}), ZonaDetalle.relojSinPuede({zona: true}), ZonaDetalle.relojSinPuede({venceMant: 4}), ZonaDetalle.relojSinPuede({colision: true}),
+      ZonaDetalle.relojSinPuede({arma: true}), ZonaDetalle.relojSinPuede({solido: true}), ZonaDetalle.relojSinPuede(null)], [true, true, false, false, false, false, false]);
+  });
+  prueba('la frase de cómo baja', () => {
+    igual(ZonaDetalle.relojComoTxt({}, {}), 'baja uno al empezar cada ronda');
+    igual(ZonaDetalle.relojComoTxt({relojModo: 'ronda'}, {quien: 'X'}), 'baja uno al empezar cada ronda');
+    igual(ZonaDetalle.relojComoTxt({}, {quien: 'Blanco J1', tuyo: true}), 'baja uno al empezar tu turno');
+    igual(ZonaDetalle.relojComoTxt({relojDe: 'c|creep'}, {quien: 'Mago'}), 'baja uno al empezar el turno de Mago');
+  });
+  prueba('el mapa: una sola cuenta de quién cuenta, el reloj es un botón, «⏳ –» para quien puede, y las reglas aceptan relojModo / relojDe', async () => {
+    const [m05, m06, m07, m14, reglas] = await Promise.all(['../vtt-hexgrid/js/05-vista-y-dibujo.js', '../vtt-hexgrid/js/06-mouse.js', '../vtt-hexgrid/js/07-tokens-y-elementos.js',
+      '../vtt-hexgrid/js/14-herramientas-y-arranque.js', '../firebase/firestore.rules'].map(traer));
+    cierto(/function relojQuienDe\(el\)\{ return ZonaDetalle\.relojQuien\(el, colocadorDe\(el\)\); \}/.test(m07));
+    cierto(/ZonaDetalle\.turnoBaja\(el, /.test(m07) && /if\(relojPorTurnos\(el\)\) return;/.test(m07) && /function relojesAlDia\(\)/.test(m07));
+    cierto(/function relojEn\(x, y\)/.test(m05) && /ZonaDetalle\.RELOJ_SIN/.test(m05) && /ZonaDetalle\.relojSinPuede\(el\) && puedeManipularElemento\(el\)/.test(m05));
+    cierto(/relojEn\(m\.x, m\.y\)/.test(m06) && /elementoDuracionAbrir\(relojId\)/.test(m06));
+    cierto(/elem-reloj-de/.test(m14) && /elem-edit-reloj-de/.test(m07));
+    cierto(/'relojModo', 'relojDe'\]\)/.test(reglas) && /d\.relojModo in \['ronda', 'turno'\]/.test(reglas));
+    cierto((reglas.match(/'venceMant', 'relojModo', 'relojDe', 'zonaResueltos'/g) || []).length === 2);
   });
 })();
 

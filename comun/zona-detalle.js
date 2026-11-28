@@ -8,7 +8,9 @@
    ZonaDetalle.tiene(el) → ¿hay algo que contar? (zona, trampa, fuego, nube, portal, acelerador)
    ZonaDetalle.armar(el, ctx) → {icono, titulo, esencial, filas: [{k, v, aMano}], descripcion}
    ZonaDetalle.turnosQuedan(el, {mant, enOrden}) → {quedan, porTurnos} | null (⏳ la cuenta de lo que le queda); relojTexto(q); relojLugar(celdas, o) (la casilla; ya no la usa el mapa);
-     relojVertice(celdas, o) (⏳ sobre un vértice, P384); turnosCambio(n, mant) → {turnos, venceMant} | null (poner / cambiar / quitar la duración)
+     relojVertice(celdas, o) (⏳ sobre un vértice, P384); turnosCambio(n, mant) → {turnos, venceMant} | null (poner / cambiar / quitar la duración);
+     relojMuestra(q) (sin cero), relojQuien(el, porDefecto) / relojDeParse / relojDeTxt (quién cuenta: `relojModo`, `relojDe`), turnoBaja(el, o) (empieza
+     su turno), rondaAlDia(el, mant), RELOJ_SIN «⏳ –» y relojSinPuede(el) (sin contador), relojComoTxt(el, o) (2026-11-28, «sin cero»)
    ZonaDetalle.entraDesdeAfuera(celdas, desde) → ¿un movimiento que termina adentro de la zona cuenta como ENTRAR? (💨 las zonas con duelo por token)
    ZonaDetalle.html(m, {glosario, cargando}) → la tarjeta en HTML, con los términos del glosario marcados una sola vez (2026-11-22)
      ctx = {statLabel(id), estadoTexto(spec), elemento (del daño: 'fuego'…), elementoNombre ('fuego'), elementoRes ('al fuego'), quedan, quedanDe ('turnos de X' | ''), sinVencer,
@@ -130,7 +132,8 @@ const ZonaDetalle = (() => {
   function filaQueda(el, ctx, filas){
     const q = Number.isFinite(ctx.quedan) ? Math.max(0, Math.round(ctx.quedan)) : null;
     if(q === null) filas.push({k: 'Cuánto le queda', v: 'No tiene turnos contados: queda hasta que alguien la saque.'});
-    else filas.push({k: 'Cuánto le queda', v: `${q} turno${s(q)}${ctx.quedanDe ? ` (${ctx.quedanDe})` : ' (cuenta cada vez que se pasa de ronda)'}${q === 0 ? ': se va después de su efecto de esta ronda' : ''}.`});
+    else if(q === 0) filas.push({k: 'Cuánto le queda', v: 'Se está yendo: se va después de su efecto de esta ronda.'});   // (⏳ sin cero, 2026-11-28)
+    else filas.push({k: 'Cuánto le queda', v: `${q} turno${s(q)}${ctx.quedanDe ? ` (${ctx.quedanDe})` : ' (baja uno al empezar cada ronda)'}; cuando le tocaría llegar a 0, se va.`});
   }
   function filaDescripcion(ctx){
     if(ctx.descripcion) return String(ctx.descripcion).replace(/\s*⚙[\s\S]*$/, '').replace(/\s+/g, ' ').trim();   // (lo técnico, «⚙ Automatizado…», no: va en el Ver de la habilidad)
@@ -379,22 +382,65 @@ const ZonaDetalle = (() => {
      iconito con un reloj de arena que muestre cuántos turnos les queda»). LA cuenta de todo el mapa (el ⏳ del lienzo, el cartel de la casilla, el cartel
      de arriba y «Ver detalle»), la misma con la que el mapa la borra (vtt-hexgrid/js/07):
      - sin `venceMant` (o sin Mantenimiento conocido) → null: no vence, no lleva reloj;
-     - quien la puso NO está en el orden de turnos (`o.enOrden` falso) o no guarda `turnos` → lo que falta de Mantenimientos (`venceMant` − el actual):
-       se borra cuando se pasa de ronda ese número de veces (elementosVencidosBarrer);
-     - quien la puso SÍ está en el orden → sus `turnos` (bajan uno al empezar SU turno, zonasDelQueLaTiro). Una trampa (o la zona que dejó) solo se va
-       así; una zona de habilidad, un portal o un Acelerador además se van igual al llegar a `venceMant`: lo que pase primero (P380).
-     o = {mant (el número de Mantenimiento actual), enOrden}. → {quedan, porTurnos} (porTurnos: el número son turnos de quien la puso). */
+     - quien cuenta (relojQuien) NO está en el orden de turnos (`o.enOrden` falso) o no guarda `turnos` → lo que falta de Mantenimientos (`venceMant` −
+       el actual): se borra cuando se pasa de ronda ese número de veces (elementosVencidosBarrer);
+     - quien cuenta SÍ está en el orden → solo sus `turnos` (bajan uno al empezar SU turno, zonasDelQueLaTiro; 2026-11-28, dueño: «que el timer cuente
+       el inicio del turno de quien lo coloca… y que no haya cero»): ya no se va antes por llegar a `venceMant` (P380, revisada).
+     «Sin cero»: con 0 la zona se está yendo (espera su último efecto de la ronda, si tiene): `relojMuestra` dice que no se dibuja.
+     o = {mant (el número de Mantenimiento actual), enOrden}. → {quedan, porTurnos} (porTurnos: el número son turnos de quien cuenta). */
   function turnosQuedan(el, o){
     o = o || {};
     if(!el || el.venceMant === null || el.venceMant === undefined || o.mant === null || o.mant === undefined) return null;
     const vm = Math.round(Number(el.venceMant)), mant = Math.round(Number(o.mant));
     if(!Number.isFinite(vm) || !Number.isFinite(mant)) return null;
-    const porMant = Math.max(0, vm - mant), t = Math.round(Number(el.turnos)) || 0;
-    if(t > 0 && o.enOrden){
-      const soloTurnos = !!el.trampa || (!!el.zona && !el.zonaCasteadorRef);
-      if(soloTurnos || t <= porMant) return {quedan: t, porTurnos: true};
-    }
-    return {quedan: porMant, porTurnos: false};
+    const t = Math.round(Number(el.turnos)) || 0;
+    if(t > 0 && o.enOrden) return {quedan: t, porTurnos: true};
+    return {quedan: Math.max(0, vm - mant), porTurnos: false};
+  }
+  // ¿Se dibuja el número? Sin cero: con 0 se está yendo.
+  const relojMuestra = q => !!(q && Math.round(Number(q.quedan)) > 0);
+  /* ⏳ Quién cuenta el reloj (2026-11-28, dueño: «si el GM pone un área, una forma, y le pone un timer, puede elegir si el contador baja de número al
+     principio de cada ronda o al principio del turno del token jugador/usuario/creep que venga al caso»). `relojModo: 'ronda'` → nadie (por rondas);
+     `relojDe: "fichaId|pj|creep"` → ese token; si no, quien la puso (`porDefecto`: la zona o el portal de una habilidad, la trampa de alguien).
+     → {ref, tipo} | null. */
+  function relojDeParse(s){
+    const [ref, tipo] = String(s || '').split('|');
+    return ref ? {ref, tipo: tipo === 'creep' ? 'creep' : 'pj'} : null;
+  }
+  const relojDeTxt = c => c && c.ref ? `${String(c.ref).slice(0, 90)}|${c.tipo === 'creep' ? 'creep' : 'pj'}` : '';
+  function relojQuien(el, porDefecto){
+    if(!el || el.relojModo === 'ronda') return null;
+    return relojDeParse(el.relojDe) || porDefecto || null;
+  }
+  /* ⏳ Empieza el turno de quien cuenta: un turno menos. → {accion: 'bajar', cambios: {turnos, venceMant}} (venceMant al día: si quien cuenta deja el
+     orden de turnos, sigue por rondas con lo que le quedaba) | {accion: 'esperar', cambios: {venceMant}} (llegó a 0 justo después de pasar de ronda y
+     todavía tiene que hacer su efecto de esa ronda a los que siguen adentro: se borran los `turnos` —las reglas no aceptan 0— y la borra el GM cuando lo
+     resolvieron) | {accion: 'borrar'} | null (no tiene turnos). o = {mant (el Mantenimiento actual), esperaEfecto (¿le falta su efecto de la ronda?)}. */
+  function turnoBaja(el, o){
+    o = o || {};
+    const t = Math.round(Number(el && el.turnos)) || 0;
+    if(t <= 0) return null;
+    const mant = Math.round(Number(o.mant)) || 0, quedan = t - 1;
+    if(quedan > 0) return {accion: 'bajar', cambios: {turnos: quedan, venceMant: mant + quedan}};
+    return o.esperaEfecto ? {accion: 'esperar', cambios: {venceMant: mant}} : {accion: 'borrar'};
+  }
+  /* ⏳ Pasó de ronda y lo cuenta la ronda (nadie en el orden): sus `turnos` al día con lo que le queda, así si después cuenta los turnos de alguien
+     (empieza el combate, lo eligió el GM) arranca de ahí. → {turnos} | null (nada que cambiar; con 0 se va: no se escribe). */
+  function rondaAlDia(el, mant){
+    if(!el || el.venceMant === null || el.venceMant === undefined) return null;
+    const t = Math.round(Number(el.turnos)) || 0, q = Math.round(Number(el.venceMant)) - (Math.round(Number(mant)) || 0);
+    return t > 0 && q >= 1 && q < t ? {turnos: q} : null;
+  }
+  // El texto del reloj sin contador (solo para quien lo puede configurar): «⏳ –».
+  const RELOJ_SIN = '⏳ –';
+  /* ¿Lleva «⏳ –»? Lo que todavía no tiene contador y se le puede poner (no la Colisión, un arma en el piso ni lo sólido: paredes, rocas, columnas,
+     que casi siempre quedan para siempre; a esas se les pone desde el ⚙). La pantalla decide si puede (el GM o quien lo puso). */
+  const relojSinPuede = el => !!el && (el.venceMant === null || el.venceMant === undefined) && !el.colision && !el.arma && !el.solido;
+  /* La frase de cómo baja, para el ⚙ y «Ver detalle». o = {quien: 'Fulano' | '', tuyo (es mi personaje)}. */
+  function relojComoTxt(el, o){
+    o = o || {};
+    if(!el || el.relojModo === 'ronda' || !o.quien) return 'baja uno al empezar cada ronda';
+    return o.tuyo ? 'baja uno al empezar tu turno' : `baja uno al empezar el turno de ${o.quien}`;
   }
   // El texto del relojito: «⏳ 3».
   const relojTexto = q => `⏳ ${Math.max(0, Math.round(Number(q)) || 0)}`;
@@ -460,7 +506,8 @@ const ZonaDetalle = (() => {
     return {turnos: t, venceMant: (Math.round(Number(mant)) || 0) + t};
   }
 
-  return {tiene, armar, entraDesdeAfuera, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, relojVertice, turnosCambio, A_MANO};
+  return {tiene, armar, entraDesdeAfuera, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, relojVertice, turnosCambio,
+    relojMuestra, relojQuien, relojDeParse, relojDeTxt, turnoBaja, rondaAlDia, RELOJ_SIN, relojSinPuede, relojComoTxt, A_MANO};
 
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

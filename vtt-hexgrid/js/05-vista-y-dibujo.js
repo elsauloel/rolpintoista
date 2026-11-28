@@ -628,7 +628,8 @@ function dibujarLienzo(){
     }   // fin de lo que no es Colisión
     // ⏳ El relojito con los turnos que le quedan (2026-11-28): se junta acá —así vale lo de arriba: solo lo que esta pantalla ve— y se dibuja
     // después de los tokens y las nubes (relojesDibujar), sobre un vértice de la zona sin token (P384).
-    if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length) relojes.push([id, el, celdas]);
+    // Sin contador, «⏳ –» solo para quien lo puede configurar (el GM y quien lo puso; 2026-11-28): tocándolo se le pone.
+    if(id !== ID_BORRADOR && mantenimientoNumero !== null && celdas.length && (el.venceMant !== null && el.venceMant !== undefined || (ZonaDetalle.relojSinPuede(el) && puedeManipularElemento(el)))) relojes.push([id, el, celdas]);
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
       ctx.setLineDash([6 / z, 5 / z]);
@@ -1417,10 +1418,16 @@ function relojesDibujar(lista, z){
     vivos.add(id);
     let c = relojCache.get(id);
     // Los turnos y el texto: solo cuando cambia algo de lo que entra en la cuenta (sus turnos, el Mantenimiento, quién la puso, el orden de turnos).
-    const fq = `${el.venceMant}|${el.turnos}|${mantenimientoNumero}|${el.zonaCasteadorRef || ''}|${el.trampaEstado || ''}|${firmaOrden}`;
-    if(!c || c.fq !== fq){ const q = elementoTurnosQuedan(el); c = {...(c || {}), fq, q, txt: q ? ZonaDetalle.relojTexto(q.quedan) : ''}; relojCache.set(id, c); }
+    const fq = `${el.venceMant}|${el.turnos}|${mantenimientoNumero}|${el.zonaCasteadorRef || ''}|${el.trampaEstado || ''}|${el.relojModo || ''}|${el.relojDe || ''}|${firmaOrden}`;
+    if(!c || c.fq !== fq){
+      const q = elementoTurnosQuedan(el), sin = !q && ZonaDetalle.relojSinPuede(el);
+      // Sin cero (2026-11-28): con 0 se está yendo y no se dibuja; sin contador, «⏳ –».
+      c = {...(c || {}), fq, q, sin, txt: ZonaDetalle.relojMuestra(q) ? ZonaDetalle.relojTexto(q.quedan) : sin ? ZonaDetalle.RELOJ_SIN : ''};
+      relojCache.set(id, c);
+    }
     const q = c.q;
-    if(!q) return;
+    c.caja = null;
+    if(!c.txt) return;
     const icono = relojIcono(el, celdas);
     const firma = `${el.origen.col},${el.origen.fila},${el.rotacion || 0},${celdas.length},${celdas[0].col},${celdas[0].fila}|${icono}|${firmaOcup}`;
     if(c.firma !== firma){
@@ -1438,15 +1445,26 @@ function relojesDibujar(lista, z){
     if(w0 === undefined){ w0 = ctx.measureText(txt).width * z; relojAnchos.set(kw, w0); }   // (el ancho en píxeles de pantalla)
     const x = c.lugar.x, y = c.lugar.y;
     const w = (w0 + 10) / z, h = (px + 6) / z, r = 4 / z;
+    // ⏳ Es un botón para quien lo puede configurar (el GM y quien lo puso): relojEn (js/06) mira esta caja.
+    c.caja = puedeManipularElemento(el) ? {x0: x - w / 2, y0: y - h / 2, x1: x + w / 2, y1: y + h / 2} : null;
+    const rojo = !c.sin && q && q.quedan <= 1;
     ctx.beginPath();
     if(ctx.roundRect) ctx.roundRect(x - w / 2, y - h / 2, w, h, r); else ctx.rect(x - w / 2, y - h / 2, w, h);
-    ctx.fillStyle = q.quedan <= 1 ? 'rgba(70,22,18,.92)' : 'rgba(15,12,14,.88)'; ctx.fill();
-    ctx.strokeStyle = q.quedan <= 1 ? 'rgba(255,170,120,.95)' : 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
-    ctx.fillStyle = q.quedan <= 1 ? '#FFD2B0' : '#EDE3D2'; ctx.fillText(txt, x, y + 0.5 / z);
+    ctx.fillStyle = c.sin ? 'rgba(15,12,14,.62)' : rojo ? 'rgba(70,22,18,.92)' : 'rgba(15,12,14,.88)'; ctx.fill();
+    if(c.sin) ctx.setLineDash([3 / z, 2 / z]);
+    ctx.strokeStyle = c.sin ? 'rgba(237,227,210,.6)' : rojo ? 'rgba(255,170,120,.95)' : 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
+    if(c.sin) ctx.setLineDash([]);
+    ctx.fillStyle = c.sin ? 'rgba(237,227,210,.75)' : rojo ? '#FFD2B0' : '#EDE3D2'; ctx.fillText(txt, x, y + 0.5 / z);
   });
   ctx.restore();
   if(relojCache.size > vivos.size) [...relojCache.keys()].forEach(k => { if(!vivos.has(k)) relojCache.delete(k); });
   if(relojAnchos.size > 200) relojAnchos.clear();
+}
+// ⏳ ¿Hay un relojito-botón en ese punto del mundo? (2026-11-28) → el id del elemento, o null. Solo los que esta pantalla puede configurar.
+function relojEn(x, y){
+  let hit = null;
+  relojCache.forEach((c, id) => { const b = c.caja; if(b && x >= b.x0 - 2 && x <= b.x1 + 2 && y >= b.y0 - 2 && y <= b.y1 + 2 && elementos.has(id)) hit = id; });
+  return hit;
 }
 function tokenEn(x, y){
   for(let i = disposicion.length - 1; i >= 0; i--){

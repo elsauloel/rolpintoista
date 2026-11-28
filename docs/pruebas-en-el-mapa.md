@@ -3679,3 +3679,21 @@ y volvió a entrar: el «+1 stack» de siempre.
 - El GM con un creep que tenga 🧿 Mal de ojo listo: que su cuadro espere.
 - Enyetar que **gana** (la tirada se repite y el duelo cambia de resultado): que todas las pantallas cuenten 20 s desde la nueva resolución.
 - Restaurar el cuadro minimizado desde su tira y que siga diciendo «Esperando…».
+
+## ⏳ El relojito cuenta por los turnos de quien la puso, sin cero, y se configura tocándolo (2026-11-28, P385)
+
+Probado con clics en «Prueba · General» (GM, Jugador 1 y Jugador 2), **sin las reglas nuevas pegadas**: en narrativo, una forma de J1 con 2 → ⟳ → 1 →
+⟳ → se fue (nunca «⏳ 0»); otra sin contador con «⏳ –» (la ven J1 y el GM, J2 no); J1 tocó el «⏳ –» → se abrió la duración, le puso 3. En combate con
+orden (J1, Mago · Piromante, J2, Hachero): Muro de fuego del Piromante de 3 sobre J2 y J1 → al pasar de ronda siguió en 3; bajó a 2 y a 1 al empezar los
+turnos del Piromante; en la ronda 4 todavía le pegó a J1 (que juega antes que él) y se fue al empezar el turno del Piromante («Se fue Muro de fuego»), sin
+mostrar 0. J2 recibió sus 3 golpes. El GM puso formas «al empezar cada ronda» (2 → 1 al pasar de ronda) y «al empezar el turno de» Warrior · Hachero
+(sin las reglas: avisa y cuenta por ronda), y tocó el «⏳ –» de una suya: se abrió con «Cuándo baja el número».
+**Falta ver (con las reglas nuevas pegadas):**
+- J1 pone una forma con 1 en su turno (con orden de turnos) → ⏳ 1 → se va al empezar su siguiente turno; con 2 → baja a 1 al empezar su turno y se va
+  en el siguiente. Que el aviso «Se guardó, pero el relojito va a contar por ronda…» ya no salga.
+- El GM: una forma «al empezar el turno de» un creep (baja solo en el turno de ese creep; al pasar de ronda no cambia) y cambiar el modo desde el ⚙ de
+  una ya puesta (también una zona de habilidad a «al empezar cada ronda»).
+- Una zona puesta a mano por un jugador con el asistente de zonas (cuenta sus turnos).
+- Quien la puso **cae** con la zona puesta: pasa a contar por ronda.
+- Dudoso: en la ronda 3 el Muro no le pegó a Blanco J1 (el script tocó «✔ Aplicar» enseguida; en las rondas 2 y 4 sí le pegó). Mirarlo a mano: que al
+  empezar el turno adentro del Muro siempre aparezca su renglón «🔥 Tirar el daño».

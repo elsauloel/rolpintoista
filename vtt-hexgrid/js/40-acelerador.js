@@ -16,7 +16,7 @@ async function aceleradorDeHabilidad(msg){
     if(distanciaHex(h, t) > Math.max(1, alcance)){ toast(`Esa casilla queda a más de ${Math.max(1, alcance)} (tu Rango)`); pedir(); return; }
     if(elementoSolidoEn(h.col, h.fila)){ toast('Ahí hay algo sólido: elegí otra casilla'); pedir(); return; }
     const n = Math.max(1, Math.round(num(msg.turnos)) || 10), de = {ref: msg.fichaId, tipo: msg.casteadorTipo === 'creep' ? 'creep' : 'pj'};
-    const vence = Math.round(num(mantenimientoNumero)) + n + (colocadorEnOrden(de) ? 1 : 0);
+    const vence = Math.round(num(mantenimientoNumero)) + n;   // (⏳ 2026-11-28: con quien lo puso en el orden, cuentan sus turnos)
     try{
       await coleccionElementos().add({
         tipo: 'flor', origen: {col: h.col, fila: h.fila}, celdas: [0, 0], rotacion: Math.round(num(t.rotacion)) % 360, color: '#4FE0A0', alfa: 0, solido: false, invisible: false,

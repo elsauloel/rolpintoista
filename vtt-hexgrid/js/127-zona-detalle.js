@@ -86,7 +86,13 @@ function zonaDetalleCtx(elId, el){
   ctx.estadoTexto = sp => { try{ const {duelo, porTirada, pct, unaVez, sumaUno, resetea, renuevaPaso, superficie, tiraPaso, salva, efecto, magica, elemento, alEmpezar, porPaso, ...limpio} = sp; return EstadosAplicar.texto(limpio); }catch(e){ return sp.nombre; } };
   // Cuánto le queda: la misma cuenta que el ⏳ del lienzo (js/05) y el cartel de la casilla (js/104).
   const q = zonaTurnosQuedan(el);
-  if(q){ ctx.quedan = q.quedan; if(q.porTurnos) ctx.quedanDe = `son turnos de ${a.nombre || 'quien la puso'}: baja uno cada vez que empieza su turno`; }
+  if(q){
+    ctx.quedan = q.quedan;
+    // ⏳ (2026-11-28) De quién son los turnos: el que eligió el GM (`relojDe`) o quien la puso. Un token que esta pantalla no ve no se nombra.
+    let quien = a.nombre || 'quien la puso';
+    if(el.relojDe){ const tk = relojTokenDe(relojQuienDe(el)); quien = tk && (soyGM || (!tk[1].oculto && !(typeof enSigilo === 'function' && enSigilo(tk[1])))) ? nombreDe(tk[1]) : 'quien cuenta el reloj'; }
+    if(q.porTurnos) ctx.quedanDe = `son turnos de ${quien}: baja uno cada vez que empieza su turno`;
+  }
   let sp = {}; try{ sp = JSON.parse(el.zonaEstado || el.trampaEstado || '{}') || {}; }catch(e){}
   const elem = (typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(el.zonaDanoTipo || '') : '') || (el.trampa ? sp.elemento || '' : '');
   if(elem){ ctx.elemento = elem; ctx.elementoNombre = (ZD_ELEM[elem] || [elem])[0]; ctx.elementoRes = (ZD_ELEM[elem] || [])[1] || `a ${elem}`; }

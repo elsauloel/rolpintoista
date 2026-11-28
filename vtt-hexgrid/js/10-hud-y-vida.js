@@ -1178,7 +1178,7 @@ function actualizarEtiquetaElemento(){
   const verDet0 = typeof ZonaDetalle !== 'undefined' && ZonaDetalle.tiene(e) ? '<button type="button" class="ee-detalle" data-zona-detalle="1" title="Qué hace, a quién, cuándo, de quién es y cuánto le queda">🔍 Ver detalle</button>' : '';
   // ⏳ Duración (2026-11-28): poner, cambiar o quitar cuántos turnos dura, para quien lo puede editar (su dueño o el GM). Abre el ⚙ (js/07).
   const qd = puedeManipularElemento(e) && !e.colision && !e.arma ? elementoTurnosQuedan(e) : undefined;
-  const verDur = qd === undefined ? '' : `<button type="button" class="ee-detalle" data-elem-duracion="1" title="Cuántos turnos dura: ponerle, cambiarle o quitarle el límite">${qd ? `⏳ ${qd.quedan} · cambiar` : '⏳ Duración'}</button>`;
+  const verDur = qd === undefined ? '' : `<button type="button" class="ee-detalle" data-elem-duracion="1" title="Cuántos turnos dura: ponerle, cambiarle o quitarle el límite">${qd && qd.quedan > 0 ? `⏳ ${qd.quedan} · cambiar` : '⏳ Duración'}</button>`;
   const verDet = verDet0 + verDur;
   if(especial){
     const clave = 'especial|' + especial + '|' + verDet;

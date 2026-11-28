@@ -75,6 +75,10 @@ lienzo.addEventListener('pointerdown', e => {
   }
   const {px, py} = posEvento(e);
   const m = pantallaAMundo(px, py);
+  // ⏳ El relojito de una zona es un botón (2026-11-28, dueño: «que el mismo icono del relojito sea un botón»): para el GM y quien la puso, abre su
+  // duración (selecciona el elemento y abre el ⚙ con los turnos listos). Va antes que el token: el reloj está en un vértice, encima de todo.
+  const relojId = !herramientaActiva && !rutaPendiente && typeof relojEn === 'function' ? relojEn(m.x, m.y) : null;
+  if(relojId){ e.preventDefault(); elementoSeleccionar(relojId); setTimeout(() => elementoDuracionAbrir(relojId), 0); return; }   // (después del mousedown: si no, el lienzo se queda con el foco)
   const id = tokenEn(m.x, m.y);
   lienzo.setPointerCapture(e.pointerId);
   const libre = moverLibre && tokens.get(moverLibre);

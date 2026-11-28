@@ -57,7 +57,7 @@ const HexInfo = (() => {
     // Lo que acompaña a cada línea: los turnos que le quedan y si los jugadores no lo ven.
     const quedan = Number.isFinite(o.quedan) ? Math.max(0, Math.round(o.quedan)) : null;
     out.forEach(x => {
-      if(quedan !== null && !el.colision) x.detalle += ` ⏳ Queda${s(quedan) ? 'n' : ''} ${quedan} turno${s(quedan)}.`;
+      if(quedan !== null && !el.colision) x.detalle += quedan > 0 ? ` ⏳ Queda${s(quedan) ? 'n' : ''} ${quedan} turno${s(quedan)}.` : ' ⏳ Se está yendo.';   // (sin cero, 2026-11-28)
       if(o.oculto) x.oculto = true;
     });
     return out;

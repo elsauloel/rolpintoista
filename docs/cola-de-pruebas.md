@@ -310,13 +310,26 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   desde el campo de colocar; J2 no ve «⏳ Duración» en la de J1 ni en un sólido del GM; el GM sí y la cambió a 5. Muro de fuego del Mago · Piromante
   sobre Blanco J1 y J2: el reloj en el vértice de arriba, sin tocarlos; mover un token lejos no lo mudó; con el Warrior · Hachero parado en la casilla de
   arriba, se mudó a un vértice libre del costado. Pruebas: 1229. Dudas: P384. La vuelta, «quedó igual». Lo que falta ver: `pruebas-en-el-mapa.md`.
-- **⬜ en cola (primero) — ⏳ El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo** (dueño, 2026-11-28; revisa la
+- **✅ hecho (2026-11-28) — ⏳ El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo** (dueño, 2026-11-28; revisa la
   P380): «que el timer cuente el inicio del turno de quien lo coloca al área como el momento de ir de un número para abajo, y que no haya cero, cosa que
   si yo pongo una nube y le pongo que dura un turno, va a durar una ronda completa, desde el turno en el que yo la coloco hasta el principio de la
   siguiente turno. Si lo pongo 2, van a ser 2 rondas completas. Y si el GM pone un área, una forma, y le pone un timer, puede elegir si el contador baja
   de número al principio de cada ronda o al principio del turno del token jugador/usuario/creep que venga al caso. Eso se debería poder acceder o desde
   el botón del engranaje de la forma, o que el mismo icono del relojito sea un botón. Que cuando no tenga configurado un contador esté el ítem y esté
   como con una rayita, entonces entienda que ahí se puede cliquear.»
+  *Resultado:* **cuenta por los turnos de quien la puso, sin cero**: con N, dura N rondas completas; el número baja al empezar el turno de quien la puso
+  y, cuando le tocaría llegar a 0, se va en ese momento (nunca se ve «⏳ 0»). Ya no se va antes por la ronda. Sin orden de turnos (o si quien la puso no
+  está en el orden, o cayó), baja al pasar de ronda, también sin cero. Vale para todo lo que tiene turnos: formas, zonas, trampas, nubes, portales; las
+  zonas de las habilidades (Muro de fuego, Pedos, Nube tóxica…) cuentan los turnos de quien las lanzó. **El GM elige cómo cuenta** al ponerla (en
+  Terreno y Formas, «Cuándo baja el número») o desde el ⚙: «al empezar cada ronda» o «al empezar el turno de» un personaje, invocación o creep del mapa.
+  Un jugador, siempre sus turnos (sin opción). **El relojito es un botón** para el GM y quien la puso: tocarlo abre la duración. **Sin contador** se ve
+  «⏳ –» (tenue, punteado) solo para el GM y quien la puso (no en lo sólido); tocándolo se le pone. **Reglas de Firestore nuevas** (`relojModo`,
+  `relojDe`): **hay que pegarlas**; mientras tanto se guarda igual y avisa que cuenta por ronda. **Probado con clics** en «Claude · pruebas 2», «Prueba ·
+  General» (GM, Jugador 1 y Jugador 2; sin las reglas pegadas): narrativo, la forma de J1 de 2 → 1 → se fue sin mostrar 0; el «⏳ –» lo ven J1 y el GM,
+  J2 no; tocarlo abre la duración. Combate con orden (J1, Piromante, J2, Hachero): el Muro de fuego del Mago · Piromante de 3 siguió en 3 al pasar de
+  ronda, bajó en los turnos del Piromante, en la ronda 4 todavía le pegó a J1 (que juega antes) y se fue al empezar el turno del Piromante; J2 recibió sus
+  3 golpes. El GM: una forma «por ronda» (2 → 1 al pasar de ronda) y una «por el turno de» Warrior · Hachero (sin reglas: avisa y cuenta por ronda).
+  Pruebas: 1236. Dudas: P385 (la P380 quedó revisada). La vuelta, «quedó igual». Lo que falta (con las reglas pegadas): `pruebas-en-el-mapa.md`.
 - **⬜ en cola (primero) — 🕊️ Mensajes privados entre el GM y los jugadores, en los dos sentidos** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» y «y vice versa» (que un jugador también le pueda mandar uno privado al GM). Revisar si hoy se puede en cada sentido (🕊️, `/m`, `/r`) y por qué no anduvo en la sesión.
   **En pausa (dueño, 2026-11-28):** ya existe (🕊️ y `/m Nombre texto`); «es bastante probable que yo haya visto mal, así que lo volveré a probar y te aviso».
 - **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».

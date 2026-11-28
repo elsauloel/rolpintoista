@@ -3465,6 +3465,9 @@ el de arriba y «Ver detalle»). Lo que se eligió (el dueño puede cambiar cual
 5. **Quién lo ve**: el que ve la zona (una trampa sin descubrir o una forma invisible tampoco muestran el reloj); la niebla de guerra lo tapa como a la zona.
 
 **✅ Decidido (dueño, 2026-11-28): «me parece bien»** (queda como está).
+**Revisada (dueño, 2026-11-28, cola «⏳ El relojito cuenta por turnos de quien la puso, sin cero…», ver P385)**: el punto 2 cambia — con quien la puso en el
+orden cuentan **solo sus turnos** (ya no se va antes por llegar a su ronda límite) — y el punto 3 también: **no hay «⏳ 0»** (con 0 la zona se está yendo y
+el reloj no se dibuja). N turnos = N rondas completas.
 
 ### P381 — 💨 Una zona con duelo por token: ¿quien sale y vuelve a entrar en la misma ronda la resiste de nuevo? (2026-11-28, Claude, al hacer «Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube»)
 
@@ -3526,3 +3529,27 @@ que el contador lo tape un token… quizás en algún vértice en el perímetro 
    trampa, el 🌀 del portal y el número del fuego cuentan como un token. El Acelerador sigue con el reloj debajo de su círculo.
 4. **Estable**: si el vértice de antes sigue libre, se queda ahí aunque se muevan los tokens; se muda solo si lo tapan.
 5. **Reglas de Firestore**: no cambian (el dueño y el GM ya podían cambiar `turnos` y `venceMant`).
+
+### P385 — ⏳ El relojito por los turnos de quien la puso: los casos de borde (2026-11-28, Claude, al hacer «El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo»)
+
+Lo pedido por el dueño: N turnos = N rondas completas; el número baja al **empezar el turno de quien la puso** y, cuando le tocaría llegar a 0, se va
+(sin «⏳ 0»); sin orden de turnos (o si quien la puso no está en el orden), baja al pasar de ronda; el GM elige «al empezar cada ronda» o «al empezar el
+turno de» un token; un jugador, siempre sus turnos; se configura desde el ⚙ o tocando el reloj; sin contador, «⏳ –» solo para el GM y quien la puso.
+Lo que eligió Claude (lo recomendado; el dueño puede cambiar cualquiera):
+1. **Quien la puso cae** (0 de vida, o un creep derrotado): pasa a contar por ronda con lo que le quedaba (antes, una trampa de alguien caído no se iba
+   nunca; una zona de habilidad se iba por la ronda).
+2. **Ya no hay «ronda de respaldo»**: una zona de habilidad, un portal o el Acelerador de alguien que está en el orden se van solo con sus turnos.
+3. **Cambia de modo a mitad de camino**: cada vez que baja (por turno o por ronda) se guardan los dos números al día, así si empieza el combate o el GM
+   cambia el modo, sigue con lo que le quedaba.
+4. **Una zona que pega en el Mantenimiento** y llega a 0 justo al empezar el turno de quien la puso (primero en la ronda): espera a que se resuelva ese
+   efecto de la ronda y se va (como antes). **Una de «al empezar su turno»** (el Muro de fuego) en combate se va en el acto: ya no se queda hasta 2
+   minutos esperando un efecto del Mantenimiento que no tiene (antes le podía pegar de más al primero de la ronda). Quien la puso, si está adentro de su
+   propio Muro, no recibe el golpe del turno en que se va (como antes).
+5. **«⏳ –»** va en todo lo que no tiene contador **menos lo sólido** (paredes, rocas, columnas: casi siempre quedan para siempre), la Colisión y un arma
+   en el piso; a lo sólido se le pone desde «⏳ Duración» o el ⚙. Es tenue y punteado, para que no se confunda con un contador.
+6. **El GM, al elegir «al empezar el turno de»**: la lista son los personajes, invocaciones y creeps del mapa; si el que contaba ya no está en el mapa,
+   aparece como «quien la puso (no está en este mapa)». El asistente de zonas del GM cuenta por ronda (no pregunta).
+7. **Un jugador sin personaje en el mapa** (o el GM que maneja uno con 🎮): su forma cuenta por ronda.
+8. **«Ver detalle»** nombra a quien cuenta el reloj solo si esa pantalla lo ve (un creep oculto: «quien cuenta el reloj»).
+9. **Reglas de Firestore**: hacen falta dos campos nuevos, `relojModo` y `relojDe` (hay que pegarlas). Mientras no estén, lo demás anda igual: la forma se
+   guarda y avisa «Se guardó, pero el relojito va a contar por ronda hasta que se publiquen las reglas nuevas».

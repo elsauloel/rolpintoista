@@ -2513,3 +2513,8 @@ versión parecida en más de una, es candidato a juntar.
 - **💨 `ZonaDetalle.entraDesdeAfuera(celdas, desde)`** (2026-11-28, P381): ¿un movimiento que termina adentro de una zona cuenta como entrar? (no si
   arrancó en una casilla de la zona; sin `desde`, sí). Lo usa el motor de zonas del mapa (vtt-hexgrid/js/08) para las zonas con duelo por token.
 
+- **⏳ `zona-detalle.js`, el relojito sin cero y quién lo cuenta** (2026-11-28, P385): `turnosQuedan` ya no hace el mínimo con `venceMant` (con quien
+  cuenta en el orden: solo sus turnos); `relojMuestra(q)` (con 0 no se dibuja), `relojQuien(el, porDefecto)` / `relojDeParse` / `relojDeTxt` (campos
+  `relojModo` 'ronda'|'turno' y `relojDe` "fichaId|pj|creep" del elemento), `turnoBaja(el, {mant, esperaEfecto})`, `rondaAlDia(el, mant)`, `RELOJ_SIN`
+  («⏳ –»), `relojSinPuede(el)` y `relojComoTxt(el, {quien, tuyo})`. Puras, en `pruebas.html`. `hex-info.js`: con 0, «⏳ Se está yendo.». Lo usa el mapa
+  (vtt-hexgrid/CLAUDE.md, «El relojito cuenta por los turnos…»).

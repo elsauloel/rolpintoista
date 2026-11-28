@@ -447,59 +447,84 @@ function zonaEsperaSuFin(el, id){
   if(!zonasFinDesde.has(id)){ zonasFinDesde.set(id, Date.now()); setTimeout(elementosVencidosBarrer, ZONA_FIN_MS + 500); }
   if(Date.now() - zonasFinDesde.get(id) > ZONA_FIN_MS) return false;
   const celdas = celdasDeElemento(el);
+  // (2026-11-28) Una de «al empezar su turno» (el Muro de fuego) no le pega en el Mantenimiento a quien está en el orden de turnos: no se lo espera
+  // (antes quedaba hasta 2 minutos y le pegaba de más al primero de la ronda).
+  const alEmpezar = typeof zonaAlEmpezar === 'function' && zonaAlEmpezar(el);
   return [...tokens.entries()].some(([tid, t]) => celdas.some(c => c.col === t.col && c.fila === t.fila) && zonaAplicaA(el, t) && zonaLeFalta(el, t)
+    && !(alEmpezar && typeof zonaPorTurno === 'function' && zonaPorTurno(t))
     && !(el.zonaResueltos || []).includes(tid + '@fin'));
 }
 /* P172 (dueño, 2026-10-07): una zona que tiró alguien dura los turnos DE ÉL, no la ronda. Al empezar el turno de un token (▶ Siguiente, js/04), a
    sus zonas les queda un turno menos; con 0, se van (el fuego de 1 turno de la Bola de fuego quema a todos los que juegan antes de que el mago
-   vuelva a jugar). Sin orden de turnos siguen venciendo por Mantenimiento, como siempre. Lo hace el GM. → líneas para la Crónica. */
+   vuelva a jugar). Sin orden de turnos siguen venciendo por Mantenimiento, como siempre. Lo hace el GM. → líneas para la Crónica.
+   ⏳ Desde el 2026-11-28 (dueño: «que el timer cuente el inicio del turno de quien lo coloca al área como el momento de ir de un número para abajo, y
+   que no haya cero… si le pongo que dura un turno, va a durar una ronda completa»): vale para todo lo que tiene turnos (también las formas puestas a
+   mano), cuenta quien diga el reloj (relojQuienDe: el GM puede elegir «por ronda» o «por el turno de» alguien; un jugador, sus turnos) y, con quien
+   cuenta en el orden, solo sus turnos (ya no se va antes por la ronda). */
 // Quién la puso, para contar sus turnos: la zona de una habilidad (zonaCasteadorRef) o una trampa que colocó alguien, y la zona que deja al
 // dispararse (`de` adentro de su trampaEstado, comun/tokens-auto.js; 2026-10-07, dueño: «siempre los turnos contando al caster»).
 function colocadorDe(el){
-  if((el.zona || el.portal) && el.zonaCasteadorRef) return {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'};   // (los portales, 2026-10-07)
+  if((el.zona || el.portal || el.acelerador) && el.zonaCasteadorRef) return {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'};   // (los portales, 2026-10-07)
   try{
     const de = (JSON.parse(el.trampaEstado || '{}') || {}).de;
     if(typeof de === 'string' && de.includes('|')){ const [ref, tipo] = de.split('|'); return {ref, tipo: tipo === 'creep' ? 'creep' : 'pj'}; }
   }catch(err){}
   return null;
 }
-// ¿Quien la puso está en el orden de turnos? Entonces su duración la cuentan sus turnos, no los Mantenimientos.
-function colocadorEnOrden(c){
-  return !!(c && iniciativa.orden.some(o => { const t = tokens.get(o.id); return t && String(t.fichaId) === c.ref && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo; }));
+// ⏳ Quién cuenta el reloj (2026-11-28): `relojModo: 'ronda'` → nadie; `relojDe` → ese token; si no, quien la puso (colocadorDe).
+function relojQuienDe(el){ return ZonaDetalle.relojQuien(el, colocadorDe(el)); }
+// El token de quien cuenta (en este mapa), o null.
+function relojTokenDe(c){
+  if(!c) return null;
+  for(const [id, t] of tokens) if(t && String(t.fichaId) === String(c.ref) && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo) return [id, t];
+  return null;
 }
+// ¿Quien la puso está en el orden de turnos (y sigue en juego)? Entonces su duración la cuentan sus turnos, no los Mantenimientos. Un caído (o un
+// creep derrotado) ya no juega: cuenta la ronda (2026-11-28; antes una trampa de alguien que cayó no se iba nunca).
+function colocadorEnOrden(c){
+  return !!(c && iniciativa.orden.some(o => { const t = tokens.get(o.id); return t && String(t.fichaId) === c.ref && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo && !iniciativaFueraDeJuego(o.id); }));
+}
+// ⏳ ¿Este elemento cuenta los turnos de alguien que está en el orden?
+const relojPorTurnos = el => Math.round(num(el.turnos)) > 0 && colocadorEnOrden(relojQuienDe(el));
 // ⏳ Cuántos turnos le quedan a un elemento: {quedan, porTurnos} o null si no vence (2026-11-28). La cuenta pura es ZonaDetalle.turnosQuedan, la
 // misma que usa este archivo para borrarla (zonasDelQueLaTiro / elementosVencidosBarrer); la usan el relojito del lienzo (js/05), el cartel de la
 // casilla (js/104), el de arriba (js/10) y «Ver detalle» (js/127).
 function elementoTurnosQuedan(el){
   if(!el || mantenimientoNumero === null || el.venceMant === null || el.venceMant === undefined) return null;
-  const enOrden = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
+  const enOrden = relojPorTurnos(el);
   return ZonaDetalle.turnosQuedan(el, {mant: mantenimientoNumero, enOrden});
 }
 // `mantNuevo` (2026-10-22, la sesión del Pedo tóxico): si justo antes se pasó de ronda, la zona que se va todavía tiene que hacer efecto en esa
 // ronda a los que siguen adentro: en vez de borrarla, vence en ese Mantenimiento y la borra elementosVencidosBarrer cuando la resolvieron
-// (zonaEsperaSuFin). Antes, con quien la tiró primero en la ronda, la zona se iba antes de su segundo efecto.
+// (zonaEsperaSuFin). Antes, con quien la tiró primero en la ronda, la zona se iba antes de su segundo efecto. (Una de «al empezar su turno», en
+// combate, no pega en el Mantenimiento: se va en el acto.)
 async function zonasDelQueLaTiro(tokenId, mantNuevo){
   const t = tokens.get(tokenId);
   if(!soyGM || !t || !t.fichaId) return [];
   const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
+  const mant = Number.isFinite(mantNuevo) ? mantNuevo : Math.round(num(mantenimientoNumero));
   for(const [id, el] of elementos){
-    const c = (el.zona || el.trampa || el.portal || el.acelerador) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
+    const c = Math.round(num(el.turnos)) > 0 && !el.colision && !el.arma ? relojQuienDe(el) : null;
     if(!c || c.ref !== String(t.fichaId) || c.tipo !== tipo || elementosVencidosBorrando.has(id)) continue;
-    const quedan = Math.round(num(el.turnos)) - 1;
+    const alEmpezar = typeof zonaAlEmpezar === 'function' && zonaAlEmpezar(el) && typeof modoMapa !== 'undefined' && modoMapa === 'combate';
+    const paso = ZonaDetalle.turnoBaja(el, {mant, esperaEfecto: !!el.zona && !el.portal && el.zonaEnMantenimiento !== false && Number.isFinite(mantNuevo) && !alEmpezar});
     try{
-      if(quedan <= 0 && el.zona && !el.portal && el.zonaEnMantenimiento !== false && Number.isFinite(mantNuevo)){
+      if(paso.accion === 'esperar'){
         // (Sin `turnos`: las reglas no aceptan 0 —de 1 a 99— y la escritura fallaba callada; la zona se quedaba otra ronda. 2026-10-23.)
-        await coleccionElementos().doc(id).update({turnos: firebase.firestore.FieldValue.delete(), venceMant: mantNuevo});
+        await coleccionElementos().doc(id).update({turnos: firebase.firestore.FieldValue.delete(), venceMant: paso.cambios.venceMant});
         const txt = `Se va ${el.zonaNombre || 'la zona'} (terminaron sus turnos), después de su efecto de esta ronda.`;
         if(!lineas.includes(txt)) lineas.push(txt);
-      }else if(quedan <= 0){
+      }else if(paso.accion === 'borrar'){
         elementosVencidosBorrando.add(id);
         if(typeof superficieAlIrse === 'function') await superficieAlIrse(el);   // 🧊 → 💧 el hielo deja un charco (js/50)
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
-        const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : el.acelerador ? 'Se apagó el Acelerador (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`;
-        if(!lineas.includes(txt)) lineas.push(txt);   // (los dos portales, una sola línea)
-      }else await coleccionElementos().doc(id).update({turnos: quedan});
+        const nombre = el.zonaNombre || el.trampaNombre || '';
+        const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : el.acelerador ? 'Se apagó el Acelerador (terminaron sus turnos).'
+          : el.zona || el.niebla || el.fuego ? `Se fue ${nombre || 'la zona'} (terminaron sus turnos).` : el.trampa ? `Se fue ${nombre || 'la trampa'} (terminaron sus turnos).`
+          : el.invisible ? '' : `Se fue ${nombre || 'una forma'} (terminaron sus turnos).`;
+        if(txt && !lineas.includes(txt)) lineas.push(txt);   // (los dos portales, una sola línea; una forma invisible no se cuenta)
+      }else await coleccionElementos().doc(id).update(paso.cambios);
     }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
   }
   return lineas;
@@ -508,13 +533,35 @@ function elementosVencidosBarrer(){
   if(!soyGM || mantenimientoNumero === null) return;
   elementos.forEach((el, id) => {
     if(el.venceMant === null || el.venceMant === undefined || mantenimientoNumero < el.venceMant || elementosVencidosBorrando.has(id)) return;
+    if(relojPorTurnos(el)) return;   // ⏳ cuenta los turnos de alguien que está en el orden: se va al empezar su turno (zonasDelQueLaTiro), no por la ronda
     if(zonaEsperaSuFin(el, id)) return;   // su último Mantenimiento: primero hace efecto
-    if((el.trampa || (el.zona && !el.zonaCasteadorRef)) && colocadorEnOrden(colocadorDe(el))) return;   // una trampa (o la zona que dejó) cuenta los turnos de quien la puso
     elementosVencidosBorrando.add(id);
     if(typeof superficieAlIrse === 'function') superficieAlIrse(el);   // 🧊 → 💧 el hielo deja un charco (js/50)
     borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
   });
 }
+// ⏳ Pasó de ronda (2026-11-28): lo que cuenta la ronda deja sus `turnos` al día (ZonaDetalle.rondaAlDia), así si después cuenta los turnos de alguien
+// (empieza el combate) arranca con lo que le quedaba. Lo hace el GM.
+function relojesAlDia(){
+  if(!soyGM || mantenimientoNumero === null) return;
+  elementos.forEach((el, id) => {
+    if(elementosVencidosBorrando.has(id) || relojPorTurnos(el)) return;
+    const c = ZonaDetalle.rondaAlDia(el, mantenimientoNumero);
+    if(c) coleccionElementos().doc(id).update(c).catch(err => console.error('No se pudo poner al día el reloj:', err));
+  });
+}
+/* ⏳ Cómo cuenta lo que pone esta pantalla (2026-11-28): un jugador, sus turnos (su personaje); el GM, lo que eligió (`elemRelojDe`: '' = por ronda,
+   o "fichaId|pj|creep"). Solo si tiene turnos. → los campos para guardar ({} si cuenta la ronda sin más). */
+function relojAlCrear(n, elegido){
+  if(!(Math.round(num(n)) > 0)) return {};
+  if(!soyGM){ const t = miTokenPrincipal(); return t ? {relojModo: 'turno', relojDe: ZonaDetalle.relojDeTxt({ref: t.fichaId, tipo: 'pj'})} : {}; }
+  const de = ZonaDetalle.relojDeParse(elegido === undefined ? elemRelojDe : elegido);
+  return de ? {relojModo: 'turno', relojDe: ZonaDetalle.relojDeTxt(de)} : {};
+}
+// Sin las reglas nuevas publicadas, `relojModo`/`relojDe` no se pueden guardar: se guarda igual sin ellos (cuenta la ronda) y se avisa.
+const RELOJ_SIN_REGLAS = 'Se guardó, pero el relojito va a contar por ronda hasta que se publiquen las reglas nuevas de Firestore';
+const sinReloj = d => { const {relojModo, relojDe, ...resto} = d; return resto; };
+const conReloj = d => 'relojModo' in d || 'relojDe' in d;
 
 /* ---------- Colisión del mapa (2026-09-24, pedido del dueño) ----------
    Una "forma" del creador de Terreno y Formas (solo GM) que ya viene configurada: forma libre, Sólida (bloquea el paso y la
@@ -645,11 +692,13 @@ async function pegarElemento(){
       ...(c.trampaDejaZona ? {zonaTurnos: Math.max(1, Math.round(num(c.zonaTurnos)) || 3), zonaEnMantenimiento: c.zonaEnMantenimiento !== false, zonaCadaPaso: !!c.zonaCadaPaso,
         ...(c.zonaResistStat ? {zonaResistStat: String(c.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(c.zonaResistValor)) || 1} : {})} : {})} : {}),
     ...(c.fuego ? {fuego: true, fuegoDano: c.fuegoDano || 5} : {}),
-    ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos} : {}),
+    ...(c.turnos > 0 ? {turnos: c.turnos, venceMant: Math.round(num(mantenimientoNumero)) + c.turnos, ...relojAlCrear(c.turnos, c.relojModo === 'turno' ? c.relojDe || '' : '')} : {}),
     duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
   };
   try{
-    const ref = await coleccionElementos().add(datos);
+    let ref;
+    try{ ref = await coleccionElementos().add(datos); }
+    catch(err){ if(!(err && err.code === 'permission-denied' && conReloj(datos))) throw err; ref = await coleccionElementos().add(sinReloj(datos)); toast(RELOJ_SIN_REGLAS); }
     elementoSeleccionar(ref.id);
     toast('Forma pegada');
   }catch(err){
@@ -664,8 +713,7 @@ async function guardarElemento(tipo, origen, celdasSet){
   celdasSet.forEach(({dq, dr}) => celdas.push(dq, dr));
   if(!celdas.length) return;
   const invisible = !!(soyGM && elemInvisible);
-  try{
-    await coleccionElementos().add({
+  const datos = {
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, ...(elemSolido && elemVerEntero ? {verEntero: true} : {}), imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
@@ -677,8 +725,16 @@ async function guardarElemento(tipo, origen, celdasSet){
       ...(elemTrampa ? {trampaDejaZona: elemTrampaDejaZona} : {}),
       ...(elemTrampa && elemTrampaDejaZona ? {zonaTurnos: elemTrampaZonaTurnos, zonaEnMantenimiento: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso,
         ...(elemTrampaZonaResistStat ? {zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor} : {})} : {}),
+      ...relojAlCrear(elemTurnos),   // ⏳ cómo cuenta (2026-11-28): un jugador, sus turnos; el GM, lo que eligió
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  };
+  try{
+    try{ await coleccionElementos().add(datos); }
+    catch(err){
+      if(!(err && err.code === 'permission-denied' && conReloj(datos))) throw err;
+      await coleccionElementos().add(sinReloj(datos));   // (sin las reglas nuevas: cuenta la ronda)
+      toast(RELOJ_SIN_REGLAS);
+    }
   }catch(err){
     console.error('No se pudo crear el elemento:', err);
     toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo crear');
@@ -696,6 +752,15 @@ function elementoSolidoEn(col, fila){
 async function moverElemento(id, cambios){
   try{ await coleccionElementos().doc(id).update(cambios); }
   catch(err){ console.error('No se pudo mover el elemento:', err); toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo mover'); }
+}
+// ⏳ Guardar con cómo cuenta el reloj (2026-11-28): sin las reglas nuevas publicadas, se guarda lo demás y se avisa.
+async function elementoGuardarConReloj(id, cambios, reloj){
+  if(!reloj || !Object.keys(reloj).length) return moverElemento(id, cambios);
+  try{ await coleccionElementos().doc(id).update({...cambios, ...reloj}); }
+  catch(err){
+    if(err && err.code === 'permission-denied'){ try{ await coleccionElementos().doc(id).update(cambios); toast(RELOJ_SIN_REGLAS); return; }catch(e2){ err = e2; } }
+    console.error('No se pudo guardar el elemento:', err); toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo guardar');
+  }
 }
 async function borrarElemento(id){
   try{ await coleccionElementos().doc(id).delete(); }
@@ -728,7 +793,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, verEntero: el.verEntero, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, fuegoDano: el.fuegoDano, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, relojModo: el.relojModo, relojDe: el.relojDe, color: el.color, alfa: el.alfa, invisible: el.invisible, verEntero: el.verEntero, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, fuegoDano: el.fuegoDano, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
   };
   renderEditorElemento();
 }
@@ -740,18 +805,42 @@ function elementoDuracionHtml(el){
   const q = elementoTurnosQuedan(el);
   return `<label class="etiqueta" for="elem-edit-turnos">⏳ Cuántos turnos dura (desde ahora)</label>
     <div class="fila" style="margin-top:0;gap:6px;align-items:center">
-      <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${q ? q.quedan : ''}" placeholder="sin límite" style="width:90px">
+      <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${q && q.quedan > 0 ? q.quedan : ''}" placeholder="sin límite" style="width:90px">
       <span class="hint">turnos</span>
       <button type="button" class="btn" id="elem-edit-sin-limite" title="Que quede hasta que alguien lo borre">Sin límite</button>
     </div>
+    ${soyGM ? `<label class="etiqueta" for="elem-edit-reloj-de">Cuándo baja el número</label>${relojDeSelectHtml('elem-edit-reloj-de', relojDeValor(el))}` : ''}
     <div class="tk-lapiz-ayuda" id="elem-edit-turnos-ayuda" style="margin-top:4px">${esc(elementoDuracionAyuda(el))}</div>`;
 }
+/* ⏳ (2026-11-28) El GM elige cómo cuenta: «al empezar cada ronda» o «al empezar el turno de» un token del mapa (personaje o creep; el suyo si maneja
+   uno). El valor: 'ronda' o "fichaId|pj|creep". */
+function relojDeValor(el){ const c = relojQuienDe(el); return c ? ZonaDetalle.relojDeTxt(c) : 'ronda'; }
+function relojDeOpciones(actual){
+  const ops = [], vistos = new Set();
+  tokens.forEach(t => {
+    if(!t || !t.fichaId || (t.tipo !== 'pj' && t.tipo !== 'creep')) return;
+    const v = ZonaDetalle.relojDeTxt({ref: t.fichaId, tipo: t.tipo});
+    if(vistos.has(v)) return;
+    vistos.add(v); ops.push({v, n: nombreDe(t) || (t.tipo === 'creep' ? 'un creep' : 'un personaje'), creep: t.tipo === 'creep'});
+  });
+  ops.sort((a, b) => (a.creep - b.creep) || a.n.localeCompare(b.n, 'es'));
+  if(actual && actual !== 'ronda' && !vistos.has(actual)) ops.unshift({v: actual, n: 'quien la puso (no está en este mapa)'});
+  return ops;
+}
+function relojDeSelectHtml(id, actual){
+  return `<select id="${id}" style="width:100%"><option value="ronda"${actual === 'ronda' ? ' selected' : ''}>al empezar cada ronda</option>${relojDeOpciones(actual).map(o =>
+    `<option value="${esc(o.v)}"${o.v === actual ? ' selected' : ''}>al empezar el turno de ${esc(o.n)}</option>`).join('')}</select>`;
+}
+// Los campos para guardar lo elegido en el selector: 'ronda' → por ronda; un token → su turno.
+const relojDeCampos = v => v === 'ronda' ? {relojModo: 'ronda', relojDe: ''} : {relojModo: 'turno', relojDe: String(v).slice(0, 100)};
 function elementoDuracionAyuda(el){
   const q = elementoTurnosQuedan(el);
   if(!q) return 'Sin límite: queda hasta que alguien lo borre.';
   const n = q.quedan, t = n === 1 ? '1 turno' : `${n} turnos`;
-  return q.porTurnos ? `Le quedan ${t} de quien lo puso: baja uno cada vez que empieza su turno, y al llegar a 0 se va solo.`
-    : `Le quedan ${t}: baja uno cada vez que se pasa de ronda, y al llegar a 0 se va solo.`;
+  const c = relojQuienDe(el), tk = relojTokenDe(c), mio = !!(tk && !soyGM && tk[1].duenoUid === fbUsuario.uid);
+  const como = ZonaDetalle.relojComoTxt(el, {quien: c ? (tk ? nombreDe(tk[1]) : 'quien la puso') : '', tuyo: mio});
+  const fuera = c && !q.porTurnos ? ` (mientras ${mio ? 'no estés' : 'no esté'} en el orden de turnos, baja al empezar cada ronda)` : '';
+  return `Le quedan ${t}: ${como}${fuera}. Cuando le tocaría llegar a 0, se va.`;
 }
 // El «⏳ Duración» del cartel de arriba (js/10): abre el ⚙ con el campo de los turnos listo para escribir.
 function elementoDuracionAbrir(id){
@@ -845,6 +934,12 @@ function renderEditorElemento(){
   caja.querySelector('#elem-edit-cancelar').onclick = () => cerrarEditorElemento(true);
   caja.querySelector('#elem-edit-guardar').onclick = () => {
     const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
+    // ⏳ Cómo cuenta (2026-11-28): solo si cambió (así, sin las reglas nuevas, lo demás se guarda igual). Un jugador que le pone turnos a lo suyo: sus turnos.
+    const orig = editandoElemento.original, reloj = {};
+    if((el.relojModo || '') !== (orig.relojModo || '') || (el.relojDe || '') !== (orig.relojDe || '')){
+      reloj.relojModo = el.relojModo || firebase.firestore.FieldValue.delete();
+      reloj.relojDe = el.relojDe || firebase.firestore.FieldValue.delete();
+    }else if(!soyGM && conTurnos && !relojQuienDe(el)) Object.assign(reloj, relojAlCrear(el.turnos || 1));
     const tGuardar = Math.min(99, Math.round(num(el.turnos)) || 0);   // (una zona en su último paso no tiene `turnos`: no se le inventa uno)
     const cambios = {turnos: conTurnos && tGuardar > 0 ? tGuardar : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
       ...(el.fuego ? {fuegoDano: Math.max(1, Math.min(999, Math.round(num(el.fuegoDano)) || 5))} : {}),
@@ -857,7 +952,7 @@ function renderEditorElemento(){
           ...(el.zonaResistStat ? {zonaResistStat: String(el.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(el.zonaResistValor)) || 1} : {})} : {})} : {})};
     editandoElemento = null;
     caja.hidden = true; caja.innerHTML = '';
-    moverElemento(id, cambios);
+    elementoGuardarConReloj(id, cambios, reloj);
   };
   caja.querySelectorAll('[data-eled-color]').forEach(b => b.onclick = () => {
     vivo({color: b.dataset.eledColor});
@@ -869,8 +964,12 @@ function renderEditorElemento(){
   // ⏳ La duración (2026-11-28): N turnos desde ahora (ZonaDetalle.turnosCambio, la misma cuenta que al colocarla); vacío o 0 = sin límite. Se ve en vivo
   // (el ⏳ del lienzo cambia o se va) y se guarda con Guardar.
   const inTurnos = caja.querySelector('#elem-edit-turnos');
-  const turnosVivo = () => { vivo(ZonaDetalle.turnosCambio(inTurnos.value, mantenimientoNumero) || {turnos: 0, venceMant: null}); const a = caja.querySelector('#elem-edit-turnos-ayuda'); if(a) a.textContent = elementoDuracionAyuda(el); };
+  const turnosVivo = () => { const tc = ZonaDetalle.turnosCambio(inTurnos.value, mantenimientoNumero);
+    vivo({...(tc || {turnos: 0, venceMant: null}), ...(tc && !soyGM && !relojQuienDe(el) ? relojAlCrear(tc.turnos) : {})});   // ⏳ un jugador: sus turnos
+    const a = caja.querySelector('#elem-edit-turnos-ayuda'); if(a) a.textContent = elementoDuracionAyuda(el); };
   if(inTurnos) inTurnos.oninput = turnosVivo;
+  const selReloj = caja.querySelector('#elem-edit-reloj-de');
+  if(selReloj) selReloj.onchange = () => { vivo(relojDeCampos(selReloj.value)); turnosVivo(); };
   const sinLim = caja.querySelector('#elem-edit-sin-limite');
   if(sinLim && inTurnos) sinLim.onclick = () => { inTurnos.value = ''; turnosVivo(); };
   const chkInvisible = caja.querySelector('#elem-edit-invisible');

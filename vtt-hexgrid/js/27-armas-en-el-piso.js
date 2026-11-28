@@ -98,6 +98,8 @@ async function armaSoltar(t, vuela, o){
         tx.set(ref, {json: JSON.stringify(datos), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
       });
     }catch(err){ console.error('No se pudo sacar el arma del inventario:', err); }
+    // 🔥 Si tenía el Arma elemental en esa arma, se le va con ella (P374). Si esta pantalla no puede escribir su ficha, lo hace la de su dueño al refrescar.
+    try{ await editarPersonajeMapa(String(t.fichaId), S => armaElementalRevisarPj(S, item.id).length > 0); }catch(err){ console.error('Arma elemental: no se pudo apagar al caerse el arma', err); }
   }
   return {cayo: true, escudo: !!(typeof Combatiente !== 'undefined' && Combatiente.esEscudo(item)), nota: `se le cayó ${item.nombre}${o.celda ? ' lejos' : num(vuela) > 0 ? ` y voló ${Math.round(num(vuela))} casillas` : ''}`};
 }

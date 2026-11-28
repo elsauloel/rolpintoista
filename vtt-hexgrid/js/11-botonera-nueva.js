@@ -118,7 +118,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261127clic', '../comun/ficha-botin.js?v=20261120min1', '../comun/generador-tiendas.js?v=20261120maestria', '../comun/filtro-catalogo.js?v=20261111r33', '../comun/ficha-tienda.js?v=20261120carcaj2', '../comun/ficha-mantenimiento.js?v=20261126tope', '../comun/ficha-calculo.js?v=20261125sil', '../comun/ficha-combate.js?v=20261122cola47', '../comun/skills-clase.js?v=20261127enyC', '../comun/ficha-habilidades.js?v=20261126tope',
-  '../comun/catalogo.js?v=20261126tope', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261125gas', '../comun/ficha-sesion.js?v=20261127p370b', '../comun/ficha-botonera.js?v=20261127unico2', '../comun/ficha-resumen.js?v=20261127suerte', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261127unico2', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261126tope', '../comun/inv-habilidades.js?v=20261126tope', '../comun/inv-lupa.js?v=20261127unico2',
+  '../comun/catalogo.js?v=20261126tope', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261125gas', '../comun/ficha-sesion.js?v=20261127p370b', '../comun/ficha-botonera.js?v=20261127unico2', '../comun/ficha-resumen.js?v=20261127suerte', '../comun/inv-calculo.js?v=20261122prisa5', '../comun/inv-botonera.js?v=20261127unico2', '../comun/inv-acciones.js?v=20261122prisa5', '../comun/inv-duelo.js?v=20261120mae7', '../comun/ficha-acciones.js?v=20261128armael', '../comun/inv-habilidades.js?v=20261126tope', '../comun/inv-lupa.js?v=20261127unico2',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261127contra', '../comun/lupa.js?v=20261122prisa5', '../comun/ficha-lupa.js?v=20261127unico2'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -517,6 +517,7 @@ function bnUi(antes, comoGM){
 // Lo que la ficha revisa cada vez que redibuja la vida (renderVitals): el Ankh del cinturón con HP 0 y el estado de muerte. El
 // mapa lo muestra solo, leyendo el resumen (actualizarMuerteMapa).
 function bnRevisarVida(){
+  if(typeof armaElementalRevisarPj === 'function') armaElementalRevisarPj(bn.S);   // 🔥 el arma encantada ya no está en la mano: el estado se va (P374)
   const ankh = FichaAcciones.revisarAnkh(bn.S);
   if(ankh) toast(ankh === 'El Pacto' ? `😇 Zafaste de morir: te salvó el pacto (volvés con ${fmt(bn.S.hp)} HP, Titilando).` : `¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
   const caida = FichaAcciones.revisarMuerte(bn.S);
@@ -1745,6 +1746,7 @@ async function editarPersonajeMapa(fichaId, cambiar, o){
     const antes = FichaGuardado.partes(S);
     const hubo = await cambiar(S, {enBn: usarBn});
     if(!hubo) return hubo;
+    if(!usarBn && typeof armaElementalRevisarPj === 'function') armaElementalRevisarPj(S);   // 🔥 (P374; con la Botonera lo hace bnRevisarVida)
     if(typeof resurreccionRevisarPj === 'function') resurreccionRevisarPj(fichaId, S);   // ☥ si en este cambio volvió de la muerte, lo cuenta (js/123)
     if(usarBn){
       const f = bn.sesion;

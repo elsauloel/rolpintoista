@@ -3603,3 +3603,13 @@ adentro (Sí de J1 con el duelo abierto), el Muro de fuego sobre la caja (una so
 - El jugador **no conectado**: que el GM conteste por él.
 - Recargar la pantalla del GM con una zona ya preguntada (que no vuelva a preguntar).
 
+
+## 🔥 El Arma elemental va con el arma (2026-11-28, P374)
+
+Probado con clics en «Prueba · General» (Blanco J1 con Cuchillo y Daga): Arma elemental en la Daga, sacarla de la mano desde el mapa (Equipo y
+mochila) y desde la ficha → el estado se va con su aviso y su línea en la Mesa; volver a equiparla → no vuelve; «¿Con qué arma?» sin el fuego.
+**Falta ver:**
+- Un **duelo entero** con el Cuchillo mientras la Daga arde: que el daño no sume el fuego (hoy probado con «¿Con qué arma?» y con las pruebas automáticas).
+- Un **creep** con dos armas y Arma elemental en una: guardarla o cambiarla desde sus Acciones y desde GM Tools; y un **desarme** (que se le caiga).
+- Un **personaje desarmado** por un creep (el arma al piso): que se le vaya el estado.
+- **Dar o vender** el arma encantada.

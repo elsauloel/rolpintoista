@@ -285,6 +285,7 @@ function cambiarPiezaCreep(scId, equipoId, poner){
   if([it, ...r.guardados].some(e => modsAfectanHp(e.mods))) actualizarHpMaxPorCon(sc);
   renderAll();
   toast(poner ? `${it.nombre}: ${Combatiente.vaEnLaMano(it) ? 'en la mano' : 'puesto'}${r.guardados.length ? ` · guardó ${r.guardados.map(e => e.nombre).join(' y ')}` : ''}` : `${it.nombre}: guardado (no da bonos)`);
+  if((r.apagados || []).length){ const txt = Combatiente.armaFueraTxt(sc.nombre, r.apagados); toast(txt); try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }   // 🔥 (P374)
 }
 function quitarEquipoDeCreep(scId, equipoId){
   const sc = S.creeps.find(s => s.id === scId);

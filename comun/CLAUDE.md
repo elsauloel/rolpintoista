@@ -2485,3 +2485,11 @@ versión parecida en más de una, es candidato a juntar.
   pausa con `yetaReclamar`. `filaOpciones`: lo que cierra la fila es el daño aplicado (no el tirado).
 
 
+
+- **🔥 El Arma elemental va con el arma** (2026-11-28, P374; dueño: «la cambió y no se le fue el estado»): un estado con `armaDe` solo vale mientras esa
+  arma esté en la mano. `Combatiente.esLaMismaArma(de, a)` (con los dos ids manda el id: dos Dagas son dos armas; si falta alguno, el nombre; también la usa
+  `estadoAplicaAlArma`), `estadosDeArmaFuera(estados, armas)`, `quitarEstadosDeArmaFuera(estados, armas)` → [{nombre, arma}], `armaFueraTxt(quien,
+  sacados)` (el aviso), `armasDeManoRef(x)` y `apagarArmasFuera(x)` (creep o invocación). `ponerPieza` / `guardarPieza` devuelven además `apagados`, y
+  `ponerArma` también limpia. Personaje: `FichaAcciones.armasEnLaMano(S)` (equipadas, de mano, no rotas) y `revisarArmaDeEstados(S)`; la ficha lo corre en
+  `refresh()` (js/05 `revisarArmaElementalFicha`) y el mapa en `bnRevisarVida` / `editarPersonajeMapa` / `modificarCreep` / el arma que se cae
+  (vtt-hexgrid/js/97). Si vuelve a la mano, no vuelve. Las cargas (Arma envenenada) no son de un arma: no cambian.

@@ -286,6 +286,18 @@ const FichaAcciones = (() => {
     return {vivo: false, cayo: false};
   }
 
+  /* 🔥 El Arma elemental va con el arma (2026-11-28, P374): un estado con `armaDe` se va si esa arma ya no está en la mano (la guardó, la cambió,
+     la dio, la vendió, se le cayó o se le rompió). → los sacados [{nombre, arma}] (Combatiente.armaFueraTxt arma el aviso). Lo llaman la ficha
+     (refresh) y el mapa (bnRevisarVida, y al caérsele el arma). */
+  function armasEnLaMano(S){
+    const roto = it => typeof FichaCalculo !== 'undefined' && FichaCalculo.itemRoto ? FichaCalculo.itemRoto(it) : false;
+    return (S.inventario || []).filter(i => i && i.equipado === true && Combatiente.esArmaDeMano(i) && !roto(i)).map(i => ({id: String(i.id || ''), nombre: String(i.nombre || '')}));
+  }
+  function revisarArmaDeEstados(S){
+    if(!S || !Array.isArray(S.efectos) || !Array.isArray(S.inventario)) return [];
+    return Combatiente.quitarEstadosDeArmaFuera(S.efectos, armasEnLaMano(S));
+  }
+
   /* ---------- Consumir un ítem (js/06, el botón Consumir; js/02 y js/09) ---------- */
   function purgarSiAgotado(S, key, id){
     const it = S[key].find(x=>x.id===id);
@@ -1739,6 +1751,6 @@ const FichaAcciones = (() => {
     ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, gastarUnaTirada, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
-    aplicarRevivirConAnkh, fijarHp, revisarAnkh, formasDeVolver, volverPendiente, volverCon, revisarMuerte,
+    aplicarRevivirConAnkh, fijarHp, revisarAnkh, formasDeVolver, volverPendiente, volverCon, revisarMuerte, armasEnLaMano, revisarArmaDeEstados,
     purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};
 })();

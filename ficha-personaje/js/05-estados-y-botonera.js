@@ -392,8 +392,19 @@ function sincronizarEstadosDeEquipo(){
   });
 }
 
+/* 🔥 El Arma elemental va con el arma (2026-11-28, P374): si el arma encantada ya no está en la mano, el estado se va, con su aviso. Solo avisa la
+   pantalla que puede guardar al personaje (su dueño o el GM editándolo), como la caída (js/02). */
+function revisarArmaElementalFicha(){
+  const sacados = FichaAcciones.revisarArmaDeEstados(S);
+  if(!sacados.length) return;
+  const puede = !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura && !fichaVivo.editaGM);
+  const txt = Combatiente.armaFueraTxt(((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje', sacados);
+  if(puede && txt){ toast(txt); try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }
+}
+
 function refresh(){
   sincronizarEstadosDeEquipo();
+  revisarArmaElementalFicha();
   Combatiente.sincronizarEstadosDePasivas(S.efectos = Array.isArray(S.efectos) ? S.efectos : [], S.pasivas, estadosPresetFicha(), uid);   // la pasiva que da un estado (2026-10-16)
   renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderInteligencia(); renderExp(); renderNitros();
   renderList('efectos');

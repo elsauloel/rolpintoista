@@ -70,3 +70,27 @@ async function armaElementalDirecto(yo, mio, t, ataque){
   }
   return true;
 }
+
+/* 🔥 El estado va con el arma (2026-11-28, P374; dueño: «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el
+   estado»). Si el arma encantada ya no está en la mano de un personaje (la guardó, la cambió, la dio, la vendió, se le rompió), el estado se va
+   (FichaAcciones.revisarArmaDeEstados) y se cuenta en la Mesa. `sinArma`: el id de un arma que se le acaba de caer (todavía puede estar en S). */
+function armaElementalRevisarPj(S, sinArma){
+  if(!S || !Array.isArray(S.efectos) || !Array.isArray(S.inventario)) return [];
+  const sacados = sinArma
+    ? Combatiente.quitarEstadosDeArmaFuera(S.efectos, FichaAcciones.armasEnLaMano(S).filter(a => a.id !== String(sinArma)))
+    : FichaAcciones.revisarArmaDeEstados(S);
+  if(sacados.length){
+    const txt = Combatiente.armaFueraTxt(((S.meta && S.meta.nombre) || '').trim() || 'Tu personaje', sacados);
+    setTimeout(() => { try{ toast(txt); mesaLinea(txt, 'recordatorio'); }catch(e){} }, 0);
+  }
+  return sacados;
+}
+// Lo mismo para un creep (o una invocación), dentro de su cambio (modificarCreep): el GM lo ve en la Mesa.
+function armaElementalRevisarCreep(sc){
+  const sacados = Combatiente.apagarArmasFuera(sc);
+  if(sacados.length){
+    const txt = Combatiente.armaFueraTxt(sc.nombre || 'El creep', sacados);
+    setTimeout(() => { try{ toast(txt); mesaLinea(txt, 'recordatorio'); }catch(e){} }, 0);
+  }
+  return sacados;
+}

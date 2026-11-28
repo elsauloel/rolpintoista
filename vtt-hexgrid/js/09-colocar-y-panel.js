@@ -693,6 +693,7 @@ async function modificarCreep(creepId, cambiar){
     // alterados»; queda lo del equipo y la Llama de Fénix sin usar, el criterio de Combatiente.quedaAlVolver).
     { const sac = Combatiente.caerSiCayo(sc, 'estados', hpAntes);   // (el mismo corte que GM Tools, P270)
       if(sac.length) setTimeout(() => creepCaidaContar(creepId, sc.nombre, sac), 0); }
+    if(typeof armaElementalRevisarCreep === 'function') armaElementalRevisarCreep(sc);   // 🔥 el arma encantada ya no está en la mano: el estado se va (P374)
     CreepCalculo.vidaAlDia(sc);   // ❤ si el cambio tocó el equipo o un estado con Vida +N (2026-11-06)
     const hpMax = num(sc.hpMax);
     const json = JSON.stringify(sc);

@@ -2955,3 +2955,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `Duelo.enyetarTirada(…, {tipo, deshacer: true})` (la peor / la mejor), la Moneda con `Duelo.reabrirDeshecho` (la tirada se borra y se vuelve a tirar con
   el botón). El cartel de confirmación es uno solo, `deshacerConfirmar(tipo, o)`. Probado con clics en «Prueba · General» (GM, J1, J2): el daño y los d20
   del último duelo enyetados, la Moneda de J1 sobre su defensa, el Golpe de suerte de J2 sobre la Evasión de J1 y el daño en curso desde la fila.
+
+- **🔥 El Arma elemental va con el arma** (2026-11-28, P374): `js/97` suma `armaElementalRevisarPj(S, sinArma)` y `armaElementalRevisarCreep(sc)`: si el
+  arma encantada ya no está en la mano, el estado se va, con toast y línea en la Mesa («🔥 X ya no tiene Daga en la mano: se apagó …»). Las llaman
+  `bnRevisarVida` (cada cambio de la Botonera, Equipo y mochila incluido), `editarPersonajeMapa` (sin Botonera abierta), `modificarCreep` (js/09) y
+  `armaSoltar` (js/27, el desarme de un personaje: con `sinArma` = el arma que cayó). GM Tools: `cambiarPiezaCreep` avisa con `r.apagados`.

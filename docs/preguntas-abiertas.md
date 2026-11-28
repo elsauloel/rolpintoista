@@ -3352,3 +3352,16 @@ decide le sale «🚩 X está dentro del área de Y (de Z). ¿Lo afecta?» Sí /
 5. **«No»** solo cierra el cartel, sin línea en la Mesa; **«Sí»** deja «X decidió que <efecto> afecta a <objeto>: se resuelve a mano».
 6. Un cartel sin contestar se pierde al recargar la página (no vuelve a salir).
 
+
+### P374 — 🔥 El Arma elemental va con el arma: ¿vuelve si la volvés a agarrar? (2026-11-28, Claude, al arreglar la cola «El Arma elemental no se va al cambiar el arma»)
+
+**Contexto:** el dueño (2026-11-27): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». Desde el 2026-11-28
+el estado guarda a qué arma pertenece (ya lo hacía) y **solo vale mientras esa arma esté en la mano**: si la guarda en la mochila, la cambia por otra,
+la da, la vende, se le cae en un desarme o se le rompe, el estado se va (con un aviso y una línea en la Mesa: «🔥 X ya no tiene Daga en la mano: se
+apagó 🔥 Arma ígnea: Daga»). Vale para personajes y creeps (las invocaciones no eligen arma: el estado vale para la que tengan).
+**Elegido (lo recomendado, lo más simple):**
+1. **Si la vuelve a agarrar mientras duraban los turnos, NO vuelve**: el encanto se perdió. La otra opción sería apagarlo (como un estado pausado) y
+   prenderlo de nuevo al volver a la mano mientras queden turnos.
+2. Un **arma rota** cuenta como «fuera de la mano» (se va el estado aunque después se repare).
+3. Dos armas con el **mismo nombre** (dos Dagas) son dos armas distintas: el encanto va a la que se eligió (antes, por el nombre, valía para las dos).
+4. **Arma envenenada** (Envenenar arma del Asalto) y las otras cargas **no** son de un arma: «tus próximos 2 ataques con arma», con cualquiera. No se tocaron.

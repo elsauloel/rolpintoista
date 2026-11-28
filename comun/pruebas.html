@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261127contra"></script>
+<script src="combatiente.js?v=20261128armael"></script>
 <script src="creep-calculo.js?v=20261127unico2"></script>
 <script src="creep-botonera.js?v=20261127unico2"></script>
 <script src="creep-acciones.js?v=20261126ve"></script>
@@ -83,7 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js?v=20261127unico2"></script>
-<script src="ficha-acciones.js?v=20261126tope"></script>
+<script src="ficha-acciones.js?v=20261128armael"></script>
 <script src="orden-turnos.js?v=20261126fin"></script>
 <script src="ficha-mantenimiento.js?v=20261126tope"></script>
 <script src="estado-preguntas.js"></script>
@@ -2299,6 +2299,39 @@ prueba('🔥 Arma elemental en UN arma (2026-11-04): el nombre con el arma, el p
       false, null, true, '🔥1d6 fuego', true, true,
       true]);
 });
+prueba('🔥 El Arma elemental va con el arma (2026-11-28, P374): si el arma encantada no está en la mano, el estado se va; las otras quedan', () => {
+  const est = (n, de) => ({...structuredClone(EstadosAplicar.presetPorNombre('Arma ígnea')), nombre: n, ...(de ? {armaDe: de} : {})});
+  const daga = {id: 'dg', nombre: 'Daga'}, cuchillo = {id: 'cu', nombre: 'Cuchillo de cazador'}, otraDaga = {id: 'dg2', nombre: 'Daga'};
+  const lista = [est('🔥 Arma ígnea: Daga', daga), est('Arma ígnea'), {nombre: 'Veneno', turnos: 2}];
+  const conLas2 = Combatiente.estadosDeArmaFuera(lista, [cuchillo, daga]).length;
+  const fueraSoloNombre = Combatiente.estadosDeArmaFuera([est('x', {nombre: 'Daga'})], [otraDaga]).length;   // sin id: por el nombre
+  const sacados = Combatiente.quitarEstadosDeArmaFuera(lista, [cuchillo]);
+  const txt = Combatiente.armaFueraTxt('Blanco', sacados);
+  // dos armas con el mismo nombre: el id manda (al golpear y al revisar la mano)
+  const conId = est('🔥 Arma ígnea: Daga', daga);
+  igual([conLas2, fueraSoloNombre, sacados, lista.map(e => e.nombre), txt,
+      Combatiente.estadoAplicaAlArma(conId, otraDaga), Combatiente.estadoAplicaAlArma(conId, daga), Combatiente.estadosDeArmaFuera([conId], [otraDaga]).length,
+      Combatiente.quitarEstadosDeArmaFuera(null, []), Combatiente.armaFueraTxt('X', [])],
+    [0, 0, [{nombre: '🔥 Arma ígnea: Daga', arma: 'Daga'}], ['Arma ígnea', 'Veneno'], '🔥 Blanco ya no tiene Daga en la mano: se apagó 🔥 Arma ígnea: Daga',
+      false, true, 1, [], '']);
+});
+prueba('🔥 El Arma elemental va con el arma (P374): un personaje que guarda el arma la pierde; un creep que guarda o cambia su arma, también', () => {
+  const S = {};
+  S.inventario = [{id: 'cu', nombre: 'Cuchillo de cazador', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, equipado: true},
+    {id: 'dg', nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, equipado: true}];
+  S.efectos = [{nombre: '🔥 Arma ígnea: Daga', armaElemental: 'fuego', golpePorTurnos: true, golpe: {efectos: [{nombre: 'Fuego', dado: '1d6'}]}, armaDe: {id: 'dg', nombre: 'Daga'}, turnos: 3}];
+  const antes = FichaAcciones.revisarArmaDeEstados(S).length;
+  S.inventario[1].equipado = false;
+  const despues = FichaAcciones.revisarArmaDeEstados(S), quedan = S.efectos.length;
+  S.inventario[1].equipado = true;
+  const noVuelve = S.efectos.length;
+  const sc = {nombre: 'Goblin', equipo: [{id: 'a1', nombre: 'Hacha', tipoItem: 'arma_1m', tipoDado: 8, peso: 2, equipado: true}, {id: 'a2', nombre: 'Maza', tipoItem: 'arma_1m', tipoDado: 6, peso: 2, equipado: true}],
+    estados: [{nombre: '🔥 Arma ígnea: Hacha', armaDe: {id: 'a1', nombre: 'Hacha'}}, {nombre: '❄ Arma helada: Maza', armaDe: {id: 'a2', nombre: 'Maza'}}]};
+  const g = Combatiente.guardarPieza(sc, 'a1');
+  const p = Combatiente.ponerArma(sc, {id: 'a3', nombre: 'Lanza', tipoItem: 'arma_2m', tipoDado: 8});
+  igual([antes, despues.map(x => x.nombre), quedan, noVuelve, g.apagados.map(x => x.nombre), sc.estados.map(e => e.nombre), !!p],
+    [0, ['🔥 Arma ígnea: Daga'], 0, 0, ['🔥 Arma ígnea: Hacha'], [], true]);
+});
 prueba('✨ Carga Elemental (2026-10-31): tóxico 2 + 1 cada 4, luz y siniestro (Herida sombría y Punto débil 2 turnos)', () => {
   const C = Combatiente.CARGAS, tox = C.toxico.duelo.porDano;
   const base = {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d6', tipoDano: 'arcano'};
@@ -3097,7 +3130,7 @@ prueba('💀 Un creep que cae por cualquier camino (P270, 2026-11-23): Combatien
 prueba('💀 GM Tools, el mapa, la ficha suelta y la Botonera nueva usan el mismo corte al caer (P270, 2026-11-23)', async () => {
   const leer = async r => (await fetch('../' + r, {cache: 'no-store'})).text();
   const g01 = await leer('gm-toolset/js/01-dados-reglas-y-nitros.js'), g11 = await leer('gm-toolset/js/11-en-vivo.js'), m09 = await leer('vtt-hexgrid/js/09-colocar-y-panel.js');
-  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte');
+  const f02 = await leer('ficha-personaje/js/02-recompensas-estados-y-atributos.js'), m11 = await leer('vtt-hexgrid/js/11-botonera-nueva.js?v=20261128armael');
   cierto(/function renderAll\(\)\{\s*if\(typeof gmCaidasRevisar === 'function'\) gmCaidasRevisar\(\);/.test(g01), 'renderAll de GM Tools mira las caídas');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', antes\)/.test(g11) && /gmCaidasRevisar\(\);   \/\/ 💀 por si/.test(g11) && /mesaLinea\(txt, 'recordatorio'\)/.test(g11), 'GM Tools: el corte común, en el guardado y con la línea de la Mesa');
   cierto(/Combatiente\.caerSiCayo\(sc, 'estados', hpAntes\)/.test(m09), 'modificarCreep del mapa');
@@ -10966,7 +10999,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     const narr = await mundo({ini: {...ini, movidos: {}}, tokens, modo: 'narrativo'});
     igual([await narr.quietoAvisoHab('biz', {nombre: 'Dash', dashMapa: {}}), narr.preguntas.length], [true, 0]);
     // Los tres lugares que lo llaman, antes de cobrar: la Botonera (habilidad y Varita del blink), la invocación y las Acciones del creep.
-    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
+    const t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261128armael', {cache: 'no-store'})).text(), t12 = await (await fetch('../vtt-hexgrid/js/12-acciones-nuevas.js?v=20261126p311', {cache: 'no-store'})).text();
     cierto((t11.match(/quietoAvisoHab\(/g) || []).length === 3 && /quietoAvisoHab\(e\[0\], h\)/.test(t12));
   });
   prueba('en el mapa (js/126): deshacer el primer movimiento de la ronda lo desanota; si ya se había movido antes, no', async () => {
@@ -11090,7 +11123,7 @@ grupo('Anillos de «no te moviste»: Puntería certera y Foco');
     ini.movidos.j1 = [2];
     igual(m.quietoNoSumaTxt('j1', tokens.get('j1'), m.quietoFiltroAtaque(ballesta)), '🎯 Puntería certera +2: no suma — se movió en esta ronda · 🎯 Apuntada +2: no suma — se movió en esta ronda');
     // Lo usan js/13 (el cuadro) y js/11 (la 🔍); el cuadro del duelo lo muestra (comun/duelo.js).
-    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261127suerte', {cache: 'no-store'})).text();
+    const t13 = await (await fetch('../vtt-hexgrid/js/13-tokens-portal-duelo.js', {cache: 'no-store'})).text(), t11 = await (await fetch('../vtt-hexgrid/js/11-botonera-nueva.js?v=20261128armael', {cache: 'no-store'})).text();
     cierto(/quietoNoSumaTxt\(mio\.id, mio, quietoFiltroAtaque\(ataque\)\)/.test(t13) && /quietoLupaHtml\(id/.test(t11));
   });
 })();

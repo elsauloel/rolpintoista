@@ -230,6 +230,9 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   cambian. **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General» (GM y Jugador 1): el Muro de fuego del Mago · Piromante sobre Blanco J1
   y J2, la Nube tóxica (dada al Debuffer · Maldito) sobre el Liviano, y tres zonas del asistente (Pedos violeta sobre J3, una niebla y una común),
   capturas antes y después, de lejos y de cerca. Pruebas: 1207. Dudas: P377. La vuelta, «quedó igual». Sin reglas nuevas.
+- **⬜ en cola (primero, antes de los Pedos) — ☁🔥 Contorno que sigue la forma de la nube y del fuego** (dueño, 2026-11-28, eligió entre 8
+  ideas dibujadas): nubes **C** (línea de algodón por afuera que se ondula despacio + el borde de las casillas tenue, punteado y quieto) y fuego **E**
+  (lengüetas de llama que suben y bajan). «Probemos, siempre y cuando no ralenticen el programa.» Con «reducir movimiento», quietas.
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
 - **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
   no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).

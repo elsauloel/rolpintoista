@@ -3386,3 +3386,17 @@ suelo preguntan como antes, pero si en esa pantalla hay un duelo abierto a la vi
    alcanzados estaban escondidos, sale enseguida (salvo un duelo a la vista en esa pantalla).
 6. Con **varios objetos** en la misma área, salen todos juntos al terminar, uno detrás de otro, como antes.
 
+
+### P376 — 🔥 La silueta marca el arma encantada: los detalles (2026-11-28, Claude, al hacer la cola «La silueta del Equipo marca el arma con carga elemental»)
+
+**Contexto:** el dueño pidió que en la silueta del Equipo, el recuadro de un arma con una carga elemental tenga un ícono o una señal. Quedó: un
+circulito del color del elemento con su ícono (🔥 ❄ ⚡ 🧪 ☠ ☀ 🌑) arriba a la izquierda del recuadro, un contorno con un brillo suave del mismo color,
+y en el detalle del arma (al pasar el mouse) la línea «🔥 Arma ígnea: +1d6 de fuego ×1,5 (para arriba) (quedan 3 turnos)».
+**Elegido (lo recomendado) para lo que quedaba suelto:**
+1. **El ícono va a la izquierda** (el 💔 / ⚠ de la durabilidad sigue a la derecha): un arma gastada y encantada muestra los dos.
+2. **El brillo late despacio** (más fuerte y más suave cada 2,4 s). Con «reducir movimiento» del sistema, queda quieto.
+3. **Solo el Arma elemental** (lo que va atado a UN arma). Las cargas que valen para cualquier arma (Arma envenenada, los óleos) no se marcan:
+   no son de un arma puntual. Si más adelante se quiere, podrían marcarse todas las armas en la mano.
+4. **Un arma de dos manos encantada** se marca en las dos manos (es la misma arma, que se ve en las dos).
+5. **La leyenda de abajo** suma «encantada 🔥» solo cuando hay alguna.
+6. **Creeps e invocaciones** no tienen silueta (su equipo se ve como lista): no cambia nada ahí.

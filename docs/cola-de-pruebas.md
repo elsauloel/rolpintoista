@@ -210,9 +210,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   Blanco J1 (Evasión, PdG.Esp, daño, Escarcha) no salió nada; cuando el cuadro se cerró, le salió a J1 (y al GM con «Lo decide Jugador 1»); «Sí» abrió
   la vida de la caja. (3) Otra vez el Hálito polar, y el GM canceló el duelo: el cartel salió igual a los dos. Pruebas: 1205. Dudas: P375. La
   vuelta, «quedó igual». Sin reglas nuevas. Lo que falta ver: `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola (primero, antes del Muro de fuego) — 🔥 La silueta del Equipo marca el arma con carga elemental** (dueño, 2026-11-28: «me
+- **✅ hecho (2026-11-28) — 🔥 La silueta del Equipo marca el arma con carga elemental** (dueño, 2026-11-28: «me
   gustaría que en el diagrama con la silueta, en el recuadro de las armas se vea algún icono o señal que marque un arma cuando está con una carga
   elemental»).
+  **Hecho:** el recuadro del arma con Arma elemental lleva el ícono del elemento (🔥 ❄ ⚡ 🧪 ☠ ☀ 🌑) en un circulito de su color, arriba a la
+  izquierda (el ⚠ / 💔 de la durabilidad sigue a la derecha: si está gastada y encantada se ven los dos), y un contorno con un brillo suave del mismo
+  color. Con el mouse sobre el ícono: qué suma y cuántos turnos le quedan; en el detalle del arma, la línea «🔥 Arma ígnea: +1d6 de fuego ×1,5 (para
+  arriba) (quedan 3 turnos)». De dos armas con el mismo nombre, solo la encantada. Arma envenenada (vale para cualquier arma) no se marca. En la ficha
+  y en el Equipo del mapa. **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General»: Blanco J1 con dos Dagas; Arma elemental ✋ Elegir
+  → 🔥 → la Daga de la Mano 2: solo esa se marcó (mapa y ficha); gastada y encantada, los dos íconos; al sacarla desde la ficha, la marca se fue (y al
+  volver a equiparla no volvió); ❄ en la Daga de la Mano 1 y sacarla desde la silueta del mapa: se fue con su aviso. Pruebas: 1207. Dudas: P376.
+  La vuelta, «quedó igual». Sin reglas nuevas. Lo que falta ver: `docs/pruebas-en-el-mapa.md`.
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
 - **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto

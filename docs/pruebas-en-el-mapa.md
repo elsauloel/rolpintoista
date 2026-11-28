@@ -3625,3 +3625,12 @@ dentro del Hálito polar (a J1 y al GM, después del duelo) y el mismo Hálito p
 - Una **zona del suelo** que pregunta mientras el GM tiene un duelo abierto: espera a que lo cierre o lo minimice.
 - **Recargar** la pantalla del GM mientras espera (vuelve a esperar y sale al terminar) y el **tope** de 5 minutos y medio.
 
+
+## 🔥 La silueta marca el arma encantada (2026-11-28, P376)
+
+Probado con clics en «Prueba · General» (Blanco J1 con dos Dagas): 🔥 en la Daga de la Mano 2 (solo esa marcada, en el mapa y en la ficha), gastada y
+encantada (los dos íconos), sacarla desde la ficha (la marca se va) y ❄ en la otra Daga, sacada desde la silueta del mapa.
+**Falta ver:**
+- Que la marca **se actualice sola** en una pantalla con el Equipo abierto cuando el encanto llega desde otra (un aliado Support se lo pone).
+- Los **turnos que bajan** en el Mantenimiento (de «quedan 3» a «queda 1») y que la marca se vaya al terminar.
+- Un **arma de dos manos** encantada (marcada en las dos manos) y los otros elementos (⚡ 🧪 ☠ ☀ 🌑) en pantalla.

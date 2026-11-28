@@ -50,7 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="zona-detalle.js?v=20261125gas"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261128armael"></script>
+<script src="combatiente.js?v=20261128silelem"></script>
 <script src="creep-calculo.js?v=20261127unico2"></script>
 <script src="creep-botonera.js?v=20261127unico2"></script>
 <script src="creep-acciones.js?v=20261126ve"></script>
@@ -61,7 +61,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261126tope"></script>
 <script src="estado-corto.js?v=20261126entera"></script>
 <script src="recibidos.js?v=20261126tope"></script>
-<script src="dar-jugador.js?v=20261127clic"></script>
+<script src="dar-jugador.js?v=20261128silelem"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
@@ -93,7 +93,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
 <script src="selector-estados.js?v=20261126tope"></script>
-<script src="ficha-equipo.js?v=20261127clic"></script>
+<script src="ficha-equipo.js?v=20261128silelem"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
@@ -3822,6 +3822,37 @@ prueba('🩹 las grietas cambian según el lugar (no todas iguales) y el estado 
   const S2 = fz([{id: 'g', nombre: 'Gran hacha', tipoItem: 'arma_2m', equipado: true, peso: 3}, {id: 'd', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1}]);
   const b = FichaEquipo.siluetaHtml(S2, S2.inventario);
   igual([trazos.length, new Set(trazos).size > 1, /sil-grietas/.test(b), /mano sil-der roto/.test(b)], [3, true, false, true]);
+});
+prueba('🔥 cargasElementalesDelArma (2026-11-28): solo las Armas elementales de ESA arma (por id), con lo que suma y cuánto le queda; Arma envenenada no', () => {
+  const ign = {nombre: '🔥 Arma ígnea: Daga', armaElemental: 'fuego', turnos: 2, golpe: {efectos: [{nombre: 'Fuego', dado: '1d6'}]}, armaDe: {id: 'd1', nombre: 'Daga'}, activo: true};
+  const env = {nombre: 'Arma envenenada', cargas: 2, golpe: {fijo: 3}, activo: true};
+  const hel = {nombre: '❄ Arma helada: Hacha', armaElemental: 'hielo', turnos: 1, armaDe: {nombre: 'Hacha'}};
+  const est = [ign, env, hel];
+  const a = Combatiente.cargasElementalesDelArma(est, {id: 'd1', nombre: 'Daga'});
+  const b = Combatiente.cargasElementalesDelArma(est, {id: 'd2', nombre: 'Daga'});
+  const c = Combatiente.cargasElementalesDelArma(est, {id: 'h9', nombre: 'Hacha'});
+  const apagado = Combatiente.cargasElementalesDelArma([{...ign, activo: false}], {id: 'd1', nombre: 'Daga'});
+  igual([a.length, a[0] && a[0].clave, a[0] && a[0].icono, a[0] && a[0].dura, a[0] && a[0].txt, b.length, c.length, c[0] && c[0].dura, c[0] && c[0].color, apagado.length,
+      Combatiente.cargasElementalesDelArma(est, null).length, Combatiente.cargasElementalesDelArma(null, {id: 'd1'}).length],
+    [1, 'fuego', '🔥', 'quedan 2 turnos', '🔥 Arma ígnea: +1d6 de fuego ×1,5 (para arriba) (quedan 2 turnos)', 0, 1, 'queda 1 turno', '#8fd8ff', 0, 0, 0]);
+});
+prueba('🔥 la silueta marca el arma encantada (2026-11-28): ícono del elemento a la izquierda (el ⚠ de la durabilidad sigue a la derecha), brillo del color y la línea en el detalle; de dos Dagas, solo la encantada; sin encanto, nada', () => {
+  const fz = (inv, ef) => { const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: inv}).S); S.efectos = ef || []; return S; };
+  const dagas = [{id: 'd1', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, manoPreferida: '1'}, {id: 'd2', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, manoPreferida: '2'}];
+  const ign = {nombre: '🔥 Arma ígnea: Daga', armaElemental: 'fuego', turnos: 3, armaDe: {id: 'd2', nombre: 'Daga'}, activo: true};
+  const S = fz(dagas, [ign]);
+  const h = FichaEquipo.siluetaHtml(S, S.inventario);
+  const slot = t => (h.match(new RegExp(`<div class="sil-slot [^"]*"[^>]*><b>${t}</b>[^]*?(?=<div class="sil-slot |<div class="sil-zona|</div><div class="sil-ley)`)) || [''])[0];
+  const m1 = slot('Mano 1'), m2 = slot('Mano 2');
+  // gastada y encantada: los dos íconos
+  const S2 = fz([{id: 'h', nombre: 'Hacha', tipoItem: 'arma_1m', equipado: true, peso: 2, dur: 1, durV: Combatiente.DUR_VERSION}], [{nombre: '⚡ Arma eléctrica: Hacha', armaElemental: 'rayo', turnos: 1, armaDe: {id: 'h', nombre: 'Hacha'}}]);
+  const h2 = FichaEquipo.siluetaHtml(S2, S2.inventario);
+  const sinNada = FichaEquipo.siluetaHtml(fz(dagas, [{nombre: 'Arma envenenada', cargas: 2, golpe: {fijo: 3}}]), dagas);
+  igual([/encantado/.test(m1), /sil-ico-elem/.test(m1), /sil-slot [^"]*encantado sil-elem-fuego[^"]*" style="[^"]*--sil-elem:#ff8a3d/.test(m2), /sil-ico sil-ico-elem[^>]*><span class="sil-ico-n">🔥/.test(m2),
+      /sil-tip-elem[^>]*>🔥 Arma ígnea: \+1d6 de fuego ×1,5 \(para arriba\) \(quedan 3 turnos\)/.test(m2), /encantada 🔥/.test(h),
+      /sil-ico-casi/.test(h2), /sil-ico-elem[^>]*><span class="sil-ico-n">⚡/.test(h2), /queda 1 turno/.test(h2),
+      /encantad|sil-ico-elem|sil-tip-elem/.test(sinNada)],
+    [false, false, true, true, true, true, true, true, true, false]);
 });
 prueba('🎒 lo básico en la espalda y el cinturón (2026-11-25): «Mochila básica · 20 ranuras», «Cinturón básico · 5 ranuras» y el «Carcaj básico» con arco o ballesta; lo equipado, con sus ranuras', () => {
   const ficha = inv => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, inventario: inv}).S);

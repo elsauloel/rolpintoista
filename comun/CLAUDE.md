@@ -1177,6 +1177,11 @@ versión parecida en más de una, es candidato a juntar.
   queda arriba de las grietas con `position:relative` y un halo. La Mochila, el Cinturón y el Carcaj sin nada equipado muestran lo básico
   (`silSlotHtml({basico: true, contenido, titleBasico})`, clase `.basico`): «Mochila básica · N ranuras» (`capMochila(S)`), «Cinturón básico · N
   ranuras» (`capCinturon(S)`) y el «Carcaj básico» (con arco o ballesta, `carcajDe(S).incluido`); lo equipado lleva sus ranuras de insignia.
+  **🔥 El arma encantada** (2026-11-28, P376): `Combatiente.cargasElementalesDelArma(estados, arma)` → las Armas elementales atadas a esa arma
+  (`armaDe`, por id: de dos Dagas, solo la encantada) con `{clave, icono, color, estado, que, dura, txt}` (`ARMAS_ELEMENTALES` lleva `color`). En la
+  silueta, `silSlotHtml({cargas})` (las manos y el antebrazo): clase `.encantado` + `--sil-elem` (contorno con brillo, `::before`), el circulito
+  `silElemIconoHtml` (`.sil-ico-elem`, arriba a la IZQUIERDA; el 💔 / ⚠ sigue a la derecha) con su `.sil-tip`, y la línea `.sil-tip-elem` en el detalle
+  del arma; la leyenda suma «encantada 🔥» si hay alguna. Las cargas para cualquier arma (Arma envenenada) no van.
 - **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
   `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
   dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y

@@ -221,7 +221,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   → 🔥 → la Daga de la Mano 2: solo esa se marcó (mapa y ficha); gastada y encantada, los dos íconos; al sacarla desde la ficha, la marca se fue (y al
   volver a equiparla no volvió); ❄ en la Daga de la Mano 1 y sacarla desde la silueta del mapa: se fue con su aviso. Pruebas: 1207. Dudas: P376.
   La vuelta, «quedó igual». Sin reglas nuevas. Lo que falta ver: `docs/pruebas-en-el-mapa.md`.
-- **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
+- **✅ hecho (2026-11-28) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…»; y el 2026-11-28: «se me ocurre quizás subirle el brillo y ponerle una línea/contorno. Lo mismo para las nubes...».
+  **Hecho:** las zonas de fuego (Muro de fuego, terreno incendiado, la lava, el piso de la Mina napalm) y las nubes (Nube tóxica, Pedos, gases, humo,
+  niebla, talco) llevan **un contorno marcado alrededor de toda la zona** (un resplandor del color de la zona, un filo oscuro finito y la línea clara
+  encima, en el borde exacto de sus casillas; reemplaza a la línea punteada tenue) y **un relleno más vivo** (el fuego más encendido; la nube verde y la
+  violeta más saturadas). El contorno del fuego late con las llamas (quieto con «reducir movimiento»). Las zonas comunes (sin nube ni fuego) también
+  llevan el contorno. Va debajo de los tokens: no los tapa. Las formas libres, las trampas, el hielo, el charco, la curación y el Escudo elemental no
+  cambian. **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General» (GM y Jugador 1): el Muro de fuego del Mago · Piromante sobre Blanco J1
+  y J2, la Nube tóxica (dada al Debuffer · Maldito) sobre el Liviano, y tres zonas del asistente (Pedos violeta sobre J3, una niebla y una común),
+  capturas antes y después, de lejos y de cerca. Pruebas: 1207. Dudas: P377. La vuelta, «quedó igual». Sin reglas nuevas.
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
 - **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
   no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).

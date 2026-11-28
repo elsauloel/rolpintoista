@@ -2183,6 +2183,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla). Con una línea punteada tenue en el borde exacto de sus casillas (2026-10-26, dueño: la mancha se puede salir un poco sin dudas de qué toca).
   **Fuego**: el terreno incendiado y las zonas de fuego (`esFuego`, también la zona de una trampa de fuego) se dibujan con una textura propia
   (`fuegoDibujar`: mancha de brasas, resplandor que titila y chispas que suben; reemplaza las llamitas 🔥).
+  **🔥☁ El contorno de las zonas** (2026-11-28, dueño: «subirle el brillo y ponerle una línea/contorno. Lo mismo para las nubes»; js/50 `zonaContorno`):
+  las zonas de fuego (`fuegoDibujar(celdas, z, {zona: true})` desde `superficieDibujar`, y la lava), las nubes (`nubeDibujar`) y las zonas comunes
+  (js/05, `zonaConContorno(el)`: `zona` visible, ni sólida, ni invisible, ni de transparencia 0) llevan una línea alrededor de toda la zona (los lados
+  de afuera de sus casillas, un `Path2D` guardado por forma en `zonaContornoCaminos`): resplandor ancho del color, filo oscuro y la línea clara
+  (`zonaColorBorde`), con ancho en píxeles de pantalla. El fuego late (`o.pulso`; quieto con `prefers-reduced-motion`, `zonaQuieta`). Relleno más vivo:
+  `FUEGO_VIVO` (el manchón del fuego, con su propia clave en `fuegoManchones`, y focos +0,1) y `nubeRelleno` (la verde y la violeta; humo, talco y
+  niebla iguales). El Escudo elemental de fuego llama `fuegoDibujar` sin `o` y queda como antes (con la punteada). Detalles: P377.
   **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una
   habilidad de rayo o el daño eléctrico de un arma) les llega a los demás parados en ese charco (`aguaConduceRayo`, desde `dueloAplicarDano`
   de js/13): ×1,5, menos su Res. eléctrica, y la Parálisis del golpe con el doble de chance. Crónica y Mesa. (Las zonas y trampas de rayo, no.)

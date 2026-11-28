@@ -83,7 +83,7 @@ function superficieDibujar(el, celdas, z){
   if(nube && typeof zonaDueloExpandiendo === 'function'){ const k = zonaDueloExpandiendo(el); if(k !== null){ zonaDueloExpansionDibujar(el, celdas, nube, z, k); return {anima: true, sinBorde: true}; } }   // 💨 recién tirada, se expande (js/112)
   if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
   if(esLava(el)){ lavaDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }   // 🌋 la lava (2026-11-09)
-  if(esFuego(el)){ fuegoDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }
+  if(esFuego(el)){ fuegoDibujar(celdas, z, {zona: true}); return {anima: true, sinBorde: true, fuego: true}; }
   return null;
 }
 /* 💧 El charco (2026-11-05, dueño: «el borde del charco parece una nube; tiene que ser una ondulación, como agua»). El contorno de afuera de las
@@ -311,12 +311,69 @@ function bordeHexPunteado(celdas, z, color, o){   // o (2026-11-18, la sombra de
   ctx.strokeStyle = color; ctx.lineWidth = (o.ancho || 1.4) / z; ctx.stroke();
   ctx.restore();
 }
+/* 🔥☁ El contorno de una zona (2026-11-28, dueño: «el muro de fuego, que se vea mejor… subirle el brillo y ponerle una línea/contorno. Lo mismo
+   para las nubes»). Una sola línea alrededor de TODA la zona (los lados de afuera de sus casillas, no cada hexágono), en tres pasadas: un resplandor
+   ancho y tenue del color de la zona, un filo oscuro finito (para que se lea sobre cualquier fondo) y la línea clara encima. El ancho es en píxeles
+   de pantalla (casi igual de lejos y de cerca). Va debajo de los tokens, como la zona: no los tapa. `o.pulso` (0–1) hace latir el brillo (el fuego);
+   con «reducir movimiento», quieto. El camino se arma una vez por forma (Path2D) y se reusa en cada cuadro. Reemplaza a la línea punteada tenue. */
+const zonaContornoCaminos = new Map();
+function zonaContornoCamino(celdas){
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';');
+  let pth = zonaContornoCaminos.get(clave);
+  if(pth) return pth;
+  pth = new Path2D();
+  const set = new Set(celdas.map(c => c.col + ',' + c.fila));
+  celdas.forEach(c => {
+    const cubo = hexACubo(c), h = hexCentro(c.col, c.fila);
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      if(set.has(cuboACol(cubo.q + vq, cubo.r + vr) + ',' + cuboAFila(cubo.q + vq, cubo.r + vr))) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+      pth.moveTo(h.x + a[0], h.y + a[1]); pth.lineTo(h.x + b[0], h.y + b[1]);
+    });
+  });
+  if(zonaContornoCaminos.size > 80) zonaContornoCaminos.clear();
+  zonaContornoCaminos.set(clave, pth);
+  return pth;
+}
+const zonaQuieta = () => { try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } };
+// Un color (rgba(…) o #rrggbb) → [r, g, b].
+function zonaRgb(color){
+  const s = String(color || '');
+  const m = s.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i);
+  if(m) return [+m[1], +m[2], +m[3]];
+  const h = s.match(/^#([0-9a-f]{6})$/i);
+  if(h) return [0, 2, 4].map(i => parseInt(h[1].slice(i, i + 2), 16));
+  return [230, 220, 200];
+}
+// El color de la línea: el de la zona, más claro y más fuerte (mezclado con blanco y más saturado).
+function zonaColorBorde(color, alfa){
+  const [r, g, b] = zonaRgb(color), m = (r + g + b) / 3;
+  const sat = v => Math.max(0, Math.min(255, m + (v - m) * 1.35));
+  const cl = v => Math.round(Math.min(255, sat(v) + (255 - sat(v)) * 0.32));
+  return `rgba(${cl(r)},${cl(g)},${cl(b)},${alfa === undefined ? 0.95 : alfa})`;
+}
+// ¿Una zona común (sin nube, fuego ni superficie) lleva el contorno? Las zonas visibles; no las formas libres, las trampas sin disparar como zona,
+// las invisibles para jugadores, las sólidas ni las de transparencia 0 (esas conservan su borde de siempre).
+function zonaConContorno(el){ return !!(el && el.zona && !el.invisible && !el.solido && el.alfa !== 0 && !el.colision); }
+function zonaContorno(celdas, z, color, o){
+  if(!celdas || !celdas.length) return;
+  o = o || {};
+  const pth = zonaContornoCamino(celdas), k = Math.max(0.85, Math.min(1.35, Math.sqrt(z)));   // de cerca, un poco más gruesa
+  const lat = o.pulso && !zonaQuieta() ? o.pulso : 0;
+  const [r, g, b] = zonaRgb(o.brillo || color);
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.setLineDash([]);
+  ctx.strokeStyle = `rgba(${r},${g},${b},${(0.28 + 0.12 * lat).toFixed(3)})`; ctx.lineWidth = 9 * k / z; ctx.stroke(pth);   // el resplandor
+  ctx.strokeStyle = 'rgba(12,8,10,.55)'; ctx.lineWidth = 4.2 * k / z; ctx.stroke(pth);                                         // el filo oscuro
+  ctx.strokeStyle = zonaColorBorde(color, (0.88 + 0.12 * lat).toFixed(3)); ctx.lineWidth = 2.3 * k / z; ctx.stroke(pth);      // la línea
+  ctx.restore();
+}
 // ⚡ El manchón borroso del fuego (2026-11-06, rendimiento): el desenfoque se hace UNA vez por forma y zoom, en un lienzo aparte, y después se pega
 // en cada cuadro (antes se desenfocaba en cada cuadro). Hasta 40 formas guardadas.
 const fuegoManchones = new Map();
-function fuegoManchon(celdas, z){
+function fuegoManchon(celdas, z, vivo){
   const esc = z * (typeof dpr === 'number' ? dpr : 1), zq = Math.round(esc * 8) / 8;
-  const clave = celdas.map(c => c.col + ',' + c.fila).join(';') + '|' + zq;
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';') + '|' + zq + (vivo ? '|v' : '');
   let m = fuegoManchones.get(clave);
   if(m) return m;
   const cs = celdas.map(c => hexCentro(c.col, c.fila)), mx = HEX * 1.6;
@@ -342,21 +399,24 @@ function fuegoManchon(celdas, z){
       g.moveTo(cx + r, cy); g.arc(cx, cy, r, 0, Math.PI * 2);
     }
   });
-  g.fillStyle = 'rgba(120,28,8,.55)'; g.fill();
+  g.fillStyle = vivo ? FUEGO_VIVO : 'rgba(120,28,8,.55)'; g.fill();
   m = {lz, x0, y0, w: (x1 - x0), h: (y1 - y0)};
   if(fuegoManchones.size > 40) fuegoManchones.clear();
   fuegoManchones.set(clave, m);
   return m;
 }
-function fuegoDibujar(celdas, z){
-  const s = performance.now() / 1000, lista = celdas.slice(0, 120);
+// 🔥 (2026-11-28) Las zonas de fuego, más vivas: el manchón rojo más encendido y los focos más fuertes (`o.zona`); el Escudo elemental de fuego
+// (js/106) llama sin `o` y queda como estaba.
+const FUEGO_VIVO = 'rgba(185,52,10,.6)';
+function fuegoDibujar(celdas, z, o){
+  const s = performance.now() / 1000, lista = celdas.slice(0, 120), vivo = !!(o && o.zona), mas = vivo ? 0.1 : 0;
   ctx.save();
-  const man = celdas.length <= 400 ? fuegoManchon(celdas, z) : null;
+  const man = celdas.length <= 400 ? fuegoManchon(celdas, z, vivo) : null;
   if(man) ctx.drawImage(man.lz, man.x0, man.y0, man.w, man.h);
   else{
     ctx.filter = `blur(${Math.max(1, HEX * 0.08 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
     trazarManchon(celdas, {radio: [0.42, 0.22], sale: [-0.04, 0.2]});
-    ctx.fillStyle = 'rgba(120,28,8,.55)'; ctx.fill();
+    ctx.fillStyle = vivo ? FUEGO_VIVO : 'rgba(120,28,8,.55)'; ctx.fill();
     ctx.filter = 'none';
   }
   ctx.globalCompositeOperation = 'lighter';
@@ -367,8 +427,8 @@ function fuegoDibujar(celdas, z){
       const f = (Math.sin(s * (3 + 2 * a) + b * 6.28) + Math.sin(s * (5.3 + a) + a * 9)) / 4 + 0.5;   // 0–1, desparejo
       const x = p.x + (a - 0.5) * HEX * 0.7, y = p.y + (b - 0.5) * HEX * 0.6, r = HEX * (0.42 + 0.18 * f);
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(255,220,110,${(0.32 + 0.25 * f).toFixed(2)})`);
-      g.addColorStop(0.45, `rgba(255,120,30,${(0.22 + 0.15 * f).toFixed(2)})`);
+      g.addColorStop(0, `rgba(255,220,110,${(0.32 + mas + 0.25 * f).toFixed(2)})`);
+      g.addColorStop(0.45, `rgba(255,120,30,${(0.22 + mas + 0.15 * f).toFixed(2)})`);
       g.addColorStop(1, 'rgba(200,40,0,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     }
@@ -382,8 +442,10 @@ function fuegoDibujar(celdas, z){
     }
   });
   ctx.restore();
-  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
+  if(vivo) zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,110,20)', pulso: 0.5 + 0.5 * Math.sin(s * 3.1) * Math.sin(s * 1.7 + 1)});   // dónde quema (2026-11-28)
+  else bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
 }
+const FUEGO_BORDE = 'rgb(255,160,50)';
 /* 🌋 La lava (2026-11-09, dueño: «con bordes no difuminados, sino como si fuera una mancha de lava con detalles de fuego, pero que los bordes sean
    como si fuera un líquido aplastado, espeso»). Las zonas de fuego que se llaman «lava» (la Varita del chorro de lava) ya no son el manchón borroso
    del fuego: son una mancha espesa con la misma forma de lóbulos redondos del charco (aguaForma), borde NÍTIDO. Por capas: una costra oscura afuera,
@@ -604,7 +666,7 @@ function lavaDibujar(celdas, z){
     }
   });
   ctx.restore();
-  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente
+  zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,90,20)', pulso: 0.5 + 0.5 * Math.sin(s * 1.4)});   // dónde quema exactamente (2026-11-28: el contorno de las zonas)
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
 function trazarManchon(celdas, o){
@@ -640,28 +702,22 @@ function nubeColor(el){
   return /gas|nube|vapor/i.test(nombre) ? NUBE_VIOLETA : '';
 }
 // El dibujo de una nube: la mancha más grande y desordenada que el charco, con el borde borroso.
+// (2026-11-28, dueño: «subirle el brillo y ponerle una línea/contorno… lo mismo para las nubes») El relleno de las nubes de color, más vivo
+// (`nubeRelleno`: la tóxica y la violeta; el humo, el talco y la niebla quedan, que ya son opacos y la niebla de una varita va ENCIMA de los
+// tokens), y en vez de la línea punteada tenue, el contorno de toda la zona (`zonaContorno`) en el borde exacto de sus casillas, del color de la
+// nube y más claro.
+const NUBE_RELLENO = new Map([[NUBE_TOXICA, 'rgba(108,200,58,.5)'], [NUBE_VIOLETA, 'rgba(168,98,232,.48)']]);
+const nubeRelleno = color => NUBE_RELLENO.get(color) || color;
+const NUBE_BORDE = new Map([[NUBE_TOXICA, 'rgb(120,225,60)'], [NUBE_VIOLETA, 'rgb(180,110,250)'], [NUBE_GRIS, 'rgb(215,222,236)'], [NUBE_HUMO, 'rgb(120,120,132)'], [NUBE_TALCO, 'rgb(255,255,250)']]);
 function nubeDibujar(celdas, color, z){
   ctx.save();
   ctx.filter = `blur(${Math.max(1.5, HEX * 0.16 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
   trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
-  ctx.fillStyle = color; ctx.fill();
+  ctx.fillStyle = nubeRelleno(color); ctx.fill();
   ctx.restore();
-  // Una línea punteada tenue con el borde exacto de las casillas (dueño, 2026-10-26): la mancha se puede salir un poco sin que quede en duda
-  // qué casillas toca.
-  ctx.save();
-  ctx.beginPath();
-  const set = new Set(celdas.map(c => c.col + ',' + c.fila));
-  celdas.forEach(c => {
-    const k = hexACubo(c), h = hexCentro(c.col, c.fila);
-    VECINO_LADO.forEach(([vq, vr], i) => {
-      if(set.has(cuboACol(k.q + vq, k.r + vr) + ',' + cuboAFila(k.q + vq, k.r + vr))) return;
-      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
-      ctx.moveTo(h.x + a[0], h.y + a[1]); ctx.lineTo(h.x + b[0], h.y + b[1]);
-    });
-  });
-  ctx.setLineDash([6 / z, 5 / z]);
-  ctx.strokeStyle = String(color).replace(/[\d.]+\)\s*$/, '.5)'); ctx.lineWidth = 1.5 / z; ctx.stroke();
-  ctx.restore();
+  // El borde exacto de las casillas (dueño, 2026-10-26: la mancha se puede salir un poco sin que quede en duda qué casillas toca), ahora una línea
+  // marcada (2026-11-28).
+  zonaContorno(celdas, z, NUBE_BORDE.get(color) || color);
 }
 /* Al irse el hielo (lo borra el GM: js/07), queda el charco en las mismas casillas. **No vence** (dueño, 2026-10-17): queda hasta que el GM lo
    borre. */

@@ -3400,3 +3400,18 @@ y en el detalle del arma (al pasar el mouse) la línea «🔥 Arma ígnea: +1d6 
 4. **Un arma de dos manos encantada** se marca en las dos manos (es la misma arma, que se ve en las dos).
 5. **La leyenda de abajo** suma «encantada 🔥» solo cuando hay alguna.
 6. **Creeps e invocaciones** no tienen silueta (su equipo se ve como lista): no cambia nada ahí.
+
+### P377 — 🔥☁ El contorno de las zonas y las nubes: los detalles (2026-11-28, Claude, al hacer la cola «El Muro de fuego, que se vea mejor»)
+
+Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
+1. **El contorno va en el borde exacto de las casillas** (una sola línea alrededor de toda la zona, no de cada hexágono), no siguiendo la mancha
+   borrosa de la nube: así no queda duda de qué casillas toca (lo que pedía la línea punteada del 2026-10-26, que reemplaza). Alternativa: una línea
+   redondeada que siga la forma de la nube (y la punteada para las casillas).
+2. **El ancho es casi fijo en la pantalla** (un poco más gruesa de cerca): se ve igual de lejos y de cerca.
+3. **El fuego late** (la línea brilla más y menos, al ritmo de las llamas); con «reducir movimiento», quieta. **Las nubes, quietas** (no tenían
+   animación salvo al aparecer y al irse, que siguen).
+4. **El relleno más vivo** solo en la nube verde (veneno) y la violeta (tóxico, gases) y en el fuego. El humo, el talco y la niebla quedan con el
+   relleno de antes (ya eran fuertes, y la niebla de una varita va encima de los tokens: más opaca los taparía); llevan el contorno igual.
+5. **Las zonas comunes** (una zona con estado o daño que no es nube ni fuego, p. ej. la que arma el asistente de Zonas) también llevan el contorno
+   y un relleno un poco más fuerte. **No cambian**: las formas libres, las trampas, el hielo, el charco, la zona de curación (su línea verde
+   ondulada) ni el Escudo elemental de fuego (que usa el mismo dibujo del fuego: se separó para que quede como estaba).

@@ -496,7 +496,7 @@ function dibujarLienzo(){
     const esColision = !!el.colision || !!el.acelerador || !!el.townPortal;   // su relleno y su contorno ya se dibujaron arriba, todos juntos (el Acelerador, en js/40)
     if(!esColision){
     const img = el.imagen ? imagenLista(el.imagen) : null;
-    const sup = !img ? (typeof zonaCuraDe === 'function' && zonaCuraDe(el) ? curaDibujarZona(el, celdas, z) : typeof superficieDibujar === 'function' ? superficieDibujar(el, celdas, z) : null) : null;   // ✨ la zona de curación (js/70), como una superficie
+    let sup = !img ? (typeof zonaCuraDe === 'function' && zonaCuraDe(el) ? curaDibujarZona(el, celdas, z) : typeof superficieDibujar === 'function' ? superficieDibujar(el, celdas, z) : null) : null;   // ✨ la zona de curación (js/70), como una superficie
     if(img){
       ctx.save();
       trazarCeldas(celdas); ctx.clip();
@@ -514,9 +514,13 @@ function dibujarLienzo(){
     }else if(sup){
       if(sup.anima) superficiesAnimando = true;   // 🧊 hielo / 💧 agua: su propio dibujo (js/50)
     }else{
+      const conContorno = typeof zonaConContorno === 'function' && zonaConContorno(el) && id !== ID_BORRADOR;
       trazarCeldas(celdas);
-      ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
+      // 🔥☁ (2026-11-28, dueño: «subirle el brillo y ponerle una línea/contorno») Una zona persistente común (no una forma libre ni una trampa)
+      // se rellena un poco más fuerte y lleva el contorno de toda la zona (zonaContorno, js/50), del color de la zona y más claro.
+      ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * (conContorno ? 0.85 : 0.7)));
       ctx.fill();
+      if(conContorno){ zonaContorno(celdas, z, el.color); sup = {sinBorde: true}; }
     }
     if(!(sup && sup.sinBorde)){   // el charco no lleva el borde de los hexágonos
     bordeCeldas(celdas);

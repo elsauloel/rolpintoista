@@ -3332,4 +3332,23 @@ no un área, y **sí** le sigue pegando a un estandarte que esté pegado.
 alterados no lo afectan, pero el daño sí… una ráfaga de fuego debería hacerle daño a un tótem, pero una nube de veneno no, porque el tótem no respira.
 Entonces, en vez de estar en las minucias de los casos particulares y las excepciones… en vez de abrirse el duelo de manera directa con los objetos que
 tienen HP, los efectos en área le debe aparecer al propietario del objeto o al GM en su defecto una notificación que diga: tal objeto está dentro del
-área de tal efecto. ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve a mano. Y listo.» Va a la cola (primero).
+área de tal efecto. ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve a mano. Y listo.» Va a la cola (primero). **Hecho el 2026-11-27**
+(`vtt-hexgrid/js/139-objeto-en-area.js`; ver la cola). Dudas chicas: P373.
+
+### P373 — 🚩 «¿Lo afecta?»: los detalles que eligió Claude (2026-11-27, Claude, al programar la P372)
+
+**Contexto:** desde la P372, un objeto con vida (tótem, estandarte, token suelto con vida) que queda dentro de un área no entra al duelo: a quien lo
+decide le sale «🚩 X está dentro del área de Y (de Z). ¿Lo afecta?» Sí / No, y «Sí» abre la vida del objeto para cambiarla a mano. Quedaron elegidas
+(lo recomendado; se cambia fácil):
+1. **A quién se le pregunta.** El mapa no sabe si un jugador está conectado. Por eso el objeto de un jugador le pregunta **a él y también al GM** (el
+   cartel del GM dice «Lo decide <jugador> (es su objeto); si no está, decidí vos»); contesta el primero y al otro se le cierra. Un tótem, un estandarte
+   o un objeto del GM: solo al GM. *Otra opción:* solo al jugador (el GM se entera por la Mesa).
+2. **Lo de apoyo y las curas no preguntan** (un área «a sus aliados», una cura). Tampoco el agua ni una zona de curación.
+3. **Qué cuenta como «dentro»:** lo mismo que para los combatientes (las casillas del área, el cono, la línea; en el Barrido / Remolino y el Salto
+   aplastante, los objetos pegados), y solo los objetos del bando rival de quien lo lanza (salvo lo que tiene fuego amigo, como la línea).
+4. **Una zona del suelo** pregunta una sola vez por zona y objeto; lo recuerda la pantalla del GM (también al recargar, en ese navegador). Si el objeto
+   sale y vuelve a entrar a la misma zona, no se vuelve a preguntar. Si un área deja una zona (la Bola de fuego), se pregunta por el área y después por
+   la zona (son dos cosas).
+5. **«No»** solo cierra el cartel, sin línea en la Mesa; **«Sí»** deja «X decidió que <efecto> afecta a <objeto>: se resuelve a mano».
+6. Un cartel sin contestar se pierde al recargar la página (no vuelve a salir).
+

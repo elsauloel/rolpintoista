@@ -25,6 +25,7 @@ function barridoRivales(yo, centros){
     .filter(t => !propio(t) && (!t.oculto || soyGM) && !t.bajoTierra && !etereoDe(t) && !(typeof tapadoPorNiebla === 'function' && tapadoPorNiebla(t)))
     .filter(t => !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(t.id)))   // 💀 un caído no recibe el giro
     .filter(t => dueloEsRival(yo, t) && !sueltoNoAtacable(t))   // 📦 un objeto sin vida, no (2026-11-25)
+    .filter(t => typeof objetoFueraDelArea !== 'function' || !objetoFueraDelArea(t))   // 🚩 ni uno con vida (tótem, estandarte, suelto): «¿Lo afecta?» a quien lo decide (js/139, P372)
     .filter(t => centros.some(c => distanciaHex(c, t) === 1));
 }
 // El ángulo en pantalla (y hacia abajo): crece en el sentido de las agujas del reloj, como la hoja del giro.
@@ -69,6 +70,7 @@ function barridoElegirPrimero(msg, mio, centros){
       if(!t){ toast(`🌀 ${nombre}: elegí a uno de los rivales que tenés al lado (brillan)`); pedir(); return; }
       objetivosResaltados = null; pedirDibujo();
       const centro = {col: mio.col, fila: mio.fila};
+      if(typeof objetosEnAreaAvisar === 'function') objetosEnAreaAvisar(objetosAlLado(centros, mio.id).filter(x => dueloEsRival(yo, x) && (!x.oculto || soyGM)), {efecto: nombre, quienTokenId: mio.id, quienNombre: yo.nombre, demora: 1800});   // 🚩 (js/139)
       barridoCorrer(msg, mio, barridoOrden(centro, t, rivales)).catch(err => console.error(`${nombre}: la cascada`, err));
     }, `<b>🌀 ${esc(nombre)}: elegí el primer rival</b> <span>brillan los que tenés al lado (${rivales.length}) · el giro sigue en el sentido de las agujas del reloj · Esc o clic derecho cancelan</span>`,
     true, () => { objetivosResaltados = null; pedirDibujo(); barridoCancelado(msg); });

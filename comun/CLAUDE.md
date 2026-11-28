@@ -1028,6 +1028,9 @@ versión parecida en más de una, es candidato a juntar.
   (2026-11-25) `sueltoSinVida(t)` (no se lo puede atacar) con `SIN_VIDA_TXT(nombre)`, y `sueltoSeRompio(antes, ahora)` (de más de 0 a 0) con
   `SE_ROMPIO_TXT(nombre)`. **`duelo.js`**: `crear` marca `defensor.objeto` y frena a un suelto sin vida (el mapa le da el token entero con
   `window.dueloTokenDe`); contra un objeto no hay crítico (`entrarCritico`, `crit.objeto`) ni estados (`objetoSinEstados`).
+  **🚩 Un objeto dentro de un área** (2026-11-27, P372 ✅): `objetoConVida(t, {inerte, enPie})` (¿hay que preguntar?), `objetoQuienDecide(t, {inerte,
+  gmUids, miembros})` (el jugador que lo puso, si sigue en la partida, y los GM; un inerte o un objeto del GM, solo los GM), `OBJETO_AREA_TXT` /
+  `OBJETO_AREA_SI_TXT` (la pregunta y la línea de la Mesa) y `objetoZonaClave(elId, tokenId)`. Los usa el mapa (vtt-hexgrid/js/139).
 - **`orden-turnos.js`, ¿ocupa lugar en la iniciativa?** (2026-11-23): `OrdenTurnos.ocupaLugar(t, pub)` — el tótem y el estandarte no (`pub.estandarteRadio`),
   una trampa no, el campo `t.iniciativa` (true/false) manda; lo demás sí. La regla de todos los caminos que arman el orden de turnos (vtt-hexgrid/js/04, 86, 31).
 - **⚖ El sobrepeso con la mochila** (2026-11-23, dueño, P312 (a)): `FichaCalculo.calcular` suma a lo equipado **1 por cada ranura de más de la mochila**

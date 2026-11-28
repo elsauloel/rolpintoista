@@ -3592,3 +3592,14 @@ dos pantallas, el mapa atrasado no pisa un cambio de la ficha, el daño desde el
 - Las listas que cambian las dos a la vez (estados, mochila, una invocación herida en dos pantallas): queda la última (P371).
 - Algo que llega de afuera mientras esa misma parte se está escribiendo (`llegoDurante`: probado solo en lo automático).
 
+## 🚩 Un objeto dentro de un área: «¿Lo afecta?» (2026-11-27, P372 ✅)
+
+Probado con clics en «Prueba · General»: el Shockwave con el estandarte al lado (Sí y No del GM), el Hálito polar de un creep con una caja de J1
+adentro (Sí de J1 con el duelo abierto), el Muro de fuego sobre la caja (una sola pregunta en dos rondas) y el Remolino con el estandarte al lado.
+**Falta ver:**
+- Un **tótem dentro de una zona del suelo** que le toque (hoy las zonas de los creeps no le tocan a sus propios tótems; haría falta la zona de un jugador
+  o una zona «a todos»).
+- El **Salto aplastante** con un objeto pegado al caer, el **Meteoro / la Tormenta** y una **línea** (fuego amigo) con un objeto.
+- El jugador **no conectado**: que el GM conteste por él.
+- Recargar la pantalla del GM con una zona ya preguntada (que no vuelva a preguntar).
+

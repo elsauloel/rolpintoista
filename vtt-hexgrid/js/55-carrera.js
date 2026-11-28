@@ -73,7 +73,8 @@ async function saltoHab(mio, t, ataque, yo){
 // rival, se despliega el cuadro, se resuelve, se repliega y sigue el próximo. La Fuerza la tira quien saltó en el primero y vale para todos
 // (`pdgCompartido`, como un hechizo de área); cada rival tira su Res.CC con su botón.
 async function saltoAplastar(mio, yo){
-  const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== mio.id && distanciaHex(x, mio) === 1 && !x.oculto && !x.bajoTierra && !etereoDe(x) && dueloEsRival(yo, x) && !sueltoNoAtacable(x));   // 📦 (2026-11-25)
+  const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== mio.id && distanciaHex(x, mio) === 1 && !x.oculto && !x.bajoTierra && !etereoDe(x) && dueloEsRival(yo, x) && !sueltoNoAtacable(x) && !(typeof objetoFueraDelArea === 'function' && objetoFueraDelArea(x)));   // 📦 (2026-11-25) · 🚩 un objeto con vida, tampoco (js/139, P372)
+  if(typeof objetosEnAreaAvisar === 'function') objetosEnAreaAvisar(objetosAlLado([mio], mio.id).filter(x => dueloEsRival(yo, x) && !x.oculto), {efecto: 'Salto aplastante', quienTokenId: mio.id, quienNombre: yo.nombre});   // 🚩
   if(!rivales.length || typeof contiendaDuelo !== 'function') return;
   const nom = nombreDe(mio), quien = {ref: yo.ref, tipo: yo.tipo, nombre: yo.nombre || nom, ...(yo.uid ? {uid: yo.uid} : {})};
   mesaLinea(`💥 ${nom} cae aplastando: su Fuerza contra la Res.CC de ${rivales.map(nombreDe).join(', ')} (quien no llega, Sentado)`, 'recordatorio');

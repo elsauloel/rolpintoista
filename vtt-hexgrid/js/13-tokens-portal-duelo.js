@@ -1858,11 +1858,17 @@ function dueloElegirAreaMapa(msg){
       .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
       .filter(t => !habEsCura(hab) || !iniciativaFueraDeJuego(t.id))
       .filter(t => !hab.anula || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)))   // 🚫 las invocaciones las resuelve anularEn (contra su invocador)
-      .filter(t => typeof esInerte !== 'function' || !esInerte(t))   // 🪵 al tótem y al estandarte no les llega ni lo de apoyo (js/73, 2026-10-25) ni el daño: no son rivales que se resistan (2026-11-27, dueño, P372)
+      .filter(t => typeof objetoFueraDelArea !== 'function' || !objetoFueraDelArea(t))   // 🚩 un objeto (tótem, estandarte, token suelto con vida) no entra al duelo: a quien lo decide le llega «¿Lo afecta?» (js/139, 2026-11-27, dueño, P372)
       .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
+    // 🚩 Los objetos con vida que quedaron adentro (js/139): el aviso a quien decide, sin frenar la cascada (después de la onda, si hay).
+    if(typeof objetosEnAreaAvisar === 'function' && !hab.aliados && !habEsCura(hab)){
+      const adentro = t => enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio);
+      objetosEnAreaAvisar(todos.filter(t => !propio(t) && !t.bajoTierra && adentro(t) && (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))),
+        {efecto: hab.nombre, quienTokenId: mio ? mio.id : '', quienNombre: yo.nombre, demora: hab.objetivo === 'onda' || hab.objetivo === 'cono' ? 2200 : 0});
+    }
     if(!objetivos.length && hab.anula) return;   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
     // 🙈 Los que esta pantalla no ve (en sigilo, ocultos, en la niebla…) van aparte, sin que el bando que la lanzó se entere (P263, js/130).
     const ocultosArea = typeof areaOcultosDe === 'function' ? areaOcultosDe(hab, objetivos) : [];

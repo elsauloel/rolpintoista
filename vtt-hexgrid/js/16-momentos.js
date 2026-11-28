@@ -117,6 +117,7 @@ function momentoRecibido(id, d){
   if(nv) d = nv.d;
   if(typeof revelarMomento === 'function') revelarMomento(d);   // ✋ el GM resolvió a mano que una trampa no fue detectada (js/122)
   if(d.tipo === 'meteoro-sombra'){ momentosFeed.delete(id); renderMomentosFeed(); if(typeof meteoroSombraMomento === 'function') meteoroSombraMomento(id, d); return; }   // ☄ el aviso de la sombra, sin tarjeta (js/74)
+  if(d.tipo === 'objeto-area'){ momentosFeed.delete(id); renderMomentosFeed(); if(typeof objetoAreaMomento === 'function') objetoAreaMomento(id, d); return; }   // 🚩 «¿Lo afecta?», solo a quien decide (js/139)
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
   if(d.tipo === 'robo-huida'){ if(typeof roboHuidaMomento === 'function') roboHuidaMomento(id, d); return; }   // 🫳 la huida de un personaje que robó (js/47, 2026-11-03)
   if(d.tipo === 'estallido' && d.datos && d.datos.explota && typeof explosionEmpezar === 'function') explosionEmpezar(d.datos.explota);

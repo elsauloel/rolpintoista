@@ -449,5 +449,31 @@ const TokensAuto = (() => {
     return !!(a && b && a.hp > 0 && b.hp <= 0);
   }
   const SE_ROMPIO_TXT = nombre => `💥 ${nombre || 'Tu objeto'} se rompió (llegó a 0 de vida). ¿Lo sacás del mapa?`;
-  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoSinVida, SIN_VIDA_TXT, sueltoSeRompio, SE_ROMPIO_TXT, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
+  /* 🚩 Un objeto adentro de un área (2026-11-27, dueño, P372 ✅: «en vez de abrirse el duelo de manera directa con los objetos que tienen HP, los
+     efectos en área le debe aparecer al propietario del objeto o al GM en su defecto una notificación… ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve
+     a mano»). Objeto = el tótem o el estandarte (`inerte`, lo dice el mapa) o un token suelto; solo cuenta si tiene vida y no está roto.
+     `objetoConVida(t, {inerte, enPie})` → true si hay que preguntar. */
+  function objetoConVida(t, o){
+    o = o || {};
+    if(!t) return false;
+    if(o.inerte) return o.enPie !== false;
+    const v = sueltoVida(t);
+    return !!(v && v.hp > 0);
+  }
+  // ¿A quién se le pregunta? El jugador que lo puso (si sigue en la partida y no es el GM) y además el GM, por si el jugador no está: contesta el
+  // primero (P373). Un tótem, un estandarte o un objeto del GM: solo los GM. o = {inerte, gmUids: [...], miembros: [uids]} → [uids].
+  function objetoQuienDecide(t, o){
+    o = o || {};
+    const gms = [...new Set((o.gmUids || []).filter(Boolean))];
+    if(!t || o.inerte || t.tipo === 'creep') return gms;
+    const u = String(t.duenoUid || '');
+    if(u && (o.miembros || []).includes(u) && !gms.includes(u)) return [u, ...gms];
+    return gms;
+  }
+  // Los textos: la pregunta y la línea de la Mesa cuando alguien dice que sí.
+  const OBJETO_AREA_TXT = o => `🚩 ${o.objeto || 'Un objeto'} está dentro del área de ${o.efecto || 'un efecto'}${o.quien ? ` (de ${o.quien})` : ''}. ¿Lo afecta?`;
+  const OBJETO_AREA_SI_TXT = o => `🚩 ${o.decide || 'Alguien'} decidió que ${o.efecto || 'el efecto'} afecta a ${o.objeto || 'un objeto'}: se resuelve a mano`;
+  // Una zona del suelo pregunta una sola vez por cada objeto (aunque se chequee en cada Mantenimiento): la clave del par.
+  const objetoZonaClave = (elId, tokenId) => `${String(elId || '')}|${String(tokenId || '')}`;
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoSinVida, SIN_VIDA_TXT, sueltoSeRompio, SE_ROMPIO_TXT, objetoConVida, objetoQuienDecide, OBJETO_AREA_TXT, OBJETO_AREA_SI_TXT, objetoZonaClave, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
 })();

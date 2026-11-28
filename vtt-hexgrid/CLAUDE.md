@@ -1168,6 +1168,21 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   con `Mensajes.cronicaHtml` (entra con un fogonazo, borde y fondo que brillan; las animaciones arrancan en negativo según la edad porque la
   Crónica se redibuja cada medio segundo). Tocarla abre la conversación (`data-mensaje-abrir`). El 🕊️ flotante va abajo a la derecha del lienzo.
 
+- **🚩 Un objeto dentro de un área: «¿Lo afecta?»** (2026-11-27, dueño, P372 ✅: «en vez de abrirse el duelo de manera directa con los objetos que
+  tienen HP… una notificación… ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve a mano»; `js/139-objeto-en-area.js`). Objeto = el tótem y el estandarte
+  (`esInerte`) y los tokens sueltos con vida. `objetoFueraDelArea(t)` los saca de la cascada de `dueloElegirAreaMapa` (js/13: ondas, conos, líneas,
+  áreas, Meteoro, Tormenta), de `barridoRivales` (js/108: Barrido, Coletazo, Remolino) y de `saltoAplastar` (js/55); las zonas ya no los contaban
+  (`zonaAplicaA`, js/08: sin ficha o inerte). `objetoEnAreaEs(t, id)` = objeto con vida (el tótem en pie, el suelto con vida > 0). Los que quedaron
+  adentro (del bando rival, o todos con fuego amigo / línea; nada en lo de apoyo ni en una cura) van a `objetosEnAreaAvisar(lista, {efecto, quienTokenId,
+  quienNombre, demora})`: un momento `objeto-area` por objeto con `paraUids` = `TokensAuto.objetoQuienDecide` (el jugador que lo puso y los GM; un
+  inerte o un objeto del GM, solo los GM) y `estado: 'esperando'`; la onda lo publica después de la animación (2,2 s), el Barrido al elegir el primero.
+  js/16 lo pasa a `objetoAreaMomento` (sin tarjeta en la Crónica): un `AvisoCombate.cartel('objarea:<id>')` con Sí / No (al GM, si el objeto es de un
+  jugador, «Lo decide <jugador>…; si no está, decidí vos»). Contesta el primero (transacción sobre el momento → `listo`; las otras pantallas cierran el
+  cartel). «Sí»: línea en la Mesa (`TokensAuto.OBJETO_AREA_SI_TXT`) y `objetoVidaAMano(tokenId)`: minimiza el duelo abierto, selecciona, centra y abre
+  `hudGlobo = 'hp'` («1 · Recibe daño»). **Zonas:** la pantalla del GM, cada 1,5 s (`objetoZonaRevisar`), pregunta una vez por zona y objeto
+  (`objetoZonaPreguntados`, también en `localStorage` `objeto-zona-preguntados`; `objetoZonaLeToca`: no a quien la creó, a todos si es amiga, si no a
+  los rivales; sin agua ni curación). Probado con clics en «Prueba · General». Dudas: P373.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.
@@ -2310,9 +2325,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
   dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
   ficha). El aura, `estandarteDibujar(z)` desde js/05.
-  **No entran en nada de área** (2026-11-27, dueño: «el estandarte de guerra no debe tirar resistencia a shockwave»; P372): `esInerte` saca al tótem y al
-  estandarte de la cascada de `dueloElegirAreaMapa` (js/13: ondas, conos, líneas, áreas, Meteoro, de daño o de apoyo) y de las zonas (`zonaAplicaA`,
-  js/08). Un ataque o una habilidad dirigida a él sí le pega (se lo rompe). El Barrido / Remolino (js/108) no se tocó.
+  **No entran al duelo de nada de área; a quien decide, «¿Lo afecta?»** (2026-11-27, dueño, P372 ✅; corrige lo del mismo día, que solo los sacaba): ver
+  «🚩 Un objeto dentro de un área» más abajo. Un ataque o una habilidad dirigida a él sí le pega (se lo rompe).
   **El nombre no delata al creep** (P281, 2026-11-23): el token, su ficha y su nota se llaman como la habilidad («Estandarte de guerra», «Tótem de silencio»;
   `ZonaDetalle.nombreInerte` / `notasInerte`), sin «de <creep>»; de quién es lo dice «Ver detalle» con su regla (P259 4). Los clavados antes («Estandarte de
   <creep>») los renombra una vez la pantalla del GM (`estandarteRenombrar`, en el mismo intervalo que saca los rotos): token, ficha pública y privada y nota.

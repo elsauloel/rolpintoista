@@ -3151,13 +3151,43 @@ prueba('🎲 ¿Ocupa lugar en la iniciativa? (2026-11-23): el tótem y el estand
 prueba('🚩 Ni el tótem ni el estandarte entran a un área, onda, cono, línea o zona (2026-11-27, dueño: «el estandarte de guerra no debe tirar resistencia a shockwave»; P372)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
   const t13 = await leer('13-tokens-portal-duelo.js'), t08 = await leer('08-mover-trampas-y-zonas.js'), t73 = await leer('73-estandarte.js');
-  cierto(/\.filter\(t => typeof esInerte !== 'function' \|\| !esInerte\(t\)\)/.test(t13) && !/\.filter\(t => !hab\.aliados \|\| typeof esInerte/.test(t13), 'la cascada de las áreas los saca siempre, no solo en las de apoyo');
+  cierto(/\.filter\(t => typeof objetoFueraDelArea !== 'function' \|\| !objetoFueraDelArea\(t\)\)/.test(t13) && !/\.filter\(t => !hab\.aliados \|\| typeof esInerte/.test(t13), 'la cascada de las áreas los saca siempre (y a los sueltos con vida: js/139), no solo en las de apoyo');
   const fZona = t08.slice(t08.indexOf('function zonaEsRival('), t08.indexOf('// ¿Todavía le falta algo a este par'));
   const aplica = new Function('esInerte', fZona + '\nreturn zonaAplicaA;')(t => t.fichaId === 'tot');
   const el = {zonaCasteadorRef: 'f1', zonaCasteadorTipo: 'pj'};
   igual([aplica(el, {tipo: 'creep', fichaId: 'tot'}), aplica(el, {tipo: 'creep', fichaId: 'rata'}), aplica(el, {tipo: 'pj', fichaId: 'f1'}), aplica({...el, zonaAmiga: true}, {tipo: 'pj', fichaId: 'f2'})],
     [false, true, false, true]);
   cierto(/const esInerte = t => !!estandarteInfo\(t\);/.test(t73), 'el criterio es el de siempre (js/73)');
+});
+prueba('🚩 Un objeto dentro de un área: «¿Lo afecta?» a quien lo decide (2026-11-27, dueño, P372 ✅): quién, con vida, los textos y la clave de la zona', () => {
+  const TA = TokensAuto;
+  const caja = {nombre: 'Caja', duenoUid: 'j1', tipo: 'pj', hpMax: 10, hp: 4}, rota = {...caja, hp: 0}, sinVida = {nombre: 'Cofre', duenoUid: 'j1', tipo: 'pj'};
+  igual([TA.objetoConVida(caja), TA.objetoConVida(rota), TA.objetoConVida(sinVida), TA.objetoConVida({tipo: 'creep', fichaId: 'tot'}, {inerte: true}),
+    TA.objetoConVida({tipo: 'creep', fichaId: 'tot'}, {inerte: true, enPie: false}), TA.objetoConVida({...caja, fichaId: 'f1'}), TA.objetoConVida(null)],
+    [true, false, false, true, false, false, false]);
+  const o = {gmUids: ['gm'], miembros: ['gm', 'j1', 'j2']};
+  igual([TA.objetoQuienDecide(caja, o), TA.objetoQuienDecide({...caja, duenoUid: 'fuera'}, o), TA.objetoQuienDecide({...caja, duenoUid: 'gm'}, o),
+    TA.objetoQuienDecide({tipo: 'creep', fichaId: 'tot'}, {...o, inerte: true}), TA.objetoQuienDecide({nombre: 'NPC', tipo: 'creep', duenoUid: 'gm'}, o), TA.objetoQuienDecide(caja, {gmUids: ['gm', 'gm', '']})],
+    [['j1', 'gm'], ['gm'], ['gm'], ['gm'], ['gm'], ['gm']]);
+  igual([TA.OBJETO_AREA_TXT({objeto: 'Estandarte de guerra', efecto: 'Shockwave', quien: 'Blanco J1'}), TA.OBJETO_AREA_TXT({objeto: 'Caja', efecto: 'Bola de fuego'}),
+    TA.OBJETO_AREA_SI_TXT({decide: 'El GM', efecto: 'Shockwave', objeto: 'Estandarte de guerra'}), TA.objetoZonaClave('z1', 't9')],
+    ['🚩 Estandarte de guerra está dentro del área de Shockwave (de Blanco J1). ¿Lo afecta?', '🚩 Caja está dentro del área de Bola de fuego. ¿Lo afecta?',
+     '🚩 El GM decidió que Shockwave afecta a Estandarte de guerra: se resuelve a mano', 'z1|t9']);
+});
+prueba('🚩 el mapa saca a los objetos de las áreas, del Barrido y del Salto aplastante y les manda el aviso; la zona pregunta una vez (js/139)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
+  const [t139, t13, t108, t55, t16, html] = await Promise.all(['js/139-objeto-en-area.js', 'js/13-tokens-portal-duelo.js', 'js/108-barrido.js', 'js/55-carrera.js', 'js/16-momentos.js', 'mapa.html'].map(leer));
+  cierto(/objetosEnAreaAvisar\(todos\.filter/.test(t13) && /!hab\.aliados && !habEsCura\(hab\)/.test(t13), 'la cascada avisa (no en lo de apoyo ni en una cura)');
+  cierto(/objetoFueraDelArea\(t\)/.test(t108) && /objetosEnAreaAvisar\(objetosAlLado\(centros/.test(t108), 'el Barrido / Remolino');
+  cierto(/objetoFueraDelArea\(x\)/.test(t55) && /objetosEnAreaAvisar\(objetosAlLado\(\[mio\]/.test(t55), 'el Salto aplastante');
+  cierto(/d\.tipo === 'objeto-area'.*objetoAreaMomento\(id, d\)/.test(t16), 'el momento va al cartel, no a la Crónica');
+  cierto(/objetoZonaPreguntados\.has\(k\)/.test(t139) && /objetoZonaRecordar\(k\)/.test(t139) && /runTransaction/.test(t139), 'una vez por zona y objeto; contesta el primero');
+  cierto(/js\/139-objeto-en-area\.js\?v=/.test(html), 'el mapa lo carga');
+  // objetoFueraDelArea: el tótem y el suelto con vida sí; el suelto sin vida (lo maneja sueltoNoAtacable) y un creep, no.
+  const f = t139.slice(t139.indexOf('function objetoFueraDelArea('), t139.indexOf('function objetoGmUids('));
+  const fuera = new Function('TokensAuto', 'esInerte', f + '\nreturn objetoFueraDelArea;')(TokensAuto, t => t.fichaId === 'tot');
+  igual([fuera({tipo: 'creep', fichaId: 'tot'}), fuera({tipo: 'pj', nombre: 'Caja', hpMax: 5, hp: 5}), fuera({tipo: 'pj', nombre: 'Caja', hpMax: 5, hp: 0}), fuera({tipo: 'creep', nombre: 'Rata'}), fuera({tipo: 'creep', fichaId: 'rata'})],
+    [true, true, true, false, false]);
 });
 prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, ▶ Siguiente, Iniciar combate, invocaciones y refuerzos (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();

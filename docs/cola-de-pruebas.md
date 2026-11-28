@@ -181,6 +181,20 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   de guerra (desde sus Acciones, como en el juego) pegado a Blanco J1, y J1 tiró Shockwave con el Sanador y el estandarte al lado. Con el código de
   antes la cascada armó dos duelos (el segundo, «Estandarte de guerra se resiste»); con el nuevo, uno solo, contra el Sanador. Duda nueva: P372
   (¿un área que hace daño debería romper un tótem?; quedó la A: no los cuenta). El Barrido / Remolino (giro con el arma) no se tocó.
+- **✅ hecho (2026-11-27) — 🚩 Un objeto dentro de un área: «¿Lo afecta?» (P372 ✅)** (dueño, 2026-11-27: «en vez de abrirse el duelo de manera directa con los objetos que tienen HP, los efectos en área le debe aparecer al propietario del objeto o al GM en su defecto una notificación… ¿Lo afecta? Sí, no. Y si lo afecta, se resuelve a mano»).
+  **Hecho:** los objetos (tótems, estandartes y tokens sueltos con vida) ya no entran al duelo de ninguna onda, cono, línea, hechizo de área, Meteoro,
+  Tormenta, zona del suelo, Barrido / Remolino ni Salto aplastante. Si quedan adentro y tienen vida, a quien lo decide le sale un cartel «🚩 X está dentro
+  del área de Y (de Z). ¿Lo afecta?» con **Sí / No**: el objeto de un jugador le pregunta a él y también al GM (contesta el primero); un tótem, un
+  estandarte o un objeto del GM, solo al GM. «No» cierra. «Sí» minimiza el duelo si hay uno abierto, selecciona el objeto, lo centra y abre el menú de
+  su vida («1 · Recibe daño»), y deja la línea en la Mesa «X decidió que <efecto> afecta a <objeto>: se resuelve a mano». Sin tirada ni estados. La
+  cascada sigue con los combatientes sin esperar. Una zona del suelo pregunta una sola vez por zona y objeto (también en cada Mantenimiento). Un objeto
+  sin vida o roto no pregunta. **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General»: (1) el Support · Sanador clavó el Estandarte de
+  guerra y Blanco J1 tiró Shockwave con los dos al lado: un solo duelo (contra el Sanador) y al GM le salió el cartel; «Sí» abrió la vida del estandarte
+  (le bajó 4: 10 → 6) y dejó la línea; en otra pasada, «No» cerró y no hizo nada. (2) Una «Caja de prueba» de J1 (8 de vida) dentro del Hálito polar
+  del Mago · Piromante: el duelo fue solo contra Blanco J1, el cartel le salió a J1 (y al GM con «lo decide Jugador 1»); J1 dijo «Sí» con el duelo
+  abierto: el duelo se minimizó, se abrió la vida de su caja y el cartel del GM se cerró. (3) El Muro de fuego del Mago sobre la caja: preguntó una vez;
+  después de «No» y dos ⟳ Pasar de ronda, no volvió a preguntar. (4) El Remolino de J1 con el estandarte al lado: un solo duelo (el Sanador) y el
+  cartel al GM. Pruebas: 1201. Dudas: P373. La vuelta, «quedó igual». Sin reglas nuevas.
 - **⬜ en cola (primero) — 🔥 El Arma elemental no se va al cambiar el arma** (dueño, 2026-11-27, notas de la sesión): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». El estado tiene que ir con el arma (o irse al sacarla).
 - **⬜ en cola (primero) — 🔥 El Muro de fuego, que se vea mejor** (dueño, 2026-11-27, notas de la sesión): «corregir el muro de fuego para que se vea mejor…» (proponerle al dueño cómo, con captura).
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).

@@ -3490,7 +3490,7 @@ Sigue quieta y más fina que la línea de algodón. Se probaron tres mezclas (m�
 Abierto: si se siente demasiado blanca o marcada (sobre todo en las nubes oscuras), se puede bajar la mezcla hacia el blanco (0,7 → 0,5) o la
 opacidad (0,9 → 0,75); si todavía no se lee en algún mapa, subir el filo (0,42 → 0,5). Son tres números en esa función.
 
-### P383 — ⏳ El duelo que no se cierra solo: qué cuenta como «algo para usar» y cuándo vuelve a contar (2026-11-28, Claude, al hacer «⚔ Que los duelos no se cierren solos, para poder usar Enyetar», la B)
+### P383 ✅ — ⏳ El duelo que no se cierra solo: qué cuenta como «algo para usar» y cuándo vuelve a contar (2026-11-28, Claude, al hacer «⚔ Que los duelos no se cierren solos, para poder usar Enyetar», la B)
 
 Lo decidido por el dueño (la B): el cuadro de un duelo terminado se cierra solo a los 20 s (antes 10); si esa pantalla tiene algo para usar sobre ese duelo,
 no se cierra solo hasta que lo use o lo deje pasar. Lo que eligió Claude (lo recomendado), en `comun/duelo.js` (`motivoEspera`, `autoCierreArmar`):
@@ -3507,3 +3507,5 @@ no se cierra solo hasta que lo use o lo deje pasar. Lo que eligió Claude (lo re
    pasó a ser el último terminado): ahí arranca su cuenta de 20 s.
 Abierto: si molesta que espere aunque la persona no piense usar nada (por ejemplo, Enyetar siempre disponible con mucho SP), se puede poner un tope (por
 ejemplo 60 s) o que espere solo si el duelo es contra un rival al alcance (ya lo es: la fila solo ofrece Enyetar si el enemigo está a tu alcance y a la vista).
+
+**✅ Decidido (dueño, 2026-11-28): un tope de 90 segundos** («efectivamente, ponele un tope de 90 segundos»): el cuadro de quien puede usar algo espera, pero a los 90 s se cierra solo igual.

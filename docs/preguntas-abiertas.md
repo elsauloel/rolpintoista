@@ -3431,7 +3431,7 @@ Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
    (encima de los tokens), la nube que aparece expandiéndose y la que se desvanece llevan la misma línea, **quieta**.
 5. **No cambian**: la lava (sigue con la línea de hoy, sin lengüetas), el Escudo elemental de fuego y las zonas comunes (la línea de hoy).
 
-### P379 — 🔥 Las llamas en el contorno de la mancha del fuego: los detalles (2026-11-28, Claude, al rehacer la «E» de P378)
+### P379 ✅ — 🔥 Las llamas en el contorno de la mancha del fuego: los detalles (2026-11-28, Claude, al rehacer la «E» de P378)
 
 El dueño vio la E: «me gustan las nubes, no el fuego. En la muestra, la animación del fuego no estaba alrededor del hexágono sino alrededor del
 contorno mismo del efecto de fuego. Lo preferiría así». Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
@@ -3445,7 +3445,10 @@ contorno mismo del efecto de fuego. Lo preferiría así». Lo que se eligió (lo
    no se arman; quietas con «reducir movimiento» (medido: 0 píxeles cambian en las llamas).
 5. **No cambian**: las nubes (C), la lava, el Escudo elemental de fuego y las zonas comunes.
 
-### P380 — ⏳ El relojito de las zonas: qué número muestra (2026-11-28, Claude, al hacer «Las zonas con duración muestran un relojito»)
+**✅ Decidido (dueño, 2026-11-28): la recomendación** (queda el punteado de las casillas debajo de las llamas).
+
+
+### P380 ✅ — ⏳ El relojito de las zonas: qué número muestra (2026-11-28, Claude, al hacer «Las zonas con duración muestran un relojito»)
 
 El dueño pidió «que las zonas que están en el mapa por un tiempo determinado muestren un iconito con un reloj de arena que muestre cuántos turnos les
 queda». El número sale de la misma cuenta con la que el mapa las borra (`ZonaDetalle.turnosQuedan`, una sola para el lienzo, el cartel de la casilla,
@@ -3460,3 +3463,5 @@ el de arriba y «Ver detalle»). Lo que se eligió (el dueño puede cambiar cual
 4. **Dónde va**: en la casilla de la zona más cerca de su centro que no tenga un token a la vista ni el dibujo propio (la ficha de la trampa, el 🌀); si
    están todas ocupadas, en la esquina de arriba a la derecha de la del medio. Del tamaño de la pantalla (entre 11 y 16 px según el zoom).
 5. **Quién lo ve**: el que ve la zona (una trampa sin descubrir o una forma invisible tampoco muestran el reloj); la niebla de guerra lo tapa como a la zona.
+
+**✅ Decidido (dueño, 2026-11-28): «me parece bien»** (queda como está).

@@ -1182,6 +1182,14 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `hudGlobo = 'hp'` («1 · Recibe daño»). **Zonas:** la pantalla del GM, cada 1,5 s (`objetoZonaRevisar`), pregunta una vez por zona y objeto
   (`objetoZonaPreguntados`, también en `localStorage` `objeto-zona-preguntados`; `objetoZonaLeToca`: no a quien la creó, a todos si es amiga, si no a
   los rivales; sin agua ni curación). Probado con clics en «Prueba · General». Dudas: P373.
+- **🚩 «¿Lo afecta?» espera a que termine el duelo** (2026-11-28, dueño, opción A; P375; js/139): el momento `objeto-area` lleva `datos.espera`:
+  `{areas: [id]}` (la cascada de `dueloElegirAreaMapa`, js/13: se publica después de crear el área, con su id; sin combatientes a la vista, sin
+  espera) o `{seq: true}` (el Barrido js/108, el Salto aplastante js/55, la Tormenta y el Meteoro: quien lo lanzó lo suelta al terminar o cortarse con
+  `objetosEnAreaSoltar(ids)`, que deja `datos.espera = {}`). `objetosEnAreaAvisar` devuelve los ids; ya no usa `demora`. En la pantalla de quien
+  decide, `objetoAreaMomento` lo guarda en `objetoAreaPend` y un reloj (700 ms, `objetoAreaRevisarPend`) lo muestra (`objetoAreaMostrar`) cuando
+  `TokensAuto.objetoAreaEspera` dice que ya: las áreas terminadas (`objetoAreaEstado`: `areasActivas` o, si no está, una lectura cada 4 s), la
+  secuencia soltada (se relee el momento cada 4 s, por si quedó fuera de los últimos 20) y ningún duelo abierto a la vista (`Duelo.abiertoId()`).
+  Las zonas del suelo, sin `espera`: solo lo del duelo a la vista. Tope: 5 minutos y medio desde que se publicó. Probado con clics en «Prueba · General».
 
 ## Pendiente (más adelante)
 

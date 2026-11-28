@@ -3365,3 +3365,21 @@ apagó 🔥 Arma ígnea: Daga»). Vale para personajes y creeps (las invocacione
 2. Un **arma rota** cuenta como «fuera de la mano» (se va el estado aunque después se repare).
 3. Dos armas con el **mismo nombre** (dos Dagas) son dos armas distintas: el encanto va a la que se eligió (antes, por el nombre, valía para las dos).
 4. **Arma envenenada** (Envenenar arma del Asalto) y las otras cargas **no** son de un arma: «tus próximos 2 ataques con arma», con cualquiera. No se tocaron.
+
+### P375 — 🚩 «¿Lo afecta?» espera a que termine el duelo: los bordes (2026-11-28, Claude, al hacer la cola «El cartel «¿Lo afecta?» espera a que termine el duelo», opción A del dueño)
+
+**Contexto:** el dueño eligió la opción A: el cartel «🚩 X está dentro del área de Y. ¿Lo afecta?» ya no sale encima del duelo del área contra los
+combatientes; espera a que termine (toda la cascada) y recién ahí aparece. Si el área no alcanzó a ningún combatiente, sale enseguida. Las zonas del
+suelo preguntan como antes, pero si en esa pantalla hay un duelo abierto a la vista, esperan a que se cierre o se minimice.
+**Elegido (lo recomendado) para lo que quedaba suelto:**
+1. **También en un área, después de la cascada espera a que en esa pantalla no haya un cuadro de duelo abierto** (el último duelo suele quedar
+   abierto unos segundos con «Listo, cerrar»; se cierra solo o a mano, o se minimiza). Si no, el cartel saldría encima de ese cuadro.
+2. **Tope: 5 minutos y medio desde que se publicó** el aviso, sale igual (aunque haya un duelo a la vista o la cascada siga). Es medio minuto más
+   que el seguro que cierra solo un área atascada (5 minutos).
+3. **Cancelado el duelo, el cartel sale igual** (el área se cierra al cancelar: no se pierde la pregunta).
+4. **El Barrido / Coletazo / Remolino, el Salto aplastante, la Tormenta y el Meteoro** no son una cascada de área común: el cartel espera a que
+   termine la secuencia en la pantalla de quien lo lanzó (o se corte). Si esa pantalla se cierra en el medio, sale por el tope.
+5. **Rivales escondidos dentro del área** (sus duelos van aparte, P263): el cartel espera solo a la cascada de los que se ven. Si los únicos
+   alcanzados estaban escondidos, sale enseguida (salvo un duelo a la vista en esa pantalla).
+6. Con **varios objetos** en la misma área, salen todos juntos al terminar, uno detrás de otro, como antes.
+

@@ -3613,3 +3613,15 @@ mochila) y desde la ficha → el estado se va con su aviso y su línea en la Mes
 - Un **creep** con dos armas y Arma elemental en una: guardarla o cambiarla desde sus Acciones y desde GM Tools; y un **desarme** (que se le caiga).
 - Un **personaje desarmado** por un creep (el arma al piso): que se le vaya el estado.
 - **Dar o vender** el arma encantada.
+
+## 🚩 «¿Lo afecta?» espera a que termine el duelo (2026-11-28, P375)
+
+Probado con clics en «Prueba · General»: Shockwave con el Estandarte de guerra al lado (el cartel al GM recién al cerrar el cuadro), la Caja de J1
+dentro del Hálito polar (a J1 y al GM, después del duelo) y el mismo Hálito polar cancelado (sale igual).
+**Falta ver:**
+- El **Barrido / Remolino** y el **Salto aplastante** con un objeto al lado y dos rivales: que el cartel salga después del último golpe.
+- La **Tormenta arcana / el Meteoro** con un objeto adentro (espera a que termine la lluvia, o a que se corte antes de los proyectiles).
+- Un área que alcanza **solo objetos** (sale enseguida) y una con **dos rivales** (espera los dos sub-duelos).
+- Una **zona del suelo** que pregunta mientras el GM tiene un duelo abierto: espera a que lo cierre o lo minimice.
+- **Recargar** la pantalla del GM mientras espera (vuelve a esperar y sale al terminar) y el **tope** de 5 minutos y medio.
+

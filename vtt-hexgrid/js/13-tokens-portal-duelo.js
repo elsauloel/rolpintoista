@@ -1863,24 +1863,36 @@ function dueloElegirAreaMapa(msg){
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
-    // 🚩 Los objetos con vida que quedaron adentro (js/139): el aviso a quien decide, sin frenar la cascada (después de la onda, si hay).
-    if(typeof objetosEnAreaAvisar === 'function' && !hab.aliados && !habEsCura(hab)){
+    // 🚩 Los objetos con vida que quedaron adentro (js/139): el aviso a quien decide, sin frenar la cascada. Desde el 2026-11-28 (dueño, opción A;
+    // P375) el cartel espera a que termine el duelo del área: se publica cuando el área ya existe (con su id) o, si no hay ningún combatiente, enseguida.
+    let objetosAvisados = false;
+    const objetosAdentro = typeof objetosEnAreaAvisar === 'function' && !hab.aliados && !habEsCura(hab) ? (() => {
       const adentro = t => enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio);
-      objetosEnAreaAvisar(todos.filter(t => !propio(t) && !t.bajoTierra && adentro(t) && (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))),
-        {efecto: hab.nombre, quienTokenId: mio ? mio.id : '', quienNombre: yo.nombre, demora: hab.objetivo === 'onda' || hab.objetivo === 'cono' ? 2200 : 0});
-    }
-    if(!objetivos.length && hab.anula) return;   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
+      return todos.filter(t => !propio(t) && !t.bajoTierra && adentro(t) && (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)));
+    })() : [];
+    const avisarObjetos = espera => {
+      if(objetosAvisados || !objetosAdentro.length) return Promise.resolve([]);
+      objetosAvisados = true;
+      return objetosEnAreaAvisar(objetosAdentro, {efecto: hab.nombre, quienTokenId: mio ? mio.id : '', quienNombre: yo.nombre, ...(espera ? {espera} : {})});
+    };
+    if(!objetivos.length && hab.anula){ avisarObjetos(); return; }   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
     // 🙈 Los que esta pantalla no ve (en sigilo, ocultos, en la niebla…) van aparte, sin que el bando que la lanzó se entere (P263, js/130).
     const ocultosArea = typeof areaOcultosDe === 'function' ? areaOcultosDe(hab, objetivos) : [];
     const visiblesArea = objetivos.filter(id => !ocultosArea.includes(id));
     if(!visiblesArea.length){
+      avisarObjetos();   // 🚩 sin combatientes a la vista: el cartel, enseguida
       toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área');   // (lo mismo que si no hubiera nadie)
       if(ocultosArea.length) await areaLanzarOcultos({hab, casteador, h, radio, ocultos: ocultosArea, deArea: ''});
       return;
     }
     let habArea = hab, objetivosArea = visiblesArea;
     // 🌩☄ La Tormenta arcana y el Meteoro, de a uno (2026-11-13, dueño): el d20, la ronda de «¿Esquiva?», la lluvia y el daño (js/118).
-    if((hab.tormenta || hab.meteoro) && typeof secuenciaArea === 'function'){ secuenciaArea({yo, casteador, hab, centro: {col: h.col, fila: h.fila}, radio, objetivos}); return; }
+    if((hab.tormenta || hab.meteoro) && typeof secuenciaArea === 'function'){
+      const avisados = avisarObjetos({seq: true});   // 🚩 el cartel, cuando termina la secuencia (o se corta)
+      Promise.resolve().then(() => secuenciaArea({yo, casteador, hab, centro: {col: h.col, fila: h.fila}, radio, objetivos}))
+        .catch(err => console.error('La secuencia del área:', err)).then(() => avisados.then(objetosEnAreaSoltar));
+      return;
+    }
     // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03), y el duelo recién cuando se terminó de ver (dueño, el mismo día: «el
     // menú del duelo se abrió antes de que se terminara de apreciar la animación. Dale un margen de algunos ms»).
     // Desde el 2026-11-03 también las otras ondas (Pisotón, Nova arcana, Remolino, Grito…) y el cono del Sonic Boom, cada una con su variante.
@@ -1902,8 +1914,10 @@ function dueloElegirAreaMapa(msg){
         casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {}), mapa: mapaMostrado}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: AREA_EN_CURSO,
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
+      avisarObjetos({areas: [refArea.id]});   // 🚩 el cartel, cuando termine la cascada de esta área
       if(ocultosArea.length) await areaLanzarOcultos({hab, casteador, h, radio, ocultos: ocultosArea, deArea: refArea.id});
     }catch(err){
+      avisarObjetos();   // (no se pudo lanzar el área: que el cartel no se pierda)
       console.error('No se pudo lanzar el hechizo de área:', err);
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));
     }

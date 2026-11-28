@@ -10,6 +10,8 @@
    solo el GM): un cartel «🚩 X está dentro del área de Y (de Z). ¿Lo afecta?» con Sí / No. Contesta el primero (el momento pasa a `listo` y el cartel se
    cierra en las demás pantallas). «Sí»: selecciona el objeto, lo centra y abre el menú de la vida del círculo rojo («1 · Recibe daño»), y deja la
    línea en la Mesa. Sin tirada ni estados. La cascada del área sigue con los combatientes sin esperar.
+   Desde el 2026-11-28 (dueño, opción A; P375) el cartel espera a que termine el duelo del área (`datos.espera`, ver objetosEnAreaAvisar) y a que en
+   esa pantalla no haya un cuadro de duelo abierto a la vista; si se atasca, sale igual a los 5 minutos y medio.
    Las zonas del suelo: la pantalla del GM mira cada 1,5 s qué objetos con vida hay adentro de cada zona y pregunta UNA vez por zona y objeto
    (`objetoZonaPreguntados`, recordado también en el navegador). */
 
@@ -37,22 +39,32 @@ function objetoQuienLanzo(tokenId, nombre){
   if(t && (t.oculto || (typeof enSigilo === 'function' && enSigilo(t)))) return 'alguien';
   return String((t ? nombreDe(t) : '') || nombre || '').slice(0, 40);
 }
-/* Publica el aviso por cada objeto. lista = [{id, ...token}] · o = {efecto, quienTokenId, quienNombre, demora}. No espera la respuesta. */
+/* Publica el aviso por cada objeto. lista = [{id, ...token}] · o = {efecto, quienTokenId, quienNombre, demora, espera}. No espera la respuesta.
+   `espera` (2026-11-28, dueño, opción A; P375): el cartel no sale encima del duelo del área. {areas: [ids]} = hasta que esas áreas terminen
+   (toda la cascada; la lleva el GM, así que no depende de esta pantalla); {seq: true} = hasta que quien lo lanzó avise que terminó su secuencia
+   (el Barrido, el Salto aplastante, la Tormenta y el Meteoro) con `objetosEnAreaSoltar(ids)`. Sin `espera`, sale enseguida (salvo un duelo
+   abierto a la vista en la pantalla de quien decide). → Promise con los ids de los momentos publicados. */
 function objetosEnAreaAvisar(lista, o){
   o = o || {};
   const objs = (lista || []).filter(t => t && t.id && objetoEnAreaEs(t, t.id));
-  if(!objs.length || typeof momentoAbrir !== 'function') return;
+  if(!objs.length || typeof momentoAbrir !== 'function') return Promise.resolve([]);
   const efecto = String(o.efecto || 'un efecto').replace(/^[^\wÁÉÍÓÚáéíóúÑñ¿¡]+/, '').trim().slice(0, 60) || 'un efecto';
   const quien = objetoQuienLanzo(o.quienTokenId, o.quienNombre);
-  const ir = () => objs.forEach(t => {
+  const espera = o.espera && (o.espera.seq || (Array.isArray(o.espera.areas) && o.espera.areas.length))
+    ? (o.espera.seq ? {seq: true} : {areas: o.espera.areas.filter(Boolean).map(String).slice(0, 10)}) : null;
+  const ir = () => Promise.all(objs.map(t => {
     const para = objetoDecideUids(t);
-    if(!para.length) return;
+    if(!para.length) return null;
     const objeto = String(nombreDe(t) || 'Un objeto').slice(0, 40);
-    momentoAbrir({tipo: 'objeto-area', icono: '🚩', titulo: TokensAuto.OBJETO_AREA_TXT({objeto, efecto, quien}).slice(0, 200), estado: 'esperando',
-      datos: {paraUids: para, tokenId: t.id, objeto, efecto, quien, ...(o.zonaId ? {zonaId: String(o.zonaId)} : {})}})
-      .catch(err => console.error('El aviso del objeto en el área:', err));
-  });
-  if(o.demora > 0) setTimeout(ir, o.demora); else ir();
+    return momentoAbrir({tipo: 'objeto-area', icono: '🚩', titulo: TokensAuto.OBJETO_AREA_TXT({objeto, efecto, quien}).slice(0, 200), estado: 'esperando',
+      datos: {paraUids: para, tokenId: t.id, objeto, efecto, quien, ...(o.zonaId ? {zonaId: String(o.zonaId)} : {}), ...(espera ? {espera} : {})}})
+      .catch(err => { console.error('El aviso del objeto en el área:', err); return null; });
+  })).then(ids => ids.filter(Boolean));
+  return o.demora > 0 ? new Promise(r => setTimeout(() => ir().then(r), o.demora)) : ir();
+}
+// Terminó la secuencia de quien lo lanzó (o se canceló): los carteles que esperaban ya pueden salir (si no hay un duelo a la vista).
+function objetosEnAreaSoltar(ids){
+  (ids || []).forEach(id => { if(id && typeof momentoActualizar === 'function') momentoActualizar(id, {'datos.espera': {}}); });
 }
 // Los que están adentro de una lista de casillas / pegados: la usan el Barrido (js/108) y el Salto aplastante (js/55).
 function objetosAlLado(centros, excluirId){
@@ -61,13 +73,63 @@ function objetosAlLado(centros, excluirId){
 }
 
 /* ---------- El cartel (en la pantalla de quien decide) ---------- */
+// Espera a que termine el duelo del área (2026-11-28, P375): los que llegaron y todavía no salen quedan en `objetoAreaPend`; un reloj los mira.
 const objetoAreaMostrados = new Set();
+const objetoAreaPend = new Map();   // id → {d, desde}
+const objetoAreaLeidas = new Map();   // áreas que esta pantalla no tiene en `areasActivas`: id → {estado, ms} (leídas una vez cada tanto)
+function objetoAreaEstado(id){
+  const a = typeof areasActivas !== 'undefined' ? areasActivas.get(id) : null;
+  if(a) return 'activa';   // (en `areasActivas` solo están las que siguen: en curso, eligiendo o en secuencia)
+  const l = objetoAreaLeidas.get(id);
+  if(l && l.estado === 'terminada') return 'terminada';
+  if(!l || Date.now() - l.ms > 4000){
+    objetoAreaLeidas.set(id, {estado: (l && l.estado) || '?', ms: Date.now()});
+    try{
+      coleccionAreas().doc(id).get().then(doc => {
+        const x = doc.exists ? doc.data() : null;
+        const sigue = !!x && (areaEnCurso(x) || areaEligiendo(x) || x.estado === 'secuencia-mapa');
+        objetoAreaLeidas.set(id, {estado: sigue ? 'activa' : 'terminada', ms: Date.now()});
+        objetoAreaRevisarPend();
+      }).catch(() => {});
+    }catch(err){}
+  }
+  return 'activa';   // hasta saber, espera (el tope lo suelta igual)
+}
+function objetoAreaDueloAVista(){
+  try{ return !!(typeof Duelo !== 'undefined' && Duelo.abiertoId && Duelo.abiertoId()); }catch(err){ return false; }
+}
+function objetoAreaRevisarPend(){
+  if(!objetoAreaPend.size) return;
+  const ahora = Date.now();
+  [...objetoAreaPend.entries()].forEach(([id, p]) => {
+    const dt = p.d.datos || {}, ms = p.d.creado && p.d.creado.toMillis ? p.d.creado.toMillis() : p.desde;
+    const por = TokensAuto.objetoAreaEspera({espera: dt.espera, creadoMs: ms, ahora, areaEstado: objetoAreaEstado, dueloAVista: objetoAreaDueloAVista()});
+    if(por){
+      // La secuencia la suelta quien la lanzó editando el momento; por si el aviso no llega (la lista de momentos solo trae los últimos 20), se relee.
+      if(por === 'seq' && ahora - (p.leido || p.desde) > 4000){
+        p.leido = ahora;
+        coleccionMomentos().doc(id).get().then(doc => { if(doc.exists && objetoAreaPend.has(id)){ objetoAreaPend.get(id).d = doc.data(); if(doc.data().estado !== 'esperando') objetoAreaPend.delete(id); } }).catch(() => {});
+      }
+      return;
+    }
+    objetoAreaPend.delete(id);
+    objetoAreaMostrar(id, p.d);
+  });
+}
+setInterval(() => { try{ objetoAreaRevisarPend(); }catch(err){ console.error('Los carteles de los objetos en el área:', err); } }, 700);
 function objetoAreaMomento(id, d){
   const clave = 'objarea:' + id, dt = d.datos || {};
-  if(d.estado !== 'esperando'){ if(objetoAreaMostrados.has(id)) AvisoCombate.cartel(clave, null); return; }
+  if(d.estado !== 'esperando'){ objetoAreaPend.delete(id); if(objetoAreaMostrados.has(id)) AvisoCombate.cartel(clave, null); return; }
   if(!fbUsuario || !Array.isArray(dt.paraUids) || !dt.paraUids.includes(fbUsuario.uid) || objetoAreaMostrados.has(id)) return;
   const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
   if(Date.now() - ms > 30 * 60 * 1000) return;
+  const p = objetoAreaPend.get(id);
+  objetoAreaPend.set(id, {...(p || {}), d, desde: p ? p.desde : Date.now()});
+  objetoAreaRevisarPend();
+}
+function objetoAreaMostrar(id, d){
+  const clave = 'objarea:' + id, dt = d.datos || {};
+  if(objetoAreaMostrados.has(id)) return;
   objetoAreaMostrados.add(id);
   const otro = soyGM && dt.paraUids.some(u => !(miembros.get(u) || {}).gm);
   const nombreJug = otro ? ((miembros.get(dt.paraUids.find(u => !(miembros.get(u) || {}).gm)) || {}).nombre || 'su jugador') : '';

@@ -70,8 +70,9 @@ function barridoElegirPrimero(msg, mio, centros){
       if(!t){ toast(`🌀 ${nombre}: elegí a uno de los rivales que tenés al lado (brillan)`); pedir(); return; }
       objetivosResaltados = null; pedirDibujo();
       const centro = {col: mio.col, fila: mio.fila};
-      if(typeof objetosEnAreaAvisar === 'function') objetosEnAreaAvisar(objetosAlLado(centros, mio.id).filter(x => dueloEsRival(yo, x) && (!x.oculto || soyGM)), {efecto: nombre, quienTokenId: mio.id, quienNombre: yo.nombre, demora: 1800});   // 🚩 (js/139)
-      barridoCorrer(msg, mio, barridoOrden(centro, t, rivales)).catch(err => console.error(`${nombre}: la cascada`, err));
+      // 🚩 (js/139) El cartel espera a que termine el giro (o se corte): 2026-11-28, dueño, opción A (P375).
+      const avisados = typeof objetosEnAreaAvisar === 'function' ? objetosEnAreaAvisar(objetosAlLado(centros, mio.id).filter(x => dueloEsRival(yo, x) && (!x.oculto || soyGM)), {efecto: nombre, quienTokenId: mio.id, quienNombre: yo.nombre, espera: {seq: true}}) : Promise.resolve([]);
+      barridoCorrer(msg, mio, barridoOrden(centro, t, rivales)).catch(err => console.error(`${nombre}: la cascada`, err)).then(() => avisados.then(objetosEnAreaSoltar));
     }, `<b>🌀 ${esc(nombre)}: elegí el primer rival</b> <span>brillan los que tenés al lado (${rivales.length}) · el giro sigue en el sentido de las agujas del reloj · Esc o clic derecho cancelan</span>`,
     true, () => { objetivosResaltados = null; pedirDibujo(); barridoCancelado(msg); });
   };

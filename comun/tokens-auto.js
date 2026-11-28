@@ -475,5 +475,22 @@ const TokensAuto = (() => {
   const OBJETO_AREA_SI_TXT = o => `🚩 ${o.decide || 'Alguien'} decidió que ${o.efecto || 'el efecto'} afecta a ${o.objeto || 'un objeto'}: se resuelve a mano`;
   // Una zona del suelo pregunta una sola vez por cada objeto (aunque se chequee en cada Mantenimiento): la clave del par.
   const objetoZonaClave = (elId, tokenId) => `${String(elId || '')}|${String(tokenId || '')}`;
-  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoSinVida, SIN_VIDA_TXT, sueltoSeRompio, SE_ROMPIO_TXT, objetoConVida, objetoQuienDecide, OBJETO_AREA_TXT, OBJETO_AREA_SI_TXT, objetoZonaClave, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
+  /* El cartel espera a que termine el duelo del área (2026-11-28, dueño, opción A; P375): ¿sale ya o espera, y por qué?
+     o = {espera: {areas: [ids], seq}, creadoMs, ahora, areaEstado(id) → 'activa' | 'terminada' | '?' (todavía no se sabe: espera),
+     dueloAVista (hay un cuadro de duelo abierto, no minimizado, en esta pantalla), tope (ms; por defecto OBJETO_ESPERA_TOPE_MS)}.
+     → '' = que salga ya · 'seq' (la secuencia de quien lo lanzó sigue) · 'area' (la cascada sigue) · 'duelo' (hay un duelo a la vista).
+     Pasado el tope desde que se publicó, sale igual (si algo se atascó, no espera para siempre). */
+  const OBJETO_ESPERA_TOPE_MS = 5.5 * 60 * 1000;
+  function objetoAreaEspera(o){
+    o = o || {};
+    const ahora = Number(o.ahora) || Date.now(), creado = Number(o.creadoMs) || ahora, tope = Number(o.tope) > 0 ? Number(o.tope) : OBJETO_ESPERA_TOPE_MS;
+    if(ahora - creado >= tope) return '';
+    const e = o.espera || {};
+    if(e.seq) return 'seq';
+    const est = typeof o.areaEstado === 'function' ? o.areaEstado : () => '?';
+    if((Array.isArray(e.areas) ? e.areas : []).filter(Boolean).some(id => est(id) !== 'terminada')) return 'area';
+    if(o.dueloAVista) return 'duelo';
+    return '';
+  }
+  return {filasPersonajes, esSuelto, sueltoPuedeEditar, sueltoNorm, sueltoVida, sueltoSinVida, SIN_VIDA_TXT, sueltoSeRompio, SE_ROMPIO_TXT, objetoConVida, objetoQuienDecide, OBJETO_AREA_TXT, OBJETO_AREA_SI_TXT, objetoZonaClave, objetoAreaEspera, OBJETO_ESPERA_TOPE_MS, sueltoRasgos, sueltoCampos, sueltoGolpe, sueltoVidaAMano, VIDA_MAX, DESCRIPCION_MAX, sinToken, sinTokenTexto, nombresCambios, nombresPonerAlDia, nombreDeFicha, salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR, rutaModo, ponerModo, volverANarrativo, publicadoEnCombate, rutaIniciativa, limpiarIniciativa};
 })();

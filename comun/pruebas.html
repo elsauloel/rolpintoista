@@ -3210,7 +3210,7 @@ prueba('🚩 Un objeto dentro de un área: «¿Lo afecta?» a quien lo decide (2
 prueba('🚩 el mapa saca a los objetos de las áreas, del Barrido y del Salto aplastante y les manda el aviso; la zona pregunta una vez (js/139)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/' + f, {cache: 'no-store'})).text();
   const [t139, t13, t108, t55, t16, html] = await Promise.all(['js/139-objeto-en-area.js', 'js/13-tokens-portal-duelo.js', 'js/108-barrido.js', 'js/55-carrera.js', 'js/16-momentos.js', 'mapa.html'].map(leer));
-  cierto(/objetosEnAreaAvisar\(todos\.filter/.test(t13) && /!hab\.aliados && !habEsCura\(hab\)/.test(t13), 'la cascada avisa (no en lo de apoyo ni en una cura)');
+  cierto(/objetosEnAreaAvisar\(objetosAdentro/.test(t13) && /!hab\.aliados && !habEsCura\(hab\)/.test(t13), 'la cascada avisa (no en lo de apoyo ni en una cura)');
   cierto(/objetoFueraDelArea\(t\)/.test(t108) && /objetosEnAreaAvisar\(objetosAlLado\(centros/.test(t108), 'el Barrido / Remolino');
   cierto(/objetoFueraDelArea\(x\)/.test(t55) && /objetosEnAreaAvisar\(objetosAlLado\(\[mio\]/.test(t55), 'el Salto aplastante');
   cierto(/d\.tipo === 'objeto-area'.*objetoAreaMomento\(id, d\)/.test(t16), 'el momento va al cartel, no a la Crónica');
@@ -3221,6 +3221,35 @@ prueba('🚩 el mapa saca a los objetos de las áreas, del Barrido y del Salto a
   const fuera = new Function('TokensAuto', 'esInerte', f + '\nreturn objetoFueraDelArea;')(TokensAuto, t => t.fichaId === 'tot');
   igual([fuera({tipo: 'creep', fichaId: 'tot'}), fuera({tipo: 'pj', nombre: 'Caja', hpMax: 5, hp: 5}), fuera({tipo: 'pj', nombre: 'Caja', hpMax: 5, hp: 0}), fuera({tipo: 'creep', nombre: 'Rata'}), fuera({tipo: 'creep', fichaId: 'rata'})],
     [true, true, true, false, false]);
+});
+prueba('🚩 El cartel «¿Lo afecta?» espera a que termine el duelo del área (2026-11-28, dueño, opción A; P375): TokensAuto.objetoAreaEspera', () => {
+  const TA = TokensAuto, t0 = 1000000, est = m => id => m[id] || '?';
+  igual([
+    TA.objetoAreaEspera({espera: null, creadoMs: t0, ahora: t0 + 10}),
+    TA.objetoAreaEspera({espera: {}, creadoMs: t0, ahora: t0 + 10, dueloAVista: true}),
+    TA.objetoAreaEspera({espera: {areas: ['a1']}, creadoMs: t0, ahora: t0 + 10, areaEstado: est({a1: 'activa'})}),
+    TA.objetoAreaEspera({espera: {areas: ['a1']}, creadoMs: t0, ahora: t0 + 10, areaEstado: est({})}),
+    TA.objetoAreaEspera({espera: {areas: ['a1']}, creadoMs: t0, ahora: t0 + 10, areaEstado: est({a1: 'terminada'})}),
+    TA.objetoAreaEspera({espera: {areas: ['a1']}, creadoMs: t0, ahora: t0 + 10, areaEstado: est({a1: 'terminada'}), dueloAVista: true}),
+    TA.objetoAreaEspera({espera: {areas: ['a1', 'a2']}, creadoMs: t0, ahora: t0 + 10, areaEstado: est({a1: 'terminada', a2: 'activa'})}),
+    TA.objetoAreaEspera({espera: {seq: true}, creadoMs: t0, ahora: t0 + 10}),
+    TA.objetoAreaEspera({espera: {seq: true}, creadoMs: t0, ahora: t0 + TA.OBJETO_ESPERA_TOPE_MS}),
+    TA.objetoAreaEspera({espera: {areas: ['a1']}, creadoMs: t0, ahora: t0 + TA.OBJETO_ESPERA_TOPE_MS + 1, areaEstado: est({a1: 'activa'}), dueloAVista: true}),
+    TA.objetoAreaEspera({espera: {seq: true}, creadoMs: t0, ahora: t0 + 5000, tope: 4000}),
+    TA.objetoAreaEspera({espera: {areas: []}, creadoMs: t0, ahora: t0 + 10}),
+  ], ['', 'duelo', 'area', 'area', '', 'duelo', 'area', 'seq', '', '', '', '']);
+  cierto(TA.OBJETO_ESPERA_TOPE_MS > 5 * 60 * 1000 && TA.OBJETO_ESPERA_TOPE_MS <= 6 * 60 * 1000, 'el tope: pasados los 5 minutos en que el área se cierra sola');
+});
+prueba('🚩 el mapa publica el cartel con lo que tiene que esperar y lo suelta al terminar (js/13, js/108, js/55, js/139; P375)', async () => {
+  const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();
+  const [t139, t13, t108, t55] = await Promise.all(['139-objeto-en-area.js', '13-tokens-portal-duelo.js', '108-barrido.js', '55-carrera.js'].map(leer));
+  cierto(/avisarObjetos\(\{areas: \[refArea\.id\]\}\)/.test(t13), 'el área: espera su cascada');
+  cierto(/if\(!visiblesArea\.length\)\{\s*avisarObjetos\(\);/.test(t13), 'sin combatientes: enseguida');
+  cierto(/avisarObjetos\(\{seq: true\}\)/.test(t13) && /avisados\.then\(objetosEnAreaSoltar\)/.test(t13), 'la Tormenta y el Meteoro: al terminar la secuencia');
+  cierto(/espera: \{seq: true\}/.test(t108) && /avisados\.then\(objetosEnAreaSoltar\)/.test(t108), 'el Barrido: al terminar el giro');
+  cierto(/finally\{ avisados\.then\(objetosEnAreaSoltar\); \}/.test(t55), 'el Salto aplastante: al terminar (o cortarse)');
+  cierto(/TokensAuto\.objetoAreaEspera\(/.test(t139) && /Duelo\.abiertoId\(\)/.test(t139) && /objetoAreaPend/.test(t139), 'el cartel espera (el área, la secuencia, un duelo a la vista)');
+  cierto(/'datos\.espera': \{\}/.test(t139), 'soltar: deja el momento sin espera');
 });
 prueba('🎲 el mapa usa esa regla en Traer tokens, Tirar iniciativa, Ordenar, ▶ Siguiente, Iniciar combate, invocaciones y refuerzos (2026-11-23)', async () => {
   const leer = async f => (await fetch('../vtt-hexgrid/js/' + f, {cache: 'no-store'})).text();

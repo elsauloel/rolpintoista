@@ -1031,6 +1031,8 @@ versión parecida en más de una, es candidato a juntar.
   **🚩 Un objeto dentro de un área** (2026-11-27, P372 ✅): `objetoConVida(t, {inerte, enPie})` (¿hay que preguntar?), `objetoQuienDecide(t, {inerte,
   gmUids, miembros})` (el jugador que lo puso, si sigue en la partida, y los GM; un inerte o un objeto del GM, solo los GM), `OBJETO_AREA_TXT` /
   `OBJETO_AREA_SI_TXT` (la pregunta y la línea de la Mesa) y `objetoZonaClave(elId, tokenId)`. Los usa el mapa (vtt-hexgrid/js/139).
+  (2026-11-28, P375) `objetoAreaEspera({espera, creadoMs, ahora, areaEstado, dueloAVista, tope})` → '' (que salga) o por qué espera ('seq' |
+  'area' | 'duelo'); pasado `OBJETO_ESPERA_TOPE_MS` (5,5 min) sale igual.
 - **`orden-turnos.js`, ¿ocupa lugar en la iniciativa?** (2026-11-23): `OrdenTurnos.ocupaLugar(t, pub)` — el tótem y el estandarte no (`pub.estandarteRadio`),
   una trampa no, el campo `t.iniciativa` (true/false) manda; lo demás sí. La regla de todos los caminos que arman el orden de turnos (vtt-hexgrid/js/04, 86, 31).
 - **⚖ El sobrepeso con la mochila** (2026-11-23, dueño, P312 (a)): `FichaCalculo.calcular` suma a lo equipado **1 por cada ranura de más de la mochila**

@@ -1,0 +1,91 @@
+# Respaldo de las Herramientas de diseño (copia del 2026-09-27)
+
+> Copia de solo lectura de las pestañas **🎨 A desarrollar** y **💬 Preguntas** del log compartido (`preguntas.html`, que vive en Firebase y pide iniciar sesión). Se ve sin loguearse en `https://elsauloel.github.io/rolpintoista/preguntas-diseno/respaldo.html`. Solo incluye lo **abierto** (lo ya marcado como hecho no está) y se actualiza a mano: cuando se pida "actualizá el respaldo" o cada tanto al cerrar una sesión de trabajo.
+
+## 🎨 A desarrollar (58)
+- [2026-09-22 · Rol Pintoista] Repasar y auditar las habilidades (skills) de las clases, una por una — mecánica y texto, como se hizo con los 12 debuffs base.
+- [2026-09-22 · Rol Pintoista] Auditar el catálogo a fondo, profundizando en armas mágicas y en armas de rango.
+- [2026-09-23 · dueño] Auditar catálogo.
+- [2026-09-24 · Rol Pintoista] ⚪ Investigar pathfinder.
+- [2026-09-24 · Rol Pintoista] ⚪ Desarrollar un documento para poder crear un proyecto de Claude con cualquier cuenta, pedirle que diseñe creeps a partir de conceptos y que pueda hacerlo.
+- [2026-09-24 · Rol Pintoista] ⚪ Posibilidad de ir ajustando el manual integrado al programa.
+- [2026-09-24 · Rol Pintoista] ⚪ Diseñar un tutorial para la creación de personaje.
+- [2026-09-24 · Rol Pintoista] 🟣 Lentes: ver como si la niebla de guerra fuera al revés. (Relacionado con el punto ya listado de "lentes".)
+- [2026-09-24 · Rol Pintoista] 🟣 Desarrollar "robar".
+- [2026-09-24 · Rol Pintoista] 🟣 Turnos para objetos.
+- [2026-09-24 · Rol Pintoista] 🟣 Desarrollar "luminosidad" en el mapa.
+- [2026-09-24 · Rol Pintoista] 🟣 Definir la tienda "raciones".
+- [2026-09-24 · Rol Pintoista] 🟣 Botón "pasar de día".
+- [2026-09-24 · Rol Pintoista] 🟣 Mecánica de fases del día.
+- [2026-09-24 · Rol Pintoista] 🟣 Mecánica de días y raciones.
+- [2026-09-24 · Rol Pintoista] 🔵 Volver a pensar los creeps: a partir de cierto nivel, a medida que suben, sube la calidad de sus equipos y también tienen mayor diversidad de skills, incluso habilidades pasivas.
+- [2026-09-24 · Rol Pintoista] 🔵 Ungüento de la turca.
+- [2026-09-24 · Rol Pintoista] 🔵 Seguir elaborando pasivas: las que cuestan 2 o más puntos de job, etc.
+- [2026-09-24 · Rol Pintoista] 🟢 Al igual que con las armas, ofrecer tiradas para los efectos de skills de creeps sobre terceros.
+- [2026-09-24 · Rol Pintoista] 🟢 Mejorar el menú de mochila, equipararlo a "mochila/equipo" de las otras tools.
+- [2026-09-24 · Rol Pintoista] 🟢 Tienda: igualar "tienda abierta" = "tienda publicada", y que el título de la tienda se vea más claro.
+- [2026-09-24 · Rol Pintoista] 🟢 Reorientar las fichas.
+- [2026-09-24 · Rol Pintoista] 🟢 Sumar "prisa" a las pasivas.
+- [2026-09-24 · Rol Pintoista] 🟢 Mejorar la línea que marca "adelante" (en el original: "roka") para que se vea mejor.
+- [2026-09-24 · Rol Pintoista] 🟢 Mapa desde PJ: traer mi token como botón.
+- [2026-09-24 · Rol Pintoista] 🟡 Testear las trampas y ajustar la trampa de raíces.
+- [2026-09-24 · Rol Pintoista] 🟡 Revisar la herramienta de skills de creep.
+- [2026-09-24 · Rol Pintoista] 🟡 Probar las auras con efectos automatizados.
+- [2026-09-24 · Rol Pintoista] 🟡 Probar el blindaje.
+- [2026-09-24 · Rol Pintoista] 🟠 Desarrollar las reglas y armar el catálogo de talentos (habilidades sociales).
+- [2026-09-24 · Rol Pintoista] 🟠 Vincular los puntos de inteligencia por habilidades sociales.
+- [2026-09-24 · Rol Pintoista] 🟠 Terminar de definir talentos / inteligencia / carisma / persuasión / intuición.
+- [2026-09-24 · Rol Pintoista] 🟠 Que ciertos skills digan en el log "(personaje) realizó una acción incierta". Establecer el mecanismo de tiradas de percepción.
+- [2026-09-24 · Rol Pintoista] 🟠 Regla de colisión: chocarse contra algo te hace tu Constitución en dado (nota original: "derecho a la vida"). Definir y automatizar.
+- [2026-09-24 · Rol Pintoista] 🟠 PdG vs Destreza + el bloqueo del escudo: si gana el defensor, el atacante tira Fuerza + peso del arma (el daño). Definir cómo se resuelve.
+- [2026-09-24 · Rol Pintoista] 🟠 Desarrollar el sistema de parry con escudo y reworkear los escudos (agregarles HP).
+- [2026-09-24 · Rol Pintoista] 🟠 Ataque de oportunidad: ¿cuesta los No2 de un primer ataque, correcto? Configurar la ficha e introducir la mecánica. Establecer también la regla del parry y del contraataque.
+- [2026-09-24 · Rol Pintoista] 🔴 Diferenciar los iconos: el "monito con la cara tapada" (token oculto por el máster) y un token en sigilo se confunden.
+- [2026-09-24 · Rol Pintoista] 🔴 Las armas también son equipo: la tarjeta de creeps que ven los jugadores no muestra el arma entre el equipo.
+- [2026-09-24 · Rol Pintoista] 🔴 Revisar y corregir la botonera del PJ (PdGM aparece debajo de DES).
+- [2026-09-24 · Rol Pintoista] 🔴 Sigilo: la detección automática de un creep no funcionó. Revisarla, y revisar también el trail de nitros de las personas en sigilo.
+- [2026-09-24 · Pablo Echezarreta] Que la imagen del token quede siempre vertical
+- [2026-09-24 · Pablo Echezarreta] Definir y programar la armadura rota debe quedar asignada a un ítem en caso de que el ítem sea des equipado
+- [2026-09-24 · Pablo Echezarreta] Herramienta para pausar sesión durante combate para tiempo entre sesiones
+- [2026-09-24 · Pablo Echezarreta] mejorar el menu de terreno y formas.
+- [2026-09-24 · Rol Pintoista] 🟢 Tiradas visibles o no visibles para los jugadores: que las tiradas de los creeps que los jugadores no ven (ocultos, en sigilo o fuera de la niebla) no aparezcan en la Mesa de los jugadores, y el GM las siga viendo todas. Idea: cada tirada de creep lleva una marca de "visible para los jugadores" que se decide al tirar según si ese creep está visible en ese momento; los jugadores solo muestran las marcadas como visibles. Sirve para todas las tiradas de creeps (iniciativa, ataques, defensas, habilidades). Requiere una regla nueva de Firebase y trabajo en la Mesa. Anotado el 2026-09-24 a partir de "Botón del GM para tirar iniciativa de todo el grupo".
+- [2026-09-24 · Rol Pintoista] 🟢 Mejorar todo el menú de gestión de trampas del mapa (Terreno y Formas): hoy la trampa es un tilde secundario dentro del menú de formas. Idea: un menú propio y bien identificable ("🪤 Trampas") con una lista de las trampas (recurrentes guardadas y las puestas en el mapa), y crear/editar con un formulario claro: nombre, qué hace, daño, forma y tamaño, fuego amigo, estado que deja, oculta o visible; poder editar o borrar una ya puesta, y guardar como recurrente. Alinearlo con el paso "🪤 Trampa" que ya tiene el editor de habilidades de creep, para que se configuren igual. Pedido por el dueño el 2026-09-24.
+- [2026-09-24 · Pablo Echezarreta] Definir Qué muestra el historial en principio los cambios de hp y los cambios de SP también definir Cuándo se resetea yo diría al finalizar un combate
+- [2026-09-25 · Rol Pintoista] 🟠 Auditar las trampas de las habilidades de creep (skills-creep-base.js y creeps-base.js) con el mismo criterio que las trampas base: las físicas respetan la Defensa; las elementales, mágicas y explosivas van directo a la vida ("ignora la Defensa"). Hoy ninguna lo tiene marcado. Candidatas a ir directo, por el nombre: Trampa de fuego, Trampa de hielo, Trampa de ácido, Trampa de runas, Descarga oculta, Cepo de alma y Trampa de veneno. Revisar también las de los creeps base (Cartucho enterrado, Campo minado, etc.).
+- [2026-09-25 · Pablo Echezarreta] ajustar inteligencia y talentos, explicar regla y configurar
+- [2026-09-25 · Pablo Echezarreta] definir daño de colisión cuando se chocan dos cuerpos CON vs CON, se hacen daño mutuo, contempla armadura
+- [2026-09-25 · Pablo Echezarreta] cuando un pj esta muerto, anular tabla de turnos
+- [2026-09-25 · Pablo Echezarreta] que todos vean la animación del turno al pasar de turno por la tabla de incicativa
+- [2026-09-26 · Pablo Echezarreta] Qué es la calculadora de críticos muestra el resultado final mucho más destacado
+- [2026-09-26 · Pablo Echezarreta] evaluar la posibilidad de hacer un panel de ataque que se abra y haga los cálculos, parecido a la calculadora de críticos...
+- [2026-09-26 · Pablo Echezarreta] Hacer un test de cuánto es el máximo que se puede acumular de resistencia crítico de cada tipo con el catálogo diseñado hoy con un ítem en cada slot *(hecho el 2026-09-27: ver `docs/guia-de-diseno.md`, «Máximo de Resistencia a crítico acumulable»)*
+- [2026-09-26 · Rol Pintoista] Revisar los grupos de GM Tools y los mapas: tokens y fichas tienen que estar representados por igual. Hoy el grupo de creeps de un mapa se arma a mano en GM Tools y se vincula al mapa, y los tokens pueden existir fuera del grupo (creeps sin grupo con token, o tokens creados con «Nuevo token» sin ficha detrás), así que el mapa muestra más creeps que el grupo. Flujo del dueño: primero crea los creeps en GM Tools y después los tokens en el mapa. Ideas a revisar: que la pestaña del mapa muestre siempre los creeps con token en ese mapa; marcar los tokens sin ficha para vincularlos o borrarlos. (Por ahora el duelo vincula solo un token de creep sin ficha al creep del mismo nombre.) Detalle: docs/preguntas-abiertas.md, P-Grupos-mapa.
+- [2026-09-26 · Pablo Echezarreta] Un baúl compartido con el parte un baúl con patitas una vaca una carreta para aumentar el inventario conjunto diseñarlo que solo se puede acceder a él fuera del combate
+
+## 💬 Preguntas (21)
+- [2026-09-22 · Rol Pintoista] Faltaría definir la penalidad por sobrepeso. Ah re gordofóbico.
+  - respuesta (Arturo Oppen, 2026-09-23): Para mi es, -X a la evasion por el sobrepeso salvo que gaste 1 no2, hasta llegar a evasion 0, y ahí en resto del exceso va directo a no2. Sobrepeso maximo sería el doble de tu fuerza.
+  - respuesta (Arturo Oppen, 2026-09-23): Insisto conque cualquier penalizacion de no2 de 1 o más significa instantáneamente nadie lo va a usar nunca.
+  - respuesta (Arturo Oppen, 2026-09-23): Basándome en la experiencia anterior.
+- [2026-09-22 · dueño] girar en el lugar para revelar mapa y buscar personas en sigilo, cuesta nitros? 1 por posición?
+- [2026-09-22 · dueño] Definición de wildcards, qué las da, uso, etc.
+  - respuesta (Arturo Oppen, 2026-09-23): Una por día si descansaste bien. Adicionales por comer bien o dormir en instalaciones de lujo, etc.
+- [2026-09-22 · dueño] Atacar por la espalda. Definir regla. Con y sin sigilo.
+  - respuesta (Arturo Oppen, 2026-09-23): Por la espalda no se puede parriar
+- [2026-09-22 · dueño] Cerramos costo en No2 de parry: mitad de peso?
+- [2026-09-23 · dueño] ¿cuántos no2 cuesta el ataque de oportunidad?
+- [2026-09-24 · Rol Pintoista] Definir bien las reglas del crítico y dejarlas por escrito definir bien Qué significa apuntado y crítico mejorado
+- [2026-09-24 · Pablo Echezarreta] Un gran elefante en la habitación es el diseño y la definición de la mecánica de las armas de Rango
+- [2026-09-24 · Pablo Echezarreta] Para seguir imaginando el mecanismo de situaciones y puntos del mundo social se me ocurren en paralelo inteligencia, carisma intuición y algo más vinculado a la habilidad manual
+- [2026-09-24 · Pablo Echezarreta] Establecer contrataque después de un parry. Definir reglas y mecánicas.
+- [2026-09-24 · Pablo Echezarreta] ¿Qué les parece la idea siguiente? Que las acciones defensivas que cuesten nitros, díganse dodge roll, parry, etcétera, te permitan quedarte en nitros negativos, que se descuenten de tu próximo mantenimiento y establecer un tope máximo.
+- [2026-09-24 · Pablo Echezarreta] Qué pasa si un personaje está en pajaritos y lisiado a la vez ya que ambos estados dividen la probabilidad de golpe a la mitad?
+- [2026-09-25 · Rol Pintoista] Sonic Boom (Tanque): ¿tiene sentido que se pueda usar con Flash en turno ajeno? Por ahora queda como Flash (cuesta el doble de SP, 4 SP, si se usa fuera de turno). Es un cono de control (le saca No2 a los enemigos y puede dejarlos Sentados), así que conviene decidir en grupo si fuera de turno no es demasiado fuerte.
+- [2026-09-25 · Rol Pintoista] Daño en área (Tanque): ¿se esquiva con la Evasión normal o exige sí o sí dodge roll? ¿Se puede parrear? Por ahora el texto dice que los afectados pueden esquivar con dodge roll (a mano) y no define nada más.
+- [2026-09-25 · Rol Pintoista] Flash: ¿siempre implica que la skill no cuesta Nitros (No2), o solo quiere decir que se puede usar en turno ajeno (y los No2 se cobran igual si la skill los tiene)? Hoy la regla dice "Flash = no cuesta Nitros y se puede usar en cualquier turno". Aparece en Blindaje, Shockwave, Sonic Boom y Takle. Ejemplo para tener en cuenta cuántos No2 cuesta — Takle: Flash, incluye un desplazamiento de hasta 2 casillas y un ataque con +1 a la PdG. Si Flash no cuesta No2, todo eso sale gratis (0 No2). Si Flash solo habilita el turno ajeno, ¿cuesta 1 No2 por casilla movida (2 No2) más lo que cuesta un ataque con el arma (Tipo ÷ 2 el primero del turno)? ¿O el ataque de Takle no cuenta como el primer ataque del turno?
+- [2026-09-25 · Rol Pintoista] trampas explosivas contemplan algun tipo de resistencia o armadura o es daño directo?
+- [2026-09-25 · Pablo Echezarreta] idea para summoner: puede tener tantos summons como quieran. Pero el propietario consume 1 n2 si ese creep se mueve. pero solouna vez por turno. También 1 n2 por cada accion o ataque de su invocacion
+- [2026-09-26 · Rol Pintoista] Durabilidad: ¿qué pasa con los efectos adicionales de un ítem cuando su durabilidad llega a 0? Regla decidida: al llegar a 0 se anulan todos sus efectos, pero el ítem sigue ocupando el slot (es como si no lo tuvieras equipado). Pendiente de revisar entre todos: los efectos adicionales (bonos a stats, efectos al golpear, estados que otorga, habilidades que da, resistencias) ¿se anulan todos sin excepción o alguno queda? Contexto: 3 puntos de durabilidad por punto de Peso (mínimo 3); se gasta al perder el Bloqueo y con Rompe armadura. Detalle en docs/durabilidad.md.
+- [2026-09-26 · Rol Pintoista] Propuesta: que las invocaciones gasten Nitros para actuar por cuenta del invocador. 1 Nitro para moverse en el turno (una vez pagado, se puede mover todo lo que quiera ese turno), 1 Nitro para atacar y 1 Nitro por cada skill. ¿Qué les parece? ¿Se paga desde los Nitros de la propia invocación o de los del invocador?
+- [2026-09-26 · Rol Pintoista] El sobrepeso sólo afecta a la evasión, o también aumenta el nitro para parriar?
+- [2026-09-27 · Pablo Echezarreta] ROMPE ARMADURA del hacha, aplica con golpe crítico? entiendo que narrativamente no debería, pero sería nerfiar el efecto sólo por falvor...

@@ -1,0 +1,19 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>clon · lectura</title>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script>
+// CANDADO TOTAL: desde esta página no puede salir NINGUNA escritura a Firestore. Con esta página se lee la partida original.
+(function(){
+  const F = firebase.firestore;
+  const no = n => function(){ console.log('BLOQUEADO ' + n); throw new Error('BLOQUEADO ' + n + ': esta página es de solo lectura'); };
+  F.DocumentReference.prototype.set = no('set'); F.DocumentReference.prototype.update = no('update'); F.DocumentReference.prototype.delete = no('delete');
+  F.CollectionReference.prototype.add = no('add'); F.Firestore.prototype.runTransaction = no('runTransaction'); F.Firestore.prototype.batch = no('batch');
+  F.WriteBatch.prototype.commit = no('batch.commit'); F.WriteBatch.prototype.set = no('batch.set');
+  F.WriteBatch.prototype.update = no('batch.update'); F.WriteBatch.prototype.delete = no('batch.delete');
+  window.CANDADO = 'total';
+})();
+</script>
+<script src="comun/sesion.js"></script>
+<script src="clon-pagina.js"></script>
+</head><body>clon · lectura (sin escrituras)</body></html>

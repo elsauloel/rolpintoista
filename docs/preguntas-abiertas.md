@@ -3353,7 +3353,7 @@ decide le sale «🚩 X está dentro del área de Y (de Z). ¿Lo afecta?» Sí /
 6. Un cartel sin contestar se pierde al recargar la página (no vuelve a salir).
 
 
-### P374 — 🔥 El Arma elemental va con el arma: ¿vuelve si la volvés a agarrar? (2026-11-28, Claude, al arreglar la cola «El Arma elemental no se va al cambiar el arma»)
+### P374 ✅ — 🔥 El Arma elemental va con el arma: ¿vuelve si la volvés a agarrar? (2026-11-28, Claude, al arreglar la cola «El Arma elemental no se va al cambiar el arma»)
 
 **Contexto:** el dueño (2026-11-27): «un pj le tiró arma elemental a una de sus armas, después la cambió y no se le fue el estado». Desde el 2026-11-28
 el estado guarda a qué arma pertenece (ya lo hacía) y **solo vale mientras esa arma esté en la mano**: si la guarda en la mochila, la cambia por otra,
@@ -3365,6 +3365,9 @@ apagó 🔥 Arma ígnea: Daga»). Vale para personajes y creeps (las invocacione
 2. Un **arma rota** cuenta como «fuera de la mano» (se va el estado aunque después se repare).
 3. Dos armas con el **mismo nombre** (dos Dagas) son dos armas distintas: el encanto va a la que se eligió (antes, por el nombre, valía para las dos).
 4. **Arma envenenada** (Envenenar arma del Asalto) y las otras cargas **no** son de un arma: «tus próximos 2 ataques con arma», con cualquiera. No se tocaron.
+
+**✅ Decidido (dueño, 2026-11-28): «esto está bien»** (los tres puntos quedan como están).
+
 
 ### P375 — 🚩 «¿Lo afecta?» espera a que termine el duelo: los bordes (2026-11-28, Claude, al hacer la cola «El cartel «¿Lo afecta?» espera a que termine el duelo», opción A del dueño)
 

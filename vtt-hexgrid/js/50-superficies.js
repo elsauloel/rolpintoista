@@ -396,7 +396,7 @@ function zonaForma(celdas){
     });
   });
   const m = HEX * 2.8;   // lo que se sale la mancha, las llamas y el resplandor
-  f = {clave, set, lados, caja: {x0: x0 - m, y0: y0 - m, x1: x1 + m, y1: y1 + m}, algodon: null};
+  f = {clave, set, lados, caja: {x0: x0 - m, y0: y0 - m, x1: x1 + m, y1: y1 + m}, algodon: null, llamas: null};
   if(zonaFormas.size > 80) zonaFormas.clear();
   zonaFormas.set(clave, f);
   return f;
@@ -411,8 +411,13 @@ function zonaEnPantalla(f){
    pedacitos de las casillas que asoman entre panza y panza). Se muestrea cada arco y se guardan los tramos de puntos que no caen adentro de otra
    panza ni de una casilla de la nube; cada punto con su normal (hacia afuera) y su fase (para la onda). */
 function nubeAlgodon(f){
-  if(f.algodon) return f.algodon;
-  const R = {radio: [0.5, 0.35], sale: [0, 0.35]}, panzas = [];
+  if(!f.algodon) f.algodon = {tramos: manchaBorde(f, {radio: [0.5, 0.35], sale: [0, 0.35]}), quieto: null};
+  return f.algodon;
+}
+// El borde de afuera de una mancha de `trazarManchon` (las casillas más las panzas de radio y salida `R`), en tramos de puntos [x, y, nx, ny, fase]
+// (2026-11-28: lo usan la línea de algodón de la nube y, con las panzas del fuego, las llamas).
+function manchaBorde(f, R){
+  const panzas = [];
   f.lados.forEach(l => {
     const p = hexCentro(l.col, l.fila), mx = (l.ax + l.bx) / 2 - p.x, my = (l.ay + l.by) / 2 - p.y;
     const u = superficieAzar(l.col, l.fila, 20 + l.i), w = superficieAzar(l.col, l.fila, 30 + l.i);
@@ -452,8 +457,7 @@ function nubeAlgodon(f){
     }
     if(cur.length > 1) tramos.push(Float32Array.from(cur.flatMap(q => [q[0], q[1], q[2], q[3], fase(q[0], q[1])])));
   });
-  f.algodon = {tramos, quieto: null};
-  return f.algodon;
+  return tramos;
 }
 // Arma el camino de la línea de algodón; `t` (segundos) la ondula: respira toda junta y una onda lenta la recorre. Sin `t`, quieta (y guardada).
 function nubeAlgodonCamino(alg, t){
@@ -486,36 +490,59 @@ function nubeContorno(celdas, color, z, o){
   ctx.restore();
   return t !== null;
 }
-/* 🔥 «E»: lengüetas de llama por el borde de afuera de la zona, naranjas con la punta amarilla, que suben y bajan sin parar. Nacen en el borde
-   exacto de las casillas (así se sigue leyendo dónde quema) y se tuercen un poco hacia arriba, como el fuego. Todas juntas en tres rellenos por
-   cuadro (la base roja, el cuerpo naranja y la punta amarilla), sin degradados ni desenfoque. Con «reducir movimiento», quietas a media altura. */
+/* 🔥 «E»: lengüetas de llama por el contorno de la mancha del fuego (2026-11-28, segunda vuelta; dueño: «en la muestra, la animación del fuego no
+   estaba alrededor del hexágono sino alrededor del contorno mismo del efecto de fuego. Lo preferiría así»). El contorno es el borde de afuera de la
+   mancha redondeada del relleno (las casillas y las panzas de `fuegoManchon`), armado UNA vez por zona y guardado (`f.llamas`): los puntos de base,
+   cada uno con su normal y su azar. Encima, un anillo naranja con resplandor que sigue ese mismo contorno (quieto: un camino guardado). Las lengüetas
+   son finitas, naranjas con la punta amarilla, y suben, bajan y se mecen; todas juntas en dos rellenos por cuadro (cuerpo naranja, punta amarilla;
+   la base roja es el anillo), sin degradados ni desenfoque, y las que caen fuera de la pantalla no se arman. Con «reducir movimiento», quietas a media altura. */
+const FUEGO_PANZAS = {radio: [0.42, 0.22], sale: [-0.04, 0.2]};   // las mismas de `fuegoManchon`
+function fuegoLlamas(f){
+  if(f.llamas) return f.llamas;
+  const tramos = manchaBorde(f, FUEGO_PANZAS), paso = HEX * 0.2, pts = [];
+  const azar = (x, y, k) => { const v = Math.sin(x * 12.9898 + y * 78.233 + k * 37.719) * 43758.5453; return v - Math.floor(v); };
+  const anillo = new Path2D();
+  tramos.forEach(tr => {
+    let resto = paso * azar(tr[0], tr[1], 1);
+    for(let i = 0; i < tr.length; i += 5){
+      const x = tr[i], y = tr[i + 1];
+      if(i){ anillo.lineTo(x, y); resto -= Math.hypot(x - tr[i - 5], y - tr[i - 4]); } else anillo.moveTo(x, y);
+      if(resto <= 0){ resto += paso; pts.push(x, y, tr[i + 2], tr[i + 3], azar(x, y, 2), azar(x, y, 3)); }
+    }
+  });
+  f.llamas = {pts: Float32Array.from(pts), anillo};
+  return f.llamas;
+}
 function fuegoLenguetas(celdas, z){
-  const f = zonaForma(celdas), quieto = zonaQuieta(), s = quieto ? 0 : performance.now() / 1000;
-  const porLado = f.lados.length > 80 || z < 0.45 ? 2 : 3;
-  const base = new Path2D(), cuerpo = new Path2D(), punta = new Path2D();
+  const f = zonaForma(celdas), ll = fuegoLlamas(f), P = ll.pts, quieto = zonaQuieta(), s = quieto ? 0 : performance.now() / 1000;
+  const k = Math.max(0.85, Math.min(1.35, Math.sqrt(z)));
+  const n = P.length / 6, salto = n > 420 || z < 0.45 ? 2 : 1;   // muchas o muy de lejos: una sí y una no
+  const cuerpo = new Path2D(), punta = new Path2D();
+  // Lo que queda fuera de la pantalla no se arma (una zona grande vista de cerca).
+  const vx0 = -vista.x / z - HEX, vy0 = -vista.y / z - HEX, vx1 = vx0 + anchoPx / z + 2 * HEX, vy1 = vy0 + altoPx / z + 2 * HEX;
   const lengua = (pth, bx, by, nx, ny, w, L, sway) => {
     const tx = bx + nx * L + sway, ty = by + ny * L - L * 0.38;   // la punta, torcida hacia arriba
     const mx = bx + nx * L * 0.5, my = by + ny * L * 0.5 - L * 0.12;
     pth.moveTo(bx - ny * w, by + nx * w);
-    pth.quadraticCurveTo(mx - ny * w * 0.55, my + nx * w * 0.55, tx, ty);
-    pth.quadraticCurveTo(mx + ny * w * 0.55, my - nx * w * 0.55, bx + ny * w, by - nx * w);
+    pth.quadraticCurveTo(mx - ny * w * 0.5, my + nx * w * 0.5, tx, ty);
+    pth.quadraticCurveTo(mx + ny * w * 0.5, my - nx * w * 0.5, bx + ny * w, by - nx * w);
     pth.closePath();
   };
-  f.lados.forEach(l => {
-    for(let j = 0; j < porLado; j++){
-      const u = superficieAzar(l.col, l.fila, 40 + l.i * 4 + j), v = superficieAzar(l.col, l.fila, 60 + l.i * 4 + j);
-      const t = (j + 0.25 + 0.5 * u) / porLado, bx = l.ax + (l.bx - l.ax) * t, by = l.ay + (l.by - l.ay) * t;
-      const sube = quieto ? 0.5 : 0.5 + 0.3 * Math.sin(s * (4 + 3 * u) + v * 6.28) + 0.2 * Math.sin(s * (7.3 + 2 * v) + u * 9);   // 0–1, desparejo
-      const L = HEX * (0.2 + 0.2 * v) * (0.45 + 0.75 * sube), w = HEX * (0.1 + 0.04 * u) * (porLado === 2 ? 1.3 : 1);
-      const sway = quieto ? 0 : Math.sin(s * 2.3 + u * 7) * L * 0.18;
-      lengua(base, bx, by, l.nx, l.ny, w * 1.25, L * 1.12, sway);
-      lengua(cuerpo, bx, by, l.nx, l.ny, w, L, sway);
-      lengua(punta, bx + l.nx * L * 0.35, by + l.ny * L * 0.35 - L * 0.12, l.nx, l.ny, w * 0.5, L * 0.62, sway * 0.7);
-    }
-  });
+  for(let i = 0; i < P.length; i += 6 * salto){
+    const bx = P[i], by = P[i + 1], nx = P[i + 2], ny = P[i + 3], u = P[i + 4], v = P[i + 5];
+    if(bx < vx0 || bx > vx1 || by < vy0 || by > vy1) continue;
+    const sube = quieto ? 0.5 : 0.5 + 0.3 * Math.sin(s * (4 + 3 * u) + v * 6.28) + 0.2 * Math.sin(s * (7.3 + 2 * v) + u * 9);   // 0–1, desparejo
+    const L = HEX * (0.16 + 0.26 * v) * (0.45 + 0.75 * sube), w = HEX * (0.07 + 0.035 * u) * salto ** 0.5;
+    const sway = quieto ? 0 : Math.sin(s * 2.3 + u * 7) * L * 0.2;
+    lengua(cuerpo, bx, by, nx, ny, w, L, sway);
+    lengua(punta, bx + nx * L * 0.3, by + ny * L * 0.3 - L * 0.1, nx, ny, w * 0.5, L * 0.66, sway * 0.7);
+  }
+  const lat = quieto ? 0.5 : 0.5 + 0.5 * Math.sin(s * 3.1) * Math.sin(s * 1.7 + 1);   // el anillo late con las llamas
   ctx.save();
-  ctx.fillStyle = 'rgba(190,40,8,.55)'; ctx.fill(base);
-  ctx.fillStyle = 'rgba(255,112,26,.9)'; ctx.fill(cuerpo);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.strokeStyle = `rgba(255,110,20,${(0.2 + 0.12 * lat).toFixed(3)})`; ctx.lineWidth = 6 * k / z; ctx.stroke(ll.anillo);   // el resplandor (trazo ancho)
+  ctx.strokeStyle = 'rgba(240,96,24,.95)'; ctx.lineWidth = 2.4 * k / z; ctx.stroke(ll.anillo);                                  // el anillo (la base de las llamas)
+  ctx.fillStyle = 'rgba(255,112,26,.92)'; ctx.fill(cuerpo);
   ctx.fillStyle = 'rgba(255,226,102,.92)'; ctx.fill(punta);
   ctx.restore();
 }
@@ -593,8 +620,14 @@ function fuegoDibujar(celdas, z, o){
     }
   });
   ctx.restore();
-  // Dónde quema (2026-11-28): la línea en el borde exacto de las casillas y, encima, las lengüetas de llama que nacen ahí («E»).
-  if(vivo){ zonaContorno(celdas, z, FUEGO_BORDE, {brillo: 'rgb(255,110,20)', pulso: 0.5 + 0.5 * Math.sin(s * 3.1) * Math.sin(s * 1.7 + 1)}); fuegoLenguetas(celdas, z); }
+  // Dónde quema (2026-11-28, P378/P379): las lengüetas de llama y su anillo por el contorno de la mancha («E») y, por adentro, el borde exacto de
+  // las casillas, tenue, punteado y quieto (como en la nube), para que se sepa qué casillas quema.
+  if(vivo){
+    ctx.save(); ctx.setLineDash([6 / z, 5 / z]); ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(255,214,150,.5)'; ctx.lineWidth = 1.3 * Math.max(0.85, Math.min(1.35, Math.sqrt(z))) / z; ctx.stroke(zonaContornoCamino(celdas));
+    ctx.restore();
+    fuegoLenguetas(celdas, z);
+  }
   else bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
 }
 const FUEGO_BORDE = 'rgb(255,160,50)';

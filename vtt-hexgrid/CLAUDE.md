@@ -2196,8 +2196,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `nubeContorno`: el borde de las casillas punteado y tenue (quieto) y la línea de algodón (`nubeAlgodon`: tramos de puntos de las panzas de
   `trazarManchon` que no caen adentro de otra ni de una casilla, más las puntas de las casillas que asoman; `nubeAlgodonCamino(alg, t)` la ondula
   con `o.anima`, nada con `zonaQuieta()`), con un resplandor de trazo ancho (sin desenfoque). La niebla de js/05 va con `{guardada: true}` (quieta);
-  la que se expande (js/112) y la que se desvanece (js/91), quietas y sin guardar. **Fuego** (`fuegoDibujar` con `{zona: true}`): la línea de P377 y
-  encima `fuegoLenguetas` (3 por lado, 2 si hay más de 80 lados o de muy lejos; tres rellenos lisos por cuadro; quietas con `zonaQuieta()`).
+  la que se expande (js/112) y la que se desvanece (js/91), quietas y sin guardar. **Fuego** (`fuegoDibujar` con `{zona: true}`; segunda vuelta del
+  2026-11-28, dueño: «la animación del fuego no estaba alrededor del hexágono sino alrededor del contorno mismo del efecto de fuego»): el borde de
+  las casillas tenue, punteado y quieto (como la nube) y `fuegoLenguetas`, que nacen en el **contorno de la mancha del fuego**: `manchaBorde(f, R)`
+  (el mismo cálculo de la línea de algodón, con las panzas del fuego `FUEGO_PANZAS` = las de `fuegoManchon`) y `fuegoLlamas(f)` guarda en la forma
+  los puntos de base cada 0,2 casilla (normal y azar) y el camino del anillo. Por cuadro: un anillo naranja con resplandor (trazo ancho, quieto) y
+  las lengüetas en dos rellenos lisos (cuerpo y punta); las de fuera de la pantalla no se arman; una sí y una no con más de 420 o de muy lejos;
+  quietas con `zonaQuieta()`. Detalles: P379.
   `superficieDibujar`: una nube o un fuego fuera de la pantalla no se dibuja; los que se ven piden cuadros con `pedirAnimacionLenta` (~30 por
   segundo) en vez de `anima`. `trazarManchon(celdas, o, g)` acepta otro contexto. La lava y el Escudo elemental no cambian. Detalles: P378.
   **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una

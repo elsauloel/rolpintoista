@@ -3419,13 +3419,28 @@ Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
 ### P378 — ☁🔥 El contorno con forma de nube (C) y de llamas (E): los detalles (2026-11-28, Claude, al hacer la cola «Contorno que sigue la forma de la nube y del fuego»)
 
 Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
-1. **Las llamas nacen en el borde exacto de las casillas** (no en el borde borroso del manchón) y debajo queda la línea de hoy (P377): así se sigue
+1. ~~**Las llamas nacen en el borde exacto de las casillas**~~ → cambiado el mismo día (dueño: «me gustan las nubes, no el fuego… lo preferiría
+   alrededor del contorno mismo del efecto de fuego»): ver **P379**. Lo que decía: (no en el borde borroso del manchón) y debajo queda la línea de hoy (P377): así se sigue
    leyendo qué casillas queman. Las de los lados de abajo salen más cortas (las llamas se tuercen hacia arriba). Alternativa: sacar la línea y dejar
    solo las llamas.
-2. **Tres lengüetas por lado de casilla** (dos si la zona es enorme o se mira muy de lejos), de tres colores lisos (base roja, cuerpo naranja, punta
+2. ~~**Tres lengüetas por lado de casilla**~~ (cambiado en P379) (dos si la zona es enorme o se mira muy de lejos), de tres colores lisos (base roja, cuerpo naranja, punta
    amarilla), sin degradados ni desenfoque: es lo que las hace livianas.
 3. **El fuego y las nubes se animan a ~20–30 cuadros por segundo** (antes el fuego pedía todos los cuadros de la pantalla) y **lo que está fuera
    de la pantalla no se dibuja ni se anima**. El parpadeo del fuego de adentro va al mismo ritmo.
 4. **La línea de algodón respira toda junta y una onda lenta la recorre** (se mueve muy poco: un vigésimo de casilla). La niebla de una varita
    (encima de los tokens), la nube que aparece expandiéndose y la que se desvanece llevan la misma línea, **quieta**.
 5. **No cambian**: la lava (sigue con la línea de hoy, sin lengüetas), el Escudo elemental de fuego y las zonas comunes (la línea de hoy).
+
+### P379 — 🔥 Las llamas en el contorno de la mancha del fuego: los detalles (2026-11-28, Claude, al rehacer la «E» de P378)
+
+El dueño vio la E: «me gustan las nubes, no el fuego. En la muestra, la animación del fuego no estaba alrededor del hexágono sino alrededor del
+contorno mismo del efecto de fuego. Lo preferiría así». Lo que se eligió (lo recomendado; el dueño puede cambiar cualquiera):
+1. **Las lengüetas nacen en el contorno redondeado de la mancha del fuego** (las casillas más sus «panzas»), como en la muestra, y por ese mismo
+   contorno va **un anillo naranja con un resplandor suave**. El anillo late apenas con las llamas.
+2. **Debajo, el borde de las casillas queda tenue, punteado y quieto**, como en la nube, para que se sepa qué casillas quema. La línea marcada de
+   P377 por el borde de las casillas se saca del fuego (la lava la conserva). Alternativa: sacar también el punteado.
+3. **Una lengüeta cada un quinto de casilla de contorno**, finitas, en dos colores lisos (cuerpo naranja, punta amarilla; la base roja la pone el
+   anillo). Más finitas y más juntas que las de antes, como en la muestra. Si la zona es enorme o se mira muy de lejos, una sí y una no.
+4. **Rendimiento**: el contorno y los puntos de las llamas se calculan una vez por zona y se guardan; las lengüetas que caen fuera de la pantalla
+   no se arman; quietas con «reducir movimiento» (medido: 0 píxeles cambian en las llamas).
+5. **No cambian**: las nubes (C), la lava, el Escudo elemental de fuego y las zonas comunes.

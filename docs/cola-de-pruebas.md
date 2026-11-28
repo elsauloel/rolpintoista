@@ -310,7 +310,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   desde el campo de colocar; J2 no ve «⏳ Duración» en la de J1 ni en un sólido del GM; el GM sí y la cambió a 5. Muro de fuego del Mago · Piromante
   sobre Blanco J1 y J2: el reloj en el vértice de arriba, sin tocarlos; mover un token lejos no lo mudó; con el Warrior · Hachero parado en la casilla de
   arriba, se mudó a un vértice libre del costado. Pruebas: 1229. Dudas: P384. La vuelta, «quedó igual». Lo que falta ver: `pruebas-en-el-mapa.md`.
+- **⬜ en cola (primero) — ⏳ El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo** (dueño, 2026-11-28; revisa la
+  P380): «que el timer cuente el inicio del turno de quien lo coloca al área como el momento de ir de un número para abajo, y que no haya cero, cosa que
+  si yo pongo una nube y le pongo que dura un turno, va a durar una ronda completa, desde el turno en el que yo la coloco hasta el principio de la
+  siguiente turno. Si lo pongo 2, van a ser 2 rondas completas. Y si el GM pone un área, una forma, y le pone un timer, puede elegir si el contador baja
+  de número al principio de cada ronda o al principio del turno del token jugador/usuario/creep que venga al caso. Eso se debería poder acceder o desde
+  el botón del engranaje de la forma, o que el mismo icono del relojito sea un botón. Que cuando no tenga configurado un contador esté el ítem y esté
+  como con una rayita, entonces entienda que ahí se puede cliquear.»
 - **⬜ en cola (primero) — 🕊️ Mensajes privados entre el GM y los jugadores, en los dos sentidos** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» y «y vice versa» (que un jugador también le pueda mandar uno privado al GM). Revisar si hoy se puede en cada sentido (🕊️, `/m`, `/r`) y por qué no anduvo en la sesión.
+  **En pausa (dueño, 2026-11-28):** ya existe (🕊️ y `/m Nombre texto`); «es bastante probable que yo haya visto mal, así que lo volveré a probar y te aviso».
 - **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».
 - **⬜ en cola (primero) — ☠ Que al morir se borren los estados alterados** (dueño, 2026-11-27, notas de la sesión): «que cuando mueran se le borren los estados alterados» (hoy se van al volver de la muerte, 2026-11-20; el dueño lo quiere al morir: revisar con él qué queda, como en `quedaAlVolver`).
 

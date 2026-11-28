@@ -54,6 +54,9 @@ const Duelo = (() => {
   const AUTOCIERRE_MS = 20 * 1000;
   let autoCierre = null;   // {id, hasta, quieto, espera, timer, tic} — la cuenta del cuadro terminado que está a la vista (espera = el motivo para no cerrarse)
   const usoFila = new Set();   // duelos en los que esta pantalla ya usó algo de la fila: después de eso se cierra solo como cualquiera
+  // ⏳ (2026-11-28, P383 ✅, dueño: «ponele un tope de 90 segundos»): el que espera porque puede usar algo, a los 90 s desde que el duelo terminó (o desde que
+  // se volvió a resolver) se cierra solo igual, también minimizado. La cuenta se ve en el cartel de espera.
+  const ESPERA_TOPE_MS = 90 * 1000;
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos', 'rerollUsado', 'resumido'];
 
@@ -4285,18 +4288,38 @@ const Duelo = (() => {
     if(autoCierre && autoCierre.id === d.id){
       const a = autoCierre;
       if(a.quieto || a.espera === motivo) return;
-      if(motivo){ clearTimeout(a.timer); clearInterval(a.tic); a.espera = motivo; }
-      else { a.espera = ''; autoCierreContar(a); }
+      if(motivo){ const yaEsperaba = !!a.espera; clearTimeout(a.timer); clearInterval(a.tic); a.espera = motivo; if(!yaEsperaba) esperaContar(a); }
+      else { a.espera = ''; clearInterval(a.espTic); autoCierreContar(a); }
       return;
     }
     if(autoCierre) autoCierreParar();
     const desde = resueltoDesde.get(d.id);
     if(d.estado === 'resuelto' && !usoFila.has(d.id) && !(desde && Date.now() - desde < 15000)) return;
-    const a = {id: d.id, hasta: Date.now() + AUTOCIERRE_MS, quieto: false, espera: motivo};
+    const a = {id: d.id, hasta: Date.now() + AUTOCIERRE_MS, quieto: false, espera: motivo, espDesde: desde || Date.now()};
     autoCierre = a;
-    if(!motivo) autoCierreContar(a);
+    if(!motivo) autoCierreContar(a); else esperaContar(a);
   }
-  function autoCierreParar(){ if(!autoCierre) return; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic); autoCierre = null; }
+  /* ⏳ El tope de la espera (P383): cuenta desde que esta pantalla vio el duelo resuelto (`resueltoDesde`, que se borra mientras está en pausa por la yeta
+     y vuelve a arrancar al resolverse de nuevo). Mientras no hay desde dónde contar (en pausa), no cuenta. Cada medio segundo pone al día el cartel y, al
+     llegar a 0, cierra el cuadro (abierto o minimizado). */
+  function esperaBase(a){
+    if(resueltoDesde.has(a.id)) return (a.espDesde = resueltoDesde.get(a.id));
+    const dd = actual && actual.id === a.id ? actual.dato : null;
+    if(dd && ((dd.estado !== 'resuelto' && dd.estado !== 'cancelado') || enYeta(dd))) return null;
+    return a.espDesde;
+  }
+  function esperaContar(a){
+    clearInterval(a.espTic);
+    const tic = () => {
+      if(autoCierre !== a || !a.espera){ clearInterval(a.espTic); return; }
+      const q = esperaQueda(esperaBase(a), Date.now());
+      const el = document.querySelector('#duelo-fondo [data-espera-txt]');
+      if(el) el.textContent = esperaTxt(a.espera, q);
+      if(q === 0){ autoCierreParar(); if(actual && actual.id === a.id) cerrar(); }
+    };
+    a.espTic = setInterval(tic, 500);
+  }
+  function autoCierreParar(){ if(!autoCierre) return; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic); clearInterval(autoCierre.espTic); autoCierre = null; }
   function autoCierreQuieto(){
     if(!autoCierre || autoCierre.quieto || autoCierre.espera) return;
     autoCierre.quieto = true; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic);
@@ -4306,11 +4329,21 @@ const Duelo = (() => {
   const autoCierreTxt = a => `Se cierra solo en ${Math.max(0, Math.ceil((a.hasta - Date.now()) / 1000))} s · tocá el cuadro para dejarlo abierto (se vuelve a abrir desde la Mesa)`;
   function autoCierreHtml(d){
     if(!autoCierre || autoCierre.id !== d.id) return '';
-    if(autoCierre.espera && !autoCierre.quieto) return `<div class="chico duelo-espera" data-espera style="margin:10px 0 0">⏳ Esperando: ${_esc(autoCierre.espera)} (arriba, en «⚡ Entre tiradas») · <button type="button" class="sec" data-dejar-pasar title="No uso nada: cerrá el cuadro (se vuelve a abrir desde la Mesa)">Dejar pasar</button></div>`;
+    if(autoCierre.espera && !autoCierre.quieto) return `<div class="chico duelo-espera" data-espera style="margin:10px 0 0"><span data-espera-txt>${_esc(esperaTxt(autoCierre.espera, esperaQueda(esperaBase(autoCierre), Date.now())))}</span> · <button type="button" class="sec" data-dejar-pasar title="No uso nada: cerrá el cuadro (se vuelve a abrir desde la Mesa)">Dejar pasar</button></div>`;
     return `<div class="chico" data-autocierre style="margin:10px 0 0">${_esc(autoCierre.quieto ? 'Queda abierto: cerralo cuando quieras.' : autoCierreTxt(autoCierre))}</div>`;
   }
   /* ⏸ Por qué esta pantalla no deja cerrarse solo un duelo terminado (P383): lo que la fila le ofrece que cambia una tirada de ESE duelo. El Empower no
      cuenta (es para la próxima tirada, no para este duelo). → '' o «podés usar 😈 Enyetar» / «podés usar 😈 Enyetar o 🧚 Golpe de suerte». */
+  /* ⏳ Puras (P383, el tope): cuánto le queda a la espera (`desde` = cuándo terminó o se volvió a resolver; null = en pausa, no cuenta → null) y el texto
+     del cartel («⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 45 s»). */
+  function esperaQueda(desde, ahora, tope){
+    if(desde == null || !isFinite(desde)) return null;
+    return Math.max(0, desde + (tope == null ? ESPERA_TOPE_MS : tope) - ahora);
+  }
+  function esperaTxt(motivo, quedaMs){
+    const base = `⏳ Esperando: ${motivo} (arriba, en «⚡ Entre tiradas»)`;
+    return quedaMs == null ? base : `${base} · se cierra en ${Math.ceil(quedaMs / 1000)} s`;
+  }
   const ESPERA_NOMBRE = {enyetar: '😈 Enyetar', reroll: '🧚 Golpe de suerte', moneda: '🪙 Re-roll (WC-Moneda)', polilla: '🦋 la Polilla', maldeojo: '🧿 Mal de ojo'};
   function motivoEspera(ops){
     const vistos = [];
@@ -5438,5 +5471,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {refiltrarOcultos, motivoEspera, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, etqCampo, tiroDe, tiradasDeLado, puedeCambiar, repetirTotal, danoBase, efectosReset, reabrirDeshecho, yetaReclamar, monedaDeshacer, monedaDeshace, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {refiltrarOcultos, motivoEspera, esperaQueda, esperaTxt, ESPERA_TOPE_MS, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, etqCampo, tiroDe, tiradasDeLado, puedeCambiar, repetirTotal, danoBase, efectosReset, reabrirDeshecho, yetaReclamar, monedaDeshacer, monedaDeshace, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

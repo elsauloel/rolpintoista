@@ -114,7 +114,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261112sind2"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261128espera3"></script>
+<script src="duelo.js?v=20261128tope90"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js?v=20261127unico2"></script>
@@ -1159,11 +1159,21 @@ prueba('⏸ El duelo terminado no se cierra solo si esta pantalla tiene algo par
     Duelo.motivoEspera([op('reroll', {cerrado: true}), op('polilla')])],
     ['', '', '', 'podés usar 😈 Enyetar', 'podés usar 😈 Enyetar, 🧚 Golpe de suerte o 🪙 Re-roll (WC-Moneda)', 'podés usar 🧿 Mal de ojo', '', 'podés usar 🧚 Golpe de suerte o 🦋 la Polilla']);
 });
+prueba('⏳ El tope de la espera (P383 ✅): a los 90 s desde que terminó (o se volvió a resolver) se cierra solo igual; en pausa no cuenta; el cartel con la cuenta', () => {
+  const m = 'podés usar 😈 Enyetar';
+  igual([Duelo.ESPERA_TOPE_MS, Duelo.esperaQueda(1000, 1000), Duelo.esperaQueda(1000, 46000), Duelo.esperaQueda(1000, 91000), Duelo.esperaQueda(1000, 200000),
+    Duelo.esperaQueda(null, 5000), Duelo.esperaQueda(undefined, 5000), Duelo.esperaQueda(0, 3000, 5000),
+    Duelo.esperaTxt(m, 45000), Duelo.esperaTxt(m, 44200), Duelo.esperaTxt(m, 0), Duelo.esperaTxt(m, null)],
+    [90000, 90000, 45000, 0, 0, null, null, 2000,
+      '⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 45 s', '⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 45 s',
+      '⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 0 s', '⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas»)']);
+});
 prueba('⏸ El cierre solo del duelo en el código: 20 s, la espera con «Dejar pasar» y la misma lógica de la fila (comun/duelo.js)', async () => {
   const t = await fetch('duelo.js', {cache: 'no-store'}).then(r => r.text());
   cierto(/const AUTOCIERRE_MS = 20 \* 1000;/.test(t) && /const RESUELTO_VISIBLE_MS = 20 \* 1000;/.test(t));
   cierto(/const filaOps = filaOpciones\(d\);[^\n]*\n\s+autoCierreArmar\(d, terminado, motivoEspera\(filaOps\)\)/.test(t));
   cierto(/data-dejar-pasar/.test(t) && /⏳ Esperando: /.test(t) && /if\(ok\) usoFila\.add\(d\.id\)/.test(t));
+  cierto(/const ESPERA_TOPE_MS = 90 \* 1000;/.test(t) && /data-espera-txt/.test(t) && /if\(q === 0\)\{ autoCierreParar\(\); if\(actual && actual\.id === a\.id\) cerrar\(\); \}/.test(t));
 });
 prueba('😈 Enyetar C: qué tiradas se pueden cambiar sin deshacer (el daño tirado y sin aplicar sí; aplicado o tomado, no) y la regla de cada una al repetirla', () => {
   const d = {estado: 'esperando', fase: 'dano', crit: {critico: true, d20: [9], mejor: 9, mult: 2}, dano: {crudo: 6, formula: '1d8', rolls: [6], mod: 0, aplicado: false, reclamado: 'libre'}, pdg: {total: 9}, eva: {total: 2}};

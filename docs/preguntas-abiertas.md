@@ -3508,4 +3508,5 @@ no se cierra solo hasta que lo use o lo deje pasar. Lo que eligió Claude (lo re
 Abierto: si molesta que espere aunque la persona no piense usar nada (por ejemplo, Enyetar siempre disponible con mucho SP), se puede poner un tope (por
 ejemplo 60 s) o que espere solo si el duelo es contra un rival al alcance (ya lo es: la fila solo ofrece Enyetar si el enemigo está a tu alcance y a la vista).
 
-**✅ Decidido (dueño, 2026-11-28): un tope de 90 segundos** («efectivamente, ponele un tope de 90 segundos»): el cuadro de quien puede usar algo espera, pero a los 90 s se cierra solo igual.
+**✅ Decidido (dueño, 2026-11-28): un tope de 90 segundos** («efectivamente, ponele un tope de 90 segundos»): el cuadro de quien puede usar algo espera, pero a los 90 s se cierra solo igual. **Aplicado** (2026-11-28, `comun/duelo.js`, `ESPERA_TOPE_MS`): cuenta desde que el duelo terminó o se volvió a resolver (en pausa por la yeta no
+cuenta), también minimizado; el cartel lleva la cuenta («· se cierra en 45 s»).

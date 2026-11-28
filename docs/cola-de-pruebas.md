@@ -291,6 +291,11 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   General» (GM, J1, J2; Blanco J2 con Enyetar, Warrior · Hachero contra Blanco J1): GM y J1 se cerraron solos a los ~20 s; J2 siguió esperando a los
   30 s y minimizado; Dejar pasar lo cerró; usó Enyetar y, al volver a resolverse, las tres pantallas se cerraron a los ~20 s. Pruebas automáticas
   1220/1220. Sin ver con clics: el Golpe de suerte, la Moneda / WC, la Polilla y el Mal de ojo (`docs/pruebas-en-el-mapa.md`).
+  **Tope de 90 s (dueño, 2026-11-28, P383 ✅: «ponele un tope de 90 segundos»):** el que espera porque puede usar algo, a los **90 s** desde que el
+  duelo terminó (o desde que se volvió a resolver después de una yeta) se cierra solo igual, también minimizado. El cartel lleva la cuenta todo el
+  tiempo: «⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas») · se cierra en 45 s». Mientras el duelo está en pausa por la yeta, no
+  cuenta. Probado con clics (mismo armado: Warrior · Hachero contra Blanco J1, Blanco J2 con Enyetar): J2 vio la cuenta bajar (88 → 67 → 42 → 12 → 4 s)
+  y a los ~90 s se le cerró solo; minimizado, igual. Pruebas automáticas 1221/1221.
 - **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
   **Y el lugar del relojito ⏳ (dueño, 2026-11-28):** «si está en el centro va a haber muchos casos en los que el contador lo tape un token… quizás en algún vértice en el perímetro de la zona puede ser mejor, porque un token inclusive lo permitiría dejar a la vista, o cualquier vértice dentro de la zona también».
 - **⬜ en cola (primero) — 🕊️ Mensajes privados entre el GM y los jugadores, en los dos sentidos** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» y «y vice versa» (que un jugador también le pueda mandar uno privado al GM). Revisar si hoy se puede en cada sentido (🕊️, `/m`, `/r`) y por qué no anduvo en la sesión.

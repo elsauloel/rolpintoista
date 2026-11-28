@@ -825,6 +825,7 @@
   ficha lite (el 📜 de un token o la F en el mapa) que estén los stats derivados, Sigilo incluido, y lo que falte o sobre.
 - [x] (✅ probado por el dueño el 2026-11-27, con «☠ Quién cae»: «está ok») **Probar «🏁 Finalizar combate» → 🔮 Simular** (2026-11-20): la ventana de siempre con el cartel «Simulación: no se guarda nada», sin Publicar,
   y «▶ Pasar a Avanzar» para seguir de verdad. Claude ya lo probó (no escribe nada); falta que lo veas en tu compu.
+- [ ] **⬡ Profundizar en el editor de formas del mapa** (dueño, 2026-11-28): mirarlo juntos en la compu. **Recordatorio:** «poder guardar formas predeterminadas para colocarlas fácilmente».
 - [ ] **Mirar vos «sacar y pegar creeps» entre el mapa y GM Tools** (2026-11-11): Claude ya lo probó; falta que lo veas en tu compu.
 - [ ] **Los dados 3D del crítico** (el giro y los efectos ×2, ×3, ×4): en la máquina de pruebas de Claude no cargan; mirarlos en tu compu.
 - [ ] **✨ Mirar las cuatro animaciones de resurrección (2026-11-20)** — Ankh, Fénix, Revive y Pacto ya están en el mapa (`vtt-hexgrid/CLAUDE.md`,

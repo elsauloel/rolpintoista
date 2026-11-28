@@ -3530,7 +3530,7 @@ que el contador lo tape un token… quizás en algún vértice en el perímetro 
 4. **Estable**: si el vértice de antes sigue libre, se queda ahí aunque se muevan los tokens; se muda solo si lo tapan.
 5. **Reglas de Firestore**: no cambian (el dueño y el GM ya podían cambiar `turnos` y `venceMant`).
 
-### P385 — ⏳ El relojito por los turnos de quien la puso: los casos de borde (2026-11-28, Claude, al hacer «El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo»)
+### P385 ✅ — ⏳ El relojito por los turnos de quien la puso: los casos de borde (2026-11-28, Claude, al hacer «El relojito cuenta por turnos de quien la puso, sin cero, y se configura tocándolo»)
 
 Lo pedido por el dueño: N turnos = N rondas completas; el número baja al **empezar el turno de quien la puso** y, cuando le tocaría llegar a 0, se va
 (sin «⏳ 0»); sin orden de turnos (o si quien la puso no está en el orden), baja al pasar de ronda; el GM elige «al empezar cada ronda» o «al empezar el
@@ -3553,3 +3553,5 @@ Lo que eligió Claude (lo recomendado; el dueño puede cambiar cualquiera):
 8. **«Ver detalle»** nombra a quien cuenta el reloj solo si esa pantalla lo ve (un creep oculto: «quien cuenta el reloj»).
 9. **Reglas de Firestore**: hacen falta dos campos nuevos, `relojModo` y `relojDe` (hay que pegarlas). Mientras no estén, lo demás anda igual: la forma se
    guarda y avisa «Se guardó, pero el relojito va a contar por ronda hasta que se publiquen las reglas nuevas».
+
+**✅ Decidido (dueño, 2026-11-28): «sobre los detalles, sí»** (quedan como están).

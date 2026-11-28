@@ -8,6 +8,7 @@
    ZonaDetalle.tiene(el) → ¿hay algo que contar? (zona, trampa, fuego, nube, portal, acelerador)
    ZonaDetalle.armar(el, ctx) → {icono, titulo, esencial, filas: [{k, v, aMano}], descripcion}
    ZonaDetalle.turnosQuedan(el, {mant, enOrden}) → {quedan, porTurnos} | null (⏳ la cuenta de lo que le queda); relojTexto(q); relojLugar(celdas, o)
+   ZonaDetalle.entraDesdeAfuera(celdas, desde) → ¿un movimiento que termina adentro de la zona cuenta como ENTRAR? (💨 las zonas con duelo por token)
    ZonaDetalle.html(m, {glosario, cargando}) → la tarjeta en HTML, con los términos del glosario marcados una sola vez (2026-11-22)
      ctx = {statLabel(id), estadoTexto(spec), elemento (del daño: 'fuego'…), elementoNombre ('fuego'), elementoRes ('al fuego'), quedan, quedanDe ('turnos de X' | ''), sinVencer,
             autor: {nombre, escondido, sinDato}, habilidad, descripcion, descripcionNo (por qué no se muestra), altura, cura: {cura, pulsos},
@@ -409,6 +410,15 @@ const ZonaDetalle = (() => {
     return libre ? {celda: libre.c, corrido: false} : {celda: pts[0].c, corrido: true};
   }
 
-  return {tiene, armar, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, A_MANO};
+  /* 💨 Entrar desde afuera (cola 2026-11-28, dueño, «la B»: los Pedos Tóxicos se disparaban en cada paso adentro de la nube). Una zona con duelo
+     por token se resiste al ENTRAR (venir de una casilla fuera de la zona) y en su tanda (el Mantenimiento o el empezar del turno); caminar adentro no
+     la dispara. Se mira la casilla de la que salió el movimiento (`desde`): si ya era de la zona, no es una entrada (aunque el camino haya salido y
+     vuelto a entrar en el mismo movimiento, P381). Sin `desde` (teletransporte, la zona que aparece encima), cuenta. */
+  function entraDesdeAfuera(celdas, desde){
+    if(!desde) return true;
+    return !(celdas || []).some(c => c && c.col === desde.col && c.fila === desde.fila);
+  }
+
+  return {tiene, armar, entraDesdeAfuera, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

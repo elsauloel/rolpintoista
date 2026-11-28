@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261125gas"></script>
-<script src="zona-detalle.js?v=20261128reloj"></script>
+<script src="zona-detalle.js?v=20261128pedos"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261128silelem"></script>
@@ -127,7 +127,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js?v=20261125sil"></script>
 <script src="pasivas.js?v=20261127detalle"></script>
-<script src="skills-clase.js?v=20261127enyC"></script>
+<script src="skills-clase.js?v=20261128pedos"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261127unico2"></script>
 <script src="skills-creep-base.js?v=20261127detalle"></script>
@@ -660,7 +660,7 @@ prueba('💨 duelo por token: la habilidad de la zona conserva «tira contra cad
 prueba('💀 Pedos (2026-11-09): el 20 es natural y deja inconsciente (con Revivir); con bonos 18+2 no; la tabla y el texto de la habilidad', () => {
   const pedos = SKILLS_CUSTOM.find(x => x.id === 'custom-pedos-toxicos'), t = pedos.duelo.danoExtraEfectos;
   const nat20 = Combatiente.efectoPorTirada(t, 20, 20), con2 = Combatiente.efectoPorTirada(t, 20, 18), sin = Combatiente.efectoPorTirada(t, 20);
-  igual([!!nat20.caer, !!nat20.muere, con2.estado && con2.estado.nombre, !!sin.caer, Combatiente.porTiradaTxt(t), /Un jefe no queda inconsciente ni con Stun/.test(pedos.detalle), /o el inconsciente\)/.test(pedos.detalle), /20 queda inconsciente/.test(pedos.detalle), /a rivales y aliados/.test(pedos.detalle)],
+  igual([!!nat20.caer, !!nat20.muere, con2.estado && con2.estado.nombre, !!sin.caer, Combatiente.porTiradaTxt(t), /Un jefe no queda inconsciente ni con Stun/.test(pedos.reglas), /o el inconsciente\)/.test(pedos.reglas), /20 queda inconsciente/.test(pedos.detalle), /A rivales y aliados/.test(pedos.detalle)],
     [true, false, 'Stun', true, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20 natural cae (la vida a 0)', true, true, true, true]);
   const vieja = Combatiente.zonaDeHab({nombre: 'Pedos Tóxicos'}, {objetivo: 'zona', radio: 2, dano: true, danoDiferencia: true, danoExtra: '1d20', danoExtraEfectos: [{desde: 7, estado: {nombre: 'Pajaritos', turnos: 1}}, {desde: 20, caer: true}]}, {fichaId: 'f1', tipo: 'pj', tiraValor: 9});
   const f20 = vieja.zonaEstado.porTirada.find(f => f.desde === 20);
@@ -11380,8 +11380,9 @@ grupo('🔍 Ver detalle de una zona (comun/zona-detalle.js)');
   });
   prueba('💨 los Pedos Tóxicos en el Mantenimiento: todos juntos, una tirada nueva del dueño de la nube y cada uno resiste (P295, dueño, 2026-11-25)', async () => {
     const pedos = SKILLS_CUSTOM.find(x => x.id === 'custom-pedos-toxicos');
-    ok(/En cada Mantenimiento, los que siguen adentro van todos juntos: tirás tu Ef\.Esp una sola vez para todos y cada uno resiste en su pantalla, de a uno \(si no contesta en 40 s, se tira solo\)\./.test(pedos.detalle));
-    ok(/Con quien entra después, lo mismo \(con tu última tirada\)\./.test(pedos.detalle) && !/sigue adentro cuando pasa la ronda/.test(pedos.detalle));
+    ok(/En cada Mantenimiento, los que siguen adentro van todos juntos: tirás tu Ef\.Esp una sola vez para todos y cada uno resiste en su pantalla, de a uno \(si no contesta en 40 s, se tira solo\)\./.test(pedos.reglas));
+    // (2026-11-28, «la B»: quien entra desde afuera, una vez por entrada; caminar adentro no la dispara)
+    ok(/a quien entra desde afuera \(una vez por cada entrada, con tu última tirada\)/.test(pedos.reglas) && /Caminar adentro de la nube no la vuelve a disparar\./.test(pedos.reglas) && !/sigue adentro cuando pasa la ronda/.test(pedos.detalle));
     // El duelo guarda de qué Mantenimiento es (solo en una zona); sin zona, no.
     const base = {nombre: 'Pedos Tóxicos', objetivo: 'area', tira: {formula: '1d8+1', etq: 'Ef.Esp'}, contra: [{modo: 'resmg', stat: 'resmg', etq: 'Res.Esp'}], dano: {formula: '', diferencia: true, tipo: 'toxico', ignoraDef: true}, sinDodge: true};
     igual([Duelo.limpiarHab({...base, zonaId: 'z1', mant: 7}).mant, Duelo.limpiarHab({...base, zonaId: 'z1'}).mant, Duelo.limpiarHab({...base, mant: 7}).mant, Duelo.limpiarHab({...base, zonaId: 'z1', mant: 'x'}).mant], [7, undefined, undefined, undefined]);
@@ -12528,6 +12529,21 @@ grupo('👁 Revelar lo oculto del GM: qué ve y cómo lo marca (2026-11-24, vtt-
     cierto(/veOcultoPorOjo: d =>/.test(m14) && /const dueloOcultoPorOjo = d =>/.test(m130) && /ocultoPorOjo\(d\) \? `<div class="duelo-interpuesto duelo-por-ojo">/.test(duelo));
     cierto(/const porOjo = reveladoPorOjo\(t\)/.test(m05) && /if\(porOjo\) marcas\.push\('👁'\)/.test(m05) && /elementoReveladoPorOjo\(el\)\) ojoMarcaCeldas/.test(m05) && /areaOcultaPorOjo\(a\)/.test(m05));
     cierto(/reveladoPorOjo\(t\) \? '<span title="Lo ves porque estás revelando lo oculto">👁<\/span> '/.test(m04) && /porOjo: true/.test(m104));
+  });
+})();
+
+grupo('💨 Zona con duelo por token: caminar adentro no la dispara, entrar desde afuera sí (2026-11-28, ZonaDetalle.entraDesdeAfuera, vtt-hexgrid/js/08)');
+(() => {
+  const c = (col, fila) => ({col, fila}), nube = [c(4, 6), c(5, 6), c(5, 7), c(4, 7), c(3, 7), c(4, 8)];
+  prueba('salir de una casilla de la nube y terminar en otra de la misma nube: no es entrar', () => {
+    igual([ZonaDetalle.entraDesdeAfuera(nube, c(5, 7)), ZonaDetalle.entraDesdeAfuera(nube, c(4, 8))], [false, false]);
+  });
+  prueba('venir de afuera: es entrar; sin casilla de salida (teletransporte, la nube que aparece encima): cuenta', () => {
+    igual([ZonaDetalle.entraDesdeAfuera(nube, c(4, 9)), ZonaDetalle.entraDesdeAfuera(nube, null), ZonaDetalle.entraDesdeAfuera([], c(4, 6))], [true, true, true]);
+  });
+  prueba('el motor de zonas lo usa solo al moverse, solo en las de duelo y no en las de «por paso»', async () => {
+    const m08 = await (await fetch('../vtt-hexgrid/js/08-mover-trampas-y-zonas.js', {cache: 'no-store'})).text();
+    cierto(/!desdeMantenimiento && !soloAlEmpezar && !e\.porPaso && typeof zonaEsDuelo === 'function' && zonaEsDuelo\(el\) && !ZonaDetalle\.entraDesdeAfuera\(cs, desde\)\) return;/.test(m08));
   });
 })();
 

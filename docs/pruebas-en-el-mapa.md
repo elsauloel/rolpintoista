@@ -3647,3 +3647,19 @@ su reloj; «Ver detalle» dice lo mismo.
 - Una **trampa con turnos** de un jugador: el GM no ve el reloj mientras no la descubra; la ve quien la puso.
 - Los **portales** y el **Acelerador** (el reloj debajo del círculo) con el reloj.
 - La **niebla de guerra** tapando el reloj de una zona fuera de la vista del jugador.
+
+## 💨 Las zonas con duelo por token no se disparan al caminar adentro (2026-11-28, P381)
+
+Probado con clics en «Prueba · General» (GM, Jugador 1 y Jugador 2, en narrativo), antes y después del arreglo: Blanco J1 tiró los Pedos Tóxicos con
+el Liviano · Sangrador y su Abeja adentro. **Antes**: el GM movió al Sangrador una casilla dentro de la nube y se abrió otro duelo. **Después**: el
+Sangrador dio uno y dos pasos adentro y no pasó nada; Blanco J2 entró desde afuera y tuvo su duelo, una vez, con la última tirada de J1; caminó adentro
+y, en un solo arrastre, salió y volvió a entrar: nada; salió en un movimiento y volvió a entrar en otro: otro duelo (P381); ⟳ Pasar de ronda: una
+sola tanda con los tres, J1 tiró de nuevo. La Nube tóxica del Debuffer · Maldito: la Abeja 2 (envenenada) dio un paso adentro y no pasó nada; salió
+y volvió a entrar: el «+1 stack» de siempre.
+**Falta ver:**
+- **Con orden de turnos**: la Nube tóxica (de clase o de creep), que pega al empezar el turno de quien está adentro, y alguien que camina adentro en su
+  turno (no tiene que pegarle de nuevo; sí al empezar su próximo turno).
+- La Nube tóxica de un creep sobre alguien que **la resistió** (sin Veneno) y camina adentro: antes le volvía a tirar en cada paso; ahora no.
+- Entrar con un **teletransporte** o un **empujón** a la nube (cuenta como entrar).
+- Una zona con «tirada de la zona» puesta a mano (asistente de zonas, con stat de quien la pone): caminar adentro no la dispara.
+

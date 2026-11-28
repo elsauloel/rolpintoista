@@ -3465,3 +3465,17 @@ el de arriba y «Ver detalle»). Lo que se eligió (el dueño puede cambiar cual
 5. **Quién lo ve**: el que ve la zona (una trampa sin descubrir o una forma invisible tampoco muestran el reloj); la niebla de guerra lo tapa como a la zona.
 
 **✅ Decidido (dueño, 2026-11-28): «me parece bien»** (queda como está).
+
+### P381 — 💨 Una zona con duelo por token: ¿quien sale y vuelve a entrar en la misma ronda la resiste de nuevo? (2026-11-28, Claude, al hacer «Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube»)
+
+Decidido por el dueño («la B»): quien **entra desde afuera** la resiste una vez al entrar; **caminar adentro** no dispara nada; en cada Mantenimiento,
+la tanda de todos juntos. Quedaba un caso abierto: alguien que sale de la nube y vuelve a entrar en la misma ronda. Lo que se eligió (lo recomendado;
+el dueño puede cambiarlo):
+1. **Cada entrada desde afuera es una entrada**: si sale en un movimiento y vuelve a entrar en otro, la resiste de nuevo (con la última tirada de
+   quien la creó), aunque sea la misma ronda.
+2. **Salvo en el mismo movimiento**: un solo arrastre que arranca adentro, sale y termina otra vez adentro no cuenta como entrar (se mira la casilla de
+   la que salió el movimiento).
+3. **Sin casilla de salida** (un teletransporte, un empujón que no pasa por el camino), cuenta como entrar.
+Vale para todas las zonas con duelo por token (los Pedos Tóxicos, la Nube tóxica de los creeps, las zonas con «tirada de la zona»). En la Nube tóxica,
+a quien ya quedó envenenado, volver a entrar le suma 1 stack (como antes).
+

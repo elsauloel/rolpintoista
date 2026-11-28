@@ -3002,4 +3002,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   arriba a la derecha); el Acelerador, debajo del círculo. Tamaño de pantalla 11–16 px; rojizo con 1 o 0. **Rendimiento**: `relojCache` guarda por
   elemento el número (firma: `venceMant`, `turnos`, Mantenimiento, quién la puso, el orden) y el lugar (firma: sus casillas y las de los tokens a la
   vista); `relojAnchos`, el ancho del texto. Reemplaza al «⏳N» viejo, que iba debajo de los tokens en la casilla del medio de la lista.
+- **💨 Una zona con duelo por token se resiste al ENTRAR, no al caminar adentro** (2026-11-28, dueño, «la B»; P381): en `zonaRevisarToken` (js/08), al
+  moverse (no en el Mantenimiento ni al empezar el turno), una zona con `zonaEsDuelo` (js/112: los Pedos Tóxicos, la Nube tóxica de los creeps, las de
+  «tirada de la zona») y sin `porPaso` solo cuenta si el movimiento arrancó fuera de ella (`ZonaDetalle.entraDesdeAfuera(celdas, desde)`,
+  comun/zona-detalle.js, pura; sin `desde`, cuenta). Antes, cada paso que terminaba adentro abría otro duelo (la zona con daño «se vuelve a chequear
+  siempre»). Un solo arrastre que sale y vuelve a entrar no cuenta; salir en un movimiento y entrar en otro, sí. Probado con clics en «Prueba · General».
 

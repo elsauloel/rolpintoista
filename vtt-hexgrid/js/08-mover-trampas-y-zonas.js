@@ -457,6 +457,9 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde, solo
     // de ronda (o vuelve a entrar), sin tirada ni daño, le suma 1 stack. `sumaUno` en el JSON de zonaEstado; las zonas de antes traen `resetea`
     // (del 2026-10-26: volvía a sus stacks) y desde hoy hacen lo mismo. Vale igual para personajes, invocaciones y creeps.
     const e = zonaSpecDe(el);
+    // 💨 Una zona con duelo por token (los Pedos Tóxicos, la Nube tóxica…; cola 2026-11-28, dueño, «la B»): al moverse, solo cuenta ENTRAR desde
+    // afuera; caminar adentro no la dispara (antes, cada paso que terminaba adentro abría otro duelo). El Mantenimiento y el empezar del turno, igual.
+    if(!desdeMantenimiento && !soloAlEmpezar && !e.porPaso && typeof zonaEsDuelo === 'function' && zonaEsDuelo(el) && !ZonaDetalle.entraDesdeAfuera(cs, desde)) return;
     if(zonaSoloSuma(el, t)){
       if(zonaJuntar){ zonaJuntar.push(el.id); return; }   // ▶ (P295, 2026-11-25) al empezar su turno: un renglón de «Empieza tu turno», no otro cartel encima
       if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, stacks: 1}, el, 'sumaUno');

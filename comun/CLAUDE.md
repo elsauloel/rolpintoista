@@ -2500,3 +2500,6 @@ versión parecida en más de una, es candidato a juntar.
   `ponerArma` también limpia. Personaje: `FichaAcciones.armasEnLaMano(S)` (equipadas, de mano, no rotas) y `revisarArmaDeEstados(S)`; la ficha lo corre en
   `refresh()` (js/05 `revisarArmaElementalFicha`) y el mapa en `bnRevisarVida` / `editarPersonajeMapa` / `modificarCreep` / el arma que se cae
   (vtt-hexgrid/js/97). Si vuelve a la mano, no vuelve. Las cargas (Arma envenenada) no son de un arma: no cambian.
+- **💨 `ZonaDetalle.entraDesdeAfuera(celdas, desde)`** (2026-11-28, P381): ¿un movimiento que termina adentro de una zona cuenta como entrar? (no si
+  arrancó en una casilla de la zona; sin `desde`, sí). Lo usa el motor de zonas del mapa (vtt-hexgrid/js/08) para las zonas con duelo por token.
+

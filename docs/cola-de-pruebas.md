@@ -273,9 +273,13 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   tanda del Mantenimiento, el 20 natural, el jefe); las copias se ponen al día solas. **Probado con clics** en «Prueba · General» (GM, Jugador 1 y
   Jugador 2), antes (un paso adentro abría otro duelo) y después (pasos adentro: nada; entrar desde afuera: un duelo; ⟳ Pasar de ronda: la tanda de
   todos). Pruebas: 1218. Dudas: P381 (salir y volver a entrar). La vuelta, «quedó igual». Lo que falta ver: `pruebas-en-el-mapa.md`.
-- **⬜ en cola (primero) — ☁ Más brillo al punteado de las casillas dentro de las nubes** (dueño, 2026-11-28, con captura de los Pedos Tóxicos
+- **✅ hecho (2026-11-28) — ☁ Más brillo al punteado de las casillas dentro de las nubes** (dueño, 2026-11-28, con captura de los Pedos Tóxicos
   violetas sobre un mapa claro: «en la nube de pedos tóxicos no se aprecia bien la línea punteada de los hexágonos… habría que darle un poco más de
-  brillo»). Que se lea en nubes claras y oscuras, sin perder lo tenue.
+  brillo»). Que se lea en nubes claras y oscuras, sin perder lo tenue. **Hecho:** la rayita del borde de las casillas es ahora casi blanca con un
+  tinte del color de la nube, un poco más gruesa y con un filo oscuro finito debajo (se lee sobre fondo claro y oscuro); lo mismo debajo de las llamas
+  del fuego. Sigue quieta y más fina que la línea de algodón; una sola pasada más por cuadro (`casillasPunteado`, js/50). Probado en «Prueba · General»
+  con los Pedos Tóxicos (violeta), una nube de veneno (verde) y un fuego, sobre el fondo oscuro y sobre un fondo claro de piedra/arena puesto solo en
+  la pantalla de la prueba (sin guardar). Duda de estilo: P382.
 - **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
   no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).
 - **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).

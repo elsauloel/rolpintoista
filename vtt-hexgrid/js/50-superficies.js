@@ -473,6 +473,24 @@ function nubeAlgodonCamino(alg, t){
   if(t === null) alg.quieto = pth;
   return pth;
 }
+/* ☁🔥 El borde de las casillas por adentro de una nube o de un fuego, punteado y quieto (2026-11-28; segunda vuelta el mismo día, dueño, con los
+   Pedos Tóxicos sobre un mapa claro: «no se aprecia bien la línea punteada de los hexágonos… habría que darle un poco más de brillo»). Dos pasadas
+   del mismo camino guardado (`zonaContornoCamino`) y las mismas rayitas: abajo un filo oscuro finito y semitransparente (para que se lea sobre un
+   fondo claro o una nube clara) y encima la rayita, casi blanca con un tinte del color de la zona (70 % hacia el blanco), para que se lea sobre lo oscuro.
+   Sigue siendo más fina y apagada que la línea de algodón. Una sola pasada más por zona y por cuadro: nada que armar de nuevo. Detalles: P382. */
+function zonaColorClaro(color, mezcla, alfa){
+  const [r, g, b] = zonaRgb(color), cl = v => Math.round(v + (255 - v) * mezcla);
+  return `rgba(${cl(r)},${cl(g)},${cl(b)},${alfa})`;
+}
+function casillasPunteado(celdas, z, k, color){
+  const pth = zonaContornoCamino(celdas);
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.setLineDash([6 / z, 5 / z]);
+  ctx.strokeStyle = 'rgba(14,8,20,.42)'; ctx.lineWidth = 3 * k / z; ctx.stroke(pth);   // el filo oscuro, debajo
+  ctx.strokeStyle = zonaColorClaro(color, 0.7, 0.9); ctx.lineWidth = 1.9 * k / z; ctx.stroke(pth);   // la rayita clara
+  ctx.restore();
+}
 // ☁ «C»: la línea de algodón (clara, del color de la nube, con un resplandor ancho y tenue debajo) y, por adentro, el borde de las casillas que
 // toca, tenue, punteado y quieto (para que se sepa qué casillas cuentan).
 function nubeContorno(celdas, color, z, o){
@@ -480,9 +498,7 @@ function nubeContorno(celdas, color, z, o){
   const base = NUBE_BORDE.get(color) || color, [r, g, b] = zonaRgb(base);
   ctx.save();
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-  ctx.setLineDash([6 / z, 5 / z]);
-  ctx.strokeStyle = zonaColorBorde(base, 0.42); ctx.lineWidth = 1.3 * k / z; ctx.stroke(zonaContornoCamino(celdas));   // las casillas, punteado
-  ctx.setLineDash([]);
+  casillasPunteado(celdas, z, k, base);   // las casillas, punteado
   const t = o && o.anima && !zonaQuieta() ? performance.now() / 1000 : null;
   const pth = nubeAlgodonCamino(nubeAlgodon(f), t);
   ctx.strokeStyle = `rgba(${r},${g},${b},.24)`; ctx.lineWidth = 7 * k / z; ctx.stroke(pth);   // el resplandor (un trazo ancho: sin desenfoque)
@@ -623,9 +639,7 @@ function fuegoDibujar(celdas, z, o){
   // Dónde quema (2026-11-28, P378/P379): las lengüetas de llama y su anillo por el contorno de la mancha («E») y, por adentro, el borde exacto de
   // las casillas, tenue, punteado y quieto (como en la nube), para que se sepa qué casillas quema.
   if(vivo){
-    ctx.save(); ctx.setLineDash([6 / z, 5 / z]); ctx.lineJoin = 'round';
-    ctx.strokeStyle = 'rgba(255,214,150,.5)'; ctx.lineWidth = 1.3 * Math.max(0.85, Math.min(1.35, Math.sqrt(z))) / z; ctx.stroke(zonaContornoCamino(celdas));
-    ctx.restore();
+    casillasPunteado(celdas, z, Math.max(0.85, Math.min(1.35, Math.sqrt(z))), 'rgb(255,200,120)');
     fuegoLenguetas(celdas, z);
   }
   else bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)

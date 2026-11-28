@@ -3479,3 +3479,13 @@ el dueño puede cambiarlo):
 Vale para todas las zonas con duelo por token (los Pedos Tóxicos, la Nube tóxica de los creeps, las zonas con «tirada de la zona»). En la Nube tóxica,
 a quien ya quedó envenenado, volver a entrar le suma 1 stack (como antes).
 
+
+### P382 — ☁🔥 El punteado de las casillas dentro de las nubes y del fuego: ¿cuánto se tiene que notar? (2026-11-28, Claude, al hacer «☁ Más brillo al punteado de las casillas dentro de las nubes»)
+
+El dueño, con los Pedos Tóxicos sobre un mapa claro: «no se aprecia bien la línea punteada de los hexágonos… habría que darle un poco más de brillo».
+Lo que se hizo (`casillasPunteado`, `vtt-hexgrid/js/50-superficies.js`): la rayita pasó a ser casi blanca con un tinte del color de la nube (70 % hacia
+el blanco, 90 % opaca), un poco más gruesa (1,9 en vez de 1,3) y con un filo oscuro finito debajo (las mismas rayitas, negro al 42 %), así se lee
+sobre una nube clara o un fondo claro (por el filo) y sobre lo oscuro (por la rayita clara). Igual para el punteado debajo de las llamas del fuego.
+Sigue quieta y más fina que la línea de algodón. Se probaron tres mezclas (más o menos filo, más o menos blanco) y se eligió la del medio.
+Abierto: si se siente demasiado blanca o marcada (sobre todo en las nubes oscuras), se puede bajar la mezcla hacia el blanco (0,7 → 0,5) o la
+opacidad (0,9 → 0,75); si todavía no se lee en algún mapa, subir el filo (0,42 → 0,5). Son tres números en esa función.

@@ -2192,6 +2192,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   niebla iguales). El Escudo elemental de fuego llama `fuegoDibujar` sin `o` y queda como antes (con la punteada). Detalles: P377.
   **☁🔥 Con la forma de la nube y de las llamas** (2026-11-28, dueño eligió «C» y «E» entre ideas dibujadas; «siempre y cuando no ralenticen el
   programa»; js/50): `zonaForma(celdas)` guarda por forma los lados de afuera, la caja y la línea de algodón (`zonaFormas`); `zonaEnPantalla(f)`.
+  **El punteado de las casillas, más visible** (2026-11-28, segunda vuelta, dueño: «en la nube de pedos tóxicos no se aprecia bien la línea punteada»):
+  `casillasPunteado(celdas, z, k, color)` (lo usan la nube y el fuego): dos pasadas del camino guardado con las mismas rayitas, un filo oscuro finito
+  debajo y encima la rayita casi blanca con el tinte del color (`zonaColorClaro(color, 0.7, 0.9)`). Se lee sobre fondos y nubes claras y oscuras. P382.
   **Nubes**: `nubeDibujar(celdas, color, z, o)` → la mancha (con `o.guardada`, desenfocada una vez por forma, color y zoom en `nubeManchon`) y
   `nubeContorno`: el borde de las casillas punteado y tenue (quieto) y la línea de algodón (`nubeAlgodon`: tramos de puntos de las panzas de
   `trazarManchon` que no caen adentro de otra ni de una casilla, más las puntas de las casillas que asoman; `nubeAlgodonCamino(alg, t)` la ondula

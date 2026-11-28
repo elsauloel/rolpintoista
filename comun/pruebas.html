@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261125gas"></script>
-<script src="zona-detalle.js?v=20261125gas"></script>
+<script src="zona-detalle.js?v=20261128reloj"></script>
 <script src="revelar.js?v=20261120rev2"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261128silelem"></script>
@@ -12528,6 +12528,54 @@ grupo('👁 Revelar lo oculto del GM: qué ve y cómo lo marca (2026-11-24, vtt-
     cierto(/veOcultoPorOjo: d =>/.test(m14) && /const dueloOcultoPorOjo = d =>/.test(m130) && /ocultoPorOjo\(d\) \? `<div class="duelo-interpuesto duelo-por-ojo">/.test(duelo));
     cierto(/const porOjo = reveladoPorOjo\(t\)/.test(m05) && /if\(porOjo\) marcas\.push\('👁'\)/.test(m05) && /elementoReveladoPorOjo\(el\)\) ojoMarcaCeldas/.test(m05) && /areaOcultaPorOjo\(a\)/.test(m05));
     cierto(/reveladoPorOjo\(t\) \? '<span title="Lo ves porque estás revelando lo oculto">👁<\/span> '/.test(m04) && /porOjo: true/.test(m104));
+  });
+})();
+
+grupo('⏳ El relojito con los turnos que le quedan a una zona (2026-11-28, ZonaDetalle.turnosQuedan / relojLugar, vtt-hexgrid/js/05 y js/07)');
+(() => {
+  const tq = (el, mant, enOrden) => ZonaDetalle.turnosQuedan(el, {mant, enOrden});
+  const traer = async u => (await fetch(u, {cache: 'no-store'})).text();
+  prueba('sin vencimiento (o sin Mantenimiento conocido) no hay reloj', () => {
+    igual(tq({zona: true}, 4, false), null);
+    igual(tq({zona: true, venceMant: null, turnos: 3}, 4, true), null);
+    igual(tq({zona: true, venceMant: 7, turnos: 3}, null, false), null);
+  });
+  prueba('sin quien la puso en el orden: los Mantenimientos que faltan (nunca menos de 0)', () => {
+    igual(tq({niebla: true, venceMant: 7, turnos: 3}, 4, false), {quedan: 3, porTurnos: false});
+    igual(tq({zona: true, venceMant: 7, turnos: 3}, 6, false), {quedan: 1, porTurnos: false});
+    igual(tq({zona: true, venceMant: 7}, 9, false), {quedan: 0, porTurnos: false});
+  });
+  prueba('con quien la puso en el orden: sus turnos; una zona de habilidad se va igual al llegar a su Mantenimiento (lo que pase primero, P380)', () => {
+    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 8, turnos: 3}, 4, true), {quedan: 3, porTurnos: true});
+    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6, turnos: 2}, 5, true), {quedan: 1, porTurnos: false});
+    igual(tq({portal: true, zonaCasteadorRef: 'p1', venceMant: 10, turnos: 2}, 4, true), {quedan: 2, porTurnos: true});
+  });
+  prueba('una trampa (o la zona que dejó) solo cuenta los turnos de quien la puso: el mapa no la borra por Mantenimiento', () => {
+    igual(tq({trampa: true, venceMant: 5, turnos: 3}, 5, true), {quedan: 3, porTurnos: true});
+    igual(tq({zona: true, trampaEstado: '{"de":"f1|pj"}', venceMant: 5, turnos: 2}, 6, true), {quedan: 2, porTurnos: true});
+  });
+  prueba('el último paso: sin turnos guardados, espera su efecto de la ronda con 0', () => {
+    igual(tq({zona: true, zonaCasteadorRef: 'c1', venceMant: 6}, 6, true), {quedan: 0, porTurnos: false});
+  });
+  prueba('el texto del reloj: «⏳ N»', () => {
+    igual([ZonaDetalle.relojTexto(3), ZonaDetalle.relojTexto(0), ZonaDetalle.relojTexto(-2)], ['⏳ 3', '⏳ 0', '⏳ 0']);
+  });
+  prueba('dónde va: la casilla del centro si está libre; si tiene token, la libre más cerca; todas ocupadas → corrido', () => {
+    const c = (col, fila) => ({col, fila}), centro = x => ({x: x.col * 10, y: x.fila * 10});
+    const flor = [c(0, 0), c(1, 0), c(-1, 0), c(0, 1), c(0, -1)];
+    igual(ZonaDetalle.relojLugar(flor, {centro, ocupada: () => false}), {celda: c(0, 0), corrido: false});
+    const r = ZonaDetalle.relojLugar(flor, {centro, ocupada: x => x.col === 0 && x.fila === 0});
+    cierto(!r.corrido && !(r.celda.col === 0 && r.celda.fila === 0));
+    igual(ZonaDetalle.relojLugar(flor, {centro, ocupada: () => true}), {celda: c(0, 0), corrido: true});
+    igual(ZonaDetalle.relojLugar([], {centro, ocupada: () => false}), null);
+  });
+  prueba('el mapa usa una sola cuenta: el lienzo, el cartel de la casilla, el de arriba y «Ver detalle»', async () => {
+    const [m05, m07, m10, m104, m127] = await Promise.all(['../vtt-hexgrid/js/05-vista-y-dibujo.js', '../vtt-hexgrid/js/07-tokens-y-elementos.js', '../vtt-hexgrid/js/10-hud-y-vida.js',
+      '../vtt-hexgrid/js/104-hex-info.js', '../vtt-hexgrid/js/127-zona-detalle.js'].map(traer));
+    cierto(/function elementoTurnosQuedan\(el\)/.test(m07) && /ZonaDetalle\.turnosQuedan\(el, \{mant: mantenimientoNumero, enOrden\}\)/.test(m07));
+    cierto(/const q = elementoTurnosQuedan\(el\)/.test(m05) && /ZonaDetalle\.relojLugar\(/.test(m05) && /relojesDibujar\(relojes, z\)/.test(m05));
+    cierto(/elementoTurnosQuedan\(e\)/.test(m10) && /elementoTurnosQuedan\(el\)/.test(m104) && /return elementoTurnosQuedan\(el\)/.test(m127));
+    cierto(!/Math\.max\(0, el\.venceMant - mantenimientoNumero\)/.test(m05 + m104 + m127));
   });
 })();
 

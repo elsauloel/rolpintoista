@@ -24,11 +24,7 @@ function hexInfoDatos(celda){
   const igual = c => c.col === celda.col && c.fila === celda.fila;
   elementos.forEach((el, id) => {
     if(id === ID_BORRADOR || !puedeVerElemento(el) || !celdasDeElemento(el).some(igual)) return;
-    let quedan;
-    if(el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null){
-      const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
-      quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
-    }
+    const q = elementoTurnosQuedan(el), quedan = q ? q.quedan : undefined;   // ⏳ la misma cuenta que el relojito (js/07)
     const porOjo = typeof elementoReveladoPorOjo === 'function' && elementoReveladoPorOjo(el);   // 👁 la trampa de un jugador, solo por Revelar lo oculto
     items.push(...HexInfo.describir(el, {quedan, oculto: !!el.invisible || (el.trampa && !el.disparada && soyGM && !el.descubierta && trampaEsDelGM(el))}).map(x => ({...x, elId: id, ...(porOjo ? {porOjo: true} : {})})));   // (elId: para «👁 Revelar», js/122)
   });

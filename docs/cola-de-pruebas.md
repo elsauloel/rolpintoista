@@ -255,8 +255,15 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   mirando el fuego grande ≈3,3 → ≈3,8 ms). **Probado con clics** en «Claude · pruebas 2», mapa «Prueba · General» (GM, Jugador 1 y Jugador 2):
   el Muro de fuego del Mago · Piromante sobre Blanco J1 y J2 y un fuego grande; capturas de lejos y de cerca y un video de 5 s. Pruebas: 1207.
   Dudas: P379. La vuelta, «quedó igual». Sin reglas nuevas.
-- **⬜ en cola (primero) — ⏳ Las zonas con duración muestran un relojito con los turnos que les quedan** (dueño, 2026-11-28): «que las zonas
+- **✅ hecho (2026-11-28) — ⏳ Las zonas con duración muestran un relojito con los turnos que les quedan** (dueño, 2026-11-28): «que las zonas
   que están en el mapa por un tiempo determinado muestren un iconito con un reloj de arena que muestre cuántos turnos les queda».
+  *Resultado:* toda zona o forma con turnos (zonas de habilidades como el Muro de fuego o los Pedos, nubes, formas a mano, trampas con duración, portales,
+  Acelerador) lleva encima un cartelito **«⏳ N»**, en una casilla libre de la zona (si están todas con token, corrido a la esquina), del tamaño de la
+  pantalla (se lee de cerca y de lejos), rojizo con 1 o 0. Baja solo y se va con la zona. Lo ve solo quien ve la zona. El número sale de UNA cuenta
+  (`ZonaDetalle.turnosQuedan`, la misma con la que se borra), que ahora usan también el cartel de la casilla, el de arriba y «Ver detalle» (que ya decía
+  «Cuánto le queda»). Se dibuja después de los tokens, sin recalcular el lugar ni el número en cada cuadro. **Probado con clics** en «Claude · pruebas 2»,
+  mapa «Prueba · General» (GM, Jugador 1 y Jugador 2): Muro de fuego del Mago · Piromante, Nube tóxica y Bomba de humo de prueba, una forma bajo un token y
+  una invisible; ⟳ Pasar de ronda 3 → 2 → 1 → 0 y se fueron. Pruebas: 1215. Dudas: P380. La vuelta, «quedó igual». Lo que falta ver: `pruebas-en-el-mapa.md`.
 - **⬜ en cola (primero) — 💨 Pedos Tóxicos: no se tienen que disparar al caminar dentro de la nube** (dueño, 2026-11-27, notas de la sesión): «en el origen el pedo tóxico se triggerea cuando caminan dentro de las nubes» y «el pedo tóxico está programado raro… al dar un paso se triggerea y eso no debería pasar. Solamente una tirada al principio del mantenimiento, al principio de la ronda» (ya estaba decidido así el 2026-11-24: una tanda en el Mantenimiento, una sola tirada del dueño).
 - **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
   no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).

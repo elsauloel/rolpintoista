@@ -467,6 +467,14 @@ function colocadorDe(el){
 function colocadorEnOrden(c){
   return !!(c && iniciativa.orden.some(o => { const t = tokens.get(o.id); return t && String(t.fichaId) === c.ref && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo; }));
 }
+// ⏳ Cuántos turnos le quedan a un elemento: {quedan, porTurnos} o null si no vence (2026-11-28). La cuenta pura es ZonaDetalle.turnosQuedan, la
+// misma que usa este archivo para borrarla (zonasDelQueLaTiro / elementosVencidosBarrer); la usan el relojito del lienzo (js/05), el cartel de la
+// casilla (js/104), el de arriba (js/10) y «Ver detalle» (js/127).
+function elementoTurnosQuedan(el){
+  if(!el || mantenimientoNumero === null || el.venceMant === null || el.venceMant === undefined) return null;
+  const enOrden = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
+  return ZonaDetalle.turnosQuedan(el, {mant: mantenimientoNumero, enOrden});
+}
 // `mantNuevo` (2026-10-22, la sesión del Pedo tóxico): si justo antes se pasó de ronda, la zona que se va todavía tiene que hacer efecto en esa
 // ronda a los que siguen adentro: en vez de borrarla, vence en ese Mantenimiento y la borra elementosVencidosBarrer cuando la resolvieron
 // (zonaEsperaSuFin). Antes, con quien la tiró primero en la ronda, la zona se iba antes de su segundo efecto.

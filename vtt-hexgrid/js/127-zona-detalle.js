@@ -77,18 +77,15 @@ function zonaDetalleDescripcion(elId, el, a){
 // Cuántos turnos le quedan a lo puesto en el mapa: {quedan, porTurnos} (null si no vence). Con quien la puso en el orden de turnos, son turnos
 // SUYOS (`turnos`); si no, lo que falta de Mantenimientos. La usan la tarjeta y el cartel de arriba (js/10), para que digan lo mismo (2026-11-21:
 // el cartel contaba siempre por Mantenimientos y decía «quedan 2 turnos» donde la tarjeta decía 1).
-function zonaTurnosQuedan(el, a){
-  if(!el || el.venceMant === null || el.venceMant === undefined || mantenimientoNumero === null) return null;
-  a = a || zonaDetalleAutor(el);
-  const porTurnos = !el.niebla && Math.round(num(el.turnos)) > 0 && !!a.c && colocadorEnOrden(a.c);   // (la nube: por Mantenimientos)
-  return {quedan: porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero), porTurnos};
+function zonaTurnosQuedan(el){
+  return elementoTurnosQuedan(el);   // (2026-11-28: una sola cuenta, ZonaDetalle.turnosQuedan, la misma con la que se borra — js/07)
 }
 function zonaDetalleCtx(elId, el){
   const a = zonaDetalleAutor(el), ctx = {autor: a.autor};
   ctx.statLabel = id => (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[id]) || '';
   ctx.estadoTexto = sp => { try{ const {duelo, porTirada, pct, unaVez, sumaUno, resetea, renuevaPaso, superficie, tiraPaso, salva, efecto, magica, elemento, alEmpezar, porPaso, ...limpio} = sp; return EstadosAplicar.texto(limpio); }catch(e){ return sp.nombre; } };
   // Cuánto le queda: la misma cuenta que el ⏳ del lienzo (js/05) y el cartel de la casilla (js/104).
-  const q = zonaTurnosQuedan(el, a);
+  const q = zonaTurnosQuedan(el);
   if(q){ ctx.quedan = q.quedan; if(q.porTurnos) ctx.quedanDe = `son turnos de ${a.nombre || 'quien la puso'}: baja uno cada vez que empieza su turno`; }
   let sp = {}; try{ sp = JSON.parse(el.zonaEstado || el.trampaEstado || '{}') || {}; }catch(e){}
   const elem = (typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(el.zonaDanoTipo || '') : '') || (el.trampa ? sp.elemento || '' : '');

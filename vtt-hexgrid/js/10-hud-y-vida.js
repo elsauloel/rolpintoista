@@ -1217,13 +1217,12 @@ function elementoQueEs(e){
   // 🔥 El terreno incendiado (el mapa lo lee como zona desde el 2026-11-25, P295): primero, como lo que es.
   if(e.fuego && !e.trampa) return `<b>🔥 TERRENO EN LLAMAS</b> <span>${de}</span> · <span class="es-solido">quema a quien entra y a quien empieza su turno adentro (también volando)</span>`;
   if(e.zona){
-    const q = num(e.turnos) > 0 && typeof zonaTurnosQuedan === 'function' ? zonaTurnosQuedan(e) : null;   // la misma cuenta que «Ver detalle» (js/127)
-    const t = q ? q.quedan : (num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0);
+    const q = elementoTurnosQuedan(e), t = q ? q.quedan : 0;   // ⏳ la misma cuenta que el relojito y «Ver detalle» (js/07)
     return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
       ` · <span class="es-libre">${esc(typeof ZonaDetalle !== 'undefined' && ZonaDetalle.cuandoEtiqueta ? ZonaDetalle.cuandoEtiqueta(e, {cura: typeof zonaCuraDe === 'function' ? zonaCuraDe(e) : null}) : 'se dispara al entrar y, mientras sigan adentro, cada vez que se pasa de ronda')}</span>`;   // (2026-11-21) lo mismo que dice «Ver detalle»
   }
   // ☁ La nube y 🔥 el terreno en llamas también dicen qué son (2026-11-20, con el «Ver detalle»; antes salían como «Flor · TRANSITABLE»).
-  if(e.niebla){ const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
+  if(e.niebla){ const q = elementoTurnosQuedan(e), t = q ? q.quedan : 0;
     // (P259 (3), 2026-11-22: la nube guarda quién la puso; si esta pantalla no lo ve, tampoco se dice desde qué cuenta se puso — js/127)
     let quien = de; try{ if(typeof zonaDetalleAutor === 'function' && e.zonaCasteadorRef){ const a = zonaDetalleAutor(e).autor || {}; quien = a.escondido ? '(alguien)' : a.nombre ? esc(`(${a.nombre})`) : de; } }catch(err){}
     return `<b>☁ NUBE${e.zonaNombre && quien !== '(alguien)' ? ' · ' + esc(e.zonaNombre) : ''}</b> <span>${quien}</span>${t ? ` · <span>queda${t === 1 ? '' : 'n'} ${t} turno${t === 1 ? '' : 's'}</span>` : ''} · <span class="es-libre">tapa la vista: quien está adentro no se ve desde afuera</span>`; }

@@ -487,6 +487,7 @@ function dibujarLienzo(){
     ctx.fillStyle = pintandoColision.borrar ? 'rgba(237,227,210,.35)' : 'rgba(255,92,72,.35)'; ctx.fill();
     ctx.strokeStyle = pintandoColision.borrar ? 'rgba(237,227,210,.95)' : 'rgba(255,92,72,1)'; ctx.lineWidth = 2 / z; ctx.stroke();
   }
+  const relojes = [];   // ⏳ los elementos con turnos que se ven (relojesDibujar)
   listaElementos.forEach(([id, el]) => {
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
     if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z, id === elementoSeleccionado); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
@@ -625,22 +626,9 @@ function dibujarLienzo(){
       ctx.restore();
     }
     }   // fin de lo que no es Colisión
-    if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
-      // Contador de turnos que le quedan a la forma (se elimina sola al llegar a 0). Si cuenta los turnos de quien la puso (zonas, P172, y trampas,
-      // 2026-10-07), esos; si no, los Mantenimientos.
-      const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
-      const quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
-      const cm = celdas[Math.floor(celdas.length / 2)], pm0 = hexCentro(cm.col, cm.fila), pm = el.acelerador ? {x: pm0.x, y: pm0.y + HEX * 0.9} : pm0;   // el Acelerador: debajo del círculo, para no tapar las flechitas
-      ctx.save();
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = `700 ${12 / z}px "Space Mono", monospace`;
-      const txt = `⏳${quedan}`, w = ctx.measureText(txt).width + 10 / z, h = 17 / z;
-      ctx.fillStyle = 'rgba(15,12,14,.85)';
-      ctx.beginPath(); ctx.rect(pm.x - w / 2, pm.y - h / 2, w, h); ctx.fill();
-      ctx.strokeStyle = 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
-      ctx.fillStyle = '#EDE3D2'; ctx.fillText(txt, pm.x, pm.y + 0.5 / z);
-      ctx.restore();
-    }
+    // ⏳ El relojito con los turnos que le quedan (2026-11-28): se junta acá —así vale lo de arriba: solo lo que esta pantalla ve— y se dibuja
+    // después de los tokens y las nubes (relojesDibujar), en una casilla sin token.
+    if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length) relojes.push([id, el, celdas]);
     if(id === ID_BORRADOR){
       // Todavía no está creado: contorno blanco punteado.
       ctx.setLineDash([6 / z, 5 / z]);
@@ -1137,6 +1125,7 @@ function dibujarLienzo(){
   if(typeof iconosPintarPendientes === 'function') iconosPintarPendientes();
   if(dibujarNieblaVarita(z)) animando = true;   // la niebla de una varita, encima de los tokens (2026-10-05)
   if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, true)) animando = true;   // ☁ la niebla que se va disipando (js/91)
+  relojesDibujar(relojes, z);   // ⏳ los turnos que les quedan a las zonas, encima de todo eso (debajo de la niebla de guerra)
 
   // Trazos del lápiz: los temporales se ven un rato y se desvanecen sobre
   // el final (los borra el que los ve, por eso conviene que se note antes
@@ -1396,6 +1385,65 @@ function dibujarLienzo(){
   return animando;
 }
 
+/* ⏳ El relojito de las zonas con duración (2026-11-28, dueño: «que las zonas que están en el mapa por un tiempo determinado muestren un iconito con
+   un reloj de arena que muestre cuántos turnos les queda»). «⏳ N» con la cuenta de elementoTurnosQuedan (js/07, la misma con la que se borra), en
+   una casilla de la zona sin token a la vista (ZonaDetalle.relojLugar); si están todas ocupadas, corrido a la esquina. Del tamaño de la pantalla (entre
+   11 y 16 px según el zoom), así se lee de cerca y de lejos. Lo que no cambia no se recalcula: el lugar se guarda por elemento con una firma (sus
+   casillas, los tokens a la vista y sus casillas) y el ancho del texto, por texto y tamaño. */
+const relojCache = new Map(), relojAnchos = new Map();
+function relojOcupadas(){
+  // Las casillas con un token que esta pantalla ve (los ocultos o tapados por la niebla no cuentan: no se delatan).
+  const set = new Set();
+  (disposicion || []).forEach(d => { const t = tokens.get(d.id); if(t) set.add(t.col + ',' + t.fila); });
+  return set;
+}
+function relojIcono(el, celdas){
+  // La casilla con el dibujo propio del elemento (la ficha de la trampa, el 🌀, el número del fuego): mejor no taparla.
+  if(el.trampa && typeof trampaCentro === 'function'){ const c = trampaCentro(el); return c ? c.col + ',' + c.fila : ''; }
+  if(el.portal) return celdas[0].col + ',' + celdas[0].fila;
+  if(el.fuego){ const c = celdas[Math.floor(celdas.length / 2)]; return c.col + ',' + c.fila; }
+  return '';
+}
+function relojesDibujar(lista, z){
+  if(!lista.length){ if(relojCache.size) relojCache.clear(); return; }
+  const ocup = relojOcupadas(), firmaOcup = [...ocup].join(';'), vivos = new Set();
+  const px = Math.max(11, Math.min(16, HEX * z * 0.3)), font = `700 ${px / z}px "Space Mono", monospace`;
+  ctx.save();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = font;
+  const firmaOrden = (iniciativa.orden || []).map(o => o.id).join(',');
+  lista.forEach(([id, el, celdas]) => {
+    vivos.add(id);
+    let c = relojCache.get(id);
+    // Los turnos y el texto: solo cuando cambia algo de lo que entra en la cuenta (sus turnos, el Mantenimiento, quién la puso, el orden de turnos).
+    const fq = `${el.venceMant}|${el.turnos}|${mantenimientoNumero}|${el.zonaCasteadorRef || ''}|${el.trampaEstado || ''}|${firmaOrden}`;
+    if(!c || c.fq !== fq){ const q = elementoTurnosQuedan(el); c = {...(c || {}), fq, q, txt: q ? ZonaDetalle.relojTexto(q.quedan) : ''}; relojCache.set(id, c); }
+    const q = c.q;
+    if(!q) return;
+    const icono = relojIcono(el, celdas);
+    const firma = `${el.origen.col},${el.origen.fila},${el.rotacion || 0},${celdas.length},${celdas[0].col},${celdas[0].fila}|${icono}|${firmaOcup}`;
+    if(c.firma !== firma){
+      c.lugar = ZonaDetalle.relojLugar(celdas, {centro: x => hexCentro(x.col, x.fila), ocupada: x => { const k = x.col + ',' + x.fila; return ocup.has(k) || k === icono; }});
+      c.firma = firma;
+    }
+    if(!c.lugar) return;
+    const txt = c.txt, kw = txt + '|' + px;
+    let w0 = relojAnchos.get(kw);
+    if(w0 === undefined){ w0 = ctx.measureText(txt).width * z; relojAnchos.set(kw, w0); }   // (el ancho en píxeles de pantalla)
+    const p0 = hexCentro(c.lugar.celda.col, c.lugar.celda.fila);
+    let x = p0.x, y = p0.y;
+    if(el.acelerador) y += HEX * 0.9;   // el Acelerador: debajo del círculo, para no tapar las flechitas
+    else if(c.lugar.corrido){ x += HEX * 0.5; y -= HEX * 0.866; }   // todas con token: a la esquina de arriba a la derecha, entre casillas
+    const w = (w0 + 10) / z, h = (px + 6) / z, r = 4 / z;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x - w / 2, y - h / 2, w, h, r); else ctx.rect(x - w / 2, y - h / 2, w, h);
+    ctx.fillStyle = q.quedan <= 1 ? 'rgba(70,22,18,.92)' : 'rgba(15,12,14,.88)'; ctx.fill();
+    ctx.strokeStyle = q.quedan <= 1 ? 'rgba(255,170,120,.95)' : 'rgba(237,227,210,.9)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
+    ctx.fillStyle = q.quedan <= 1 ? '#FFD2B0' : '#EDE3D2'; ctx.fillText(txt, x, y + 0.5 / z);
+  });
+  ctx.restore();
+  if(relojCache.size > vivos.size) [...relojCache.keys()].forEach(k => { if(!vivos.has(k)) relojCache.delete(k); });
+  if(relojAnchos.size > 200) relojAnchos.clear();
+}
 function tokenEn(x, y){
   for(let i = disposicion.length - 1; i >= 0; i--){
     const d = disposicion[i];

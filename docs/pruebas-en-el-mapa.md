@@ -3634,3 +3634,16 @@ encantada (los dos íconos), sacarla desde la ficha (la marca se va) y ❄ en la
 - Que la marca **se actualice sola** en una pantalla con el Equipo abierto cuando el encanto llega desde otra (un aliado Support se lo pone).
 - Los **turnos que bajan** en el Mantenimiento (de «quedan 3» a «queda 1») y que la marca se vaya al terminar.
 - Un **arma de dos manos** encantada (marcada en las dos manos) y los otros elementos (⚡ 🧪 ☠ ☀ 🌑) en pantalla.
+
+
+## ⏳ El relojito de las zonas con duración (2026-11-28, P380)
+
+Probado con clics en «Prueba · General» (GM, Jugador 1 y Jugador 2, en narrativo): el Muro de fuego del Mago · Piromante sobre Blanco J1 y J2 (el
+reloj en una casilla libre del muro), una Nube tóxica y una Bomba de humo de prueba, una forma de 1 casilla bajo Blanco J3 (el reloj corrido a la
+esquina) y una forma invisible del GM (el Jugador 1 no ve ni la forma ni el reloj). Con ⟳ Pasar de ronda bajó 3 → 2 → 1 → 0 y cada zona se fue con
+su reloj; «Ver detalle» dice lo mismo.
+**Falta ver:**
+- **Con orden de turnos**: una zona de un creep que baja al empezar SU turno (no al pasar de ronda) y el ⏭ Pasar de ronda.
+- Una **trampa con turnos** de un jugador: el GM no ve el reloj mientras no la descubra; la ve quien la puso.
+- Los **portales** y el **Acelerador** (el reloj debajo del círculo) con el reloj.
+- La **niebla de guerra** tapando el reloj de una zona fuera de la vista del jugador.

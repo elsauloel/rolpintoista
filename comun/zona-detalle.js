@@ -7,6 +7,7 @@
    descripción de la habilidad) lo decide el mapa (vtt-hexgrid/js/127-zona-detalle.js) y llega en `ctx`.
    ZonaDetalle.tiene(el) → ¿hay algo que contar? (zona, trampa, fuego, nube, portal, acelerador)
    ZonaDetalle.armar(el, ctx) → {icono, titulo, esencial, filas: [{k, v, aMano}], descripcion}
+   ZonaDetalle.turnosQuedan(el, {mant, enOrden}) → {quedan, porTurnos} | null (⏳ la cuenta de lo que le queda); relojTexto(q); relojLugar(celdas, o)
    ZonaDetalle.html(m, {glosario, cargando}) → la tarjeta en HTML, con los términos del glosario marcados una sola vez (2026-11-22)
      ctx = {statLabel(id), estadoTexto(spec), elemento (del daño: 'fuego'…), elementoNombre ('fuego'), elementoRes ('al fuego'), quedan, quedanDe ('turnos de X' | ''), sinVencer,
             autor: {nombre, escondido, sinDato}, habilidad, descripcion, descripcionNo (por qué no se muestra), altura, cura: {cura, pulsos},
@@ -372,6 +373,42 @@ const ZonaDetalle = (() => {
       `<div class="zd-pie">Sale de los datos de lo que está puesto en el mapa. «${A_MANO}» = ese dato no está guardado ahí.</div>`;
   }
 
-  return {tiene, armar, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, A_MANO};
+  /* ⏳ Cuántos turnos le quedan a lo puesto en el mapa (2026-11-28, dueño: «que las zonas que están en el mapa por un tiempo determinado muestren un
+     iconito con un reloj de arena que muestre cuántos turnos les queda»). LA cuenta de todo el mapa (el ⏳ del lienzo, el cartel de la casilla, el cartel
+     de arriba y «Ver detalle»), la misma con la que el mapa la borra (vtt-hexgrid/js/07):
+     - sin `venceMant` (o sin Mantenimiento conocido) → null: no vence, no lleva reloj;
+     - quien la puso NO está en el orden de turnos (`o.enOrden` falso) o no guarda `turnos` → lo que falta de Mantenimientos (`venceMant` − el actual):
+       se borra cuando se pasa de ronda ese número de veces (elementosVencidosBarrer);
+     - quien la puso SÍ está en el orden → sus `turnos` (bajan uno al empezar SU turno, zonasDelQueLaTiro). Una trampa (o la zona que dejó) solo se va
+       así; una zona de habilidad, un portal o un Acelerador además se van igual al llegar a `venceMant`: lo que pase primero (P380).
+     o = {mant (el número de Mantenimiento actual), enOrden}. → {quedan, porTurnos} (porTurnos: el número son turnos de quien la puso). */
+  function turnosQuedan(el, o){
+    o = o || {};
+    if(!el || el.venceMant === null || el.venceMant === undefined || o.mant === null || o.mant === undefined) return null;
+    const vm = Math.round(Number(el.venceMant)), mant = Math.round(Number(o.mant));
+    if(!Number.isFinite(vm) || !Number.isFinite(mant)) return null;
+    const porMant = Math.max(0, vm - mant), t = Math.round(Number(el.turnos)) || 0;
+    if(t > 0 && o.enOrden){
+      const soloTurnos = !!el.trampa || (!!el.zona && !el.zonaCasteadorRef);
+      if(soloTurnos || t <= porMant) return {quedan: t, porTurnos: true};
+    }
+    return {quedan: porMant, porTurnos: false};
+  }
+  // El texto del relojito: «⏳ 3».
+  const relojTexto = q => `⏳ ${Math.max(0, Math.round(Number(q)) || 0)}`;
+  /* Dónde va el relojito (2026-11-28): la casilla de la zona más cerca de su centro que no tenga un token a la vista ni el dibujo propio del elemento
+     (la ficha de la trampa, el 🌀, el número del fuego); si están todas ocupadas, en la del medio pero corrido a la esquina de arriba a la derecha
+     (`corrido`), para no tapar el token. o = {centro(c) → {x, y}, ocupada(c) → bool}. → {celda, corrido} (null sin casillas). */
+  function relojLugar(celdas, o){
+    if(!celdas || !celdas.length) return null;
+    const pts = celdas.map(c => ({c, p: o.centro(c)}));
+    const mx = pts.reduce((a, x) => a + x.p.x, 0) / pts.length, my = pts.reduce((a, x) => a + x.p.y, 0) / pts.length;
+    const d = x => (x.p.x - mx) * (x.p.x - mx) + (x.p.y - my) * (x.p.y - my);
+    pts.sort((a, b) => d(a) - d(b) || a.c.col - b.c.col || a.c.fila - b.c.fila);
+    const libre = pts.find(x => !o.ocupada(x.c));
+    return libre ? {celda: libre.c, corrido: false} : {celda: pts[0].c, corrido: true};
+  }
+
+  return {tiene, armar, armarInerte, nombreInerte, notasInerte, cuandoEtiqueta, sinTiradaTexto, frenoDe, frenoCorto, html, turnosQuedan, relojTexto, relojLugar, A_MANO};
 })();
 if(typeof module !== 'undefined' && module.exports) module.exports = ZonaDetalle;

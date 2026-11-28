@@ -3444,3 +3444,19 @@ contorno mismo del efecto de fuego. Lo preferiría así». Lo que se eligió (lo
 4. **Rendimiento**: el contorno y los puntos de las llamas se calculan una vez por zona y se guardan; las lengüetas que caen fuera de la pantalla
    no se arman; quietas con «reducir movimiento» (medido: 0 píxeles cambian en las llamas).
 5. **No cambian**: las nubes (C), la lava, el Escudo elemental de fuego y las zonas comunes.
+
+### P380 — ⏳ El relojito de las zonas: qué número muestra (2026-11-28, Claude, al hacer «Las zonas con duración muestran un relojito»)
+
+El dueño pidió «que las zonas que están en el mapa por un tiempo determinado muestren un iconito con un reloj de arena que muestre cuántos turnos les
+queda». El número sale de la misma cuenta con la que el mapa las borra (`ZonaDetalle.turnosQuedan`, una sola para el lienzo, el cartel de la casilla,
+el de arriba y «Ver detalle»). Lo que se eligió (el dueño puede cambiar cualquiera):
+1. **Sin orden de turnos (narrativo), o si quien la puso no está en el orden**: cuenta las veces que falta **pasar de ronda** (⟳ / ⏭). Es lo que pasa
+   siempre con las nubes de humo y las formas puestas a mano.
+2. **Con quien la puso en el orden de turnos**: son **sus turnos** (baja uno cada vez que empieza su turno, P172). Una zona de habilidad, un portal o el
+   Acelerador además se van igual al llegar a su ronda límite: el reloj muestra **lo que pase primero**. Una trampa (o la zona que dejó) solo cuenta los
+   turnos de quien la puso.
+3. **En su último paso muestra «⏳ 0»**: la zona todavía hace su efecto de esa ronda a quien sigue adentro y después se va (P172, 2026-10-05). Con
+   1 o 0, el reloj se pone rojizo.
+4. **Dónde va**: en la casilla de la zona más cerca de su centro que no tenga un token a la vista ni el dibujo propio (la ficha de la trampa, el 🌀); si
+   están todas ocupadas, en la esquina de arriba a la derecha de la del medio. Del tamaño de la pantalla (entre 11 y 16 px según el zoom).
+5. **Quién lo ve**: el que ve la zona (una trampa sin descubrir o una forma invisible tampoco muestran el reloj); la niebla de guerra lo tapa como a la zona.

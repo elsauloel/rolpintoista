@@ -3489,3 +3489,21 @@ sobre una nube clara o un fondo claro (por el filo) y sobre lo oscuro (por la ra
 Sigue quieta y más fina que la línea de algodón. Se probaron tres mezclas (más o menos filo, más o menos blanco) y se eligió la del medio.
 Abierto: si se siente demasiado blanca o marcada (sobre todo en las nubes oscuras), se puede bajar la mezcla hacia el blanco (0,7 → 0,5) o la
 opacidad (0,9 → 0,75); si todavía no se lee en algún mapa, subir el filo (0,42 → 0,5). Son tres números en esa función.
+
+### P383 — ⏳ El duelo que no se cierra solo: qué cuenta como «algo para usar» y cuándo vuelve a contar (2026-11-28, Claude, al hacer «⚔ Que los duelos no se cierren solos, para poder usar Enyetar», la B)
+
+Lo decidido por el dueño (la B): el cuadro de un duelo terminado se cierra solo a los 20 s (antes 10); si esa pantalla tiene algo para usar sobre ese duelo,
+no se cierra solo hasta que lo use o lo deje pasar. Lo que eligió Claude (lo recomendado), en `comun/duelo.js` (`motivoEspera`, `autoCierreArmar`):
+1. **Qué cuenta**: lo que ofrece la fila «⚡ Entre tiradas» de esa pantalla (la misma función, `filaOpciones`): 😈 Enyetar, 🧚 Golpe de suerte, 🪙 Re-roll
+   (WC-Moneda), 🦋 la Polilla y, para el GM, 🧿 el Mal de ojo. **El 💪 Empower no cuenta** (es para la próxima tirada, no cambia nada de ese duelo). Los
+   botones fijos de arriba no se miran aparte: lo que ofrecen sobre ese duelo ya está en la fila.
+2. **El cartel**: abajo, junto a «Terminar duelo», «⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas»)» con el botón «Dejar pasar»; y la
+   fila se abre sola aunque el duelo sea ajeno (antes quedaba plegada en «⚡ Tenés algo para usar acá»).
+3. **Después de usarlo** (o de tocar «Dejar pasar»), ese duelo ya no espera en esa pantalla: cuando se vuelve a resolver, cuenta sus 20 s como los demás.
+4. **La pausa de la yeta reinicia la cuenta en todas las pantallas**: mientras un duelo está en pausa por Enyetar, el Golpe de suerte o la Moneda, no cuenta;
+   cuando se vuelve a resolver, todas cuentan 20 s desde ahí (antes, como ya habían pasado más de 15 s, quedaba abierto en las demás pantallas).
+5. **Minimizado** sigue esperando (no se cierra); la tira de abajo de un duelo terminado ajeno también quedó en 20 s.
+6. **Sin tope**: si nadie toca nada, el cuadro de quien puede usar algo queda abierto hasta que lo cierre, lo use, o deje de tener con qué (sin SP, otro duelo
+   pasó a ser el último terminado): ahí arranca su cuenta de 20 s.
+Abierto: si molesta que espere aunque la persona no piense usar nada (por ejemplo, Enyetar siempre disponible con mucho SP), se puede poner un tope (por
+ejemplo 60 s) o que espere solo si el duelo es contra un rival al alcance (ya lo es: la fila solo ofrece Enyetar si el enemigo está a tu alcance y a la vista).

@@ -48,9 +48,12 @@ const Duelo = (() => {
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
   // 🏁 (2026-11-18, dueño: «que una vez que un duelo esté terminado, a los 10 segundos se cierre solo… siempre que se pueda reabrir desde la Mesa»):
   // la tira de un duelo terminado se va a los 10 s, y el cuadro terminado se cierra solo a los 10 s (AUTOCIERRE_MS) salvo que lo toquen.
-  const RESUELTO_VISIBLE_MS = 10 * 1000;
-  const AUTOCIERRE_MS = 10 * 1000;
-  let autoCierre = null;   // {id, hasta, quieto, timer, tic} — la cuenta del cuadro terminado que está a la vista
+  // ⏸ (2026-11-28, dueño, la B: «que los duelos no se cierren solos, para poder usar enyetar»): 20 s en vez de 10, y si esta pantalla tiene algo para usar
+  // sobre ese duelo (lo que ofrece la fila «⚡ Entre tiradas»: Enyetar, el Golpe de suerte, la Moneda / WC…), no se cierra solo hasta que lo use o lo deje pasar.
+  const RESUELTO_VISIBLE_MS = 20 * 1000;
+  const AUTOCIERRE_MS = 20 * 1000;
+  let autoCierre = null;   // {id, hasta, quieto, espera, timer, tic} — la cuenta del cuadro terminado que está a la vista (espera = el motivo para no cerrarse)
+  const usoFila = new Set();   // duelos en los que esta pantalla ya usó algo de la fila: después de eso se cierra solo como cualquiera
   const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos', 'rerollUsado', 'resumido'];
 
@@ -353,6 +356,8 @@ const Duelo = (() => {
 .duelo-aceptar{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 34px;font-size:18px;font-weight:800;cursor:pointer;animation:duelo-boton 1.2s ease-in-out infinite alternate}   /* 🤺 el Aceptar del desarme (2026-10-22): un botón de verdad, que titila */
 .duelo-aceptar:disabled{animation:none;opacity:.6;cursor:default}
 .duelo-fin button{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 30px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+.duelo-fin .duelo-espera{color:#ffd25a;font-size:14px;font-weight:700}
+.duelo-fin .duelo-espera button{padding:6px 16px;font-size:14px;margin-left:6px;background:#39435c;border-color:#aab3ca;box-shadow:none;animation:none}
 .duelo-fin.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
 .duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
@@ -3257,7 +3262,7 @@ const Duelo = (() => {
   const esPropio = d => esMio(d.atacante) || esMio(d.defensor) || (soyGM() && ((d.atacante && d.atacante.tipo === 'creep') || (d.defensor && d.defensor.tipo === 'creep')));
   function filaHtml(d, ops){
     if(!ops.length) return '';
-    const propio = esPropio(d), abierta = propio || filaAbierta.has(d.id);
+    const propio = esPropio(d), abierta = propio || filaAbierta.has(d.id) || !!(autoCierre && autoCierre.id === d.id && autoCierre.espera);   // ⏳ esperando que la use: la fila, abierta (P383)
     if(!abierta) return `<div class="duelo-fila ajena"><button type="button" class="duelo-fila-abrir" data-fila-abrir title="Hay algo que podés usar sobre una tirada de este duelo">⚡ Tenés algo para usar acá <small>(${_fmt(ops.length)})</small></button></div>`;
     return `<div class="duelo-fila${propio ? '' : ' ajena'}"><div class="duelo-fila-tit">⚡ Entre tiradas${propio ? '' : ' · <button type="button" class="duelo-fila-cerrar" data-fila-cerrar title="Plegar">▴</button>'}<span>tocá uno y el duelo espera hasta que se resuelva</span></div>
       <div class="duelo-fila-bts">${ops.map((o, i) => `<button type="button" data-fila="${i}"${o.motivoNo ? ' disabled' : ''} title="${_esc(o.titulo || o.sub || '')}"><b>${_esc(o.icono || '⚡')} ${_esc(o.txt)}</b>${o.sub ? `<small>${_esc(o.sub)}</small>` : ''}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div></div>`;
@@ -4261,24 +4266,39 @@ const Duelo = (() => {
   }
 
   /* 🏁 La cuenta del cierre solo (2026-11-18). Arranca únicamente si el duelo terminó mientras esta pantalla lo miraba (hace menos de 15 s): uno viejo
-     reabierto desde la Mesa («🔍 Ver detalle del duelo») para revisarlo no se cierra solo. Tocar el cuadro lo deja abierto; minimizado, igual se cierra. */
-  function autoCierreArmar(d, terminado){
-    if(!terminado){ if(autoCierre && autoCierre.id === d.id) autoCierreParar(); return; }
-    if(autoCierre && autoCierre.id === d.id) return;
-    if(autoCierre) autoCierreParar();
-    const desde = resueltoDesde.get(d.id);
-    if(d.estado === 'resuelto' && !(desde && Date.now() - desde < 15000)) return;
-    const a = {id: d.id, hasta: Date.now() + AUTOCIERRE_MS, quieto: false};
-    a.timer = setTimeout(() => { if(autoCierre === a && !a.quieto){ autoCierreParar(); if(actual && actual.id === a.id) cerrar(); } }, AUTOCIERRE_MS);
+     reabierto desde la Mesa («🔍 Ver detalle del duelo») para revisarlo no se cierra solo. Tocar el cuadro lo deja abierto; minimizado, igual se cierra.
+     ⏸ (2026-11-28, P383) `motivo` = lo que esta pantalla puede usar sobre el duelo (`motivoEspera` de las opciones de la fila): mientras haya, la cuenta
+     queda parada y el cuadro dice «Esperando: podés usar…» con «Dejar pasar»; si deja de haber, vuelve a contar 20 s. Después de usar algo de la fila
+     (`usoFila`), el duelo vuelto a resolver cuenta sus 20 s aunque haya pasado más tiempo y ya no espera. */
+  function autoCierreContar(a){
+    clearTimeout(a.timer); clearInterval(a.tic);
+    a.hasta = Date.now() + AUTOCIERRE_MS;
+    a.timer = setTimeout(() => { if(autoCierre === a && !a.quieto && !a.espera){ autoCierreParar(); if(actual && actual.id === a.id) cerrar(); } }, AUTOCIERRE_MS);
     a.tic = setInterval(() => {
       const el = document.querySelector('#duelo-fondo [data-autocierre]');
-      if(el && autoCierre === a && !a.quieto) el.textContent = autoCierreTxt(a);
+      if(el && autoCierre === a && !a.quieto && !a.espera) el.textContent = autoCierreTxt(a);
     }, 500);
+  }
+  function autoCierreArmar(d, terminado, motivo){
+    if(!terminado){ if(autoCierre && autoCierre.id === d.id) autoCierreParar(); return; }
+    motivo = usoFila.has(d.id) ? '' : (motivo || '');
+    if(autoCierre && autoCierre.id === d.id){
+      const a = autoCierre;
+      if(a.quieto || a.espera === motivo) return;
+      if(motivo){ clearTimeout(a.timer); clearInterval(a.tic); a.espera = motivo; }
+      else { a.espera = ''; autoCierreContar(a); }
+      return;
+    }
+    if(autoCierre) autoCierreParar();
+    const desde = resueltoDesde.get(d.id);
+    if(d.estado === 'resuelto' && !usoFila.has(d.id) && !(desde && Date.now() - desde < 15000)) return;
+    const a = {id: d.id, hasta: Date.now() + AUTOCIERRE_MS, quieto: false, espera: motivo};
     autoCierre = a;
+    if(!motivo) autoCierreContar(a);
   }
   function autoCierreParar(){ if(!autoCierre) return; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic); autoCierre = null; }
   function autoCierreQuieto(){
-    if(!autoCierre || autoCierre.quieto) return;
+    if(!autoCierre || autoCierre.quieto || autoCierre.espera) return;
     autoCierre.quieto = true; clearTimeout(autoCierre.timer); clearInterval(autoCierre.tic);
     const el = document.querySelector('#duelo-fondo [data-autocierre]');
     if(el) el.textContent = 'Queda abierto: cerralo cuando quieras.';
@@ -4286,7 +4306,17 @@ const Duelo = (() => {
   const autoCierreTxt = a => `Se cierra solo en ${Math.max(0, Math.ceil((a.hasta - Date.now()) / 1000))} s · tocá el cuadro para dejarlo abierto (se vuelve a abrir desde la Mesa)`;
   function autoCierreHtml(d){
     if(!autoCierre || autoCierre.id !== d.id) return '';
+    if(autoCierre.espera && !autoCierre.quieto) return `<div class="chico duelo-espera" data-espera style="margin:10px 0 0">⏳ Esperando: ${_esc(autoCierre.espera)} (arriba, en «⚡ Entre tiradas») · <button type="button" class="sec" data-dejar-pasar title="No uso nada: cerrá el cuadro (se vuelve a abrir desde la Mesa)">Dejar pasar</button></div>`;
     return `<div class="chico" data-autocierre style="margin:10px 0 0">${_esc(autoCierre.quieto ? 'Queda abierto: cerralo cuando quieras.' : autoCierreTxt(autoCierre))}</div>`;
+  }
+  /* ⏸ Por qué esta pantalla no deja cerrarse solo un duelo terminado (P383): lo que la fila le ofrece que cambia una tirada de ESE duelo. El Empower no
+     cuenta (es para la próxima tirada, no para este duelo). → '' o «podés usar 😈 Enyetar» / «podés usar 😈 Enyetar o 🧚 Golpe de suerte». */
+  const ESPERA_NOMBRE = {enyetar: '😈 Enyetar', reroll: '🧚 Golpe de suerte', moneda: '🪙 Re-roll (WC-Moneda)', polilla: '🦋 la Polilla', maldeojo: '🧿 Mal de ojo'};
+  function motivoEspera(ops){
+    const vistos = [];
+    (ops || []).forEach(o => { const n = o && !o.motivoNo && ESPERA_NOMBRE[o.clave]; if(n && !vistos.includes(n)) vistos.push(n); });
+    if(!vistos.length) return '';
+    return 'podés usar ' + (vistos.length === 1 ? vistos[0] : vistos.slice(0, -1).join(', ') + ' o ' + vistos[vistos.length - 1]);
   }
   function dibujar(){
     const d = actual && actual.dato;
@@ -4330,7 +4360,8 @@ const Duelo = (() => {
     const nuevoFin = d.estado === 'resuelto' && !desarmando && !esperaContra && !revelado[d.id + ':fin'];
     if(d.estado === 'resuelto' && !desarmando && !esperaContra) revelado[d.id + ':fin'] = true;
     const terminado = (d.estado === 'resuelto' && !desarmando && !esperaContra) || d.estado === 'cancelado';
-    autoCierreArmar(d, terminado);
+    const filaOps = filaOpciones(d);   // ⚡ la fila entre tiradas (A2)
+    autoCierreArmar(d, terminado, motivoEspera(filaOps));   // ⏸ con algo para usar, no se cierra solo (P383)
     const cuentaHtml = autoCierreHtml(d);
     const finHtml = d.estado === 'resuelto' && !desarmando && !esperaContra
       ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button>${cuentaHtml}</div>`
@@ -4338,7 +4369,6 @@ const Duelo = (() => {
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
-    const filaOps = filaOpciones(d);   // ⚡ la fila entre tiradas (A2)
     const mostrarBloqueo = (d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza) && !yetaFrena(d, 'fuerza');
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
@@ -4569,6 +4599,7 @@ const Duelo = (() => {
       let ok = false;
       try{ ok = o.clave === 'moneda' && !o.cerrado ? await filaUsarMoneda(d, o) : !!(cfgEscuchar.usarFila && await cfgEscuchar.usarFila(d, o)); }
       catch(err){ console.error('Duelo: la fila', err); _toast('No se pudo usar: ' + (err.message || err)); }
+      if(ok) usoFila.add(d.id);   // ⏸ ya lo usó: al volver a terminar, se cierra solo como cualquiera (P383)
       if(!ok && actual && actual.dato) dibujar();
     });
     const bfa = f.querySelector('[data-fila-abrir]');
@@ -4580,7 +4611,8 @@ const Duelo = (() => {
     if(bys) bys.onclick = () => { bys.disabled = true; bys.textContent = 'Siguiendo…'; yetaSeguir(d.id, soyGM() ? 'lo decidió el GM' : `${(d.ataque.yeta || {}).porNombre || 'quien la usaba'} lo dejó`)
       .then(ok => { if(!ok) dibujar(); }).catch(err => { console.error(err); _toast('No se pudo seguir el duelo'); bys.disabled = false; }); };
     const bfin = f.querySelector('[data-fin-duelo]');
-    { const caja = f.querySelector('.duelo-caja'); if(caja && autoCierre && autoCierre.id === d.id && !autoCierre.quieto) caja.addEventListener('pointerdown', ev => { if(!ev.target.closest('[data-fin-duelo]')) autoCierreQuieto(); }, {once: true}); }
+    { const bdp = f.querySelector('[data-dejar-pasar]'); if(bdp) bdp.onclick = () => { usoFila.add(d.id); cerrar(); }; }   // ⏸ «Dejar pasar» (P383)
+    { const caja = f.querySelector('.duelo-caja'); if(caja && autoCierre && autoCierre.id === d.id && !autoCierre.quieto && !autoCierre.espera) caja.addEventListener('pointerdown', ev => { if(!ev.target.closest('[data-fin-duelo]')) autoCierreQuieto(); }, {once: true}); }
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
@@ -4851,7 +4883,9 @@ const Duelo = (() => {
   function revisarPasos(){
     const ahora = Date.now();
     listaDuelos.forEach(d => {
-      if(d.estado === 'resuelto' && !resueltoDesde.has(d.id)) resueltoDesde.set(d.id, pasosListo ? ahora : (d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora));
+      // ⏳ (P383) un duelo en pausa por la yeta (Enyetar, Golpe de suerte, Moneda…) vuelve a contar desde que se resuelve de nuevo: así también se cierra solo
+      if(d.estado !== 'resuelto' || enYeta(d)) resueltoDesde.delete(d.id);
+      else if(!resueltoDesde.has(d.id)) resueltoDesde.set(d.id, pasosListo ? ahora : (d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora));
       let vistos = pasosVistos.get(d.id);
       if(!vistos){ vistos = new Set(); pasosVistos.set(d.id, vistos); }
       const nuevos = pasosDe(d).filter(p => !vistos.has(p.clave) && !pasosEnEspera.has(d.id + ':' + p.clave));
@@ -4898,7 +4932,7 @@ const Duelo = (() => {
       if(esDueloYeta(d) && (hijosCerrados.has(d.id) || yetaPadreDe(d))) return;   // 😈 la maldición va adentro del cuadro del otro duelo (A3)
       const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
       if(abierto(d) && ahora - t > VIGENCIA_MS) return;
-      if(d.estado === 'resuelto' && ahora - (resueltoDesde.get(d.id) || t) > RESUELTO_VISIBLE_MS) return;   // a contar desde que se resolvió
+      if(d.estado === 'resuelto' && !enYeta(d) && ahora - (resueltoDesde.get(d.id) || t) > RESUELTO_VISIBLE_MS) return;   // a contar desde que se resolvió
       if(d.estado === 'cancelado') return;
       const abiertoAhora = actual && actual.id === d.id && !actual.min;
       if(abiertoAhora) return;
@@ -5404,5 +5438,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {refiltrarOcultos, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, etqCampo, tiroDe, tiradasDeLado, puedeCambiar, repetirTotal, danoBase, efectosReset, reabrirDeshecho, yetaReclamar, monedaDeshacer, monedaDeshace, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {refiltrarOcultos, motivoEspera, cerrarPar, contraPorHab, contraPrePendiente, contraPreHtml, criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, danoSinRes, cuentaTxt, cuentaHtml, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, enYeta, yetaFrena, yetaPausar, yetaSeguir, yetaMarcar, yetaTipo, parListo, yetaAvisoTxt, esHijoDeYeta, filaOpciones, yetaQueHacer, dueloDeLaYeta, tiradasEnyetables, etqCampo, tiroDe, tiradasDeLado, puedeCambiar, repetirTotal, danoBase, efectosReset, reabrirDeshecho, yetaReclamar, monedaDeshacer, monedaDeshace, ultimoTerminado, ultimoTerminadoAhora, deshacerPlan, deshacerVida, deshacerAtacante, deshacerEstados, estadosDelDuelo, vidaPerdida, generacion, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, guardarMagico, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

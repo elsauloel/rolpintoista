@@ -280,9 +280,17 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
   del fuego. Sigue quieta y más fina que la línea de algodón; una sola pasada más por cuadro (`casillasPunteado`, js/50). Probado en «Prueba · General»
   con los Pedos Tóxicos (violeta), una nube de veneno (verde) y un fuego, sobre el fondo oscuro y sobre un fondo claro de piedra/arena puesto solo en
   la pantalla de la prueba (sin guardar). Duda de estilo: P382.
-- **⬜ en cola (primero) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
+- **✅ hecho (2026-11-28) — ⚔ Que los duelos no se cierren solos, para poder usar Enyetar** (dueño, 2026-11-27, notas de la sesión): «que los duelos no se cierren solos, para poder usar enyetar» (dar tiempo / un botón para cerrarlo, para que entre un Flash como Enyetar). **Ojo (investigado el 2026-11-27, P363):** que el cuadro quede abierto
   no alcanza; lo que frena a Enyetar es que el duelo ya tiró el daño. Va junto con «😈 Enyetar puede reabrir un duelo» (opción A de P363).
   **Decidido (dueño, 2026-11-28): la B**: se sigue cerrando solo pero más tarde (~20 s); si esa pantalla tiene algo para usar en ese duelo (Enyetar, Moneda / WC, Golpe de suerte), no se cierra hasta que lo use o lo deje pasar.
+  *Resultado:* el cuadro de un duelo terminado se cierra solo a los **20 s** (antes 10). En la pantalla que tiene algo para usar sobre ese duelo (lo que
+  ofrece la fila «⚡ Entre tiradas»: 😈 Enyetar, 🧚 Golpe de suerte, 🪙 Re-roll WC-Moneda, 🦋 la Polilla, 🧿 el Mal de ojo del GM; el Empower no cuenta), no
+  se cierra: abajo dice «⏳ Esperando: podés usar 😈 Enyetar (arriba, en «⚡ Entre tiradas»)» con el botón **Dejar pasar**, y la fila se abre sola. Al
+  usarlo, o con Dejar pasar / Terminar duelo, se cierra; si lo usó, cuando el duelo se vuelve a resolver cuenta sus 20 s en todas las pantallas (antes,
+  después de una yeta, quedaba abierto en las demás). Minimizado sigue esperando. Dudas: P383. Probado con clics en «Claude · pruebas 2», «Prueba ·
+  General» (GM, J1, J2; Blanco J2 con Enyetar, Warrior · Hachero contra Blanco J1): GM y J1 se cerraron solos a los ~20 s; J2 siguió esperando a los
+  30 s y minimizado; Dejar pasar lo cerró; usó Enyetar y, al volver a resolverse, las tres pantallas se cerraron a los ~20 s. Pruebas automáticas
+  1220/1220. Sin ver con clics: el Golpe de suerte, la Moneda / WC, la Polilla y el Mal de ojo (`docs/pruebas-en-el-mapa.md`).
 - **⬜ en cola (primero) — ⏳ Ponerle un contador de turnos a las formas colocadas a mano** (dueño, 2026-11-27, notas de la sesión): «poder programarle contador a las formas colocadas manualmente» (Terreno y Formas: que se pueda poner o editar cuántos turnos dura, también después de colocarla).
 - **⬜ en cola (primero) — 🕊️ Mensajes privados entre el GM y los jugadores, en los dos sentidos** (dueño, 2026-11-27, notas de la sesión): «que el gm pueda mandar mensajes privados a los jugadores» y «y vice versa» (que un jugador también le pueda mandar uno privado al GM). Revisar si hoy se puede en cada sentido (🕊️, `/m`, `/r`) y por qué no anduvo en la sesión.
 - **⬜ en cola (primero) — ❤ La barra de vida del token no coincidía con la de la ficha (vida máxima)** (dueño, 2026-11-27, notas de la sesión): «revisar que la barra de hp del token no estaba sincronizada con el hp de la ficha… pasó algo raro con el hp máximo».

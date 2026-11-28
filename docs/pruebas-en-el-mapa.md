@@ -3663,3 +3663,10 @@ y volvió a entrar: el «+1 stack» de siempre.
 - Entrar con un **teletransporte** o un **empujón** a la nube (cuenta como entrar).
 - Una zona con «tirada de la zona» puesta a mano (asistente de zonas, con stat de quien la pone): caminar adentro no la dispara.
 
+
+**⏳ El duelo que espera a que uses algo (2026-11-28, P383)** — probado con clics solo con 😈 Enyetar. Falta ver:
+- Con 🧚 Golpe de suerte (un Support aliado a tu alcance), 🪙 la Moneda Re-Roll / 🃏 WildCard en el cinturón y 🦋 la Polilla: que el cuadro no se cierre
+  solo y diga «Esperando: podés usar …»; al usarlo, que se cierre a los 20 s después de volver a resolverse.
+- El GM con un creep que tenga 🧿 Mal de ojo listo: que su cuadro espere.
+- Enyetar que **gana** (la tirada se repite y el duelo cambia de resultado): que todas las pantallas cuenten 20 s desde la nueva resolución.
+- Restaurar el cuadro minimizado desde su tira y que siga diciendo «Esperando…».
